@@ -303,6 +303,7 @@ class multiLingualUtils
 		{
 			array_push($array, $fieldValueInLang);
 		}
+	}
 
 	public static function getMultiLingualStringArrayFromString($value)
 	{
