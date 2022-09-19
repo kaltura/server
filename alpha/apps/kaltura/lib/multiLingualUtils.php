@@ -266,6 +266,44 @@ class multiLingualUtils
 		return isset(kCurrentContext::$language);
 	}
 	
+
+	public static function getElasticFieldValue($dbObject, $fieldName, $isCommaSeparatedString = false)
+	{
+		$dbValue = $dbObject->getDefaultFieldValue($fieldName);
+		$mapping = self::getMultiLanguageMapping($dbObject);
+		if (!$mapping || ($mapping == ''))
+		{
+			return $dbValue;
+		}
+		return self::getMultiLingualValuesArrayForField($dbValue, $mapping, $fieldName, $isCommaSeparatedString);
+	}
+	
+	protected static function getMultiLingualValuesArrayForField($dbValue, $mapping, $fieldName, $isCommaSeparatedString = false)
+	{
+		$mapping = json_decode($mapping, true);
+		if (!$isCommaSeparatedString)
+		{
+			$multiLingualArray = array($dbValue);
+			self::addValuesToArray($mapping[$fieldName], $multiLingualArray);
+			return $multiLingualArray;
+		}
+		
+		$multiLingualArray = explode(',', $dbValue);
+		foreach ($mapping[$fieldName] as $languageKey => $fieldValueArrInLang)
+		{
+			$fieldValueArrInLang = explode(',', $fieldValueArrInLang);
+			self::addValuesToArray($fieldValueArrInLang, $multiLingualArray);
+		}
+		return $multiLingualArray;
+	}
+	
+	protected static function addValuesToArray($arrayValues, &$array)
+	{
+		foreach ($arrayValues as $languageKey => $fieldValueInLang)
+		{
+			array_push($array, $fieldValueInLang);
+		}
+
 	public static function getMultiLingualStringArrayFromString($value)
 	{
 		$multiLangString = new KalturaMultiLingualString();
