@@ -90,7 +90,7 @@ class multiLingualUtils
 		{
 			if($languageOfFirstItem !== 'default')
 			{
-				throw new KalturaAPIException('Language must be set to MULTI when adding MultiLingualString');
+				throw new KalturaAPIException(KalturaErrors::WRONG_REQUEST_LANGUAGE, $contextLanguage);
 			}
 			$defaultLanguage = $contextLanguage;
 			if (!self::getDefaultLanguage($object) || !$currentMultiLingualMapping)
@@ -261,7 +261,7 @@ class multiLingualUtils
 	{
 		if(!isset($newMapping['default']) && !kCurrentContext::$language)
 		{
-			throw new KalturaAPIException('Language must be set to MULTI when adding MultiLingualString');
+			throw new KalturaAPIException(KalturaErrors::WRONG_REQUEST_LANGUAGE, kCurrentContext::$language);
 		}
 		return isset(kCurrentContext::$language);
 	}
