@@ -46,6 +46,8 @@ class KalturaErrors extends APIErrors
 	
 	// LANGUAGE_CODE - language
 	const INVALID_LANGUAGE_CODE = "INVALID_LANGUAGE_CODE;LANGUAGE_CODE; Invalid language code [\"@LANGUAGE_CODE@\"] - must be a valid 2 char code";
+	
+	const WRONG_REQUEST_LANGUAGE = "WRONG_REQUEST_LANGUAGE;LANGUAGE; Language must be set to MULTI when adding MultiLingualString. Given [\"@LANGUAGE@\"]";
 
 	// PARAM_NAME - parameter name
 	const MISSING_MANDATORY_PARAMETER = "MISSING_MANDATORY_PARAMETER;PARAM_NAME;Missing parameter \"@PARAM_NAME@\"";
