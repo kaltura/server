@@ -1,3 +1,25 @@
+# Rigel-18.15.0
+## Update Entry published to category email event notification template ##
+* Issue Type: Task
+* Issue ID: SUP-33956
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+
+    - deployment/updates/scripts/xml/2022_09_18_addEntryPublishedToSpecificCategoryEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_09_18_deploy_add_email_event_notification_entry_published_to_specific_category.php
+
+Update script:
+
+    - deployment/updates/scripts/xml/2022_09_18_updateEntryPublishedToSpecificCategoryEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_09_18_deploy_update_email_event_notification_entry_published_to_specific_category.php
+
 # Rigel-18.14.0
 ## Add event notification that enables to create dynamic app instance ##
 - Issue Type: Task
@@ -35,27 +57,6 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2022_09_06_update_groupuser_permission.php
-
-## Update Entry published to category email event notification template ##
-* Issue Type: Task
-* Issue ID: SUP-33956
-
-#### Configuration ####
-None.
-
-### Deployment scripts ###
-If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
-First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
-
-Add script:
-
-    - deployment/updates/scripts/xml/2022_09_18_addEntryPublishedToSpecificCategoryEmailNotification.template.xml
-    - php deployment/updates/scripts/2022_09_18_deploy_add_email_event_notification_entry_published_to_specific_category.php
-
-Update script:
-
-    - deployment/updates/scripts/xml/2022_09_18_updateEntryPublishedToSpecificCategoryEmailNotification.template.xml
-    - php deployment/updates/scripts/2022_09_18_deploy_update_email_event_notification_entry_published_to_specific_category.php
 
 # Rigel-18.13.0
 ## Changes to Co-editors or Co-publishers changed email event notification templates ##
