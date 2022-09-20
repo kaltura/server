@@ -1,5 +1,5 @@
 # Rigel-18.15.0
-## Support adding core values to kafka noications ##
+## Support adding values dynamically to kafka notifications ##
 - Issue Type: Task
 - Issue ID: FOUN-702
 
