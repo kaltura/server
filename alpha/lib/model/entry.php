@@ -354,10 +354,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	/**
 	 * @param $v
 	 * @param $fieldName
-	 * @return mixed|string|null
+	 * @return string|null
 	 * @throws KalturaAPIException
 	 *
-	 * This function calculates the value that is to be set in the relevant field in the db (called defaultValue
+	 * This function calculates and returns the value that is going to be set in the relevant field in the db (called defaultValue)
 	 * It also updates the multilingual object of the entry if applicable
 	 */
 	protected function getValueToSetInDbAndUpdateMultiLangObject($v, $fieldName)
