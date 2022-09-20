@@ -351,41 +351,49 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return self::$multiLingualSupportedFields;
 	}
 	
+	/**
+	 * @param $v
+	 * @param $fieldName
+	 * @return mixed|string|null
+	 * @throws KalturaAPIException
+	 *
+	 * This function calculates the value that is to be set in the relevant field in the db (called defaultValue
+	 * It also updates the multilingual object of the entry if applicable
+	 */
+	protected function getValueToSetInDbAndUpdateMultiLangObject($v, $fieldName)
+	{
+		if(is_null($v))
+		{
+			return $v;
+		}
+		$multiLingualValue = (is_string($v)) ? multiLingualUtils::getMultiLingualStringArrayFromString($v)->toObjectsArray() : $v;
+		$dbValue = $multiLingualValue['default'];
+		if (multiLingualUtils::isMultiLingualRequest($multiLingualValue))
+		{
+			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, $fieldName, $multiLingualValue);
+			$dbValue = $defaultValues['defaultValue'];
+			$multiLingualValue = ($fieldName === self::TAGS) ? $this->updateMultiLingualTags($multiLingualValue) : $multiLingualValue;
+			multiLingualUtils::updateMultiLanguageObject($this, $fieldName, $multiLingualValue, $defaultValues);
+		}
+		return $dbValue;
+	}
+	
 	public function setName($v)
 	{
-		$name = $v['default'];
-		if (multiLingualUtils::isMultiLingualRequest($v))
-		{
-			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, self::NAME, $v);
-			$name = $defaultValues['defaultValue'];
-			multiLingualUtils::updateMultiLanguageObject($this, self::NAME, $v, $defaultValues);
-		}
+		$name = $this->getValueToSetInDbAndUpdateMultiLangObject($v, self::NAME);
 		PeerUtils::setExtension($this, $name, self::MAX_NAME_LEN, __FUNCTION__);
 		return $name ? parent::setName(kString::alignUtf8String($name, self::MAX_NAME_LEN)) : null;
 	}
 	
 	public function setDescription ($v)
 	{
-		$description = $v['default'];
-		if (multiLingualUtils::isMultiLingualRequest($v))
-		{
-			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, self::DESCRIPTION, $v);
-			$description = $defaultValues['defaultValue'];
-			multiLingualUtils::updateMultiLanguageObject($this, self::DESCRIPTION, $v, $defaultValues);
-		}
+		$description = $this->getValueToSetInDbAndUpdateMultiLangObject($v, self::DESCRIPTION);
 		return $description ? parent::setDescription($description): null;
 	}
 	
 	public function setTags($tags , $update_db = true )
 	{
-		$newTags = $tags['default'];
-		if (multiLingualUtils::isMultiLingualRequest($tags))
-		{
-			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, self::TAGS, $tags);
-			$newTags = $defaultValues['defaultValue'];
-			$updatedMultiLingualTags = $this->updateMultiLingualTags($tags);
-			multiLingualUtils::updateMultiLanguageObject($this, self::TAGS, $updatedMultiLingualTags, $defaultValues);
-		}
+		$newTags = $this->getValueToSetInDbAndUpdateMultiLangObject($tags, self::TAGS);
 		if ($newTags)
 		{
 			if($this->tags !== $newTags)
