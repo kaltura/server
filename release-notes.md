@@ -1,5 +1,5 @@
 # Rigel-18.15.0
-## Support adding custom values values to kafka notifications ##
+## Support adding values dynamically to kafka notifications ##
 - Issue Type: Task
 - Issue ID: FOUN-702
 
