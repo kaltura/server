@@ -325,6 +325,16 @@ class entryPeer extends BaseentryPeer
 		return $res;
 	}
 
+	public static function retrieveByPKsAndFilterResults($pks, $con = null)
+	{
+		KalturaCriterion::disableTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
+		self::$filterResults = true;
+		$res = parent::retrieveByPKs($pks, $con);
+		self::$filterResults = false;
+		KalturaCriterion::restoreTags(array(KalturaCriterion::TAG_ENTITLEMENT_ENTRY, KalturaCriterion::TAG_WIDGET_SESSION));
+		return $res;
+	}
+
 	/**
 	 * Retrieves array of entries with referenceId $v
 	 * @param string $v
