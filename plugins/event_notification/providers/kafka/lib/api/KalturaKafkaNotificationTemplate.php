@@ -34,8 +34,12 @@ class KalturaKafkaNotificationTemplate extends KalturaEventNotificationTemplate
 	 */
 	public $apiObjectType;
 	
-	
-	private static $map_between_objects = array('topicName', 'partitionKey', 'messageFormat', 'apiObjectType');
+	private static $map_between_objects = array(
+		'topicName',
+		'partitionKey',
+		'messageFormat',
+		'apiObjectType',
+	);
 	
 	public function __construct()
 	{

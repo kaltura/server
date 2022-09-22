@@ -122,7 +122,21 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		
 		$apiObjectType = $this->getApiObjectType();
 		$apiObject = call_user_func(kCurrentContext::$serializeCallback, $object, $apiObjectType, 1);
+		$apiObject = json_decode($apiObject, true);
 		
+		$apiObjectAdditionalParams = $this->getContentParameters();
+		foreach ($apiObjectAdditionalParams as $apiObjectAdditionalParam)
+		{
+			/* @var $apiObjectAdditionalParam kEventNotificationParameter */
+			$value = $apiObjectAdditionalParam->getValue();
+			if($scope && $value instanceof kStringField)
+				$value->setScope($scope);
+			
+			$key = $apiObjectAdditionalParam->getKey();
+			$apiObject[$key] = $value->getValue();
+		}
+		
+		$apiObject = json_encode($apiObject);
 		$msg = array(
 			"uniqueId" => (string)new UniqueId(),
 			"eventTime" => date('Y-m-d H:i:s'),

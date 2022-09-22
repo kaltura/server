@@ -16,6 +16,12 @@ class kCurrentContext
 	public static $ks_object;
 	
 	/**
+	 * language code (2char) of the returned object
+	 * @var string
+	 */
+	public static $language;
+	
+	/**
 	 * @var string
 	 */
 	public static $ks_hash;
@@ -306,5 +312,10 @@ class kCurrentContext
 			kCurrentContext::$ks_kuser_id = 0;
 			
 		return kCurrentContext::$ks_kuser_id;
+	}
+	
+	public static function getLanguage()
+	{
+		return kCurrentContext::$language;
 	}
 }

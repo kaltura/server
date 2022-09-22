@@ -220,7 +220,7 @@ class KalturaRequestDeserializer
 		return $this->buildObject($typeReflector, $this->paramsGrouped[$paramName], $paramName);
 	}
 	
-	protected function validateParameter($name, &$value, $constraintsObj) {
+	protected function validateParameter($name, &$value, $constraintsObj, $class = null) {
 		$constraints = $constraintsObj->getConstraints();
 		if(array_key_exists(KalturaDocCommentParser::MIN_LENGTH_CONSTRAINT, $constraints))
 			$this->validateMinLength($name, $value, $constraints[KalturaDocCommentParser::MIN_LENGTH_CONSTRAINT]);
@@ -232,6 +232,28 @@ class KalturaRequestDeserializer
 			$this->validateMaxValue($name, $value, $constraints[KalturaDocCommentParser::MAX_VALUE_CONSTRAINT]);
 		if(array_key_exists(KalturaDocCommentParser::UTF8_TRUNCATE, $constraints))
 			$this->truncateUTF8String($name,$value, $constraints[KalturaDocCommentParser::UTF8_TRUNCATE]);
+		if($this->isMultiLingualString($name, $class))
+		{
+			$this->validateMultiLingualLanguageCode($name, $value);
+		}
+	}
+	
+	protected function isMultiLingualString($name, $class = null)
+	{
+		return ($class && $class === 'KalturaMultiLingualString');
+	}
+	
+	protected function validateMultiLingualLanguageCode($name, &$value)
+	{
+		if ($name === 'language')
+		{
+			$upperCase2charLanguageCode = strtoupper($value);
+			if(!languageCodeManager::getLanguageKey($upperCase2charLanguageCode))
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_LANGUAGE_CODE, $value);
+			}
+			$value = $upperCase2charLanguageCode;
+		}
 	}
 	
 	protected function validateMinLength($name, $objectValue, $constraint) {
@@ -330,7 +352,7 @@ class KalturaRequestDeserializer
 				$value = $this->castSimpleType($type, $value);
 				if(!kXml::isXMLValidContent($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
-				$this->validateParameter($name, $value, $property);
+				$this->validateParameter($name, $value, $property, $class);
 				$obj->$name = $value;
 				continue;
 			}
@@ -366,7 +388,7 @@ class KalturaRequestDeserializer
 				continue;
 			}
 			
-			if ($property->isArray() && is_array($value))
+			if (($property->isArray() && is_array($value)) || ($property->isArray() && $type == 'KalturaMultiLingualStringArray' && !is_array($value)))
 			{
 				$arrayObj = new $type();
 				if($property->isAssociativeArray())
@@ -389,6 +411,10 @@ class KalturaRequestDeserializer
 					}
 				}
 				$obj->$name = $arrayObj;
+				if ($type == 'KalturaMultiLingualStringArray' && !is_array($value))
+				{
+					$this->generateMultiLingualStringFromString($obj, $name, $value);
+				}
 				continue;
 			}
 			
@@ -406,6 +432,18 @@ class KalturaRequestDeserializer
 			}
 		}
 		return $obj;
+	}
+	
+	/**
+	 * This function creates a KalturaMultiLingualStringArray that reflects the value of the string that was received in the call
+	 *
+	 * @param $object an object supporting multi-lingual strings
+	 * @param $fieldName the name of the supported field
+	 * @param $value the value of the supported field
+	 */
+	protected function generateMultiLingualStringFromString(&$object, $fieldName, $value)
+	{
+		$object->$fieldName = multiLingualUtils::getMultiLingualStringArrayFromString($value);
 	}
 	
 	private function castSimpleType($type, $var)
