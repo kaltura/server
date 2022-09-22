@@ -41,14 +41,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 			}
 
 			$userFilter = new KalturaUserFilter();
-			if(count($categoryUserIds) == 1)
-			{
-				$userFilter->idIn = $categoryUserIds[0];
-			}
-			else
-			{
-				$userFilter->idIn = implode(',', $categoryUserIds);
-			}
+			$userFilter->idIn = implode(',', $categoryUserIds);
 			$userList = KBatchBase::$kClient->user->listAction($userFilter, $userPager);
 
 			foreach ($userList->objects as $user)
@@ -64,19 +57,10 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 						return $recipients;
 					}
 				}
+
 				else if($user->type == KalturaUserType::GROUP)
 				{
-					$groupUserIds = $this->getGroupUserIds($user->id);
-					if(!$groupUserIds)
-					{
-						break;
-					}
-
-					$groupUsers = $this->getUsersByUserIds($groupUserIds);
-					if(!$groupUsers)
-					{
-						break;
-					}
+					$groupUsers = $this->getUsersOfGroupByGroupId($user->id);
 
 					foreach($groupUsers as $groupUser)
 					{

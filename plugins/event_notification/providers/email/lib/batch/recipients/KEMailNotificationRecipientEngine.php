@@ -37,51 +37,16 @@ abstract class KEmailNotificationRecipientEngine
 	 */
 	abstract function getRecipients (array $contentParameters);
 
-	protected function getUsersByUserIds($userIds)
-	{
-		$userFilter = new KalturaUserFilter();
-		$pager = new KalturaFilterPager();
-		$maxIdIn = 150;
-		$pager->pageSize = $maxIdIn;
-		$idsArray = explode(',', $userIds);
-		$offset = 0;
-		$usersListResponse = array();
-		$allUsers = array();
-
-		while($offset * $maxIdIn < count($idsArray))
-		{
-			$currentUserArrIds = array_slice($idsArray, $offset * $maxIdIn, $maxIdIn);
-			if(count($currentUserArrIds) == 1)
-			{
-				$currentUserStrIds = $currentUserArrIds[0];
-			}
-			else
-			{
-				$currentUserStrIds = implode(',',$currentUserArrIds);
-			}
-			$userFilter->idIn = $currentUserStrIds;
-			$usersListResponse[] = (KBatchBase::$kClient->user->listAction($userFilter, $pager))->objects;
-			$allUsers = array_merge($allUsers, $usersListResponse[$offset]);
-			$offset++;
-		}
-
-		if(!(count($allUsers) > 0))
-		{
-			return null;
-		}
-
-		return $allUsers;
-	}
-
-	protected function getGroupUserIds($groupId)
+	protected function getUsersOfGroupByGroupId($groupId)
 	{
 		$groupFilter = new KalturaGroupUserFilter();
 		$groupFilter->groupIdEqual = $groupId;
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
+		$userFilter = new KalturaUserFilter();
 
 		$groupUserList = KBatchBase::$kClient->groupUser->listAction($groupFilter, $pager);
-		if(!($groupUserList->totalCount > 0))
+		if(!($groupUserList->totalCount))
 		{
 			return null;
 		}
@@ -92,8 +57,29 @@ abstract class KEmailNotificationRecipientEngine
 			$groupUserIds[]= $user->userId;
 		}
 
-		$groupUserIdsString = implode(',',$groupUserIds);
+		$maxIdInQueryChunk = 150;
+		$pager->pageSize = $maxIdInQueryChunk;
+		$offset = 0;
+		$index = 0;
+		$usersListResponse = array();
+		$allUsers = array();
 
-		return $groupUserIdsString;
+		while($offset < count($groupUserIds))
+		{
+			$currentUserArrIds = array_slice($groupUserIds, $offset, $maxIdInQueryChunk);
+			$currentUserStrIds = implode(',',$currentUserArrIds);
+			$userFilter->idIn = $currentUserStrIds;
+			$usersListResponse[] = (KBatchBase::$kClient->user->listAction($userFilter, $pager))->objects;
+			$allUsers = array_merge($allUsers, $usersListResponse[$index]);
+			$offset += $maxIdInQueryChunk;
+			$index++;
+		}
+
+		if(!(count($allUsers) > 0))
+		{
+			return null;
+		}
+
+		return $allUsers;
 	}
 }

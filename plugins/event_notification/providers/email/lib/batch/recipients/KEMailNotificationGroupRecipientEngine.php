@@ -18,14 +18,7 @@ class KEMailNotificationGroupRecipientEngine extends  KEmailNotificationRecipien
 		}
 		
 		$recipients = array();
-		
-		$groupUserIds = $this->getGroupUserIds($groupId);
-		if(!$groupUserIds)
-			return $recipients;
-		
-		$groupUsers = $this->getUsersByUserIds($groupUserIds);
-		if(!$groupUsers)
-			return $recipients;
+		$groupUsers = $this->getUsersOfGroupByGroupId($groupId);
 		
 		foreach($groupUsers as $groupUser)
 		{
