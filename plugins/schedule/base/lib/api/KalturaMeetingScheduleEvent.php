@@ -12,6 +12,8 @@ class KalturaMeetingScheduleEvent extends KalturaEntryScheduleEvent
 	 * @var int
 	 */
 	public $preStartTime;
+
+	const MAX_DURATION_DAYS = 3;
 	
 	private static $map_between_objects = array
 	(
@@ -46,5 +48,15 @@ class KalturaMeetingScheduleEvent extends KalturaEntryScheduleEvent
 	public function getScheduleEventType ()
 	{
 		return ScheduleEventType::MEETING;
+	}
+
+	protected function getScheduleEventMaxDuration()
+	{
+		return self::MAX_DURATION_DAYS * kTimeConversion::DAYS;
+	}
+
+	protected function getSingleScheduleEventMaxDuration()
+	{
+		return $this->getScheduleEventMaxDuration();
 	}
 }
