@@ -10,6 +10,27 @@
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/2022_09_15_deploy_update_kuser_kafka_notifications.php
 
+## Update Entry published to category email event notification template ##
+* Issue Type: Task
+* Issue ID: SUP-33956
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+
+    - deployment/updates/scripts/xml/2022_09_18_addEntryPublishedToSpecificCategoryEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_09_18_deploy_add_email_event_notification_entry_published_to_specific_category.php
+
+Update script:
+
+    - deployment/updates/scripts/xml/2022_09_18_updateEntryPublishedToSpecificCategoryEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_09_18_deploy_update_email_event_notification_entry_published_to_specific_category.php
+
 # Rigel-18.14.0
 ## Add event notification that enables to create dynamic app instance ##
 - Issue Type: Task
