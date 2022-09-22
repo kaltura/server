@@ -275,16 +275,16 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		{
 		    if($recipientsBcc)
 		    {
-				$recipients =  array_slice($recipientsBcc, $recipientsBccHandledCounter, $recipientsBccBulk);
+		    		$recipients =  array_slice($recipientsBcc, $recipientsBccHandledCounter, $recipientsBccBulk);
 
 				foreach ($recipients as $email=>$name)
 				{
-			    	$recipientsBccHandledCounter++;
-			    	if(filter_var($email, FILTER_VALIDATE_EMAIL))
-			    	{
+					$recipientsBccHandledCounter++;
+			    		if(filter_var($email, FILTER_VALIDATE_EMAIL))
+			    		{
 						KalturaLog::info("Adding recipient to BCC recipients $name<$email> , Index:$recipientsBccHandledCounter");
 						self::$mailer->AddBCC($email, $name);
-			    	}
+			    		}
 				}
 		    }
 
@@ -294,10 +294,10 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 				$success = $this::$mailer->Send();
 				if (!$success)
 				{
-			    	throw new kTemporaryException("Sending mail failed: " . $this::$mailer->ErrorInfo);
+			    		throw new kTemporaryException("Sending mail failed: " . $this::$mailer->ErrorInfo);
 				}
 		    }
-			catch(Exception $e)
+		    catch(Exception $e)
 		    {
 				throw new kTemporaryException("Sending mail failed with exception: " . $e->getMessage(), $e->getCode());
 		    }
