@@ -1,4 +1,13 @@
 # Rigel-18.15.0
+
+## Add new extended status enum values for Quiz user entries ## 
+- Issue Type: Task
+- Issue ID: ILMS-287
+
+### Deployment scripts ###  
+Client generation required.
+
+
 ## Support adding values dynamically to kafka notifications ##
 - Issue Type: Task
 - Issue ID: FOUN-702

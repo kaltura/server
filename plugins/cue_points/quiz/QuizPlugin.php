@@ -71,30 +71,25 @@ class QuizPlugin extends BaseCuePointPlugin implements IKalturaCuePoint, IKaltur
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
-			return array('QuizCuePointType','QuizUserEntryType',"QuizUserEntryStatus","QuizEntryCapability","QuizReportType","QuizCuePointMetadataObjectType");
-		if ($baseEnumName == 'CuePointType')
-			return array('QuizCuePointType');
-		if ($baseEnumName == "UserEntryType")
-		{
-			return array("QuizUserEntryType");
-		}
-		if ($baseEnumName == "UserEntryStatus")
-		{
-			return array("QuizUserEntryStatus");
-		}
-		if ($baseEnumName == 'EntryCapability')
-		{
-			return array("QuizEntryCapability");
-		}
-		if ($baseEnumName == 'ReportType')
-		{
-			return array("QuizReportType");
-		}
-		if ($baseEnumName == 'MetadataObjectType')
-		{
-			return array('QuizCuePointMetadataObjectType');
-		}
+			return array('QuizCuePointType','QuizUserEntryType','QuizUserEntryStatus','QuizEntryCapability','QuizReportType','QuizCuePointMetadataObjectType', 'QuizUserEntryExtendedStatus');
 
+		switch($baseEnumName)
+		{
+			case 'CuePointType':
+				return array('QuizCuePointType');
+			case 'UserEntryType':
+				return array('QuizUserEntryType');
+			case 'UserEntryStatus':
+				return array('QuizUserEntryStatus');
+			case 'EntryCapability':
+				return array('QuizEntryCapability');
+			case 'ReportType':
+				return array('QuizReportType');
+			case 'MetadataObjectType':
+				return array('QuizCuePointMetadataObjectType');
+			case 'UserEntryExtendedStatus':
+				return array('QuizUserEntryExtendedStatus');
+		}
 
 		return array();
 	}
