@@ -37,7 +37,7 @@ class TagFilter extends baseObjectFilter
         	"_in_instance_count",
 			) , NULL );
 
-		$this->allowed_order_fields = array ("instance_count");
+		$this->allowed_order_fields = array ("instance_count", "created_at");
         
     }
 

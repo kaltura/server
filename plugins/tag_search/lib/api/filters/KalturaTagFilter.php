@@ -47,6 +47,8 @@ class KalturaTagFilter extends KalturaFilter
 	(
 		"+instanceCount" => "+instance_count",
 	    "-instanceCount" => "-instance_count",
+        "+createdAt" => "+created_at",
+        "-createdAt" => "-created_at",
 	);
 
 	public function getMapBetweenObjects()
