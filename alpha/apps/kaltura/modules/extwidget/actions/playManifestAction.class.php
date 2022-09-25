@@ -1143,6 +1143,19 @@ class playManifestAction extends kalturaAction
 		if(!$this->deliveryProfile)
 			return null;
 
+		// temporary workaround till adding caption as asset for the live entry
+		if ($this->deliveryProfile->getShouldRedirect() && $this->entry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY)){
+			KalturaLog::info("Entry has capability of schedule and redirect on DP is true for entry: " . $this->entry->getId());
+			$events = $this->entry->getScheduleEvents(time(), time() + 10);
+			$features = $events ? $events[0]->getLiveFeatures() : array();
+			foreach ($features as $feature) {
+				if ($feature instanceof LiveCaptionFeature) {
+					KalturaLog::info("Entry has live caption feature - overriding specific flavors ");
+					$this->deliveryAttributes->setFlavorParamIds(array());
+				}
+			}
+		}
+
 		$this->updateDeliveryAttributes();
 		$this->deliveryProfile->setDynamicAttributes($this->deliveryAttributes);
 		return $this->deliveryProfile->serve();
