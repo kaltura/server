@@ -573,20 +573,16 @@ class embedPlaykitJsAction extends sfAction
 		$last_uiconf_content = (is_array($uiconfs_content) && reset($uiconfs_content)) ? reset($uiconfs_content) : null;
 		$last_uiconf_config = isset($last_uiconf_content) ? $last_uiconf_content->getConfig() : '';
 		$productVersion = isset($last_uiconf_content) ? $this->getProductVersionFromUiConf($last_uiconf_content->getConfVars()) : null;
-		$collectionId = isset($last_uiconf_content) ? $this->getCollectionId($last_uiconf_content->getConfVars()) : null;
-		return array($last_uiconf_config, $productVersion, $collectionId ? array($collectionId => $productVersion) : array());
+		return array($last_uiconf_config, $productVersion);
 	}
 
 	private function getConfigByVersion($version){
 		$config = array();
 		$corePackages = array();
 		$productVersion = null;
-		$collectionMaps = array();
 		foreach ($this->uiConfTags as $tag) {
 			$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
-			list($versionLastUiConf,$tagVersionNumber, $collectionMap) = $this->getLastConfig($versionUiConfs);
-			$collectionMaps = array_merge($collectionMaps, $collectionMap);
-			
+			list($versionLastUiConf,$tagVersionNumber) = $this->getLastConfig($versionUiConfs);
 			$versionConfig = json_decode($versionLastUiConf, true);
 			if (is_array($versionConfig)) {
 				$config = array_merge($config, $versionConfig);
@@ -596,7 +592,7 @@ class embedPlaykitJsAction extends sfAction
 				$productVersion = $tagVersionNumber;
 			}
 		}
-		return array($config,$productVersion,$corePackages,$collectionMaps);
+		return array($config,$productVersion,$corePackages);
 	}
 
 	private function maybeAddAnalyticsPlugins()
@@ -647,9 +643,9 @@ class embedPlaykitJsAction extends sfAction
 
 		if ($isLatestVersionRequired || $isBetaVersionRequired || $isCanaryVersionRequired) {
 
-			list($latestVersionMap, $latestProductVersion, $corePackages, $latestCollectionMap) = $this->getConfigByVersion("latest");
-			list($betaVersionMap, $betaProductVersion, $betaCorePackages, $betaCollectionMap) = $this->getConfigByVersion("beta");
-			list($canaryVersionMap, $canaryProductVersion, $canaryPackages, $canaryCollectionMap) = $this->getConfigByVersion("canary");
+			list($latestVersionMap, $latestProductVersion, $corePackages) = $this->getConfigByVersion("latest");
+			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
+			list($canaryVersionMap, $canaryProductVersion) = $this->getConfigByVersion("canary");
 
 			foreach ($this->bundleConfig as $key => $val)
 			{
@@ -701,12 +697,6 @@ class embedPlaykitJsAction extends sfAction
 		$productVersionJson = isset($productVersionString) ? json_decode($productVersionString) : null;
 		$productVersion = $productVersionJson ? $productVersionJson->version : null;
 		return $productVersion;
-	}
-	
-	private function getCollectionId($confVars)
-	{
-		$confVarsJson = isset($confVars) ? json_decode($confVars) : null;
-		return ($confVarsJson && isset($confVarsJson->collectionId)) ? $confVarsJson->collectionId : null;
 	}
 
 	private function initMembers()
