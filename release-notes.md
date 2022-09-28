@@ -5,7 +5,7 @@
 - Issue ID: ILMS-287
 
 ### Deployment scripts ###  
-php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
 Client generation required.
 
 
