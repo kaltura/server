@@ -132,7 +132,7 @@ class multiLingualUtils
 		{
 			foreach ($valueToAdd as $languageKey => $languageValue)
 			{
-				if ($multiLingualMapping[$field][$languageKey] != $languageValue)
+				if (!isset($multiLingualMapping[$field][$languageKey]) || $multiLingualMapping[$field][$languageKey] != $languageValue)
 				{
 					$multiLingualMapping[$field][$languageKey] = $languageValue;
 				}
