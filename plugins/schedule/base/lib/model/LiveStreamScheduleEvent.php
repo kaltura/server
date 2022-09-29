@@ -219,6 +219,12 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 				$liveEntry->addCapability(LiveEntry::SIMULIVE_CAPABILITY);
 				$shouldSave = true;
 			}
+			if ($this->getLiveFeatures() && !$liveEntry->hasCapability(LiveEntry::LIVE_FEATURE_CAPABILITY))
+			{
+				$liveEntry->addCapability(LiveEntry::LIVE_FEATURE_CAPABILITY);
+				$shouldSave = true;
+			}
+
 			if ($shouldSave)
 			{
 				$liveEntry->save($con);
