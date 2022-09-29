@@ -533,7 +533,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		}
 		$requestLanguage = kCurrentContext::getLanguage();
 		
-		multiLingualUtils::setCorrectLanguageValuesInResponse($this, $sourceObject, $requestLanguage);
+		multiLingualUtils::setCorrectLanguageValuesInResponse($this, $sourceObject, $requestLanguage, $responseProfile);
 	}
 	
 	public function validateObjectsExist(entry $sourceObject = null)

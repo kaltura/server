@@ -184,21 +184,21 @@ class multiLingualUtils
 		$object->putInCustomData(self::MULTI_LINGUAL, $value);
 	}
 	
-	public static function setCorrectLanguageValuesInResponse(&$responseObject, $dbObject, $requestLanguage = null)
+	public static function setCorrectLanguageValuesInResponse(&$responseObject, $dbObject, $requestLanguage = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$multiLanguageMap = json_decode(self::getMultiLanguageMapping($dbObject), true);
 		if (strtolower($requestLanguage) === self::MULTI)
 		{
 			
-			self::setMultiLanguageStringInField($responseObject, $dbObject, $multiLanguageMap);
+			self::setMultiLanguageStringInField($responseObject, $dbObject, $multiLanguageMap, $responseProfile);
 		}
 		else
 		{
-			self::setRequestedLanguageStringInField($responseObject, $dbObject, $multiLanguageMap, $requestLanguage);
+			self::setRequestedLanguageStringInField($responseObject, $dbObject, $multiLanguageMap, $requestLanguage, $responseProfile);
 		}
 	}
 	
-	protected static function setMultiLanguageStringInField(&$responseObject, $dbObject, $multiLanguageMap)
+	protected static function setMultiLanguageStringInField(&$responseObject, $dbObject, $multiLanguageMap, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		if(!$multiLanguageMap)
 		{
@@ -208,6 +208,10 @@ class multiLingualUtils
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		foreach ($supportedFields as $fieldName)
 		{
+			if (!$responseObject->shouldGet($fieldName, $responseProfile))
+			{
+				continue;
+			}
 			if ($responseObject->$fieldName)
 			{
 				$multiLanguageMap[$fieldName][$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
@@ -216,13 +220,17 @@ class multiLingualUtils
 		}
 	}
 	
-	protected static function setRequestedLanguageStringInField(&$responseObject, $dbObject, $newMultiLingualMapping, $requestLanguage = null)
+	protected static function setRequestedLanguageStringInField(&$responseObject, $dbObject, $newMultiLingualMapping, $requestLanguage = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$language = $requestLanguage ? $requestLanguage : self::getDefaultLanguage($dbObject);
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		$supportedFieldsInRequestedLang = array();
 		foreach ($supportedFields as $fieldName)
 		{
+			if (!$responseObject->shouldGet($fieldName, $responseProfile))
+			{
+				continue;
+			}
 			$supportedFieldsInRequestedLang[$fieldName] = self::getFieldValueByLanguage($newMultiLingualMapping, $fieldName, $language);
 			
 			$responseObject->$fieldName = ($supportedFieldsInRequestedLang[$fieldName] && $supportedFieldsInRequestedLang[$fieldName] !== '') ?
