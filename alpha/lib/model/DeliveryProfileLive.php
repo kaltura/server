@@ -145,11 +145,12 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 		foreach($streams as $stream)
 		{
-			if ($stream->getCodec() == 2001) // WEBVTT
+			if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
 			{
 				KalturaLog::debug("Stream has live caption - redirecting to live packager");
 				$this->shouldRedirect = true;
 				$this->getDynamicAttributes()->setFlavorParamIds(array());
+				break;
 			}
 		}
 
