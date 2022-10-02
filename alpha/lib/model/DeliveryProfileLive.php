@@ -142,7 +142,17 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		$streams = $liveEntryServerNode->getStreams();
 		$this->sanitizeAndFilterStreamIdsByBitrate($streams);
-		
+
+		foreach($streams as $stream)
+		{
+			if ($stream->getCodec() == 2001) // WEBVTT
+			{
+				KalturaLog::debug("Stream has live caption - redirecting to live packager");
+				$this->shouldRedirect = true;
+				$this->getDynamicAttributes()->setFlavorParamIds(array());
+			}
+		}
+
 		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
 		
