@@ -321,4 +321,16 @@ class multiLingualUtils
 		$multiLangStringArr = new KalturaMultiLingualStringArray();
 		return $multiLangStringArr->fromDbArray(array($multiLangString->language => $multiLangString->value));
 	}
+	
+	public static function copyMultiLingualValues(&$target, $source)
+	{
+		if ($defaultLanguage = self::getDefaultLanguage($source))
+		{
+			self::setDefaultLanguage($target, $defaultLanguage);
+		}
+		if ($multiLingualMapping = self::getMultiLanguageMapping($source))
+		{
+			self::setMultiLanguageMapping($target, $multiLingualMapping);
+		}
+	}
 }
