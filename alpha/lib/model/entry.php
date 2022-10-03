@@ -367,7 +367,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return $v;
 		}
 		$multiLingualValue = (is_string($v)) ? multiLingualUtils::getMultiLingualStringArrayFromString($v)->toObjectsArray() : $v;
-		$dbValue = $multiLingualValue['default'];
+		$dbValue = isset($multiLingualValue['default']) ? $multiLingualValue['default'] : null;
 		if (multiLingualUtils::isMultiLingualRequest($multiLingualValue))
 		{
 			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, $fieldName, $multiLingualValue);
