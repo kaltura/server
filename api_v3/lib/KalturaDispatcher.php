@@ -7,8 +7,9 @@ class KalturaDispatcher
 {
 	private static $instance = null;
 	private $arguments = null;
-
+	
 	const OWNER_ONLY_OPTION = "ownerOnly";
+
 	/**
 	 * Return a KalturaDispatcher instance
 	 *
@@ -66,7 +67,7 @@ class KalturaDispatcher
         {
              throw new Exception("Could not create action reflector for service [$service], action [$action]. Received error: ". $e->getMessage());
         }
-        
+		
 		$actionParams = $actionReflector->getActionParams();
 		$actionInfo = $actionReflector->getActionInfo();
 		// services.ct - check if partner is allowed to access service ...
@@ -76,6 +77,13 @@ class KalturaDispatcher
 		kCurrentContext::$service = $serviceActionItem->serviceInfo->serviceName;
 		kCurrentContext::$action =  $action;
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
+		if (isset($params['language']) &&
+			(strtolower($params['language']) !== multiLingualUtils::MULTI) &&
+			!languageCodeManager::getLanguageKey(strtoupper($params['language'])))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_LANGUAGE_CODE, $params['language']);
+		}
+		kCurrentContext::$language = isset($params['language']) ? strtoupper($params['language']) : null;
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 
 		if (!KalturaResponseCacher::rateLimit($service, $action, $params, kCurrentContext::$partner_id, kCurrentContext::$ks_partner_id))
@@ -121,7 +129,7 @@ class KalturaDispatcher
 		
 		// initialize the service before invoking the action on it
 		// action reflector will init the service to maintain the pluginable action transparency
-		$actionReflector->initService($responseProfile);
+		$actionReflector->initService($responseProfile, $this->arguments, $actionParams);
 		
 		$invokeStart = microtime(true);
 		KalturaLog::debug("Invoke start");
@@ -150,7 +158,6 @@ class KalturaDispatcher
 		return $res;
 	}
 	
-
 	/**
 	 * @param string $objectClass
 	 * @param string $objectId

@@ -32,7 +32,7 @@ class kParentChildEntryUtils
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 		// verify access to the relevant entries - either same partner as the KS or kaltura network
 		$ids = entryPeer::filterEntriesByPartnerOrKalturaNetwork($entryIds, kCurrentContext::getCurrentPartnerId());
-		$entries = entryPeer::retrieveByPKs($ids);
+		$entries = entryPeer::retrieveByPKsAndFilterResults($ids);
 		$parentEntryIds = array();
 		foreach ($entries as $entry)
 		{

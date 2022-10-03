@@ -987,7 +987,10 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		// create a default name if none was given
 		if (!$entry->name && !($dbEntry && $dbEntry->getName()))
-			$entry->name = $this->getPartnerId().'_'.time();
+		{
+			$generatedName = $this->getPartnerId() . '_' . time();
+			$entry->name = multiLingualUtils::getMultiLingualStringArrayFromString($generatedName);
+		}
 			
 		if ($entry->licenseType === null)
 			$entry->licenseType = KalturaLicenseType::UNKNOWN;

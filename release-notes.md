@@ -1,3 +1,36 @@
+# Rigel-18.15.0
+## Support adding values dynamically to kafka notifications ##
+- Issue Type: Task
+- Issue ID: FOUN-702
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2022_09_15_update_kafka_kuser_notifications.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2022_09_15_deploy_update_kuser_kafka_notifications.php
+
+## Update Entry published to category email event notification template ##
+* Issue Type: Task
+* Issue ID: SUP-33956
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+
+    - deployment/updates/scripts/xml/2022_09_18_addEntryPublishedToSpecificCategoryEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_09_18_deploy_add_email_event_notification_entry_published_to_specific_category.php
+
+Update script:
+
+    - deployment/updates/scripts/xml/2022_09_18_updateEntryPublishedToSpecificCategoryEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_09_18_deploy_update_email_event_notification_entry_published_to_specific_category.php
+
 # Rigel-18.14.0
 ## Add event notification that enables to create dynamic app instance ##
 - Issue Type: Task
