@@ -3397,6 +3397,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->setEntitledPusersEdit($template->getEntitledPusersEdit());
 		$this->setEntitledPusersPublish($template->getEntitledPusersPublish());
 		$this->setEntitledPusersView($template->getEntitledPusersView());
+		multiLingualUtils::copyMultiLingualValues($this, $template);
 
 		if ($this instanceof $template)
 		{
