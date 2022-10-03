@@ -59,7 +59,7 @@ class embedPlaykitJsAction extends sfAction
 
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
 		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
-		$extraModulesNames = $this->bundleCache->get($this->bundle_extra_modules_name);
+		$extraModulesNames = unserialize($this->bundleCache->get($this->bundle_extra_modules_names));
 
 		if (!$bundleContent || $this->regenerate)
 		{
@@ -88,8 +88,8 @@ class embedPlaykitJsAction extends sfAction
 			if ($bundleContent)
 			{
 				$i18nContent = $context->bundleCache->get($context->bundle_i18n_name);
-				$extraModulesNames = $context->bundleCache->get($context->bundle_extra_modules_name);
-				return array($bundleContent, $i18nContent, $extraModulesNames ? $extraModulesNames : null);
+				$extraModulesNames = unserialize($context->bundleCache->get($context->bundle_extra_modules_names));
+				return array($bundleContent, $i18nContent, $extraModulesNames);
 			}
 		}
 
@@ -131,9 +131,9 @@ class embedPlaykitJsAction extends sfAction
 		$i18nContent = isset($content['i18n']) ? base64_decode($content['i18n']) : "";
 		$context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
 		
-		$extraModules = isset($content['extraModules']) ? $content['extraModules'] : null;
+		$extraModules = isset($content['extraModules']) ? $content['extraModules'] : array();
 		$extraModulesNames = self::getExtraModuleNames($extraModules);
-		$context->bundleCache->set($context->bundle_extra_modules_name, $extraModulesNames);
+		$context->bundleCache->set($context->bundle_extra_modules_names, serialize($extraModulesNames));
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
@@ -145,11 +145,6 @@ class embedPlaykitJsAction extends sfAction
 	private static function getExtraModuleNames($extraModules = array())
 	{
 		$extraModuleNames = array();
-		if(!count($extraModules))
-		{
-			return $extraModuleNames;
-		}
-		
 		foreach($extraModules as $extraModule)
 		{
 			if(!$extraModule['name'])
@@ -803,7 +798,7 @@ class embedPlaykitJsAction extends sfAction
 			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
 		}
 		$this->bundle_i18n_name = $this->bundle_name . "_i18n";
-		$this->bundle_extra_modules_name = $this->bundle_name . "_extramodules";
+		$this->bundle_extra_modules_names = $this->bundle_name . "_extramodules";
 	}
 
 	public function getRequestParameter($name, $default = null)
