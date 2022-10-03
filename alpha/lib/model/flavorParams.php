@@ -64,6 +64,8 @@ class flavorParams extends assetParams
 	const AUDIO_CODEC_EAC3 = "eac3";
 	const AUDIO_CODEC_PCM = "pcm";
 	const AUDIO_CODEC_COPY = "copy";
+
+	const SUBTITLE_CODEC_WEBVTT = "webvtt";
 	
 	const CUSTOM_DATA_FIELD_VIDEO_CODEC = "FlavorVideoCodec";
 	const CUSTOM_DATA_FIELD_VIDEO_BITRATE = "FlavorVideoBitrate";
