@@ -1,3 +1,14 @@
+# Rigel-18.16.0
+
+## Add ResourceUser feature ##
+* Issue Type: Task
+* Issue ID: ILMS-296
+
+### Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2022_09_27_add_resource_user_table.sql
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_10_03_add_resource_user_permissions.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 # Rigel-18.14.0
 
 ## Add partner for game services ##
