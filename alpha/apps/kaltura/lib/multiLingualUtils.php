@@ -324,11 +324,14 @@ class multiLingualUtils
 	
 	public static function copyMultiLingualValues(&$target, $source)
 	{
-		if ($defaultLanguage = self::getDefaultLanguage($source))
+		$defaultLanguage = self::getDefaultLanguage($source);
+		if ($defaultLanguage)
 		{
 			self::setDefaultLanguage($target, $defaultLanguage);
 		}
-		if ($multiLingualMapping = self::getMultiLanguageMapping($source))
+		
+		$multiLingualMapping = self::getMultiLanguageMapping($source);
+		if ($multiLingualMapping)
 		{
 			self::setMultiLanguageMapping($target, $multiLingualMapping);
 		}

@@ -84,7 +84,6 @@ class kLiveStreamCopyMetadataEventConsumer implements kObjectChangedEventConsume
         {
             $recordedEntry->setName($object->getName());
         }
-		multiLingualUtils::copyMultiLingualValues($recordedEntry, $object);
         KalturaLog::info("Resetting recorded entry ID {$object->getRecordedEntryId()} name/description");
         $recordedEntry->save();
 
