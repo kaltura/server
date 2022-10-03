@@ -477,7 +477,7 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
 		$this->last_hydrate_time = time();
-
+		
 		// Nullify cached objects
 		$this->m_custom_data = null;
 		
@@ -1192,8 +1192,16 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 			if ($this->isColumnModified(ScheduleEventResourcePeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
+				{
 					$criteria->add(ScheduleEventResourcePeer::CUSTOM_DATA, "MD5(cast(" . ScheduleEventResourcePeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
+					if (kDataCenterMgr::isMultiDc()) // if multi DC configuration don't check costume data on other DC
+					{
+						$currentDcId = kDataCenterMgr::getCurrentDcId();
+						//addOr(column, value, comparison)
+						$criteria->addOr(ScheduleEventResourcePeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+					}
+				}
 				else 
 					$criteria->add(ScheduleEventResourcePeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
@@ -1375,6 +1383,10 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 	{
 		$customData = $this->getCustomDataObj( );
 		
+		$customDataOldValue = $customData->get($name, $namespace);
+		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
+			return;
+				
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
@@ -1382,7 +1394,7 @@ abstract class BaseScheduleEventResource extends BaseObject  implements Persiste
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
-			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
 		
 		$customData->put ( $name , $value , $namespace );
 	}

@@ -37,7 +37,7 @@ class KalturaResourceUser extends KalturaObject implements IRelatedFilterable
 	public $status;
 
 	/**
-	 * CategoryUser creation date as Unix timestamp (In seconds)
+	 * ResourceUser creation date as Unix timestamp (In seconds)
 	 *
 	 * @var time
 	 * @readonly
@@ -46,7 +46,7 @@ class KalturaResourceUser extends KalturaObject implements IRelatedFilterable
 	public $createdAt;
 
 	/**
-	 * CategoryUser update date as Unix timestamp (In seconds)
+	 * ResourceUser update date as Unix timestamp (In seconds)
 	 *
 	 * @var time
 	 * @readonly

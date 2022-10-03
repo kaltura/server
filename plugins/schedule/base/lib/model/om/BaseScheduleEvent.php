@@ -1434,7 +1434,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
 		$this->last_hydrate_time = time();
-
+		
 		// Nullify cached objects
 		$this->m_custom_data = null;
 		
@@ -2349,8 +2349,16 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 			if ($this->isColumnModified(ScheduleEventPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
+				{
 					$criteria->add(ScheduleEventPeer::CUSTOM_DATA, "MD5(cast(" . ScheduleEventPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
+					if (kDataCenterMgr::isMultiDc()) // if multi DC configuration don't check costume data on other DC
+					{
+						$currentDcId = kDataCenterMgr::getCurrentDcId();
+						//addOr(column, value, comparison)
+						$criteria->addOr(ScheduleEventPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+					}
+				}
 				else 
 					$criteria->add(ScheduleEventPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
@@ -2572,6 +2580,10 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 	{
 		$customData = $this->getCustomDataObj( );
 		
+		$customDataOldValue = $customData->get($name, $namespace);
+		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
+			return;
+				
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
@@ -2579,7 +2591,7 @@ abstract class BaseScheduleEvent extends BaseObject  implements Persistent {
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
-			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
 		
 		$customData->put ( $name , $value , $namespace );
 	}
