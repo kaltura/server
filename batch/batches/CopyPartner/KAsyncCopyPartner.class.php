@@ -52,7 +52,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$this->toPartnerId = $jobData->toPartnerId;
 		
 		$this->copyCategories();
-		//$this->copyUiConfs();
+		$this->copyUiConfs();
 		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
  		$this->copyAllEntries();
 		
