@@ -68,7 +68,7 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 	 */
 	public static function getServicesMap()
 	{
-		$map = array('scheduleEvent' => 'ScheduleEventService', 'scheduleResource' => 'ScheduleResourceService', 'scheduleEventResource' => 'ScheduleEventResourceService');
+		$map = array('scheduleEvent' => 'ScheduleEventService', 'scheduleResource' => 'ScheduleResourceService', 'scheduleEventResource' => 'ScheduleEventResourceService', 'resourceUser' => 'ResourceUserService');
 		return $map;
 	}
 	

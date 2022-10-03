@@ -3,7 +3,7 @@
  * @package plugins.tagSearch
  * @subpackage api.filters
  */
-class KalturaTagFilter extends KalturaFilter
+class KalturaTagFilter extends KalturaRelatedFilter
 {
     /**
 	 * 
@@ -102,5 +102,25 @@ class KalturaTagFilter extends KalturaFilter
 				$this->$propertyName = preg_replace("/\s+$/", " ", $this->$propertyName);
 			}
 		}
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$c = KalturaCriteria::create(TagPeer::OM_CLASS);
+		$tagCoreFilter = new TagFilter();
+		$this->toObject($tagCoreFilter);
+		$c->setGroupByColumn('tag');
+		$tagCoreFilter->attachToCriteria($c);
+		$pager->attachToCriteria($c);
+		$tags = TagPeer::doSelect($c);
+
+		$searchResponse = new KalturaTagListResponse();
+		$searchResponse->objects = KalturaTagArray::fromDbArray($tags, $responseProfile);
+		$searchResponse->totalCount = $c->getRecordsCount();
+
+		return $searchResponse;
 	}
 }

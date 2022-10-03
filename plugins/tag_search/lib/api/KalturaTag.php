@@ -3,7 +3,7 @@
  * @package plugins.tagSearch
  * @subpackage api.objects
  */
-class KalturaTag extends KalturaObject
+class KalturaTag extends KalturaObject implements IRelatedFilterable
 {
     /**
      * @var int
@@ -62,5 +62,20 @@ class KalturaTag extends KalturaObject
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-    
+
+	/**
+	 * @inheritDoc
+	 */
+	function getExtraFilters()
+	{
+		return array();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	function getFilterDocs()
+	{
+		return array();
+	}
 }
