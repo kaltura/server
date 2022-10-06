@@ -354,7 +354,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	/**
 	 * @param $v
 	 * @param $fieldName
-	 * @return string|null
+	 * @return array|null
 	 * @throws KalturaAPIException
 	 *
 	 * This function calculates and returns the value that is going to be set in the relevant field in the db (called defaultValue)
@@ -368,39 +368,54 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		$multiLingualValue = (is_string($v)) ? multiLingualUtils::getMultiLingualStringArrayFromString($v)->toObjectsArray() : $v;
 		$dbValue = isset($multiLingualValue['default']) ? $multiLingualValue['default'] : null;
+		$shouldUpdateDb = true;
+		
 		if (multiLingualUtils::isMultiLingualRequest($multiLingualValue))
 		{
 			$defaultValues = multiLingualUtils::getFieldDefaultValuesFromNewMapping($this, $fieldName, $multiLingualValue);
 			$dbValue = $defaultValues['defaultValue'];
 			$multiLingualValue = ($fieldName === self::TAGS) ? $this->updateMultiLingualTags($multiLingualValue) : $multiLingualValue;
 			multiLingualUtils::updateMultiLanguageObject($this, $fieldName, $multiLingualValue, $defaultValues);
+			$shouldUpdateDb = !is_null($dbValue);
 		}
-		return $dbValue;
+		return array('value' => $dbValue, 'shouldUpdateDb' => $shouldUpdateDb);
 	}
 	
 	public function setName($v)
 	{
 		$name = $this->getValueToSetInDbAndUpdateMultiLangObject($v, self::NAME);
 		PeerUtils::setExtension($this, $name, self::MAX_NAME_LEN, __FUNCTION__);
-		return !is_null($name) ? parent::setName(kString::alignUtf8String($name, self::MAX_NAME_LEN)) : null;
+		return is_null($name) || $name['shouldUpdateDb'] ? parent::setName(kString::alignUtf8String($name['value'], self::MAX_NAME_LEN)) : null;
 	}
 	
 	public function setDescription ($v)
 	{
+		KalturaLog::info('danielB - start');
 		$description = $this->getValueToSetInDbAndUpdateMultiLangObject($v, self::DESCRIPTION);
-		return !is_null($description) ? parent::setDescription($description): null;
+//		return is_null($description) || $description['shouldUpdateDb'] ? parent::setDescription($description['value']): null;
+		if (is_null($description))
+		{
+			KalturaLog::info('danielB - got null');
+			return parent::setDescription($description);
+		}
+		elseif ($description['shouldUpdateDb'])
+		{
+			return parent::setDescription($description['value']);
+		}
+		KalturaLog::info('danielB - nope');
+		return null;
 	}
 	
 	public function setTags($tags , $update_db = true )
 	{
 		$newTags = $this->getValueToSetInDbAndUpdateMultiLangObject($tags, self::TAGS);
-		if (!is_null($newTags))
+		if (is_null($newTags) || $newTags['shouldUpdateDb'])
 		{
-			if($this->tags !== $newTags)
+			if($this->tags !== $newTags['value'])
 			{
-				$newTags = ktagword::updateTags($this->tags, $newTags, $update_db);
+				$newTags = ktagword::updateTags($this->tags, $newTags['value'], $update_db);
 			}
-			return parent::setTags(trim($newTags));
+			return parent::setTags(trim($newTags['value']));
 		}
 		else
 		{
