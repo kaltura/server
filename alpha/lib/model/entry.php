@@ -382,19 +382,19 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$name = $this->getValueToSetInDbAndUpdateMultiLangObject($v, self::NAME);
 		PeerUtils::setExtension($this, $name, self::MAX_NAME_LEN, __FUNCTION__);
-		return $name ? parent::setName(kString::alignUtf8String($name, self::MAX_NAME_LEN)) : null;
+		return !is_null($name) ? parent::setName(kString::alignUtf8String($name, self::MAX_NAME_LEN)) : null;
 	}
 	
 	public function setDescription ($v)
 	{
 		$description = $this->getValueToSetInDbAndUpdateMultiLangObject($v, self::DESCRIPTION);
-		return $description ? parent::setDescription($description): null;
+		return !is_null($description) ? parent::setDescription($description): null;
 	}
 	
 	public function setTags($tags , $update_db = true )
 	{
 		$newTags = $this->getValueToSetInDbAndUpdateMultiLangObject($tags, self::TAGS);
-		if ($newTags)
+		if (!is_null($newTags))
 		{
 			if($this->tags !== $newTags)
 			{
