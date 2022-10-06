@@ -1,3 +1,12 @@
+# Rigel-18.16.0
+
+## Add user list permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: SSRV-853
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_10_06_self_serve_add_permission_user_list.php
+
 # Rigel-18.15.0
 
 ## Add new extended status enum values for Quiz user entries ## 
