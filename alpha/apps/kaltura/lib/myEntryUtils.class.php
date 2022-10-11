@@ -744,7 +744,7 @@ class myEntryUtils
 		if ($captureRequest)
 		{
 			KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
-			$captureFlavorAsset = myPackagerUtils::getFlavorSupportedByPackagerForThumbCapture($entity->getId());
+			$captureFlavorAsset = self::getFlavorAssetForLocalCapture($entity);
 			if (is_null($captureFlavorAsset))
 			{
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);

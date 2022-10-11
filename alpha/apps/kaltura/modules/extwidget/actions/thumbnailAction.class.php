@@ -189,10 +189,7 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
 		}
 
-		if ($vid_slice != -1 || $vid_slices != -1)
-		{
-			$vid_slice = ($vid_slice > $vid_slices ? $vid_slices : $vid_slice);
-		}
+		$vid_slice = min($vid_slices, $vid_slice);
 
 		if($vid_slices > 0 && ($vid_slices * $width) >= 65500)
 		{
