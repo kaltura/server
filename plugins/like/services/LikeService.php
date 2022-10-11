@@ -6,11 +6,8 @@
  * @package plugins.like
  * @subpackage api.services
  */
-class LikeService extends KalturaBaseService
+class LikeService extends KalturaBaseLikeService
 {
-    const KVOTE_LIKE_RANK_VALUE = 1;
-    const KVOTE_UNLIKE_RANK_VALUE = 0;
-    
     public function initService($serviceId, $serviceName, $actionName)
     {
         parent::initService($serviceId, $serviceName, $actionName);
@@ -36,30 +33,13 @@ class LikeService extends KalturaBaseService
      */
     public function likeAction ( $entryId )
     {
-        if (!$entryId)
-	    {
-	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
-	    }
-	    
-	    //Check if a kvote for current entryId and kuser already exists. If it does - throw exception
-	    $existingKVote = kvotePeer::doSelectByEntryIdAndPuserId($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid);
-	    if ($existingKVote)
-	    {
-	        throw new KalturaAPIException(KalturaLikeErrors::USER_LIKE_FOR_ENTRY_ALREADY_EXISTS);
-	    }
-	    
-	    $dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-			
-		if (kvotePeer::enableExistingKVote($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid))
+		if (!$entryId)
 		{
-		    return true;
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
 		}
 		
-		kvotePeer::createKvote($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid, self::KVOTE_LIKE_RANK_VALUE, KVoteType::LIKE);
-	    
-	    return true;
+		$lockKey = "like_" . $this->getPartnerId() . $entryId . kCurrentContext::$ks_uid;
+		return kLock::runLocked($lockKey, array($this, 'likeImpl'), array($entryId));
     }
     
     /**
@@ -70,26 +50,13 @@ class LikeService extends KalturaBaseService
      */
     public function unlikeAction ( $entryId )
     {
-        if (!$entryId)
-	    {
-	        throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
-	    }
-	    
-	    $existingKVote = kvotePeer::doSelectByEntryIdAndPuserId($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid);
-	    if (!$existingKVote)
-	    {
-	        throw new KalturaAPIException(KalturaLikeErrors::USER_LIKE_FOR_ENTRY_NOT_FOUND);
-	    }
-	    
-	    $dbEntry = entryPeer::retrieveByPK($entryId);
-		if (!$dbEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-        
-		if (kvotePeer::disableExistingKVote($entryId, $this->getPartnerId(), kCurrentContext::$ks_uid))
-		    return true;
+		if (!$entryId)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
+		}
 		
-		return false;
-    
+		$lockKey = "un_like_" . $this->getPartnerId() . $entryId . kCurrentContext::$ks_uid;
+		return kLock::runLocked($lockKey, array($this, 'unLikeImpl'), array($entryId));
     }
     
     /**
