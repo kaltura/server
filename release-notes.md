@@ -1,4 +1,17 @@
 # Rigel-18.16.0
+## Disable password restriction on FirstName/LastName/Email
+* Issue Type: Task
+* Issue ID: PLAT-23928
+### Deployment
+Add the following to admin.ini
+```
+moduls.skipPasswordRestriction.enabled = true
+moduls.skipPasswordRestriction.permissionType = 2
+moduls.skipPasswordRestriction.label = "Disable password restriction on FirstName/LastName/Email"
+moduls.skipPasswordRestriction.permissionName = FEATURE_DISABLE_PASSWORD_RESTRICTION
+moduls.skipPasswordRestriction.basePermissionType = 2
+moduls.skipPasswordRestriction.group = GROUP_SECURITY_OPTIONS
+```
 
 ## Add user list permission for self serve partner ##
 * Issue Type: Task

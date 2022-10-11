@@ -251,13 +251,16 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$errorMessage = str_replace('\n', PHP_EOL ,$loginData->getInvalidPasswordStructureMessage());
 			throw new kUserException($errorMessage, kUserException::PASSWORD_STRUCTURE_INVALID);
 		}
-
-		if((strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName())) !== false) ||
-			(strlen($loginData->getLastName()) > 2 && (stripos($newPassword, $loginData->getLastName())) !== false) ||
-			(stripos($newPassword, $loginData->getFullName()) !== false) ||
-			($newPassword == $loginData->getLoginEmail()))
+		$partner = self::getPartnerByLoginData($loginData);
+		if(!$partner->getEnabledService(PermissionName::FEATURE_DISABLE_PASSWORD_RESTRICTION))
 		{
-			throw new kUserException('Can\'t contain your name or email', kUserException::PASSWORD_STRUCTURE_INVALID);
+			if ((strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName())) !== false) ||
+				(strlen($loginData->getLastName()) > 2 && (stripos($newPassword, $loginData->getLastName())) !== false) ||
+				(stripos($newPassword, $loginData->getFullName()) !== false) ||
+				($newPassword == $loginData->getLoginEmail()))
+			{
+				throw new kUserException('Can\'t contain your name or email', kUserException::PASSWORD_STRUCTURE_INVALID);
+			}
 		}
 		
 		if ($loginData->isCommonPassword($newPassword))
@@ -271,17 +274,18 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 	}
 
-	public static function resetUserPassword($email, $linkType = resetPassLinkType::KMC)
+	protected static function getPartnerByLoginData($loginData)
 	{
-		$c = new Criteria(); 
-		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
-		$loginData = UserLoginDataPeer::doSelectOne($c);
-		
-		// check if login data exists
 		if (!$loginData) {
-			throw new kUserException($email, kUserException::LOGIN_DATA_NOT_FOUND);
+			throw new kUserException(kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		$partnerId = $loginData->getConfigPartnerId();
+		
+		return PartnerPeer::retrieveByPK($partnerId);
+	}
+	
+	protected static function getUserRoleNamesByPartnerIdAndLoginData($partnerId, $loginData)
+	{
 		$roleNames = null;
 		if ($partnerId)
 		{
@@ -290,7 +294,17 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			kuserPeer::setUseCriteriaFilter(true);
 			$roleNames = ($user) ? $user->getUserRoleNames() : null;
 		}
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+		return $roleNames;
+	}
+	
+	public static function resetUserPassword($email, $linkType = resetPassLinkType::KMC)
+	{
+		$c = new Criteria(); 
+		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
+		$loginData = UserLoginDataPeer::doSelectOne($c);
+		
+		$partner = self::getPartnerByLoginData($loginData);
+		$roleNames = self::getUserRoleNamesByPartnerIdAndLoginData($partner->getPartnerId(), $loginData);
 		$dynamicTemplateUserRoleName = kEmails::getDynamicEmailUserRoleName($roleNames);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
