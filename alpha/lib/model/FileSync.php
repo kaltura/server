@@ -531,6 +531,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
 		list($root, $filePath) = kPathManager::getFilePathArr($fileSyncKey, $storageId);
 		$newfileSync->setFilePath($filePath);
+		$newfileSync->setFileRoot(rtrim($root, "/") . "/");
 		return $newfileSync;
 	}
 }
