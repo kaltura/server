@@ -284,8 +284,17 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return PartnerPeer::retrieveByPK($partnerId);
 	}
 	
-	protected static function getUserRoleNamesByPartnerIdAndLoginData($partnerId, $loginData)
+	public static function resetUserPassword($email, $linkType = resetPassLinkType::KMC)
 	{
+		$c = new Criteria(); 
+		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
+		$loginData = UserLoginDataPeer::doSelectOne($c);
+		
+		// check if login data exists
+		if (!$loginData) {
+			throw new kUserException($email, kUserException::LOGIN_DATA_NOT_FOUND);
+		}
+		$partnerId = $loginData->getConfigPartnerId();
 		$roleNames = null;
 		if ($partnerId)
 		{
@@ -294,17 +303,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			kuserPeer::setUseCriteriaFilter(true);
 			$roleNames = ($user) ? $user->getUserRoleNames() : null;
 		}
-		return $roleNames;
-	}
-	
-	public static function resetUserPassword($email, $linkType = resetPassLinkType::KMC)
-	{
-		$c = new Criteria(); 
-		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email ); 
-		$loginData = UserLoginDataPeer::doSelectOne($c);
-		
-		$partner = self::getPartnerByLoginData($loginData);
-		$roleNames = self::getUserRoleNamesByPartnerIdAndLoginData($partner->getPartnerId(), $loginData);
+		$partner = PartnerPeer::retrieveByPK($partnerId);
 		$dynamicTemplateUserRoleName = kEmails::getDynamicEmailUserRoleName($roleNames);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
