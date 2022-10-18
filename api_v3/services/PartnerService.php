@@ -42,6 +42,7 @@ class PartnerService extends KalturaBaseService
 		$c->addAnd(UserLoginDataPeer::LOGIN_EMAIL, $partner->adminEmail, Criteria::EQUAL);
 		$existingUser = UserLoginDataPeer::doSelectOne($c);
 		/* @var $exisitingUser UserLoginData */
+        
 		try
 		{
 			$cmsPassword = ($cmsPassword == "") ? null : $cmsPassword;
