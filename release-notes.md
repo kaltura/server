@@ -13,6 +13,13 @@ moduls.skipPasswordRestriction.basePermissionType = 2
 moduls.skipPasswordRestriction.group = GROUP_SECURITY_OPTIONS
 ```
 
+## Add list permission to virtualEvents plugin for Selfserve partner ##
+* Issue Type: Story
+* Issue ID: PLAT-23940
+
+### Deployment Scripts ###
+  php deployment/updates/scripts/add_permissions/2022_10_18_update_permission_virtual_event.php
+
 ## Add user list permission for self serve partner ##
 * Issue Type: Task
 * Issue ID: SSRV-853
