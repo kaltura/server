@@ -1,11 +1,26 @@
 <?php
 
-$partnerId = 1;
+$partnerId = 200;
 
 chdir(dirname(__FILE__));
 require_once(dirname(__FILE__) . '/../bootstrap.php');
 
 $objectsToTrack = array(
+	AuditTrailObjectType::CATEGORY_ENTRY => array(
+		'actions' => array(
+			'CREATED',
+			'CHANGED',
+			'DELETED',
+		),
+		'descriptors' => array(
+			categoryEntryPeer::ENTRY_ID,
+			categoryEntryPeer::CATEGORY_ID,
+			categoryEntryPeer::UPDATED_AT,
+			categoryEntryPeer::CREATED_AT,
+			categoryEntryPeer::STATUS,
+			categoryEntryPeer::ID,
+		),
+	),
 	AuditTrailObjectType::ACCESS_CONTROL => array(
 		'actions' => array(
 			'CREATED',
