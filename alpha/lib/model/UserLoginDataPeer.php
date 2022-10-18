@@ -277,7 +277,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	protected static function getPartnerByLoginData($loginData)
 	{
 		if (!$loginData) {
-			throw new kUserException(kUserException::LOGIN_DATA_NOT_FOUND);
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
 		$partnerId = $loginData->getConfigPartnerId();
 		
