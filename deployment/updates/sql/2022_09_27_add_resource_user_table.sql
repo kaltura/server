@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `resource_user`
 (
 	`id` INTEGER  NOT NULL AUTO_INCREMENT,
-	`resource_tag` TEXT  NOT NULL,
+	`resource_tag` VARCHAR(256)  NOT NULL,
 	`kuser_id` INTEGER  NOT NULL,
 	`status` INTEGER  NOT NULL,
 	`partner_id` INTEGER  NOT NULL,
