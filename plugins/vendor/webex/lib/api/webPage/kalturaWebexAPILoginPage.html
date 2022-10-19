@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kaltura Zoom connector</title>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js'></script>
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <script>
+        var encryption = {
+            enc : '@encryptData@' ,
+            iv : '@iv@'
+        }
+    </script>
+    <script>
+        function onLoginSuccess(redirectUrl, res) {
+            $.ajax({
+                url: redirectUrl,
+                type: 'post',
+                data: {'ks': res, 'tokensData' : encryption.enc, 'iv' : encryption.iv},
+                success: function (registrationPage) {
+                    $('body').css('cursor', 'default');
+                    if (registrationPage) {
+                        var newDoc = document.open('text/html', 'replace');
+                        newDoc.write(registrationPage);
+                        newDoc.close();
+                    }
+                },
+                error: function () {
+                    $('body').css('cursor', 'default');
+                    console.log('err during api call');
+                }
+            });
+        }
+
+        function tryLogin(event) {
+            $('body').css('cursor', 'progress');
+            event.preventDefault();
+            var url = '@BaseServiceUrl@/api_v3/service/user/action/loginByLoginId';
+            var redirectUrl = '@BaseServiceUrl@/api_v3/service/vendor_zoomvendor/action/fetchRegistrationPage';
+            var $emailField = $('#uname');
+            var $passwordField = $('#pwd');
+            var $partnerId = $('#partnerId');
+            var email = $emailField.val().trim();
+            var pwd = $passwordField.val();
+            var partnerId = $partnerId.val();
+            if(partnerId == null || partnerId === '' || partnerId < 100)
+            {
+                alert('Wrong parameters given.');
+                return false;
+            }
+
+            $.ajax({
+                url : url,
+                type : 'post',
+                data: { 'loginId' : email, 'password' : pwd, 'partnerId' : partnerId, 'format' : 1},
+                success : function(res) {
+                    if(res.code){
+                        alert('Login failed.\n'+res.message);
+                    }
+                    else {
+                        onLoginSuccess(redirectUrl, res);
+                    }
+                },
+                error: function() {
+                    alert('Login failed.\n');
+                    console.log('err during api call,please check server');
+                    $('body').css('cursor', 'default');
+                }
+            });
+        }
+    </script>
+    <script>
+        (function() {
+            document.addEventListener('DOMContentLoaded', function () {
+                var submitButton = document.querySelector('#submit-button');
+                submitButton.addEventListener('click', tryLogin);
+            });
+        })();
+    </script>
+    <title>Kaltura-Zoom login</title>
+</head>
+    <body>
+    <div style='width: 500px;margin: auto; padding-top: 200px'>
+        <form>
+            <div class='form-group  container p-2 my-3 border'>
+                <div class='imgcontainer'>
+                    <img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
+                </div>
+                <div class='container'>
+                    <div class='form-group'>
+                        <label><h6>Username</h6></label>
+                        <input type='text' placeholder='Enter Username' id='uname' class='form-control' name='defaultUserId' required>
+                    </div>
+                    <div class='form-group'>
+                        <label><h6>Password</h6></label>
+                        <input type='password' placeholder='Enter Password' id='pwd' class='form-control' name='defaultUserId' required>
+                    </div>
+
+                    <div class='form-group'>
+                        <label><h6>Partner ID</h6></label>
+                        <input type='text' placeholder='Enter Partner ID' id='partnerId' class='form-control' name='defaultUserId' required>
+                    </div>
+                    <button type='submit' id='submit-button' class='btn btn-primary'>Login</button>
+                </div>
+            </div>
+
+    </form>
+    </div>
+</body>
+</html>

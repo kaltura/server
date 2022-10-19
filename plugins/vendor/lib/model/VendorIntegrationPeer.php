@@ -16,10 +16,12 @@
 class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 
 	const ZOOM_VENDOR_INTEGRATION = 'ZoomVendorIntegration';
+	const WEBEX_VENDOR_INTEGRATION = 'WebexAPIVendorIntegration';
 
 	// cache classes by their type
 	protected static $class_types_cache = array(
 		VendorTypeEnum::ZOOM_ACCOUNT => self::ZOOM_VENDOR_INTEGRATION,
+		VendorTypeEnum::WEBEX_ACCOUNT => self::WEBEX_VENDOR_INTEGRATION,
 	);
 
 	/**

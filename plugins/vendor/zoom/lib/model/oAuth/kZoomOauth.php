@@ -3,7 +3,7 @@
  * @package plugins.vendor
  * @subpackage model.oAuth
  */
-class kZoomOauth
+class kZoomOauth extends kOAuth
 {
 	const OAUTH_TOKEN_PATH = '/oauth/token';
 	const ACCESS_TOKEN = 'access_token';
@@ -24,7 +24,7 @@ class kZoomOauth
 	public static function refreshTokens($vendorIntegration)
 	{
 		KalturaLog::info('Refreshing tokens');
-		list($zoomBaseURL, , $header, $userPwd) = self::getZoomHeaderData();
+		list($zoomBaseURL, , $header, $userPwd) = self::getHeaderData();
 		$oldRefreshToken = $vendorIntegration->getRefreshToken();
 		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
 		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
@@ -36,7 +36,7 @@ class kZoomOauth
 
 	public static function requestAccessToken($authCode)
 	{
-		list($zoomBaseURL, $redirectUrl, $header, $userPwd) = self::getZoomHeaderData();
+		list($zoomBaseURL, $redirectUrl, $header, $userPwd) = self::getHeaderData();
 		$postFields = "grant_type=authorization_code&code={$authCode}&redirect_uri=$redirectUrl";
 		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
 		$tokensData = self::retrieveTokenData($response);
@@ -66,7 +66,7 @@ class kZoomOauth
 	 * @return mixed|string
 	 * @throws Exception
 	 */
-	private static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
+	protected static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
 	{
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
@@ -89,40 +89,6 @@ class kZoomOauth
 		return $expiresIn;
 	}
 
-	/**
-	 * set two minutes off the token expiration, avoid 401 response from zoom
-	 * @param int $expiresIn
-	 * @return int $expiresIn
-	 */
-	public static function getTokenExpiryRelativeTime($expiresIn)
-	{
-		$expiresIn = time() + $expiresIn - 120;
-		KalturaLog::info("Set Token 'expires_in' to " . $expiresIn);
-		return $expiresIn;
-	}
-
-	/**
-	 * @param array $data
-	 * @return array tokens
-	 */
-	public static function extractTokensFromData($data)
-	{
-		return array(self::ACCESS_TOKEN => $data[self::ACCESS_TOKEN], self::REFRESH_TOKEN => $data[self::REFRESH_TOKEN],
-			self::EXPIRES_IN => $data[self::EXPIRES_IN]);
-	}
-
-	/**
-	 * @param string $response
-	 * @return array
-	 * @throws Exception
-	 */
-	public static function parseTokensResponse($response)
-	{
-		$dataAsArray = json_decode($response, true);
-		KalturaLog::debug(print_r($dataAsArray, true));
-		return $dataAsArray;
-	}
-
 	public static function validateToken($tokensData)
 	{
 		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
@@ -137,7 +103,7 @@ class kZoomOauth
 	 * @return array
 	 * @throws Exception
 	 */
-	private static function getZoomHeaderData()
+	protected static function getHeaderData()
 	{
 		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
 		$clientId = $zoomConfiguration['clientId'];
