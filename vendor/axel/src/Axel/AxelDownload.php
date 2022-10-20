@@ -16,6 +16,8 @@
 
 namespace Axel;
 
+use kFile;
+
 class AxelDownload extends AxelCore implements \JsonSerializable, \Serializable {
 
     use AxelDownloadSerializable;
@@ -129,8 +131,11 @@ class AxelDownload extends AxelCore implements \JsonSerializable, \Serializable 
         if (!isset($this->log_path) || empty($this->log_path) || !is_string($this->log_path)) $this->log_path = $this->download_path . time() . '.log';
 
         $this->last_command = AxelDownload::STARTED;
+		
+		$cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address > $this->log_path";
+		\KalturaLog::debug("Executing Axel cmd: [$this->axel_path $cmd]");
 
-        if ($this->execute($this->axel_path, " -avn $this->connections -o {$this->getFullPath()} $this->address > $this->log_path")) {
+        if ($this->execute($this->axel_path, $cmd)) {
 
             if (!$this->detach) {
 
@@ -212,17 +217,17 @@ class AxelDownload extends AxelCore implements \JsonSerializable, \Serializable 
 
         if ($this->last_command == AxelDownload::COMPLETED) {
 
-            unlink($this->log_path);
-            $this->last_command = AxelDownload::CLEARED;
-
-            return true;
-        }
+            if (kFile::unlink($this->log_path)) {
+				$this->last_command = AxelDownload::CLEARED;
+				return true;
+			}
+	
+		}
         else {
             $this->error = 'Unable to remove download. Download has not completed yet.';
-
-            return false;
-        }
-    }
+		}
+		return false;
+	}
 
     /**
      * Parse the download log to get progress updates

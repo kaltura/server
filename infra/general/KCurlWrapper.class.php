@@ -701,7 +701,7 @@ class KCurlWrapper
 		}
 	}
 
-	private static function isInternalHost($host)
+	protected static function isInternalHost($host)
 	{
 		if (!$host)
 			return true;
@@ -719,7 +719,7 @@ class KCurlWrapper
 		return !filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE); // checks if host is NOT in a private or reserved range
 	}
 
-	private static function isWhiteListedInternalUrl($url)
+	protected static function isWhiteListedInternalUrl($url)
 	{
 		if(!kConf::hasMap('security'))
 			return true;

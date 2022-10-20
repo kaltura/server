@@ -62,6 +62,36 @@ class KAsyncImport extends KJobHandlerWorker
 	{
 		return 1;
 	}
+	
+	private function downloadExec($sourceUrl, $localPath, $resumeOffset=0, $partnerId = null)
+	{
+		// accelerate download if activated for partner
+		if(self::$taskConfig->params && isset(self::$taskConfig->params->partnerAccelerateDownload))
+		{
+			$axelPartnerIds = explode(',', self::$taskConfig->params->partnerAccelerateDownload);
+			if(in_array($partnerId, $axelPartnerIds))
+			{
+				KalturaLog::debug("Import via Axel");
+				return $this->axelExec($sourceUrl, $localPath);
+			}
+		}
+		
+		KalturaLog::debug("Import via cURL");
+		return $this->curlExec($sourceUrl, $localPath, $resumeOffset);
+	}
+	
+	private function axelExec($sourceUrl, $localPath)
+	{
+		$axelWrapper = new KAxelWrapper(self::$taskConfig->params); // need to pass from worker config
+		$res = $axelWrapper->exec($sourceUrl, $localPath);
+		$responseStatusCode = $axelWrapper->getHttpCode();
+		$errorMessage = $axelWrapper->getErrorMsg();
+		$errorNumber = $axelWrapper->getErrorNumber();
+		$axelWrapper->close();
+		KalturaLog::debug("Axel results: [$res] responseStatusCode [$responseStatusCode] error [$errorMessage] error number [$errorNumber]");
+		
+		return array($res,$responseStatusCode,$errorMessage,$errorNumber);
+	}
 
 	/* Will download $sourceUrl to $localPath and will monitor progress with watchDog*/
 	private function curlExec($sourceUrl,$localPath,$resumeOffset=0)
@@ -193,8 +223,8 @@ class KAsyncImport extends KJobHandlerWorker
 				$data->fileSize = is_null($fileSize) ? -1 : $fileSize;
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
-
-			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->curlExec($sourceUrl, $data->destFileLocalPath,$resumeOffset);
+			
+			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->downloadExec($sourceUrl, $data->destFileLocalPath,$resumeOffset, $job->partnerId);
 
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
 			{
@@ -499,7 +529,7 @@ class KAsyncImport extends KJobHandlerWorker
 		$rootPath = self::$taskConfig->params->localTempPath;
 		$fileSizeThreshold = isset(self::$taskConfig->params->fileSizeThreshold) ? self::$taskConfig->params->fileSizeThreshold : null;
 		$shardTempPath = isset(self::$taskConfig->params->sharedTempPath) ? self::$taskConfig->params->sharedTempPath : null;
-		if ($fileSize && $fileSizeThreshold && $shardTempPath && $fileSize > $fileSizeThreshold )
+		if ($shardTempPath && (($fileSize && $fileSizeThreshold && $fileSize > $fileSizeThreshold) || isset(self::$taskConfig->params->axelPath)))
 		{
 			$rootPath = $shardTempPath;
 		}
