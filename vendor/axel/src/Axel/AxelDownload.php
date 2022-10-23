@@ -16,6 +16,7 @@
 
 namespace Axel;
 
+use KalturaLog;
 use kFile;
 
 class AxelDownload extends AxelCore implements \JsonSerializable, \Serializable {
@@ -133,7 +134,7 @@ class AxelDownload extends AxelCore implements \JsonSerializable, \Serializable 
         $this->last_command = AxelDownload::STARTED;
 		
 		$cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address > $this->log_path";
-		\KalturaLog::debug("Executing Axel cmd: [$this->axel_path $cmd]");
+		KalturaLog::debug("Executing Axel cmd: [$this->axel_path $cmd]");
 
         if ($this->execute($this->axel_path, $cmd)) {
 

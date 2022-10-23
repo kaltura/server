@@ -6,7 +6,17 @@ require_once (__DIR__ . '/../../vendor/axel/axel-autoloader.php');
 
 class KAxelWrapper extends KCurlWrapper
 {
-	const CONCURRENT_CONNECTIONS = 10;
+	const DEFAULT_CONCURRENT_CONNECTIONS = 10;
+	
+	/**
+	 * @var null|bool
+	 */
+	public static $partiallyDownloaded = null;
+	
+	/**
+	 * @var false|string
+	 */
+	public static $fileSize = null;
 	
 	/**
 	 * @var AxelDownload
@@ -36,36 +46,31 @@ class KAxelWrapper extends KCurlWrapper
 	/**
 	 * @var string|null
 	 */
-	private $logDirPath;
-	
-	/**
-	 * @var string|null
-	 */
 	private $logPath;
 	
 	public function __construct($params = null)
 	{
 		parent::__construct($params);
-		$this->concurrentConnections = isset($params->concurrentConnections) ? $params->concurrentConnections : self::CONCURRENT_CONNECTIONS;
+		$this->concurrentConnections = isset($params->concurrentConnections) ? $params->concurrentConnections : self::DEFAULT_CONCURRENT_CONNECTIONS;
 		$this->axelPath = isset($params->axelPath) ? $params->axelPath : null;
 		
 		$this->axel = new AxelDownload($this->axelPath, $this->concurrentConnections);
 		
 		if (!$this->axel->checkAxelInstalled())
 		{
-			KalturaLog::debug('Axel is not installed - aborting');
+			$processError = $this->axel->error;
+			KalturaLog::debug("Axel is not installed - process error [$processError]");
 			return false;
 		}
-		
-		$this->logDirPath = isset($params->logDirPath) ? rtrim($params->logDirPath, '/') : null;
 		
 		return true;
 	}
 	
-	/**
-	 *
-	 * @return string The last error encountered
-	 */
+	public function getErrorNumber()
+	{
+		return isset($this->axel->processExitCode) ? $this->axel->processExitCode : 0;
+	}
+
 	public function getErrorMsg()
 	{
 		return $this->axel->error;
@@ -108,7 +113,6 @@ class KAxelWrapper extends KCurlWrapper
 	private function execAxel()
 	{
 		$start = microtime(true);
-		KalturaLog::debug("Starting Axel Download");
 		$this->axel->start($this->url, $this->destFile);
 		$end = microtime(true);
 
@@ -117,11 +121,19 @@ class KAxelWrapper extends KCurlWrapper
 			KalturaMonitorClient::monitorCurl($this->host, $end - $start, $this->ch);
 		}
 		
-		$this->httpCode = $this->getInfo(CURLINFO_HTTP_CODE);
-		$this->errorNumber = curl_errno($this->ch);
+		$this->httpCode = $this->getHttpCodeFromLog();
+		$this->errorNumber = $this->getErrorNumber();
 		$this->error = $this->getErrorMsg();
 		
-		return ($this->axel->last_command === AxelDownload::COMPLETED);
+		$completed = $this->axel->last_command === AxelDownload::COMPLETED;
+		
+		if (!$completed || $this->errorNumber)
+		{
+			self::$partiallyDownloaded = $this->isPartialDownload();
+			self::$fileSize = $this->getFileSizeInBytesFromLogFile();
+		}
+		
+		return $completed;
 	}
 	
 	/**
@@ -219,16 +231,123 @@ class KAxelWrapper extends KCurlWrapper
 	{
 		parent::close();
 		
-		// consider adding conf for 'params.deleteLogFile' so we can decide if to delete or not (for debugging maybe)
 		$msg = "Deleting log file at [$this->logPath] - ";
-		$msg .= $this->axel->clearCompleted() ? 'success' : 'failed';
+		$msg .= kFile::unlink($this->logPath) ? 'success' : 'failed';
 		KalturaLog::debug($msg);
 	}
 	
 	private function setLogPath()
 	{
-		$this->logPath = $this->logDirPath ? $this->logDirPath . basename($this->destFile) : $this->destFile;
-		$this->logPath .= '_' . time() . '.log';
+		$this->logPath = $this->destFile . '.log';
 		$this->axel->log_path = $this->logPath;
+	}
+	
+	private function getLogPath()
+	{
+		return isset($this->logPath) && is_string($this->logPath) ? $this->logPath : false;
+	}
+	
+	private function getLogFileContentIfExists()
+	{
+		if (!$this->getLogPath() || !kFile::checkFileExists($this->getLogPath()))
+		{
+			KalturaLog::debug("Axel log path is not set or does not exist");
+			return false;
+		}
+		
+		$logFileContent = kFile::getFileContent($this->getLogPath());
+		if (!$logFileContent)
+		{
+			KalturaLog::debug("Failed to get file content from path [$this->logPath]");
+			return false;
+		}
+		
+		return $logFileContent;
+	}
+	
+	private function getFileSizeInBytesFromLogFile()
+	{
+		$logFileContent = $this->getLogFileContentIfExists();
+		if (!$logFileContent)
+		{
+			return false;
+		}
+		
+		if (!preg_match('/File size:.*bytes/', $logFileContent, $matches))
+		{
+			KalturaLog::debug("Failed to extract 'File size' line from log path at [$this->logPath]");
+			return false;
+		}
+		
+		$fileSizeLine = $matches[0];
+		
+		if (!preg_match('/\s[0-9]*\s/', $fileSizeLine, $matches))
+		{
+			KalturaLog::debug("Failed to extract 'File size' value from line [$fileSizeLine]");
+			return false;
+		}
+		
+		return trim($matches[0]);
+	}
+	
+	private function getFileDownloadPercentageFromLogFile()
+	{
+		$logFileContent = $this->getLogFileContentIfExists();
+		if (!$logFileContent)
+		{
+			return false;
+		}
+		
+		$lastLogLines = substr($logFileContent, -150);
+		if (!$lastLogLines)
+		{
+			KalturaLog::debug("Could not get last log lines from log file at [$this->logPath]");
+			return false;
+		}
+		
+		if (!preg_match('/\[\s*[0-9]{1,3}%]/', $lastLogLines, $matches))
+		{
+			KalturaLog::debug("Could not extract downloaded percentage from last log lines [$lastLogLines]");
+			return false;
+		}
+		
+		$downloadedPercentage = trim(trim($matches[0], '[]'));
+		return rtrim($downloadedPercentage, '%');
+	}
+	
+	private function isPartialDownload()
+	{
+		$percentage = $this->getFileDownloadPercentageFromLogFile();
+		KalturaLog::debug("Downloaded content percentage = [$percentage%]");
+		return $percentage !== false && $percentage != 100;
+	}
+	
+	private function getHttpCodeFromLog()
+	{
+		$logFileContent = $this->getLogFileContentIfExists();
+		if (!$logFileContent)
+		{
+			return false;
+		}
+		
+		if (preg_match('/Starting download/', $logFileContent))
+		{
+			return KCurlHeaderResponse::HTTP_STATUS_OK;
+		}
+		
+		if (preg_match('/HTTP.*/', $logFileContent, $matches))
+		{
+			$httpCodeLine = $matches[0];
+			if (!preg_match('/\s[0-9]*\s/', $httpCodeLine, $matches))
+			{
+				KalturaLog::debug("Could not extract http code from line [$httpCodeLine]");
+				return false;
+			}
+			
+			return trim($matches[0]);
+		}
+		
+		KalturaLog::debug("Could not extract http status code from log file at [$this->logPath]");
+		return 0;
 	}
 }

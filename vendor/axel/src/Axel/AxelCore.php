@@ -45,9 +45,14 @@ class AxelCore {
     /**
      * @var string The last error encountered
      */
-    public  $error;
-
-    /**
+    public $error;
+	
+	/**
+	 * @var int|null
+	 */
+	public $processExitCode;
+	
+	/**
      * Class constructor
      *
      * @param string $axel_path Full path to Axel binary
@@ -98,6 +103,7 @@ class AxelCore {
         $process->run();
         if (!$process->isSuccessful()) {
             $this->error = $process->getErrorOutput();
+			$this->processExitCode = $process->getExitCode();
 
             return false;
         }
