@@ -68,7 +68,7 @@ class KAsyncImport extends KJobHandlerWorker
 		return 1;
 	}
 	
-	private function shouldUseAxelDownloadEngine($partnerId, $jobSubType): void
+	private function shouldUseAxelDownloadEngine($partnerId, $jobSubType)
 	{
 		$axelSupportedProtocols = array(
 			kFileTransferMgrType::HTTP,
