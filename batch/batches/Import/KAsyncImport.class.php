@@ -68,7 +68,7 @@ class KAsyncImport extends KJobHandlerWorker
 		return 1;
 	}
 	
-	private function shouldUseAxelDownloadEngine($partnerId, $jobSubType)
+	private function shouldUseAxelDownloadEngine($partnerId, $jobSubType): void
 	{
 		$axelSupportedProtocols = array(
 			kFileTransferMgrType::HTTP,
@@ -78,6 +78,10 @@ class KAsyncImport extends KJobHandlerWorker
 		);
 		
 		if (in_array($jobSubType, $axelSupportedProtocols))
+		{
+			return;
+		}
+		
 		if (self::$taskConfig->params && isset(self::$taskConfig->params->partnersUseAxel))
 		{
 			$axelPartnerIds = explode(',', self::$taskConfig->params->partnersUseAxel);
