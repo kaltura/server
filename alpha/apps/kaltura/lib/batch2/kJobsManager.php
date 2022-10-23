@@ -1014,10 +1014,10 @@ class kJobsManager
     		{
     		    $subType = kFileTransferMgrType::FTP;
     		}
-			elseif (strpos($entryUrl, 'ftps:') === 0)
-			{
-				$subType = kFileTransferMgrType::FTPS;
-			}
+    		elseif (strpos($entryUrl, 'ftps:') === 0)
+    		{
+    		    $subType = kFileTransferMgrType::FTPS;
+    		}
     		elseif (stripos($entryUrl, 'https:') === 0) 
     		{
     		    $subType = kFileTransferMgrType::HTTPS;
