@@ -469,6 +469,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $eventPlatformAllowedTemplates;
 	
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $verticalClassificationName;
+	
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'blockDirectLogin',
@@ -481,7 +487,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
 		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe', 'allowedDomains',
-		'excludedAdminRoleName', 'eventPlatformAllowedTemplates'
+		'excludedAdminRoleName', 'eventPlatformAllowedTemplates', 'verticalClassificationName'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -506,6 +512,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 		$this->describeYourself = kString::stripUtf8InvalidChars($this->describeYourself);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
+		$this->verticalClassificationName = $partner->getVerticalClasiffication();
 		if (!$this->host){
 			$this->host = null;
 		}
