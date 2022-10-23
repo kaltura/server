@@ -1,6 +1,6 @@
 <?php
 
-$partnerId = 200;
+$partnerId = 1;
 
 chdir(dirname(__FILE__));
 require_once(dirname(__FILE__) . '/../bootstrap.php');
