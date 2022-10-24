@@ -1,7 +1,8 @@
 <?php
 /**
- * @package api
- * @subpackage filters
+ * @package plugins.schedule
+ * @relatedService ResourceUserService
+ * @subpackage api.filters
  */
 class KalturaResourceUserFilter extends KalturaResourceUserBaseFilter
 {
@@ -36,7 +37,10 @@ class KalturaResourceUserFilter extends KalturaResourceUserBaseFilter
 				$usersIds[] = $kuser->getId();
 			}
 
-			$this->userIdIn = implode(',', $usersIds);
+			//Any groups the users belong to should be added to the query
+			$kuserKGroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserIds($usersIds);
+
+			$this->userIdIn = implode(',', array_merge($usersIds, $kuserKGroupIds));
 		}
 		if($this->userIdEqual)
 		{
@@ -76,7 +80,6 @@ class KalturaResourceUserFilter extends KalturaResourceUserBaseFilter
 
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
-
 
 		return $response;
 	}

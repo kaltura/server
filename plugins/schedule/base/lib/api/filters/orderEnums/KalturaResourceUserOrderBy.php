@@ -1,7 +1,7 @@
 <?php
 /**
  * @package plugins.schedule
- * @subpackage filters.enum
+ * @subpackage api.filters.enum
  */
 class KalturaResourceUserOrderBy extends KalturaStringEnum
 {

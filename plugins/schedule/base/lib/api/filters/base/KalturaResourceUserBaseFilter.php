@@ -1,8 +1,8 @@
 <?php
 /**
- * @package api
+ * @package plugins.schedule
  * @relatedService ResourceUserService
- * @subpackage filters.base
+ * @subpackage api.filters.base
  * @abstract
  */
 abstract class KalturaResourceUserBaseFilter extends KalturaRelatedFilter
