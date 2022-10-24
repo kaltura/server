@@ -47,34 +47,36 @@ class ResourceUserService extends KalturaBaseService
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 
-	    if (!$kuser)
-	    {
-		    if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
-		    {
-			    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
-		    }
+		if (!$kuser)
+		{
+			if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+			}
 
-		    kuserPeer::setUseCriteriaFilter(false);
-		    $kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
-		    kuserPeer::setUseCriteriaFilter(true);
+			kuserPeer::setUseCriteriaFilter(false);
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
+			kuserPeer::setUseCriteriaFilter(true);
 
-		    if (!$kuser)
-			    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
-	    }
+			if (!$kuser)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+			}
+		}
 
-	    $dbResourceUser = ResourceUserPeer::retrieveByResourceTagAndKuserId($resourceTag, $kuser->getId());
-	    if(!$dbResourceUser)
-	    {
-		    throw new KalturaAPIException(KalturaErrors::OBJECT_NOT_FOUND);
-	    }
+		$dbResourceUser = ResourceUserPeer::retrieveByResourceTagAndKuserId($resourceTag, $kuser->getId());
+		if(!$dbResourceUser)
+		{
+			throw new KalturaAPIException(KalturaErrors::OBJECT_NOT_FOUND);
+		}
 
-	    $dbResourceUser->setStatus(ResourceUserStatus::DELETED);
-	    $dbResourceUser->save();
+		$dbResourceUser->setStatus(ResourceUserStatus::DELETED);
+		$dbResourceUser->save();
 
-	    $resourceUser = new KalturaResourceUser();
-	    $resourceUser->fromObject($dbResourceUser, $this->getResponseProfile());
+		$resourceUser = new KalturaResourceUser();
+		$resourceUser->fromObject($dbResourceUser, $this->getResponseProfile());
 
-	    return $resourceUser;
+		return $resourceUser;
     }
 
 
