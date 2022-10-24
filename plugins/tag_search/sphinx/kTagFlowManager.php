@@ -298,11 +298,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
             $idsString= "(".implode( ",",$foundTagIds).")";
             if($toIncrement==true)
             {
-                $updateSql = "update tag set instance_count=instance_count+1 , updated_at = '$time' where id in $idsString;";
+                $updateSql = "update tag set instance_count=instance_count+1 , updated_at=$time where id in $idsString;";
             }
             else
             {
-                $updateSql = "update tag set instance_count=instance_count-1 , updated_at = '$time' where id in $idsString and instance_count>0;";
+                $updateSql = "update tag set instance_count=instance_count-1 , updated_at=$time where id in $idsString and instance_count>0;";
             }
             $stmt = $connection->prepare($updateSql);
             $stmt->execute();
