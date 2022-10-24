@@ -24,6 +24,6 @@ class KalturaResourceUserArray extends KalturaTypedArray
 
 	public function __construct()
 	{
-		parent::__construct("KalturaScheduleResource");
+		parent::__construct("KalturaResourceUser");
 	}
 }
