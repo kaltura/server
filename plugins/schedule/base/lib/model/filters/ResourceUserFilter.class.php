@@ -25,7 +25,7 @@ class ResourceUserFilter extends baseObjectFilter
 		);
 
 		$this->aliases = array (
-
+			"user_id" => "kuser_id"
 		);
 	}
 
