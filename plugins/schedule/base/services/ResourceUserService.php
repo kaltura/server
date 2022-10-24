@@ -87,10 +87,14 @@ class ResourceUserService extends KalturaBaseService
 	public function listAction(KalturaResourceUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter || !($filter->resourceTagEqual || $filter->resourceTagIn || $filter->userIdEqual || $filter->userIdIn))
+		{
 			throw new KalturaAPIException(KalturaScheduleErrors::MUST_FILTER_ON_TAG_OR_USER_ID);
+		}
 
 		if(!$pager)
+		{
 			$pager = new KalturaFilterPager();
+		}
 
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
