@@ -132,7 +132,7 @@ class multiLingualUtils
 		{
 			foreach ($valueToAdd as $languageKey => $languageValue)
 			{
-				if ($multiLingualMapping[$field][$languageKey] != $languageValue)
+				if (!isset($multiLingualMapping[$field][$languageKey]) || $multiLingualMapping[$field][$languageKey] != $languageValue)
 				{
 					$multiLingualMapping[$field][$languageKey] = $languageValue;
 				}
@@ -320,5 +320,20 @@ class multiLingualUtils
 		$multiLangString->value = $value;
 		$multiLangStringArr = new KalturaMultiLingualStringArray();
 		return $multiLangStringArr->fromDbArray(array($multiLangString->language => $multiLangString->value));
+	}
+	
+	public static function copyMultiLingualValues(&$target, $source)
+	{
+		$defaultLanguage = self::getDefaultLanguage($source);
+		if ($defaultLanguage)
+		{
+			self::setDefaultLanguage($target, $defaultLanguage);
+		}
+		
+		$multiLingualMapping = self::getMultiLanguageMapping($source);
+		if ($multiLingualMapping)
+		{
+			self::setMultiLanguageMapping($target, $multiLingualMapping);
+		}
 	}
 }

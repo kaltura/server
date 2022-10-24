@@ -4417,6 +4417,8 @@ abstract class Baseentry extends BaseObject  implements Persistent {
 		$copyObj->setAvailableFrom($this->available_from);
 
 		$copyObj->setLastPlayedAt($this->last_played_at);
+		
+		multiLingualUtils::copyMultiLingualValues($copyObj, $this);
 
 
 		if ($deepCopy) {

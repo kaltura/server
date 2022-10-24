@@ -1,4 +1,43 @@
+# Rigel-18.16.0
+## Disable password restriction on FirstName/LastName/Email
+* Issue Type: Task
+* Issue ID: PLAT-23928
+### Deployment
+Add the following to admin.ini
+```
+moduls.skipPasswordRestriction.enabled = true
+moduls.skipPasswordRestriction.permissionType = 2
+moduls.skipPasswordRestriction.label = "Disable password restriction on FirstName/LastName/Email"
+moduls.skipPasswordRestriction.permissionName = FEATURE_DISABLE_PASSWORD_RESTRICTION
+moduls.skipPasswordRestriction.basePermissionType = 2
+moduls.skipPasswordRestriction.group = GROUP_SECURITY_OPTIONS
+```
+
+## Add list permission to virtualEvents plugin for Selfserve partner ##
+* Issue Type: Story
+* Issue ID: PLAT-23940
+
+### Deployment Scripts ###
+  php deployment/updates/scripts/add_permissions/2022_10_18_update_permission_virtual_event.php
+
+## Add user list permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: SSRV-853
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_10_06_self_serve_add_permission_user_list.php
+
 # Rigel-18.15.0
+
+## Add new extended status enum values for Quiz user entries ## 
+- Issue Type: Task
+- Issue ID: ILMS-287
+
+### Deployment scripts ###  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+Client generation required.
+
+
 ## Support adding values dynamically to kafka notifications ##
 - Issue Type: Task
 - Issue ID: FOUN-702

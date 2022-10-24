@@ -59,16 +59,17 @@ class embedPlaykitJsAction extends sfAction
 
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
 		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
+		$extraModulesNames = unserialize($this->bundleCache->get($this->bundle_extra_modules_names));
 
 		if (!$bundleContent || $this->regenerate)
 		{
-			list($bundleContent, $i18nContent) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
+			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
 
 		$lastModified = $this->getLastModified($bundleContent);
 
-		//Format bundle contnet
-		$bundleContent = $this->formatBundleContent($bundleContent, $i18nContent);
+		//Format bundle content
+		$bundleContent = $this->formatBundleContent($bundleContent, $i18nContent, $extraModulesNames);
 
 		// send cache headers
 		$this->sendHeaders($bundleContent, $lastModified);
@@ -87,7 +88,8 @@ class embedPlaykitJsAction extends sfAction
 			if ($bundleContent)
 			{
 				$i18nContent = $context->bundleCache->get($context->bundle_i18n_name);
-				return array($bundleContent, $i18nContent);
+				$extraModulesNames = unserialize($context->bundleCache->get($context->bundle_extra_modules_names));
+				return array($bundleContent, $i18nContent, $extraModulesNames);
 			}
 		}
 
@@ -107,7 +109,6 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$content = json_decode($content, true);
-
         if (isset($content['status'])) {
             if ($content['status'] != 0) {
                 $message = $content['message'];
@@ -120,25 +121,46 @@ class embedPlaykitJsAction extends sfAction
                 KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
             }
         }
-
-		$sourceMapContent = base64_decode($content['sourceMap']);
+		
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
 		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
+		
+		$sourceMapContent = base64_decode($content['sourceMap']);
 		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
+		
 		$i18nContent = isset($content['i18n']) ? base64_decode($content['i18n']) : "";
 		$context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
+		
+		$extraModules = isset($content['extraModules']) ? $content['extraModules'] : array();
+		$extraModulesNames = self::getExtraModuleNames($extraModules);
+		$context->bundleCache->set($context->bundle_extra_modules_names, serialize($extraModulesNames));
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
 		}
 
-		return array($bundleContent, $i18nContent);
+		return array($bundleContent, $i18nContent, $extraModulesNames);
+	}
+	
+	private static function getExtraModuleNames($extraModules = array())
+	{
+		$extraModuleNames = array();
+		foreach($extraModules as $extraModule)
+		{
+			if(!$extraModule['name'])
+			{
+				continue;
+			}
+			$extraModuleNames[] = $extraModule['name'];
+		}
+		
+		return $extraModuleNames;
 	}
 
-	private function formatBundleContent($bundleContent, $i18nContent)
+	private function formatBundleContent($bundleContent, $i18nContent, $extraModulesNames = null)
 	{
 		$bundleContentParts = explode(",", $bundleContent, 2);
-		$bundleContent = $this->appendConfig($bundleContentParts[1], $i18nContent);
+		$bundleContent = $this->appendConfig($bundleContentParts[1], $i18nContent, $extraModulesNames);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
 
@@ -160,11 +182,12 @@ class embedPlaykitJsAction extends sfAction
 		return $bundleContent;
 	}
 
-	private function appendConfig($content, $i18nContent)
+	private function appendConfig($content, $i18nContent, $extraModulesNames = null)
 	{
 		$uiConf = $this->playerConfig;
 		$this->mergeEnvConfig($uiConf);
 		$this->mergeI18nConfig($uiConf, $i18nContent);
+		$this->mergeExtraModuleNames($uiConf, $extraModulesNames);
 		$uiConfJson = json_encode($uiConf);
 
 		if ($uiConfJson === false)
@@ -226,6 +249,19 @@ class embedPlaykitJsAction extends sfAction
 			}
 			$uiConfI18nArr = json_decode(json_encode($uiConf->ui->translations), true);
 			$uiConf->ui->translations = (object) $this->arrayMergeRecursive($i18nArr, $uiConfI18nArr);
+		}
+	}
+	
+	private function mergeExtraModuleNames($uiConf, $extraModulesNames)
+	{
+		if(!$extraModulesNames || !count($extraModulesNames))
+		{
+			return;
+		}
+		
+		foreach($extraModulesNames as $extraModulesName)
+		{
+			$uiConf->plugins->$extraModulesName = new stdClass();
 		}
 	}
 
@@ -762,6 +798,7 @@ class embedPlaykitJsAction extends sfAction
 			$this->bundle_name = $this->cacheVersion . "_" . $this->bundle_name;
 		}
 		$this->bundle_i18n_name = $this->bundle_name . "_i18n";
+		$this->bundle_extra_modules_names = $this->bundle_name . "_extramodules";
 	}
 
 	public function getRequestParameter($name, $default = null)
