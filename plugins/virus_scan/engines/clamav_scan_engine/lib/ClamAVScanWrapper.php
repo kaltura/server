@@ -59,6 +59,7 @@ class ClamAVScanWrapper
 		
 		//We are piping the in stream so we should replace stream in the output with the actual file path
 		$output = str_replace("stream:", $this->filePath.":", $output);
+		$output = str_replace("stdin:", $this->filePath.":", $output);
 		$output = explode("\n", $output);
 		return array($exitCode, $output, $procErr);
 	}
