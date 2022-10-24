@@ -70,11 +70,20 @@ class KAsyncImport extends KJobHandlerWorker
 	
 	private function shouldUseAxelDownloadEngine($partnerId, $jobSubType)
 	{
+		if (self::$taskConfig->params && isset(self::$taskConfig->params->partnersUseAxel))
+		{
+			$axelPartnerIds = explode(',', self::$taskConfig->params->partnersUseAxel);
+			if(!in_array($partnerId, $axelPartnerIds))
+			{
+				return;
+			}
+		}
+		
+		// in case its an sftp job - don't use axel
 		$axelSupportedProtocols = array(
 			kFileTransferMgrType::HTTP,
 			kFileTransferMgrType::HTTPS,
-			kFileTransferMgrType::FTP,
-			kFileTransferMgrType::FTPS
+			kFileTransferMgrType::FTP
 		);
 		
 		if (!in_array($jobSubType, $axelSupportedProtocols))
@@ -82,14 +91,7 @@ class KAsyncImport extends KJobHandlerWorker
 			return;
 		}
 		
-		if (self::$taskConfig->params && isset(self::$taskConfig->params->partnersUseAxel))
-		{
-			$axelPartnerIds = explode(',', self::$taskConfig->params->partnersUseAxel);
-			if(in_array($partnerId, $axelPartnerIds))
-			{
-				self::$currentEngine = self::AXEL_DOWNLOAD_ENGINE;
-			}
-		}
+		self::$currentEngine = self::AXEL_DOWNLOAD_ENGINE;
 	}
 	
 	private function downloadExec($sourceUrl, $localPath, $resumeOffset=0)
