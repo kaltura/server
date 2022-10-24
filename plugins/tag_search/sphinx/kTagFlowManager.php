@@ -3,8 +3,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 {
     const TAGS_FIELD_NAME = "tags";
     
-    const PARTNER_ID_FIELD = "partner_id";
-    
     public static $specialCharacters = array ('\\', '!', '*', '"', );
     public static $specialCharactersReplacement = array ('\\\\', '\\!', '\\*', '\\"');
     
@@ -77,9 +75,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         		return true;
         }
 
-        
         return false;
-        
     }
     
 
@@ -122,7 +118,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	        {
 	            return true;
 	        }
-        	
         }
         
         if ($object instanceof categoryEntry)
@@ -132,10 +127,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         		return true;
         }
 
-        
         return false;
-        
     }
+
 	/* (non-PHPdoc)
      * @see kObjectChangedEventConsumer::objectChanged()
      */
@@ -183,8 +177,10 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     public function shouldConsumeChangedEvent (BaseObject $object, array $modifiedColumns)
     {
         if (!self::getTaggableObjectType(self::getBaseClass($object)))
-            return;
-        
+        {
+	        return;
+        }
+
         if (property_exists($object, self::TAGS_FIELD_NAME) && in_array(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME), $modifiedColumns) )
         {
             return true;
@@ -201,7 +197,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         }
         
         return false;
-        
     }
 
     /**
@@ -247,6 +242,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         TagPeer::setUseCriteriaFilter(false);
         $foundTagObjects = TagPeer::doSelect($c);
         TagPeer::setUseCriteriaFilter(true);
+
         return $foundTagObjects;
     }
 
@@ -281,6 +277,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		        }
 	        }
         }
+
         return $tagsToAddList;
     }
 
@@ -293,10 +290,10 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
             $connection = Propel::getConnection();
             foreach ($foundTagObjects as $tag)
             {
-	            $foundTagIds[]=$tag->getId();
+	            $foundTagIds[] = $tag->getId();
             }
-            $idsString= "(".implode( ",",$foundTagIds).")";
-            if($toIncrement==true)
+            $idsString = "(" . implode( ",",$foundTagIds) . ")";
+            if($toIncrement == true)
             {
                 $updateSql = "update tag set instance_count=instance_count+1, updated_at=$time where id in $idsString;";
             }
@@ -405,6 +402,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    $c->addAnd(TagPeer::TAG, $tagStrings, KalturaCriteria::IN);
 	    $c->addAnd(TagPeer::PARTNER_ID, $partnerId, KalturaCriteria::EQUAL);
 	    $c->addAnd(TagPeer::OBJECT_TYPE, $objectType, KalturaCriteria::EQUAL);
+
 	    return $c;
 	}
 	
@@ -452,6 +450,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		
 		$batchJob->setPartnerId($partnerId);
 		KalturaLog::log("Creating tag re-index job for categoryId [" . $data->getChangedCategoryId() . "] ");
+
 		return kJobsManager::addJob($batchJob, $data, $jobType);
 	}
 	
