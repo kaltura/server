@@ -35,12 +35,12 @@ class ResourceUserService extends KalturaBaseService
 
 
     /**
-     * Allows you to delete an existing KalturaScheduleResource object
+     * Allows you to delete an existing KalturaResourceUser object
      *
      * @action delete
      * @param string $resourceTag
      * @param string $userId
-     * @return KalturaScheduleResource
+     * @return KalturaResourceUser
      */
     public function deleteAction($resourceTag, $userId)
     {
@@ -80,9 +80,9 @@ class ResourceUserService extends KalturaBaseService
 	 * Allows you to list a group KalturaScheduleResource objects
 	 *
 	 * @action list
-	 * @param KalturaScheduleResourceFilter $scheduleResourceFilter
+	 * @param KalturaResourceUserFilter $scheduleResourceFilter
 	 * @param KalturaFilterPager $pager
-	 * @return KalturaScheduleResourceListResponse
+	 * @return KalturaResourceUserListResponse
 	 */
 	public function listAction(KalturaResourceUserFilter $filter = null, KalturaFilterPager $pager = null)
 	{
