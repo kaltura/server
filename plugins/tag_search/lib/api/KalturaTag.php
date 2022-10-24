@@ -2,6 +2,7 @@
 /**
  * @package plugins.tagSearch
  * @subpackage api.objects
+ * @relatedService TagService
  */
 class KalturaTag extends KalturaObject implements IRelatedFilterable
 {
@@ -13,12 +14,14 @@ class KalturaTag extends KalturaObject implements IRelatedFilterable
     
     /**
      * @var string
+     * @filter eq,likex
      * @readonly
      */
     public $tag;
     
     /**
      * @var KalturaTaggedObjectType
+     * @filter eq
      * @readonly
      */
     public $taggedObjectType;
@@ -31,6 +34,7 @@ class KalturaTag extends KalturaObject implements IRelatedFilterable
     
     /**
      * @var int
+     * @filter eq,in,gte,lte,order
      * @readonly
      */
     public $instanceCount;
@@ -38,6 +42,7 @@ class KalturaTag extends KalturaObject implements IRelatedFilterable
     /**
      * @var time
      * @readonly
+     * @filter gte,lte,order
      */
     public $createdAt;
     

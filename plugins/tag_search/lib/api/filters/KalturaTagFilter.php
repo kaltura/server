@@ -3,52 +3,14 @@
  * @package plugins.tagSearch
  * @subpackage api.filters
  */
-class KalturaTagFilter extends KalturaRelatedFilter
+class KalturaTagFilter extends KalturaTagBaseFilter
 {
-    /**
-	 * 
-	 * 
-	 * @var KalturaTaggedObjectType
-	 */
-	public $objectTypeEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $tagEqual;
-
-	/**
-	 * 
-	 * 
-	 * @var string
-	 */
-	public $tagStartsWith;
-	
-	/**
-	 * @var int
-	 */
-	public $instanceCountEqual;
-	
-	/**
-	 * @var int
-	 */
-    public $instanceCountIn;
-    
  	static private $map_between_objects = array
 	(
-		"objectTypeEqual" => "_eq_object_type",
-	    "instanceCountEqual" => "_eq_instance_count",
-	    "instanceCountIn" => "_in_instance_count", 
 	);
 
 	static private $order_by_map = array
 	(
-		"+instanceCount" => "+instance_count",
-	    "-instanceCount" => "-instance_count",
-        "+createdAt" => "+created_at",
-        "-createdAt" => "-created_at",
 	);
 
 	public function getMapBetweenObjects()
