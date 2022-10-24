@@ -118,7 +118,7 @@ class KAxelWrapper extends KCurlWrapper
 
 		if (class_exists('KalturaMonitorClient'))
 		{
-			KalturaMonitorClient::monitorCurl($this->host, $end - $start, $this->ch);
+			KalturaMonitorClient::monitorAxel($this->host, $end - $start);
 		}
 		
 		$this->httpCode = $this->getHttpCodeFromLog();

@@ -77,7 +77,7 @@ class KAsyncImport extends KJobHandlerWorker
 			kFileTransferMgrType::FTPS
 		);
 		
-		if (in_array($jobSubType, $axelSupportedProtocols))
+		if (!in_array($jobSubType, $axelSupportedProtocols))
 		{
 			return;
 		}
