@@ -10,22 +10,22 @@ class KalturaResourceUser extends KalturaObject implements IRelatedFilterable
 	 * @var int
 	 * @readonly
 	 */
-    public $partnerId;
+	public $partnerId;
 
-    /**
-     * @var string
-     * @filter eq,in
-     * @insertOnly
-     */
-    public $resourceTag;
+	/**
+	 * @var string
+	 * @filter eq,in
+	 * @insertOnly
+	 */
+	public $resourceTag;
 
-    /**
-     * @var string
-     * @filter eq, in
-     * @insertOnly
-     * @requiresPermissions all
-     */
-    public $userId;
+	/**
+	 * @var string
+	 * @filter eq, in
+	 * @insertOnly
+	 * @requiresPermissions all
+	 */
+	public $userId;
 
 	/**
 	 * Status
@@ -144,19 +144,19 @@ class KalturaResourceUser extends KalturaObject implements IRelatedFilterable
 		return parent::toObject($sourceObject, $propertiesToSkip);
 	}
 
-    /**
-     * @inheritDoc
-     */
-    function getExtraFilters()
-    {
-        // TODO: Implement getExtraFilters() method.
-    }
+	/**
+	 * @inheritDoc
+	 */
+	function getExtraFilters()
+	{
+	    // TODO: Implement getExtraFilters() method.
+	}
 
-    /**
-     * @inheritDoc
-     */
-    function getFilterDocs()
-    {
-        // TODO: Implement getFilterDocs() method.
-    }
+	/**https://github.com/kaltura/server/pull/11826#discussion_r1003551861
+	 * @inheritDoc
+	 */
+	function getFilterDocs()
+	{
+	    // TODO: Implement getFilterDocs() method.
+	}
 }
