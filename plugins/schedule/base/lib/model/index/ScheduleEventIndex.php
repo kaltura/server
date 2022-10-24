@@ -118,7 +118,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'plugins_data' => IIndexable::FIELD_TYPE_STRING,
 				'template_entry_categories_ids' => IIndexable::FIELD_TYPE_STRING,
 				'resource_system_names' => IIndexable::FIELD_TYPE_STRING,
-                'resource_tags' => IIndexable::FIELD_TYPE_STRING,
+				'resource_tags' => IIndexable::FIELD_TYPE_STRING,
 				'template_entry_id' => IIndexable::FIELD_TYPE_STRING,
 				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			);
@@ -175,7 +175,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.PLUGINS_DATA' => 'plugins_data',
 				'schedule_event.TEMPLATE_ENTRY_CATEGORIES_IDS' => 'template_entry_categories_ids',
 				'schedule_event.RESOURCE_SYSTEM_NAMES' => 'resource_system_names',
-                'schedule_event.RESOURCE_TAGS' => 'resource_tags',
+				'schedule_event.RESOURCE_TAGS' => 'resource_tags',
 				'schedule_event.TEMPLATE_ENTRY_ID' => 'template_entry_id',
 				'schedule_event.SPHINX_MATCH_OPTIMIZATIONS' => 'sphinx_match_optimizations',
 			);
