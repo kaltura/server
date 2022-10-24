@@ -50,7 +50,9 @@ class ResourceUserService extends KalturaBaseService
 	    if (!$kuser)
 	    {
 		    if (kCurrentContext::$master_partner_id != Partner::BATCH_PARTNER_ID)
+		    {
 			    throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+		    }
 
 		    kuserPeer::setUseCriteriaFilter(false);
 		    $kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
