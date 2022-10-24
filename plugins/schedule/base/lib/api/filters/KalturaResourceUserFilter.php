@@ -22,7 +22,7 @@ class KalturaResourceUserFilter extends KalturaResourceUserBaseFilter
 		if($this->userIdIn)
 		{
 			$usersIds = explode(',', $this->userIdIn);
-			$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+			$partnerId = kCurrentContext::getCurrentPartnerId();
 
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
