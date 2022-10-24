@@ -84,8 +84,7 @@ class KalturaResourceUser extends KalturaObject implements IRelatedFilterable
 		$this->validatePropertyNotNull('resourceTag');
 		$this->validatePropertyNotNull('userId');
 
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $this->userId );
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userId);
 
 		if(!$kuser)
 		{
