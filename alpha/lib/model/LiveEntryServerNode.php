@@ -14,6 +14,7 @@ class LiveEntryServerNode extends EntryServerNode
 	const MAX_DURATIONS_TO_KEEP = 20;
 	const CUSTOM_DATA_IS_PLAYABLE_USER = "is_playable_user";
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
+	const CUSTOM_DATA_LAST_DATA_UPDATE = "last_data_update";
 
 	/* (non-PHPdoc)
 	 * @see BaseEntryServerNode::postInsert()
@@ -292,5 +293,15 @@ class LiveEntryServerNode extends EntryServerNode
 	public function getViewMode()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_VIEW_MODE, null, ViewMode::ALLOW_ALL);
+	}
+
+	public function setLastDataUpdate($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_LAST_DATA_UPDATE, $v);
+	}
+
+	public function getLastDataUpdate()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_DATA_UPDATE);
 	}
 }

@@ -246,6 +246,19 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 		return true;
 	}
 
+	public function postSave(PropelPDO $con = null)
+	{
+		parent::postSave($con);
+
+		$entryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndServerTypes($this->getTemplateEntryId(), array(EntryServerNodeType::LIVE_PRIMARY, EntryServerNodeType::LIVE_BACKUP));
+		foreach ($entryServerNodes as $entryServerNode)
+		{
+			/* @var $entryServerNode LiveEntryServerNode */
+			$entryServerNode->setLastDataUpdate($this->getUpdatedAt(null));
+			$entryServerNode->save();
+		}
+	}
+
 	/**
 	 * @param bool $v
 	 */
