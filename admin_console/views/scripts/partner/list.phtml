@@ -131,7 +131,7 @@
 								<?php elseif (Infra_AclHelper::isAllowed('partner','block')) :?>
 										<?php if ($partner->status == Kaltura_Client_Enum_PartnerStatus::ACTIVE): ?>
 											<option value="block"><?php echo $this->translate('Block'); ?></option>
-										<?php elseif ($partner->status == Kaltura_Client_Enum_PartnerStatus::BLOCKED): ?>
+										<?php elseif (in_array($partner->status, array(Kaltura_Client_Enum_PartnerStatus::BLOCKED, Kaltura_Client_Enum_PartnerStatus::READ_ONLY))): ?>
 											<option value="unblock"><?php echo $this->translate('Unblock'); ?></option>
 										<?php endif; ?>
 										<?php if (Infra_AclHelper::isAllowed('partner','remove')): ?>
