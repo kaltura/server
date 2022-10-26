@@ -81,7 +81,7 @@ class WebexAPIService extends KalturaBaseService
 	 */
 	public static function loadSubmitPage($webexIntegration, $accountId, $ks)
 	{
-		$file_path = dirname(__FILE__) . '/../api/webPage/KalturaWebexAPIRegistrationPage.html';
+		$file_path = dirname(__FILE__) . '/../lib/api/webPage/KalturaWebexAPIRegistrationPage.html';
 		if (file_exists($file_path))
 		{
 			$page = file_get_contents($file_path);

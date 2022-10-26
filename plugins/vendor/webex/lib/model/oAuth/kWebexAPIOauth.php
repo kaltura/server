@@ -14,7 +14,7 @@ class kWebexAPIOauth extends kOAuth
 	protected static function getHeaderData()
 	{
 		$webexConfiguration = kConf::get(WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR);
-		$webexBaseURL = $webexConfiguration['BaseUrl'];
+		$webexBaseURL = $webexConfiguration['baseUrl'];
 		$redirectUrl = $webexConfiguration['redirectUrl'];
 		$clientId = $webexConfiguration['clientId'];
 		$clientSecret = $webexConfiguration['clientSecret'];
@@ -24,13 +24,12 @@ class kWebexAPIOauth extends kOAuth
 	
 	/**
 	 * @param $url
-	 * @param $userPwd
 	 * @param $header
 	 * @param $postFields
 	 * @return mixed|string
 	 * @throws Exception
 	 */
-	protected static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
+	protected static function curlRetrieveTokensData($url, $header, $postFields)
 	{
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
@@ -45,7 +44,7 @@ class kWebexAPIOauth extends kOAuth
 		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
 			!isset($tokensData[self::EXPIRES_IN]))
 		{
-			throw new KalturaException(KalturaWebexAPIErrors::TOKEN_PARSING_FAILED);
+			throw new KalturaAPIException(KalturaWebexAPIErrors::TOKEN_PARSING_FAILED);
 		}
 	}
 	
