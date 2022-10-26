@@ -15,7 +15,11 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 	{
 		if (kString::beginsWith($content, "\xff\xfe"))
 		{
-			$content = iconv('utf-16', 'utf-8', substr($content, 2));
+			$content = iconv('utf-16', 'utf-8//IGNORE', substr($content, 2));
+		}
+		else
+		{
+			$content = iconv('UTF-8', 'UTF-8//IGNORE', $content);
 		}
 		
 		$matches = null;
