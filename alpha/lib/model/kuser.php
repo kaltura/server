@@ -684,18 +684,18 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return parent::getisAdmin() == true;
 	}
 
-    public function getIsGuest()
-    {
-        return $this->getFromCustomData(self::CUSTOM_DATA_IS_GUEST, null, false);
-    }
+	public function getIsGuest()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_GUEST, null, false);
+	}
 
-    /**
-     * @param bool $isGuest
-     */
-    public function setIsGuest($isGuest)
-    {
-        $this->putInCustomData(self::CUSTOM_DATA_IS_GUEST, $isGuest);
-    }
+	/**
+	 * @param bool $isGuest
+	 */
+	public function setIsGuest($isGuest)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IS_GUEST, $isGuest);
+	}
 	
 	public function getIsSsoExcluded()
 	{

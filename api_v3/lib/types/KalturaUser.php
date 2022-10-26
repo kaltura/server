@@ -30,12 +30,12 @@ class KalturaUser extends KalturaBaseUser
 	 */
 	public $isAdmin;
 
-    /**
-     * @var bool
-     * @insertonly
-     * @filter eq
-     */
-    public $isGuest;
+	/**
+	 * @var bool
+	 * @insertonly
+	 * @filter eq
+	 */
+	public $isGuest;
 
 	/**
 	 * @var string
