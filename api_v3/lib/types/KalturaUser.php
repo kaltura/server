@@ -33,7 +33,6 @@ class KalturaUser extends KalturaBaseUser
 	/**
 	 * @var bool
 	 * @insertonly
-	 * @filter eq
 	 */
 	public $isGuest;
 
