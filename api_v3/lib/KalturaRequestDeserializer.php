@@ -402,12 +402,17 @@ class KalturaRequestDeserializer
 				}
 				else
 				{
-					ksort($value);
-					foreach($value as $arrayItemKey => $arrayItemParams)
+					if (is_array($value))
 					{
-						if($arrayItemKey === '-')
-							break;
-						$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+						ksort($value);
+						foreach ($value as $arrayItemKey => $arrayItemParams)
+						{
+							if ($arrayItemKey === '-')
+							{
+								break;
+							}
+							$arrayObj[] = $this->buildObject($property->getArrayTypeReflector(), $arrayItemParams, "{$objectName}:$name");
+						}
 					}
 				}
 				$obj->$name = $arrayObj;
