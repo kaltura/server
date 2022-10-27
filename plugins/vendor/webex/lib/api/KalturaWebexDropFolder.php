@@ -82,12 +82,12 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 //				$this -> clientId = $headerData[0];
 //				$this -> clientSecret = $headerData[1];
 //				$this -> baseURL = $headerData[2];
-//				$this -> jwtToken = $vendorIntegration -> getJwtToken();
 //				$this -> refreshToken = $vendorIntegration -> getRefreshToken();
 //				$this -> accessToken = $vendorIntegration -> getAccessToken();
 //				$this -> description = $vendorIntegration->getZoomAccountDescription();
 //				$this -> accessExpiresIn = $vendorIntegration->getExpiresIn();
-				$webexAPIClient = new kWebexAPIClient();
+				$webexAPIClient = new kWebexAPIClient($webexBaseURL, $refreshToken, $clientId,
+					$clientSecret, $accessToken, $accessExpiresIn);
 				
 //				if ($this -> accessToken && $this -> refreshToken && kCurrentContext ::$ks_partner_id == Partner::BATCH_PARTNER_ID &&
 //					$vendorIntegration -> getExpiresIn() <= time() +

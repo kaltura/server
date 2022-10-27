@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-<head >
-    <title>Kaltura Zoom connector</title>
+<head>
+    <title>Kaltura Webex connector</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -13,46 +13,45 @@
         let baseServiceUrl = '@BaseServiceUrl@';
         var accountId = '@accountId@';
         var partnerId= '@partnerId@';
-        var submitUrl = baseServiceUrl+'/api_v3/service/vendor_zoomvendor/action/submitRegistration';
-        var getUrl = baseServiceUrl + '/api_v3/service/vendor_zoomvendor/action/list?format=1';
+        var submitUrl = baseServiceUrl+'/api_v3/service/webexapidropfolder_webexapi/action/submitRegistration';
+        var getUrl = baseServiceUrl + '/api_v3/service/webexapidropfolder_webexapi/action/list?format=1';
         const CMS_USER_ID=3;
-        const RECORDING_OWNER_BASED_ON_ZOOM_USER_ID=1;
+        const RECORDING_OWNER_BASED_ON_WEBEX_USER_ID=1;
     </script>
     <script>
         function trySubmit() {
             $('body').css('cursor','progress');
             let defaultUserId = $('#defaultUserId').val().trim();
-            let zoomCategory  = $('#zoomCategory').val().trim();
-            let zoomWebinarCategory  = $('#zoomWebinarCategory').val().trim();
-            let deletionPolicy = $('#deletionPolicy').is(':checked');
+            let webexCategory  = $('#webexCategory').val().trim();
             let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
             let enableMeetingUpload = $('#enableMeetingUpload').is(':checked');
-            let enableZoomTranscription = $('#enableZoomTranscription').is(':checked');
-            let enableWebinarUploads = $('#enableWebinarUploads').is(':checked');
-            let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
-            let zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
             let createUserIfNotExist = $('#createUserIfNotExist').is(':checked');
-            if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_ZOOM_USER_ID) {
-                zoomUserMatchingMode = CMS_USER_ID;
+            let deletionPolicy = $('#deletionPolicy').is(':checked');
+            let enableTranscription = $('#enableTranscription').is(':checked');
+
+            let userMatchingMode = $('[name=userMatchingMode]:checked').val();
+            if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_WEBEX_USER_ID) {
+                userMatchingMode = CMS_USER_ID;
             }
-            let zoomUserPostfix = $('#zoomUserPostfix').val().trim();
+            let userPostfix = $('#userPostfix').val().trim();
+
+            let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
 
             $.ajax({
                 url : submitUrl,
                 type : 'post',
                 data: {"ks": ks, 'accountId' : accountId,
-                    'integrationSetting:objectType' : 'KalturaZoomIntegrationSetting',
-                    'integrationSetting:defaultUserId': defaultUserId, 'integrationSetting:zoomCategory' : zoomCategory,
+                    'integrationSetting:objectType' : 'KalturaWebexAPIIntegrationSetting',
+                    'integrationSetting:defaultUserId': defaultUserId,
+                    'integrationSetting:webexCategory' : webexCategory,
                     'integrationSetting:enableRecordingUpload':enableRecordingUpload,
                     'integrationSetting:enableMeetingUpload':enableMeetingUpload,
-                    'integrationSetting:handleParticipantsMode':handleParticipantsMode,
-                    'integrationSetting:zoomUserMatchingMode':zoomUserMatchingMode,
-                    'integrationSetting:zoomUserPostfix':zoomUserPostfix,
-                    'integrationSetting:zoomWebinarCategory':zoomWebinarCategory,
-                    'integrationSetting:deletionPolicy':deletionPolicy,
-                    'integrationSetting:enableWebinarUploads':enableWebinarUploads,
-                    'integrationSetting:enableZoomTranscription':enableZoomTranscription,
                     'integrationSetting:createUserIfNotExist':createUserIfNotExist,
+                    'integrationSetting:deletionPolicy':deletionPolicy,
+                    'integrationSetting:enableTranscription':enableTranscription,
+                    'integrationSetting:userMatchingMode':userMatchingMode,
+                    'integrationSetting:userPostfix':userPostfix,
+                    'integrationSetting:handleParticipantsMode':handleParticipantsMode,
 
                     'format': 1 },
                 success : function(res) {
@@ -125,11 +124,10 @@
         }
 
         function setDefaultValues(){
-            $('#enableWebinarUploads').prop('checked',true);
             $('#enableRecordingUpload').prop('checked',true);
             $('#enableMeetingUpload').prop('checked',true);
-            $('#enableZoomTranscription').prop('checked',true);
-            $('input:radio[name=zoomUserMatchingMode]').val(['0']).prop('checked',true);
+            $('#enableTranscription').prop('checked',true);
+            $('input:radio[name=userMatchingMode]').val(['0']).prop('checked',true);
             $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
             $('#createUserIfNotExist').prop('checked',true);
         }
@@ -138,32 +136,30 @@
                 console.log(i,v);
                 switch (i) {
                     case 'defaultUserId':
-                    case 'zoomCategory':
-                    case 'zoomUserPostfix':
-                    case 'zoomWebinarCategory':
+                    case 'webexCategory':
+                    case 'userPostfix':
                         $('#'+i).val(v);
                         break;
-                    case 'enableWebinarUploads':
                     case 'deletionPolicy':
-                    case 'enableZoomTranscription':
+                    case 'enableTranscription':
                     case 'enableRecordingUpload':
                     case 'enableMeetingUpload':
                     case 'createUserIfNotExist':
                         $('#'+i).prop('checked', v);
                         break;
-                    case 'zoomUserMatchingMode':
+                    case 'userMatchingMode':
                     {
                         //check user matching mode
                         if(v==3)
                         {
                             $('input:radio[name=recordingOwner][value="1"]').prop('checked', true);
-                            $('#matchingZoomUserBasedOnZoomUserId').hide();
+                            $('#matchingWebexUserBasedOnWebexUserId').hide();
                         }
                         else
                         {
                             $('input:radio[name=recordingOwner][value="0"]').prop('checked', true);
                             $('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
-                            $('#matchingZoomUserBasedOnZoomUserId').show();
+                            $('#matchingWebexUserBasedOnWebexUserId').show();
                         }
                     }
                     break;
@@ -177,15 +173,15 @@
 
         function recordingOwnerChanged(e) {
             if(e) {
-                $('#matchingZoomUserBasedOnZoomUserId').show();
+                $('#matchingWebexUserBasedOnWebexUserId').show();
             }
             else {
-                $('#matchingZoomUserBasedOnZoomUserId').hide();
+                $('#matchingWebexUserBasedOnWebexUserId').hide();
             }
         }
     </script>
 
-    <title>Kaltura-Zoom registration</title>
+    <title>Kaltura-Webex registration</title>
 </head>
 <body onload="onLoad()" style="max-width: 600px;margin: auto">
     <form>
@@ -198,12 +194,8 @@
                 <input type='text' value='@defaultUserID@' id='defaultUserId' class='form-control' name='defaultUserId' required>
             </div>
             <div class='form-group'>
-                <label for='zoomCategory'><h7>Zoom Category</h7></label>
-                <input type='text' value='@zoomCategory@' id='zoomCategory' class='form-control' name='zoomCategory' required>
-            </div>
-            <div class='form-group'>
-            <label for='zoomWebinarCategory'><h7>Zoom Webinar Category</h7></label>
-                <input type='text' value='@zoomWebinarCategory@' id='zoomWebinarCategory' class='form-control' name='zoomWebinarCategory' required>
+                <label for='webexCategory'><h7>Webex Category</h7></label>
+                <input type='text' value='@webexCategory@' id='webexCategory' class='form-control' name='webexCategory' required>
             </div>
             <h7>Settings</h7>
             <div class='container p-2 my-2 border'>
@@ -214,10 +206,6 @@
                 <div class='custom-control custom-switch'>
                     <input type='checkbox' class='custom-control-input' id='enableMeetingUpload' name='enableMeetingUpload'>
                     <label class='custom-control-label' for='enableMeetingUpload'>Enable meeting upload</label>
-                </div>
-                <div class='custom-control custom-switch'>
-                    <input type='checkbox' class='custom-control-input' id='enableWebinarUploads' name='enableWebinarUploads' >
-                    <label class='custom-control-label' for='enableWebinarUploads'>Enable webinar upload</label>
                 </div>
             </div>
         </div>
@@ -235,37 +223,37 @@
                         <label class='custom-control-label' for='deletionPolicy'>Enable automatic deletion of files</label>
                     </div>
                     <div class='custom-control custom-switch'>
-                        <input type='checkbox' class='custom-control-input' id='enableZoomTranscription' name='enableZoomTranscription' >
-                        <label class='custom-control-label' for='enableZoomTranscription'>Enable Transcriptions</label>
+                        <input type='checkbox' class='custom-control-input' id='enableTranscription' name='enableTranscription' >
+                        <label class='custom-control-label' for='enableTranscription'>Enable Transcriptions</label>
                     </div>
                 </div>
             </div>
             <div class='form-check'>
                 <label class='form-check-label'>
-                <input type='radio'  id='recordingOwnerBasedOnZoomId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(this.checked)' value='0' checked>
-                    Based on Zoom User ID</label>
+                <input type='radio'  id='recordingOwnerBasedOnWebexId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(this.checked)' value='0' checked>
+                    Based on Webex User ID</label>
             </div>
 
-            <div id='matchingZoomUserBasedOnZoomUserId' class='container-fluid p-3 my-2 mx-auto border' style='width: 97%;'>
-                <p class='form-check-label'>How matching Zoom users should be handled:</p>
+            <div id='matchingWebexUserBasedOnWebexUserId' class='container-fluid p-3 my-2 mx-auto border' style='width: 97%;'>
+                <p class='form-check-label'>How matching Webex users should be handled:</p>
                 <div class='form-check-inline'>
                     <input type='radio' class='form-check-input'
-                           name='zoomUserMatchingMode' value='0' >
+                           name='userMatchingMode' value='0' >
                     <label class='form-check-label'>Do not modify</label>
                 </div>
                 <div class='form-check-inline'>
                     <input type='radio' class='form-check-input'
-                           name='zoomUserMatchingMode' value='1'>
+                           name='userMatchingMode' value='1'>
                     <label class='form-check-label'>Add postfix</label>
                 </div>
                 <div class='form-check-inline'>
                     <input type='radio' class='form-check-input'
-                           name='zoomUserMatchingMode' value='2'>
+                           name='userMatchingMode' value='2'>
                     <label class='form-check-label'>Remove postfix</label>
                 </div>
                 <div class='form-group'>
                     <label class='form-check-label'>Postfix</label>
-                    <input type='text' value='' id='zoomUserPostfix' class='form-control' name='zoomUserPostfix'>
+                    <input type='text' value='' id='userPostfix' class='form-control' name='userPostfix'>
                 </div>
             </div>
             <div class='form-check'>

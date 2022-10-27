@@ -39,30 +39,6 @@ class kWebexAPIOauth extends kOAuth
 		return $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
 	}
 	
-	public static function validateToken($tokensData)
-	{
-		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
-			!isset($tokensData[self::EXPIRES_IN]))
-		{
-			throw new KalturaAPIException(KalturaWebexAPIErrors::TOKEN_PARSING_FAILED);
-		}
-	}
-	
-	/**
-	 * @param $response
-	 * @return array $tokensData
-	 * @throws Exception
-	 */
-	protected static function retrieveTokenData($response)
-	{
-		$tokensData = self::parseTokensResponse($response);
-		self::validateToken($tokensData);
-		$tokensData = self::extractTokensFromData($tokensData);
-		$expiresIn = $tokensData[self::EXPIRES_IN];
-		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($expiresIn);
-		return $tokensData;
-	}
-	
 	public static function requestAccessToken($authCode)
 	{
 		list($webexBaseURL, $redirectUrl, $clientId, $clientSecret, $header) = self::getHeaderData();

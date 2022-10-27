@@ -8,6 +8,7 @@ abstract class kOAuth
 	const ACCESS_TOKEN = 'access_token';
 	const REFRESH_TOKEN = 'refresh_token';
 	const EXPIRES_IN = 'expires_in';
+	const VERIFICATION_TOKEN = 'verificationToken';
 	
 	protected static function getHeaderData()
 	{
@@ -19,9 +20,19 @@ abstract class kOAuth
 	
 	}
 	
+	/**
+	 * @param $response
+	 * @return array $tokensData
+	 * @throws Exception
+	 */
 	protected static function retrieveTokenData($response)
 	{
-
+		$tokensData = self::parseTokensResponse($response);
+		self::validateToken($tokensData);
+		$tokensData = self::extractTokensFromData($tokensData);
+		$expiresIn = $tokensData[self::EXPIRES_IN];
+		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($expiresIn);
+		return $tokensData;
 	}
 	
 	public static function requestAccessToken($authCode)
@@ -39,6 +50,15 @@ abstract class kOAuth
 		$dataAsArray = json_decode($response, true);
 		KalturaLog::debug(print_r($dataAsArray, true));
 		return $dataAsArray;
+	}
+	
+	public static function validateToken($tokensData)
+	{
+		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
+			!isset($tokensData[self::EXPIRES_IN]))
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::TOKEN_PARSING_FAILED);
+		}
 	}
 	
 	/**
@@ -61,5 +81,25 @@ abstract class kOAuth
 		$expiresIn = time() + $expiresIn - 120;
 		KalturaLog::info("Set Token 'expires_in' to " . $expiresIn);
 		return $expiresIn;
+	}
+	
+	/**
+	 * @param string $tokensData
+	 * @param string $iv
+	 * @param array $configuration
+	 * @return array
+	 * @throws Exception
+	 */
+	public static function handleEncryptTokens($tokensData, $iv, $configuration)
+	{
+		$verificationToken = $configuration[self::VERIFICATION_TOKEN];
+		$tokensResponse = AESEncrypt::decrypt($verificationToken, $tokensData, $iv);
+		$tokens = self::retrieveTokenData($tokensResponse);
+		if (!$tokens)
+		{
+			KExternalErrors::dieGracefully();
+		}
+		
+		return $tokens;
 	}
 }

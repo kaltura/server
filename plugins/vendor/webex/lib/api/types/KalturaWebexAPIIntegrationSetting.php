@@ -5,12 +5,41 @@
  */
 class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 {
+	/**
+	 * @var string
+	 */
+	public $webexCategory;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $enableRecordingUpload;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $enableMeetingUpload;
+	
+	/**
+	 * @var KalturaZoomUsersMatching
+	 */
+	public $userMatchingMode;
+	
+	/**
+	 * @var string
+	 */
+	public $userPostfix;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
 	private static $map_between_objects = array
 	(
-
+		'webexCategory',
+		'enableRecordingUpload' => 'status',
+		'enableMeetingUpload',
+		'userMatchingMode',
+		'userPostfix',
 	);
 
 	public function getMapBetweenObjects()

@@ -8,6 +8,10 @@ class WebexAPIVendorIntegration extends VendorIntegration
 {
 	const ACCESS_TOKEN = 'accessToken';
 	const REFRESH_TOKEN = 'refreshToken';
+	const WEBEX_CATEGORY = 'webexCatogery';
+	const ENABLE_MEETING_UPLOAD = 'enableMeetingUpload';
+	const USER_MATCHING = 'userMatching';
+	const USER_POSTFIX = 'UserPostfix';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
 	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
@@ -15,6 +19,17 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	public function setRefreshToken ($v)	{ $this->putInCustomData ( self::REFRESH_TOKEN, $v);	}
 	public function getRefreshToken ( )	{ return $this->getFromCustomData(self::REFRESH_TOKEN);	}
 	
+	public function setWebexCategory($v)	{ $this->putInCustomData ( self::WEBEX_CATEGORY, $v);	}
+	public function getWebexCategory( )	{ return $this->getFromCustomData(self::WEBEX_CATEGORY);	}
+	public function unsetCategory( )  {return $this->removeFromCustomData(self::WEBEX_CATEGORY);	}
+	
+	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
+	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD); }
+		
+	public function setUserMatching($v) { $this->putInCustomData ( self::USER_MATCHING, $v); }
+	public function getUserMatching() { return $this->getFromCustomData ( self::USER_MATCHING,null, kZoomUsersMatching::DO_NOT_MODIFY); }
+	
+	public function setUserPostfix($v) { $this->putInCustomData ( self::USER_POSTFIX, $v); }
 
 	/**
 	 * returns all tokens as array
@@ -22,7 +37,7 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	 */
 	public function getTokens()
 	{
-		return array(kZoomOauth::ACCESS_TOKEN => $this->getAccessToken(), kZoomOauth::REFRESH_TOKEN => $this->getRefreshToken());
+		return array(kOAuth::ACCESS_TOKEN => $this->getAccessToken(), kOAuth::REFRESH_TOKEN => $this->getRefreshToken());
 	}
 
 	/**
@@ -37,8 +52,8 @@ class WebexAPIVendorIntegration extends VendorIntegration
 
 	public function setTokensData($tokensDataAsArray)
 	{
-		$this->setAccessToken($tokensDataAsArray[kZoomOauth::ACCESS_TOKEN]);
-		$this->setRefreshToken($tokensDataAsArray[kZoomOauth::REFRESH_TOKEN]);
+		$this->setAccessToken($tokensDataAsArray[kOAuth::ACCESS_TOKEN]);
+		$this->setRefreshToken($tokensDataAsArray[kOAuth::REFRESH_TOKEN]);
 		$this->setVendorType(VendorTypeEnum::WEBEX_ACCOUNT);
 	}
 }
