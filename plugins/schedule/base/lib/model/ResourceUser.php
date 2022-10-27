@@ -13,6 +13,8 @@
  * @package plugins.schedule
  * @subpackage model
  */
-class ResourceUser extends BaseResourceUser {
+class ResourceUser extends BaseResourceUser implements IRelatedObject{
+
+
 
 } // ResourceUser
