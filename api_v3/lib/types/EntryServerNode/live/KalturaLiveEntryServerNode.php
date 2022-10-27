@@ -32,9 +32,8 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 
 	/**
 	 * @var time
-	 * @readonly
 	 */
-	public $lastDataUpdate;
+	public $featuresUpdatedAt;
 
 	private static $map_between_objects = array
 	(
@@ -42,7 +41,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 		"recordingInfo",
 		"isPlayableUser",
 		"viewMode",
-		"lastDataUpdate",
+		"featuresUpdatedAt",
 	);
 
 	/* (non-PHPdoc)

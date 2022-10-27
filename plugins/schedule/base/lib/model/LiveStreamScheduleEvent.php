@@ -254,7 +254,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 		foreach ($entryServerNodes as $entryServerNode)
 		{
 			/* @var $entryServerNode LiveEntryServerNode */
-			$entryServerNode->setLastDataUpdate($this->getUpdatedAt(null));
+			$entryServerNode->setFeaturesUpdatedAt($this->getUpdatedAt(null));
 			$entryServerNode->save();
 		}
 	}
