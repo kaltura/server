@@ -72,7 +72,7 @@ abstract class kOAuth
 	}
 	
 	/**
-	 * set two minutes off the token expiration, avoid 401 response from zoom
+	 * set two minutes off the token expiration, avoid 401 response from vendor
 	 * @param int $expiresIn
 	 * @return int $expiresIn
 	 */

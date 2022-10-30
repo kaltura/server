@@ -2,10 +2,18 @@
 
 /**
  * @package plugins.WebexAPIDropFolder
- * @subpackage zoom.model
+ * @subpackage model
  */
 class kWebexAPIClient
 {
+	protected $webexBaseURL;
+	protected $refreshToken;
+	protected $accessToken;
+	protected $clientId;
+	protected $clientSecret;
+	protected $accessExpiresIn;
+	protected $zoomTokensHelper;
+	
 	/**
 	 * kWebexAPIClient constructor.
 	 * @param $webexBaseURL
@@ -21,14 +29,14 @@ class kWebexAPIClient
 	{
 		if ($refreshToken == null && $accessToken == null)
 		{
-			throw new KalturaAPIException (KalturaZoomErrors::UNABLE_TO_AUTHENTICATE);
+			throw new KalturaAPIException (KalturaWebexAPIErrors::UNABLE_TO_AUTHENTICATE);
 		}
 		
-		$this->zoomBaseURL = $webexBaseURL;
+		$this->webexBaseURL = $webexBaseURL;
 		$this->refreshToken = $refreshToken;
+		$this->accessToken = $accessToken;
 		$this->clientId = $clientId;
 		$this->clientSecret = $clientSecret;
-		$this->accessToken = $accessToken;
 		$this->accessExpiresIn = $accessExpiresIn;
 		$this->zoomTokensHelper = new kZoomTokens($webexBaseURL, $clientId, $clientSecret);
 	}
@@ -55,5 +63,11 @@ class kWebexAPIClient
 		KalturaLog::debug(print_r($dataAsArray, true));
 		
 		return print_r($dataAsArray, true);
+	}
+	
+	public function retrieveWebexUser()
+	{
+		$user = array('account_id' => 1);
+		return $user;
 	}
 }

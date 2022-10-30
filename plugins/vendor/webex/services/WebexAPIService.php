@@ -188,8 +188,8 @@ class WebexAPIService extends KalturaBaseService
 			$tokens = kWebexAPIOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kOauth::ACCESS_TOKEN];
 			$client = new kWebexAPIClient($webexBaseURL, null, null, null, $accessToken);
-			//$user = $client->retrieveTokenZoomUser();
-			$accountId = 1; //$user[ZoomHelper::ACCOUNT_ID];
+			$user = $client->retrieveWebexUser();
+			$accountId = $user['account_id'];
 			$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
 			if (!$webexIntegration)
 			{

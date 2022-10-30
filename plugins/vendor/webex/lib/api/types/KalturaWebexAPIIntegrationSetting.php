@@ -55,6 +55,7 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 		}
 		
 		parent::toObject($dbObject, $skip);
+		$dbObject->setStatus($this->enableRecordingUpload ? VendorIntegrationStatus::ACTIVE : VendorIntegrationStatus::DISABLED);
 		
 		return $dbObject;
 	}
@@ -65,5 +66,24 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 			return;
 
 		parent::doFromObject($sourceObject, $responseProfile);
+		$this->enableRecordingUpload = $sourceObject->getStatus() == VendorIntegrationStatus::ACTIVE ? 1 : 0;
+		
+		$dropFolderType = WebexAPIDropFolderPlugin::getDropFolderTypeCoreValue(WebexAPIDropFolderType::WEBEX_API);
+		$dropFolders = DropFolderPeer::retrieveEnabledDropFoldersPerPartner($sourceObject->getPartnerId(), $dropFolderType);
+		$relatedDropFolder = null;
+		foreach ($dropFolders as $dropFolder)
+		{
+			if ($dropFolder->getWebexAPIVendorIntegrationId() == $sourceObject->getId())
+			{
+				$relatedDropFolder = $dropFolder;
+				break;
+			}
+		}
+		if (!$relatedDropFolder)
+		{
+			//$this->enableWebexTranscription = null;
+			$this->deletionPolicy = null;
+			$this->enableMeetingUpload = null;
+		}
 	}
 }
