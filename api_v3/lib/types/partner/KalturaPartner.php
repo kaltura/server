@@ -493,7 +493,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
 		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe', 'allowedDomains',
-		'excludedAdminRoleName', 'eventPlatformAllowedTemplates', 'verticalClassificationId', 'allowDefaultPasswordRestrictions'
+		'excludedAdminRoleName', 'eventPlatformAllowedTemplates', 'verticalClassificationId' => 'verticalClasiffication', 'allowDefaultPasswordRestrictions'
 
 	);
 	
@@ -519,7 +519,6 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
 		$this->describeYourself = kString::stripUtf8InvalidChars($this->describeYourself);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
-		$this->verticalClassificationId = $partner->getVerticalClasiffication();
 		$this->allowDefaultPasswordRestrictions = !$partner->getEnabledService(PermissionName::FEATURE_DISABLE_PASSWORD_RESTRICTION);
 		if (!$this->host){
 			$this->host = null;
