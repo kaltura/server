@@ -19,7 +19,7 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 		}
 		else
 		{
-			$content = @iconv('UTF-8', 'utf-8//IGNORE', $content);
+			$content = @iconv('utf-8', 'utf-8//IGNORE', $content);
 		}
 		
 		$matches = null;
