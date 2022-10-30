@@ -45,25 +45,6 @@ class WebexAPIService extends KalturaBaseService
 	}
 	
 	/**
-	 * @action webex
-	 * @return string
-	 * @throws Exception
-	 */
-	public function webexAction()
-	{
-		// create webex account section on vendor conf map
-		// remove consts
-		// add dedicated function that gets the header data on class named kWebexOauth call the function getHeaderData
-		// create kOauth interface class that declears getHeaderData
-		// rename zoom getZoomHeaderData, add the class it is implemanting and change places that call it
-		// add curlRetrieveTokensData to the interface and implemant for webex
-		// move all generic funcion to the interface
-		// save integration to db
-		
-		
-	}
-	
-	/**
 	 * @param $accountId
 	 * @param bool $includeDeleted
 	 * @return null|WebexAPIVendorIntegration
@@ -206,13 +187,14 @@ class WebexAPIService extends KalturaBaseService
 			$authCode = $_GET[self::AUTH_CODE];
 			$tokens = kWebexAPIOauth::requestAccessToken($authCode);
 			$accessToken = $tokens[kOauth::ACCESS_TOKEN];
-			$client = new kWebexAPIClient($webexBaseURL, null, null, null, null, $accessToken );
-			//$user = $client->retrieveTokenZoomxUser();
-			$accountId = 0; //$user[ZoomHelper::ACCOUNT_ID];
+			$client = new kWebexAPIClient($webexBaseURL, null, null, null, $accessToken);
+			//$user = $client->retrieveTokenZoomUser();
+			$accountId = 1; //$user[ZoomHelper::ACCOUNT_ID];
 			$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
 			if (!$webexIntegration)
 			{
 				$webexIntegration = new WebexAPIVendorIntegration();
+				$webexIntegration->setAccountId($accountId);
 			}
 			else if ($webexIntegration->getStatus() == VendorIntegrationStatus::ACTIVE && $webexIntegration->getPartnerId() != $ks->getPartnerId())
 			{
@@ -270,7 +252,7 @@ class WebexAPIService extends KalturaBaseService
 	/**
 	 * @action submitRegistration
 	 * @param string $accountId
-	 * @param KalturaZoomIntegrationSetting $integrationSetting
+	 * @param KalturaWebexAPIIntegrationSetting $integrationSetting
 	 * @return string
 	 * @throws KalturaAPIException
 	 * @throws PropelException
@@ -280,46 +262,44 @@ class WebexAPIService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		
-		/** @var ZoomVendorIntegration $zoomIntegration */
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
-		if(!$zoomIntegration || $zoomIntegration->getPartnerId() != $partnerId)
+		/** @var WebexAPIVendorIntegration $webexIntegration */
+		$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
+		if (!$webexIntegration || $webexIntegration->getPartnerId() != $partnerId)
 		{
-			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);
+			throw new KalturaAPIException(KalturaWebexAPIErrors::NO_INTEGRATION_DATA);
 		}
 		
 		kuserPeer::createKuserForPartner($partnerId, $integrationSetting->defaultUserId);
-		$this->configureZoomCategories($integrationSetting, $zoomIntegration);
-		$integrationSetting->toInsertableObject($zoomIntegration);
-		$zoomIntegration->save();
+		//$this->configureZoomCategories($integrationSetting, $webexIntegration);
+		$integrationSetting->toInsertableObject($webexIntegration);
+		$webexIntegration->save();
 		return true;
 	}
 	
 	/**
+	 * List KalturaWebexAPIIntegrationSetting objects
+	 *
 	 * @action list
-	 * @return string
-	 * @throws Exception
+	 * @param KalturaFilterPager $pager Pager
+	 * @return KalturaWebexAPIIntegrationSettingResponse
 	 */
-	public function listAction()
+	public function listAction(KalturaFilterPager $pager = null)
 	{
-		$webexConfiguration = self::getWebexConfiguration();
-		$webexBaseURL = $webexConfiguration['baseUrl'];
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
 		
-		$hostEmail = $webexConfiguration['hostEmail']; //todo
-		
-		$url = $webexBaseURL . 'recordings?hostEmail=' . $hostEmail;
-		
-		$accessToken = '';
-		$authorizationHeader = 'Authorization: Bearer ' . $accessToken;
-		$requestHeaders = array($authorizationHeader);
-		$curlWrapper = new KCurlWrapper();
-		$curlWrapper->setOpt(CURLOPT_POST, 1);
-		$curlWrapper->setOpt(CURLOPT_HEADER, true);
-		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
-		$response = $curlWrapper->exec($url);
-		
-		$dataAsArray = json_decode($response, true);
-		KalturaLog::debug(print_r($dataAsArray, true));
-		
-		return print_r($dataAsArray, true);
+		$c = KalturaCriteria::create(VendorIntegrationPeer::OM_CLASS);
+		$c->addAnd(VendorIntegrationPeer::VENDOR_TYPE,VendorTypeEnum::WEBEX_ACCOUNT);
+		$c->addAnd(VendorIntegrationPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId());
+		$totalCount = VendorIntegrationPeer::doCount($c);
+		$pager->attachToCriteria($c);
+		$list = VendorIntegrationPeer::doSelect($c);
+		$newList = KalturaWebexAPIIntegrationSettingArray::fromDbArray($list);
+		$response = new KalturaWebexAPIIntegrationSettingResponse();
+		$response->objects = $newList;
+		$response->totalCount = $totalCount;
+		return $response;
 	}
 }

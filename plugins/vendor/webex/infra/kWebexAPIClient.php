@@ -32,4 +32,28 @@ class kWebexAPIClient
 		$this->accessExpiresIn = $accessExpiresIn;
 		$this->zoomTokensHelper = new kZoomTokens($webexBaseURL, $clientId, $clientSecret);
 	}
+	
+	public function getRecording()
+	{
+		$webexConfiguration = self::getWebexConfiguration();
+		$webexBaseURL = $webexConfiguration['baseUrl'];
+		
+		$hostEmail = $webexConfiguration['hostEmail']; //todo
+		
+		$url = $webexBaseURL . 'recordings?hostEmail=' . $hostEmail;
+		
+		$accessToken = '';
+		$authorizationHeader = 'Authorization: Bearer ' . $accessToken;
+		$requestHeaders = array($authorizationHeader);
+		$curlWrapper = new KCurlWrapper();
+		$curlWrapper->setOpt(CURLOPT_POST, 1);
+		$curlWrapper->setOpt(CURLOPT_HEADER, true);
+		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
+		$response = $curlWrapper->exec($url);
+		
+		$dataAsArray = json_decode($response, true);
+		KalturaLog::debug(print_r($dataAsArray, true));
+		
+		return print_r($dataAsArray, true);
+	}
 }
