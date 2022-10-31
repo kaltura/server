@@ -38,7 +38,7 @@ class LikeService extends KalturaBaseLikeService
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
 		}
 		
-		$lockKey = "like_" . $this->getPartnerId() . $entryId . kCurrentContext::$ks_uid;
+		$lockKey = "like_" . $this->getPartnerId() . '_' .  $entryId . '_' . kCurrentContext::$ks_uid;
 		return kLock::runLocked($lockKey, array($this, 'likeImpl'), array($entryId));
     }
     
@@ -55,7 +55,7 @@ class LikeService extends KalturaBaseLikeService
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "entryId");
 		}
 		
-		$lockKey = "like_" . $this->getPartnerId() . $entryId . kCurrentContext::$ks_uid;
+		$lockKey = "like_" . $this->getPartnerId() . '_' .  $entryId . '_' . kCurrentContext::$ks_uid;
 		return kLock::runLocked($lockKey, array($this, 'unLikeImpl'), array($entryId));
     }
     
