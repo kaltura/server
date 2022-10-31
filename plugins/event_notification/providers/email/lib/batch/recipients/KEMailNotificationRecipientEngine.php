@@ -60,19 +60,26 @@ abstract class KEmailNotificationRecipientEngine
 		$maxIdInQueryChunk = 150;
 		$pager->pageSize = $maxIdInQueryChunk;
 		$offset = 0;
-		$index = 0;
-		$usersListResponse = array();
 		$allUsers = array();
 
 		while($offset < count($groupUserIds))
 		{
 			$currentUserArrIds = array_slice($groupUserIds, $offset, $maxIdInQueryChunk);
-			$currentUserStrIds = implode(',',$currentUserArrIds);
+			$currentUserStrIds = implode(',', $currentUserArrIds);
 			$userFilter->idIn = $currentUserStrIds;
-			$usersListResponse[] = (KBatchBase::$kClient->user->listAction($userFilter, $pager))->objects;
-			$allUsers = array_merge($allUsers, $usersListResponse[$index]);
-			$offset += $maxIdInQueryChunk;
-			$index++;
+			$response = KBatchBase::$kClient->user->listAction($userFilter, $pager);
+			if($response)
+			{
+				$usersListObject = $response -> objects;
+				$totalCount = $response -> totalCount;
+			}
+			else
+			{
+				KalturaLog::debug("Failed to list users of group: ". $groupId);
+				break;
+			}
+			$allUsers = array_merge($allUsers, $usersListObject);
+			$offset += min($maxIdInQueryChunk, $totalCount);
 		}
 
 		if(!(count($allUsers) > 0))
