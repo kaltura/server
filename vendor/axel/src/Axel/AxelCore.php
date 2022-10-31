@@ -100,10 +100,13 @@ class AxelCore {
         // Spawn off the process
         $process = new Process($command . $command_args . $detach . $process);
 
+        $process->setTimeout(null); // default Process timeout is 60 sec - too small for large files
+        $process->setIdleTimeout(60);
+
         $process->run();
         if (!$process->isSuccessful()) {
             $this->error = $process->getErrorOutput();
-			$this->processExitCode = $process->getExitCode();
+            $this->processExitCode = $process->getExitCode();
 
             return false;
         }

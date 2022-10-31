@@ -68,12 +68,32 @@ class KAxelWrapper extends KCurlWrapper
 	
 	public function getErrorNumber()
 	{
-		return isset($this->axel->processExitCode) ? $this->axel->processExitCode : 0;
+		if (isset($this->axel->processExitCode))
+		{
+			return $this->axel->processExitCode;
+		}
+		
+		if (isset($this->error))
+		{
+			return $this->errorNumber;
+		}
+		
+		return 0;
 	}
 
 	public function getErrorMsg()
 	{
-		return $this->axel->error;
+		if (isset($this->axel->error))
+		{
+			return $this->axel->error;
+		}
+		
+		if (isset($this->error))
+		{
+			return $this->error;
+		}
+		
+		return false;
 	}
 	
 	private function setInternalUrlErrorResults($url)
@@ -231,9 +251,12 @@ class KAxelWrapper extends KCurlWrapper
 	{
 		parent::close();
 		
-		$msg = "Deleting log file at [$this->logPath] - ";
-		$msg .= kFile::unlink($this->logPath) ? 'success' : 'failed';
-		KalturaLog::debug($msg);
+		if (kFile::checkFileExists($this->logPath))
+		{
+			$msg = "Deleting log file at [$this->logPath] - ";
+			$msg .= kFile::unlink($this->logPath) ? 'success' : 'failed';
+			KalturaLog::debug($msg);
+		}
 	}
 	
 	private function setLogPath()
@@ -281,13 +304,21 @@ class KAxelWrapper extends KCurlWrapper
 		
 		$fileSizeLine = $matches[0];
 		
-		if (!preg_match('/\s[0-9]*\s/', $fileSizeLine, $matches))
+		if (!preg_match('/[0-9]+\s*bytes/', $fileSizeLine, $matches))
 		{
-			KalturaLog::debug("Failed to extract 'File size' value from line [$fileSizeLine]");
+			KalturaLog::debug("Failed to extract 'File size in bytes' value from line [$fileSizeLine]");
 			return false;
 		}
 		
-		return trim($matches[0]);
+		$fileSizeBytesPostfix = $matches[0];
+		
+		if (!preg_match('/[0-9]+/', $fileSizeBytesPostfix, $matches))
+		{
+			KalturaLog::debug("Failed to extract 'File size' value from line [$fileSizeBytesPostfix]");
+			return false;
+		}
+		
+		return $matches;
 	}
 	
 	private function getFileDownloadPercentageFromLogFile()
@@ -349,5 +380,28 @@ class KAxelWrapper extends KCurlWrapper
 		
 		KalturaLog::debug("Could not extract http status code from log file at [$this->logPath]");
 		return 0;
+	}
+	
+	public static function checkUserAndPassOnUrl($url)
+	{
+		$sourceUrl = trim($url);
+		if (strpos($sourceUrl, '://') === false && substr($sourceUrl, 0, 1) != '/')
+		{
+			$sourceUrl = 'http://' . $sourceUrl;
+		}
+		
+		//Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
+		//https://bugs.php.net/bug.php?id=73754
+		$sourceUrl = preg_replace("/#/", "_kHash_", $sourceUrl, -1, $replaceCount);
+		
+		// extract information from URL and job data
+		$parts = parse_url($sourceUrl);
+		
+		if (isset($parts['user']) || isset($parts['pass']))
+		{
+			return true;
+		}
+		
+		return false;
 	}
 }

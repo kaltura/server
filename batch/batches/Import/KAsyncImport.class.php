@@ -68,7 +68,7 @@ class KAsyncImport extends KJobHandlerWorker
 		return 1;
 	}
 	
-	private function shouldUseAxelDownloadEngine($partnerId, $jobSubType)
+	private function shouldUseAxelDownloadEngine($partnerId, $jobSubType, $url)
 	{
 		if (self::$taskConfig->params && isset(self::$taskConfig->params->partnersUseAxel))
 		{
@@ -90,6 +90,19 @@ class KAsyncImport extends KJobHandlerWorker
 		{
 			return;
 		}
+		
+		if (KAxelWrapper::checkUserAndPassOnUrl($url))
+		{
+			KalturaLog::debug("Source URL has a user/pass - not using axel for security reasons. URL [$url]");
+			return;
+		}
+		
+		if ($this->getRedirectUrlIfExist($url))
+		{
+			KalturaLog::debug("Source URL has a redirect - not using axel for security reasons. URL [$url]");
+			return;
+		}
+		
 		
 		self::$currentEngine = self::AXEL_DOWNLOAD_ENGINE;
 	}
@@ -256,7 +269,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 			
-			$this->shouldUseAxelDownloadEngine($job->partnerId, $jobSubType);
+			$this->shouldUseAxelDownloadEngine($job->partnerId, $jobSubType, $sourceUrl);
 			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->downloadExec($sourceUrl, $data->destFileLocalPath,$resumeOffset);
 
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
@@ -665,6 +678,20 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		return $sourceUrl;
 	}
+	
+	protected function getRedirectUrlIfExist($url)
+	{
+		$curlWrapper = new KCurlWrapper(self::$taskConfig->params);
+		$curlWrapper->setTimeout(self::HEADERS_TIMEOUT);
+		$curlWrapper->getHeader($url);
+		
+		$redirectUrl = $curlWrapper->getInfo(CURLINFO_EFFECTIVE_URL);
+		
+		$curlWrapper->close();
+		
+		return ($redirectUrl && $url != $redirectUrl) ? $redirectUrl : null;
+	}
+	
 	
 	private function isPartialFile($errNumber)
 	{

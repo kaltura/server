@@ -132,16 +132,25 @@ class AxelDownload extends AxelCore implements \JsonSerializable, \Serializable 
         if (!isset($this->log_path) || empty($this->log_path) || !is_string($this->log_path)) $this->log_path = $this->download_path . time() . '.log';
 
         $this->last_command = AxelDownload::STARTED;
+
+//		dont output to file during cmd executing because then the Process (inside 'execute' function below)
+//		will reach 'idle timout' because no output is being received
+//		this means that the log file is only available after the 'execute' finished
+//		$cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address > $this->log_path";
 		
-		$cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address > $this->log_path";
+		$cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address";
 		KalturaLog::debug("Executing Axel cmd: [$this->axel_path $cmd]");
 
         if ($this->execute($this->axel_path, $cmd)) {
 
             if (!$this->detach) {
-
-                $this->updateStatus();
-                $this->runCallbacks(true);
+	
+				if (kFile::filePutContents($this->log_path, $this->process_info['pid']) === false) {
+					
+					KalturaLog::debug("Failed to write output to log file path [$this->log_path]");
+				}
+				$this->updateStatus();
+				$this->runCallbacks(true);
             }
         }
         else if (!$this->detach) $this->runCallbacks(false);
