@@ -191,7 +191,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	protected function createEntryDescriptionFromRecording($recording)
 	{
-		return "Zoom Recording ID: {$recording->id}\nUUID: {$recording->uuid}\nMeeting Time: {$recording->startTime}";
+		return "Zoom Recording ID: {$recording->id}\nUUID: {$recording->uuid}\nMeeting Time: {$recording->startTime}GMT";
 	}
 
 	/**
