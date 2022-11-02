@@ -141,14 +141,9 @@ class AxelDownload extends AxelCore implements \JsonSerializable, \Serializable 
 		$cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address";
 		KalturaLog::debug("Executing Axel cmd: [$this->axel_path $cmd]");
 
-        if ($this->execute($this->axel_path, $cmd)) {
+        if ($this->execute($this->axel_path, $cmd, true, $this->log_path)) {
 
             if (!$this->detach) {
-	
-				if (kFile::filePutContents($this->log_path, $this->process_info['pid']) === false) {
-					
-					KalturaLog::debug("Failed to write output to log file path [$this->log_path]");
-				}
 				$this->updateStatus();
 				$this->runCallbacks(true);
             }

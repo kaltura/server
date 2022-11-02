@@ -16,6 +16,7 @@
 
 namespace Axel;
 
+use kFile;
 use Symfony\Component\Process\Process;
 
 class AxelCore {
@@ -92,7 +93,7 @@ class AxelCore {
      * @param bool $process_info Whether to fetch and set process information
      * @return bool If the command executed successfully
      */
-    protected function execute($command, $command_args, $process_info = true) {
+    protected function execute($command, $command_args, $process_info = true, $log_path = null) {
 
         $detach = ($this->detach) ? ' 2>&1 &': '';
         $process = ($process_info) ? ' echo $!': '';
@@ -100,10 +101,14 @@ class AxelCore {
         // Spawn off the process
         $process = new Process($command . $command_args . $detach . $process);
 
-        $process->setTimeout(null); // default Process timeout is 60 sec - too small for large files
+        $process->setTimeout(null); // default Process timeout is 60 sec - too short for large files
         $process->setIdleTimeout(60);
 
-        $process->run();
+        $process->run(function ($type, $buffer) use ($log_path) {
+			if ($type === Process::OUT) {
+				kFile::filePutContents($log_path, $buffer, FILE_APPEND);
+			}
+		});
         if (!$process->isSuccessful()) {
             $this->error = $process->getErrorOutput();
             $this->processExitCode = $process->getExitCode();
