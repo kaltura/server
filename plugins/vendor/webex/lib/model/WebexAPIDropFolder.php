@@ -60,12 +60,12 @@ class WebexAPIDropFolder extends RemoteDropFolder
 	public function getFolderUrl()
 	{
 		return kConf ::getArrayValue(
-			KalturaWebexAPIDropFolder::WEBEX_BASE_URL, KalturaWebexAPIDropFolder::CONFIGURATION_PARAM_NAME, KalturaWebexAPIDropFolder::MAP_NAME
+			KalturaWebexAPIDropFolder::WEBEX_BASE_URL, WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR
 		);
 	}
 	
 	protected function getRemoteFileTransferMgrType()
 	{
-		return kFileTransferMgrType::WEBEX_API; /// ????
+		return kFileTransferMgrType::WEBEX_API;
 	}
 }

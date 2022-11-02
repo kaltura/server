@@ -10,7 +10,7 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	const REFRESH_TOKEN = 'refreshToken';
 	const WEBEX_CATEGORY = 'webexCatogery';
 	const ENABLE_MEETING_UPLOAD = 'enableMeetingUpload';
-	const USER_MATCHING = 'userMatching';
+	const USER_MATCHING_MODE = 'userMatchingMode';
 	const USER_POSTFIX = 'UserPostfix';
 
 	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
@@ -26,10 +26,11 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
 	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD); }
 		
-	public function setUserMatching($v) { $this->putInCustomData ( self::USER_MATCHING, $v); }
-	public function getUserMatching() { return $this->getFromCustomData ( self::USER_MATCHING,null, kZoomUsersMatching::DO_NOT_MODIFY); }
+	public function setUserMatchingMode($v) { $this->putInCustomData ( self::USER_MATCHING_MODE, $v); }
+	public function getUserMatchingMode() { return $this->getFromCustomData ( self::USER_MATCHING_MODE,null, kZoomUsersMatching::DO_NOT_MODIFY); }
 	
 	public function setUserPostfix($v) { $this->putInCustomData ( self::USER_POSTFIX, $v); }
+	public function getUserPostfix ( )	{ return $this->getFromCustomData(self::USER_POSTFIX); }
 
 	/**
 	 * returns all tokens as array

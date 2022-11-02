@@ -41,6 +41,29 @@ class kWebexAPIClient
 		$this->zoomTokensHelper = new kZoomTokens($webexBaseURL, $clientId, $clientSecret);
 	}
 	
+	public function getRecordings($accessToken)
+	{
+		$request =  'recordings';
+		return $this->sendRequest($request, $accessToken);
+	}
+	
+	protected function sendRequest($request, $accessToken)
+	{
+		$webexConfiguration = self::getWebexConfiguration();
+		$webexBaseURL = $webexConfiguration['baseUrl'];
+		
+		$requestUrl = $webexBaseURL . $request;
+		$authorizationHeader = 'Authorization: Bearer ' . $accessToken;
+		$requestHeaders = array($authorizationHeader);
+		$curlWrapper = new KCurlWrapper();
+		$curlWrapper->setOpt(CURLOPT_POST, 1);
+		$curlWrapper->setOpt(CURLOPT_HEADER, true);
+		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
+		$response = $curlWrapper->exec($requestUrl);
+		
+		return $response;
+	}
+	
 	public function getRecording()
 	{
 		$webexConfiguration = self::getWebexConfiguration();

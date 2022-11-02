@@ -55,9 +55,7 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 	 */
 	public $lastHandledMeetingTime;
 	
-	/*
-	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
-	 */
+	
 	private static $map_between_objects = array(
 		'webexAPIVendorIntegrationId',
 		'lastHandledMeetingTime'
@@ -78,16 +76,16 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 		{
 			if ($vendorIntegration)
 			{
-//				$headerData = self ::getZoomHeaderData();
-//				$this -> clientId = $headerData[0];
+				$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
+				$this->clientId = $webexConfiguration['clientId'];
+				$this->baseURL = $webexConfiguration['baseUrl'];
 //				$this -> clientSecret = $headerData[1];
-//				$this -> baseURL = $headerData[2];
-//				$this -> refreshToken = $vendorIntegration -> getRefreshToken();
-//				$this -> accessToken = $vendorIntegration -> getAccessToken();
+				$this->refreshToken = $vendorIntegration->getRefreshToken();
+				$this->accessToken = $vendorIntegration->getAccessToken();
 //				$this -> description = $vendorIntegration->getZoomAccountDescription();
-//				$this -> accessExpiresIn = $vendorIntegration->getExpiresIn();
-				$webexAPIClient = new kWebexAPIClient($webexBaseURL, $refreshToken, $clientId,
-					$clientSecret, $accessToken, $accessExpiresIn);
+				$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
+				$webexAPIClient = new kWebexAPIClient($this->baseURL, $this->refreshToken, $this->clientId,
+					$this->clientSecret, $this->accessToken, $this->accessExpiresIn);
 				
 //				if ($this -> accessToken && $this -> refreshToken && kCurrentContext ::$ks_partner_id == Partner::BATCH_PARTNER_ID &&
 //					$vendorIntegration -> getExpiresIn() <= time() +
@@ -111,7 +109,7 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 			}
 			else
 			{
-				//throw new KalturaAPIException(KalturaZoomDropFolderErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
+				throw new KalturaAPIException(KalturaWebexAPIErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
 			}
 		}
 		catch (Exception $e)
@@ -129,7 +127,7 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 			$vendorIntegration = VendorIntegrationPeer::retrieveByPK($dbObject->getWebexAPIVendorIntegrationId());
 			if (!$vendorIntegration)
 			{
-				//throw new KalturaAPIException(KalturaZoomDropFolderErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
+				throw new KalturaAPIException(KalturaWebexAPIErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
 			}
 			$vendorIntegration->save();
 		}

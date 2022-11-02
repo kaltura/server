@@ -13,4 +13,5 @@ class KalturaWebexAPIErrors extends KalturaErrors
 	const UNABLE_TO_AUTHENTICATE     = 'UNABLE_TO_AUTHENTICATE;;Unable to authenticate because both Refresh Token and JWT are missing';
 	const NOT_ALLOWED_ON_THIS_INSTANCE        = 'NOT_ALLOWED_ON_THIS_INSTANCE;;Not allowed on this instance';
 	const INTEGRATION_ALREADY_EXIST   = "INTEGRATION_ALREADY_EXIST;PARTNER_ID;Integration already exist for partner id \"@PARTNER_ID@\", please disable it and try again";
+	const DROP_FOLDER_INTEGRATION_DATA_MISSING = 'DROP_FOLDER_INTEGRATION_DATA_MISSING;;Missing integration data for this drop folder';
 }

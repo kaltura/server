@@ -14,7 +14,6 @@ class Form_WebexAPIDropFolderConfigureExtend_SubForm extends Form_DropFolderConf
 	{
 		$this->addElement('text', 'webexAPIVendorIntegrationId', array(
 			'label'			=> 'Vendor Integration id:',
-			'disabled'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
 		

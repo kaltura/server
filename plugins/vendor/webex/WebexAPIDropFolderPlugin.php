@@ -152,4 +152,14 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 		$value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
 		return kPluginableEnumsManager::apiToCore('DropFolderType', $value);
 	}
+	
+	public static function getWebexConfiguration()
+	{
+		if (!kConf::hasMap(kConfMapNames::VENDOR))
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::NO_VENDOR_CONFIGURATION);
+		}
+		
+		return kConf::get(WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR);
+	}
 }
