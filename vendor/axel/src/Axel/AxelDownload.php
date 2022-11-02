@@ -137,15 +137,15 @@ class AxelDownload extends AxelCore implements \JsonSerializable, \Serializable 
 //		will reach 'idle timout' because no output is being received
 //		this means that the log file is only available after the 'execute' finished
 //		$cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address > $this->log_path";
-		
-		$cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address";
-		KalturaLog::debug("Executing Axel cmd: [$this->axel_path $cmd]");
+
+        $cmd = " -avn $this->connections -o {$this->getFullPath()} $this->address";
+        KalturaLog::debug("Executing Axel cmd: [$this->axel_path $cmd]");
 
         if ($this->execute($this->axel_path, $cmd, true, $this->log_path)) {
 
             if (!$this->detach) {
-				$this->updateStatus();
-				$this->runCallbacks(true);
+                $this->updateStatus();
+                $this->runCallbacks(true);
             }
         }
         else if (!$this->detach) $this->runCallbacks(false);

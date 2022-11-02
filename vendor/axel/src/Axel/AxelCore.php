@@ -105,10 +105,10 @@ class AxelCore {
         $process->setIdleTimeout(60);
 
         $process->run(function ($type, $buffer) use ($log_path) {
-			if ($type === Process::OUT) {
-				kFile::filePutContents($log_path, $buffer, FILE_APPEND);
-			}
-		});
+            if ($type === Process::OUT) {
+                kFile::filePutContents($log_path, $buffer, FILE_APPEND);
+            }
+        });
         if (!$process->isSuccessful()) {
             $this->error = $process->getErrorOutput();
             $this->processExitCode = $process->getExitCode();
