@@ -25,7 +25,9 @@ class ExternalMediaService extends KalturaEntryService
 	 */
 	function addAction(KalturaExternalMediaEntry $entry)
 	{
-		$dbEntry = parent::add($entry, $entry->conversionProfileId);
+		$dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId, $entry->templateEntryId);
+		$dbEntry = $this->prepareEntryForInsert($entry, $dbEntry);
+		$dbEntry->save();
 		$dbEntry->setStatus(entryStatus::READY);
 		$dbEntry->save();
 		
