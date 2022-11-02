@@ -92,7 +92,7 @@ class KGenericProcessor
 	}
 
 	protected static function getUpdateDay($waitDays = 0) {
-		$now = intval(time() / 86400);  // as num of sec in day to get day number
+		$now = intval((time() - 18000) / 86400);  // as num of sec in day to get day number
 		return $now - $waitDays;
 	}
 
