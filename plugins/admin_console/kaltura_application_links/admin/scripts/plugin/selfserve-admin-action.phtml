@@ -13,10 +13,10 @@
             return;
         }
         initialized = true;
-        var myIframe = document.getElementById('LoginIframe');
-        myIframe.addEventListener("load", function() {
+        var loginIframe = window.document.getElementById('LoginIframe');
+        loginIframe.addEventListener("load", function() {
             window.document.getElementById('ApplicationIframe').src = '<?php echo $this->appUrl; ?>';
         });
-        window.document.getElementById('LoginIframe').src = '<?php echo $this->loginUrl; ?>';
+        loginIframe.src = '<?php echo $this->loginUrl; ?>';
     })(window);
 </script>
