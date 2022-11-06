@@ -227,7 +227,7 @@ class WebexAPIService extends KalturaBaseService
 	 */
 	public static function loadRegionalCloudRedirectionPage($authCode)
 	{
-		$file_path = dirname(__FILE__) . '/../lib/api/webPage/KalturaRegionalRedirectPage.html';
+		$file_path = dirname(__FILE__) . '/../lib/api/webPage/KalturaWebexAPIRegionalRedirectPage.html';
 		if (file_exists($file_path))
 		{
 			$page = file_get_contents($file_path);
