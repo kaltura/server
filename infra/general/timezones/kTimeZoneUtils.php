@@ -8,33 +8,27 @@ class kTimeZoneUtils
 {
     /**
      * @param string $datetime
-     * @param int $baseTimestamp
      * @param string $timeZone
      * @return int|false a timestamp on success, false otherwise
      */
-    public static function timeZoneStrToTime($datetime , $baseTimestamp=NULL, $timeZone=NULL)
+    public static function timeZoneStrToTime($datetimeStr, $timeZone=null)
     {
-        $original = date_default_timezone_get();
-        if($timeZone)
-        {
-            date_default_timezone_set($timeZone);
-        }
-        if($baseTimestamp)
-        {
-            $result = strtotime($datetime, $baseTimestamp);
-        }
-        else
-        {
-            $result = strtotime($datetime);
-        }
-        date_default_timezone_set($original);
-        return $result;
+    	$datetime = new DateTime($datetimeStr, new DateTimeZone($timeZone));
+    	return $datetime->getTimestamp();
     }
 
     public static function strToZuluTime($datetime)
     {
         $newDatetime = str_replace(array('T','Z'),array(' ',''), $datetime);
-        return self::timeZoneStrToTime($newDatetime, Null, 'Zulu');
+        return self::timeZoneStrToTime($newDatetime, 'Zulu');
     }
+
+    public static function timezoneDate($format, $timestamp, $timezone=null)
+	{
+		$datetime = new DateTime();
+		$datetime->setTimeZone(new DateTimeZone($timezone));
+		$datetime->setTimestamp($timestamp);
+		return $datetime->format($format);
+	}
 
 }

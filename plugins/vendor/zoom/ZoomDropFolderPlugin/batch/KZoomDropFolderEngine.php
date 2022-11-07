@@ -193,7 +193,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsFromZoom()
 	{
-		$dayToScan = date('Y-m-d', $this->dropFolder->lastHandledMeetingTime);
+		$dayToScan = kTimeZoneUtils::timezoneDate('Y-m-d', $this->dropFolder->lastHandledMeetingTime, 'Zulu');
 
 		$pageSize = self::MAX_PAGE_SIZE;
 		$maxMeetings = $this->getZoomParam('maxMeetings', 3000);
