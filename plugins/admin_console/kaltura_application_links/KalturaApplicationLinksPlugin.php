@@ -1,7 +1,9 @@
 <?php
 
-class KalturaApplicationLinksPlugin extends KalturaPlugin implements IKalturaApplicationPartialView, IKalturaAdminConsolePages{
+class KalturaApplicationLinksPlugin extends KalturaPlugin implements IKalturaApplicationPartialView, IKalturaAdminConsolePages
+{
     const PLUGIN_NAME = 'KalturaApplicationLinks';
+    const ROOT_LABEL = "App Links";
 
     /* (non-PHPdoc)
      * @see IKalturaPlugin::getPluginName()
@@ -25,7 +27,7 @@ class KalturaApplicationLinksPlugin extends KalturaPlugin implements IKalturaApp
     {
         //todo take list of items from config
         $links = array(
-            new SelfserveAdminAction(),
+            new SelfserveAdminAction(self::ROOT_LABEL),
         );
         return $links;
     }

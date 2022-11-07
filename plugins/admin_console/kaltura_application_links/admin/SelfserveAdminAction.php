@@ -2,10 +2,11 @@
 
 class SelfserveAdminAction extends KalturaApplicationPlugin
 {
-    public function __construct()
+    const LABEL = "Selfserve";
+    public function __construct($rootLabel)
     {
-        $this->rootLabel = "External Links";
-        $this->label = "Selfserve";
+        $this->rootLabel = $rootLabel;
+        $this->label = self::LABEL;
     }
 
     public function doAction(Zend_Controller_Action $action)
