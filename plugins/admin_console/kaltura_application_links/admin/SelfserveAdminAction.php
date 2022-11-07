@@ -4,7 +4,7 @@ class SelfserveAdminAction extends KalturaApplicationPlugin
 {
     public function __construct()
     {
-        $this->rootLabel = "External Links";
+        $this->rootLabel = "External apps";
         $this->label = "Selfserve";
     }
 
