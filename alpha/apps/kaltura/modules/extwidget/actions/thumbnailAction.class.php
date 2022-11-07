@@ -317,7 +317,7 @@ class thumbnailAction extends sfAction
 			}
 		}
 
-		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
+		myPartnerUtils::blockInactivePartner($entry->getPartnerId(), array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY));
 		
 		if ( $nearest_aspect_ratio )
 		{

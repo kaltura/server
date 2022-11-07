@@ -1671,12 +1671,24 @@ class myPartnerUtils
 			}
 		}		
  	}
- 	
+	protected static function blockPartnerByStatus($partnerId, $status, $allowedStatusArray = null)
+	{
+		 if(is_null($allowedStatusArray))
+		 {
+			 $allowedStatusArray = array(Partner::PARTNER_STATUS_ACTIVE);
+		 }
+		 if (!in_array($status, $allowedStatusArray))
+		 {
+			 KalturaLog::log ( "BLOCK_PARNTER_STATUS partner [$partnerId] status [$status]" );
+			 KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_ACTIVE);
+		 }
+	}
+
  	/*
  	 * check partner status before delivering actual media files
  	 * checks also the requesting ip to be from non-blocked ips
  	 */
- 	public static function blockInactivePartner($partnerId)
+ 	public static function blockInactivePartner($partnerId, $allowedStatusArray = null)
  	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		if (is_null($partner))
@@ -1686,11 +1698,7 @@ class myPartnerUtils
 		}
 			
 		$status = $partner->getStatus();
-		if ($status != Partner::PARTNER_STATUS_ACTIVE)
-		{
-			KalturaLog::log ( "BLOCK_PARNTER_STATUS partner [$partnerId] status [$status]" );
-			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_ACTIVE);
-		}
+		self::blockPartnerByStatus($partnerId, $status, $allowedStatusArray);
 
 		// take blocked-countries country code from partner custom data
 		$blockCountries = $partner->getDelivryBlockCountries();

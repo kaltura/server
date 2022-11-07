@@ -36,4 +36,5 @@ interface AuditTrailObjectType extends BaseEnum
 	const USER_ROLE = UserRolePeer::OM_CLASS;
 	const PERMISSION = PermissionPeer::OM_CLASS;
 	const REACH_PROFILE = ReachProfilePeer::OM_CLASS;
+	const CATEGORY_ENTRY = categoryEntryPeer::OM_CLASS;
 }

@@ -1,3 +1,11 @@
+# Rigel-18.17.0
+## Add self serve admin view permission
+* Issue Type: Task
+* Issue ID: SSRV-892
+
+### Deployment Scripts ###
+php deployment/updates/scripts/add_permissions/2022_11_01_add_ssrv_view_admin_permission.php
+
 # Rigel-18.16.0
 ## Disable password restriction on FirstName/LastName/Email
 * Issue Type: Task
