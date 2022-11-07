@@ -21,6 +21,11 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 	public $enableMeetingUpload;
 	
 	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $enableTranscription;
+	
+	/**
 	 * @var KalturaZoomUsersMatching
 	 */
 	public $userMatchingMode;
@@ -38,6 +43,7 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 		'webexCategory',
 		'enableRecordingUpload' => 'status',
 		'enableMeetingUpload',
+		'enableTranscription',
 		'userMatchingMode',
 		'userPostfix',
 	);
@@ -81,7 +87,7 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 		}
 		if (!$relatedDropFolder)
 		{
-			//$this->enableWebexTranscription = null;
+			$this->enableTranscription = null;
 			$this->deletionPolicy = null;
 			$this->enableMeetingUpload = null;
 		}

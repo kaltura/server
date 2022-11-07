@@ -2,10 +2,11 @@
 /**
  * @package plugins.WebexAPIDropFolder
  */
-class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaServices
+class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaServices, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'WebexAPIDropFolder';
 	const CONFIGURATION_PARAM_NAME = 'WebexAccount';
+	const EVENT_WEBEX_API_DROP_FOLDER_FLOW_MANAGER = 'kWebexAPIDropFolderFlowManager';
 	
 	public static function dependsOn()
 	{
@@ -28,6 +29,16 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 			'webexAPI' => 'WebexAPIService',
 		);
 		return $map;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public static function getEventConsumers()
+	{
+		return array(
+			self::EVENT_WEBEX_API_DROP_FOLDER_FLOW_MANAGER
+		);
 	}
 	
 	public static function getCoreValue($type, $valueName)

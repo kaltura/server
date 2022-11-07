@@ -13,7 +13,7 @@ class kWebexAPIOauth extends kOAuth
 	 */
 	protected static function getHeaderData()
 	{
-		$webexConfiguration = kConf::get(WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR);
+		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
 		$webexBaseURL = $webexConfiguration['baseUrl'];
 		$redirectUrl = $webexConfiguration['redirectUrl'];
 		$clientId = $webexConfiguration['clientId'];

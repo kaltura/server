@@ -100,8 +100,8 @@ class ZoomVendorIntegration extends VendorIntegration
 	 */
 	public function getTokens()
 	{
-		return array(kZoomOauth::ACCESS_TOKEN => $this->getAccessToken(), kZoomOauth::REFRESH_TOKEN => $this->getRefreshToken(),
-			kZoomOauth::EXPIRES_IN => $this->getExpiresIn(), self::JWT_TOKEN => $this->getJwtToken());
+		return array(kOAuth::ACCESS_TOKEN => $this->getAccessToken(), kOAuth::REFRESH_TOKEN => $this->getRefreshToken(),
+			kOAuth::EXPIRES_IN => $this->getExpiresIn(), self::JWT_TOKEN => $this->getJwtToken());
 	}
 
 	/**
@@ -116,9 +116,9 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	public function setTokensData($tokensDataAsArray)
 	{
-		$this->setExpiresIn($tokensDataAsArray[kZoomOauth::EXPIRES_IN]);
-		$this->setAccessToken($tokensDataAsArray[kZoomOauth::ACCESS_TOKEN]);
-		$this->setRefreshToken($tokensDataAsArray[kZoomOauth::REFRESH_TOKEN]);
+		$this->setExpiresIn($tokensDataAsArray[kOAuth::EXPIRES_IN]);
+		$this->setAccessToken($tokensDataAsArray[kOAuth::ACCESS_TOKEN]);
+		$this->setRefreshToken($tokensDataAsArray[kOAuth::REFRESH_TOKEN]);
 		$this->setJwtToken($tokensDataAsArray[self::JWT_TOKEN]);
 		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 	}

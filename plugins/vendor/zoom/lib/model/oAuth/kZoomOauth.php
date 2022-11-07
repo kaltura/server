@@ -6,12 +6,8 @@
 class kZoomOauth extends kOAuth
 {
 	const OAUTH_TOKEN_PATH = '/oauth/token';
-	const ACCESS_TOKEN = 'access_token';
-	const REFRESH_TOKEN = 'refresh_token';
-	const VERIFICATION_TOKEN = 'verificationToken';
 	const AUTHORIZATION_HEADER = 'Authorization';
 	const TOKEN_TYPE = 'token_type';
-	const EXPIRES_IN = 'expires_in';
 	const SCOPE = 'scope';
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
@@ -53,8 +49,8 @@ class kZoomOauth extends kOAuth
 		$tokensData = self::parseTokensResponse($response);
 		self::validateToken($tokensData);
 		$tokensData = self::extractTokensFromData($tokensData);
-		$expiresIn = $tokensData[self::EXPIRES_IN];
-		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($expiresIn);
+		$expiresIn = $tokensData[kOAuth::EXPIRES_IN];
+		$tokensData[kOAuth::EXPIRES_IN] = self::getTokenExpiryRelativeTime($expiresIn);
 		return $tokensData;
 	}
 
@@ -91,8 +87,8 @@ class kZoomOauth extends kOAuth
 
 	public static function validateToken($tokensData)
 	{
-		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
-			!isset($tokensData[self::EXPIRES_IN]))
+		if (!$tokensData || !isset($tokensData[kOAuth::REFRESH_TOKEN]) || !isset($tokensData[kOAuth::ACCESS_TOKEN]) ||
+			!isset($tokensData[kOAuth::EXPIRES_IN]))
 		{
 			ZoomHelper::exitWithError(kZoomErrorMessages::TOKEN_PARSING_FAILED . print_r($tokensData));
 		}
@@ -139,7 +135,7 @@ class kZoomOauth extends kOAuth
 		$headers = getallheaders();
 		if (isset($headers[self::AUTHORIZATION_HEADER]))
 		{
-			$verificationToken = $zoomConfiguration[self::VERIFICATION_TOKEN];
+			$verificationToken = $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 			if ($verificationToken === $headers[self::AUTHORIZATION_HEADER])
 			{
 				return;
