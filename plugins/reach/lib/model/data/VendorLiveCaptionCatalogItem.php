@@ -13,6 +13,7 @@ class VendorLiveCaptionCatalogItem extends VendorCaptionsCatalogItem implements 
 	const CUSTOM_DATA_MINIMAL_REFUND_TIME = "minimal_refund_time";
 	const CUSTOM_DATA_MINIMAL_ORDER_TIME = "minimal_order_time";
 	const CUSTOM_DATA_DURATION_LIMIT = "duration_limit";
+	const CUSTOM_DATA_CONTENT_TRANFER_METHOD = "content_transfer_method";
 
 	public function setMinimalRefundTime($minimalRefundTime)
 	{
@@ -29,6 +30,11 @@ class VendorLiveCaptionCatalogItem extends VendorCaptionsCatalogItem implements 
 		$this->putInCustomData(self::CUSTOM_DATA_DURATION_LIMIT, $durationLimit);
 	}
 
+	public function setContentTransferMethod($contentTransferMethod)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_CONTENT_TRANFER_METHOD, $contentTransferMethod);
+	}
+
 	public function getMinimalRefundTime()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_MINIMAL_REFUND_TIME);
@@ -42,5 +48,10 @@ class VendorLiveCaptionCatalogItem extends VendorCaptionsCatalogItem implements 
 	public function getDurationLimit()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_DURATION_LIMIT);
+	}
+
+	public function getContentTransferMethod()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_CONTENT_TRANFER_METHOD);
 	}
 }
