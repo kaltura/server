@@ -338,6 +338,37 @@ class kSessionBase
 		}
 		return null;
 	}
+	
+	static public function deleteSecretCacheKey($partnerId)
+	{
+		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
+		
+		if(!$cacheSections)
+		{
+			return null;
+		}
+		$cacheKey = self::getSecretsCacheKey($partnerId);
+		KalturaLog::debug("Deleting key [$cacheKey] now [" . date('Y-m-d H:i:s', time()) . "]");
+		$deleted = false;
+		foreach ($cacheSections as $cacheSection)
+		{
+			$queryStart = microtime(true);
+			$cacheStore = kCacheManager::getCache($cacheSection);
+			if (!$cacheStore)
+			{
+				continue;
+			}
+			$secrets = $cacheStore->get($cacheKey);
+			if (!$secrets)
+			{
+				continue;
+			}
+			$cacheStore->delete($cacheKey);
+			$deleted = true;
+			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey]");
+		}
+		return $deleted;
+	}
 
 	// overridable
 	protected function getKSVersionAndSecret($partnerId)
