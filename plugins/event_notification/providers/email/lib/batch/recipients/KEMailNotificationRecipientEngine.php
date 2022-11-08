@@ -5,6 +5,8 @@
  * @package plugins.emailNotification
  * @subpackage Scheduler
  */
+const ID_QUERY_MAX_CHUNK_SIZE = 150;
+
 abstract class KEmailNotificationRecipientEngine
 {
 	/**
@@ -57,29 +59,25 @@ abstract class KEmailNotificationRecipientEngine
 			$groupUserIds[]= $user->userId;
 		}
 
-		$maxIdInQueryChunk = 150;
-		$pager->pageSize = $maxIdInQueryChunk;
+		$pager->pageSize = ID_QUERY_MAX_CHUNK_SIZE;
 		$offset = 0;
 		$allUsers = array();
 
 		while($offset < count($groupUserIds))
 		{
-			$currentUserArrIds = array_slice($groupUserIds, $offset, $maxIdInQueryChunk);
+			$currentUserArrIds = array_slice($groupUserIds, $offset, ID_QUERY_MAX_CHUNK_SIZE);
 			$currentUserStrIds = implode(',', $currentUserArrIds);
 			$userFilter->idIn = $currentUserStrIds;
 			$response = KBatchBase::$kClient->user->listAction($userFilter, $pager);
-			if($response)
-			{
-				$usersListObject = $response -> objects;
-				$totalCount = $response -> totalCount;
-			}
-			else
+			if(!$response)
 			{
 				KalturaLog::debug("Failed to list users of group: ". $groupId);
 				break;
 			}
+			$usersListObject = $response->objects;
+			$totalCount = $response->totalCount;
 			$allUsers = array_merge($allUsers, $usersListObject);
-			$offset += min($maxIdInQueryChunk, $totalCount);
+			$offset += min(ID_QUERY_MAX_CHUNK_SIZE, $totalCount);
 		}
 
 		if(!(count($allUsers) > 0))
