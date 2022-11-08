@@ -42,8 +42,36 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 			$userFilter = new KalturaUserFilter();
 			$userFilter->idIn = implode(',', $categoryUserIds);
 			$userList = KBatchBase::$kClient->user->listAction($userFilter, $userPager);
+			/* @var $user KalturaUser */
 			foreach ($userList->objects as $user)
 			{
+				if($user->type == KalturaUserType::GROUP)
+				{
+					$groupPager = new KalturaFilterPager();
+					$groupPager->pageSize = 500;
+					$groupPager->pageIndex = 1;
+					$groupUserFilter = new KalturaGroupUserFilter();
+					$groupUserFilter->userIdEqual = $user->id;
+					$groupUserList = KBatchBase::$kClient->groupUser->listAction($groupUserFilter, $groupPager);
+					if($groupUserList->totalCount > 0)
+					{
+						$groupUsersIds = array();
+						/* @var $groupUser KalturaGroupUser */
+						foreach ($groupUserList->objects as $groupUser)
+						{
+							$groupUsersIds[] = $groupUser->userId;
+						}
+						$userFilter = new KalturaUserFilter();
+						$userFilter->idIn = implode(',', $groupUsersIds);
+						$userListFromGroup = KBatchBase::$kClient->user->listAction($userFilter, $groupPager);
+						/* @var $userFromGroup KalturaUser */
+						foreach ($userListFromGroup->objects as $userFromGroup)
+						{
+							$recipients[$userFromGroup->email] = $userFromGroup->firstName. ' ' . $userFromGroup->lastName;
+						}
+					}
+					continue;
+				}
 				$recipients[$user->email] = $user->firstName. ' ' . $user->lastName;
 			}
 			$pager->pageIndex ++;
