@@ -3,9 +3,9 @@
 class SelfserveAdminAction extends KalturaApplicationPlugin
 {
     const LABEL = "Selfserve";
-    public function __construct($rootLabel)
+    public function __construct()
     {
-        $this->rootLabel = $rootLabel;
+        $this->rootLabel = KalturaApplicationLinksPlugin::ROOT_LABEL;
         $this->label = self::LABEL;
     }
 

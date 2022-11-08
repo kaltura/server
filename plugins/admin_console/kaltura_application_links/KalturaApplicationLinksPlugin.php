@@ -27,7 +27,7 @@ class KalturaApplicationLinksPlugin extends KalturaPlugin implements IKalturaApp
     {
         //todo take list of items from config
         $links = array(
-            new SelfserveAdminAction(self::ROOT_LABEL),
+            new SelfserveAdminAction(),
         );
         return $links;
     }
