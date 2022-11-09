@@ -18,14 +18,7 @@ class KEMailNotificationGroupRecipientEngine extends  KEmailNotificationRecipien
 		}
 		
 		$recipients = array();
-		
-		$groupUserIds = $this->getGroupUserIds($groupId);
-		if(!$groupUserIds)
-			return $recipients;
-		
-		$groupUsers = $this->getUsersByUserIds($groupUserIds);
-		if(!$groupUsers)
-			return $recipients;
+		$groupUsers = $this->getUsersOfGroupByGroupId($groupId);
 		
 		foreach($groupUsers as $groupUser)
 		{
@@ -34,45 +27,5 @@ class KEMailNotificationGroupRecipientEngine extends  KEmailNotificationRecipien
 		
 		return $recipients;
 	}
-	
-	private function getUsersByUserIds($userIds)
-	{
-		$userFilter = new KalturaUserFilter();
-		$userFilter->idIn = $userIds;
-		
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 500;
-		
-		$users = KBatchBase::$kClient->user->listAction($userFilter, $pager);
-		
-		if(!($users->totalCount > 0))
-			return null;
-		
-		return $users->objects;
-	}
 
-	private function getGroupUserIds($groupId)
-	{
-		//list users in group
-		$groupFilter = new KalturaGroupUserFilter();
-		$groupFilter->groupIdEqual = $groupId;
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 500;
-		
-		$groupUserList = KBatchBase::$kClient->groupUser->listAction($groupFilter, $pager);
-		
-		if(!($groupUserList->totalCount > 0))
-			return null;
-
-		
-                $groupUserIds = array();
-                foreach ($groupUserList->objects as $user)
-                {
-                        $groupUserIds[]= $user->userId;
-                }
-                $groupUserIdsString = implode(',',$groupUserIds);
-
-		
-		return $groupUserIdsString;
-	}
 }
