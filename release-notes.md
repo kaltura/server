@@ -1,3 +1,18 @@
+# Rigel-18.18.0
+## Added support for player studio V7
+* Issue Type: story
+* Issue ID: PLAT-23970
+
+### Deployment Scripts ###
+```
+Add the following to admin.ini
+moduls.V7Studio.enabled = true
+moduls.V7Studio.permissionType = 2
+moduls.V7Studio.label = "Show V7 Studio"
+moduls.V7Studio.permissionName = FEATURE_V7_STUDIO_PERMISSION
+moduls.V7Studio.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Rigel-18.17.0
 ## Add self serve admin view permission
 * Issue Type: Task
