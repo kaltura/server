@@ -5,7 +5,6 @@
  * @package plugins.emailNotification
  * @subpackage Scheduler
  */
-const ID_QUERY_MAX_CHUNK_SIZE = 150;
 
 abstract class KEmailNotificationRecipientEngine
 {
@@ -13,6 +12,8 @@ abstract class KEmailNotificationRecipientEngine
 	 * Job data for the email notification recipients
 	 * @var KalturaEmailNotificationRecipientJobData
 	 */
+	const ID_QUERY_MAX_CHUNK_SIZE = 150;
+
 	protected $recipientJobData;
 	
 	public function __construct(KalturaEmailNotificationRecipientJobData $recipientJobData)
@@ -59,13 +60,13 @@ abstract class KEmailNotificationRecipientEngine
 			$groupUserIds[]= $user->userId;
 		}
 
-		$pager->pageSize = ID_QUERY_MAX_CHUNK_SIZE;
+		$pager->pageSize = self::ID_QUERY_MAX_CHUNK_SIZE;
 		$offset = 0;
 		$allUsers = array();
 
 		while($offset < count($groupUserIds))
 		{
-			$currentUserArrIds = array_slice($groupUserIds, $offset, ID_QUERY_MAX_CHUNK_SIZE);
+			$currentUserArrIds = array_slice($groupUserIds, $offset, self::ID_QUERY_MAX_CHUNK_SIZE);
 			$currentUserStrIds = implode(',', $currentUserArrIds);
 			$userFilter->idIn = $currentUserStrIds;
 			$response = KBatchBase::$kClient->user->listAction($userFilter, $pager);
@@ -77,7 +78,7 @@ abstract class KEmailNotificationRecipientEngine
 			$usersListObject = $response->objects;
 			$totalCount = $response->totalCount;
 			$allUsers = array_merge($allUsers, $usersListObject);
-			$offset += min(ID_QUERY_MAX_CHUNK_SIZE, $totalCount);
+			$offset += min(self::ID_QUERY_MAX_CHUNK_SIZE, $totalCount);
 		}
 
 		if(!(count($allUsers) > 0))
