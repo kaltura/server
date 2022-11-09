@@ -5,6 +5,7 @@
 class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaServices, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'WebexAPIDropFolder';
+	const CONFIGURATION_MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'WebexAccount';
 	const EVENT_WEBEX_API_DROP_FOLDER_FLOW_MANAGER = 'kWebexAPIDropFolderFlowManager';
 	
@@ -166,11 +167,11 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 	
 	public static function getWebexConfiguration()
 	{
-		if (!kConf::hasMap(kConfMapNames::VENDOR))
+		if (!kConf::hasMap(self::CONFIGURATION_MAP_NAME))
 		{
 			throw new KalturaAPIException(KalturaWebexAPIErrors::NO_VENDOR_CONFIGURATION);
 		}
 		
-		return kConf::get(WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR);
+		return kConf::get(self::CONFIGURATION_PARAM_NAME, self::CONFIGURATION_MAP_NAME);
 	}
 }

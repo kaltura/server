@@ -26,10 +26,30 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		
-		$list = $this->webexClient->getRecordings($this->accessToken);
-		KalturaLog::info(print_r($list));
+		$list = $this->webexClient->getRecordings();
+		KalturaLog::info('Response from Webex recordings: ' . print_r($list));
+		
+		$items = $list['items'];
+		foreach ($items as $item)
+		{
+			KalturaLog::info($item['meeting_id']);
+			KalturaLog::info($item['createTime']);
+			KalturaLog::info($item['topic']);
+			KalturaLog::info($item->format);
+			KalturaLog::info($item->serviceType);
+		}
+		
+		self::updateDropFolderLastMeetingHandled(time());
 		
 		//$this->handleExistingDropFolderFiles();
+	}
+	
+	protected function updateDropFolderLastMeetingHandled($lastHandledMeetingTime)
+	{
+		$updateDropFolder = new KalturaWebexAPIDropFolder();
+		$updateDropFolder->lastHandledMeetingTime = $lastHandledMeetingTime;
+		$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
+		KalturaLog::debug("Last handled meetings time is: $lastHandledMeetingTime");
 	}
 
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)

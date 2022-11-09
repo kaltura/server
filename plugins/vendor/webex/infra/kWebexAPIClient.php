@@ -41,51 +41,31 @@ class kWebexAPIClient
 		$this->zoomTokensHelper = new kZoomTokens($webexBaseURL, $clientId, $clientSecret);
 	}
 	
-	public function getRecordings($accessToken)
+	public function getRecordings()
 	{
-		$request =  'recordings';
-		return $this->sendRequest($request, $accessToken);
+		$earliestTime = 1662034849;
+		$dateFormat = 'Y-m-d';
+		$startDate = date($dateFormat, $earliestTime);
+		$endDate = date($dateFormat, time());
+		$request = "recordings?from=$startDate&to=$endDate";
+		return $this->sendRequest($request);
 	}
 	
-	protected function sendRequest($request, $accessToken)
+	protected function sendRequest($request, $isRequestPost = false)
 	{
-		$webexConfiguration = self::getWebexConfiguration();
+		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
 		$webexBaseURL = $webexConfiguration['baseUrl'];
 		
 		$requestUrl = $webexBaseURL . $request;
-		$authorizationHeader = 'Authorization: Bearer ' . $accessToken;
+		$authorizationHeader = 'Authorization: Bearer ' . $this->accessToken;
 		$requestHeaders = array($authorizationHeader);
 		$curlWrapper = new KCurlWrapper();
-		$curlWrapper->setOpt(CURLOPT_POST, 1);
+		$curlWrapper->setOpt(CURLOPT_POST, $isRequestPost);
 		$curlWrapper->setOpt(CURLOPT_HEADER, true);
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
 		$response = $curlWrapper->exec($requestUrl);
 		
 		return $response;
-	}
-	
-	public function getRecording()
-	{
-		$webexConfiguration = self::getWebexConfiguration();
-		$webexBaseURL = $webexConfiguration['baseUrl'];
-		
-		$hostEmail = $webexConfiguration['hostEmail']; //todo
-		
-		$url = $webexBaseURL . 'recordings?hostEmail=' . $hostEmail;
-		
-		$accessToken = '';
-		$authorizationHeader = 'Authorization: Bearer ' . $accessToken;
-		$requestHeaders = array($authorizationHeader);
-		$curlWrapper = new KCurlWrapper();
-		$curlWrapper->setOpt(CURLOPT_POST, 1);
-		$curlWrapper->setOpt(CURLOPT_HEADER, true);
-		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
-		$response = $curlWrapper->exec($url);
-		
-		$dataAsArray = json_decode($response, true);
-		KalturaLog::debug(print_r($dataAsArray, true));
-		
-		return print_r($dataAsArray, true);
 	}
 	
 	public function retrieveWebexUser()

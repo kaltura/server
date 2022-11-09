@@ -46,13 +46,13 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 				$partnerWebexDropFolderModified = true;
 				KalturaLog::debug('WebexAPIDropFolder with vendorId ' . $object->getId() . ' updated status to ' . $partnerWebexDropFolder->getStatus());
 			}
-			if (!$partnerWebexDropFolder && $partnerWebexDropFoldersCount <= self::MAX_WEBEX_API_DROP_FOLDERS)
-			{
-				self::createNewWebexAPIDropFolder($object);
-			}
 			else
 			{
-				if (!$partnerWebexDropFolder)
+				if ($partnerWebexDropFoldersCount <= self::MAX_WEBEX_API_DROP_FOLDERS)
+				{
+					self::createNewWebexAPIDropFolder($object);
+				}
+				else
 				{
 					throw new KalturaAPIException(KalturaWebexAPIErrors::EXCEEDED_MAX_WEBEX_API_DROP_FOLDERS);
 				}
@@ -146,7 +146,7 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 			&& $object->isColumnModified('refreshToken');
 	}
 	
-	private static function getDropFolderStatus(VendorIntegrationStatus $status)
+	private static function getDropFolderStatus($status)
 	{
 		switch ($status)
 		{
