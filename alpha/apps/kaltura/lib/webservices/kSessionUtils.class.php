@@ -249,11 +249,11 @@ class kSessionUtils
 			}
 			if ($cacheStore->delete($cacheKey))
 			{
-				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey] - Deletion successful");
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey]");
 			}
 			else
 			{
-				KalturaLog::warning("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey] - Failed to delete");
+				KalturaLog::err("Failed to delete [$cacheKey] from[$cacheSection]. query took " . (microtime(true) - $queryStart) . " seconds");
 			}
 		}
 	}
