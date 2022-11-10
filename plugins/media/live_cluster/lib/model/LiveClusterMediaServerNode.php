@@ -114,7 +114,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
 	public function getAdditionalUrlParam(LiveStreamEntry $entry) : string
 	{
-		$res = "";
+		$res = '';
 		if ($entry->isContainsAdminTag('lowlatency'))
 		{
 			$res .= self::LOW_LATENCY_URL_PARAM . '/1/';
