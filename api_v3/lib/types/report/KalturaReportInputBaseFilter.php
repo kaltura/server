@@ -8,14 +8,14 @@ class KalturaReportInputBaseFilter extends KalturaObject
 	/**
 	 * Start date as Unix timestamp (In seconds)
 	 * 
-	 * @var bigint
+	 * @var int
 	 */
 	public $fromDate;
 	
 	/**
 	 * End date as Unix timestamp (In seconds)
 	 * 
-	 * @var bigint
+	 * @var int
 	 */
 	public $toDate;
 	
