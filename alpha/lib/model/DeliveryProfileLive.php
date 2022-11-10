@@ -348,7 +348,13 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$serverNode = $entryServerNode->serverNode;
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
 		$segmentDuration = $this->getDynamicAttributes()->getEntry()->getSegmentDuration();
-		
+
+		/* @var $entry LiveStreamEntry */
+		$entry = $this->getDynamicAttributes()->getEntry();
+		if ($entry->isLowLatencyEntry())
+		{
+			$this->shouldRedirect = true; // low-latency manifest should be build by live-packager
+		}
 		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
 		$livePackagerUrl = rtrim(str_replace('{DC}', $serverNode->getEnvDc(), $livePackagerUrl), '/');
 		
@@ -374,7 +380,6 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$livePackagerUrl .= $serverNode->getEntryIdUrl($this->getDynamicAttributes());
 		$livePackagerUrl .= $serverNode->getSegmentDurationUrlString($segmentDuration);
 
-		$entry = $this->getDynamicAttributes()->getEntry();
 		$livePackagerUrl .= $serverNode->getExplicitLiveUrl($livePackagerUrl, $entry);
 		$livePackagerUrl .= $serverNode->getSessionType($entryServerNode);
 		$livePackagerUrl .= $serverNode->getAdditionalUrlParam($entry);
