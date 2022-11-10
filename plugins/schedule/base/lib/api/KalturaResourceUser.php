@@ -151,7 +151,7 @@ class KalturaResourceUser extends KalturaObject implements IRelatedFilterable
 	    // TODO: Implement getExtraFilters() method.
 	}
 
-	/**https://github.com/kaltura/server/pull/11826#discussion_r1003551861
+	/**
 	 * @inheritDoc
 	 */
 	function getFilterDocs()
