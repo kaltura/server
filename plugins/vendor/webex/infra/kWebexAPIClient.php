@@ -41,13 +41,19 @@ class kWebexAPIClient
 		$this->zoomTokensHelper = new kZoomTokens($webexBaseURL, $clientId, $clientSecret);
 	}
 	
-	public function getRecordings()
+	public function getRecordingsList()
 	{
 		$earliestTime = 1662034849;
 		$dateFormat = 'Y-m-d';
 		$startDate = date($dateFormat, $earliestTime);
 		$endDate = date($dateFormat, time());
 		$request = "recordings?from=$startDate&to=$endDate";
+		return $this->sendRequest($request);
+	}
+	
+	public function getRecording($recordingId)
+	{
+		$request = "recordings/$recordingId";
 		return $this->sendRequest($request);
 	}
 	
