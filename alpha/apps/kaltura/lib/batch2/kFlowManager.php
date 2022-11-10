@@ -661,7 +661,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			&& (in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) && $object->isCustomDataModified('enforceHttpsApi'))
 		)
 		{
-			kSessionBase::deleteSecretCacheKey($object->getId());
+			kSessionUtils::deleteSecretCacheKey($object->getId());
 			return true;
 		}
 		

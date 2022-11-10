@@ -302,7 +302,7 @@ class kSessionBase
 	{
 	}
 	
-	static protected function getSecretsCacheKey($partnerId)
+	static public function getSecretsCacheKey($partnerId)
 	{
 		return self::SECRETS_CACHE_PREFIX . kConf::get('secrets_cache_version', kConfMapNames::CACHE_VERSIONS, '1') . '_' . $partnerId;
 	}
@@ -337,34 +337,6 @@ class kSessionBase
 			return $secrets;
 		}
 		return null;
-	}
-	
-	static public function deleteSecretCacheKey($partnerId)
-	{
-		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
-		
-		if(!$cacheSections)
-		{
-			return null;
-		}
-		$cacheKey = self::getSecretsCacheKey($partnerId);
-		KalturaLog::debug("Deleting key [$cacheKey] now [" . date('Y-m-d H:i:s', time()) . "]");
-		foreach ($cacheSections as $cacheSection)
-		{
-			$queryStart = microtime(true);
-			$cacheStore = kCacheManager::getCache($cacheSection);
-			if (!$cacheStore)
-			{
-				continue;
-			}
-			$secrets = $cacheStore->get($cacheKey);
-			if (!$secrets)
-			{
-				continue;
-			}
-			$isDeleted = $cacheStore->delete($cacheKey) ? 'WAS' : 'WAS NOT';
-			KalturaLog::debug("cacheKey[$cacheKey] $isDeleted deleted from  cache section[$cacheSection]. Query took " . (microtime(true) - $queryStart) . " seconds [" . date('Y-m-d H:i:s', time()) . "]");
-		}
 	}
 
 	// overridable

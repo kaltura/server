@@ -223,6 +223,40 @@ class kSessionUtils
 		}
 		catch(Exception $e){}
 	}
+	
+	public static function deleteSecretCacheKey($partnerId)
+	{
+		$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PARTNER_SECRETS);
+		
+		if(!$cacheSections)
+		{
+			return null;
+		}
+		$cacheKey = kSessionBase::getSecretsCacheKey($partnerId);
+		KalturaLog::debug("Deleting key [$cacheKey] from [" . implode(',', $cacheSections) . "]");
+		foreach ($cacheSections as $cacheSection)
+		{
+			$queryStart = microtime(true);
+			$cacheStore = kCacheManager::getCache($cacheSection);
+			if (!$cacheStore)
+			{
+				continue;
+			}
+			$secrets = $cacheStore->get($cacheKey);
+			if (!$secrets)
+			{
+				continue;
+			}
+			if ($cacheStore->delete($cacheKey))
+			{
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey] - Deletion successful");
+			}
+			else
+			{
+				KalturaLog::warning("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey] - Failed to delete");
+			}
+		}
+	}
 }
 
 class ks extends kSessionBase
