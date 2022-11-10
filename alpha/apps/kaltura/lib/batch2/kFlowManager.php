@@ -588,8 +588,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if ($object instanceof Partner &&
-			(in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) && $object->isCustomDataModified('enforceHttpsApi')))
+		if(
+			$object instanceof Partner
+			&& (in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) && $object->isCustomDataModified('enforceHttpsApi'))
+		)
 		{
 			return true;
 		}
@@ -654,8 +656,10 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if ($object instanceof Partner &&
-			(in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) && $object->isCustomDataModified('enforceHttpsApi')))
+		if (
+			$object instanceof Partner
+			&& (in_array(PartnerPeer::CUSTOM_DATA, $modifiedColumns) && $object->isCustomDataModified('enforceHttpsApi'))
+		)
 		{
 			kSessionBase::deleteSecretCacheKey($object->getId());
 			return true;

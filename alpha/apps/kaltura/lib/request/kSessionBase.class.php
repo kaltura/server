@@ -349,7 +349,6 @@ class kSessionBase
 		}
 		$cacheKey = self::getSecretsCacheKey($partnerId);
 		KalturaLog::debug("Deleting key [$cacheKey] now [" . date('Y-m-d H:i:s', time()) . "]");
-		$deleted = false;
 		foreach ($cacheSections as $cacheSection)
 		{
 			$queryStart = microtime(true);
@@ -363,11 +362,15 @@ class kSessionBase
 			{
 				continue;
 			}
-			$cacheStore->delete($cacheKey);
-			$deleted = true;
-			KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey]");
+			if ($cacheStore->delete($cacheKey))
+			{
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey] - Deletion Successful [" . date('Y-m-d H:i:s', time()) . "]");
+			}
+			else
+			{
+				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey] - Deletion Failed [" . date('Y-m-d H:i:s', time()) . "]");
+			}
 		}
-		return $deleted;
 	}
 
 	// overridable
