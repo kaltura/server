@@ -6,6 +6,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
     const ENVIRONMENT = 'env';
     const SESSION_TYPE = 'st';
     const TIMELINE_URL_PARAM = 'tl';
+    const LOW_LATENCY_URL_PARAM = 'll';
     const EXPLICIT_LIVE_VIEWER_TYPE_URL = 'tl';
     const USER_TYPE_ADMIN = 'main';
     const USER_TYPE_USER = 'viewer';
@@ -109,5 +110,15 @@ class LiveClusterMediaServerNode extends MediaServerNode
 			return '';
 		}
 		return parent::getExplicitLiveUrl($liveUrl, $entry);
+	}
+
+	public function getAdditionalUrlParam(LiveStreamEntry $entry) : string
+	{
+		$res = "";
+		if ($entry->isContainsAdminTag('lowlatency'))
+		{
+			$res .= self::LOW_LATENCY_URL_PARAM . '/1/';
+		}
+		return $res;
 	}
 }
