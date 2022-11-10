@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS `resource_user`
 (
-	`id` INTEGER  NOT NULL AUTO_INCREMENT,
+	`id` bigint(20)  NOT NULL AUTO_INCREMENT,
 	`resource_tag` VARCHAR(256)  NOT NULL,
-	`kuser_id` INTEGER  NOT NULL,
+	`kuser_id` int(11)  NOT NULL,
 	`status` tinyint(4)  NOT NULL,
-	`partner_id` INTEGER  NOT NULL,
-	`creator_kuser_id` INTEGER  NOT NULL,
+	`partner_id` int(11)  NOT NULL,
+	`creator_kuser_id` int(11)  NOT NULL,
 	`created_at` DATETIME NOT NULL,
 	`updated_at` DATETIME NOT NULL,
 	PRIMARY KEY (`id`),
