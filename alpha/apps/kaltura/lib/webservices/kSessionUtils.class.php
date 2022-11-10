@@ -253,7 +253,7 @@ class kSessionUtils
 			}
 			else
 			{
-				KalturaLog::err("Failed to delete [$cacheKey] from[$cacheSection]. query took " . (microtime(true) - $queryStart) . " seconds");
+				KalturaLog::err("Failed to delete [$cacheKey] from [$cacheSection] . query took " . (microtime(true) - $queryStart) . " seconds");
 			}
 		}
 	}
