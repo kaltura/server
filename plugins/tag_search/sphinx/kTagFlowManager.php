@@ -79,35 +79,35 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     }
     
 
-	/* (non-PHPdoc)
-	 * @see kObjectCreatedEventConsumer::objectCreated()
-	 */
-	public function objectCreated (BaseObject $object)
-	{
-		try
+    /* (non-PHPdoc)
+     * @see kObjectCreatedEventConsumer::objectCreated()
+     */
+    public function objectCreated (BaseObject $object)
+    {
+    	try
 	    {
 	    	if (!($object instanceof categoryEntry))
-	        {
-	        	$baseClass = self::getBaseClass($object);
-	        	self::addOrIncrementTags($object->getTags(), $object->getPartnerId(), $baseClass);
-	        }
-	        else
-	        {
-	        	/* @var $object categoryEntry */
-		        $privacyContexts = $object->getPrivacyContext() != "" ? self::trimObjectTags($object->getPrivacyContext()) : array();
-		        if (!count($privacyContexts))
-		        {
-		        	$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT;
-		        }
+	    	{
+	    		$baseClass = self::getBaseClass($object);
+	    		self::addOrIncrementTags($object->getTags(), $object->getPartnerId(), $baseClass);
+	    	}
+	    	else
+		    {
+            	/* @var $object categoryEntry */
+	            $privacyContexts = $object->getPrivacyContext() != "" ? self::trimObjectTags($object->getPrivacyContext()) : array();
+	            if (!count($privacyContexts))
+	            {
+	            	$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT;
+	            }
 	            $entry = $this->getEntryByIdNoFilter($object->getEntryId());
 	            self::addOrIncrementTags($entry->getTags(), $entry->getPartnerId(), get_class($entry), $privacyContexts);
 	        }
 	    }
 	    catch(Exception $e)
 	    {
-	        KalturaLog::err($e);
+	    	KalturaLog::err($e);
 	    }
-	}
+    }
 
 	/* (non-PHPdoc)
      * @see kObjectCreatedEventConsumer::shouldConsumeCreatedEvent()
