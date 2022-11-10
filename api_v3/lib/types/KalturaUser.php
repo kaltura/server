@@ -31,6 +31,12 @@ class KalturaUser extends KalturaBaseUser
 	public $isAdmin;
 
 	/**
+	 * @var bool
+	 * @insertonly
+	 */
+	public $isGuest;
+
+	/**
 	 * @var string
 	 */
 	public $roleIds;
@@ -125,6 +131,7 @@ class KalturaUser extends KalturaBaseUser
 		"company",
 		"ksPrivileges",
 		"isSsoExcluded",
+		"isGuest",
 	);
 
 	public function getMapBetweenObjects ( )
