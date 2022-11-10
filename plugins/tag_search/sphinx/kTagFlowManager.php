@@ -88,8 +88,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    {
 	    	if (!($object instanceof categoryEntry))
 	        {
-				$baseClass = self::getBaseClass($object);
-				self::addOrIncrementTags($object->getTags(), $object->getPartnerId(), $baseClass);
+	        	$baseClass = self::getBaseClass($object);
+	        	self::addOrIncrementTags($object->getTags(), $object->getPartnerId(), $baseClass);
 	        }
 	        else
 	        {
