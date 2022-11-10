@@ -362,14 +362,8 @@ class kSessionBase
 			{
 				continue;
 			}
-			if ($cacheStore->delete($cacheKey))
-			{
-				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey] - Deletion Successful [" . date('Y-m-d H:i:s', time()) . "]");
-			}
-			else
-			{
-				KalturaLog::debug("query took " . (microtime(true) - $queryStart) . " seconds [$cacheSection, $cacheKey] - Deletion Failed [" . date('Y-m-d H:i:s', time()) . "]");
-			}
+			$isDeleted = $cacheStore->delete($cacheKey) ? 'WAS' : 'WAS NOT';
+			KalturaLog::debug("cacheKey[$cacheKey] $isDeleted deleted from  cache section[$cacheSection]. Query took " . (microtime(true) - $queryStart) . " seconds [" . date('Y-m-d H:i:s', time()) . "]");
 		}
 	}
 
