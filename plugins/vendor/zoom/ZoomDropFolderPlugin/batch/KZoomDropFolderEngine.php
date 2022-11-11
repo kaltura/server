@@ -45,20 +45,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		}
 		return $val;
 	}
-	
-	protected function createZuluDateTime($timestamp)
-	{
-		$dateTime = new DateTime();
-		$dateTime->setTimezone(new DateTimeZone("Zulu"));
-		$dateTime->setTimestamp($timestamp);
-		$dateTime->setTime(0, 0); // set time part to midnight
-		return $dateTime;
-	}
-	
+
 	protected function isDayInThePast($startRunTime, $timestamp)
 	{
-		$today = $this->createZuluDateTime($startRunTime);
-		$lastDayScanned = $this->createZuluDateTime($timestamp);
+		$today = kTimeZoneUtils::midnightTimezoneDateTime($startRunTime, 'Zulu');
+		$lastDayScanned = kTimeZoneUtils::midnightTimezoneDateTime($timestamp, 'Zulu');
 		
 		$diff = $today->diff( $lastDayScanned );
 		$diffDays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
