@@ -640,7 +640,8 @@ class KAsyncImport extends KJobHandlerWorker
 			$axelStatePartialFilePath = $partialFilePath . '.st';
 			$axelStateSharedTempFilePath = $sharedTempFilePath . '.st';
 			
-			if(!kFile::moveFile($axelStatePartialFilePath, $axelStateSharedTempFilePath))
+			// some servers does not support multi-connection in which case there will be no state file
+			if(kFile::checkFileExists($axelStatePartialFilePath) && !kFile::moveFile($axelStatePartialFilePath, $axelStateSharedTempFilePath))
 			{
 				//If we failed to copy local file to shared location reset download operation
 				kFile::unlink($partialFilePath);

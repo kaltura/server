@@ -92,7 +92,7 @@ class KAxelWrapper extends KCurlWrapper
 	
 	private function setLogPathErr()
 	{
-		$this->logPathErr = $this->destFile . 'err.log';
+		$this->logPathErr = $this->destFile . '.err.log';
 	}
 	
 	private function getLogPathErr()
@@ -114,7 +114,7 @@ class KAxelWrapper extends KCurlWrapper
 		
 		if ($resultCode)
 		{
-			KalturaLog::debug("Executed command result status [$resultCode]");
+			KalturaLog::debug("Executed command result code [$resultCode]");
 			$this->errorNumber = $resultCode;
 			return false;
 		}
@@ -263,7 +263,7 @@ class KAxelWrapper extends KCurlWrapper
 			return false;
 		}
 		
-		return $matches;
+		return $matches[0];
 	}
 	
 	private function getFileDownloadPercentageFromLogFile()
