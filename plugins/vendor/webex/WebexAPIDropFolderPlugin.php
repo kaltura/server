@@ -91,7 +91,7 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 			case ('KalturaDropFolderFile'):
 				if ($enumValue == self::getDropFolderTypeCoreValue(WebexAPIDropFolderType::WEBEX_API) )
 				{
-					return new KalturaWebexDropFolderFile();
+					return new KalturaWebexAPIDropFolderFile();
 				}
 				break;
 			case 'kDropFolderContentProcessorJobData':
