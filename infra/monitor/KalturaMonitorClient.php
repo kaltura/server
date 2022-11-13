@@ -621,7 +621,7 @@ class KalturaMonitorClient
 			return;
 		
 		$data = array_merge(self::$basicEventInfo, array(
-			self::FIELD_EVENT_TYPE 		=> self::EVENT_CURL,
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_AXEL,
 			self::FIELD_HOST			=> $hostName,
 			self::FIELD_EXECUTION_TIME	=> $timeTook,
 		));
