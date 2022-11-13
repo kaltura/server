@@ -51,7 +51,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 					$groupPager->pageSize = 500;
 					$groupPager->pageIndex = 1;
 					$groupUserFilter = new KalturaGroupUserFilter();
-					$groupUserFilter->userIdEqual = $user->id;
+					$groupUserFilter->groupIdEqual = $user->id;
 					$groupUserList = KBatchBase::$kClient->groupUser->listAction($groupUserFilter, $groupPager);
 					if($groupUserList->totalCount > 0)
 					{
