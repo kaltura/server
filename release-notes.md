@@ -104,7 +104,6 @@ Update script:
 
     - deployment/updates/scripts/xml/2022_09_18_updateEntryPublishedToSpecificCategoryEmailNotification.template.xml
     - php deployment/updates/scripts/2022_09_18_deploy_update_email_event_notification_entry_published_to_specific_category.php
->>>>>>> Rigel-18.18.0
 
 # Rigel-18.14.0
 ## Add event notification that enables to create dynamic app instance ##
