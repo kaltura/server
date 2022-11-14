@@ -26,8 +26,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
 		
-		$response = $this->webexClient->getRecordingsList();
-		$recordingsList = json_decode($response, true);
+		$recordingsList = $this->webexClient->getRecordingsList();
 		KalturaLog::info('Response from Webex recordings: ' . print_r($recordingsList));
 		$items = $recordingsList['items'];
 		if (!$items)
@@ -44,8 +43,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 			KalturaLog::info($item['format']);
 			KalturaLog::info($item['serviceType']);
 			
-			$response = $this->webexClient->getRecording($item['id']);
-			$recordingInfo = json_decode($response, true);
+			$recordingInfo = $this->webexClient->getRecording($item['id']);
 			KalturaLog::info('Response from Webex recordings: ' . print_r($recordingInfo));
 			KalturaLog::info(print_r($recordingInfo));
 			
@@ -114,7 +112,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
-		KalturaLog::debug('Start processing Webex Folder');
+		KalturaLog::debug("Start processing Webex Folder [{$data->dropFolderId}]");
 		KBatchBase::impersonate($job->partnerId);
 		if (!$data->contentMatchPolicy == KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW)
 		{

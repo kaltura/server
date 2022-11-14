@@ -176,7 +176,7 @@ class WebexAPIService extends KalturaBaseService
 			}
 			
 			$authCode = $_GET[self::AUTH_CODE];
-			$tokens = kWebexAPIOauth::requestAccessToken($authCode);
+			$tokens = kWebexAPIOauth::requestAuthorizationTokens($authCode);
 			$accessToken = $tokens[kOauth::ACCESS_TOKEN];
 			$client = new kWebexAPIClient($webexBaseURL, null, null, null, $accessToken);
 			$user = $client->retrieveWebexUser();
@@ -218,20 +218,23 @@ class WebexAPIService extends KalturaBaseService
 	public function oauthValidationAction()
 	{
 		$authCode = $_GET[self::AUTH_CODE];
-		self::loadRegionalCloudRedirectionPage($authCode);
+		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
+		$domain = $webexConfiguration['domain'];
+		self::loadRegionalCloudRedirectionPage($authCode, $domain);
 	}
 	
 	/**
 	 * @param $authCode
 	 * @throws Exception
 	 */
-	public static function loadRegionalCloudRedirectionPage($authCode)
+	public static function loadRegionalCloudRedirectionPage($authCode, $domain)
 	{
 		$file_path = dirname(__FILE__) . '/../lib/api/webPage/KalturaWebexAPIRegionalRedirectPage.html';
 		if (file_exists($file_path))
 		{
 			$page = file_get_contents($file_path);
 			$page = str_replace('@authCode@', $authCode, $page);
+			$page = str_replace('@domain@', $domain, $page);
 			
 			echo $page;
 			die();

@@ -35,7 +35,7 @@ abstract class kOAuth
 		return $tokensData;
 	}
 	
-	public static function requestAccessToken($authCode)
+	public static function requestAuthorizationTokens($authCode)
 	{
 	
 	}

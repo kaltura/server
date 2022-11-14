@@ -22,6 +22,13 @@ class kWebexAPIOauth extends kOAuth
 		return array($webexBaseURL, $redirectUrl, $clientId, $clientSecret, $header);
 	}
 	
+	protected static function retrieveTokensData($webexBaseURL, $header, $postFields)
+	{
+		$response = self::curlRetrieveTokensData($webexBaseURL, $header, $postFields);
+		$tokensData = self::retrieveTokenData($response);
+		return $tokensData;
+	}
+	
 	/**
 	 * @param $url
 	 * @param $header
@@ -39,13 +46,28 @@ class kWebexAPIOauth extends kOAuth
 		return $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
 	}
 	
-	public static function requestAccessToken($authCode)
+	/**
+	 * @param $authCode
+	 * @return array|void
+	 * @throws Exception
+	 */
+	public static function requestAuthorizationTokens($authCode)
 	{
 		list($webexBaseURL, $redirectUrl, $clientId, $clientSecret, $header) = self::getHeaderData();
 		$redirectUri = urlencode($redirectUrl);
 		$postFields = "grant_type=authorization_code&client_id=$clientId&client_secret=$clientSecret&code=$authCode&redirect_uri=$redirectUri";
-		$response = self::curlRetrieveTokensData($webexBaseURL, $header, $postFields);
-		$tokensData = self::retrieveTokenData($response);
-		return $tokensData;
+		return self::retrieveTokensData($webexBaseURL, $header, $postFields);
+	}
+	
+	public static function requestAccessToken($refreshToken)
+	{
+		list($webexBaseURL, $redirectUrl, $clientId, $clientSecret, $header) = self::getHeaderData();
+		$postFields = "grant_type=refresh_token&client_id=$clientId&client_secret=$clientSecret&refresh_token=$refreshToken";
+		return self::retrieveTokensData($webexBaseURL, $header, $postFields);
+	}
+	
+	public static function requestRefreshToken()
+	{
+	
 	}
 }

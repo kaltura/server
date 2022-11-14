@@ -30,7 +30,7 @@ class kZoomOauth extends kOAuth
 	}
 	
 
-	public static function requestAccessToken($authCode)
+	public static function requestAuthorizationTokens($authCode)
 	{
 		list($zoomBaseURL, $redirectUrl, $header, $userPwd) = self::getHeaderData();
 		$postFields = "grant_type=authorization_code&code={$authCode}&redirect_uri=$redirectUrl";

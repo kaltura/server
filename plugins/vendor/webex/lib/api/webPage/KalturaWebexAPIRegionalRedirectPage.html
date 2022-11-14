@@ -10,6 +10,7 @@
 	<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
 	<script>
 		var authCode = '@authCode@';
+        var domain = '@domain@';
 	</script>
 	<script>
 		function submitKMCUrl(event)
@@ -19,12 +20,12 @@
 			let kmcUrl = $('#kmcUrl');
 			let integrationCode = $('#integrationCode').val();
 			let regionStartIndex = 0;
-			let regionEndIndex = kmcUrl.val().indexOf("kaltura.com");
+			let regionEndIndex = kmcUrl.val().indexOf(domain);
 			if (regionEndIndex < 0)
 			{
 				return onFail('Invalid URL');
 			}
-			regionEndIndex = regionEndIndex + 11;
+			regionEndIndex = regionEndIndex + domain.length;
 			let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
 			$.ajax(
 					{

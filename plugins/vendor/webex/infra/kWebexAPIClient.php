@@ -48,13 +48,22 @@ class kWebexAPIClient
 		$startDate = date($dateFormat, $earliestTime);
 		$endDate = date($dateFormat, time());
 		$request = "recordings?from=$startDate&to=$endDate";
-		return $this->sendRequest($request);
+		$response = $this->sendRequest($request);
+		return json_decode($response, true);
 	}
 	
 	public function getRecording($recordingId)
 	{
 		$request = "recordings/$recordingId";
-		return $this->sendRequest($request);
+		$response = $this->sendRequest($request);
+		return json_decode($response, true);
+	}
+	
+	public function getWebexUser()
+	{
+		$request = 'people/me';
+		$response = $this->sendRequest($request);
+		return json_decode($response, true);
 	}
 	
 	protected function sendRequest($request, $isRequestPost = false)
