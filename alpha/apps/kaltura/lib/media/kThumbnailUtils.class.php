@@ -42,10 +42,11 @@ class kThumbnailUtils
 	 * @param int $requiredHeight Thumbnail's requested height
 	 * @return string|null The path to the physical thumbnail file
 	 */
-	public static function getNearestAspectRatioThumbnailDescriptorByEntryId( $entryId, $requiredWidth, $requiredHeight, $fallbackThumbnailPath )
+	public static function getNearestAspectRatioThumbnailDescriptorByEntry( $entry, $requiredWidth, $requiredHeight, $fallbackThumbnailPath )
 	{
-		$thumbAssets = assetPeer::retrieveReadyThumbnailsByEntryId( $entryId );
-		return self::getNearestAspectRatioThumbnailDescriptorFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath );
+		$thumbAssets = assetPeer::retrieveReadyThumbnailsByEntryId( $entry->getEntryId() );
+		$fileSync = myEntryUtils::getEntryLocalImageFileSync( $entry );
+		return self::getNearestAspectRatioThumbnailDescriptorFromThumbAssets( $thumbAssets, $fileSync, $requiredWidth, $requiredHeight, $fallbackThumbnailPath );
 	}
 
 	/**
@@ -61,7 +62,7 @@ class kThumbnailUtils
 	 *                                   aspect ratio to the required, or null
 	 *                                   if the entry doesn't contain thumbnails.
 	 */
-	public static function getNearestAspectRatioThumbnailDescriptorFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath = null )
+	public static function getNearestAspectRatioThumbnailDescriptorFromThumbAssets( $thumbAssets, $fileSync, $requiredWidth, $requiredHeight, $fallbackThumbnailPath = null )
 	{
 		// Calc aspect ratio + distance from requiredAspectRatio
 		$chosenThumbnailDescriptor = null;
@@ -70,10 +71,9 @@ class kThumbnailUtils
 
 		if ( $fallbackThumbnailPath )
 		{
-			$imageSizeArray = getimagesize( $fallbackThumbnailPath );
-			
-			$thumbWidth = $imageSizeArray[0];
-			$thumbHeight = $imageSizeArray[1];
+			list( $width, $height, $type, $attr ) = kImageUtils::getImageSize( $fileSync );
+			$thumbWidth = $width;
+			$thumbHeight = $height;
 
 			$chosenThumbnailDescriptor = kThumbnailDescriptor::fromParams( $thumbWidth, $thumbHeight, $fallbackThumbnailPath, true );
 		}

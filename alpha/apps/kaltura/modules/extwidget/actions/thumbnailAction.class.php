@@ -325,7 +325,7 @@ class thumbnailAction extends sfAction
 			$defaultThumbnailPath = myEntryUtils::getLocalImageFilePathByEntry( $entry, $version );
 			
 			// Get the file path of the thumbnail with the nearest  
-			$selectedThumbnailDescriptor = kThumbnailUtils::getNearestAspectRatioThumbnailDescriptorByEntryId( $entry_id, $width, $height, $defaultThumbnailPath );
+			$selectedThumbnailDescriptor = kThumbnailUtils::getNearestAspectRatioThumbnailDescriptorByEntry( $entry, $width, $height, $defaultThumbnailPath );
 
 			if ( $selectedThumbnailDescriptor ) // Note: In case nothing returned, then the entry doesn't have a thumbnail to work with, so we'll do nothing.
 			{
