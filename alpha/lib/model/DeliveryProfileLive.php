@@ -346,9 +346,15 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		/* @var $serverNode MediaServerNode */
 		$serverNode = $entryServerNode->serverNode;
+		/* @var $entry LiveStreamEntry */
+		$entry = $this->getDynamicAttributes()->getEntry();
+
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
-		$segmentDuration = $this->getDynamicAttributes()->getEntry()->getSegmentDuration();
-		
+		$segmentDuration = $entry->getSegmentDuration();
+		if ($entry->isLowLatencyEntry())
+		{
+			$this->shouldRedirect = true; // low-latency manifest should be build by live-packager
+		}
 		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
 		$livePackagerUrl = rtrim(str_replace('{DC}', $serverNode->getEnvDc(), $livePackagerUrl), '/');
 		
@@ -357,7 +363,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if($matchedPattern)
 		{
 			$this->shouldRedirect = $shouldRedirect;
-			
+
 			$hostname = $serverNode->getHostname();
 			if(!$serverNode->getIsExternalMediaServer())
 				$hostname = preg_replace('/\..*$/', '', $hostname);
@@ -374,9 +380,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$livePackagerUrl .= $serverNode->getEntryIdUrl($this->getDynamicAttributes());
 		$livePackagerUrl .= $serverNode->getSegmentDurationUrlString($segmentDuration);
 
-		$entry = $this->getDynamicAttributes()->getEntry();
 		$livePackagerUrl .= $serverNode->getExplicitLiveUrl($livePackagerUrl, $entry);
 		$livePackagerUrl .= $serverNode->getSessionType($entryServerNode);
+		$livePackagerUrl .= $serverNode->getAdditionalUrlParam($entry);
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
 		$livePackagerUrl .= "t/$secureToken/";
 
