@@ -346,11 +346,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		/* @var $serverNode MediaServerNode */
 		$serverNode = $entryServerNode->serverNode;
-		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
-		$segmentDuration = $this->getDynamicAttributes()->getEntry()->getSegmentDuration();
-
 		/* @var $entry LiveStreamEntry */
 		$entry = $this->getDynamicAttributes()->getEntry();
+
+		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
+		$segmentDuration = $entry->getSegmentDuration();
 		if ($entry->isLowLatencyEntry())
 		{
 			$this->shouldRedirect = true; // low-latency manifest should be build by live-packager
@@ -363,7 +363,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if($matchedPattern)
 		{
 			$this->shouldRedirect = $shouldRedirect;
-			
+
 			$hostname = $serverNode->getHostname();
 			if(!$serverNode->getIsExternalMediaServer())
 				$hostname = preg_replace('/\..*$/', '', $hostname);

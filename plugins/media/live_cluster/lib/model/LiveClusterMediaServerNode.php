@@ -112,7 +112,10 @@ class LiveClusterMediaServerNode extends MediaServerNode
 		return parent::getExplicitLiveUrl($liveUrl, $entry);
 	}
 
-	public function getAdditionalUrlParam(LiveStreamEntry $entry) : string
+	/**
+	 * @return string
+	 */
+	public function getAdditionalUrlParam(LiveStreamEntry $entry)
 	{
 		$res = '';
 		if ($entry->isLowLatencyEntry())

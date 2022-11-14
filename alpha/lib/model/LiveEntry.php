@@ -1212,8 +1212,11 @@ abstract class LiveEntry extends entry
 	    return $conversionProfileId;
     }
 
-	public function isLowLatencyEntry() : bool
-	{
+	/**
+	 * @return bool
+	 */
+	public function isLowLatencyEntry()
+    {
 		return $this->isContainsAdminTag('lowlatency');
 	}
 }
