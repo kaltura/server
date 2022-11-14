@@ -1,4 +1,4 @@
-# Rigel-18.16.0
+# Rigel-18.18.0
 
 ## Add ResourceUser feature ##
 * Issue Type: Task
@@ -7,9 +7,116 @@
 ### Scripts ###
     mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2022_09_27_add_resource_user_table.sql
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_10_03_add_resource_user_permissions.php
-    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+    Client generation required
+    Sphinx reindexing is required
+
+## Added support for player studio V7
+* Issue Type: story
+* Issue ID: PLAT-23970
+
+### Deployment Scripts ###
+```
+Add the following to admin.ini
+moduls.V7Studio.enabled = true
+moduls.V7Studio.permissionType = 2
+moduls.V7Studio.label = "Show V7 Studio"
+moduls.V7Studio.permissionName = FEATURE_V7_STUDIO_PERMISSION
+moduls.V7Studio.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Rigel-18.17.0
+## Add self serve admin view permission
+* Issue Type: Task
+* Issue ID: SSRV-892
+
+### Deployment Scripts ###
+php deployment/updates/scripts/add_permissions/2022_11_01_add_ssrv_view_admin_permission.php
+
+# Rigel-18.16.0
+## Disable password restriction on FirstName/LastName/Email
+* Issue Type: Task
+* Issue ID: PLAT-23928
+### Deployment
+Add the following to admin.ini
+```
+moduls.skipPasswordRestriction.enabled = true
+moduls.skipPasswordRestriction.permissionType = 2
+moduls.skipPasswordRestriction.label = "Disable password restriction on FirstName/LastName/Email"
+moduls.skipPasswordRestriction.permissionName = FEATURE_DISABLE_PASSWORD_RESTRICTION
+moduls.skipPasswordRestriction.basePermissionType = 2
+moduls.skipPasswordRestriction.group = GROUP_SECURITY_OPTIONS
+```
+
+## Add list permission to virtualEvents plugin for Selfserve partner ##
+* Issue Type: Story
+* Issue ID: PLAT-23940
+
+### Deployment Scripts ###
+  php deployment/updates/scripts/add_permissions/2022_10_18_update_permission_virtual_event.php
+
+## Add user list permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: SSRV-853
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2022_10_06_self_serve_add_permission_user_list.php
+
+# Rigel-18.15.0
+
+## Add new extended status enum values for Quiz user entries ## 
+- Issue Type: Task
+- Issue ID: ILMS-287
+
+### Deployment scripts ###  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+Client generation required.
+
+
+## Support adding values dynamically to kafka notifications ##
+- Issue Type: Task
+- Issue ID: FOUN-702
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2022_09_15_update_kafka_kuser_notifications.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2022_09_15_deploy_update_kuser_kafka_notifications.php
+
+## Update Entry published to category email event notification template ##
+* Issue Type: Task
+* Issue ID: SUP-33956
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+
+    - deployment/updates/scripts/xml/2022_09_18_addEntryPublishedToSpecificCategoryEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_09_18_deploy_add_email_event_notification_entry_published_to_specific_category.php
+
+Update script:
+
+    - deployment/updates/scripts/xml/2022_09_18_updateEntryPublishedToSpecificCategoryEmailNotification.template.xml
+    - php deployment/updates/scripts/2022_09_18_deploy_update_email_event_notification_entry_published_to_specific_category.php
+>>>>>>> Rigel-18.18.0
 
 # Rigel-18.14.0
+## Add event notification that enables to create dynamic app instance ##
+- Issue Type: Task
+- Issue ID: PLAT-23200
+
+### Configuration ###
+	First replace all tokens from the XML files below and remove ".template" from the file name:
+	deployment/updates/scripts/xml/notifications/2022_09_01_partner_added_custom_application_Http_Notification.template.xml
+
+### Deployment scripts ###
+	php deployment/updates/scripts/2021_09_01_partner_added_custom_application.php
 
 ## Add partner for game services ##
 * Issue Type: Task
@@ -37,7 +144,7 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2022_09_06_update_groupuser_permission.php
 
-# Rigel 18.13.0
+# Rigel-18.13.0
 ## Changes to Co-editors or Co-publishers changed email event notification templates ##
 * Issue Type: Task
 * Issue ID: SUP-28334
