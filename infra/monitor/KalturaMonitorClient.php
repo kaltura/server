@@ -21,7 +21,7 @@ class KalturaMonitorClient
 	const EVENT_MEMCACHE       = 'memcache';
 	const EVENT_REDIS          = 'redis';
 	const EVENT_CURL           = 'curl';
-	const EVENT_AXEL		   = 'axel';
+	const EVENT_AXEL           = 'axel';
 	const EVENT_RABBIT         = 'rabbit';
 	const EVENT_SLEEP          = 'sleep';
 	const EVENT_UPLOAD         = 'upload';
