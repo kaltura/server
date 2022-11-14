@@ -5,12 +5,15 @@
  * @package plugins.emailNotification
  * @subpackage Scheduler
  */
+
 abstract class KEmailNotificationRecipientEngine
 {
 	/**
 	 * Job data for the email notification recipients
 	 * @var KalturaEmailNotificationRecipientJobData
 	 */
+	const ID_QUERY_MAX_CHUNK_SIZE = 150;
+
 	protected $recipientJobData;
 	
 	public function __construct(KalturaEmailNotificationRecipientJobData $recipientJobData)
@@ -36,4 +39,53 @@ abstract class KEmailNotificationRecipientEngine
 	 * @param array $contentParameters
 	 */
 	abstract function getRecipients (array $contentParameters);
+
+	protected function getUsersOfGroupByGroupId($groupId)
+	{
+		$groupFilter = new KalturaGroupUserFilter();
+		$groupFilter->groupIdEqual = $groupId;
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
+		$userFilter = new KalturaUserFilter();
+
+		$groupUserList = KBatchBase::$kClient->groupUser->listAction($groupFilter, $pager);
+		if(!($groupUserList->totalCount))
+		{
+			return null;
+		}
+
+		$groupUserIds = array();
+		foreach ($groupUserList->objects as $user)
+		{
+			$groupUserIds[]= $user->userId;
+		}
+
+		$pager->pageSize = self::ID_QUERY_MAX_CHUNK_SIZE;
+		$offset = 0;
+		$allUsers = array();
+
+		while($offset < count($groupUserIds))
+		{
+			$currentUserArrIds = array_slice($groupUserIds, $offset, self::ID_QUERY_MAX_CHUNK_SIZE);
+			$currentUserStrIds = implode(',', $currentUserArrIds);
+			$userFilter->idIn = $currentUserStrIds;
+			$response = KBatchBase::$kClient->user->listAction($userFilter, $pager);
+			if(!$response)
+			{
+				KalturaLog::debug("Failed to list users of group: ". $groupId);
+				break;
+			}
+			$usersListObject = $response->objects;
+			$totalCount = $response->totalCount;
+			$allUsers = array_merge($allUsers, $usersListObject);
+			$offset += min(self::ID_QUERY_MAX_CHUNK_SIZE, $totalCount);
+		}
+
+		if(!(count($allUsers) > 0))
+		{
+			return null;
+		}
+
+		return $allUsers;
+	}
 }

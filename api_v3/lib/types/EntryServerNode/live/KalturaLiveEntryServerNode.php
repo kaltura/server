@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveEntryServerNode extends KalturaEntryServerNode 
+class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 {
 	const MAX_BITRATE_PERCENTAGE_DIFF_ALLOWED = 10;
 	const MAX_FRAMERATE_PERCENTAGE_DIFF_ALLOWED = 15;
@@ -30,12 +30,18 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	 */
 	public $viewMode;
 
+	/**
+	 * @var time
+	 */
+	public $featuresUpdatedAt;
+
 	private static $map_between_objects = array
 	(
 		"streams",
 		"recordingInfo",
 		"isPlayableUser",
 		"viewMode",
+		"featuresUpdatedAt",
 	);
 
 	/* (non-PHPdoc)

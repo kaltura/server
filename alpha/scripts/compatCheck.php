@@ -88,6 +88,8 @@ define('CM_WIDGET', 2);
 
 define('MAX_BINARY_DIFFS', 5);
 
+define('MAX_REDIRECTS', 5);
+
 $ID_FIELDS = array('id', 'guid', 'loc', 'title', 'link');
 
 class PartnerSecretPool
@@ -155,7 +157,7 @@ function extendKsExpiry($ks)
 	if (!$adminSecret)
 		return null;
 	
-	return kSessionBase::generateKsV1($adminSecret, $ksObj->user, $ksObj->type, $ksObj->partner_id, 86400, $ksObj->privileges, $ksObj->master_partner_id, $ksObj->additional_data);
+	return kSessionBase::generateKsV1($adminSecret, $ksObj->user, $ksObj->type, $ksObj->partner_id, time() + 86400, $ksObj->privileges, $ksObj->master_partner_id, $ksObj->additional_data);
 }
 
 function print_r_reverse($in) {
@@ -222,7 +224,7 @@ function getSignedIpHeader($ipAddress)
 	return array("X-KALTURA-REMOTE-ADDR: $ipHeader");
 }
 
-function doCurl($url, $params = array(), $files = array(), $range = null, $requestHeaders = array())
+function doCurl($url, $params = array(), $files = array(), $range = null, $requestHeaders = array(), $verifyHeaders = false)
 {
 	global $extraRequestHeaders;
 	
@@ -256,6 +258,10 @@ function doCurl($url, $params = array(), $files = array(), $range = null, $reque
 	{
 		curl_setopt($ch, CURLOPT_RANGE, $range);
 	}
+	if($verifyHeaders)
+	{
+		curl_setopt($ch, CURLOPT_HEADER, 1);
+	}
 	curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_USERAGENT, '');
@@ -265,10 +271,33 @@ function doCurl($url, $params = array(), $files = array(), $range = null, $reque
 	$beforeTime = microtime(true);
 	$result = curl_exec($ch);
 	$endTime = microtime(true);
+
+	$headers = null;
+
+	if($verifyHeaders)
+	{
+		$redirectCount = 0;
+		$redirectLocation = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+		while($redirectLocation && $redirectCount < MAX_REDIRECTS)
+		{
+			//print $redirectLocation;
+			curl_setopt($ch, CURLOPT_URL, $redirectLocation);
+			$beforeTime = microtime(true);
+			$result = curl_exec($ch);
+			$endTime = microtime(true);
+			$redirectCount += 1 ;
+			print "\nDoing curl: $redirectLocation \n";
+			$redirectLocation = curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+		}
+
+		$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+		$headers = substr($result, 0, $header_size);
+		$result = substr($result, $header_size);
+	}
 	
 	$curlError = curl_error($ch);
 	curl_close($ch);
-	return array($result, $curlError, $endTime - $beforeTime);
+	return array($result, $curlError, $endTime - $beforeTime, $headers);
 }
 
 function stripXMLInvalidChars($value)
@@ -598,6 +627,58 @@ function countDifferences($buffer1, $buffer2)
 	return $result;
 }
 
+function compareHeaders($headersNew, $headersOld)
+{
+	print "\nNew request headers: \n";
+	print($headersNew);
+	print "\nOld request headers: \n";
+	print($headersOld);
+
+	$headersArrNew = getHeadersArr($headersNew);
+	$headersArrOld = getHeadersArr($headersOld);
+	$keys = array_unique(array_merge(array_keys($headersArrNew), array_keys($headersArrOld)));
+	$ignoreHeaders = array('Server', 'Date', 'Connection', 'X-Me', 'X-Kaltura-Session', 'Expires', 'Cache-Control',
+		'Last-modified', 'ETag', 'Pragma', 'X-Kaltura', 'X-Vod-Me', 'X-Vod-Session', 'Last-Modified', 'Last-modified',
+		'Access-Control-Allow-Headers', 'Access-Control-Expose-Headers', 'Access-Control-Allow-Methods',
+		'Timing-Allow-Origin', 'Content-Description','X-Kaltura-ACP', 'X-Kaltura-Sendfile', 'Accept-Ranges',
+		'X-Proxy-Me', 'X-Proxy-Session', 'X-Vod-Me', 'X-Vod-Session');
+
+	foreach($keys as $key)
+	{
+		if(!in_array($key, $ignoreHeaders))
+		{
+			if(!isset($headersArrNew[$key]) || !isset($headersArrOld[$key]))
+			{
+				print "\nheader [$key] is missing in one of the responses\n";
+				return false;
+			}
+
+			if($headersArrNew[$key] !== $headersArrOld[$key])
+			{
+				print "\nheader [$key] value does not match. old [" . $headersArrOld[$key] ."] new [" . $headersArrNew[$key] . "]\n";
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+function getHeadersArr($headers)
+{
+	$headersArr = explode("\r\n", $headers);
+	$headersArr = array_filter($headersArr);
+	$status_message = array_shift($headersArr);
+	$keyValHeadersArr = array();
+
+	foreach ($headersArr as $value)
+	{
+		if(false !== ($matches = explode(':', $value, 2)))
+		{
+			$keyValHeadersArr["{$matches[0]}"] = trim($matches[1]);
+		}
+	}
+	return $keyValHeadersArr;
+}
 
 define('KWIDGET_API_START', '<xml><result>');
 define('KWIDGET_API_END', '</result></xml>');
@@ -747,7 +828,7 @@ function shouldProcessRequest($fullActionName, $parsedParams)
 	return 'yes';
 }
 
-function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParams = array(), $compareMode = CM_XML, $kalcliCmd = '')
+function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParams = array(), $compareMode = CM_XML, $kalcliCmd = '', $verifyHeaders = false)
 {
 	global $serviceUrlOld, $serviceUrlNew;
 	
@@ -788,11 +869,11 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 		
 		if ($ipAddress)
 			$requestHeaders = getSignedIpHeader($ipAddress);
-		list($resultNew, $curlErrorNew, $newTime) = doCurl($serviceUrlNew . $uri, $postParams, array(), $range, $requestHeaders);
+		list($resultNew, $curlErrorNew, $newTime, $headersNew) = doCurl($serviceUrlNew . $uri, $postParams, array(), $range, $requestHeaders, $verifyHeaders);
 		
 		if ($ipAddress)
 			$requestHeaders = getSignedIpHeader($ipAddress);
-		list($resultOld, $curlErrorOld, $oldTime) = doCurl($serviceUrlOld . $uri, $postParams, array(), $range, $requestHeaders);
+		list($resultOld, $curlErrorOld, $oldTime, $headersOld) = doCurl($serviceUrlOld . $uri, $postParams, array(), $range, $requestHeaders, $verifyHeaders);
 		
 		if ($curlErrorNew || $curlErrorOld)
 		{
@@ -835,6 +916,14 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 					$errors = array('Data does not match - newSize='.strlen($resultNew).' oldSize='.strlen($resultOld));
 					break;
 				}
+				if($verifyHeaders)
+				{
+					if(!compareHeaders($headersNew, $headersOld))
+					{
+						$errors = array('Headers dont match');
+						break;
+					}
+				}
 				if (countDifferences($resultNew, $resultOld) <= MAX_BINARY_DIFFS)
 					$errors = array();
 				else
@@ -843,6 +932,14 @@ function testAction($ipAddress, $fullActionName, $parsedParams, $uri, $postParam
 			
 			case CM_XML:
 				$errors = compareResults($resultNew, $resultOld);
+				if($verifyHeaders)
+				{
+					if(!compareHeaders($headersNew, $headersOld))
+					{
+						$errors = array('Headers dont match');
+						break;
+					}
+				}
 				break;
 		}
 		
@@ -976,6 +1073,23 @@ function extendRequestKss(&$parsedParams)
 	}
 	
 	return true;
+}
+
+function getUriRenewKS($uri)
+{
+	if (preg_match('#/ks/([^/]+)/*#', $uri, $matches, PREG_OFFSET_CAPTURE))
+	{
+		$ks = $matches[1][0];
+		if($ks)
+		{
+			$parsedParams = array('ks' => $ks);
+			extendRequestKss($parsedParams);
+			$startUri = substr($uri, 0, $matches[0][1]);
+			$endUri = substr($uri,  $matches[1][1] + strlen($matches[1][0]) + 1);
+			$uri = $startUri . '/ks/' . $parsedParams['ks'] . '/' .  $endUri;
+		}
+	}
+	return $uri;
 }
 
 function isServiceApproved($service)
@@ -1409,9 +1523,9 @@ class LogProcessorUriList implements LogProcessor
 	function processLine($buffer)
 	{
 		$uri = trim($buffer);
-		
-		// TODO: call extendRequestKss
-		
+
+		$uri = getUriRenewKS($uri);
+
 		$service = '';
 		if (preg_match('/service=([\w_]+)/', $uri, $matches))
 			$service = $matches[1];
@@ -1425,6 +1539,17 @@ class LogProcessorUriList implements LogProcessor
 			$fullActionName = $uri;
 		
 		testAction(null, $fullActionName, array(), $uri);
+	}
+}
+
+class LogProcessorContentUriList implements LogProcessor
+{
+	function processLine($buffer)
+	{
+		$uri = trim($buffer);
+		$matches = null;
+		$uri = getUriRenewKS($uri);
+		testAction(null, $uri, array(), $uri, array(), CM_BINARY, '', true);
 	}
 }
 
@@ -1481,8 +1606,8 @@ if (strpos($apiLogPath, ':') !== false)
 	$apiLogPath = $localLogPath;
 }
 
-if (!in_array($logFormat, array('api_v3', 'ps2', 'feedids', 'uris')))
-	die("Log format should be one of: api_v3, ps2, feedids, uris");
+if (!in_array($logFormat, array('api_v3', 'ps2', 'feedids', 'uris', 'content_uri')))
+	die("Log format should be one of: api_v3, ps2, feedids, uris, content_uri");
 
 if (!beginsWith(strtolower($serviceUrlOld), 'http://'))
 	$serviceUrlOld = 'http://' . $serviceUrlOld;
@@ -1521,6 +1646,9 @@ switch ($logFormat)
 		break;
 	case 'uris':
 		$logProcessor = new LogProcessorUriList();
+		break;
+	case 'content_uri':
+		$logProcessor = new LogProcessorContentUriList();
 		break;
 }
 

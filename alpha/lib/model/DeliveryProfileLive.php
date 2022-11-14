@@ -142,7 +142,18 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		
 		$streams = $liveEntryServerNode->getStreams();
 		$this->sanitizeAndFilterStreamIdsByBitrate($streams);
-		
+
+		foreach($streams as $stream)
+		{
+			if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
+			{
+				KalturaLog::debug("Stream has live caption - redirecting to live packager");
+				$this->shouldRedirect = true;
+				$this->getDynamicAttributes()->setFlavorParamIds(array());
+				break;
+			}
+		}
+
 		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
 		
@@ -335,9 +346,15 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		/* @var $serverNode MediaServerNode */
 		$serverNode = $entryServerNode->serverNode;
+		/* @var $entry LiveStreamEntry */
+		$entry = $this->getDynamicAttributes()->getEntry();
+
 		$protocol = $this->getDynamicAttributes()->getMediaProtocol();
-		$segmentDuration = $this->getDynamicAttributes()->getEntry()->getSegmentDuration();
-		
+		$segmentDuration = $entry->getSegmentDuration();
+		if ($entry->isLowLatencyEntry())
+		{
+			$this->shouldRedirect = true; // low-latency manifest should be build by live-packager
+		}
 		$livePackagerUrl = $serverNode->getPlaybackHost($protocol, $streamFormat, $this->getUrl());
 		$livePackagerUrl = rtrim(str_replace('{DC}', $serverNode->getEnvDc(), $livePackagerUrl), '/');
 		
@@ -346,7 +363,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		if($matchedPattern)
 		{
 			$this->shouldRedirect = $shouldRedirect;
-			
+
 			$hostname = $serverNode->getHostname();
 			if(!$serverNode->getIsExternalMediaServer())
 				$hostname = preg_replace('/\..*$/', '', $hostname);
@@ -363,9 +380,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$livePackagerUrl .= $serverNode->getEntryIdUrl($this->getDynamicAttributes());
 		$livePackagerUrl .= $serverNode->getSegmentDurationUrlString($segmentDuration);
 
-		$entry = $this->getDynamicAttributes()->getEntry();
 		$livePackagerUrl .= $serverNode->getExplicitLiveUrl($livePackagerUrl, $entry);
 		$livePackagerUrl .= $serverNode->getSessionType($entryServerNode);
+		$livePackagerUrl .= $serverNode->getAdditionalUrlParam($entry);
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
 		$livePackagerUrl .= "t/$secureToken/";
 

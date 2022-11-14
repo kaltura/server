@@ -6,6 +6,10 @@
  */
 class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
+	const NAME = 'name';
+	const DESCRIPTION = 'description';
+	const TAGS = 'tags';
+	
 	/**
 	 * Auto generated 10 characters alphanumeric string
 	 * 
@@ -18,7 +22,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	/**
 	 * Entry name (Min 1 chars)
 	 * 
-	 * @var string
+	 * @var KalturaMultiLingualStringArray
 	 * @filter like,mlikeor,mlikeand,eq,order
 	 * @requiresPermission update
 	 */
@@ -27,7 +31,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	/**
 	 * Entry description
 	 * 
-	 * @var string
+	 * @var KalturaMultiLingualStringArray
 	 * @requiresPermission update
 	 */
 	public $description;
@@ -61,7 +65,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	/**
 	 * Entry tags
 	 * 
-	 * @var string
+	 * @var KalturaMultiLingualStringArray
 	 * @filter like,mlikeor,mlikeand
 	 * @requiresPermission update
 	 */
@@ -405,14 +409,13 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 */
 	public $blockAutoTranscript;
 
-
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array 
 	 (
 	 	"id", 
-	 	"name", 
+	 	"name",
 	 	"description",
 	 	"tags",
 	 	"adminTags",
@@ -456,7 +459,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"displayInSearch",
 		"application",
 		"applicationVersion",
-		"blockAutoTranscript"
+		"blockAutoTranscript",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -528,6 +531,9 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 			if($this->shouldGet('creatorId', $responseProfile))
 				$this->creatorId = $sourceObject->getCreatorPuserId();
 		}
+		$requestLanguage = kCurrentContext::getLanguage();
+		
+		multiLingualUtils::setCorrectLanguageValuesInResponse($this, $sourceObject, $requestLanguage, $responseProfile);
 	}
 	
 	public function validateObjectsExist(entry $sourceObject = null)

@@ -22,6 +22,11 @@ class kAccessControlModifyRequestHostRegexAction extends kRuleAction
 	 */
 	protected $replacmenServerNodeId;
 	
+	/**
+	 * @var int
+	 */
+	protected $checkAliveTimeoutMs;
+	
 	public function __construct() 
 	{
 		parent::__construct(RuleActionType::REQUEST_HOST_REGEX);
@@ -87,6 +92,22 @@ class kAccessControlModifyRequestHostRegexAction extends kRuleAction
 	public function getReplacmenServerNodeId()
 	{
 		return $this->replacmenServerNodeId;
+	}
+	
+	/**
+	 * @param int $checkAliveTimeoutMs
+	 */
+	public function setCheckAliveTimeoutMs($checkAliveTimeoutMs)
+	{
+		$this->checkAliveTimeoutMs = $checkAliveTimeoutMs;
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getCheckAliveTimeoutMs()
+	{
+		return $this->checkAliveTimeoutMs;
 	}
 	
 	/**
