@@ -30,6 +30,12 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$recordingsList = json_decode($response, true);
 		KalturaLog::info('Response from Webex recordings: ' . print_r($recordingsList));
 		$items = $recordingsList['items'];
+		if (!$items)
+		{
+			KaltureLog::debug('No items in response');
+			return;
+		}
+		
 		foreach ($items as $item)
 		{
 			KalturaLog::info($item['meetingId']);
@@ -108,6 +114,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
+		KalturaLog::debug('Start processing Webex Folder');
 		KBatchBase::impersonate($job->partnerId);
 		if (!$data->contentMatchPolicy == KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW)
 		{
@@ -127,16 +134,16 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		$webexBaseURL = $dropFolder->baseURL;
 		//$zoomRecordingProcessor = new zoomMeetingProcessor($webexBaseURL, $dropFolder);
-		$entry = $this->createEntryFromRecording($dropFolderFile, $ownerId);
+		$entry = $this->createEntryFromRecording($dropFolderFile, $job->partnerId);
 		//$this->setEntryCategory($entry, $recording->meetingMetadata->meetingId);
 		//$this->handleParticipants($updatedEntry, $validatedUsers);
-		$entry = KBatchBase::$kClient->baseEntry->update($entry->id, $updatedEntry);
+		//$entry = KBatchBase::$kClient->baseEntry->update($entry->id, $updatedEntry);
 		
 		$kFlavorAsset = new KalturaFlavorAsset();
 		//$kFlavorAsset->tags = self::TAG_SOURCE;
 		//$kFlavorAsset->flavorParamsId = self::SOURCE_FLAVOR_ID;
 		$kFlavorAsset->fileExt = strtolower($dropFolderFile->recordingFile->fileExtension);
-		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->id, $kFlavorAsset);
+		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->getId(), $kFlavorAsset);
 		
 		$resource = new KalturaUrlResource();
 		$resource->url = $dropFolderFile->contentUrl;
@@ -145,9 +152,9 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
 		$assetParamsResourceContainer->resource = $resource;
 		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
-		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
+		KBatchBase::$kClient->media->updateContent($entry->getId(), $resource);
 		
-		$this->updateDropFolderFile($entry->id , $dropFolderFile);
+		$this->updateDropFolderFile($entry->getId() , $dropFolderFile);
 		
 		KBatchBase::unimpersonate();
 	}
