@@ -1402,31 +1402,33 @@ KalturaLog::log("fetchedFileSize:".filesize($fetchedChunkName));
 				/*
 				 * Generate the pre-planned chunk params (start, frames, ...)
 				 */
-			$start = $setup->startFrom;
+$roundDgts=4;
+			$start = round($setup->startFrom,$roundDgts);
 //			$this->chunkDataIdx=round($start/$this->setup->chunkDuration);
-			$finish = $setup->startFrom+$params->duration;
-			$duration = $setup->chunkDuration+$this->calcChunkDrift();
+			$finish = round($setup->startFrom+$params->duration,$roundDgts);
+			$duration = round($setup->chunkDuration+$this->calcChunkDrift(),$roundDgts);
+			$frameDuration = $params->frameDuration;
 			$idx = 0;
-			while($finish-$start>$params->frameDuration) {
+			while($finish-$start>$frameDuration) {
 				$chunkData = new KChunkData($idx, $start, $duration);
 				if($idx>0) {
-					$this->chunkDataArr[$idx-1]->calcGapToNext($start, $params->frameDuration);
+					$this->chunkDataArr[$idx-1]->calcGapToNext($start, $frameDuration);
 				}
 				$this->chunkDataArr[$idx++] = $chunkData;
 		
-				$start += $setup->chunkDuration+$this->calcChunkDrift();
-				$delta = $start-$idx*$setup->chunkDuration;
-				$duration = $setup->chunkDuration+$this->calcChunkDrift();
-				if($params->frameDuration<$delta) {
-					KalturaLog::log("idx($idx)- remove frame - frameDuration($params->frameDuration), delta($delta)");
-					$start-=($params->frameDuration);
+				$start += round($setup->chunkDuration+$this->calcChunkDrift(),$roundDgts);
+				$delta = round($start-$idx*$setup->chunkDuration,$roundDgts);
+				$duration = round($setup->chunkDuration+$this->calcChunkDrift(),$roundDgts);
+				if($frameDuration<$delta) {
+					KalturaLog::log("idx($idx)- remove frame - frameDuration($frameDuration), delta($delta)");
+					$start-=($frameDuration);
 				}
-				else if($delta<0 && $params->frameDuration>-$delta) {
-					KalturaLog::log("idx($idx)- add frame - frameDuration($params->frameDuration), delta($delta)");
-					$start+=($params->frameDuration);
+				else if($delta<0 && $frameDuration>-$delta) {
+					KalturaLog::log("idx($idx)- add frame - frameDuration($frameDuration), delta($delta)");
+					$start+=($frameDuration);
 				}
 			}
-			$chunkData->calcGapToNext($params->duration, $params->frameDuration);
+			$chunkData->calcGapToNext($params->duration, $frameDuration);
 		}
 
 		/********************
