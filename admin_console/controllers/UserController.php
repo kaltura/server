@@ -588,20 +588,51 @@ class UserController extends Zend_Controller_Action
 			$form->isValid($request->getPost());
 			$form->populate($request->getPost());
 			$userRole = new Kaltura_Client_Type_UserRole();
-			$userRole->permissionNames = $form->getPermissionNames();
-			try{
+			$userRole->permissionNames = $this->collectPermissionsForUpdate($form, $client, $userId);
+			try
+			{
 				$client->userRole->update($userId, $userRole);
 			}
-			catch (Exception $e){
+			catch (Exception $e)
+			{
 				$this->view->errMessage = $e->getMessage();
 			}
-		}else
+		}
+		else
 		{
-			
 			$user = $client->userRole->get($userId);
 			$form->populateFromObject($user);
 		}
 		$this->view->form = $form;
+	}
+	
+	private function collectPermissionsForUpdate($form, $client, $userId)
+	{
+		$selectedPermissions = explode(',', $form->getPermissionNames());
+		$existingPermissions = explode(',', $client->userRole->get($userId)->permissionNames);
+		$adminConsolePermissionsList = $this->getAdminConsolePermissionList($client);
+		$permissionsToPersist = array_diff($existingPermissions, $adminConsolePermissionsList);
+		return implode(',', array_filter(array_merge($permissionsToPersist, $selectedPermissions)));
+	}
+	
+	private function getAdminConsolePermissionList($client)
+	{
+		$filter = new Kaltura_Client_Type_PermissionFilter();
+		$filter->statusEqual = Kaltura_Client_Enum_PermissionStatus::ACTIVE;
+		$filter->typeEqual = Kaltura_Client_Enum_PermissionType::NORMAL;
+		$filter->partnerIdEqual = -2;
+		
+		$pager = new Kaltura_Client_Type_FilterPager();
+		$pager->pageSize = 1000;
+		
+		$permissions = $client->permission->listAction($filter, $pager);
+		
+		$permissionNames = array();
+		foreach ($permissions->objects as $permission)
+		{
+			array_push($permissionNames, $permission->name);
+		}
+		return $permissionNames;
 	}
 	
 	
