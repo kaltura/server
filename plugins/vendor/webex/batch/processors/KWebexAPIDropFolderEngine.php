@@ -4,6 +4,8 @@
  */
 class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 {
+	const DEFAULT_WEBEX_QUERY_TIMERANGE = 259200; // 3 days
+	
 	/**
 	 * @var kWebexAPIClient
 	 */
@@ -28,13 +30,13 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		$recordingsList = $this->webexClient->getRecordingsList();
 		KalturaLog::info('Response from Webex recordings: ' . print_r($recordingsList));
-		$items = $recordingsList['items'];
-		if (!$items)
+		if (!isset($recordingsList['items']))
 		{
-			KaltureLog::debug('No items in response');
+			KalturaLog::debug('No items in response');
 			return;
 		}
 		
+		$items = $recordingsList['items'];
 		foreach ($items as $item)
 		{
 			KalturaLog::info($item['meetingId']);
@@ -64,7 +66,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		self::updateDropFolderLastMeetingHandled(time());
 		
-		//$this->handleExistingDropFolderFiles();
+		$this->handleExistingDropFolderFiles();
 	}
 	
 	protected function addDropFolderFile($recordingInfo)
@@ -101,13 +103,58 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
 		KalturaLog::debug("Last handled meetings time is: $lastHandledMeetingTime");
 	}
-
+	
+	protected function handleExistingDropFolderFiles()
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = 500;
+		if (KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
+		{
+			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+		}
+		
+		$fromCreatedAt = time() - self::DEFAULT_WEBEX_QUERY_TIMERANGE;
+		do
+		{
+			$pager->pageIndex++;
+			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager, $fromCreatedAt);
+			foreach ($dropFolderFiles as $dropFolderFile)
+			{
+				$this->handleExistingDropFolderFile($dropFolderFile);
+			}
+			
+		} while (count($dropFolderFiles) >= $pager->pageSize);
+	}
+	
 	protected function handleExistingDropFolderFile(KalturaDropFolderFile $dropFolderFile)
 	{
+		$fileSize = $dropFolderFile->fileSize;
+		if (!$fileSize)
+		{
+			KalturaLog::info('Current file size is empty');
+			return;
+		}
+		
+		if ($dropFolderFile->status == KalturaDropFolderFileStatus::UPLOADING)
+		{
+			$this->handleUploadingDropFolderFile($dropFolderFile, $fileSize, 0);
+		}
+		else
+		{
+			$deleteTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays * 86400;
+			if (($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED && $this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE && time() > $deleteTime) ||
+				$dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
+			{
+				$this->purgeFile($dropFolderFile);
+			}
+		}
 	}
 	
 	protected function purgeFile(KalturaDropFolderFile $dropFolderFile)
 	{
+		$fullPath = $dropFolderFile->fileName;
+		// client->delete file from webex
 	}
 
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
