@@ -703,19 +703,18 @@ class KAsyncImport extends KJobHandlerWorker
 		return ($redirectUrl && $url != $redirectUrl) ? $redirectUrl : null;
 	}
 	
-	
 	private function isPartialFile($errNumber)
 	{
-		if (self::$currentEngine == self::CURL_DOWNLOAD_ENGINE && $errNumber == CURLE_PARTIAL_FILE)
+		switch (self::$currentEngine)
 		{
-			return true;
+			case self::CURL_DOWNLOAD_ENGINE:
+				return $errNumber == CURLE_PARTIAL_FILE;
+				
+			case self::AXEL_DOWNLOAD_ENGINE:
+				return KAxelWrapper::$partiallyDownloaded;
+				
+			default:
+				return false;
 		}
-		
-		if (self::$currentEngine == self::AXEL_DOWNLOAD_ENGINE && KAxelWrapper::$partiallyDownloaded)
-		{
-			return true;
-		}
-		
-		return false;
 	}
 }

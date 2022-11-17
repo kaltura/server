@@ -53,10 +53,7 @@ class KAxelWrapper extends KCurlWrapper
 		if (!$this->checkAxelInstalled())
 		{
 			KalturaLog::debug("Axel is not installed");
-			return false;
 		}
-		
-		return true;
 	}
 	
 	public function getErrorNumber()
@@ -154,7 +151,7 @@ class KAxelWrapper extends KCurlWrapper
 	private function execAxel()
 	{
 		$start = microtime(true);
-		$result = $this->execCmd("$this->axelPath -n $this->concurrentConnections -o $this->destFile $this->url > $this->logPath 2> $this->logPathErr");
+		$result = $this->execCmd("$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url > $this->logPath 2> $this->logPathErr");
 		$end = microtime(true);
 		
 		if (class_exists('KalturaMonitorClient'))
@@ -166,13 +163,10 @@ class KAxelWrapper extends KCurlWrapper
 		$this->errorNumber = $this->getErrorNumber();
 		$this->error = $this->getErrorMsgFromLog();
 		
-		if (!$result)
-		{
-			self::$partiallyDownloaded = $this->isPartialDownload();
-			self::$fileSize = $this->getFileSizeInBytesFromLogFile();
-		}
+		self::$partiallyDownloaded = $this->isPartialDownload();
+		self::$fileSize = $this->getFileSizeInBytesFromLogFile();
 		
-		return $result;
+		return $this->downloadCompleted($result);
 	}
 	
 	/**
@@ -289,6 +283,17 @@ class KAxelWrapper extends KCurlWrapper
 		$percentage = $this->getFileDownloadPercentageFromLogFile();
 		KalturaLog::debug("Downloaded content percentage = [$percentage%]");
 		return $percentage !== false && $percentage != 100;
+	}
+	
+	private function downloadCompleted($result)
+	{
+		if (!$result || self::$partiallyDownloaded)
+		{
+			return false;
+		}
+		
+		$logFileContent = $this->getLogFileContentIfExists($this->getLogPath(), -150);
+		return preg_match('/Downloaded/', $logFileContent);
 	}
 	
 	private function getHttpCodeFromLog()
