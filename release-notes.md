@@ -1,4 +1,18 @@
 # Rigel-18.18.0
+## Add partners for auth-broker/user-profile/kms ##
+
+* Issue Type: Task
+* Issue ID: - Issue Type: Feature
+- Issue ID: FOUN-819
+
+### Configuration ###
+	Add new partners config to ini file: 
+	/opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_11_17_add_broker_user_kms_partners.php
+
+
 ## Added support for player studio V7
 * Issue Type: story
 * Issue ID: PLAT-23970
