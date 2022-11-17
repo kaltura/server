@@ -37,12 +37,12 @@ class KAxelWrapper extends KCurlWrapper
 	/**
 	 * @var string|null
 	 */
-	private $logPath;
+	private $logPath = null;
 	
 	/**
 	 * @var string|null
 	 */
-	private $logPathErr;
+	private $logPathErr = null;
 	
 	public function __construct($params = null)
 	{
@@ -87,7 +87,7 @@ class KAxelWrapper extends KCurlWrapper
 	
 	private function getLogPath()
 	{
-		return isset($this->logPath) && is_string($this->logPath) ? $this->logPath : false;
+		return $this->logPath;
 	}
 	
 	private function setLogPathErr()
@@ -97,7 +97,7 @@ class KAxelWrapper extends KCurlWrapper
 	
 	private function getLogPathErr()
 	{
-		return isset($this->logPathErr) && is_string($this->logPathErr) ? $this->logPathErr : false;
+		return $this->logPathErr;
 	}
 	
 	/**
