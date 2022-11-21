@@ -1,4 +1,4 @@
-# Rigel-18.18.0
+# Rigel-18.19.0
 
 ## Add ResourceUser feature ##
 * Issue Type: Task
@@ -10,6 +10,8 @@
     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
     Client generation required
     Sphinx reindexing is required
+
+# Rigel-18.18.0
 
 ## Added support for player studio V7
 * Issue Type: story
