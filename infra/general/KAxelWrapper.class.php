@@ -166,17 +166,18 @@ class KAxelWrapper extends KCurlWrapper
 	
 	private function getErrorCode()
 	{
-		if ($this->errorNumber > 1)
-		{
-			return 'AXEL_' . $this->errorNumber;
-		}
-		else if ($this->httpCode && ($this->httpCode < 200 || $this->httpCode > 300))
+		if ($this->httpCode && ($this->httpCode < 200 || $this->httpCode > 300))
 		{
 			return 'HTTP_' . $this->httpCode;
 		}
 		else if ($this->error)
 		{
+			KalturaLog::debug("Axel Error: [$this->error]");
 			return 'ERROR';
+		}
+		else if ($this->errorNumber)
+		{
+			return 'AXEL_' . $this->errorNumber;
 		}
 		
 		return null;
