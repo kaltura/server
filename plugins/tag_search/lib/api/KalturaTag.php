@@ -2,8 +2,9 @@
 /**
  * @package plugins.tagSearch
  * @subpackage api.objects
+ * @relatedService TagService
  */
-class KalturaTag extends KalturaObject
+class KalturaTag extends KalturaObject implements IRelatedFilterable
 {
     /**
      * @var int
@@ -13,12 +14,14 @@ class KalturaTag extends KalturaObject
     
     /**
      * @var string
+     * @filter eq,likex
      * @readonly
      */
     public $tag;
     
     /**
      * @var KalturaTaggedObjectType
+     * @filter eq
      * @readonly
      */
     public $taggedObjectType;
@@ -31,6 +34,7 @@ class KalturaTag extends KalturaObject
     
     /**
      * @var int
+     * @filter eq,in,gte,lte,order
      * @readonly
      */
     public $instanceCount;
@@ -38,6 +42,7 @@ class KalturaTag extends KalturaObject
     /**
      * @var time
      * @readonly
+     * @filter gte,lte,order
      */
     public $createdAt;
     
@@ -62,5 +67,20 @@ class KalturaTag extends KalturaObject
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-    
+
+	/**
+	 * @inheritDoc
+	 */
+	function getExtraFilters()
+	{
+		return array();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	function getFilterDocs()
+	{
+		return array();
+	}
 }

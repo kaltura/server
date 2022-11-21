@@ -1,4 +1,18 @@
+# Rigel-18.19.0
+
+## Add ResourceUser feature ##
+* Issue Type: Task
+* Issue ID: ILMS-296
+
+### Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2022_09_27_add_resource_user_table.sql
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_10_03_add_resource_user_permissions.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+    Client generation required
+    Sphinx reindexing is required
+
 # Rigel-18.18.0
+
 ## Added support for player studio V7
 * Issue Type: story
 * Issue ID: PLAT-23970

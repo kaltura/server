@@ -19,6 +19,8 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 		"resourceSystemNamesLike" => "_like_resource_system_names",
 		"resourceSystemNamesMultiLikeOr" => "_mlikeor_resource_system_names",
 		"resourceSystemNamesMultiLikeAnd" => "_mlikeand_resource_system_names",
+		"resourceTagsMultiLikeOr" => "_mlikeor_resource_tags",
+		"resourceTagsMultiLikeAnd" => "_mlikeand_resource_tags",
 		"resourceIdEqual" => "_eq_resource_ids",
 	);
 
@@ -82,6 +84,16 @@ class KalturaScheduleEventFilter extends KalturaScheduleEventBaseFilter
 	 * @var string
 	 */
 	public $resourceSystemNamesMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $resourceTagsMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $resourceTagsMultiLikeOr;
 
 	/**
 	 * @var string
