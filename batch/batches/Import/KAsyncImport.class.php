@@ -95,7 +95,7 @@ class KAsyncImport extends KJobHandlerWorker
 		// axel cant handle urls > 1024
 		if (strlen($url) > self::AXEL_MAX_URL_LENGTH)
 		{
-			KalturaLog::debug("URL length longer than 1024 - cannot use axel due to axel limitation");
+			KalturaLog::debug("URL length longer than [" . self::AXEL_MAX_URL_LENGTH . "] - cannot use axel due to axel limitation");
 			return;
 		}
 		
