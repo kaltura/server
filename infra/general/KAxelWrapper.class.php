@@ -56,11 +56,6 @@ class KAxelWrapper extends KCurlWrapper
 		}
 	}
 	
-	public function getErrorNumber()
-	{
-		return isset($this->errorNumber) ? $this->errorNumber : 0;
-	}
-	
 	public function getErrorMsg()
 	{
 		return isset($this->error) ? $this->error : false;
@@ -109,10 +104,11 @@ class KAxelWrapper extends KCurlWrapper
 		unset($output);
 		exec($cmdLine, $output, $resultCode);
 		
+		$this->errorNumber = $resultCode;
+		
 		if ($resultCode)
 		{
 			KalturaLog::debug("Executed command result code [$resultCode]");
-			$this->errorNumber = $resultCode;
 			return false;
 		}
 		
@@ -154,9 +150,7 @@ class KAxelWrapper extends KCurlWrapper
 		$result = $this->execCmd("$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url > $this->logPath 2> $this->logPathErr");
 		$end = microtime(true);
 		
-		
 		$this->httpCode = $this->getHttpCodeFromLog();
-		$this->errorNumber = $this->getErrorNumber();
 		$this->error = $this->getErrorMsgFromLog();
 		
 		self::$partiallyDownloaded = $this->isPartialDownload();
