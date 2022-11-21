@@ -41,45 +41,49 @@ class kWebexAPIClient
 		$this->zoomTokensHelper = new kZoomTokens($webexBaseURL, $clientId, $clientSecret);
 	}
 	
-	public function getRecordingsList()
+	public function getRecordingsList($lastFileTimestamp)
 	{
-		$earliestTime = 1662034849;
 		$dateFormat = 'Y-m-d';
-		$startDate = date($dateFormat, $earliestTime);
-		$endDate = date($dateFormat, time());
+		$startDate = date($dateFormat, $lastFileTimestamp);
+		$endDate = date($dateFormat, time() + kTimeConversion::DAY);
 		$request = "recordings?from=$startDate&to=$endDate";
-		$response = $this->sendRequest($request);
-		return json_decode($response, true);
+		return $this->sendRequest($request);
 	}
 	
 	public function getRecording($recordingId)
 	{
 		$request = "recordings/$recordingId";
-		$response = $this->sendRequest($request);
-		return json_decode($response, true);
+		return $this->sendRequest($request);
 	}
 	
 	public function getWebexUser()
 	{
 		$request = 'people/me';
-		$response = $this->sendRequest($request);
-		return json_decode($response, true);
+		return $this->sendRequest($request);
 	}
 	
 	protected function sendRequest($request, $isRequestPost = false)
 	{
 		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
 		$webexBaseURL = $webexConfiguration['baseUrl'];
-		
 		$requestUrl = $webexBaseURL . $request;
 		$authorizationHeader = 'Authorization: Bearer ' . $this->accessToken;
 		$requestHeaders = array($authorizationHeader);
+		
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, $isRequestPost);
 		$curlWrapper->setOpt(CURLOPT_HEADER, true);
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
 		$response = $curlWrapper->exec($requestUrl);
 		
+		if (!$response)
+		{
+			$response = $curlWrapper->getErrorMsg();
+		}
+		else
+		{
+			$response = json_decode($response, true);
+		}
 		return $response;
 	}
 	

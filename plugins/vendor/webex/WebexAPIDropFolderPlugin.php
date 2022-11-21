@@ -172,6 +172,16 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 			throw new KalturaAPIException(KalturaWebexAPIErrors::NO_VENDOR_CONFIGURATION);
 		}
 		
-		return kConf::get(self::CONFIGURATION_PARAM_NAME, self::CONFIGURATION_MAP_NAME);
+		$webexConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::CONFIGURATION_MAP_NAME);
+		$requiredParmeter = array('baseUrl', 'clientId', 'clientSecret', 'redirectUrl', 'domain', 'scope', 'state');
+		foreach($requiredParmeter as $parameter)
+		{
+			if (!isset($webexConfiguration[$parameter]))
+			{
+				throw new KalturaAPIException(KalturaWebexAPIErrors::MISSING_CONFIGURATION_PARAMETER, $parameter);
+			}
+		}
+		
+		return $webexConfiguration;
 	}
 }

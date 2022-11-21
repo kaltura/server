@@ -8,6 +8,7 @@ class KalturaWebexAPIErrors extends KalturaErrors
 	const NO_INTEGRATION_DATA        = 'NO_INTEGRATION_DATA;;Webex integration data does not exist for current account';
 	const TOKEN_PARSING_FAILED       = 'TOKEN_PARSING_FAILED;;Parsing tokens failed';
 	const NO_VENDOR_CONFIGURATION    = 'NO_VENDOR_CONFIGURATION;;Vendor configuration file was not found!';
+	const MISSING_CONFIGURATION_PARAMETER    = 'MISSING_CONFIGURATION_PARAMETER;PARAMETER;Configuration parameter \"@PARAMETER@\" not found in Webex section of vendor map';
 	const WEBEX_ADMIN_REQUIRED        = 'WEBEX_ADMIN_REQUIRED;;Only Webex admins are allowed to access kaltura configuration page, please check your user account';
 	const UNABLE_TO_FIND_SUBMIT_PAGE = 'UNABLE_TO_FIND_SUBMIT_PAGE;;unable to find submit page, please contact support';
 	const UNABLE_TO_AUTHENTICATE     = 'UNABLE_TO_AUTHENTICATE;;Unable to authenticate because both Refresh Token and JWT are missing';

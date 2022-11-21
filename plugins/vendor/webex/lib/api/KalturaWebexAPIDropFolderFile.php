@@ -29,6 +29,11 @@ class KalturaWebexAPIDropFolderFile extends KalturaDropFolderFile
 	 * @var string
 	 */
 	public $contentUrl;
+	
+	/**
+	 * @var int
+	 */
+	public $urlExpiry;
 
 
 
@@ -41,6 +46,7 @@ class KalturaWebexAPIDropFolderFile extends KalturaDropFolderFile
 		'description',
 		'confId',
 		'contentUrl',
+		'urlExpiry',
 	 );
 		 
 	public function getMapBetweenObjects()
