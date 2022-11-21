@@ -28,6 +28,7 @@ class KAsyncImport extends KJobHandlerWorker
 	const HEADERS_TIMEOUT=30;
 	const CURL_DOWNLOAD_ENGINE = 'curl';
 	const AXEL_DOWNLOAD_ENGINE = 'axel';
+	const AXEL_MAX_URL_LENGTH = 1024;
 
 
 	public static function  progressWatchDog($resource,$download_size, $downloaded, $upload_size)
@@ -91,15 +92,22 @@ class KAsyncImport extends KJobHandlerWorker
 			return;
 		}
 		
+		// axel cant handle urls > 1024
+		if (strlen($url) > self::AXEL_MAX_URL_LENGTH)
+		{
+			KalturaLog::debug("URL length longer than 1024 - cannot use axel due to axel limitation");
+			return;
+		}
+		
 		if (KAxelWrapper::checkUserAndPassOnUrl($url))
 		{
-			KalturaLog::debug("Source URL has a user/pass - not using axel for security reasons. URL [$url]");
+			KalturaLog::debug("URL has a user/pass - not using axel for security reasons. URL [$url]");
 			return;
 		}
 		
 		if ($this->getRedirectUrlIfExist($url))
 		{
-			KalturaLog::debug("Source URL has a redirect - not using axel for security reasons. URL [$url]");
+			KalturaLog::debug("URL has a redirect - not using axel for security reasons. URL [$url]");
 			return;
 		}
 		

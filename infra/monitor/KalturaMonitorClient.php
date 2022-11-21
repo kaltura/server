@@ -615,7 +615,7 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 
-	public static function monitorAxel($hostName, $timeTook)
+	public static function monitorAxel($hostName, $timeTook, $errorCode = null)
 	{
 		if (!self::$stream)
 			return;
@@ -625,6 +625,11 @@ class KalturaMonitorClient
 			self::FIELD_HOST			=> $hostName,
 			self::FIELD_EXECUTION_TIME	=> $timeTook,
 		));
+		
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
 		
 		self::writeDeferredEvent($data);
 	}

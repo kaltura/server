@@ -154,10 +154,6 @@ class KAxelWrapper extends KCurlWrapper
 		$result = $this->execCmd("$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url > $this->logPath 2> $this->logPathErr");
 		$end = microtime(true);
 		
-		if (class_exists('KalturaMonitorClient'))
-		{
-			KalturaMonitorClient::monitorAxel($this->host, $end - $start);
-		}
 		
 		$this->httpCode = $this->getHttpCodeFromLog();
 		$this->errorNumber = $this->getErrorNumber();
@@ -166,7 +162,30 @@ class KAxelWrapper extends KCurlWrapper
 		self::$partiallyDownloaded = $this->isPartialDownload();
 		self::$fileSize = $this->getFileSizeInBytesFromLogFile();
 		
+		if (class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorAxel($this->host, $end - $start, $this->getErrorCode());
+		}
+		
 		return $this->downloadCompleted($result);
+	}
+	
+	private function getErrorCode()
+	{
+		if ($this->errorNumber > 1)
+		{
+			return 'AXEL_' . $this->errorNumber;
+		}
+		else if ($this->httpCode && ($this->httpCode < 200 || $this->httpCode > 300))
+		{
+			return 'HTTP_' . $this->httpCode;
+		}
+		else if ($this->error)
+		{
+			return 'ERROR';
+		}
+		
+		return null;
 	}
 	
 	/**
