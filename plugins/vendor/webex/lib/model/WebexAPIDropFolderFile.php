@@ -41,6 +41,11 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	 * @var int
 	 */
 	public $urlExpiry;
+	
+	/**
+	 * @var string
+	 */
+	protected $fileExtension;
 
 
 	/**
@@ -137,6 +142,22 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	public function setUrlExpiry($v)
 	{
 		$this->putInCustomData(self::URL_EXPIRY, $v);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getFileExtension()
+	{
+		return $this->fileExtension;
+	}
+	
+	/**
+	 * @param string $fileExtension
+	 */
+	public function setFileExtension($fileExtension)
+	{
+		$this->fileExtension = $fileExtension;
 	}
 	
 	public function getFileUrl ()
