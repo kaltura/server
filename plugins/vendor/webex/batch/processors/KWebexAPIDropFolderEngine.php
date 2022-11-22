@@ -16,6 +16,16 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	 */
 	protected $lastFileTimestamp;
 	
+	/**
+	 * @var KalturaWebexAPIDropFolder
+	 */
+	protected $dropFolder;
+	
+	/**
+	 * @var KalturaWebexAPIDropFolderFile
+	 */
+	protected $dropFolderFile;
+	
 	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
@@ -206,31 +216,44 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
-		KalturaLog::debug("Start processing Webex Folder [{$data->dropFolderId}]");
 		KBatchBase::impersonate($job->partnerId);
+		
+		$this->initProcessFolder($job, $data);
+		list($entry, $flavorAsset) = $this->prepareEntryAndFlavorAsset($job->partnerId);
+		$this->refreshDownloadUrl();
+		$this->setContentOnEntry($entry, $flavorAsset);
+		$this->updateDropFolderFile($entry->id);
+		
+		KBatchBase::unimpersonate();
+	}
+	
+	protected function initProcessFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
+	{
+		KalturaLog::debug("Start processing Webex Folder [{$data->dropFolderId}]");
 		if (!$data->contentMatchPolicy == KalturaDropFolderContentFileHandlerMatchPolicy::ADD_AS_NEW)
 		{
 			throw new kApplicativeException(KalturaDropFolderErrorCode::CONTENT_MATCH_POLICY_UNDEFINED, 'No content match policy is defined for drop folder');
 		}
 		
-		/* @var KalturaWebexAPIDropFolderFile $dropFolderFile*/
 		$dropFolderFileId = $data->dropFolderFileIds;
-		$dropFolderFile = $this->dropFolderFileService->get($dropFolderFileId);
-		if (!dropFolderFile)
+		$this->dropFolderFile = $this->dropFolderFileService->get($dropFolderFileId);
+		if (!$this->dropFolderFile)
 		{
 			throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, ERROR_IN_CONTENT_PROCESSOR_MESSAGE);
 		}
 		
-		/* @var KalturaWebexAPIDropFolder $dropFolder */
-		$dropFolder = $this->dropFolderPlugin->dropFolder->get($data->dropFolderId);
-		if (!$dropFolder->webexAPIVendorIntegration)
+		$this->dropFolder = $this->dropFolderPlugin->dropFolder->get($data->dropFolderId);
+		if (!$this->dropFolder->webexAPIVendorIntegration)
 		{
 			throw new kExternalException(KalturaDropFolderErrorCode::MISSING_CONFIG, DropFolderPlugin::MISSING_CONFIG_MESSAGE);
 		}
-		
-		$webexBaseURL = $dropFolder->baseURL;
+	}
+	
+	protected function prepareEntryAndFlavorAsset($partnerId)
+	{
+		$webexBaseURL = $this->dropFolder->baseURL;
 		//$zoomRecordingProcessor = new zoomMeetingProcessor($webexBaseURL, $dropFolder);
-		$entry = $this->createEntryFromRecording($dropFolderFile, $job->partnerId, $dropFolder);
+		$entry = $this->createEntryFromRecording($this->dropFolderFile, $partnerId, $this->dropFolder);
 		//$this->setEntryCategory($entry, $recording->meetingMetadata->meetingId);
 		//$this->handleParticipants($updatedEntry, $validatedUsers);
 		//$entry = KBatchBase::$kClient->baseEntry->update($entry->id, $updatedEntry);
@@ -238,30 +261,10 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$kFlavorAsset = new KalturaFlavorAsset();
 		//$kFlavorAsset->tags = self::TAG_SOURCE;
 		//$kFlavorAsset->flavorParamsId = self::SOURCE_FLAVOR_ID;
-		$kFlavorAsset->fileExt = strtolower($dropFolderFile->recordingFile->fileExtension);
+		$kFlavorAsset->fileExt = strtolower($this->dropFolderFile->fileExtension);
 		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->id, $kFlavorAsset);
 		
-		$resource = new KalturaUrlResource();
-		if ($dropFolderFile->urlExpiry + kTimeConversion::MINUTE * 5 > time())
-		{
-			$this->webexClient = $this->initWebexClient($dropFolder);
-			$recordingInfo = $this->webexClient->getRecording($dropFolderFile->recordingId);
-			$dropFolderFile->contentUrl = $recordingInfo['temporaryDirectDownloadLinks']['recordingDownloadLink'];
-			$dropFolderFile->urlExpiry = strtotime($recordingInfo['temporaryDirectDownloadLinks']['expiration']);
-		}
-		
-		
-		$resource->url = $dropFolderFile->contentUrl;
-		$resource->forceAsyncDownload = true;
-		
-		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
-		$assetParamsResourceContainer->resource = $resource;
-		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
-		KBatchBase::$kClient->media->updateContent($entry->getId(), $resource);
-		
-		$this->updateDropFolderFile($entry->getId() , $dropFolderFile);
-		
-		KBatchBase::unimpersonate();
+		return array($entry, $flavorAsset);
 	}
 	
 	/**
@@ -299,11 +302,36 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		return "Webex Recording";
 	}
 	
-	function updateDropFolderFile($entryId , $dropFolderFile)
+	protected function refreshDownloadUrl()
+	{
+		if ($this->dropFolderFile->urlExpiry < time() + kTimeConversion::MINUTE * 5)
+		{
+			KalturaLog::info("Refreshing download link for {$this->dropFolderFile->fileName}");
+			$this->webexClient = $this->initWebexClient($this->dropFolder);
+			$recordingInfo = $this->webexClient->getRecording($this->dropFolderFile->recordingId);
+			$this->dropFolderFile->contentUrl = $recordingInfo['temporaryDirectDownloadLinks']['recordingDownloadLink'];
+			$this->dropFolderFile->urlExpiry = strtotime($recordingInfo['temporaryDirectDownloadLinks']['expiration']);
+		}
+	}
+	
+	protected function setContentOnEntry($entry, $flavorAsset)
+	{
+		$resource = new KalturaUrlResource();
+		$resource->url = $this->dropFolderFile->contentUrl;
+		$resource->forceAsyncDownload = true;
+		
+		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
+		$assetParamsResourceContainer->resource = $resource;
+		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
+		
+		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
+	}
+	
+	function updateDropFolderFile($entryId)
 	{
 		$kWebexDropFolderFile = new KalturaWebexAPIDropFolderFile();
 		$kWebexDropFolderFile->entryId = $entryId;
-		$this->dropFolderFileService->update($dropFolderFile->id, $kWebexDropFolderFile);
-		$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::HANDLED);
+		$this->dropFolderFileService->update($this->dropFolderFile->id, $kWebexDropFolderFile);
+		$this->dropFolderFileService->updateStatus($this->dropFolderFile->id, KalturaDropFolderFileStatus::HANDLED);
 	}
 }
