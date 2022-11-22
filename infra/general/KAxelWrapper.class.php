@@ -49,21 +49,11 @@ class KAxelWrapper extends KCurlWrapper
 		parent::__construct($params);
 		$this->concurrentConnections = isset($params->concurrentConnections) ? $params->concurrentConnections : self::DEFAULT_CONCURRENT_CONNECTIONS;
 		$this->axelPath = isset($params->axelPath) ? $params->axelPath : null;
-		
-		if (!$this->checkAxelInstalled())
-		{
-			KalturaLog::debug("Axel is not installed");
-		}
 	}
 	
 	public function getErrorMsg()
 	{
 		return isset($this->error) ? $this->error : false;
-	}
-	
-	private function checkAxelInstalled()
-	{
-		return $this->execCmd("$this->axelPath --version");
 	}
 	
 	private function setInternalUrlErrorResults($url)
@@ -456,5 +446,11 @@ class KAxelWrapper extends KCurlWrapper
 		}
 		
 		return false;
+	}
+	
+	public static function checkAxelInstalled($axelPath = null)
+	{
+		kExecWrapper::exec("$axelPath --version", $output, $returnValue);
+		return !$returnValue;
 	}
 }

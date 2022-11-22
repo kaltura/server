@@ -71,13 +71,21 @@ class KAsyncImport extends KJobHandlerWorker
 
 	private function shouldUseAxelDownloadEngine($partnerId, $jobSubType, $url)
 	{
-		if (self::$taskConfig->params && isset(self::$taskConfig->params->partnersUseAxel))
+		if (!self::$taskConfig->params || !isset(self::$taskConfig->params->partnersUseAxel) || !isset(self::$taskConfig->params->axelPath))
 		{
-			$axelPartnerIds = explode(',', self::$taskConfig->params->partnersUseAxel);
-			if(!in_array($partnerId, $axelPartnerIds))
-			{
-				return;
-			}
+			return;
+		}
+		
+		$axelPartnerIds = explode(',', self::$taskConfig->params->partnersUseAxel);
+		if(!in_array($partnerId, $axelPartnerIds))
+		{
+			return;
+		}
+		
+		if (!KAxelWrapper::checkAxelInstalled(self::$taskConfig->params->axelPath))
+		{
+			KalturaLog::debug("Axel not installed");
+			return;
 		}
 		
 		// in case its an sftp job - don't use axel
