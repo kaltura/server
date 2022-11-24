@@ -5,7 +5,7 @@
  */
 class kWebexAPIOauth extends kOAuth
 {
-	const OAUTH_TOKEN_PATH = 'access_token/';
+	const OAUTH_TOKEN_PATH = 'access_token?';
 	
 	/**
 	 * @return array
@@ -16,16 +16,17 @@ class kWebexAPIOauth extends kOAuth
 		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
 		$webexBaseURL = $webexConfiguration['baseUrl'];
 		$redirectUrl = $webexConfiguration['redirectUrl'];
+		$redirectUri = urlencode($redirectUrl);
 		$clientId = $webexConfiguration['clientId'];
 		$clientSecret = $webexConfiguration['clientSecret'];
 		$header = array('Content-Type:application/x-www-form-urlencoded');
-		return array($webexBaseURL, $redirectUrl, $clientId, $clientSecret, $header);
+		return array($webexBaseURL, $redirectUri, $clientId, $clientSecret, $header);
 	}
 	
 	protected static function retrieveTokensData($webexBaseURL, $header, $postFields)
 	{
 		$response = self::curlRetrieveTokensData($webexBaseURL, $header, $postFields);
-		$tokensData = self::retrieveTokenData($response);
+		$tokensData = self::retrieveTokensDataFromResponse($response);
 		return $tokensData;
 	}
 	
@@ -53,15 +54,14 @@ class kWebexAPIOauth extends kOAuth
 	 */
 	public static function requestAuthorizationTokens($authCode)
 	{
-		list($webexBaseURL, $redirectUrl, $clientId, $clientSecret, $header) = self::getHeaderData();
-		$redirectUri = urlencode($redirectUrl);
+		list($webexBaseURL, $redirectUri, $clientId, $clientSecret, $header) = self::getHeaderData();
 		$postFields = "grant_type=authorization_code&client_id=$clientId&client_secret=$clientSecret&code=$authCode&redirect_uri=$redirectUri";
 		return self::retrieveTokensData($webexBaseURL, $header, $postFields);
 	}
 	
 	public static function requestAccessToken($refreshToken)
 	{
-		list($webexBaseURL, $redirectUrl, $clientId, $clientSecret, $header) = self::getHeaderData();
+		list($webexBaseURL, $redirectUri, $clientId, $clientSecret, $header) = self::getHeaderData();
 		$postFields = "grant_type=refresh_token&client_id=$clientId&client_secret=$clientSecret&refresh_token=$refreshToken";
 		return self::retrieveTokensData($webexBaseURL, $header, $postFields);
 	}

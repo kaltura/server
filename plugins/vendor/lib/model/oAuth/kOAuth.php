@@ -12,12 +12,17 @@ abstract class kOAuth
 	
 	protected static function getHeaderData()
 	{
-	
+		return null;
 	}
 	
 	protected static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
 	{
+		return null;
+	}
 	
+	public static function requestAuthorizationTokens($authCode)
+	{
+		return null;
 	}
 	
 	/**
@@ -25,19 +30,13 @@ abstract class kOAuth
 	 * @return array $tokensData
 	 * @throws Exception
 	 */
-	protected static function retrieveTokenData($response)
+	protected static function retrieveTokensDataFromResponse($response)
 	{
 		$tokensData = self::parseTokensResponse($response);
-		self::validateToken($tokensData);
+		self::validateTokens($tokensData);
 		$tokensData = self::extractTokensFromData($tokensData);
-		$expiresIn = $tokensData[self::EXPIRES_IN];
-		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($expiresIn);
+		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($tokensData[self::EXPIRES_IN]);
 		return $tokensData;
-	}
-	
-	public static function requestAuthorizationTokens($authCode)
-	{
-	
 	}
 	
 	/**
@@ -52,7 +51,7 @@ abstract class kOAuth
 		return $dataAsArray;
 	}
 	
-	public static function validateToken($tokensData)
+	public static function validateTokens($tokensData)
 	{
 		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
 			!isset($tokensData[self::EXPIRES_IN]))
@@ -72,13 +71,13 @@ abstract class kOAuth
 	}
 	
 	/**
-	 * set two minutes off the token expiration, avoid 401 response from vendor
+	 * Set two minutes off the token expiration, avoid 401 response from vendor
 	 * @param int $expiresIn
 	 * @return int $expiresIn
 	 */
 	public static function getTokenExpiryRelativeTime($expiresIn)
 	{
-		$expiresIn = time() + $expiresIn - 120;
+		$expiresIn = time() + $expiresIn - kTimeConversion::MINUTE * 2;
 		KalturaLog::info("Set Token 'expires_in' to " . $expiresIn);
 		return $expiresIn;
 	}
@@ -94,7 +93,7 @@ abstract class kOAuth
 	{
 		$verificationToken = $configuration[self::VERIFICATION_TOKEN];
 		$tokensResponse = AESEncrypt::decrypt($verificationToken, $tokensData, $iv);
-		$tokens = self::retrieveTokenData($tokensResponse);
+		$tokens = self::retrieveTokensDataFromResponse($tokensResponse);
 		if (!$tokens)
 		{
 			KExternalErrors::dieGracefully();

@@ -3,7 +3,6 @@
  * @package plugins.WebexAPIDropFolder
  * @subpackage api.objects
  */
-
 class KalturaWebexAPIIntegrationSettingArray extends KalturaTypedArray
 {
 	public static function fromDbArray(array $arr, KalturaDetachedResponseProfile $responseProfile = null)

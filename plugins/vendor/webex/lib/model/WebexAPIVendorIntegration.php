@@ -3,7 +3,6 @@
  * @package plugins.WebexAPIDropFolder
  * @subpackage webex.model
  */
-
 class WebexAPIVendorIntegration extends VendorIntegration
 {
 	const ACCESS_TOKEN = 'accessToken';
@@ -70,6 +69,6 @@ class WebexAPIVendorIntegration extends VendorIntegration
 		$this->setExpiresIn($tokensDataAsArray[kOAuth::EXPIRES_IN]);
 		$this->setAccessToken($tokensDataAsArray[kOAuth::ACCESS_TOKEN]);
 		$this->setRefreshToken($tokensDataAsArray[kOAuth::REFRESH_TOKEN]);
-		$this->setVendorType(VendorTypeEnum::WEBEX_ACCOUNT);
+		$this->setVendorType(VendorTypeEnum::WEBEX_API_ACCOUNT);
 	}
 }

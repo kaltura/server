@@ -251,7 +251,7 @@ class ZoomVendorService extends KalturaBaseService
 		$verificationToken = $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 		$tokensResponse = AESEncrypt::decrypt($verificationToken, $tokensData, $iv);
 		$tokens = kZoomOauth::parseTokensResponse($tokensResponse);
-		kZoomOauth::validateToken($tokens);
+		kZoomOauth::validateTokens($tokens);
 		$tokens = kZoomOauth::extractTokensFromData($tokens);
 		$expiresIn = $tokens[kOAuth::EXPIRES_IN];
 		$tokens[kOAuth::EXPIRES_IN] = kZoomOauth::getTokenExpiryAbsoluteTime($expiresIn);

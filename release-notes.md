@@ -1,3 +1,25 @@
+# Rigel-18.999.0
+## Webex API Drop Folder ##
+* Issue Type: Epic
+* Issue ID: PLAT-23885
+
+### Configuration ###
+Add the following to vendor.ini
+```
+[WebexAccount]
+baseUrl = "https://webexapis.com/v1/"
+redirectUrl = "http://ec2-44-197-214-88.compute-1.amazonaws.com/api_v3/service/webexapidropfolder_webexapi/action/oauthValidation"
+clientId = "C62058d97b84ae605d39b43c3eb5f7f3ed8105b95bcb682042704773a4d0e63d4"
+clientSecret = "480279e8c94361d1122bab90ee8caecbeb111e77c6e8c20386b271c3e4bc3597"
+scope = "meeting%3Arecordings_read%20spark%3Akms%20meeting%3Aschedules_read%20meeting%3Aparticipants_read%20meeting%3Arecordings_write%20meeting%3Atranscripts_read"
+state = "validation"
+DisableWebexAPIDropFolder = 0
+domain = "compute-1.amazonaws.com"
+```
+
+### Deployment Scripts ###
+php deployment/updates/scripts/add_permissions/2022_09_29_add_webexAPI_service.php
+
 # Rigel-18.16.0
 ## Disable password restriction on FirstName/LastName/Email
 * Issue Type: Task

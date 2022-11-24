@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package plugins.WebexAPIDropFolder
  * @subpackage model
@@ -41,27 +40,6 @@ class kWebexAPIClient
 		$this->zoomTokensHelper = new kZoomTokens($webexBaseURL, $clientId, $clientSecret);
 	}
 	
-	public function getRecordingsList($lastFileTimestamp)
-	{
-		$dateFormat = 'Y-m-d';
-		$startDate = date($dateFormat, $lastFileTimestamp);
-		$endDate = date($dateFormat, time() + kTimeConversion::DAY);
-		$request = "recordings?from=$startDate&to=$endDate";
-		return $this->sendRequest($request);
-	}
-	
-	public function getRecording($recordingId)
-	{
-		$request = "recordings/$recordingId";
-		return $this->sendRequest($request);
-	}
-	
-	public function getWebexUser()
-	{
-		$request = 'people/me';
-		return $this->sendRequest($request);
-	}
-	
 	protected function sendRequest($request, $isRequestPost = false)
 	{
 		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
@@ -87,8 +65,24 @@ class kWebexAPIClient
 		return $response;
 	}
 	
+	public function getRecordingsList($lastFileTimestamp)
+	{
+		$dateFormat = 'Y-m-d';
+		$startDate = date($dateFormat, $lastFileTimestamp);
+		$endDate = date($dateFormat, time() + kTimeConversion::DAY);
+		$request = "recordings?from=$startDate&to=$endDate";
+		return $this->sendRequest($request);
+	}
+	
+	public function getRecording($recordingId)
+	{
+		$request = "recordings/$recordingId";
+		return $this->sendRequest($request);
+	}
+	
 	public function retrieveWebexUser()
 	{
+		$request = 'people/me';
 		$user = array('account_id' => 1);
 		return $user;
 	}

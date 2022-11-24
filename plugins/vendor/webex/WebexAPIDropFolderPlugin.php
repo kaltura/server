@@ -137,12 +137,12 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 	 */
 	public static function getObjectClass($baseClass, $enumValue)
 	{
-		if($baseClass == 'DropFolder' &&
+		if ($baseClass == 'DropFolder' &&
 			$enumValue == self::getDropFolderTypeCoreValue(WebexAPIDropFolderType::WEBEX_API))
 		{
 			return 'WebexAPIDropFolder';
 		}
-		else if($baseClass == 'DropFolderFile' &&
+		else if ($baseClass == 'DropFolderFile' &&
 			$enumValue == self::getDropFolderTypeCoreValue(WebexAPIDropFolderType::WEBEX_API))
 		{
 			return 'WebexAPIDropFolderFile';
@@ -173,8 +173,8 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 		}
 		
 		$webexConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::CONFIGURATION_MAP_NAME);
-		$requiredParmeter = array('baseUrl', 'clientId', 'clientSecret', 'redirectUrl', 'domain', 'scope', 'state');
-		foreach($requiredParmeter as $parameter)
+		$requiredParameter = array('baseUrl', 'clientId', 'clientSecret', 'redirectUrl', 'domain', 'scope', 'state');
+		foreach($requiredParameter as $parameter)
 		{
 			if (!isset($webexConfiguration[$parameter]))
 			{

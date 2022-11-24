@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package plugins.WebexAPIDropFolder
  * @subpackage model
@@ -59,7 +58,7 @@ class WebexAPIDropFolder extends RemoteDropFolder
 	
 	public function getFolderUrl()
 	{
-		return kConf ::getArrayValue(
+		return kConf::getArrayValue(
 			KalturaWebexAPIDropFolder::WEBEX_BASE_URL, WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR
 		);
 	}

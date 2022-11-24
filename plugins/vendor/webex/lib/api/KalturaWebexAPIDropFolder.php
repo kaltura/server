@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package plugins.WebexAPIDropFolder
  * @subpackage api.objects
@@ -76,32 +75,22 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 		{
 			if ($vendorIntegration)
 			{
-				$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
-				$this->clientId = $webexConfiguration['clientId'];
-				$this->baseURL = $webexConfiguration['baseUrl'];
-//				$this -> clientSecret = $headerData[1];
 				$this->refreshToken = $vendorIntegration->getRefreshToken();
 				$this->accessToken = $vendorIntegration->getAccessToken();
-//				$this -> description = $vendorIntegration->getZoomAccountDescription();
 				$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
-				$webexAPIClient = new kWebexAPIClient($this->baseURL, $this->refreshToken, $this->clientId,
-					$this->clientSecret, $this->accessToken, $this->accessExpiresIn);
 				
-//				if ($this -> accessToken && $this -> refreshToken && kCurrentContext ::$ks_partner_id == Partner::BATCH_PARTNER_ID &&
-//					$vendorIntegration -> getExpiresIn() <= time() +
-//					kconf ::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
-//				{
-//					KalturaLog ::debug('Token expired for account id: ' . $vendorIntegration -> getAccountId() . ' renewing with the new tokens');
-//					$freshTokens = $zoomClient -> refreshTokens();
-//					if ($freshTokens)
-//					{
-//						$this -> accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
-//						$this -> refreshToken = $freshTokens[kZoomTokens::REFRESH_TOKEN];
-//						$this -> accessExpiresIn = $freshTokens[kZoomTokens::EXPIRES_IN];
-//						$vendorIntegration -> saveTokensData($freshTokens);
-//					}
-//				}
-				
+				if ($this->accessToken && $this->refreshToken && kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID
+					&& $vendorIntegration->getExpiresIn() < time() + kTimeConversion::MINUTE * 5)
+				{
+					$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
+					$this->clientId = $webexConfiguration['clientId'];
+					$this->baseURL = $webexConfiguration['baseUrl'];
+					$tokens = kWebexAPIOauth::requestAccessToken($this->refreshToken);
+					$vendorIntegration->saveTokensData($tokens);
+					$this->refreshToken = $vendorIntegration->getRefreshToken();
+					$this->accessToken = $vendorIntegration->getAccessToken();
+					$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
+				}
 				
 				$webexAPIIntegrationObject = new KalturaWebexAPIIntegrationSetting();
 				$webexAPIIntegrationObject->fromObject($vendorIntegration);

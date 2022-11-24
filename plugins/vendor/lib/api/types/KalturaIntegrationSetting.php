@@ -115,7 +115,7 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 				$object = new KalturaZoomIntegrationSetting();
 				break;
 			
-			case VendorTypeEnum::WEBEX_ACCOUNT:
+			case VendorTypeEnum::WEBEX_API_ACCOUNT:
 				$object = new KalturaWebexAPIIntegrationSetting();
 				break;
 

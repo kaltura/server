@@ -4,7 +4,7 @@
  */
 class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 {
-	const DEFAULT_WEBEX_QUERY_TIMERANGE = 259200; // 3 days
+	const DEFAULT_WEBEX_QUERY_TIME_RANGE = kTimeConversion::MONTH;
 	
 	/**
 	 * @var kWebexAPIClient
@@ -168,7 +168,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
 		}
 		
-		$fromCreatedAt = time() - kTimeConversion::MONTH;
+		$fromCreatedAt = time() - self::DEFAULT_WEBEX_QUERY_TIME_RANGE;
 		do
 		{
 			$pager->pageIndex++;
@@ -285,9 +285,9 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$newEntry->conversionProfileId = $dropFolder->conversionProfileId;
 		//$newEntry->adminTags = self::ADMIN_TAG_ZOOM;
 		//$newEntry->referenceId = self::ZOOM_PREFIX . $dropFolerFile->meetingMetadata->uuid;
-		//KBatchBase::impersonate($this->dropFolder->partnerId);
+		KBatchBase::impersonate($this->dropFolder->partnerId);
 		$kalturaEntry = KBatchBase::$kClient->baseEntry->add($newEntry);
-		//KBatchBase::unimpersonate();
+		KBatchBase::unimpersonate();
 		return $kalturaEntry;
 	}
 	

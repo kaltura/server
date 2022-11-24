@@ -11,6 +11,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	const WEBEX_CONF_IF = 'webex_conf_id';
 	const CONTENT_URL = 'content_url';
 	const URL_EXPIRY = 'url_expiry';
+	const FILE_EXTENSION = 'file_extension';
 	
 	/**
 	 * @var int
@@ -149,15 +150,15 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	 */
 	public function getFileExtension()
 	{
-		return $this->fileExtension;
+		return $this->getFromCustomData(self::FILE_EXTENSION);
 	}
 	
 	/**
-	 * @param string $fileExtension
+	 * @param string $v
 	 */
-	public function setFileExtension($fileExtension)
+	public function setFileExtension($v)
 	{
-		$this->fileExtension = $fileExtension;
+		$this->putInCustomData(self::FILE_EXTENSION, $v);
 	}
 	
 	public function getFileUrl ()
