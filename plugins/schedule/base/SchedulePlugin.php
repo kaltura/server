@@ -7,8 +7,7 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
                                                       IKalturaVersion,
                                                       IKalturaObjectLoader,
                                                       IKalturaScheduleEventProvider,
-                                                      IKalturaDynamicGetter,
-                                                      IKalturaEnumerator
+                                                      IKalturaDynamicGetter
 {
 	const PLUGIN_NAME = 'schedule';
 	const PLUGIN_VERSION_MAJOR = 1;
@@ -22,12 +21,10 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 	
 	public static function dependsOn()
 	{
-		$metadataDependency = new KalturaDependency(MetadataPlugin::getPluginName());
-		$tagsDependency = new KalturaDependency(TagSearchPlugin::getPluginName());
-
-		return array($metadataDependency, $tagsDependency);
+		$metadataDependency = new KalturaDependency(self::METADATA_PLUGIN_NAME);
+		
+		return array($metadataDependency);
 	}
-
 	public static function getPluginName()
 	{
 		return self::PLUGIN_NAME;
@@ -41,34 +38,14 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 	{
 		return new KalturaVersion(self::PLUGIN_VERSION_MAJOR, self::PLUGIN_VERSION_MINOR, self::PLUGIN_VERSION_BUILD);
 	}
-
-    /**
-     * @inheritDoc
-     */
-    public static function getEnums($baseEnumName = null)
-    {
-        if (!$baseEnumName)
-        {
-            return array('ScheduleResourceTaggedObjectType');
-        }
-
-        switch ($baseEnumName)
-        {
-            case 'taggedObjectType':
-                return array('ScheduleResourceTaggedObjectType');
-                break;
-        }
-
-        return array();
-    }
-
+	
 	/*
 	 * (non-PHPdoc)
 	 * @see IKalturaServices::getServicesMap()
 	 */
 	public static function getServicesMap()
 	{
-		$map = array('scheduleEvent' => 'ScheduleEventService', 'scheduleResource' => 'ScheduleResourceService', 'scheduleEventResource' => 'ScheduleEventResourceService', 'resourceUser' => 'ResourceUserService');
+		$map = array('scheduleEvent' => 'ScheduleEventService', 'scheduleResource' => 'ScheduleResourceService', 'scheduleEventResource' => 'ScheduleEventResourceService');
 		return $map;
 	}
 	
@@ -86,10 +63,10 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 	 * @see IKalturaObjectLoader::loadObject()
 	 */
 	public static function loadObject($baseClass, $enumValue, array $constructorArgs = null)
-    {
-        if ($baseClass == 'KalturaSerializer' && $enumValue == self::ICAL_RESPONSE_TYPE)
-            return new KalturaICalSerializer();
-
+	{
+		if($baseClass == 'KalturaSerializer' && $enumValue == self::ICAL_RESPONSE_TYPE)
+			return new KalturaICalSerializer();
+		
 		return null;
 	}
 	
@@ -101,29 +78,9 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 	{
 		if($baseClass == 'KalturaSerializer' && $enumValue == self::ICAL_RESPONSE_TYPE)
 			return 'KalturaICalSerializer';
-
-        if ($baseClass == 'Tag' && $enumValue == ScheduleResourcePeer::OM_CLASS)
-        {
-            return self::getTaggedObjectTypeCoreValue(ScheduleResourceTaggedObjectType::SCHEDULE_RESOURCE);
-        }
-
+		
 		return null;
 	}
-
-    /**
-     * @param $valueName
-     * @return string external API value of dynamic enum.
-     */
-    public static function getApiValue($valueName)
-    {
-        return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-    }
-
-    public static function getTaggedObjectTypeCoreValue($valueName)
-    {
-        $value = self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
-        return kPluginableEnumsManager::apiToCore('taggedObjectType', $value);
-    }
 
 	public static function getSingleScheduleEventMaxDuration()
 	{
@@ -207,5 +164,5 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 		kApiCache::setConditionalCacheExpiry($cacheTime);
 		return $currentEvents->dynamicGetter($context, $output);
 	}
-
+	
 }

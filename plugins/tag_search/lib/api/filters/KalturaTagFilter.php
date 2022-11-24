@@ -3,14 +3,50 @@
  * @package plugins.tagSearch
  * @subpackage api.filters
  */
-class KalturaTagFilter extends KalturaTagBaseFilter
+class KalturaTagFilter extends KalturaFilter
 {
+    /**
+	 * 
+	 * 
+	 * @var KalturaTaggedObjectType
+	 */
+	public $objectTypeEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagEqual;
+
+	/**
+	 * 
+	 * 
+	 * @var string
+	 */
+	public $tagStartsWith;
+	
+	/**
+	 * @var int
+	 */
+	public $instanceCountEqual;
+	
+	/**
+	 * @var int
+	 */
+    public $instanceCountIn;
+    
  	static private $map_between_objects = array
 	(
+		"objectTypeEqual" => "_eq_object_type",
+	    "instanceCountEqual" => "_eq_instance_count",
+	    "instanceCountIn" => "_in_instance_count", 
 	);
 
 	static private $order_by_map = array
 	(
+		"+instanceCount" => "+instance_count",
+	    "-instanceCount" => "-instance_count",
 	);
 
 	public function getMapBetweenObjects()
@@ -64,25 +100,5 @@ class KalturaTagFilter extends KalturaTagBaseFilter
 				$this->$propertyName = preg_replace("/\s+$/", " ", $this->$propertyName);
 			}
 		}
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
-	{
-		$c = KalturaCriteria::create(TagPeer::OM_CLASS);
-		$tagCoreFilter = new TagFilter();
-		$this->toObject($tagCoreFilter);
-		$c->setGroupByColumn('tag');
-		$tagCoreFilter->attachToCriteria($c);
-		$pager->attachToCriteria($c);
-		$tags = TagPeer::doSelect($c);
-
-		$searchResponse = new KalturaTagListResponse();
-		$searchResponse->objects = KalturaTagArray::fromDbArray($tags, $responseProfile);
-		$searchResponse->totalCount = $c->getRecordsCount();
-
-		return $searchResponse;
 	}
 }
