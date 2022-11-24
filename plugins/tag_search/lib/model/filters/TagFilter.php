@@ -33,15 +33,11 @@ class TagFilter extends baseObjectFilter
 			"_eq_object_type",
 			"_eq_tag",
 			"_likex_tag",
-			"_eq_instance_count",
-			"_in_instance_count",
-			"_gte_instance_count",
-			"_lte_instance_count",
-			"_gte_created_at",
-			"_lte_created_at",
+            "_eq_instance_count",
+        	"_in_instance_count",
 			) , NULL );
 
-		$this->allowed_order_fields = array ("instance_count", "created_at");
+		$this->allowed_order_fields = array ("instance_count");
         
     }
 

@@ -3,36 +3,13 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 {
     const TAGS_FIELD_NAME = "tags";
     
+    const PARTNER_ID_FIELD = "partner_id";
+    
     public static $specialCharacters = array ('\\', '!', '*', '"', );
     public static $specialCharactersReplacement = array ('\\\\', '\\!', '\\*', '\\"');
     
     const NULL_PC = "NO_PC";
-
-    protected static $objectTypeNames = array(
-        entryPeer::OM_CLASS => taggedObjectType::ENTRY,
-        categoryPeer::OM_CLASS => taggedObjectType::CATEGORY
-    );
-
-    protected static function getTaggableObjectType($className)
-    {
-        if (isset(self::$objectTypeNames[$className]))
-        {
-            return self::$objectTypeNames[$className];
-        }
-
-        // Note: this is something of a hack, since there is no functionality to get a plugin enum value dynamically,
-        // and there was no ask for it in the 10 years this feature existed.
-        return KalturaPluginManager::getObjectClass(TagPeer::OM_CLASS, $className);
-    }
-
-    protected static function getBaseClass(BaseObject $object)
-    {
-        $peer = $object->getPeer();
-        /* @var $peer BasePeer */
-
-        return $peer::OM_CLASS;
-    }
-
+    
 	/* (non-PHPdoc)
      * @see kObjectDeletedEventConsumer::objectDeleted()
      */
@@ -40,18 +17,16 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     {
     	if (! ($object instanceof categoryEntry))
     	{
-            $baseClass = self::getBaseClass($object);
-            self::decrementExistingTagsInstanceCount($object->getTags(), $object->getPartnerId(), $baseClass);
+        	self::decrementExistingTagsInstanceCount($object->getTags(), $object->getPartnerId(), get_class($object));
     	}
     	else
     	{
-    		$privacyContexts = $object->getPrivacyContext() != '' ? explode(',' , $object->getPrivacyContext()) : array();
+    		$privacyContexts = $object->getPrivacyContext() != "" ? explode(",", $object->getPrivacyContext()) : array();
     		if (!count($privacyContexts))
     				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT;
 			$entry = $this->getEntryByIdNoFilter($object->getEntryId());
-    		self::decrementExistingTagsInstanceCount($entry->getTags(), $entry->getPartnerId(), entryPeer::OM_CLASS, $privacyContexts);
+    		self::decrementExistingTagsInstanceCount($entry->getTags(), $entry->getPartnerId(), get_class($entry), $privacyContexts);
     	}
-
         return true;
     }
 
@@ -60,12 +35,13 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function shouldConsumeDeletedEvent (BaseObject $object)
     {
-        if ($this->getTaggableObjectType(self::getBaseClass($object)))
+        if (defined("taggedObjectType::". strtoupper(get_class($object))))
         {
 	        if (property_exists($object, self::TAGS_FIELD_NAME) && $object->getTags() != "")
 	        {
 	            return true;
 	        }
+        	
         }
         
         if ($object instanceof categoryEntry)
@@ -75,38 +51,37 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         		return true;
         }
 
+        
         return false;
+        
     }
     
 
-    /* (non-PHPdoc)
+	/* (non-PHPdoc)
      * @see kObjectCreatedEventConsumer::objectCreated()
      */
     public function objectCreated (BaseObject $object)
     {
     	try
-	    {
-	    	if (!($object instanceof categoryEntry))
-	    	{
-	    		$baseClass = self::getBaseClass($object);
-	    		self::addOrIncrementTags($object->getTags(), $object->getPartnerId(), $baseClass);
-	    	}
-	    	else
-		    {
-            	/* @var $object categoryEntry */
-	            $privacyContexts = $object->getPrivacyContext() != "" ? self::trimObjectTags($object->getPrivacyContext()) : array();
-	            if (!count($privacyContexts))
-	            {
-	            	$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT;
-	            }
-	            $entry = $this->getEntryByIdNoFilter($object->getEntryId());
-	            self::addOrIncrementTags($entry->getTags(), $entry->getPartnerId(), get_class($entry), $privacyContexts);
-	        }
-	    }
-	    catch(Exception $e)
-	    {
-	    	KalturaLog::err($e);
-	    }
+    	{
+    		if (!($object instanceof categoryEntry))
+    		{
+		        self::addOrIncrementTags($object->getTags(), $object->getPartnerId(), get_class($object));
+    		}
+    		else
+    		{
+    			/* @var $object categoryEntry */
+     			$privacyContexts = $object->getPrivacyContext() != "" ? self::trimObjectTags($object->getPrivacyContext()) : array();
+    			if (!count($privacyContexts))
+    				$privacyContexts[] = kEntitlementUtils::DEFAULT_CONTEXT;
+    			$entry = $this->getEntryByIdNoFilter($object->getEntryId());
+    			self::addOrIncrementTags($entry->getTags(), $entry->getPartnerId(), get_class($entry), $privacyContexts);
+    		}
+    	}
+    	catch(Exception $e)
+    	{
+    		KalturaLog::err($e);
+    	}
     }
 
 	/* (non-PHPdoc)
@@ -114,12 +89,13 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function shouldConsumeCreatedEvent (BaseObject $object)
     {
-        if (self::getTaggableObjectType(self::getBaseClass($object)))
+        if (defined("taggedObjectType::". strtoupper(get_class($object))))
         {
 	        if (property_exists($object, self::TAGS_FIELD_NAME) && $object->getTags() != "")
 	        {
 	            return true;
 	        }
+        	
         }
         
         if ($object instanceof categoryEntry)
@@ -129,9 +105,10 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         		return true;
         }
 
+        
         return false;
+        
     }
-
 	/* (non-PHPdoc)
      * @see kObjectChangedEventConsumer::objectChanged()
      */
@@ -168,9 +145,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         $tagsForUpdate = implode(',', array_diff(explode(',', $newTags), explode(',', $oldTags)));
         
         if ($oldTags && $oldTags != "")
-            self::decrementExistingTagsInstanceCount($tagsForDelete, $object->getPartnerId(), self::getBaseClass($object), $privacyContexts);
+            self::decrementExistingTagsInstanceCount($tagsForDelete, $object->getPartnerId(), get_class($object), $privacyContexts);
 
-        self::addOrIncrementTags($tagsForUpdate, $object->getPartnerId(), self::getBaseClass($object), $privacyContexts);
+        self::addOrIncrementTags($tagsForUpdate, $object->getPartnerId(), get_class($object), $privacyContexts);
     }
 
 	/* (non-PHPdoc)
@@ -178,11 +155,9 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     public function shouldConsumeChangedEvent (BaseObject $object, array $modifiedColumns)
     {
-        if (!self::getTaggableObjectType(self::getBaseClass($object)))
-        {
-	        return;
-        }
-
+        if (!defined("taggedObjectType::". strtoupper(get_class($object))))
+            return;
+        
         if (property_exists($object, self::TAGS_FIELD_NAME) && in_array(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME), $modifiedColumns) )
         {
             return true;
@@ -199,10 +174,11 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         }
         
         return false;
+        
     }
 
     /**
-     * Function which checks the object tags against DB
+     * Function which checks the object tags agains DB
      * and returns the tags strings which are new and need to be saved. Existing tags instance count is incremented.
      * @param string $tagsForUpdate
      * @param int $partnerId
@@ -219,7 +195,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    $tagsToAddList = self::getTagsToAdd($foundTagObjects, $objectTags, $privacyContexts);
 	    if (count($tagsToAddList))
 	    {
-		    self::addTags($tagsToAddList, self::getTaggableObjectType($objectClass), $partnerId);
+		    self::addTags($tagsToAddList, self::getObjectTypeByClassName($objectClass), $partnerId);
 	    }
 	    if (count($foundTagObjects))
 	    {
@@ -236,7 +212,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
      */
     private static function getFoundTags(array $objectTags, $partnerId, $objectClass, $privacyContexts = array())
     {
-        $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getTaggableObjectType($objectClass), $partnerId);
+        $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
         if (count($privacyContexts))
         {
             $c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
@@ -244,7 +220,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         TagPeer::setUseCriteriaFilter(false);
         $foundTagObjects = TagPeer::doSelect($c);
         TagPeer::setUseCriteriaFilter(true);
-
         return $foundTagObjects;
     }
 
@@ -279,7 +254,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		        }
 	        }
         }
-
         return $tagsToAddList;
     }
 
@@ -292,16 +266,16 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
             $connection = Propel::getConnection();
             foreach ($foundTagObjects as $tag)
             {
-	            $foundTagIds[] = $tag->getId();
+	            $foundTagIds[]=$tag->getId();
             }
-            $idsString = "(" . implode( ",",$foundTagIds) . ")";
-            if($toIncrement == true)
+            $idsString= "(".implode( ",",$foundTagIds).")";
+            if($toIncrement==true)
             {
-                $updateSql = "update tag set instance_count=instance_count+1, updated_at='$time' where id in $idsString;";
+                $updateSql = "update tag set instance_count=instance_count+1 , updated_at = '".$time."' where id in ".$idsString.";";
             }
             else
             {
-                $updateSql = "update tag set instance_count=instance_count-1, updated_at='$time' where id in $idsString and instance_count>0;";
+                $updateSql = "update tag set instance_count=instance_count-1 , updated_at = '".$time."' where id in ".$idsString."and instance_count>0;";
             }
             $stmt = $connection->prepare($updateSql);
             $stmt->execute();
@@ -320,7 +294,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     {
         $date_time = new DateTime();
         $time = $date_time->format('Y-m-d H:i:s');
-        self::updateInstanceCountList($foundTagObjects, $time, $toIncrement);
+        self::updateInstanceCountList($foundTagObjects,$time,$toIncrement);
         foreach ($foundTagObjects as $foundTag)
         {
             if($toIncrement)
@@ -354,7 +328,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		TagPeer::setUseCriteriaFilter(true);
 		if(count($tagsToDecrement))
 		{
-			self::updateTagsInstanceCount($tagsToDecrement,false);
+			self:: updateTagsInstanceCount($tagsToDecrement,false);
 		}
 	}
 	
@@ -364,6 +338,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 */
 	protected static function addTags ($tagsToAdd, $objectType, $partnerId)
 	{
+	   
 	    foreach ($tagsToAdd as $tagToAdd => $privacyContexts)
 	    {
 	    	foreach ($privacyContexts as $privacyContext)
@@ -379,6 +354,16 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		        }
 	    	}
 	    }
+	}
+	
+	/**
+	 * Get class name and returns the class's enum
+	 * @param string $className
+	 * @return int
+	 */
+	protected static function getObjectTypeByClassName ($className)
+	{
+	    return self::getClassConstValue("taggedObjectType", $className);
 	}
 	
 	/**
@@ -404,7 +389,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	    $c->addAnd(TagPeer::TAG, $tagStrings, KalturaCriteria::IN);
 	    $c->addAnd(TagPeer::PARTNER_ID, $partnerId, KalturaCriteria::EQUAL);
 	    $c->addAnd(TagPeer::OBJECT_TYPE, $objectType, KalturaCriteria::EQUAL);
-
 	    return $c;
 	}
 	
@@ -452,7 +436,6 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 		
 		$batchJob->setPartnerId($partnerId);
 		KalturaLog::log("Creating tag re-index job for categoryId [" . $data->getChangedCategoryId() . "] ");
-
 		return kJobsManager::addJob($batchJob, $data, $jobType);
 	}
 	
