@@ -6,7 +6,7 @@
 - Issue ID: FOUN-819
 
 ### Configuration ###
-    Replace all tokens from the ini file (under connectors-framework section) and remove".template" from the file name: 
+    Replace all tokens from the ini file (under auth-broker/user-profile/kms sections) and remove".template" from the file name: 
     /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment Scripts ###
