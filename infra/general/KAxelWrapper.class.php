@@ -303,7 +303,7 @@ class KAxelWrapper extends KCurlWrapper
 			return 0;
 		}
 		
-		if (!preg_match('/ERROR ([0-9]+)/', $logFileContent, $matches) || !$matches[1])
+		if (!preg_match('/ERROR ([0-9]+)/', $logFileContent, $matches) || !isset($matches[1]))
 		{
 			KalturaLog::debug("Could not extract http status code from log file");
 			return 0;
