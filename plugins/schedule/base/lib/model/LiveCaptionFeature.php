@@ -89,12 +89,12 @@ class LiveCaptionFeature extends LiveFeature
 
 	public function setInputDelay($v)
 	{
-		$this->captionToken = $v;
+		$this->inputDelay = $v;
 	}
 
 	public function getInputDelay()
 	{
-		return $this->captionToken;
+		return $this->inputDelay;
 	}
 
 	public function getApiType()
