@@ -244,7 +244,7 @@ class KAxelWrapper extends KCurlWrapper
 		// example log line:
 		// File size: 26.8561 Megabyte(s) (28160686 bytes)
 		// we extract the bytes int value: 28160686
-		if (!preg_match('/File size:.*?([0-9]+) bytes/', $logFileContent, $matches))
+		if (!preg_match('/File size:.*?([0-9]+)\s+bytes/', $logFileContent, $matches))
 		{
 			KalturaLog::debug('Failed to extract "File size" value from log');
 		}
