@@ -1,4 +1,4 @@
-# Rigel-18.18.0
+# Rigel-18.19.0
 ## Add partners for auth-broker/user-profile/kms ##
 
 * Issue Type: Task
@@ -12,7 +12,7 @@
 ### Deployment Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_11_17_add_broker_user_kms_partners.php
 
-
+# Rigel-18.18.0
 ## Added support for player studio V7
 * Issue Type: story
 * Issue ID: PLAT-23970
