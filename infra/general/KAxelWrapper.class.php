@@ -194,7 +194,7 @@ class KAxelWrapper extends KCurlWrapper
 			if (kFile::checkFileExists($logPath))
 			{
 				$msg = "Deleting log file at [$logPath] - ";
-				$msg .= kFile::unlink($this->logPath) ? 'success' : 'failed';
+				$msg .= kFile::unlink($logPath) ? 'success' : 'failed';
 				KalturaLog::debug($msg);
 			}
 		}
@@ -314,6 +314,11 @@ class KAxelWrapper extends KCurlWrapper
 	
 	private function getErrorMsgFromLog()
 	{
+		if (!kFile::fileSize($this->getLogPathErr()))
+		{
+			return false;
+		}
+		
 		$logFileContent = $this->getLogFileContentIfExists($this->getLogPathErr());
 		return explode("\n", $logFileContent)[0];
 	}
