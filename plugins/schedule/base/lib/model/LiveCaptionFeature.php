@@ -30,6 +30,12 @@ class LiveCaptionFeature extends LiveFeature
 	protected $captionToken;
 
 	/**
+	 * Number of seconds stream should wait for caption data
+	 * @var int
+	 */
+	protected $inputDelay;
+
+	/**
 	 * @param string $v
 	 */
 	public function setMediaUrl($v)
@@ -77,6 +83,16 @@ class LiveCaptionFeature extends LiveFeature
 	}
 
 	public function getCaptionToken()
+	{
+		return $this->captionToken;
+	}
+
+	public function setInputDelay($v)
+	{
+		$this->captionToken = $v;
+	}
+
+	public function getInputDelay()
 	{
 		return $this->captionToken;
 	}
