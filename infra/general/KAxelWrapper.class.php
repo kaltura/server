@@ -207,7 +207,8 @@ class KAxelWrapper extends KCurlWrapper
 	 */
 	private function getLogFileContentIfExists($logFilePath, $lengthInBytes = 3000)
 	{
-		if (!$logFilePath || !kFile::fileSize($logFilePath))
+		$logFileSize = kFile::fileSize($logFilePath);
+		if (!$logFilePath || !$logFileSize)
 		{
 			KalturaLog::debug("Axel log path is not set or is empty log file");
 			return false;
@@ -215,12 +216,12 @@ class KAxelWrapper extends KCurlWrapper
 		
 		if ($lengthInBytes < 0)
 		{
-			$fromByte = max(kFile::fileSize($logFilePath) + $lengthInBytes, 0);
+			$fromByte = max($logFileSize + $lengthInBytes, 0);
 			$toByte = -1;
 		}
 		
 		$fromByte = isset($fromByte) ? $fromByte : 0;
-		$toByte = isset($toByte) ? $toByte : min(kFile::fileSize($logFilePath), $lengthInBytes);
+		$toByte = isset($toByte) ? $toByte : min($logFileSize, $lengthInBytes);
 		
 		$logFileContent = kFile::getFileContent($logFilePath, $fromByte, $toByte);
 		if (!$logFileContent)
@@ -240,7 +241,10 @@ class KAxelWrapper extends KCurlWrapper
 			return false;
 		}
 		
-		if (!preg_match('/File size:.*?([0-9]+) bytes/', $logFileContent, $matches) || !isset($matches[1]))
+		// example log line:
+		// File size: 26.8561 Megabyte(s) (28160686 bytes)
+		// we extract the bytes int value: 28160686
+		if (!preg_match('/File size:.*?([0-9]+) bytes/', $logFileContent, $matches))
 		{
 			KalturaLog::debug('Failed to extract "File size" value from log');
 		}
@@ -258,6 +262,7 @@ class KAxelWrapper extends KCurlWrapper
 		
 		if (!preg_match_all('/\[\s*[0-9]{1,3}%]/', $logFileContent, $matches))
 		{
+			$logFileContent = trim($logFileContent);
 			KalturaLog::debug("Could not extract downloaded percentage from last log lines [$logFileContent]");
 			return false;
 		}
@@ -303,7 +308,7 @@ class KAxelWrapper extends KCurlWrapper
 			return 0;
 		}
 		
-		if (!preg_match('/ERROR ([0-9]+)/', $logFileContent, $matches) || !isset($matches[1]))
+		if (!preg_match('/ERROR\s+([0-9]+)/', $logFileContent, $matches))
 		{
 			KalturaLog::debug("Could not extract http status code from log file");
 			return 0;
