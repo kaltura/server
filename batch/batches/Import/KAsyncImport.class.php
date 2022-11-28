@@ -712,6 +712,9 @@ class KAsyncImport extends KJobHandlerWorker
 		$curlWrapper->setTimeout(self::HEADERS_TIMEOUT);
 		$curlWrapper->getHeader($url);
 		
+		// if URL has a 'fragment' part, like: protocol://domain/file.ext?query#fragment
+		// CURLINFO_EFFECTIVE_URL will return: protocol://domain/file.ext?query
+		// we will treat it as 'redirectUrl'
 		$redirectUrl = $curlWrapper->getInfo(CURLINFO_EFFECTIVE_URL);
 		
 		$curlWrapper->close();
