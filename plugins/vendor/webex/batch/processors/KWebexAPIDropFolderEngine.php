@@ -66,6 +66,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		KalturaLog::info(print_r($recordingsList));
 		if (!isset($recordingsList['items']))
 		{
+			
 			KalturaLog::debug('No items in response');
 			return null;
 		}
@@ -239,7 +240,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolderFile = $this->dropFolderFileService->get($dropFolderFileId);
 		if (!$this->dropFolderFile)
 		{
-			throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, ERROR_IN_CONTENT_PROCESSOR_MESSAGE);
+			throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::ERROR_IN_CONTENT_PROCESSOR_MESSAGE);
 		}
 		
 		$this->dropFolder = $this->dropFolderPlugin->dropFolder->get($data->dropFolderId);
@@ -254,6 +255,10 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$webexBaseURL = $this->dropFolder->baseURL;
 		//$zoomRecordingProcessor = new zoomMeetingProcessor($webexBaseURL, $dropFolder);
 		$entry = $this->createEntryFromRecording($this->dropFolderFile, $partnerId, $this->dropFolder);
+		if (!$entry)
+		{
+			throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, 'Failed to create new entry');
+		}
 		//$this->setEntryCategory($entry, $recording->meetingMetadata->meetingId);
 		//$this->handleParticipants($updatedEntry, $validatedUsers);
 		//$entry = KBatchBase::$kClient->baseEntry->update($entry->id, $updatedEntry);
