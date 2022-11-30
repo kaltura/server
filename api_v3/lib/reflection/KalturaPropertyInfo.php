@@ -38,6 +38,11 @@ class KalturaPropertyInfo
 	/**
 	 * @var bool
 	 */
+	private $_multiLingual = false;
+	
+	/**
+	 * @var bool
+	 */
 	private $_insertOnly = false;
 	
 	/**
@@ -367,6 +372,22 @@ class KalturaPropertyInfo
 	/**
 	 * @param bool $value
 	 */
+	public function setMultiLingual($value)
+	{
+		$this->_multiLingual = $value;
+	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function isMultiLingual()
+	{
+		return $this->_multiLingual;
+	}
+	
+	/**
+	 * @param bool $value
+	 */
 	public function setInsertOnly($value)
 	{
 		$this->_insertOnly = $value;
@@ -611,6 +632,7 @@ class KalturaPropertyInfo
 		$array["isReadOnly"] 	= $this->isReadOnly();
 		$array["isInsertOnly"] 	= $this->isInsertOnly();
 		$array["isWriteOnly"] 	= $this->isWriteOnly();
+		$array["isMultiLingual"]= $this->isMultiLingual();
 		$array["description"] 	= $this->getDescription() ? $this->getDescription() : "";
 		$array["properties"] 	= array();
 		$array["constants"] 	= array();
