@@ -460,11 +460,14 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				$taskData = $this->getTaskJobData();
 				/* @var $connectedEvent LiveStreamScheduleEvent */
 				$connectedEvent = $taskData->getScheduleEvent();
+				/* @var $catalogItem VendorLiveCaptionCatalogItem */
+				$catalogItem = $this->getCatalogItem();
 
 				$feature = new LiveCaptionFeature();
 				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
 				$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
+				$feature->setLanguage($catalogItem->getSourceLanguage());
 
 				$connectedEvent->addFeature($feature, true);
 				$connectedEvent->save();

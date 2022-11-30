@@ -25,11 +25,17 @@ class KalturaLiveCaptionFeature extends KalturaLiveFeature
 	 */
 	public $captionToken;
 
+	/**
+	 * @var string
+	 */
+	public $language;
+
 	private static $map_between_objects = array(
 		'mediaUrl',
 		'mediaKey',
 		'captionUrl',
-		'captionToken'
+		'captionToken',
+		'language'
 	);
 
 	/* (non-PHPdoc)
