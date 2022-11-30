@@ -25,6 +25,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @var KalturaMultiLingualStringArray
 	 * @filter like,mlikeor,mlikeand,eq,order
 	 * @requiresPermission update
+	 * @multilingual
 	 */
 	public $name;
 	
@@ -33,6 +34,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * 
 	 * @var KalturaMultiLingualStringArray
 	 * @requiresPermission update
+	 * @multilingual
 	 */
 	public $description;
 	
@@ -68,6 +70,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @var KalturaMultiLingualStringArray
 	 * @filter like,mlikeor,mlikeand
 	 * @requiresPermission update
+	 * @multilingual
 	 */
 	public $tags;
 	

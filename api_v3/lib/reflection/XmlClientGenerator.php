@@ -458,6 +458,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$propertyElement->setAttribute("readOnly", $property->isReadOnly() ? "1" : "0");
 		$propertyElement->setAttribute("insertOnly", $property->isInsertOnly() ? "1" : "0");
 		$propertyElement->setAttribute("writeOnly", $property->isWriteOnly() ? "1" : "0");
+		$propertyElement->setAttribute("multiLingual", $property->isMultiLingual() ? "1" : "0");
 		
 		if($property->getDynamicType())
 		{

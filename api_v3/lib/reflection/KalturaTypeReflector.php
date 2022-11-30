@@ -180,6 +180,7 @@ class KalturaTypeReflector
 						if ($property->getDeclaringClass() == $currentReflectClass) // only properties defined in the current class, ignore the inherited
 						{
 							$name = $property->name;
+							echo "name $name";
 							if(in_array($name, self::$propertyReservedWords))
 								throw new Exception("Property name [$name] is a reserved word in type [$currentReflectClass]");
 								
@@ -193,6 +194,7 @@ class KalturaTypeReflector
 								$prop->setReadOnly($parsedDocComment->readOnly);
 								$prop->setInsertOnly($parsedDocComment->insertOnly);
 								$prop->setWriteOnly($parsedDocComment->writeOnly);
+								$prop->setMultiLingual($parsedDocComment->multiLingual);
 								$prop->setDynamicType($parsedDocComment->dynamicType);
 								$prop->setServerOnly($parsedDocComment->serverOnly);
 								$prop->setDeprecated($parsedDocComment->deprecated);

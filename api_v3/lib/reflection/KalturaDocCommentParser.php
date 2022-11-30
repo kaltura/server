@@ -8,6 +8,7 @@ class KalturaDocCommentParser
     const DOCCOMMENT_READONLY = "/\\@readonly/i";
     const DOCCOMMENT_INSERTONLY = "/\\@insertonly/i";
     const DOCCOMMENT_WRITEONLY = "/\\@writeonly/i";
+	const DOCCOMMENT_MULTILINGUAL = "/\\@multilingual/i";
 
     const DOCCOMMENT_PARAM = '/\@param (\w*) \$__NAME__ ?(.*)/';
     const DOCCOMMENT_REPLACENET_PARAM_NAME = '__NAME__';
@@ -73,6 +74,11 @@ class KalturaDocCommentParser
      * @var bool
      */
     public $readOnly;
+	
+	/**
+	 * @var bool
+	 */
+	public $multiLingual;
 
     /**
      * @var bool
@@ -255,6 +261,7 @@ class KalturaDocCommentParser
         $this->readOnly = preg_match( self::DOCCOMMENT_READONLY, $comment);
         $this->insertOnly = preg_match( self::DOCCOMMENT_INSERTONLY, $comment);
         $this->writeOnly = preg_match( self::DOCCOMMENT_WRITEONLY, $comment);
+		$this->multiLingual = preg_match( self::DOCCOMMENT_MULTILINGUAL, $comment);
         $this->volatile = preg_match( self::DOCCOMMENT_VOLATILE, $comment);
         $this->abstract = preg_match( self::DOCCOMMENT_ABSTRACT, $comment);
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
