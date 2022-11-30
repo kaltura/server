@@ -632,7 +632,7 @@ class KalturaPropertyInfo
 		$array["isReadOnly"] 	= $this->isReadOnly();
 		$array["isInsertOnly"] 	= $this->isInsertOnly();
 		$array["isWriteOnly"] 	= $this->isWriteOnly();
-		$array["isMultiLingual"] 	= $this->isMultiLingual();
+		$array["isMultiLingual"]= $this->isMultiLingual();
 		$array["description"] 	= $this->getDescription() ? $this->getDescription() : "";
 		$array["properties"] 	= array();
 		$array["constants"] 	= array();
