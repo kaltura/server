@@ -11,6 +11,7 @@ abstract class LiveEntry extends entry
 	const FIRST_BROADCAST = 'first_broadcast';
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 	const LIVE_SCHEDULE_CAPABILITY = 'live_schedule_capability';
+	const LIVE_FEATURE_CAPABILITY = 'live_feature_capability';
 	const SIMULIVE_CAPABILITY = 'simulive_capability';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
