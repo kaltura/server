@@ -143,7 +143,7 @@ class KAxelWrapper extends KCurlWrapper
 		// we use 'exec $this->axelPath ....' to avoid php from creating a child "sh -c axel..." which will create the actual child "axel" command
 		// this allows to call 'proc_terminate' function on $process (because proc_terminate does not terminate all child processes)
 		// for more info, read comments: https://www.php.net/manual/en/function.proc-terminate.php
-		$cmd = "exec $this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url";
+		$cmd = "$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url";
 		$descriptor = array(
 			1 => array('file', $this->logPath, 'w'),
 			2 => array('file', $this->logPathErr, 'w')
@@ -151,7 +151,7 @@ class KAxelWrapper extends KCurlWrapper
 		
 		KalturaLog::debug("Executing [$cmd > $this->logPath 2> $this->logPathErr]");
 		
-		$process = proc_open($cmd, $descriptor, $pipes, '/tmp');
+		$process = proc_open("exec $cmd", $descriptor, $pipes, '/tmp');
 		if (!is_resource($process))
 		{
 			KalturaLog::debug('Failed to open resource - aborting download');
