@@ -1411,7 +1411,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'company' => $this->getCompany(),
 			'country' => $this->getCountry(),
 			'external_id' => $this->getExternalId(),
-			'is_hashed' => $this->getIsHashed()
+			'is_hashed' => $this->getIsHashed(),
+			'is_admin' => $this->getIsAdmin(),
+			'login_enabled' => ($this->getLoginDataId() ? true : false),
 		);
 		$this->addGroupUserDataToObjectParams($body);
 		elasticSearchUtils::cleanEmptyValues($body);

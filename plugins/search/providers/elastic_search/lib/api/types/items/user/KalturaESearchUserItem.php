@@ -36,7 +36,9 @@ class KalturaESearchUserItem extends KalturaESearchAbstractUserItem
 		KalturaESearchUserFieldName::COMPANY => ESearchUserFieldName::COMPANY,
 		KalturaESearchUserFieldName::COUNTRY => ESearchUserFieldName::COUNTRY,
 		KalturaESearchUserFieldName::EXTERNAL_ID => ESearchUserFieldName::EXTERNAL_ID,
-		KalturaESearchUserFieldName::IS_HASHED => ESearchUserFieldName::IS_HASHED
+		KalturaESearchUserFieldName::IS_HASHED => ESearchUserFieldName::IS_HASHED,
+		KalturaESearchUserFieldName::IS_ADMIN => ESearchUserFieldName::IS_ADMIN,
+		KalturaESearchUserFieldName::LOGIN_ENABLED => ESearchUserFieldName::LOGIN_ENABLED,
 	);
 
 	protected function getMapBetweenObjects()

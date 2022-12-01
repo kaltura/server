@@ -12,7 +12,7 @@ Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indic
 
 { "external_id": { "type": "keyword", "normalizer": "kaltura_keyword_normalizer" }, "is_hashed": { "type": "boolean"} }
 
-    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": { "external_id": { "type": "keyword", "normalizer": "kaltura_keyword_normalizer" }, "is_hashed": { "type": "boolean"} }}'
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": { "external_id": { "type" : "text", "analyzer" : "kaltura_text", "fields": { "ngrams" : { "type" : "text", "analyzer" : "kaltura_ngrams" }, "raw" : { "type" : "keyword", "normalizer" : "kaltura_keyword_normalizer" } }}, "is_hashed": { "type": "boolean"}, "is_admin": { "type": "boolean" }, "login_enabled": { "type": "boolean" } }}'
 
 #### Known Issues & Limitations ####
 If Rigel-18.19.0 or later server version already ran and new users were added
