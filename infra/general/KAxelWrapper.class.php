@@ -177,7 +177,15 @@ class KAxelWrapper extends KCurlWrapper
 		}
 		
 		$processExitCode = $processStatus['exitcode'];
+		$this->closePipes($pipes);
+		proc_close($process);
+		$this->errorNumber = $processExitCode;
 		
+		return $processExitCode === 0;
+	}
+	
+	private function closePipes($pipes)
+	{
 		// we are not using 'pipes' but proc_open requires it
 		// in case proc_open opened a 'pipe', close it
 		if (count($pipes))
@@ -187,11 +195,6 @@ class KAxelWrapper extends KCurlWrapper
 				fclose($pipe);
 			}
 		}
-		
-		proc_close($process);
-		$this->errorNumber = $processExitCode;
-		
-		return $processExitCode === 0;
 	}
 	
 	private function getErrorCode()
