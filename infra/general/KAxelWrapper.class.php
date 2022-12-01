@@ -140,9 +140,6 @@ class KAxelWrapper extends KCurlWrapper
 	
 	private function execProcOpen()
 	{
-		// todo should we keep this msg? mainly for easy debugging in case of need
-		KalturaLog::debug("To execute manually [$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url > $this->logPath 2> $this->logPathErr]");
-		
 		// we use 'exec $this->axelPath ....' to avoid php from creating a child "sh -c axel..." which will create the actual child "axel" command
 		// this allows to call 'proc_terminate' function on $process (because proc_terminate does not terminate all child processes)
 		// for more info, read comments: https://www.php.net/manual/en/function.proc-terminate.php
@@ -152,6 +149,8 @@ class KAxelWrapper extends KCurlWrapper
 			2 => array('file', $this->logPathErr, 'w')
 		);
 		
+		KalturaLog::debug("Executing [$cmd > $this->logPath 2> $this->logPathErr]");
+		
 		$process = proc_open($cmd, $descriptor, $pipes, '/tmp');
 		if (!is_resource($process))
 		{
@@ -159,29 +158,27 @@ class KAxelWrapper extends KCurlWrapper
 			return false;
 		}
 		
-		$processStatus = proc_get_status($process);
-		$isRunning = $processStatus['running'] == 1;
-		
-		while ($isRunning)
+		for (;;)
 		{
 			sleep(5);
+			$processStatus = proc_get_status($process);
+			if (!$processStatus['running'])
+			{
+				break;
+			}
 			
 			if (time() - kFile::filemtime($this->logPath) > self::NO_PROGRESS_TIMEOUT_SECONDS)
 			{
 				KalturaLog::debug('Axel downloader was not active in the last [' . self::NO_PROGRESS_TIMEOUT_SECONDS . '] seconds - terminating process');
 				proc_terminate($process);
-				break;
 			}
-			$processStatus = proc_get_status($process);
-			$isRunning = $processStatus['running'] == 1;
 		}
 		
-		$processExitCode = $processStatus['exitcode'];
+		$this->errorNumber = $processStatus['exitcode'];
 		$this->closePipes($pipes);
 		proc_close($process);
-		$this->errorNumber = $processExitCode;
 		
-		return $processExitCode === 0;
+		return $processStatus['exitcode'] === 0;
 	}
 	
 	private function closePipes($pipes)
