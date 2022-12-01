@@ -116,7 +116,7 @@ class KalturaUser extends KalturaBaseUser
 	public $isSsoExcluded;
 	
 	/**
-	 * If working with user ID hashing will hold the clear value of the user id
+	 * This field should be sent instead of the id field whenever you want to work with hashed user ids
 	 * @var string
 	 */
 	public $externalId;
