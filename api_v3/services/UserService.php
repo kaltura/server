@@ -29,7 +29,17 @@ class UserService extends KalturaBaseUserService
 	 */
 	function addAction(KalturaUser $user)
 	{
-		if (!preg_match(kuser::PUSER_ID_REGEXP, $user->id))
+		if(isset($user->id) && isset($user->externalId) && trim($user->externalId) && trim($user->id))
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_BOTH_ID_AND_EXTERNAL_ID);
+		}
+		
+		if($user->externalId)
+		{
+			$user->id = $user->externalId;
+		}
+		
+		if (!preg_match(kuser::PUSER_ID_REGKalturaESearchUserBaseItemEXP, $user->id))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}

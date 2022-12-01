@@ -191,6 +191,13 @@
 				"type": "keyword",
 				"normalizer": "kaltura_keyword_normalizer"
 			},
+			"external_id": {
+				"type": "keyword",
+				"normalizer": "kaltura_keyword_normalizer"
+			},
+			"is_hashed": {
+				"type": "boolean"
+			},
 			"tags": {
 				"type": "text",
 				"analyzer": "kaltura_text",

@@ -29,6 +29,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
 	const CUSTOM_DATA_IS_SSO_EXCLUDED = 'is_sso_excluded';
 	const CUSTOM_DATA_IS_GUEST = 'is_guest';
+	const CUSTOM_DATA_EXTERNAL_ID = 'external_id';
+	const CUSTOM_DATA_IS_HASHED = 'is_hashed';
 	
 	const MINIMUM_ID_TO_DISPLAY = 8999;
 		
@@ -1407,7 +1409,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'picture' => $this->getPicture(),
 			'title' => $this->getTitle(),
 			'company' => $this->getCompany(),
-			'country' => $this->getCountry()
+			'country' => $this->getCountry(),
+			'external_id' => $this->getExternalId(),
+			'is_hashed' => $this->getIsHashed()
 		);
 		$this->addGroupUserDataToObjectParams($body);
 		elasticSearchUtils::cleanEmptyValues($body);
@@ -1558,6 +1562,26 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	public function getCountry()
 	{
 		return parent::getCountry() . PeerUtils::getExtension($this, __FUNCTION__);
+	}
+	
+	public function setExternalId($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_EXTERNAL_ID, $v);
+	}
+	
+	public function getExternalId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_EXTERNAL_ID);
+	}
+	
+	public function setIsHashed($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IS_HASHED, $v);
+	}
+	
+	public function getIsHashed()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_HASHED);
 	}
 	
 }

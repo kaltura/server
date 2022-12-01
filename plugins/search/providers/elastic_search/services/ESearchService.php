@@ -51,9 +51,10 @@ class ESearchService extends KalturaBaseService
 	 * @action searchUser
 	 * @param KalturaESearchUserParams $searchParams
 	 * @param KalturaPager $pager
+	 * @param bool $hashUserId
 	 * @return KalturaESearchUserResponse
 	 */
-	function searchUserAction(KalturaESearchUserParams $searchParams, KalturaPager $pager = null)
+	function searchUserAction(KalturaESearchUserParams $searchParams, KalturaPager $pager = null, $hashUserId = false)
 	{
 		$userSearch = new kUserSearch();
 		list($coreResults, $objectCount) = $this->initAndSearch($userSearch, $searchParams, $pager);

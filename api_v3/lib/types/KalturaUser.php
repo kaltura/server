@@ -114,7 +114,13 @@ class KalturaUser extends KalturaBaseUser
 	 * @var bool
 	 */
 	public $isSsoExcluded;
-
+	
+	/**
+	 * If working with user ID hashing will hold the clear value of the user id
+	 * @var string
+	 */
+	public $externalId;
+	
 	private static $map_between_objects = array (
 		"type",
 		"dateOfBirth",
@@ -153,6 +159,17 @@ class KalturaUser extends KalturaBaseUser
 			list($firstName, $lastName) = kString::nameSplit($this->fullName);
 			$dbObject->setFirstName($firstName);
 			$dbObject->setLastName($lastName);
+		}
+		
+		if($this->externalId)
+		{
+			$hashedUserId = myKuserUtils::getHashedUserId($this->externalId);
+			$dbObject->setPuserId($hashedUserId);
+			if($hashedUserId != $this->externalId)
+			{
+				$dbObject->setExternalId($this->externalId);
+				$dbObject->setIsHashed(true);
+			}
 		}
 
 		return $dbObject;

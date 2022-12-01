@@ -39,7 +39,13 @@ class ESearchUserItem extends ESearchItem
 		ESearchUserFieldName::PUSER_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
 		ESearchUserFieldName::TITLE => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
 		ESearchUserFieldName::COMPANY => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
-		ESearchUserFieldName::COUNTRY => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH)
+		ESearchUserFieldName::COUNTRY => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH),
+		ESearchUserFieldName::EXTERNAL_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
+		ESearchUserFieldName::IS_HASHED => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
+	);
+	
+	protected static $booleanFields = array(
+		ESearchUserFieldName::IS_HASHED,
 	);
 
 	private static $multiLanguageFields = array();
@@ -108,7 +114,9 @@ class ESearchUserItem extends ESearchItem
 		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
+				KalturaLog::debug("Got query: " . print_r($this, true) );
 				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
+				KalturaLog::debug("Got query: " . print_r($subQuery, true) );
 				break;
 			case ESearchItemType::PARTIAL:
 				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);

@@ -19,4 +19,6 @@ class KalturaESearchBaseUserFieldName extends KalturaStringEnum
 	const TITLE = 'title';
 	const COMPANY = 'company';
 	const COUNTRY = 'country';
+	const EXTERNAL_ID = 'external_id';
+	const IS_HASHED = 'is_hashed';
 }
