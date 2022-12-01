@@ -39,7 +39,7 @@ class UserService extends KalturaBaseUserService
 			$user->id = $user->externalId;
 		}
 		
-		if (!preg_match(kuser::PUSER_ID_REGKalturaESearchUserBaseItemEXP, $user->id))
+		if (!preg_match(kuser::PUSER_ID_REGEXP, $user->id))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 		}
