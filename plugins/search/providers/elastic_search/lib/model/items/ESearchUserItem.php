@@ -116,9 +116,7 @@ class ESearchUserItem extends ESearchItem
 		switch ($this->getItemType())
 		{
 			case ESearchItemType::EXACT_MATCH:
-				KalturaLog::debug("Got query: " . print_r($this, true) );
 				$subQuery = kESearchQueryManager::getExactMatchQuery($this, $this->getFieldName(), $allowedSearchTypes, $queryAttributes);
-				KalturaLog::debug("Got query: " . print_r($subQuery, true) );
 				break;
 			case ESearchItemType::PARTIAL:
 				$subQuery = kESearchQueryManager::getPartialQuery($this, $this->getFieldName(), $queryAttributes);
