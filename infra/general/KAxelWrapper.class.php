@@ -161,6 +161,8 @@ class KAxelWrapper extends KCurlWrapper
 		for (;;)
 		{
 			sleep(5);
+			clearstatcache();
+			
 			$processStatus = proc_get_status($process);
 			if (!$processStatus['running'])
 			{
