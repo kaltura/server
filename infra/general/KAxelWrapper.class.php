@@ -161,7 +161,6 @@ class KAxelWrapper extends KCurlWrapper
 		for (;;)
 		{
 			sleep(5);
-			clearstatcache();
 			
 			$processStatus = proc_get_status($process);
 			if (!$processStatus['running'])
@@ -169,6 +168,7 @@ class KAxelWrapper extends KCurlWrapper
 				break;
 			}
 			
+			clearstatcache();
 			if (time() - kFile::filemtime($this->logPath) > self::NO_PROGRESS_TIMEOUT_SECONDS)
 			{
 				KalturaLog::debug('Axel downloader was not active in the last [' . self::NO_PROGRESS_TIMEOUT_SECONDS . '] seconds - terminating process');
