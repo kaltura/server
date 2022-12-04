@@ -1576,5 +1576,19 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 	{
 		return $this->last_hydrate_time;
 	}
-
+	
+	const CREATE_USER_IF_NOT_EXIST = 'createUserIfNotExist';
+	const HANDLE_PARTICIPANTS_MODE = 'HandleParticipantsMode';
+	const DEFAULT_USER_E_MAIL = 'defaultUserEMail';
+	
+	public function setCreateUserIfNotExist($v) { $this->putInCustomData ( self::CREATE_USER_IF_NOT_EXIST, $v); }
+	public function getCreateUserIfNotExist() { return $this->getFromCustomData ( self::CREATE_USER_IF_NOT_EXIST,null, false); }
+	
+	public function setHandleParticipantsMode($v) { $this->putInCustomData ( self::HANDLE_PARTICIPANTS_MODE, $v); }
+	public function getHandleParticipantsMode() { return $this->getFromCustomData ( self::HANDLE_PARTICIPANTS_MODE,null, kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS); }
+	
+	public function setDefaultUserEMail ($v)	{ $this->putInCustomData ( self::DEFAULT_USER_E_MAIL, $v);	}
+	public function getDefaultUserEMail ( )	{ return $this->getFromCustomData(self::DEFAULT_USER_E_MAIL);	}
+	
+	
 } // BaseVendorIntegration

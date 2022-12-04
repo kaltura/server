@@ -1,54 +1,19 @@
 <?php
 /**
- * @package plugins.vendor
+ * @package plugins.WebexAPIDropFolder
  * @subpackage api.objects
  */
-class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
+class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 {
 	/**
 	 * @var string
 	 */
-	public $zoomCategory;
-
+	public $webexCategory;
+	
 	/**
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableRecordingUpload;
-
-	/**
-	 * @var KalturaZoomUsersMatching
-	 */
-	public $zoomUserMatchingMode;
-
-	/**
-	 * @var string
-	 */
-	public $zoomUserPostfix;
-
-	/**
-	 * @var string
-	 */
-	public $zoomWebinarCategory;
-
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $enableWebinarUploads;
-
-	/**
-	 * @var string
-	 */
-	public $jwtToken;
-	
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $enableZoomTranscription;
-	
-	/**
-	 * @var string
-	 */
-	public $zoomAccountDescription;
 	
 	/**
 	 * @var KalturaNullableBoolean
@@ -56,39 +21,31 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	public $enableMeetingUpload;
 	
 	/**
-	 * @var string
+	 * @var KalturaNullableBoolean
 	 */
-	public $optOutGroupNames;
+	public $enableTranscription;
+	
+	/**
+	 * @var KalturaZoomUsersMatching
+	 */
+	public $userMatchingMode;
 	
 	/**
 	 * @var string
 	 */
-	public $optInGroupNames;
-	
-	/**
-	 * @var KalturaZoomGroupParticipationType
-	 */
-	public $groupParticipationType;
-	
+	public $userPostfix;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
 	private static $map_between_objects = array
 	(
-		'zoomCategory',
-		'zoomUserMatchingMode' => 'UserMatching',
-		'zoomUserPostfix' => 'UserPostfix',
-		'zoomWebinarCategory',
-		'enableWebinarUploads',
+		'webexCategory',
 		'enableRecordingUpload' => 'status',
-		'jwtToken',
-		'enableZoomTranscription',
-		'zoomAccountDescription',
 		'enableMeetingUpload',
-		'groupParticipationType',
-		'optInGroupNames',
-		'optOutGroupNames',
+		'enableTranscription',
+		'userMatchingMode',
+		'userPostfix',
 	);
 
 	public function getMapBetweenObjects()
@@ -100,7 +57,7 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	{
 		if (is_null($dbObject))
 		{
-			$dbObject = new ZoomVendorIntegration();
+			$dbObject = new WebexAPIVendorIntegration();
 		}
 		
 		parent::toObject($dbObject, $skip);
@@ -117,12 +74,12 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		parent::doFromObject($sourceObject, $responseProfile);
 		$this->enableRecordingUpload = $sourceObject->getStatus() == VendorIntegrationStatus::ACTIVE ? 1 : 0;
 		
-		$dropFolderType = ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM);
+		$dropFolderType = WebexAPIDropFolderPlugin::getDropFolderTypeCoreValue(WebexAPIDropFolderType::WEBEX_API);
 		$dropFolders = DropFolderPeer::retrieveEnabledDropFoldersPerPartner($sourceObject->getPartnerId(), $dropFolderType);
 		$relatedDropFolder = null;
 		foreach ($dropFolders as $dropFolder)
 		{
-			if ($dropFolder->getZoomVendorIntegrationId() == $sourceObject->getId())
+			if ($dropFolder->getWebexAPIVendorIntegrationId() == $sourceObject->getId())
 			{
 				$relatedDropFolder = $dropFolder;
 				break;
@@ -130,7 +87,7 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		}
 		if (!$relatedDropFolder)
 		{
-			$this->enableZoomTranscription = null;
+			$this->enableTranscription = null;
 			$this->deletionPolicy = null;
 			$this->enableMeetingUpload = null;
 		}

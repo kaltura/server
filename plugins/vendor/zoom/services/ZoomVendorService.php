@@ -101,8 +101,8 @@ class ZoomVendorService extends KalturaBaseService
 				throw new KalturaAPIException($e->getMessage());
 			}
 			$authCode = $_GET[self::AUTH_CODE];
-			$tokens  = kZoomOauth::requestAccessToken($authCode);
-			$accessToken = $tokens[kZoomOauth::ACCESS_TOKEN];
+			$tokens  = kZoomOauth::requestAuthorizationTokens($authCode);
+			$accessToken = $tokens[kOAuth::ACCESS_TOKEN];
 			$client = new kZoomClient($zoomBaseURL, null, null, null, null, $accessToken );
 			$permissions = $client->retrieveTokenZoomUserPermissions();
 			$user = $client->retrieveTokenZoomUser();
@@ -248,13 +248,13 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	protected function handleEncryptTokens($tokensData, $iv, $zoomConfiguration)
 	{
-		$verificationToken = $zoomConfiguration[kZoomOauth::VERIFICATION_TOKEN];
+		$verificationToken = $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 		$tokensResponse = AESEncrypt::decrypt($verificationToken, $tokensData, $iv);
 		$tokens = kZoomOauth::parseTokensResponse($tokensResponse);
-		kZoomOauth::validateToken($tokens);
+		kZoomOauth::validateTokens($tokens);
 		$tokens = kZoomOauth::extractTokensFromData($tokens);
-		$expiresIn = $tokens[kZoomOauth::EXPIRES_IN];
-		$tokens[kZoomOauth::EXPIRES_IN] = kZoomOauth::getTokenExpiryAbsoluteTime($expiresIn);
+		$expiresIn = $tokens[kOAuth::EXPIRES_IN];
+		$tokens[kOAuth::EXPIRES_IN] = kZoomOauth::getTokenExpiryAbsoluteTime($expiresIn);
 		if(!$tokens)
 		{
 			KExternalErrors::dieGracefully();

@@ -1,3 +1,25 @@
+# Rigel-18.999.0
+## Webex API Drop Folder ##
+* Issue Type: Epic
+* Issue ID: PLAT-23885
+
+### Configuration ###
+Add the following to vendor.ini
+```
+[WebexAccount]
+baseUrl = @BASE_URL@
+redirectUrl = @REDIRECT_URL@
+clientId = @CLIENT_ID@
+clientSecret = @CLIENT_SECRET@
+scope = @SCOPE@
+state = @STATE@
+DisableWebexAPIDropFolder = 0
+domain = @DOMAIN@
+```
+
+### Deployment Scripts ###
+php deployment/updates/scripts/add_permissions/2022_09_29_add_webexAPI_service.php
+
 # Rigel-18.16.0
 ## Disable password restriction on FirstName/LastName/Email
 * Issue Type: Task

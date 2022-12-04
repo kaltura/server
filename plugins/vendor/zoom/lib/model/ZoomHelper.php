@@ -112,7 +112,7 @@ class ZoomHelper
 		{
 			$page = file_get_contents($file_path);
 			$tokensString = json_encode($tokens);
-			$verificationToken = $zoomConfiguration[kZoomOauth::VERIFICATION_TOKEN];
+			$verificationToken = $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 			list($enc, $iv) = AESEncrypt::encrypt($verificationToken, $tokensString);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace('@encryptData@', base64_encode($enc), $page);
