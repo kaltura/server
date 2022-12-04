@@ -3,6 +3,7 @@
 class KAxelWrapper extends KCurlWrapper
 {
 	const DEFAULT_CONCURRENT_CONNECTIONS = 10;
+	const NO_PROGRESS_TIMEOUT_SECONDS = 30;
 	
 	/**
 	 * @var null|bool
@@ -82,27 +83,10 @@ class KAxelWrapper extends KCurlWrapper
 		return $this->logPathErr;
 	}
 	
-	/**
-	 * @param $cmdLine
-	 * @param false $returnValue
-	 * @return bool|array
-	 */
-	private function execCmd($cmdLine, $returnValue = false)
+	public function close()
 	{
-		KalturaLog::debug("Executing command: [$cmdLine]");
-		
-		unset($output);
-		exec($cmdLine, $output, $resultCode);
-		
-		$this->errorNumber = $resultCode;
-		
-		if ($resultCode)
-		{
-			KalturaLog::debug("Executed command result code [$resultCode]");
-			return false;
-		}
-		
-		return $returnValue ? $output : true;
+		parent::close();
+		$this->deleteLogFiles();
 	}
 	
 	/**
@@ -137,7 +121,7 @@ class KAxelWrapper extends KCurlWrapper
 	private function execAxel()
 	{
 		$start = microtime(true);
-		$result = $this->execCmd("$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url > $this->logPath 2> $this->logPathErr");
+		$result = $this->execProcOpen();
 		$end = microtime(true);
 		
 		$this->httpCode = $this->getHttpCodeFromLog();
@@ -152,6 +136,64 @@ class KAxelWrapper extends KCurlWrapper
 		}
 		
 		return $this->downloadCompleted($result);
+	}
+	
+	private function execProcOpen()
+	{
+		$cmd = "$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url";
+		$descriptor = array(
+			1 => array('file', $this->logPath, 'w'),
+			2 => array('file', $this->logPathErr, 'w')
+		);
+		
+		KalturaLog::debug("Executing [$cmd > $this->logPath 2> $this->logPathErr]");
+		
+		// we use 'exec $this->axelPath ....' to avoid php from creating a child "sh -c axel..." which will create the actual child "axel" command
+		// this allows to call 'proc_terminate' function on $process (because proc_terminate does not terminate all child processes)
+		// for more info, read comments: https://www.php.net/manual/en/function.proc-terminate.php
+		$process = proc_open("exec $cmd", $descriptor, $pipes, '/tmp');
+		if (!is_resource($process))
+		{
+			KalturaLog::debug('Failed to open resource - aborting download');
+			return false;
+		}
+		
+		for (;;)
+		{
+			sleep(5);
+			
+			$processStatus = proc_get_status($process);
+			if (!$processStatus['running'])
+			{
+				break;
+			}
+			
+			clearstatcache();
+			if (time() - kFile::filemtime($this->logPath) > self::NO_PROGRESS_TIMEOUT_SECONDS)
+			{
+				KalturaLog::debug('Axel downloader was not active in the last [' . self::NO_PROGRESS_TIMEOUT_SECONDS . '] seconds - terminating process');
+				proc_terminate($process);
+			}
+		}
+		
+		$this->errorNumber = $processStatus['exitcode'];
+		$this->closePipes($pipes);
+		proc_close($process);
+		
+		return $processStatus['exitcode'] === 0;
+	}
+	
+	private function closePipes($pipes)
+	{
+		// we are not using 'pipes' but proc_open requires it
+		// in case proc_open opened a 'pipe', close it
+		if (count($pipes))
+		{
+			foreach ($pipes as $pipe)
+			{
+				fclose($pipe);
+			}
+		}
 	}
 	
 	private function getErrorCode()
@@ -171,15 +213,6 @@ class KAxelWrapper extends KCurlWrapper
 		}
 		
 		return null;
-	}
-	
-	/**
-	 * @return void
-	 */
-	public function close()
-	{
-		parent::close();
-		$this->deleteLogFiles();
 	}
 	
 	private function deleteLogFiles()
