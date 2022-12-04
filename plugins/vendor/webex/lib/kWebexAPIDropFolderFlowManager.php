@@ -5,7 +5,7 @@
  */
 class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 {
-	const MAX_WEBEX_API_DROP_FOLDERS = 6; //Temporary
+	const MAX_WEBEX_API_DROP_FOLDERS = 6;
 	const DELETION_POLICY = 'deletionPolicy';
 	
 	/**
@@ -13,7 +13,7 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if (kConf::getArrayValue('DisableWebexAPIDropFolder', WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR, 0))
+		if (kConf::getArrayValue('DisableWebexAPIDropFolder', WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, kConfMapNames::VENDOR, true))
 		{
 			return true;
 		}
@@ -42,7 +42,7 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 					self::verifyAndSetDropFolderConfig($partnerWebexDropFolder);
 				}
 
-				$partnerWebexDropFolder->setStatus(self::getDropFolderStatus($object->getStatus()));
+				$partnerWebexDropFolder->setStatus(VendorHelper::getDropFolderStatus($object->getStatus()));
 				$partnerWebexDropFolderModified = true;
 				KalturaLog::debug('WebexAPIDropFolder with vendorId ' . $object->getId() . ' updated status to ' . $partnerWebexDropFolder->getStatus());
 			}
@@ -119,12 +119,12 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 	
 	public static function wasStatusChanged(BaseObject $object, array $modifiedColumns)
 	{
-		return ($object instanceof WebexAPIVendorIntegration) && in_array('vendor_integration.STATUS', $modifiedColumns);
+		return ($object instanceof WebexAPIVendorIntegration) && in_array(BaseVendorIntegrationPeer::STATUS, $modifiedColumns);
 	}
 	
 	public static function wasDeletionPolicyChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if ($object instanceof WebexAPIVendorIntegration && in_array('vendor_integration.CUSTOM_DATA', $modifiedColumns))
+		if ($object instanceof WebexAPIVendorIntegration && in_array(BaseVendorIntegrationPeer::CUSTOM_DATA, $modifiedColumns))
 		{
 			$oldCustomDataValues = $object->getCustomDataOldValues();
 			if (!isset($oldCustomDataValues[''][self::DELETION_POLICY]))
@@ -144,29 +144,6 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 		return ($object instanceof WebexAPIVendorIntegration)
 			&& in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
 			&& $object->isColumnModified('refreshToken');
-	}
-	
-	private static function getDropFolderStatus($status)
-	{
-		switch ($status)
-		{
-			case VendorIntegrationStatus::DISABLED:
-			{
-				return DropFolderStatus::DISABLED;
-			}
-			case VendorIntegrationStatus::ACTIVE:
-			{
-				return DropFolderStatus::ENABLED;
-			}
-			case VendorIntegrationStatus::DELETED:
-			{
-				return DropFolderStatus::DELETED;
-			}
-			default:
-			{
-				return DropFolderStatus::ERROR;
-			}
-		}
 	}
 	
 	protected static function setDefaultValuesIntegration(WebexAPIVendorIntegration $vendorIntegrationObject)
@@ -192,10 +169,10 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 		$newWebexAPIDropFolder = new WebexAPIDropFolder();
 		$newWebexAPIDropFolder->setWebexAPIVendorIntegrationId($vendorIntegrationObject->getId());
 		$newWebexAPIDropFolder->setPartnerId($vendorIntegrationObject->getPartnerId());
-		$newWebexAPIDropFolder->setStatus(self::getDropFolderStatus($vendorIntegrationObject->getStatus()));
+		$newWebexAPIDropFolder->setStatus(VendorHelper::getDropFolderStatus($vendorIntegrationObject->getStatus()));
 		$newWebexAPIDropFolder->setType(WebexAPIDropFolderPlugin::getCoreValue('DropFolderType',WebexAPIDropFolderType::WEBEX_API));
 		$newWebexAPIDropFolder->setName('webex_api_' . $vendorIntegrationObject->getPartnerId() . '_' . $vendorIntegrationObject->getAccountId());
-		$newWebexAPIDropFolder->setTags('webex');
+		$newWebexAPIDropFolder->setTags('webex_api');
 		$conversionProfileId = $vendorIntegrationObject->getConversionProfileId();
 		if (!$conversionProfileId)
 		{
@@ -230,6 +207,7 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 			$partner = PartnerPeer::retrieveByPK($dropFolder->getPartnerId());
 			$dropFolder->setConversionProfileId($partner->getDefaultConversionProfileId());
 		}
+		$dropFolder->save();
 	}
 
 	protected static function setDeletePolicy($vendorIntegrationObject, $dropFolder)
@@ -237,12 +215,13 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 		if ($vendorIntegrationObject->getDeletionPolicy())
 		{
 			$dropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
-			$daysToDelete = kConf::getArrayValue('dayToDelete', WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR, 1);
+			$daysToDelete = kConf::getArrayValue('dayToDelete', WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, kConfMapNames::VENDOR, 1);
 			$dropFolder->setAutoFileDeleteDays($daysToDelete);
 		}
 		else
 		{
 			$dropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::MANUAL_DELETE);
 		}
+		$dropFolder->save();
 	}
 }

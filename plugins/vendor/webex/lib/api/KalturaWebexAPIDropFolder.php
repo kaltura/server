@@ -5,8 +5,6 @@
  */
 class KalturaWebexAPIDropFolder extends KalturaDropFolder
 {
-	const WEBEX_BASE_URL = 'WebexBaseUrl';
-	
 	/**
 	 * @readonly
 	 */
@@ -49,15 +47,9 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 	 */
 	public $webexAPIVendorIntegration;
 	
-	/**
-	 * @var time
-	 */
-	public $lastHandledMeetingTime;
-	
 	
 	private static $map_between_objects = array(
 		'webexAPIVendorIntegrationId',
-		'lastHandledMeetingTime'
 	);
 	
 	public function getMapBetweenObjects()
@@ -75,21 +67,27 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 		{
 			if ($vendorIntegration)
 			{
+				$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
+				$this->baseURL = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_BASE_URL];
+				$this->clientId = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_CLIENT_ID];
+				
 				$this->refreshToken = $vendorIntegration->getRefreshToken();
 				$this->accessToken = $vendorIntegration->getAccessToken();
 				$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
 				
+				$tokenExpiryGrace = kConf::getArrayValue(WebexAPIDropFolderPlugin::CONFIGURATION_TOKEN_EXPIRY_GRACE, WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, WebexAPIDropFolderPlugin::CONFIGURATION_VENDOR_MAP, 600);
 				if ($this->accessToken && $this->refreshToken && kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID
-					&& $vendorIntegration->getExpiresIn() < time() + kTimeConversion::MINUTE * 5)
+					&& $vendorIntegration->getExpiresIn() < time() + $tokenExpiryGrace)
 				{
-					$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
-					$this->clientId = $webexConfiguration['clientId'];
-					$this->baseURL = $webexConfiguration['baseUrl'];
+					KalturaLog::info("Refreshing access token for Webex drop folder [{$this->id}]");
 					$tokens = kWebexAPIOauth::requestAccessToken($this->refreshToken);
-					$vendorIntegration->saveTokensData($tokens);
-					$this->refreshToken = $vendorIntegration->getRefreshToken();
-					$this->accessToken = $vendorIntegration->getAccessToken();
-					$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
+					if ($tokens)
+					{
+						$vendorIntegration->saveTokensData($tokens);
+						$this->refreshToken = $vendorIntegration->getRefreshToken();
+						$this->accessToken = $vendorIntegration->getAccessToken();
+						$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
+					}
 				}
 				
 				$webexAPIIntegrationObject = new KalturaWebexAPIIntegrationSetting();
@@ -118,6 +116,7 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 			{
 				throw new KalturaAPIException(KalturaWebexAPIErrors::DROP_FOLDER_INTEGRATION_DATA_MISSING);
 			}
+			$vendorIntegration->setWebexAccountDescription($this->description);
 			$vendorIntegration->save();
 		}
 		

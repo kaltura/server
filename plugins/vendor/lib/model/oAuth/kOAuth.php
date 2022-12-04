@@ -10,9 +10,11 @@ abstract class kOAuth
 	const EXPIRES_IN = 'expires_in';
 	const VERIFICATION_TOKEN = 'verificationToken';
 	
+	protected static $errorCode;
+	
 	protected static function getHeaderData()
 	{
-		return null;
+		return array();
 	}
 	
 	protected static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
@@ -33,7 +35,10 @@ abstract class kOAuth
 	protected static function retrieveTokensDataFromResponse($response)
 	{
 		$tokensData = self::parseTokensResponse($response);
-		self::validateTokens($tokensData);
+		if (!self::validateTokens($tokensData))
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::TOKEN_PARSING_FAILED);
+		}
 		$tokensData = self::extractTokensFromData($tokensData);
 		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($tokensData[self::EXPIRES_IN]);
 		return $tokensData;
@@ -47,7 +52,6 @@ abstract class kOAuth
 	public static function parseTokensResponse($response)
 	{
 		$dataAsArray = json_decode($response, true);
-		KalturaLog::debug(print_r($dataAsArray, true));
 		return $dataAsArray;
 	}
 	
@@ -56,8 +60,10 @@ abstract class kOAuth
 		if (!$tokensData || !isset($tokensData[self::REFRESH_TOKEN]) || !isset($tokensData[self::ACCESS_TOKEN]) ||
 			!isset($tokensData[self::EXPIRES_IN]))
 		{
-			throw new KalturaAPIException(KalturaWebexAPIErrors::TOKEN_PARSING_FAILED);
+			return false;
 		}
+		
+		return true;
 	}
 	
 	/**

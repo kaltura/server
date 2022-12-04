@@ -4,21 +4,29 @@
 * Issue ID: PLAT-23885
 
 ### Configuration ###
-Add the following to vendor.ini
+Enable plugin:
+
+	To enable this feature plugin add the following to your plugins.ini file:
+	- WebexAPIDropFolder
+
+Add the following to vendor.ini (Replace all tokens below)
 ```
 [WebexAccount]
-baseUrl = @BASE_URL@
+DisableWebexAPIDropFolder = 0
+webexBaseUrl = @WEBEX_BASE_URL@
 redirectUrl = @REDIRECT_URL@
 clientId = @CLIENT_ID@
 clientSecret = @CLIENT_SECRET@
 scope = @SCOPE@
 state = @STATE@
-DisableWebexAPIDropFolder = 0
-domain = @DOMAIN@
+host = @HOST@
+tokenExpiryGrace = @TOKEN_EXPIRY_GRACE@
+downloadExpiryGrace = @DWONLOAD_EXPIRY_GRACE@
 ```
 
 ### Deployment Scripts ###
-php deployment/updates/scripts/add_permissions/2022_09_29_add_webexAPI_service.php
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php deployment/updates/scripts/add_permissions/2022_09_29_add_webexVendor_service.php
 
 # Rigel-18.16.0
 ## Disable password restriction on FirstName/LastName/Email

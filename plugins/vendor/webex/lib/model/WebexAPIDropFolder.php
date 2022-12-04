@@ -6,8 +6,7 @@
 class WebexAPIDropFolder extends RemoteDropFolder
 {
 	
-	const WEBEXPAI_VENDOR_INTEGRATION_ID = 'webexapi_vendor_integration_id';
-	const LAST_HANDLED_MEETING_TIME = 'last_handled_meeting_time';
+	const WEBEX_API_VENDOR_INTEGRATION_ID = 'webexapi_vendor_integration_id';
 	
 	/**
 	 * @var string
@@ -15,16 +14,11 @@ class WebexAPIDropFolder extends RemoteDropFolder
 	protected $webexAPIVendorIntegrationId;
 	
 	/**
-	 * @var time
-	 */
-	protected $lastHandledMeetingTime;
-	
-	/**
 	 * return string
 	 */
 	public function getWebexAPIVendorIntegrationId()
 	{
-		return $this->getFromCustomData(self::WEBEXPAI_VENDOR_INTEGRATION_ID);
+		return $this->getFromCustomData(self::WEBEX_API_VENDOR_INTEGRATION_ID);
 	}
 	
 	/**
@@ -32,25 +26,9 @@ class WebexAPIDropFolder extends RemoteDropFolder
 	 */
 	public function setWebexAPIVendorIntegrationId($v)
 	{
-		$this->putInCustomData(self::WEBEXPAI_VENDOR_INTEGRATION_ID, $v);
+		$this->putInCustomData(self::WEBEX_API_VENDOR_INTEGRATION_ID, $v);
 	}
-	
-	/**
-	 * return time
-	 */
-	public function getLastHandledMeetingTime()
-	{
-		return $this->getFromCustomData(self::LAST_HANDLED_MEETING_TIME);
-	}
-	
-	/**
-	 * @param time $v
-	 */
-	public function setLastHandledMeetingTime($v)
-	{
-		$this->putInCustomData(self::LAST_HANDLED_MEETING_TIME, $v);
-	}
-	
+
 	public function getImportJobData()
 	{
 		return new kDropFolderImportJobData();
@@ -59,7 +37,7 @@ class WebexAPIDropFolder extends RemoteDropFolder
 	public function getFolderUrl()
 	{
 		return kConf::getArrayValue(
-			KalturaWebexAPIDropFolder::WEBEX_BASE_URL, WebexAPIDropFolderPlugin::CONFIGURATION_PARAM_NAME, kConfMapNames::VENDOR
+			WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_BASE_URL, WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, WebexAPIDropFolderPlugin::CONFIGURATION_VENDOR_MAP
 		);
 	}
 	

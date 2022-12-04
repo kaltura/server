@@ -1,10 +1,10 @@
 <?php
 /**
- * @service webexAPI
+ * @service webexVendor
  * @package plugins.WebexAPIDropFolder
  * @subpackage api.services
  */
-class WebexAPIService extends KalturaBaseService
+class WebexVendorService extends KalturaBaseService
 {
 	const AUTH_CODE = 'code';
 	const STATE = 'state';
@@ -14,8 +14,6 @@ class WebexAPIService extends KalturaBaseService
 	const REGIONAL_REDIRECT_PAGE_PATH = '/../lib/api/webPage/KalturaWebexAPIRegionalRedirectPage.html';
 	
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array();
-	
-	protected static $webexIntegration;
 	
 	/**
 	 * no partner will be provided by vendors as this called externally and not from kaltura
@@ -48,38 +46,14 @@ class WebexAPIService extends KalturaBaseService
 	{
 		if ($includeDeleted)
 		{
-			self::$webexIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartnerNoFilter($accountId, VendorTypeEnum::WEBEX_API_ACCOUNT);
+			$webexIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartnerNoFilter($accountId, VendorTypeEnum::WEBEX_API_ACCOUNT);
 		}
 		else
 		{
-			self::$webexIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::WEBEX_API_ACCOUNT);
+			$webexIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::WEBEX_API_ACCOUNT);
 		}
 		
-		return self::$webexIntegration;
-	}
-	
-	/**
-	 * @param WebexAPIVendorIntegration $webexIntegration
-	 * @param $accountId
-	 * @param $ks
-	 * @throws Exception
-	 */
-	protected static function loadSubmitPage(WebexAPIVendorIntegration $webexIntegration, $accountId, $ks)
-	{
-		$file_path = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
-		if (file_exists($file_path))
-		{
-			$page = file_get_contents($file_path);
-			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
-			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
-			$page = str_replace( '@partnerId@',$webexIntegration->getPartnerId(),$page);
-			$page = str_replace('@accountId@', $accountId , $page);
-			
-			echo $page;
-			die();
-		}
-		
-		throw new KalturaAPIException(KalturaWebexAPIErrors::SUBMIT_PAGE_NOT_FOUND);
+		return $webexIntegration;
 	}
 	
 	/**
@@ -106,10 +80,46 @@ class WebexAPIService extends KalturaBaseService
 	
 	/**
 	 * @action preOauthValidation
-	 * @return string
 	 * @throws Exception
 	 */
 	public function preOauthValidationAction()
+	{
+		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
+		if ($webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_STATE] != $_GET[self::STATE])
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::INCORRECT_OAUTH_STATE);
+		}
+		$authCode = $_GET[self::AUTH_CODE];
+		$host = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_HOST];
+		self::loadRegionalCloudRedirectionPage($authCode, $host);
+	}
+	
+	/**
+	 * @param $authCode
+	 * @throws Exception
+	 */
+	protected static function loadRegionalCloudRedirectionPage($authCode, $host)
+	{
+		$file_path = dirname(__FILE__) . self::REGIONAL_REDIRECT_PAGE_PATH;
+		if (file_exists($file_path))
+		{
+			$page = file_get_contents($file_path);
+			$page = str_replace('@authCode@', $authCode, $page);
+			$page = str_replace('@host@', $host, $page);
+			
+			echo $page;
+			die();
+		}
+		
+		throw new KalturaAPIException(KalturaWebexAPIErrors::REGIONAL_REDIRECT_PAGE_NOT_FOUND);
+	}
+	
+	/**
+	 * @action oauthValidation
+	 * @return string
+	 * @throws Exception
+	 */
+	public function oauthValidationAction()
 	{
 		KalturaResponseCacher::disableCache();
 		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
@@ -122,7 +132,7 @@ class WebexAPIService extends KalturaBaseService
 		{
 			$ks = self::getKSFromIntegrationCode();
 			$tokens = kWebexAPIOauth::requestAuthorizationTokens($_GET[self::AUTH_CODE]);
-			$webexIntegration = self::createNewWebexAPIVendorIntegration($ks, $webexConfiguration['baseUrl'], $tokens);
+			$webexIntegration = self::createNewWebexAPIVendorIntegration($ks, $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_BASE_URL], $tokens);
 			self::redirectAfterNewVendorIntegration($ks, $webexIntegration, $tokens);
 		}
 		
@@ -131,26 +141,15 @@ class WebexAPIService extends KalturaBaseService
 	
 	protected static function requestAuthCode($webexConfiguration)
 	{
-		$clientId = $webexConfiguration['clientId'];
-		$webexBaseURL = $webexConfiguration['baseUrl'];
-		$redirectUrl = $webexConfiguration['redirectUrl'];
+		$webexBaseURL = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_BASE_URL];
+		$clientId = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_CLIENT_ID];
+		$redirectUrl = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_REDIRECT_URL];
 		$redirectUri = urlencode($redirectUrl);
-		$scope = $webexConfiguration['scope'];
-		$state = $webexConfiguration['state'];
+		$scope = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_SCOPE];
+		$state = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_STATE];
 		
 		$url = "$webexBaseURL/authorize?response_type=code&client_id=$clientId&redirect_uri=$redirectUri&scope=$scope&state=$state";
-		self::redirect($url);
-	}
-	
-	/**
-	 * Redirects to new URL
-	 * @param $url
-	 */
-	protected static function redirect($url)
-	{
-		$redirect  = new kRendererRedirect($url);
-		$redirect->output();
-		KExternalErrors::dieGracefully();
+		VendorHelper::redirect($url);
 	}
 	
 	protected static function getKSFromIntegrationCode()
@@ -169,8 +168,7 @@ class WebexAPIService extends KalturaBaseService
 	{
 		$accessToken = $tokens[kOauth::ACCESS_TOKEN];
 		$client = new kWebexAPIClient($webexBaseURL, null, null, null, $accessToken);
-		$user = $client->retrieveWebexUser();
-		$accountId = $user['account_id'];
+		$accountId = $client->retrieveWebexUser();
 		$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
 		if (!$webexIntegration)
 		{
@@ -194,48 +192,12 @@ class WebexAPIService extends KalturaBaseService
 			$webexIntegration->setPartnerId($ks->getPartnerId());
 			$webexIntegration->setVendorType(VendorTypeEnum::WEBEX_API_ACCOUNT);
 			$webexIntegration->save();
-			self::loadSubmitPage($webexIntegration, $webexIntegration->getAccountId(), $ks);
+			VendorHelper::loadSubmitPage($webexIntegration, $webexIntegration->getAccountId(), $ks, self::REGISTRATION_PAGE_PATH);
 		}
 		else
 		{
 			self::loadLoginPage($tokens, $webexIntegration);
 		}
-	}
-	
-	/**
-	 * @action oauthValidation
-	 * @throws Exception
-	 */
-	public function oauthValidationAction()
-	{
-		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
-		if ($webexConfiguration['state'] != $_GET[self::STATE])
-		{
-			throw new KalturaAPIException(KalturaWebexAPIErrors::INCORRECT_OAUTH_STATE);
-		}
-		$authCode = $_GET[self::AUTH_CODE];
-		$domain = $webexConfiguration['domain'];
-		self::loadRegionalCloudRedirectionPage($authCode, $domain);
-	}
-	
-	/**
-	 * @param $authCode
-	 * @throws Exception
-	 */
-	protected static function loadRegionalCloudRedirectionPage($authCode, $domain)
-	{
-		$file_path = dirname(__FILE__) . self::REGIONAL_REDIRECT_PAGE_PATH;
-		if (file_exists($file_path))
-		{
-			$page = file_get_contents($file_path);
-			$page = str_replace('@authCode@', $authCode, $page);
-			$page = str_replace('@domain@', $domain, $page);
-			
-			echo $page;
-			die();
-		}
-		
-		throw new KalturaAPIException(KalturaWebexAPIErrors::REGIONAL_REDIRECT_PAGE_NOT_FOUND);
 	}
 	
 	/**
@@ -280,10 +242,9 @@ class WebexAPIService extends KalturaBaseService
 		$iv = base64_decode($iv);
 		$webexConfiguration = WebexAPIDropFolderPlugin::getWebexConfiguration();
 		$tokens = kOAuth::handleEncryptTokens($tokensData, $iv, $webexConfiguration);
-		$webexBaseURL = $webexConfiguration['baseUrl'];
+		$webexBaseURL = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_BASE_URL];
 		$client = new kWebexAPIClient($webexBaseURL, $tokens[kOAuth::REFRESH_TOKEN],null, null, $tokens[kOAuth::ACCESS_TOKEN]);
-		$user = $client->retrieveWebexUser();
-		$accountId = $user['account_id'];
+		$accountId = $client->retrieveWebexUser();
 		$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if ($webexIntegration && $partnerId !==  $webexIntegration->getPartnerId() && $partnerId !== 0)
@@ -294,7 +255,7 @@ class WebexAPIService extends KalturaBaseService
 			$webexIntegration->save();
 		}
 		
-		self::loadSubmitPage($webexIntegration, $accountId, $this->getKs());
+		VendorHelper::loadSubmitPage($webexIntegration, $accountId, $this->getKs(), self::REGISTRATION_PAGE_PATH);
 	}
 	
 	/**
@@ -317,7 +278,17 @@ class WebexAPIService extends KalturaBaseService
 		}
 		
 		kuserPeer::createKuserForPartner($partnerId, $integrationSetting->defaultUserId);
-		//$this->configureZoomCategories($integrationSetting, $webexIntegration); // Create category for Webex
+		if ($integrationSetting->webexCategory)
+		{
+			if (VendorHelper::createCategoryForVendorIntegration($webexIntegration->getPartnerId(), $integrationSetting->webexCategory, $webexIntegration))
+			{
+				$webexIntegration->setWebexCategory($integrationSetting->webexCategory);
+			}
+		}
+		else
+		{
+			$webexIntegration->unsetCategory();
+		}
 		
 		$integrationSetting->toInsertableObject($webexIntegration);
 		$webexIntegration->save();

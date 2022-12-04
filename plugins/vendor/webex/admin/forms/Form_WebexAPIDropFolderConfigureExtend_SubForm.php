@@ -16,11 +16,6 @@ class Form_WebexAPIDropFolderConfigureExtend_SubForm extends Form_DropFolderConf
 			'label'			=> 'Vendor Integration id:',
 			'filters'		=> array('StringTrim'),
 		));
-		
-		$this->addElement('text', 'lastHandledMeetingTime', array(
-			'label'			=> 'Last Handled Meeting Time:',
-			'filters'		=> array('StringTrim'),
-		));
 	}
 	
 }
