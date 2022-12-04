@@ -148,7 +148,7 @@ class KAxelWrapper extends KCurlWrapper
 		
 		KalturaLog::debug("Executing [$cmd > $this->logPath 2> $this->logPathErr]");
 		
-		// we use 'exec $this->axelPath ....' to avoid php from creating a child "sh -c axel..." which will create the actual child "axel" command
+		// we use 'exec $cmd..' to avoid php from creating a child "sh -c axel..." which will create the actual child "axel" command
 		// this allows to call 'proc_terminate' function on $process (because proc_terminate does not terminate all child processes)
 		// for more info, read comments: https://www.php.net/manual/en/function.proc-terminate.php
 		$process = proc_open("exec $cmd", $descriptor, $pipes, '/tmp');
