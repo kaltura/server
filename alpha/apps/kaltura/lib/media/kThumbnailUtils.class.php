@@ -37,15 +37,16 @@ class kThumbnailUtils
 	 * If none is found, look for the one with the nearest aspect ratio.
 	 * This would be the one with the smallest distance from the original.
 	 *
-	 * @param string $entryId Id of entry containing the thumbnails
+	 * @param entry $entry Entry containing the thumbnails
 	 * @param int $requiredWidth Thumbnail's requested width
 	 * @param int $requiredHeight Thumbnail's requested height
+	 * @param int $version Desired version of the data
 	 * @return string|null The path to the physical thumbnail file
 	 */
-	public static function getNearestAspectRatioThumbnailDescriptorByEntryId( $entryId, $requiredWidth, $requiredHeight, $fallbackThumbnailPath )
+	public static function getNearestAspectRatioThumbnailDescriptorByEntry($entry, $requiredWidth, $requiredHeight, $version = null)
 	{
-		$thumbAssets = assetPeer::retrieveReadyThumbnailsByEntryId( $entryId );
-		return self::getNearestAspectRatioThumbnailDescriptorFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath );
+		$thumbAssets = assetPeer::retrieveReadyThumbnailsByEntryId($entry->getEntryId());
+		return self::getNearestAspectRatioThumbnailDescriptorFromThumbAssets($entry, $thumbAssets, $requiredWidth, $requiredHeight, $version);
 	}
 
 	/**
@@ -54,28 +55,29 @@ class kThumbnailUtils
 	 * with the smallest distance from the original). If there are several with the
 	 * same delta from original - the one with the largest dimensions will be picked.
 	 *
+	 * @param entry $entry Entry containing the thumbnails
 	 * @param array $thumbAssets ThumbAsset objects array
 	 * @param int $requiredWidth Thumbnail's requested width
 	 * @param int $requiredHeight Thumbnail's requested height
-	 * @return kThumbnailDescriptor|null The thumbnail asset with exact/closest 
+	 * @param int $version Desired version of the data
+	 * @return kThumbnailDescriptor|null The thumbnail asset with exact/closest
 	 *                                   aspect ratio to the required, or null
 	 *                                   if the entry doesn't contain thumbnails.
 	 */
-	public static function getNearestAspectRatioThumbnailDescriptorFromThumbAssets( $thumbAssets, $requiredWidth, $requiredHeight, $fallbackThumbnailPath = null )
+	public static function getNearestAspectRatioThumbnailDescriptorFromThumbAssets($entry, $thumbAssets, $requiredWidth, $requiredHeight, $version = null)
 	{
-		// Calc aspect ratio + distance from requiredAspectRatio
 		$chosenThumbnailDescriptor = null;
 
-		kThumbnailDescriptor::initDimensions( $requiredWidth, $requiredHeight );
+		// Calc aspect ratio + distance from requiredAspectRatio
+		kThumbnailDescriptor::initDimensions($requiredWidth, $requiredHeight);
 
-		if ( $fallbackThumbnailPath )
+		$defaultThumbnailPath = myEntryUtils::getLocalImageFilePathByEntry($entry, $version);
+		$fileSync = myEntryUtils::getEntryLocalImageFileSync($entry, $version);
+
+		if($fileSync)
 		{
-			$imageSizeArray = getimagesize( $fallbackThumbnailPath );
-			
-			$thumbWidth = $imageSizeArray[0];
-			$thumbHeight = $imageSizeArray[1];
-
-			$chosenThumbnailDescriptor = kThumbnailDescriptor::fromParams( $thumbWidth, $thumbHeight, $fallbackThumbnailPath, true );
+			list($thumbWidth, $thumbHeight, $type, $attr) = kImageUtils::getImageSize($fileSync);
+			$chosenThumbnailDescriptor = kThumbnailDescriptor::fromParams($thumbWidth, $thumbHeight, $defaultThumbnailPath, true);
 		}
 
 		if ( empty( $thumbAssets ) )
