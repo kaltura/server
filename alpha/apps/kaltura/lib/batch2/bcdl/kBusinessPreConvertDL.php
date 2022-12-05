@@ -1245,8 +1245,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 
 		$sourceFlavor = null;
 		$flavors = assetParamsPeer::retrieveFlavorsByPKs($flavorsIds);
-
-		$ingestedNeeded = self::checkConvertProfileParams($flavors, $conversionProfileFlavorParams, $entry, $sourceFlavor);
+		
+		$containerFormat = $originalFlavorAsset->getContainerFormat() ? $originalFlavorAsset->getContainerFormat() : $originalFlavorAsset->getFileExt();
+		
+		$ingestedNeeded = self::checkConvertProfileParams($flavors, $conversionProfileFlavorParams, $entry, $containerFormat, $sourceFlavor);
 
 		KalturaLog::log(count($flavors) . " destination flavors found for this profile[" . $profile->getId() . "]");
 
@@ -1380,7 +1382,9 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 
 		// gets the flavor params by the id
 		$flavors = assetParamsPeer::retrieveFlavorsByPKs($flavorsIds);
-		self::checkConvertProfileParams($flavors, $conversionProfileFlavorParams, $entry);
+		$containerFormat = $originalFlavorAsset->getContainerFormat() ? $originalFlavorAsset->getContainerFormat() : $originalFlavorAsset->getFileExt();
+		
+		self::checkConvertProfileParams($flavors, $conversionProfileFlavorParams, $entry, $containerFormat);
 
 		KalturaLog::log(count($flavors) . " destination flavors found for this profile[" . $profile->getId() . "]");
 
@@ -1872,11 +1876,13 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		KalturaLog::err($errDescription);
 	}
 
-	private static function checkConvertProfileParams(&$flavors, $conversionProfileFlavorParams, $entry, &$sourceFlavor = null)
+	private static function checkConvertProfileParams(&$flavors, $conversionProfileFlavorParams, $entry, $sourceAssetContainerFormat = null, &$sourceFlavor = null)
 	{
 		$ingestedNeeded = false;
 		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
 		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
+		
+		$isSourceAssetImage = is_null($sourceAssetContainerFormat) ? null : kAssetUtils::isImage($sourceAssetContainerFormat);
 
 		foreach($flavors as $index => $flavor)
 		{
@@ -1918,6 +1924,13 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				unset($flavors[$index]);
 				$ingestedNeeded = true;
 				KalturaLog::info("Flavor [" . $flavor->getId() . "] won't be converted because it's ingested recorded live");
+				continue;
+			}
+			
+			if (!is_null($isSourceAssetImage) && ($isSourceAssetImage XOR kAssetUtils::isImage($flavor->getFormat())))
+			{
+				KalturaLog::info("Flavor [" . $flavor->getId() . "] won't be converted because it's format is [" . $flavor->getFormat() . "] and source format is [$sourceAssetContainerFormat]");
+				unset($flavors[$index]);
 				continue;
 			}
 
