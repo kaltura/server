@@ -33,6 +33,7 @@ KalturaLog::debug("Conversion profile id {$conversionProfileId} found on partner
 try
 {
     $newConversionProfile = copyConversionProfile($conversionProfile, $destPartnerId);
+    KalturaLog::debug("Created new conversion profile id {$newConversionProfile->getId()} for partner {$destPartnerId}");
 
     try
     {
@@ -45,14 +46,12 @@ try
     }
     catch (Exception $exception)
     {
-        KalturaLog::debug("Could not copy flavor params {$flavorParamsConversionProfile->getId()} from conversion profile {$conversionProfile->getId()}");
-        KalturaLog::debug($exception->getMessage());
+        KalturaLog::debug("Could not copy flavor params {$flavorParamsConversionProfile->getId()} from conversion profile {$conversionProfile->getId()}, exception: {$exception->getMessage()}");
     }
 }
 catch (Exception $exception)
 {
-    KalturaLog::debug("Could not create the conversion profile for Pid {$destPartnerId}");
-    KalturaLog::debug($exception->getMessage());
+    KalturaLog::debug("Could not create the conversion profile for Pid {$destPartnerId}, exception: {$exception->getMessage()}");
 }
 
 KalturaLog::info("Script Done!");
