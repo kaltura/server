@@ -77,9 +77,9 @@ class KalturaWebexAPIDropFolder extends KalturaDropFolder
 				
 				$tokenExpiryGrace = kConf::getArrayValue(WebexAPIDropFolderPlugin::CONFIGURATION_TOKEN_EXPIRY_GRACE, WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, WebexAPIDropFolderPlugin::CONFIGURATION_VENDOR_MAP, 600);
 				if ($this->accessToken && $this->refreshToken && kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID
-					&& $vendorIntegration->getExpiresIn() < time() + $tokenExpiryGrace)
+					&& $this->accessExpiresIn < time() + $tokenExpiryGrace)
 				{
-					KalturaLog::info("Refreshing access token for Webex drop folder [{$this->id}]");
+					KalturaLog::info("Refreshing access token for Webex drop folder [{$this->id}], token expires on: {$this->accessExpiresIn}");
 					$tokens = kWebexAPIOauth::requestAccessToken($this->refreshToken);
 					if ($tokens)
 					{

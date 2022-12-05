@@ -37,7 +37,7 @@ abstract class kOAuth
 		$tokensData = self::parseTokensResponse($response);
 		if (!self::validateTokens($tokensData))
 		{
-			throw new KalturaAPIException(KalturaWebexAPIErrors::TOKEN_PARSING_FAILED);
+			throw new KalturaAPIException(KalturaVendorIntegrationErrors::TOKEN_PARSING_FAILED);
 		}
 		$tokensData = self::extractTokensFromData($tokensData);
 		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($tokensData[self::EXPIRES_IN]);

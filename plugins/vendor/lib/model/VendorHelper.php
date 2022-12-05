@@ -23,7 +23,7 @@ class VendorHelper
 	
 	}
 	
-	public static function getWebexAPIDropFolderRelatedInfo()
+	public static function getDropFolderRelatedInfo()
 	{
 	
 	}
@@ -67,26 +67,26 @@ class VendorHelper
 	}
 	
 	/**
-	 * @param VendorIntegration $webexIntegration
+	 * @param $partnerId
 	 * @param $accountId
 	 * @param $ks
 	 * @throws Exception
 	 */
-	public static function loadSubmitPage(VendorIntegration $webexIntegration, $accountId, $ks, $filePath)
+	public static function loadSubmitPage($partnerId, $accountId, $ks, $filePath)
 	{
 		if (file_exists($filePath))
 		{
 			$page = file_get_contents($filePath);
 			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
-			$page = str_replace('@partnerId@', $webexIntegration->getPartnerId(), $page);
+			$page = str_replace('@partnerId@', $partnerId, $page);
 			$page = str_replace('@accountId@', $accountId, $page);
 			
 			echo $page;
 			die();
 		}
 		
-		throw new KalturaAPIException(KalturaWebexAPIErrors::SUBMIT_PAGE_NOT_FOUND);
+		throw new KalturaAPIException(KalturaVendorIntegrationErrors::SUBMIT_PAGE_NOT_FOUND);
 	}
 	
 	/**
@@ -130,6 +130,67 @@ class VendorHelper
 		$categoryDb->setPartnerId($partnerId);
 		$categoryDb->save();
 		return $categoryDb->getId();
+	}
+	
+	public static function addEntryToCategory($categoryName, $entryId)
+	{
+		$categoryId = self::findCategoryIdByName($categoryName);
+		if ($categoryId)
+		{
+			self::addCategoryEntry($categoryId, $entryId);
+		}
+	}
+	
+	public static function findCategoryIdByName($categoryName)
+	{
+		$isFullPath = self::isFullPath($categoryName);
+		
+		$categoryFilter = new KalturaCategoryFilter();
+		if ($isFullPath)
+		{
+			$categoryFilter->fullNameEqual = $categoryName;
+		}
+		else
+		{
+			$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
+		}
+		
+		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
+		$categoryId = null;
+		if ($isFullPath)
+		{
+			if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
+			{
+				$categoryId = $categoryResponse->objects[0]->id;
+			}
+		}
+		else
+		{
+			$categoryIds = array();
+			foreach ($categoryResponse->objects as $category)
+			{
+				if ($category->name === $categoryName)
+				{
+					$categoryIds[] = $category->id;
+				}
+			}
+			$categoryId = (count($categoryIds) == 1) ? $categoryIds[0] : null;
+		}
+		return $categoryId;
+	}
+	
+	public static function isFullPath($categoryName)
+	{
+		$numCategories = count(explode('>', $categoryName));
+		return ($numCategories > 1);
+	}
+	
+	public static function addCategoryEntry($categoryId, $entryId)
+	{
+		$categoryEntry = new KalturaCategoryEntry();
+		$categoryEntry->categoryId = $categoryId;
+		$categoryEntry->entryId = $entryId;
+		KBatchBase::$kClient->categoryEntry->add($categoryEntry);
 	}
 	
 	public static function exitWithError($errMsg, $vendorIntegration)

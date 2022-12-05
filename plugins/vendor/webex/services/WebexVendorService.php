@@ -193,7 +193,7 @@ class WebexVendorService extends KalturaBaseService
 			$webexIntegration->setVendorType(VendorTypeEnum::WEBEX_API_ACCOUNT);
 			$webexIntegration->save();
 			$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
-			VendorHelper::loadSubmitPage($webexIntegration, $webexIntegration->getAccountId(), $ks, $filePath);
+			VendorHelper::loadSubmitPage($webexIntegration->getPartnerId(), $webexIntegration->getAccountId(), $ks, $filePath);
 		}
 		else
 		{
@@ -257,7 +257,7 @@ class WebexVendorService extends KalturaBaseService
 		}
 		
 		$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
-		VendorHelper::loadSubmitPage($webexIntegration, $accountId, $this->getKs(), $filePath);
+		VendorHelper::loadSubmitPage($webexIntegration->getPartnerId(), $accountId, $this->getKs(), $filePath);
 	}
 	
 	/**

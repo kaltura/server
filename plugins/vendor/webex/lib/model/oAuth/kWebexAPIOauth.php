@@ -6,6 +6,7 @@
 class kWebexAPIOauth extends kOAuth
 {
 	const OAUTH_TOKEN_PATH = 'access_token?';
+	const ACCESS_TOKEN_NOT_AUTHORIZED_CODE = 400;
 	
 	/**
 	 * @return array
@@ -26,7 +27,7 @@ class kWebexAPIOauth extends kOAuth
 	protected static function retrieveTokensData($webexBaseURL, $header, $postFields)
 	{
 		$response = self::curlRetrieveTokensData($webexBaseURL, null, $header, $postFields);
-		if (self::$errorCode == 400)
+		if (self::$errorCode == self::ACCESS_TOKEN_NOT_AUTHORIZED_CODE)
 		{
 			KalturaLog::warning('Retrieving access token from Webex was not authorized');
 			return null;

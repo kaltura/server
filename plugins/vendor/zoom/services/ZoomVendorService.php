@@ -132,7 +132,7 @@ class ZoomVendorService extends KalturaBaseService
 					$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 					$zoomIntegration->save();
 					$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
-					VendorHelper::loadSubmitPage($zoomIntegration, $accountId, $ks, $filePath);
+					VendorHelper::loadSubmitPage($zoomIntegration->getPartnerId(), $accountId, $ks, $filePath);
 				}
 				else
 				{
@@ -199,7 +199,7 @@ class ZoomVendorService extends KalturaBaseService
 		}
 		
 		$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
-		VendorHelper::loadSubmitPage($zoomIntegration, $accountId, $this->getKs(), $filePath);
+		VendorHelper::loadSubmitPage($zoomIntegration->getPartnerId(), $accountId, $this->getKs(), $filePath);
 	}
 	
 	/**
@@ -233,7 +233,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration->save();
 		
 		$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
-		VendorHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), $filePath);
+		VendorHelper::loadSubmitPage($zoomIntegration->getPartnerId(), $zoomAccountId, $this->getKs(), $filePath);
 	}
 	
 	protected function getAccountId($jsonDataAsArray)
@@ -257,7 +257,7 @@ class ZoomVendorService extends KalturaBaseService
 		$tokens = kOAuth::parseTokensResponse($tokensResponse);
 		if (!kOAuth::validateTokens($tokens))
 		{
-			ZoomHelper::exitWithError(kZoomErrorMessages::TOKEN_PARSING_FAILED . print_r($tokensData));
+			ZoomHelper::exitWithError(kZoomErrorMessages::TOKEN_PARSING_FAILED . print_r($tokensData, true));
 		}
 		$tokens = kOAuth::extractTokensFromData($tokens);
 		$expiresIn = $tokens[kOAuth::EXPIRES_IN];
