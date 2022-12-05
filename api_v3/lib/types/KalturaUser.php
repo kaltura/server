@@ -118,6 +118,7 @@ class KalturaUser extends KalturaBaseUser
 	/**
 	 * This field should be sent instead of the id field whenever you want to work with hashed user ids
 	 * @var string
+	 * @insertonly
 	 */
 	public $externalId;
 	

@@ -140,7 +140,9 @@ class APIErrors
 	
 	const DUPLICATE_USER_BY_LOGIN_ID = "DUPLICATE_USER_BY_LOGIN_ID;EMAIL;Loginable user with email [@EMAIL@] already exists in system";
 	
-	const CANNOT_SET_BOTH_ID_AND_EXTERNAL_ID= "CANNOT_SET_BOTH_ID_AND_EXTERNAL_ID;;User creation with both id and external id not allowed";
+	const ID_AND_EXTERNAL_ID_ARE_MUTUALLY_EXCLUSIVE = "ID_AND_EXTERNAL_ID_ARE_MUTUALLY_EXCLUSIVE;;User operations with both id and external id not allowed";
+	
+	const UPDATING_USER_ID_FOR_HASHED_USER_NOT_ALLOWED = "UPDATING_USER_ID_FOR_HASHED_USER_NOT_ALLOWED;;Updating user id for hashed users is not allowed";
 	
 	// PARAM_NAME - param_name
 	const MANDATORY_PARAMETER_MISSING = "MANDATORY_PARAMETER_MISSING;PARAM_NAME;Mandatory parameter missing [@PARAM_NAME@]";
