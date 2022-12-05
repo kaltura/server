@@ -190,9 +190,8 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 		$newWebexAPIDropFolder->setPath(0);
 		$newWebexAPIDropFolder->setFileSizeCheckInterval(0);
 		self::setDeletePolicy($vendorIntegrationObject, $newWebexAPIDropFolder);
-		$newWebexAPIDropFolder->setLastFileTimestamp(0);
+		$newWebexAPIDropFolder->setLastFileTimestamp(time());
 		$newWebexAPIDropFolder->setMetadataProfileId(0);
-		$newWebexAPIDropFolder->setLastHandledMeetingTime(time());
 		$newWebexAPIDropFolder->setFileNamePatterns('*');
 		$newWebexAPIDropFolder->save();
 	}
@@ -200,7 +199,6 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 	protected static function verifyAndSetDropFolderConfig(WebexAPIDropFolder $dropFolder)
 	{
 		KalturaLog::debug('Verify and set config before reactivating Drop Folder Id: ' . $dropFolder->getId());
-		$dropFolder->setLastHandledMeetingTime(time());
 		$conversionProfile = conversionProfile2Peer::retrieveByPK($dropFolder->getConversionProfileId());
 		if (!$conversionProfile)
 		{
@@ -215,7 +213,7 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 		if ($vendorIntegrationObject->getDeletionPolicy())
 		{
 			$dropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
-			$daysToDelete = kConf::getArrayValue('dayToDelete', WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, kConfMapNames::VENDOR, 1);
+			$daysToDelete = kConf::getArrayValue(CONFIGURATION_AUTO_DELETE_FILE_DAYS, WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, WebexAPIDropFolderPlugin::CONFIGURATION_VENDOR_MAP, 1);
 			$dropFolder->setAutoFileDeleteDays($daysToDelete);
 		}
 		else

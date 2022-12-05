@@ -16,6 +16,7 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 	const CONFIGURATION_HOST = 'host';
 	const CONFIGURATION_TOKEN_EXPIRY_GRACE = 'tokenExpiryGrace';
 	const CONFIGURATION_DOWNLOAD_EXPIRY_GRACE = 'downloadExpiryGrace';
+	const CONFIGURATION_AUTO_DELETE_FILE_DAYS = 'autoDeleteFileDays';
 	
 	public static function dependsOn()
 	{

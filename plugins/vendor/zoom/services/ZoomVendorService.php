@@ -131,7 +131,8 @@ class ZoomVendorService extends KalturaBaseService
 					$zoomIntegration->setPartnerId($ks->getPartnerId());
 					$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 					$zoomIntegration->save();
-					VendorHelper::loadSubmitPage($zoomIntegration, $accountId, $ks, self::REGISTRATION_PAGE_PATH);
+					$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
+					VendorHelper::loadSubmitPage($zoomIntegration, $accountId, $ks, $filePath);
 				}
 				else
 				{
@@ -197,7 +198,8 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->save();
 		}
 		
-		VendorHelper::loadSubmitPage($zoomIntegration, $accountId, $this->getKs(), self::REGISTRATION_PAGE_PATH);
+		$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
+		VendorHelper::loadSubmitPage($zoomIntegration, $accountId, $this->getKs(), $filePath);
 	}
 	
 	/**
@@ -230,7 +232,8 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomIntegration->setJwtToken($jwt);
 		$zoomIntegration->save();
 		
-		VendorHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), self::REGISTRATION_PAGE_PATH);
+		$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
+		VendorHelper::loadSubmitPage($zoomIntegration, $zoomAccountId, $this->getKs(), $filePath);
 	}
 	
 	protected function getAccountId($jsonDataAsArray)

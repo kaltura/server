@@ -12,4 +12,5 @@ class KalturaWebexAPIErrors extends KalturaVendorIntegrationErrors
 	const UNABLE_TO_AUTHENTICATE     = 'UNABLE_TO_AUTHENTICATE;;Unable to authenticate because both Refresh Token and Access Token are missing';
 	const EXCEEDED_MAX_WEBEX_API_DROP_FOLDERS = 'EXCEEDED_MAX_WEBEX_API_DROP_FOLDERS;;Amount of maximum Webex API drop folders per partner exceeded';
 	const REGIONAL_REDIRECT_PAGE_NOT_FOUND = "REGIONAL_REDIRECT_PAGE_NOT_FOUND;;Unable to find regional redirect page for Webex integration";
+	const RETRIEVE_USER_FAILED = "RETRIEVE_USER_FAILED;;Retrieve user from vendor failed";
 }

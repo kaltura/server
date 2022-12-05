@@ -11,4 +11,5 @@ abstract class kVendorClient
 	protected $clientId;
 	protected $clientSecret;
 	protected $accessExpiresIn;
+	protected $errorCode;
 }

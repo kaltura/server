@@ -21,7 +21,8 @@ scope = @SCOPE@
 state = @STATE@
 host = @HOST@
 tokenExpiryGrace = @TOKEN_EXPIRY_GRACE@
-downloadExpiryGrace = @DWONLOAD_EXPIRY_GRACE@
+downloadExpiryGrace = @DOWNLOAD_EXPIRY_GRACE@
+autoDeleteFileDays = @AUTO_DELETE_FILE_DAYS@
 ```
 
 ### Deployment Scripts ###

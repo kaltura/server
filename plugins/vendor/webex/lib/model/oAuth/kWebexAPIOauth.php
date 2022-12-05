@@ -25,7 +25,7 @@ class kWebexAPIOauth extends kOAuth
 	
 	protected static function retrieveTokensData($webexBaseURL, $header, $postFields)
 	{
-		$response = self::curlRetrieveTokensData($webexBaseURL, $header, $postFields);
+		$response = self::curlRetrieveTokensData($webexBaseURL, null, $header, $postFields);
 		if (self::$errorCode == 400)
 		{
 			KalturaLog::warning('Retrieving access token from Webex was not authorized');
@@ -37,12 +37,13 @@ class kWebexAPIOauth extends kOAuth
 	
 	/**
 	 * @param $url
+	 * @param $userPwd
 	 * @param $header
 	 * @param $postFields
 	 * @return mixed|string
 	 * @throws Exception
 	 */
-	protected static function curlRetrieveTokensData($url, $header, $postFields)
+	protected static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
 	{
 		self::$errorCode = 0;
 		
@@ -52,7 +53,6 @@ class kWebexAPIOauth extends kOAuth
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $header);
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
 		$response = $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
-		$response = json_decode($response, true);
 		self::$errorCode = $curlWrapper->getHttpCode();
 		
 		return $response;

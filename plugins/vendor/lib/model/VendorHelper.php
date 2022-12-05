@@ -72,12 +72,11 @@ class VendorHelper
 	 * @param $ks
 	 * @throws Exception
 	 */
-	public static function loadSubmitPage(VendorIntegration $webexIntegration, $accountId, $ks, $registrationPagePath)
+	public static function loadSubmitPage(VendorIntegration $webexIntegration, $accountId, $ks, $filePath)
 	{
-		$file_path = dirname(__FILE__) . $registrationPagePath;
-		if (file_exists($file_path))
+		if (file_exists($filePath))
 		{
-			$page = file_get_contents($file_path);
+			$page = file_get_contents($filePath);
 			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace('@partnerId@', $webexIntegration->getPartnerId(), $page);
@@ -86,6 +85,8 @@ class VendorHelper
 			echo $page;
 			die();
 		}
+		
+		throw new KalturaAPIException(KalturaWebexAPIErrors::SUBMIT_PAGE_NOT_FOUND);
 	}
 	
 	/**

@@ -34,12 +34,11 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		$this->initDropFolderEngine($dropFolder);
-		$recordingsList = $this->retrieveRecordingsList($dropFolder);
-		if (!$recordingsList)
+		$recordingsList = $this->retrieveRecordingsList();
+		if ($recordingsList)
 		{
-			return;
+			$this->handleRecordingsList($recordingsList);
 		}
-		$this->handleRecordingsList($recordingsList);
 		$this->updateDropFolderLastFileTimestamp();
 		$this->handleDropFolderFiles();
 	}
@@ -47,12 +46,12 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	protected function initDropFolderEngine(KalturaDropFolder $dropFolder)
 	{
 		KalturaLog::info('Watching Webex drop folder [' . $dropFolder->id . ']');
-		$this->webexClient = $this->initWebexClient();
 		$this->dropFolder = $dropFolder;
+		$this->webexClient = $this->initWebexClient();
 		$this->lastFileTimestamp = $dropFolder->lastFileTimestamp;
 	}
 	
-	protected function initWebexClient(KalturaDropFolder $dropFolder)
+	protected function initWebexClient()
 	{
 		$variablesToInit = array(
 			'refreshToken',
@@ -63,9 +62,9 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		);
 		foreach ($variablesToInit as $variable)
 		{
-			$$variable = isset($dropFolder->$variable) ? $dropFolder->$variable : null;
+			$$variable = isset($this->dropFolder->$variable) ? $this->dropFolder->$variable : null;
 		}
-		return new kWebexAPIClient($dropFolder->baseURL, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
+		return new kWebexAPIClient($this->dropFolder->baseURL, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
 	}
 	
 	protected function retrieveRecordingsList()
@@ -174,10 +173,9 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function updateDropFolderLastFileTimestamp()
 	{
-		$currentTime = time();
-		if ($this->lastFileTimestamp == $this->dropFolder->lastFileTimestamp && $this->lastFileTimestamp + kTimeConversion::DAY < $currentTime)
+		if ($this->lastFileTimestamp == $this->dropFolder->lastFileTimestamp && $this->lastFileTimestamp + kTimeConversion::DAY < time())
 		{
-			$this->lastFileTimestamp = $currentTime;
+			$this->lastFileTimestamp = $this->lastFileTimestamp + kTimeConversion::DAY;
 		}
 		
 		$updateDropFolder = new KalturaWebexAPIDropFolder();
@@ -402,7 +400,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		}
 		
 		KalturaLog::info("Refreshing download link for {$this->dropFolderFile->fileName}");
-		$this->webexClient = $this->initWebexClient($this->dropFolder);
+		$this->webexClient = $this->initWebexClient();
 		$recordingInfo = $this->webexClient->getRecording($this->dropFolderFile->recordingId);
 		
 		if (!isset($recordingInfo['temporaryDirectDownloadLinks']))

@@ -33,6 +33,8 @@ class kWebexAPIClient extends kVendorClient
 	
 	protected function sendRequest($request, $isRequestPost = false, $isRequestDelete = false)
 	{
+		$this->errorCode = 0;
+		
 		$requestUrl = $this->baseURL . $request;
 		$authorizationHeader = 'Authorization: Bearer ' . $this->accessToken;
 		$requestHeaders = array($authorizationHeader);
@@ -47,10 +49,10 @@ class kWebexAPIClient extends kVendorClient
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
 		$response = $curlWrapper->exec($requestUrl);
 		
+		$this->errorCode = $curlWrapper->getErrorNumber();
 		if (!$response)
 		{
 			$response = $curlWrapper->getErrorMsg();
-			$errorCode = $curlWrapper->getErrorNumber();
 		}
 		else
 		{
@@ -62,9 +64,12 @@ class kWebexAPIClient extends kVendorClient
 	public function getRecordingsList($startTime, $endTime)
 	{
 		$dateFormat = 'Y-m-d';
+		$hourFormat = 'H:i:s';
 		$startDate = date($dateFormat, $startTime);
+		$startHour = date($hourFormat, $startTime);
 		$endDate = date($dateFormat, $endTime);
-		$request = "recordings?from=$startDate&to=$endDate";
+		$endHour = date($hourFormat, $endTime);
+		$request = "recordings?from=$startDate" . "T$startHour" . "&to=$endDate" . "T$endHour";
 		return $this->sendRequest($request);
 	}
 	
@@ -84,6 +89,11 @@ class kWebexAPIClient extends kVendorClient
 	{
 		$request = 'people/me';
 		$response = $this->sendRequest($request);
+		if (!isset($response['emails']))
+		{
+			KalturaLog::warning("Retrieve user from Webex failed (Code {$this->errorCode}), response from Webex: ". print_r($response, true));
+			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
+		}
 		return $response['emails'][0];
 	}
 }
