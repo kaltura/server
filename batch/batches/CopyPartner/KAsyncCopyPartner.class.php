@@ -54,9 +54,9 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$this->copyCategories();
 		$this->copyUiConfs();
 		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
- 		$this->copyAllEntries();
+		$this->copyAllEntries();
 		
- 		return $this->closeJob($job, null, null, "doCopyPartner finished", KalturaBatchJobStatus::FINISHED);
+		return $this->closeJob($job, null, null, "doCopyPartner finished", KalturaBatchJobStatus::FINISHED);
 	}
 	
 	/**
@@ -65,7 +65,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	protected function copyAllEntries()
 	{
 		$entryFilter = new KalturaBaseEntryFilter();
- 		$entryFilter->order = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
+		$entryFilter->order = KalturaBaseEntryOrderBy::CREATED_AT_ASC;
 		
 		$pageFilter = new KalturaFilterPager();
 		$pageFilter->pageSize = 50;
@@ -132,7 +132,16 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 						{
 							$categoryFullName = $category->fullName;
 							KalturaLog::info("Category '$categoryFullName' already exists and was not cloned");
-							continue;
+
+							//get the already exist category
+							$categoryFilter->fullNameEqual = $categoryFullName;
+							$categoryListResonse = $this->getClient()->category->listAction($categoryFilter);
+							$result=null;
+							if($categoryListResonse && $categoryListResonse->objects)
+							{
+								$result = $categoryListResonse->objects[0];
+								KalturaLog::info("Searching for category by full name '$categoryFullName' found id - ". $result->id);
+							}
 						}
 						else
 						{
