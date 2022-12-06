@@ -6,7 +6,7 @@
 - Issue ID: PLAT-24004
 
 #### Deployment ####
-Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default it 'kaltura_kuser')
+Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default is 'kaltura_kuser')
 ##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
 Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
 
