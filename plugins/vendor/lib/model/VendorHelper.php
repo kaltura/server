@@ -74,19 +74,20 @@ class VendorHelper
 	 */
 	public static function loadSubmitPage($partnerId, $accountId, $ks, $filePath)
 	{
-		if (file_exists($filePath))
+		if (!file_exists($filePath))
 		{
-			$page = file_get_contents($filePath);
-			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
-			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
-			$page = str_replace('@partnerId@', $partnerId, $page);
-			$page = str_replace('@accountId@', $accountId, $page);
-			
-			echo $page;
-			die();
+			KalturaLog::err("Submit page not found at $filePath");
+			throw new KalturaAPIException(KalturaVendorIntegrationErrors::SUBMIT_PAGE_NOT_FOUND);
 		}
 		
-		throw new KalturaAPIException(KalturaVendorIntegrationErrors::SUBMIT_PAGE_NOT_FOUND);
+		$page = file_get_contents($filePath);
+		$page = str_replace('@ks@', $ks->getOriginalString(), $page);
+		$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
+		$page = str_replace('@partnerId@', $partnerId, $page);
+		$page = str_replace('@accountId@', $accountId, $page);
+		
+		echo $page;
+		die();
 	}
 	
 	/**
