@@ -6,44 +6,24 @@
 
 class ZoomVendorIntegration extends VendorIntegration
 {
-	const ACCESS_TOKEN = 'accessToken';
-	const REFRESH_TOKEN = 'refreshToken';
-	const EXPIRES_IN = 'expiresIn';
 	const ZOOM_CATEGORY = 'zoomCategory';
 	const ZOOM_WEBINAR_CATEGORY = 'zoomWebinarCategory';
-	const LAST_ERROR = 'lastError';
-	const LAST_ERROR_TIMESTAMP = 'lastErrorTimestamp';
 	const USER_MATCHING = 'userMatching';
 	const USER_POSTFIX = 'UserPostfix';
 	const ENABLE_WEBINAR_UPLOADS = 'enableWebinarUploads';
-	const CONVERSION_PROFILE_ID = 'conversionProfileId';
 	const JWT_TOKEN = 'jwtToken';
-	const DELETE_POLICY = 'deletionPolicy';
 	const ENABLE_ZOOM_TRANSCRIPTION =  'enableZoomTranscription';
 	const ZOOM_ACCOUNT_DESCRIPTION = 'zoomAccountDescription';
-	const ENABLE_MEETING_UPLOAD = 'enableMeetingUpload';
 	const OPT_OUT_GROUP_NAMES = 'optOutGroupNames';
 	const OPT_IN_GROUP_NAMES = 'optInGroupNames';
 	const GROUP_PARTICIPATION_TYPE = 'groupParticipationType';
-
-	public function setAccessToken ($v)	{ $this->putInCustomData ( self::ACCESS_TOKEN, $v);	}
-	public function getAccessToken ( )	{ return $this->getFromCustomData(self::ACCESS_TOKEN);	}
 	
 	public function setJwtToken ($v)	{ $this->putInCustomData ( self::JWT_TOKEN, $v);	}
 	public function getJwtToken ( )	{ return $this->getFromCustomData(self::JWT_TOKEN);	}
 	
-	public function setDeletionPolicy ($v)	{ $this->putInCustomData ( self::DELETE_POLICY, $v);	}
-	public function getDeletionPolicy ( )	{ return $this->getFromCustomData(self::DELETE_POLICY);	}
-	
 	public function setEnableZoomTranscription ($v)	{ $this->putInCustomData ( self::ENABLE_ZOOM_TRANSCRIPTION, $v);	}
 	public function getEnableZoomTranscription ( )	{ return $this->getFromCustomData(self::ENABLE_ZOOM_TRANSCRIPTION);	}
 	
-	public function setRefreshToken ($v)	{ $this->putInCustomData ( self::REFRESH_TOKEN, $v);	}
-	public function getRefreshToken ( )	{ return $this->getFromCustomData(self::REFRESH_TOKEN);	}
-
-	public function setExpiresIn ($v)	{ $this->putInCustomData ( self::EXPIRES_IN, $v);	}
-	public function getExpiresIn( )	{ return $this->getFromCustomData(self::EXPIRES_IN);	}
-
 	public function setZoomCategory($v)	{ $this->putInCustomData ( self::ZOOM_CATEGORY, $v);	}
 	public function getZoomCategory( )	{ return $this->getFromCustomData(self::ZOOM_CATEGORY);	}
 	public function unsetCategory( )  {return $this->removeFromCustomData(self::ZOOM_CATEGORY);	}
@@ -60,27 +40,9 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	public function setEnableWebinarUploads($v) { $this->putInCustomData ( self::ENABLE_WEBINAR_UPLOADS, $v); }
 	public function getEnableWebinarUploads() { return $this->getFromCustomData ( self::ENABLE_WEBINAR_UPLOADS,null, true); }
-
-	public function setConversionProfileId($v) { $this->putInCustomData ( self::CONVERSION_PROFILE_ID, $v); }
-	public function getConversionProfileId() { return $this->getFromCustomData ( self::CONVERSION_PROFILE_ID,null, null); }
 	
 	public function setZoomAccountDescription ($v)	{ $this->putInCustomData ( self::ZOOM_ACCOUNT_DESCRIPTION, $v);	}
 	public function getZoomAccountDescription ( )	{ return $this->getFromCustomData(self::ZOOM_ACCOUNT_DESCRIPTION);	}
-	
-	public function setEnableMeetingUpload ($v)	{ $this->putInCustomData ( self::ENABLE_MEETING_UPLOAD, $v);	}
-	public function getEnableMeetingUpload ( )	{ return $this->getFromCustomData(self::ENABLE_MEETING_UPLOAD);	}
-
-	public function setLastError($v)
-	{
-		$this->putInCustomData(self::LAST_ERROR_TIMESTAMP, time());
-		$this->putInCustomData(self::LAST_ERROR, $v);
-	}
-
-	public function saveLastError($v)
-	{
-		$this->setLastError($v);
-		$this->save();
-	}
 
 	/**
 	 * returns all tokens as array
@@ -92,21 +54,9 @@ class ZoomVendorIntegration extends VendorIntegration
 			kOAuth::EXPIRES_IN => $this->getExpiresIn(), self::JWT_TOKEN => $this->getJwtToken());
 	}
 
-	/**
-	 * @param array $tokensDataAsArray
-	 * @throws PropelException
-	 */
-	public function saveTokensData($tokensDataAsArray)
-	{
-		$this->setTokensData($tokensDataAsArray);
-		$this->save();
-	}
-
 	public function setTokensData($tokensDataAsArray)
 	{
-		$this->setExpiresIn($tokensDataAsArray[kOAuth::EXPIRES_IN]);
-		$this->setAccessToken($tokensDataAsArray[kOAuth::ACCESS_TOKEN]);
-		$this->setRefreshToken($tokensDataAsArray[kOAuth::REFRESH_TOKEN]);
+		parent::setTokensData($tokensDataAsArray);
 		$this->setJwtToken($tokensDataAsArray[self::JWT_TOKEN]);
 		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 	}

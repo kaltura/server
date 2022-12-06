@@ -6,12 +6,12 @@
 class WebexAPIDropFolderFile extends DropFolderFile
 {
 	const RECORDING_ID = 'recording_id';
-	const WEBEX_HOST_ID = 'webex_host_id';
 	const DESCRIPTION = 'description';
-	const WEBEX_CONF_IF = 'webex_conf_id';
 	const CONTENT_URL = 'content_url';
 	const URL_EXPIRY = 'url_expiry';
 	const FILE_EXTENSION = 'file_extension';
+	const MEETING_ID = 'meeting_id';
+	const RECORDING_START_TIME = 'recording_start_time';
 	
 	/**
 	 * @var int
@@ -21,17 +21,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	/**
 	 * @var string
 	 */
-	protected $webexHostId;
-	
-	/**
-	 * @var string
-	 */
 	protected $description;
-	
-	/**
-	 * @var string
-	 */
-	protected $confId;
 	
 	/**
 	 * @var string
@@ -41,16 +31,26 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	/**
 	 * @var int
 	 */
-	public $urlExpiry;
+	protected $urlExpiry;
 	
 	/**
 	 * @var string
 	 */
 	protected $fileExtension;
+	
+	/**
+	 * @var string
+	 */
+	protected $meetingId;
+	
+	/**
+	 * @var int
+	 */
+	protected $recordingStartTime;
 
 
 	/**
-	 * return int
+	 * @return int
 	 */
 	public function getRecordingId()
 	{
@@ -66,23 +66,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	}
 	
 	/**
-	 * return string
-	 */
-	public function getConfId()
-	{
-		return $this->getFromCustomData(self::WEBEX_CONF_IF);
-	}
-	
-	/**
-	 * @param string $v
-	 */
-	public function setConfId($v)
-	{
-		$this->putInCustomData(self::WEBEX_CONF_IF, $v);
-	}
-	
-	/**
-	 * return string
+	 * @return string
 	 */
 	public function getDescription()
 	{
@@ -98,23 +82,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	}
 	
 	/**
-	 * return string
-	 */
-	public function getWebexHostId()
-	{
-		return $this->getFromCustomData(self::WEBEX_HOST_ID);
-	}
-	
-	/**
-	 * @param string $v
-	 */
-	public function setWebexHostId($v)
-	{
-		$this->putInCustomData(self::WEBEX_HOST_ID, $v);
-	}
-	
-	/**
-	 * return string
+	 * @return string
 	 */
 	public function getContentUrl()
 	{
@@ -130,7 +98,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	}
 	
 	/**
-	 * return int
+	 * @return int
 	 */
 	public function getUrlExpiry()
 	{
@@ -159,6 +127,38 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	public function setFileExtension($v)
 	{
 		$this->putInCustomData(self::FILE_EXTENSION, $v);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getMeetingId()
+	{
+		return $this->getFromCustomData(self::MEETING_ID);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setMeetingId($v)
+	{
+		$this->putInCustomData(self::MEETING_ID, $v);
+	}
+	
+	/**
+	 * @return int
+	 */
+	public function getRecordingStartTime()
+	{
+		return $this->getFromCustomData(self::RECORDING_START_TIME);
+	}
+	
+	/**
+	 * @param int $v
+	 */
+	public function setRecordingStartTime($v)
+	{
+		$this->putInCustomData(self::RECORDING_START_TIME, $v);
 	}
 	
 	public function getFileUrl ()

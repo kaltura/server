@@ -51,11 +51,6 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	public $zoomAccountDescription;
 	
 	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $enableMeetingUpload;
-	
-	/**
 	 * @var string
 	 */
 	public $optOutGroupNames;
@@ -85,7 +80,6 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'jwtToken',
 		'enableZoomTranscription',
 		'zoomAccountDescription',
-		'enableMeetingUpload',
 		'groupParticipationType',
 		'optInGroupNames',
 		'optOutGroupNames',

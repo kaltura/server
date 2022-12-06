@@ -21,11 +21,11 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		if ($categoryTrackingField)
 		{
-			$this->addEntryToCategory($categoryTrackingField, $entry->id);
+			VendorHelper::addEntryToCategory($categoryTrackingField, $entry->id);
 		}
 		if ($this->dropFolder->zoomVendorIntegration->zoomCategory)
 		{
-			$this->addEntryToCategory($this->dropFolder->zoomVendorIntegration->zoomCategory, $entry->id);
+			VendorHelper::addEntryToCategory($this->dropFolder->zoomVendorIntegration->zoomCategory, $entry->id);
 		}
 		KBatchBase::unimpersonate();
 	}

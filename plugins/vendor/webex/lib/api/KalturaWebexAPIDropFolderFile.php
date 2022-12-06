@@ -13,17 +13,7 @@ class KalturaWebexAPIDropFolderFile extends KalturaDropFolderFile
 	/**
 	 * @var string
 	 */
-	public $webexHostId;
-	
-	/**
-	 * @var string
-	 */
 	public $description;
-	
-	/**
-	 * @var string
-	 */
-	public $confId;
 	
 	/**
 	 * @var string
@@ -40,18 +30,28 @@ class KalturaWebexAPIDropFolderFile extends KalturaDropFolderFile
 	 */
 	public $fileExtension;
 	
+	/**
+	 * @var string
+	 */
+	public $meetingId;
+	
+	/**
+	 * @var int
+	 */
+	public $recordingStartTime;
+	
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
 		'recordingId',
-		'webexHostId',
 		'description',
-		'confId',
 		'contentUrl',
 		'urlExpiry',
 		'fileExtension',
+		'meetingId',
+		'recordingStartTime',
 	 );
 		 
 	public function getMapBetweenObjects()

@@ -138,67 +138,6 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		return $entry;
 	}
 	
-	protected function addEntryToCategory($categoryName, $entryId)
-	{
-		$categoryId = $this->findCategoryIdByName($categoryName);
-		if ($categoryId)
-		{
-			$this->addCategoryEntry($categoryId, $entryId);
-		}
-	}
-	
-	protected function findCategoryIdByName($categoryName)
-	{
-		$isFullPath = self::isFullPath($categoryName);
-		
-		$categoryFilter = new KalturaCategoryFilter();
-		if ($isFullPath)
-		{
-			$categoryFilter->fullNameEqual = $categoryName;
-		}
-		else
-		{
-			$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
-		}
-		
-		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
-		$categoryId = null;
-		if ($isFullPath)
-		{
-			if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
-			{
-				$categoryId = $categoryResponse->objects[0]->id;
-			}
-		}
-		else
-		{
-			$categoryIds = array();
-			foreach ($categoryResponse->objects as $category)
-			{
-				if ($category->name === $categoryName)
-				{
-					$categoryIds[] = $category->id;
-				}
-			}
-			$categoryId = (count($categoryIds) == 1) ? $categoryIds[0] : null;
-		}
-		return $categoryId;
-	}
-	
-	protected function isFullPath($categoryName)
-	{
-		$numCategories = count(explode('>', $categoryName));
-		return ($numCategories > 1);
-	}
-	
-	protected function addCategoryEntry($categoryId, $entryId)
-	{
-		$categoryEntry = new KalturaCategoryEntry();
-		$categoryEntry->categoryId = $categoryId;
-		$categoryEntry->entryId = $entryId;
-		KBatchBase::$kClient->categoryEntry->add($categoryEntry);
-	}
-	
 	/**
 	 * @param KalturaMediaEntry $entry
 	 * @param array $validatedUsers

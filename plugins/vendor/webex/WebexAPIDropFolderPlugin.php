@@ -5,9 +5,18 @@
 class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaServices, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'WebexAPIDropFolder';
-	const CONFIGURATION_MAP_NAME = 'vendor';
-	const CONFIGURATION_PARAM_NAME = 'WebexAccount';
-	const EVENT_WEBEX_API_DROP_FOLDER_FLOW_MANAGER = 'kWebexAPIDropFolderFlowManager';
+	const CONFIGURATION_VENDOR_MAP = 'vendor';
+	const CONFIGURATION_WEBEX_ACCOUNT_PARAM = 'WebexAccount';
+	const CONFIGURATION_WEBEX_BASE_URL = 'webexBaseUrl';
+	const CONFIGURATION_REDIRECT_URL = 'redirectUrl';
+	const CONFIGURATION_CLIENT_ID = 'clientId';
+	const CONFIGURATION_CLIENT_SECRET = 'clientSecret';
+	const CONFIGURATION_SCOPE = 'scope';
+	const CONFIGURATION_STATE = 'state';
+	const CONFIGURATION_HOST = 'host';
+	const CONFIGURATION_TOKEN_EXPIRY_GRACE = 'tokenExpiryGrace';
+	const CONFIGURATION_DOWNLOAD_EXPIRY_GRACE = 'downloadExpiryGrace';
+	const CONFIGURATION_AUTO_DELETE_FILE_DAYS = 'autoDeleteFileDays';
 	
 	public static function dependsOn()
 	{
@@ -27,7 +36,7 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 	public static function getServicesMap()
 	{
 		$map = array(
-			'webexAPI' => 'WebexAPIService',
+			'webexVendor' => 'WebexVendorService',
 		);
 		return $map;
 	}
@@ -38,7 +47,7 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 	public static function getEventConsumers()
 	{
 		return array(
-			self::EVENT_WEBEX_API_DROP_FOLDER_FLOW_MANAGER
+			'kWebexAPIDropFolderFlowManager'
 		);
 	}
 	
@@ -167,14 +176,27 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 	
 	public static function getWebexConfiguration()
 	{
-		if (!kConf::hasMap(self::CONFIGURATION_MAP_NAME))
+		if (!kConf::hasMap(self::CONFIGURATION_VENDOR_MAP))
 		{
 			throw new KalturaAPIException(KalturaWebexAPIErrors::NO_VENDOR_CONFIGURATION);
 		}
 		
-		$webexConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::CONFIGURATION_MAP_NAME);
-		$requiredParameter = array('baseUrl', 'clientId', 'clientSecret', 'redirectUrl', 'domain', 'scope', 'state');
-		foreach($requiredParameter as $parameter)
+		$webexConfiguration = kConf::get(self::CONFIGURATION_WEBEX_ACCOUNT_PARAM, self::CONFIGURATION_VENDOR_MAP);
+		if (!$webexConfiguration)
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::NO_WEBEX_ACCOUNT_CONFIGURATION);
+		}
+		
+		$requiredParameter = array(
+			self::CONFIGURATION_WEBEX_BASE_URL,
+			self::CONFIGURATION_REDIRECT_URL,
+			self::CONFIGURATION_CLIENT_ID,
+			self::CONFIGURATION_CLIENT_SECRET,
+			self::CONFIGURATION_SCOPE,
+			self::CONFIGURATION_STATE,
+			self::CONFIGURATION_HOST,
+		);
+		foreach ($requiredParameter as $parameter)
 		{
 			if (!isset($webexConfiguration[$parameter]))
 			{

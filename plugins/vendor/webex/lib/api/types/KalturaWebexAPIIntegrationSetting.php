@@ -18,15 +18,10 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 	/**
 	 * @var KalturaNullableBoolean
 	 */
-	public $enableMeetingUpload;
-	
-	/**
-	 * @var KalturaNullableBoolean
-	 */
 	public $enableTranscription;
 	
 	/**
-	 * @var KalturaZoomUsersMatching
+	 * @var KalturaWebexAPIUsersMatching
 	 */
 	public $userMatchingMode;
 	
@@ -42,7 +37,6 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 	(
 		'webexCategory',
 		'enableRecordingUpload' => 'status',
-		'enableMeetingUpload',
 		'enableTranscription',
 		'userMatchingMode',
 		'userPostfix',
@@ -68,7 +62,7 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 
 	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if(!$sourceObject)
+		if (!$sourceObject)
 			return;
 
 		parent::doFromObject($sourceObject, $responseProfile);

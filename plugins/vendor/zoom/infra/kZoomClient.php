@@ -4,7 +4,7 @@
  * @package plugins.vendor
  * @subpackage zoom.model
  */
-class kZoomClient
+class kZoomClient extends kVendorClient
 {
 	const ZOOM_BASE_URL = 'ZoomBaseUrl';
 	const PARTICIPANTS  = 'participants';
@@ -20,14 +20,8 @@ class kZoomClient
 	const API_GET_MEETING_RECORDING = '/v2/meetings/@meetingId@/recordings';
 	const API_GET_MEETING = '/v2/meetings/@meetingId@';
 	
-	protected $zoomBaseURL;
-	protected $refreshToken;
-	protected $accessToken;
 	protected $jwtToken;
-	protected $clientId;
-	protected $clientSecret;
 	protected $zoomTokensHelper;
-	protected $accessExpiresIn;
 	
 	/**
 	 * kZoomClient constructor.
@@ -43,7 +37,7 @@ class kZoomClient
 	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null,
 	                            $clientSecret= null, $accessToken = null, $accessExpiresIn = null)
 	{
-		$this -> zoomBaseURL = $zoomBaseURL;
+		$this -> baseURL = $zoomBaseURL;
 		// check if at least one is available, otherwise throw exception
 		if ($refreshToken == null && $jwtToken == null && $accessToken == null)
 		{
@@ -262,7 +256,7 @@ class kZoomClient
 	
 	protected function generateContextualUrl($apiPath)
 	{
-		$url = $this -> zoomBaseURL . $apiPath . '?';
+		$url = $this -> baseURL . $apiPath . '?';
 		if ($this->refreshToken)
 		{
 			if (!$this->accessToken)

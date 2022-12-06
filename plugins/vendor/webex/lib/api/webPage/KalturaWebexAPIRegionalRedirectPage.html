@@ -10,7 +10,7 @@
 	<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
 	<script>
 		var authCode = '@authCode@';
-        var domain = '@domain@';
+        var host = '@host@';
 	</script>
 	<script>
 		function submitKMCUrl(event)
@@ -20,16 +20,16 @@
 			let kmcUrl = $('#kmcUrl');
 			let integrationCode = $('#integrationCode').val();
 			let regionStartIndex = 0;
-			let regionEndIndex = kmcUrl.val().indexOf(domain);
+			let regionEndIndex = kmcUrl.val().indexOf(host);
 			if (regionEndIndex < 0)
 			{
 				return onFail('Invalid URL');
 			}
-			regionEndIndex = regionEndIndex + domain.length;
+			regionEndIndex = regionEndIndex + host.length;
 			let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
 			$.ajax(
 					{
-						url: regionUrl + '/api_v3/service/webexapidropfolder_webexapi/action/preOauthValidation?format=1',
+						url: regionUrl + '/api_v3/service/webexapidropfolder_webexvendor/action/oauthValidation?format=1',
 						type: 'get',
 						data: {'code': authCode, 'integrationCode' :  integrationCode},
 						success: function (registrationPage) {

@@ -70,16 +70,6 @@ class kZoomOauth extends kOAuth
 		return $expiresIn;
 	}
 
-	public static function validateTokens($tokensData)
-	{
-		if (!$tokensData || !isset($tokensData[kOAuth::REFRESH_TOKEN]) || !isset($tokensData[kOAuth::ACCESS_TOKEN]) ||
-			!isset($tokensData[kOAuth::EXPIRES_IN]))
-		{
-			ZoomHelper::exitWithError(kZoomErrorMessages::TOKEN_PARSING_FAILED . print_r($tokensData));
-		}
-	}
-
-
 	/**
 	 * @return array
 	 * @throws Exception
