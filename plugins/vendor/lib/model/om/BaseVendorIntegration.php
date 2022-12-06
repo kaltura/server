@@ -1577,4 +1577,5 @@ abstract class BaseVendorIntegration extends BaseObject  implements Persistent {
 		return $this->last_hydrate_time;
 	}
 
+	
 } // BaseVendorIntegration

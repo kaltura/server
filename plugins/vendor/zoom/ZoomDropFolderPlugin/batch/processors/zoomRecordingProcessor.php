@@ -138,7 +138,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		return $entry;
 	}
 	
-	protected function addEntryToCategory($categoryName, $entryId)
+	public function addEntryToCategory($categoryName, $entryId)
 	{
 		$categoryId = $this->findCategoryIdByName($categoryName);
 		if ($categoryId)
@@ -147,9 +147,9 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 	}
 	
-	protected function findCategoryIdByName($categoryName)
+	public function findCategoryIdByName($categoryName)
 	{
-		$isFullPath = self::isFullPath($categoryName);
+		$isFullPath = $this->isFullPath($categoryName);
 		
 		$categoryFilter = new KalturaCategoryFilter();
 		if ($isFullPath)
@@ -185,13 +185,13 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		return $categoryId;
 	}
 	
-	protected function isFullPath($categoryName)
+	public function isFullPath($categoryName)
 	{
 		$numCategories = count(explode('>', $categoryName));
 		return ($numCategories > 1);
 	}
 	
-	protected function addCategoryEntry($categoryId, $entryId)
+	public static function addCategoryEntry($categoryId, $entryId)
 	{
 		$categoryEntry = new KalturaCategoryEntry();
 		$categoryEntry->categoryId = $categoryId;

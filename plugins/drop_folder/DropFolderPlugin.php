@@ -23,6 +23,7 @@ class DropFolderPlugin extends KalturaPlugin implements IKalturaPending, IKaltur
 	const ERROR_DOWNLOADING_FILE_MESSAGE = 'Failed in file transferring from the drop folder to Kaltura';
 	const FLAVOR_NOT_FOUND_MESSAGE = 'Failed to handle file. Could not find a matched transcoding flavor setting with system name: ';
 	const MISSING_CONFIG_MESSAGE = 'Missing required drop folder configuration';
+	const MISSING_RECORDING_INFO = 'Missing recording information from vendor';
 
 	public static function dependsOn()
 	{
