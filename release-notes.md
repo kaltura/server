@@ -29,10 +29,45 @@ autoDeleteFileDays = @AUTO_DELETE_FILE_DAYS@
     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
     php deployment/updates/scripts/add_permissions/2022_09_29_add_webexVendor_service.php
 
+
+## Support user id hashing ##
+* Issue Type: Task
+* Issue ID: PLAT-24004
+
+#### Deployment ####
+Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default is 'kaltura_kuser')
+##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
+Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
+
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": { "external_id": { "type" : "text", "analyzer" : "kaltura_text", "fields": { "ngrams" : { "type" : "text", "analyzer" : "kaltura_ngrams" }, "raw" : { "type" : "keyword", "normalizer" : "kaltura_keyword_normalizer" } }}, "is_hashed": { "type": "boolean"}, "is_admin": { "type": "boolean" }, "login_enabled": { "type": "boolean" } }}'
+
+#### Known Issues & Limitations ####
+If Rigel-18.19.0 or later server version already ran and new users were added
+with either 'externalId' or 'isHashed' (or both) then it is likely that elastic already mapped
+these fields to the kaltura_kuser index map (unless you changed elastic default index 'dynamic' attribute is 'false')
+If that happened, you will get an error from elastic.
+
+#### Resolution ####
+* Create a new kaltura_kuser index with Rigel-18.19.0 kaltura_kuser.json map (or later)
+* (if you have alias for index) Point 'kaltura_kuser' alias to the new index by following below instructions:
+  * Replace all tokens in the below curl command
+```
+curl -XPOST "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/_aliases" -H 'Content-Type: application/json' -d'{  "actions":[{"add": {"index": "@NEW_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}},{"remove": {"index": "@OLD_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}}]}'
+```
+* Execute 'populateElasticKusers.php' script:
+```
+php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+```
+* Done! you should be able to search user by 'externalId' and / or 'isHashed'
+  * If something does not work - you can revert the alias to point to the old kaltura_kuser index by following the '_aliases' curl above
+  * If everything work as expected, you can delete the old kuser index.
+
+---
+
+
 ## Add partners for auth-broker/user-profile/kms ##
 
 * Issue Type: Task
-* Issue ID: - Issue Type: Feature
 - Issue ID: FOUN-819
 
 ### Configuration ###

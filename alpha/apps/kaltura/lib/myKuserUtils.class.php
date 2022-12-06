@@ -41,4 +41,21 @@ class myKuserUtils
 		}
 		return $sanitizedValues;
 	}
+	
+	public static function getHashedUserId($userId)
+	{
+		$encKey = kConf::get("user_id_enc_key", kConfMapNames::RUNTIME_CONFIG, null);
+		if(!$encKey)
+		{
+			return $userId;
+		}
+		
+		$userId = self::normalizeKuserId($userId);
+		return hash_hmac("sha256", $userId, $encKey);
+	}
+	
+	public static function normalizeKuserId($userId)
+	{
+		return str_replace(' ', '', trim(strtolower($userId)));
+	}
 }
