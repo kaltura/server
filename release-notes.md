@@ -2,8 +2,7 @@
 ## Support user id hashing ##
 
 * Issue Type: Task
-* Issue ID: - Issue Type: Feature
-- Issue ID: PLAT-24004
+* Issue ID: PLAT-24004
 
 #### Deployment ####
 Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default is 'kaltura_kuser')
@@ -39,7 +38,6 @@ php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
 ## Add partners for auth-broker/user-profile/kms ##
 
 * Issue Type: Task
-* Issue ID: - Issue Type: Feature
 - Issue ID: FOUN-819
 
 ### Configuration ###
