@@ -1883,6 +1883,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
 		
 		$isSourceAssetImage = is_null($sourceAssetContainerFormat) ? null : kAssetUtils::isImage($sourceAssetContainerFormat);
+		$flavorAssetTypes = array_merge(array(assetType::FLAVOR), DocumentPlugin::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR));
 
 		foreach($flavors as $index => $flavor)
 		{
@@ -1927,7 +1928,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 				continue;
 			}
 			
-			if (!is_null($isSourceAssetImage) && ($isSourceAssetImage XOR kAssetUtils::isImage($flavor->getFormat())))
+			if (!is_null($isSourceAssetImage) && in_array($flavor->getType(), $flavorAssetTypes) && ($isSourceAssetImage XOR kAssetUtils::isImage($flavor->getFormat())))
 			{
 				KalturaLog::info("Flavor [" . $flavor->getId() . "] won't be converted because it's format is [" . $flavor->getFormat() . "] and source format is [$sourceAssetContainerFormat]");
 				unset($flavors[$index]);
