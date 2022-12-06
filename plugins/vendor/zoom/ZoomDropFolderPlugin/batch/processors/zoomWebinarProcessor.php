@@ -42,7 +42,7 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		if ($this->dropFolder->zoomVendorIntegration->zoomWebinarCategory)
 		{
-			VendorHelper::addEntryToCategory($this->dropFolder->zoomVendorIntegration->zoomWebinarCategory, $entry->id);
+			$this->addEntryToCategory($this->dropFolder->zoomVendorIntegration->zoomWebinarCategory, $entry->id);
 		}
 		KBatchBase::unimpersonate();
 	}
