@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Kaltura Webex preloader</title>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css'>
+	<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js'></script>
+	<script src='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js'></script>
+	<script>
+		var authCode = '@authCode@';
+        var host = '@host@';
+	</script>
+	<script>
+		function submitKMCUrl(event)
+		{
+			$('body').css('cursor', 'progress');
+			event.preventDefault();
+			let kmcUrl = $('#kmcUrl');
+			let integrationCode = $('#integrationCode').val();
+			let regionStartIndex = 0;
+			let regionEndIndex = kmcUrl.val().indexOf(host);
+			if (regionEndIndex < 0)
+			{
+				return onFail('Invalid URL');
+			}
+			regionEndIndex = regionEndIndex + host.length;
+			let regionUrl = kmcUrl.val().substring(regionStartIndex, regionEndIndex);
+			$.ajax(
+					{
+						url: regionUrl + '/api_v3/service/webexapidropfolder_webexvendor/action/oauthValidation?format=1',
+						type: 'get',
+						data: {'code': authCode, 'integrationCode' :  integrationCode},
+						success: function (registrationPage) {
+							$('body').css('cursor', 'default');
+							if (registrationPage)
+							{
+								if(registrationPage.objectType == 'KalturaAPIException')
+								{
+									return onFail('The code is incorrect. Please check your code and try again. ' + registrationPage.code + ' ' + registrationPage.message);
+								}
+								if (registrationPage.includes('Invalid authorization code'))
+								{
+									return onFail('Invalid authorization code');
+								}
+								let newDoc = document.open('text/html', 'replace');
+								newDoc.write(registrationPage);
+								newDoc.close();
+							}
+						},
+						error: function (err)
+						{
+							onFail(err);
+						}
+					});
+		}
+		function onFail(errorMessage)
+		{
+			$('body').css('cursor', 'default');
+			console.log('err during api call '+ errorMessage);
+			alert('Error\n'+errorMessage);
+		}
+	</script>
+	<script>
+		(function()
+		{
+			document.addEventListener('DOMContentLoaded',
+					function ()
+					{
+						let submitButton = document.querySelector('#submit-button');
+						submitButton.addEventListener('click', submitKMCUrl);
+					}
+			);
+		})();
+	</script>
+	<title>Kaltura Webex preloader</title>
+</head>
+
+<body>
+<div style='width: 500px;margin: auto; padding-top: 200px'>
+	<form>
+		<div class='form-group  container p-2 my-3 border'>
+			<div class='imgcontainer'>
+				<img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
+			</div>
+			<div class='container'>
+				<div class='form-group'>
+					<label><h6>Integration code</h6></label>
+					<input type='text' placeholder='Integration code' id='integrationCode' class='form-control' required>
+				</div>
+				<div class='form-group'>
+					<label><h6>Please submit the URL of your KMC</h6></label>
+					<input type='text' placeholder='https://...' value='https://www.kaltura.com' id='kmcUrl' class='form-control' required>
+				</div>
+				<button type='submit' id='submit-button' class='btn btn-primary'>Submit</button>
+			</div>
+		</div>
+	</form>
+</div>
+</body>
+</html>

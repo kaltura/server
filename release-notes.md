@@ -1,4 +1,34 @@
 # Rigel-18.19.0
+## Webex API Drop Folder ##
+* Issue Type: Epic
+* Issue ID: PLAT-23885
+
+### Configuration ###
+Enable plugin:
+
+	To enable this feature plugin add the following to your plugins.ini file:
+	- WebexAPIDropFolder
+
+Add the following to vendor.ini (Replace all tokens below)
+```
+[WebexAccount]
+DisableWebexAPIDropFolder = 0
+webexBaseUrl = @WEBEX_BASE_URL@
+redirectUrl = @REDIRECT_URL@
+clientId = @CLIENT_ID@
+clientSecret = @CLIENT_SECRET@
+scope = @SCOPE@
+state = @STATE@
+host = @HOST@
+tokenExpiryGrace = @TOKEN_EXPIRY_GRACE@
+downloadExpiryGrace = @DOWNLOAD_EXPIRY_GRACE@
+autoDeleteFileDays = @AUTO_DELETE_FILE_DAYS@
+```
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php deployment/updates/scripts/add_permissions/2022_09_29_add_webexVendor_service.php
+
 ## Add partners for auth-broker/user-profile/kms ##
 
 * Issue Type: Task
@@ -34,6 +64,7 @@ moduls.V7Studio.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment Scripts ###
 php deployment/updates/scripts/add_permissions/2022_11_01_add_ssrv_view_admin_permission.php
+
 
 # Rigel-18.16.0
 ## Disable password restriction on FirstName/LastName/Email
