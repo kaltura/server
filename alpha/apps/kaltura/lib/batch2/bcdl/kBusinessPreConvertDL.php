@@ -1882,8 +1882,12 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
 		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
 		
-		$isSourceAssetImage = is_null($sourceAssetContainerFormat) ? null : kAssetUtils::isImage($sourceAssetContainerFormat);
-		$flavorAssetTypes = array_merge(array(assetType::FLAVOR), DocumentPlugin::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR));
+		$isSourceAssetImage = null;
+		if ($sourceAssetContainerFormat)
+		{
+			$isSourceAssetImage = kAssetUtils::isImage($sourceAssetContainerFormat);
+			$flavorAssetTypes = array_merge(array(assetType::FLAVOR), DocumentPlugin::getExtendedTypes(assetPeer::OM_CLASS, assetType::FLAVOR));
+		}
 
 		foreach($flavors as $index => $flavor)
 		{
