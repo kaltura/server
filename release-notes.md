@@ -10,8 +10,6 @@ Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser i
 ##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
 Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
 
-{ "external_id": { "type": "keyword", "normalizer": "kaltura_keyword_normalizer" }, "is_hashed": { "type": "boolean"} }
-
     curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": { "external_id": { "type" : "text", "analyzer" : "kaltura_text", "fields": { "ngrams" : { "type" : "text", "analyzer" : "kaltura_ngrams" }, "raw" : { "type" : "keyword", "normalizer" : "kaltura_keyword_normalizer" } }}, "is_hashed": { "type": "boolean"}, "is_admin": { "type": "boolean" }, "login_enabled": { "type": "boolean" } }}'
 
 #### Known Issues & Limitations ####
