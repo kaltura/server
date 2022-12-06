@@ -48,6 +48,9 @@ class ESearchUserItem extends ESearchItem
 	
 	protected static $booleanFields = array(
 		ESearchUserFieldName::IS_HASHED,
+		ESearchUserFieldName::IS_ADMIN,
+		ESearchUserFieldName::LOGIN_ENABLED,
+		
 	);
 
 	private static $multiLanguageFields = array();

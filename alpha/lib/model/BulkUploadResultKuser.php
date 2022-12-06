@@ -87,6 +87,6 @@ class BulkUploadResultKuser extends BulkUploadResult
 	public function getGroup()	{return $this->getFromCustomData(self::GROUP);}
 	public function setGroup($v)	{$this->putInCustomData(self::GROUP, $v);}
 	
-	public function getExternalId()	{return $this->getFromCustomData(self::GROUP);}
+	public function getExternalId()	{return $this->getFromCustomData(self::EXTERNAL_ID);}
 	public function setExternalId($v)	{$this->putInCustomData(self::EXTERNAL_ID, $v);}
 }

@@ -56,6 +56,6 @@ class myKuserUtils
 	
 	public static function normalizeKuserId($userId)
 	{
-		return str_replace(' ', '', trim(strtolower($userId)));;
+		return str_replace(' ', '', trim(strtolower($userId)));
 	}
 }
