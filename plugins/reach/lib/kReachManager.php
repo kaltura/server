@@ -57,6 +57,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
+		$reachRestrainAdminTag = kConf::get("reach_restrain_admin_tag", kConfMapNames::RUNTIME_CONFIG, null);
+		if(in_array($reachRestrainAdminTag, $entry->getAdminTagsArr()))
+		{
+			KalturaLog::log("Entry has reach restraining admin tag [$reachRestrainAdminTag], tasks will not be added");
+			return true;
+		}
+
 		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 		{
 			//Validate the existence of the catalog item

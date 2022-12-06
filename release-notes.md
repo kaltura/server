@@ -29,6 +29,43 @@ autoDeleteFileDays = @AUTO_DELETE_FILE_DAYS@
     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
     php deployment/updates/scripts/add_permissions/2022_09_29_add_webexVendor_service.php
 
+## Add partners for auth-broker/user-profile/kms ##
+
+* Issue Type: Task
+* Issue ID: - Issue Type: Feature
+- Issue ID: FOUN-819
+
+### Configuration ###
+    Replace all tokens from the ini file (under auth-broker/user-profile/kms sections) and remove".template" from the file name: 
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_11_17_add_broker_user_kms_partners.php
+
+# Rigel-18.18.0
+## Added support for player studio V7
+* Issue Type: story
+* Issue ID: PLAT-23970
+
+### Deployment Scripts ###
+```
+Add the following to admin.ini
+moduls.V7Studio.enabled = true
+moduls.V7Studio.permissionType = 2
+moduls.V7Studio.label = "Show V7 Studio"
+moduls.V7Studio.permissionName = FEATURE_V7_STUDIO_PERMISSION
+moduls.V7Studio.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Rigel-18.17.0
+## Add self serve admin view permission
+* Issue Type: Task
+* Issue ID: SSRV-892
+
+### Deployment Scripts ###
+php deployment/updates/scripts/add_permissions/2022_11_01_add_ssrv_view_admin_permission.php
+
+
 # Rigel-18.16.0
 ## Disable password restriction on FirstName/LastName/Email
 * Issue Type: Task

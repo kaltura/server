@@ -140,6 +140,7 @@ class kmcngAction extends kalturaAction
 		$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 		$studio_version = kConf::getArrayValue('studio_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 		$studio_v3_version = kConf::getArrayValue('studio_v3_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
+		$studio_v7_version = kConf::getArrayValue('studio_v7_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 
 		if(!$html5_version)
 			KalturaLog::warning("The html player version was not found");
@@ -171,6 +172,13 @@ class kmcngAction extends kalturaAction
 				"playerOvpConfVars" => isset($this->content_uiconf_player_v3_ovp_versions) ? $this->content_uiconf_player_v3_ovp_versions->getConfVars() : '',
 				"playerBetaOvpConfVars" => isset($this->content_uiconf_player_v3_beta_ovp_versions) ? $this->content_uiconf_player_v3_beta_ovp_versions->getConfVars() : ''
 			);
+		}
+
+		$studioV7 = null;
+		if ($studio_v7_version && $html5_version)
+		{
+			$studioV7 = $studioV3;
+			$studioV7['uri'] = '/apps/player-studio-v7/' . $studio_v7_version . "/index.html";
 		}
 
 		$liveAnalytics = null;
@@ -246,6 +254,7 @@ class kmcngAction extends kalturaAction
 			"externalApps" => array(
 				"studioV2" => $studio,
 				"studioV3" => $studioV3,
+				"studioV7" => $studioV7,
 				"liveAnalytics" => $liveAnalytics,
 				"liveDashboard" => $liveDashboard,
 				"usageDashboard" => $usageDashboard,

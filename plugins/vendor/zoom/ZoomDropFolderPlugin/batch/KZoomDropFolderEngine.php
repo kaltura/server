@@ -45,20 +45,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		}
 		return $val;
 	}
-	
-	protected function createZuluDateTime($timestamp)
-	{
-		$dateTime = new DateTime();
-		$dateTime->setTimezone(new DateTimeZone("Zulu"));
-		$dateTime->setTimestamp($timestamp);
-		$dateTime->setTime(0, 0); // set time part to midnight
-		return $dateTime;
-	}
-	
+
 	protected function isDayInThePast($startRunTime, $timestamp)
 	{
-		$today = $this->createZuluDateTime($startRunTime);
-		$lastDayScanned = $this->createZuluDateTime($timestamp);
+		$today = kTimeZoneUtils::midnightTimezoneDateTime($startRunTime, 'Zulu');
+		$lastDayScanned = kTimeZoneUtils::midnightTimezoneDateTime($timestamp, 'Zulu');
 		
 		$diff = $today->diff( $lastDayScanned );
 		$diffDays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
@@ -193,7 +184,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetingsFromZoom()
 	{
-		$dayToScan = date('Y-m-d', $this->dropFolder->lastHandledMeetingTime);
+		$dayToScan = kTimeZoneUtils::timezoneDate('Y-m-d', $this->dropFolder->lastHandledMeetingTime, 'Zulu');
 
 		$pageSize = self::MAX_PAGE_SIZE;
 		$maxMeetings = $this->getZoomParam('maxMeetings', 3000);

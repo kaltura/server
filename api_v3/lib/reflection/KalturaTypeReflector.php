@@ -193,6 +193,7 @@ class KalturaTypeReflector
 								$prop->setReadOnly($parsedDocComment->readOnly);
 								$prop->setInsertOnly($parsedDocComment->insertOnly);
 								$prop->setWriteOnly($parsedDocComment->writeOnly);
+								$prop->setMultiLingual($parsedDocComment->multiLingual);
 								$prop->setDynamicType($parsedDocComment->dynamicType);
 								$prop->setServerOnly($parsedDocComment->serverOnly);
 								$prop->setDeprecated($parsedDocComment->deprecated);

@@ -137,4 +137,12 @@ abstract class MediaServerNode extends DeliveryServerNode {
 		return $this->getUrlType() . "/$userType/";
 	}
 
+    /**
+     * @return string
+     */
+    public function getAdditionalUrlParam(LiveStreamEntry $entry)
+    {
+        return '';
+    }
+
 } // MediaServerNode

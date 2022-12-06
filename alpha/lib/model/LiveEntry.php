@@ -12,6 +12,7 @@ abstract class LiveEntry extends entry
 	const RECORDED_ENTRY_ID = 'recorded_entry_id';
 	const LIVE_SCHEDULE_CAPABILITY = 'live_schedule_capability';
 	const SIMULIVE_CAPABILITY = 'simulive_capability';
+	const LOW_LATENCY_TAG = 'lowlatency';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
 	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
@@ -1210,4 +1211,12 @@ abstract class LiveEntry extends entry
         }
 	    return $conversionProfileId;
     }
+
+	/**
+	 * @return bool
+	 */
+	public function isLowLatencyEntry()
+    {
+		return $this->isContainsAdminTag('lowlatency');
+	}
 }

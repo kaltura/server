@@ -317,15 +317,12 @@ class thumbnailAction extends sfAction
 			}
 		}
 
-		myPartnerUtils::blockInactivePartner($entry->getPartnerId());
+		myPartnerUtils::blockInactivePartner($entry->getPartnerId(), array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY));
 		
 		if ( $nearest_aspect_ratio )
 		{
-			// Get the entry's default thumbnail path (if any)
-			$defaultThumbnailPath = myEntryUtils::getLocalImageFilePathByEntry( $entry, $version );
-			
 			// Get the file path of the thumbnail with the nearest  
-			$selectedThumbnailDescriptor = kThumbnailUtils::getNearestAspectRatioThumbnailDescriptorByEntryId( $entry_id, $width, $height, $defaultThumbnailPath );
+			$selectedThumbnailDescriptor = kThumbnailUtils::getNearestAspectRatioThumbnailDescriptorByEntry($entry, $width, $height, $version);
 
 			if ( $selectedThumbnailDescriptor ) // Note: In case nothing returned, then the entry doesn't have a thumbnail to work with, so we'll do nothing.
 			{

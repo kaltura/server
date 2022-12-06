@@ -302,7 +302,7 @@ class kSessionBase
 	{
 	}
 	
-	static protected function getSecretsCacheKey($partnerId)
+	static public function getSecretsCacheKey($partnerId)
 	{
 		return self::SECRETS_CACHE_PREFIX . kConf::get('secrets_cache_version', kConfMapNames::CACHE_VERSIONS, '1') . '_' . $partnerId;
 	}

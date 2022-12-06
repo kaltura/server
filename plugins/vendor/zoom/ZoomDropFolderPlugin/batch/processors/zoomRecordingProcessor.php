@@ -200,7 +200,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	protected function createEntryDescriptionFromRecording($recording)
 	{
 		$meetingStartTime = gmdate("Y-m-d h:i:sa", $recording->meetingMetadata->meetingStartTime);
-		return "Zoom Recording ID: {$recording->meetingMetadata->meetingId}\nUUID: {$recording->meetingMetadata->uuid}\nMeeting Time: {$meetingStartTime}";
+		return "Zoom Recording ID: {$recording->meetingMetadata->meetingId}\nUUID: {$recording->meetingMetadata->uuid}\nMeeting Time: {$meetingStartTime}GMT";
 	}
 	
 	/**
