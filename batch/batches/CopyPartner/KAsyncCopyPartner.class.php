@@ -136,7 +136,7 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 							//get the already exist category
 							$categoryFilter->fullNameEqual = $categoryFullName;
 							$categoryListResonse = $this->getClient()->category->listAction($categoryFilter);
-							$result=null;
+							$result = null;
 							if($categoryListResonse && $categoryListResonse->objects)
 							{
 								$result = $categoryListResonse->objects[0];
