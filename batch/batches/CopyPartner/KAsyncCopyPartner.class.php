@@ -135,11 +135,11 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 
 							//get the already exist category
 							$categoryFilter->fullNameEqual = $categoryFullName;
-							$categoryListResonse = $this->getClient()->category->listAction($categoryFilter);
+							$categoryListResponse = $this->getClient()->category->listAction($categoryFilter);
 							$result = null;
-							if($categoryListResonse && $categoryListResonse->objects)
+							if($categoryListResponse && $categoryListResponse->objects)
 							{
-								$result = $categoryListResonse->objects[0];
+								$result = $categoryListResponse->objects[0];
 								KalturaLog::info("Searching for category by full name '$categoryFullName' found id - ". $result->id);
 							}
 						}
