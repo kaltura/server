@@ -10,7 +10,7 @@ class ZoomVendorService extends KalturaBaseService
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const INTEGRATION_CODE = 'integrationCode';
 	const AUTH_CODE = 'code';
-	const REGISTRATION_PAGE_PATH = '/../api/webPage/KalturaZoomRegistrationPage.html';
+	const REGISTRATION_PAGE_PATH = '/../lib/api/webPage/KalturaZoomRegistrationPage.html';
 	
 	protected static $PARTNER_NOT_REQUIRED_ACTIONS = array('oauthValidation', 'recordingComplete', 'preOauthValidation');
 	
