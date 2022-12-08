@@ -295,7 +295,6 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 			throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, 'Failed to create new entry');
 		}
 		VendorHelper::addEntryToCategory($this->dropFolder->webexAPIVendorIntegration->webexCategory, $entry->id);
-		//$this->handleParticipants($entry); // TODO
 		
 		$kFlavorAsset = new KalturaFlavorAsset();
 		$kFlavorAsset->tags = self::TAG_SOURCE;
