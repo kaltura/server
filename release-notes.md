@@ -42,6 +42,14 @@ autoDeleteFileDays = @AUTO_DELETE_FILE_DAYS@
 ### Deployment Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_11_17_add_broker_user_kms_partners.php
 
+## New KME user reset password link  ##
+- Issue Type: Task
+- Issue ID: NR2-7461
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links':
+    kme = https://smart.newrow.com/u/#/forgotPassword/
+
 # Rigel-18.18.0
 ## Added support for player studio V7
 * Issue Type: story
