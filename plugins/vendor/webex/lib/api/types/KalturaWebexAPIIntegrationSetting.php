@@ -30,6 +30,11 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 	 */
 	public $userPostfix;
 	
+	/**
+	 * @var string
+	 */
+	public $webexAccountDescription;
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
@@ -40,6 +45,7 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 		'enableTranscription',
 		'userMatchingMode',
 		'userPostfix',
+		'webexAccountDescription',
 	);
 
 	public function getMapBetweenObjects()
