@@ -47,8 +47,8 @@ autoDeleteFileDays = @AUTO_DELETE_FILE_DAYS@
 - Issue ID: NR2-7461
 
 ### Configuration ###
-add the following to 'local.ini' under 'password_reset_links':
-    kme = https://smart.newrow.com/u/#/forgotPassword/
+add the following to 'local.ini' under 'password_reset_links' (with the service url of the required KME environment):
+    kme = @KME_SERVICE_URL@/u/#/forgotPassword/
 
 # Rigel-18.18.0
 ## Added support for player studio V7
