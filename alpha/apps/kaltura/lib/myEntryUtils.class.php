@@ -690,7 +690,7 @@ class myEntryUtils
 	}
 
 
-	public static function createThumbPaths($entity, $thumbNameAttributes, $thumbFilename, $format, $version, $thumbDirs, $contentPath, $captureRequest = false)
+	public static function createThumbPaths($entity, $thumbNameAttributes, $thumbFilename, $format, $version, $thumbDirs, $contentPath, $captureRequest = false, $processingPath = null)
 	{
 		//create final path for thumbnail created
 		$finalThumbPath = myContentStorage::getThumbEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity, $entity->getId() . $thumbNameAttributes, $thumbFilename, $version);
@@ -699,7 +699,14 @@ class myEntryUtils
 		$uniqueThumbName = $entity->getId() . $thumbNameAttributes . "_" . uniqid() . "_";
 
 		//create path for processing thumbnail request
-		$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity->getIntId(), $uniqueThumbName, $thumbFilename, $version);
+		if($processingPath)
+		{
+			$processingThumbPath = $processingPath;
+		}
+		else
+		{
+			$processingThumbPath = sys_get_temp_dir() . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entity->getIntId(), $uniqueThumbName, $thumbFilename, $version);
+		}
 
 		if(!is_null($format))
 		{
@@ -749,7 +756,7 @@ class myEntryUtils
 			{
 				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 			}
-			list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbNameAttributes, $entity->getCacheFlavorVersion() . ".jpg", $format, $entity->getCacheFlavorVersion(), $thumbDirs, $contentPath);
+			list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbNameAttributes, $entity->getCacheFlavorVersion() . ".jpg", $format, $entity->getCacheFlavorVersion(), $thumbDirs, $contentPath, false, $processingThumbPath);
 		}
 
 		return array($finalThumbPath, $processingThumbPath);

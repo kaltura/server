@@ -20,32 +20,20 @@ class thumbnailAction extends sfAction
 	public function getRequestParameter($name, $default = null)
 	{
 		$exts = implode('|', self::$extensions);
-	
 		$val = parent::getRequestParameter($name, $default);
-		if(!$val)
-			return $val;
-			
-		return preg_replace("/^(.*)\.($exts)$/", '$1', $val);
+		return !$val ? $val : preg_replace("/^(.*)\.($exts)$/", '$1', $val);
 	}
 
 	public function getIntRequestParameter($name, $default, $min, $max = null)
 	{
 		$val = max($min, intval($this->getRequestParameter($name, $default)));
-		if(is_null($max))
-		{
-			return $val;
-		}
-
-		return min($max, $val);
+		return is_null($max) ? $val : min($max, $val);
 	}
 
 	public function getFloatRequestParameter($name, $default, $min, $max = null)
 	{
 		$val = max($min, floatval($this->getRequestParameter($name, $default)));
-		if(is_null($max))
-			return $val;
-			
-		return min($max, $val);
+		return is_null($max) ? $val : min($max, $val);
 	}
   
   
