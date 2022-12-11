@@ -35,6 +35,22 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 	 */
 	public $webexAccountDescription;
 	
+	/**
+	 * @var string
+	 */
+	public $optOutGroupNames;
+	
+	/**
+	 * @var string
+	 */
+	public $optInGroupNames;
+	
+	/**
+	 * @var KalturaWebexAPIGroupParticipationType
+	 */
+	public $groupParticipationType;
+	
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
@@ -46,6 +62,9 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 		'userMatchingMode',
 		'userPostfix',
 		'webexAccountDescription',
+		'optInGroupNames',
+		'optOutGroupNames',
+		'groupParticipationType',
 	);
 
 	public function getMapBetweenObjects()
