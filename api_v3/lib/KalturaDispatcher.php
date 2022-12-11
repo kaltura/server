@@ -79,7 +79,7 @@ class KalturaDispatcher
 		kCurrentContext::$client_lang =  isset($params['clientTag']) ? $params['clientTag'] : null;
 		if (isset($params['language']) &&
 			(strtolower($params['language']) !== multiLingualUtils::MULTI) &&
-			!languageCodeManager::getLanguageKey(strtoupper($params['language'])))
+			!multiLingualUtils::validateLanguageCode($params['language']))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_LANGUAGE_CODE, $params['language']);
 		}
