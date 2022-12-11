@@ -497,6 +497,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$resetLinkPrefix = vsprintf($resetLinkPrefix, array($partnerId));
 			return $resetLinkPrefix;
 		}
+		else if ($linkType == resetPassLinkType::KME)
+		{
+			return $resetLinksArray['kme'];
+		}
 		else
 		{
 			return $resetLinksArray['default'];

@@ -7,4 +7,5 @@ interface resetPassLinkType extends BaseEnum
 {
 	const KMC = 1;
 	const KMS = 2;
+	const KME = 3;
 }
