@@ -5,6 +5,8 @@
  */
 class kWebexAPIClient extends kVendorClient
 {
+	const DELETE_SUCCESSFUL_CODE = 204;
+	
 	/**
 	 * kWebexAPIClient constructor.
 	 * @param $webexBaseURL
@@ -82,7 +84,13 @@ class kWebexAPIClient extends kVendorClient
 	public function deleteRecording($recordingId)
 	{
 		$request = "recordings/$recordingId";
-		return $this->sendRequest($request, false, true);
+		$response = $this->sendRequest($request, false, true);
+		if (!$this->errorCode == self::DELETE_SUCCESSFUL_CODE)
+		{
+			KalturaLog::warning("Deleting recording from Webex failed (Code {$this->errorCode}, response from Webex: " . print_r($response, true));
+			throw new KalturaAPIException(KalturaWebexAPIErrors::DELETE_RECORDING_FAILED);
+		}
+		return $response;
 	}
 	
 	public function retrieveWebexUser()
@@ -91,7 +99,7 @@ class kWebexAPIClient extends kVendorClient
 		$response = $this->sendRequest($request);
 		if (!isset($response['emails']))
 		{
-			KalturaLog::warning("Retrieve user from Webex failed (Code {$this->errorCode}), response from Webex: ". print_r($response, true));
+			KalturaLog::warning("Retrieve user from Webex failed (Code {$this->errorCode}), response from Webex: " . print_r($response, true));
 			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
 		}
 		return $response['emails'][0];
