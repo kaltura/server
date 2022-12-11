@@ -1198,7 +1198,15 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 
 		$mediaInfo = null;
 		if($mediaInfoId)
+		{
 			$mediaInfo = mediaInfoPeer::retrieveByPK($mediaInfoId);
+		}
+		else if ($parentJob->getStatus() == KalturaBatchJobStatus::FAILED && in_array(zoomRecordingProcessor::ADMIN_TAG_ZOOM, $entry->getAdminTagsArr()))
+		{
+			KalturaLog::debug("Entry Id: [$entryId] suspected to be a deleted zoom entry - failing the job to avoid creating convert jobs that will fail");
+			kJobsManager::updateBatchJob($convertProfileJob, KalturaBatchJobStatus::ABORTED);
+			throw new APIException(KalturaZoomErrors::RECORDING_CONTENT_DELETED, $entryId);
+		}
 		
 		$profile = myPartnerUtils::getConversionProfile2ForEntry($entryId);
 		if(! $profile)
