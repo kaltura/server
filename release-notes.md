@@ -1,4 +1,15 @@
 # Rigel-18.19.0
+## Update Unique_Kms_New_Item_Pending_Moderation_2 email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-32090
+
+#### Configuration ####
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php update deployment script.
+
+### Deployment scripts ###
+    - deployment/updates/scripts/xml/2022_11_20_updateUniqueKmsNewItemPendingModeration2.template.xml
+    - php deployment/updates/scripts/2022_11_20_deploy_update_email_event_notification_unique_kms_new_item_pending_moderation_2.php
+
 ## Webex API Drop Folder ##
 * Issue Type: Epic
 * Issue ID: PLAT-23885
