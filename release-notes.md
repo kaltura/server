@@ -1,4 +1,12 @@
 # Rigel-18.19.0
+## Fix permissions for caption_captionasset.get ##
+
+* Issue Type: Task
+* Issue ID: ILMS-388
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_11_23_update_permission_caption_captionasset_get.php
+
 ## Update Unique_Kms_New_Item_Pending_Moderation_2 email event notification templates ##
 * Issue Type: Task
 * Issue ID: SUP-32090
