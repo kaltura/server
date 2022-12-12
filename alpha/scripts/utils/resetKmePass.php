@@ -27,7 +27,8 @@ $failedPids = array();
 
 $currentPartnerId = $minPartnerId;
 
-do {
+do
+{
 	$c = new Criteria();
 	$c->add(PartnerPeer::ID, $currentPartnerId, Criteria::GREATER_THAN);
 	$c->addAnd(PartnerPeer::ID, $maxPartnerId, Criteria::LESS_THAN);
@@ -42,7 +43,8 @@ do {
 	{
 		$currentPartnerId = $partner->getId();
 		$additionalParams = $partner->getAdditionalParams();
-		if (!isset($additionalParams['note']) || $additionalParams['note'] !== 'Created by KME script') {
+		if (!isset($additionalParams['note']) || $additionalParams['note'] !== 'Created by KME script')
+		{
 			KalturaLog::info("skipping partner " . $partner->getId() . " as it wasn't created by KME script");
 			continue;
 		}
@@ -56,7 +58,8 @@ do {
 			$failedPids[] = $partner->getId();
 			continue;
 		}
-		if (!$dryRun) {
+		if (!$dryRun)
+		{
 			$loginData->resetPassword($newPass);
 		}
 		$successfulPids[] = $partner->getId();
@@ -66,7 +69,8 @@ do {
 
 $currentTime = time();
 
-if (!file_exists(LOG_DIR)) {
+if (!file_exists(LOG_DIR))
+{
 	mkdir(LOG_DIR, 0777, true);
 }
 
