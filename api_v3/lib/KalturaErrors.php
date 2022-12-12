@@ -45,7 +45,7 @@ class KalturaErrors extends APIErrors
 	const ACTION_FORBIDDEN = "ACTION_FORBIDDEN;ACTION_NAME;Action \"@ACTION_NAME@\" is forbidden for use";
 	
 	// LANGUAGE_CODE - language
-	const INVALID_LANGUAGE_CODE = "INVALID_LANGUAGE_CODE;LANGUAGE_CODE; Invalid language code [\"@LANGUAGE_CODE@\"] - must be a valid 2 char code";
+	const INVALID_LANGUAGE_CODE = "INVALID_LANGUAGE_CODE;LANGUAGE_CODE; Invalid language code [\"@LANGUAGE_CODE@\"]";
 	
 	const WRONG_REQUEST_LANGUAGE = "WRONG_REQUEST_LANGUAGE;LANGUAGE; Language must be set to MULTI when adding MultiLingualString. Given [\"@LANGUAGE@\"]";
 

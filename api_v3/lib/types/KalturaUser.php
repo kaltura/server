@@ -114,7 +114,14 @@ class KalturaUser extends KalturaBaseUser
 	 * @var bool
 	 */
 	public $isSsoExcluded;
-
+	
+	/**
+	 * This field should be sent instead of the id field whenever you want to work with hashed user ids
+	 * @var string
+	 * @insertonly
+	 */
+	public $externalId;
+	
 	private static $map_between_objects = array (
 		"type",
 		"dateOfBirth",
@@ -153,6 +160,17 @@ class KalturaUser extends KalturaBaseUser
 			list($firstName, $lastName) = kString::nameSplit($this->fullName);
 			$dbObject->setFirstName($firstName);
 			$dbObject->setLastName($lastName);
+		}
+		
+		if($this->externalId)
+		{
+			$hashedUserId = myKuserUtils::getHashedUserId($this->externalId);
+			$dbObject->setPuserId($hashedUserId);
+			if($hashedUserId != $this->externalId)
+			{
+				$dbObject->setExternalId($this->externalId);
+				$dbObject->setIsHashed(true);
+			}
 		}
 
 		return $dbObject;

@@ -3,6 +3,7 @@
 class KAxelWrapper extends KCurlWrapper
 {
 	const DEFAULT_CONCURRENT_CONNECTIONS = 10;
+	const NO_PROGRESS_TIMEOUT_SECONDS = 30;
 	
 	/**
 	 * @var null|bool
@@ -82,27 +83,10 @@ class KAxelWrapper extends KCurlWrapper
 		return $this->logPathErr;
 	}
 	
-	/**
-	 * @param $cmdLine
-	 * @param false $returnValue
-	 * @return bool|array
-	 */
-	private function execCmd($cmdLine, $returnValue = false)
+	public function close()
 	{
-		KalturaLog::debug("Executing command: [$cmdLine]");
-		
-		unset($output);
-		exec($cmdLine, $output, $resultCode);
-		
-		$this->errorNumber = $resultCode;
-		
-		if ($resultCode)
-		{
-			KalturaLog::debug("Executed command result code [$resultCode]");
-			return false;
-		}
-		
-		return $returnValue ? $output : true;
+		parent::close();
+		$this->deleteLogFiles();
 	}
 	
 	/**
@@ -137,7 +121,7 @@ class KAxelWrapper extends KCurlWrapper
 	private function execAxel()
 	{
 		$start = microtime(true);
-		$result = $this->execCmd("$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url > $this->logPath 2> $this->logPathErr");
+		$result = $this->execProcOpen();
 		$end = microtime(true);
 		
 		$this->httpCode = $this->getHttpCodeFromLog();
@@ -152,6 +136,64 @@ class KAxelWrapper extends KCurlWrapper
 		}
 		
 		return $this->downloadCompleted($result);
+	}
+	
+	private function execProcOpen()
+	{
+		$cmd = "$this->axelPath --max-redirect=0 -n $this->concurrentConnections -o $this->destFile $this->url";
+		$descriptor = array(
+			1 => array('file', $this->logPath, 'w'),
+			2 => array('file', $this->logPathErr, 'w')
+		);
+		
+		KalturaLog::debug("Executing [$cmd > $this->logPath 2> $this->logPathErr]");
+		
+		// we use 'exec $cmd..' to avoid php from creating a child "sh -c axel..." which will create the actual child "axel" command
+		// this allows to call 'proc_terminate' function on $process (because proc_terminate does not terminate all child processes)
+		// for more info, read comments: https://www.php.net/manual/en/function.proc-terminate.php
+		$process = proc_open("exec $cmd", $descriptor, $pipes, '/tmp');
+		if (!is_resource($process))
+		{
+			KalturaLog::debug('Failed to open resource - aborting download');
+			return false;
+		}
+		
+		for (;;)
+		{
+			sleep(5);
+			
+			$processStatus = proc_get_status($process);
+			if (!$processStatus['running'])
+			{
+				break;
+			}
+			
+			clearstatcache();
+			if (time() - kFile::filemtime($this->logPath) > self::NO_PROGRESS_TIMEOUT_SECONDS)
+			{
+				KalturaLog::debug('Axel downloader was not active in the last [' . self::NO_PROGRESS_TIMEOUT_SECONDS . '] seconds - terminating process');
+				proc_terminate($process);
+			}
+		}
+		
+		$this->errorNumber = $processStatus['exitcode'];
+		$this->closePipes($pipes);
+		proc_close($process);
+		
+		return $processStatus['exitcode'] === 0;
+	}
+	
+	private function closePipes($pipes)
+	{
+		// we are not using 'pipes' but proc_open requires it
+		// in case proc_open opened a 'pipe', close it
+		if (count($pipes))
+		{
+			foreach ($pipes as $pipe)
+			{
+				fclose($pipe);
+			}
+		}
 	}
 	
 	private function getErrorCode()
@@ -173,29 +215,21 @@ class KAxelWrapper extends KCurlWrapper
 		return null;
 	}
 	
-	/**
-	 * @return void
-	 */
-	public function close()
-	{
-		parent::close();
-		$this->deleteLogFiles();
-	}
-	
 	private function deleteLogFiles()
 	{
-		if (kFile::checkFileExists($this->getLogPath()))
-		{
-			$msg = "Deleting log file at [$this->logPath] - ";
-			$msg .= kFile::unlink($this->logPath) ? 'success' : 'failed';
-			KalturaLog::debug($msg);
-		}
+		$logPathArray = array(
+			$this->getLogPath(),
+			$this->getLogPathErr()
+		);
 		
-		if (kFile::checkFileExists($this->getLogPathErr()))
+		foreach ($logPathArray as $logPath)
 		{
-			$msg = "Deleting log file at [$this->logPathErr] - ";
-			$msg .= kFile::unlink($this->logPathErr) ? 'success' : 'failed';
-			KalturaLog::debug($msg);
+			if (kFile::checkFileExists($logPath))
+			{
+				$msg = "Deleting log file at [$logPath] - ";
+				$msg .= kFile::unlink($logPath) ? 'success' : 'failed';
+				KalturaLog::debug($msg);
+			}
 		}
 	}
 	
@@ -206,20 +240,21 @@ class KAxelWrapper extends KCurlWrapper
 	 */
 	private function getLogFileContentIfExists($logFilePath, $lengthInBytes = 3000)
 	{
-		if (!$logFilePath || !kFile::checkFileExists($logFilePath))
+		$logFileSize = kFile::fileSize($logFilePath);
+		if (!$logFilePath || !$logFileSize)
 		{
-			KalturaLog::debug("Axel log path is not set or does not exist");
+			KalturaLog::debug("Axel log path is not set or is empty log file");
 			return false;
 		}
 		
 		if ($lengthInBytes < 0)
 		{
-			$fromByte = max(kFile::fileSize($logFilePath) + $lengthInBytes, 0);
+			$fromByte = max($logFileSize + $lengthInBytes, 0);
 			$toByte = -1;
 		}
 		
 		$fromByte = isset($fromByte) ? $fromByte : 0;
-		$toByte = isset($toByte) ? $toByte : min(kFile::fileSize($logFilePath), $lengthInBytes);
+		$toByte = isset($toByte) ? $toByte : min($logFileSize, $lengthInBytes);
 		
 		$logFileContent = kFile::getFileContent($logFilePath, $fromByte, $toByte);
 		if (!$logFileContent)
@@ -239,29 +274,15 @@ class KAxelWrapper extends KCurlWrapper
 			return false;
 		}
 		
-		if (!preg_match('/File size:.*bytes/', $logFileContent, $matches))
+		// example log line:
+		// File size: 26.8561 Megabyte(s) (28160686 bytes)
+		// we extract the bytes int value: 28160686
+		if (!preg_match('/File size:.*?([0-9]+)\s+bytes/', $logFileContent, $matches))
 		{
-			KalturaLog::debug("Failed to extract 'File size' line from log path at [$this->logPath]");
-			return false;
+			KalturaLog::debug('Failed to extract "File size" value from log');
 		}
 		
-		$fileSizeLine = $matches[0];
-		
-		if (!preg_match('/[0-9]+\s*bytes/', $fileSizeLine, $matches))
-		{
-			KalturaLog::debug("Failed to extract 'File size in bytes' value from line [$fileSizeLine]");
-			return false;
-		}
-		
-		$fileSizeBytesPostfix = $matches[0];
-		
-		if (!preg_match('/[0-9]+/', $fileSizeBytesPostfix, $matches))
-		{
-			KalturaLog::debug("Failed to extract 'File size' value from line [$fileSizeBytesPostfix]");
-			return false;
-		}
-		
-		return $matches[0];
+		return $matches[1];
 	}
 	
 	private function getFileDownloadPercentageFromLogFile()
@@ -274,6 +295,7 @@ class KAxelWrapper extends KCurlWrapper
 		
 		if (!preg_match_all('/\[\s*[0-9]{1,3}%]/', $logFileContent, $matches))
 		{
+			$logFileContent = trim($logFileContent);
 			KalturaLog::debug("Could not extract downloaded percentage from last log lines [$logFileContent]");
 			return false;
 		}
@@ -297,7 +319,7 @@ class KAxelWrapper extends KCurlWrapper
 		}
 		
 		$logFileContent = $this->getLogFileContentIfExists($this->getLogPath(), -150);
-		return preg_match('/Downloaded/', $logFileContent);
+		return strpos($logFileContent, 'Downloaded') !== false;
 	}
 	
 	private function getHttpCodeFromLog()
@@ -308,7 +330,7 @@ class KAxelWrapper extends KCurlWrapper
 			return 0;
 		}
 		
-		if (preg_match('/Starting download/', $logFileContent))
+		if (strpos($logFileContent, 'Starting download') !== false)
 		{
 			return KCurlHeaderResponse::HTTP_STATUS_OK;
 		}
@@ -319,20 +341,13 @@ class KAxelWrapper extends KCurlWrapper
 			return 0;
 		}
 		
-		if (preg_match('/ERROR.*/', $logFileContent, $matches))
+		if (!preg_match('/ERROR\s+([0-9]+)/', $logFileContent, $matches))
 		{
-			$httpCodeLine = $matches[0];
-			if (preg_match('/[0-9]+/', $httpCodeLine, $matches))
-			{
-				return trim($matches[0]);
-			}
-			
-			KalturaLog::debug("Could not extract http code from line [$httpCodeLine]");
+			KalturaLog::debug("Could not extract http status code from log file");
 			return 0;
 		}
 		
-		KalturaLog::debug("Could not extract http status code from log file at [$this->logPath]");
-		return 0;
+		return $matches[1];
 	}
 	
 	private function getErrorMsgFromLog()
@@ -355,22 +370,7 @@ class KAxelWrapper extends KCurlWrapper
 	 */
 	public static function getSourceUrl($sourceUrl, &$protocol, &$host, $allowInternalUrl = false)
 	{
-		$sourceUrl = trim($sourceUrl);
-		if (strpos($sourceUrl, '://') === false && substr($sourceUrl, 0, 1) != '/')
-		{
-			$sourceUrl = 'http://' . $sourceUrl;
-		}
-		
-		//Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
-		//https://bugs.php.net/bug.php?id=73754
-		$sourceUrl = preg_replace("/#/", "_kHash_", $sourceUrl, -1, $replaceCount);
-		
-		// extract information from URL and job data
-		$parts = parse_url($sourceUrl);
-		if($replaceCount)
-		{
-			$parts = preg_replace("/_kHash_/", "#", $parts);
-		}
+		$parts = KAxelWrapper::parseUrl($sourceUrl);
 		
 		if (!isset($parts['scheme']) || !isset($parts['host']))
 		{
@@ -427,18 +427,7 @@ class KAxelWrapper extends KCurlWrapper
 	
 	public static function checkUserAndPassOnUrl($url)
 	{
-		$sourceUrl = trim($url);
-		if (strpos($sourceUrl, '://') === false && substr($sourceUrl, 0, 1) != '/')
-		{
-			$sourceUrl = 'http://' . $sourceUrl;
-		}
-		
-		//Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
-		//https://bugs.php.net/bug.php?id=73754
-		$sourceUrl = preg_replace("/#/", "_kHash_", $sourceUrl, -1, $replaceCount);
-		
-		// extract information from URL and job data
-		$parts = parse_url($sourceUrl);
+		$parts = KAxelWrapper::parseUrl($url);
 		
 		if (isset($parts['user']) || isset($parts['pass']))
 		{
@@ -446,6 +435,29 @@ class KAxelWrapper extends KCurlWrapper
 		}
 		
 		return false;
+	}
+	
+	public static function parseUrl(&$url)
+	{
+		$url = trim($url);
+		if (strpos($url, '://') === false && substr($url, 0, 1) != '/')
+		{
+			$url = 'http://' . $url;
+		}
+		
+		//Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
+		//https://bugs.php.net/bug.php?id=73754
+		$url = preg_replace("/#/", "_kHash_", $url, -1, $replaceCount);
+		
+		// extract information from URL and job data
+		$parts = parse_url($url);
+		
+		if($replaceCount)
+		{
+			$parts = preg_replace("/_kHash_/", "#", $parts);
+		}
+		
+		return $parts;
 	}
 	
 	public static function checkAxelInstalled($axelPath = null)

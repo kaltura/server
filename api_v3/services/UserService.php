@@ -29,6 +29,16 @@ class UserService extends KalturaBaseUserService
 	 */
 	function addAction(KalturaUser $user)
 	{
+		if(isset($user->id) && isset($user->externalId) && trim($user->externalId) && trim($user->id))
+		{
+			throw new KalturaAPIException(KalturaErrors::ID_AND_EXTERNAL_ID_ARE_MUTUALLY_EXCLUSIVE);
+		}
+		
+		if($user->externalId)
+		{
+			$user->id = $user->externalId;
+		}
+		
 		if (!preg_match(kuser::PUSER_ID_REGEXP, $user->id))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
@@ -62,33 +72,46 @@ class UserService extends KalturaBaseUserService
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
 		
 		if (!$dbUser)
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+		}
 
-		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin) {
+		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin)
+		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
+		}
+		
+		if($dbUser->getIsHashed() && $user->id)
+		{
+			throw new KalturaAPIException(KalturaErrors::UPDATING_USER_ID_FOR_HASHED_USER_NOT_ALLOWED);
 		}
 
 		// update user
 		try
 		{
-			if (!is_null($user->roleIds)) {
+			if (!is_null($user->roleIds))
+			{
 				if ($this->getPartnerId() == Partner::ADMIN_CONSOLE_PARTNER_ID && !kPermissionManager::isPermitted(PermissionName::SYSTEM_ADMIN_PERMISSIONS_UPDATE))
 				{
 					throw new KalturaAPIException(KalturaErrors::NOT_ALLOWED_TO_CHANGE_ROLE);
 				}
+				
 				UserRolePeer::testValidRolesForUser($user->roleIds, $this->getPartnerId());
-				if ($user->roleIds != $dbUser->getRoleIds() &&
-					$dbUser->getId() == $this->getKuser()->getId()) {
+				if ($user->roleIds != $dbUser->getRoleIds() && $dbUser->getId() == $this->getKuser()->getId())
+				{
 					throw new KalturaAPIException(KalturaErrors::CANNOT_CHANGE_OWN_ROLE);
 				}
 			}
-			if (!is_null($user->id) && $user->id != $userId) {
-				if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id)) {
+			if (!is_null($user->id) && $user->id != $userId)
+			{
+				if(!preg_match(kuser::PUSER_ID_REGEXP, $user->id))
+				{
 					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'id');
 				} 
 				
 				$existingUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $user->id);
-				if ($existingUser) {
+				if ($existingUser)
+				{
 					throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id);
 				}
 			}			
@@ -98,23 +121,29 @@ class UserService extends KalturaBaseUserService
 		catch (kPermissionException $e)
 		{
 			$code = $e->getCode();
-			if ($code == kPermissionException::ROLE_ID_MISSING) {
+			if ($code == kPermissionException::ROLE_ID_MISSING)
+			{
 				throw new KalturaAPIException(KalturaErrors::ROLE_ID_MISSING);
 			}
-			if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED) {
+			if ($code == kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED)
+			{
 				throw new KalturaAPIException(KalturaErrors::ONLY_ONE_ROLE_PER_USER_ALLOWED);
 			}
-			if ($code == kPermissionException::USER_ROLE_NOT_FOUND) {
+			if ($code == kPermissionException::USER_ROLE_NOT_FOUND)
+			{
 				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
 			}
-			if ($code == kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE) {
+			if ($code == kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE)
+			{
 				throw new KalturaAPIException(KalturaErrors::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);
 			}
 			throw $e;
 		}
-		catch (kUserException $e) {
+		catch (kUserException $e)
+		{
 			$code = $e->getCode();
-			if ($code == kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER) {
+			if ($code == kUserException::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER)
+			{
 				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
 			}
 			throw $e;			

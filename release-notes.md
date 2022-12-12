@@ -1,18 +1,102 @@
 # Rigel-18.19.0
-
-## Add ResourceUser feature ##
+## Update Unique_Kms_New_Item_Pending_Moderation_2 email event notification templates ##
 * Issue Type: Task
-* Issue ID: ILMS-296
+* Issue ID: SUP-32090
 
-### Scripts ###
-    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2022_09_27_add_resource_user_table.sql
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_10_03_add_resource_user_permissions.php
-    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
-    Client generation required
-    Sphinx reindexing is required
+#### Configuration ####
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php update deployment script.
+
+### Deployment scripts ###
+    - deployment/updates/scripts/xml/2022_11_20_updateUniqueKmsNewItemPendingModeration2.template.xml
+    - php deployment/updates/scripts/2022_11_20_deploy_update_email_event_notification_unique_kms_new_item_pending_moderation_2.php
+
+## Webex API Drop Folder ##
+* Issue Type: Epic
+* Issue ID: PLAT-23885
+
+### Configuration ###
+Enable plugin:
+
+	To enable this feature plugin add the following to your plugins.ini file:
+	- WebexAPIDropFolder
+
+Add the following to vendor.ini (Replace all tokens below)
+```
+[WebexAccount]
+DisableWebexAPIDropFolder = 0
+webexBaseUrl = @WEBEX_BASE_URL@
+redirectUrl = @REDIRECT_URL@
+clientId = @CLIENT_ID@
+clientSecret = @CLIENT_SECRET@
+scope = @SCOPE@
+state = @STATE@
+host = @HOST@
+tokenExpiryGrace = @TOKEN_EXPIRY_GRACE@
+downloadExpiryGrace = @DOWNLOAD_EXPIRY_GRACE@
+autoDeleteFileDays = @AUTO_DELETE_FILE_DAYS@
+```
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php deployment/updates/scripts/add_permissions/2022_09_29_add_webexVendor_service.php
+
+
+## Support user id hashing ##
+* Issue Type: Task
+* Issue ID: PLAT-24004
+
+#### Deployment ####
+Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default is 'kaltura_kuser')
+##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
+Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
+
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": { "external_id": { "type" : "text", "analyzer" : "kaltura_text", "fields": { "ngrams" : { "type" : "text", "analyzer" : "kaltura_ngrams" }, "raw" : { "type" : "keyword", "normalizer" : "kaltura_keyword_normalizer" } }}, "is_hashed": { "type": "boolean"}, "is_admin": { "type": "boolean" }, "login_enabled": { "type": "boolean" } }}'
+
+#### Known Issues & Limitations ####
+If Rigel-18.19.0 or later server version already ran and new users were added
+with either 'externalId' or 'isHashed' (or both) then it is likely that elastic already mapped
+these fields to the kaltura_kuser index map (unless you changed elastic default index 'dynamic' attribute is 'false')
+If that happened, you will get an error from elastic.
+
+#### Resolution ####
+* Create a new kaltura_kuser index with Rigel-18.19.0 kaltura_kuser.json map (or later)
+* (if you have alias for index) Point 'kaltura_kuser' alias to the new index by following below instructions:
+  * Replace all tokens in the below curl command
+```
+curl -XPOST "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/_aliases" -H 'Content-Type: application/json' -d'{  "actions":[{"add": {"index": "@NEW_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}},{"remove": {"index": "@OLD_INDEX_NAME@","alias": "@KALTURA_KUSER_ALIAS@"}}]}'
+```
+* Execute 'populateElasticKusers.php' script:
+```
+php /opt/kaltura/app/deployment/base/scripts/elastic/populateElasticKusers.php
+```
+* Done! you should be able to search user by 'externalId' and / or 'isHashed'
+  * If something does not work - you can revert the alias to point to the old kaltura_kuser index by following the '_aliases' curl above
+  * If everything work as expected, you can delete the old kuser index.
+
+---
+
+
+## Add partners for auth-broker/user-profile/kms ##
+
+* Issue Type: Task
+- Issue ID: FOUN-819
+
+### Configuration ###
+    Replace all tokens from the ini file (under auth-broker/user-profile/kms sections) and remove".template" from the file name: 
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_11_17_add_broker_user_kms_partners.php
+
+## New KME user reset password link  ##
+- Issue Type: Task
+- Issue ID: NR2-7461
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links' (with the service url of the required KME environment):
+    kme = @KME_SERVICE_URL@/u/#/forgotPassword/
 
 # Rigel-18.18.0
-
 ## Added support for player studio V7
 * Issue Type: story
 * Issue ID: PLAT-23970
@@ -34,6 +118,7 @@ moduls.V7Studio.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment Scripts ###
 php deployment/updates/scripts/add_permissions/2022_11_01_add_ssrv_view_admin_permission.php
+
 
 # Rigel-18.16.0
 ## Disable password restriction on FirstName/LastName/Email

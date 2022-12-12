@@ -13,7 +13,7 @@
  * @package plugins.tagSearch
  * @subpackage model
  */
-class Tag extends BaseTag implements IRelatedObject, IIndexable
+class Tag extends BaseTag implements IIndexable
 {
 	const PRIVACY_CONTEXT_INDEX_PREFIX = "pc";
 	

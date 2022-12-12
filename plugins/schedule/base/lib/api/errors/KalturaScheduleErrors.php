@@ -15,6 +15,4 @@ class KalturaScheduleErrors extends KalturaErrors
 	const START_TIME_AND_LINKED_TO_NOT_SET            = "START_TIME_AND_LINKED_TO_NOT_SET;;Event must have either fields StartTime or LinkedTo set";
 	const RECURRENCE_LINKED_EVENT_CONFLICT            = "RECURRENCE_LINKED_EVENT_CONFLICT;;Recurring events cannot be linked";
 	const LINKED_TO_EVENT_NOT_FOUND_OR_NOT_ACCESSIBLE = "LINKED_TO_EVENT_NOT_FOUND_OR_NOT_ACCESSIBLE;;Cannot find the linkedTo schedule event";
-	const RESOURCE_USER_ALREADY_EXISTS                = "RESOURCE_USER_ALREADY_EXISTS;;Duplicate resource user associations are not allowed";
-	const MUST_FILTER_ON_TAG_OR_USER_ID               = "MUST_FILTER_ON_TAG_OR_USER_ID;;Must filter on resource tag or user ID";
 }

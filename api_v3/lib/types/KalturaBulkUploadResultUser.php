@@ -73,6 +73,11 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
      * @var string
      */
 	public $group;
+	
+	/**
+	 * @var string
+	 */
+	public $externalId;
     
     private static $mapBetweenObjects = array
 	(
@@ -89,6 +94,7 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	    "lastName",
 	    "tags",
 	    "group",
+	    "externalId"
 	);
 	
     /* (non-PHPdoc)

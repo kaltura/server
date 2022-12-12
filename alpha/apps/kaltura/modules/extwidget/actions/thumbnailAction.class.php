@@ -20,26 +20,20 @@ class thumbnailAction extends sfAction
 	public function getRequestParameter($name, $default = null)
 	{
 		$exts = implode('|', self::$extensions);
-	
 		$val = parent::getRequestParameter($name, $default);
-		if(!$val)
-			return $val;
-			
-		return preg_replace("/^(.*)\.($exts)$/", '$1', $val);
+		return !$val ? $val : preg_replace("/^(.*)\.($exts)$/", '$1', $val);
 	}
 
-	public function getIntRequestParameter($name, $default, $min, $max)
+	public function getIntRequestParameter($name, $default, $min, $max = null)
 	{
-		return min($max, max($min, intval($this->getRequestParameter($name, $default))));
+		$val = max($min, intval($this->getRequestParameter($name, $default)));
+		return is_null($max) ? $val : min($max, $val);
 	}
 
 	public function getFloatRequestParameter($name, $default, $min, $max = null)
 	{
 		$val = max($min, floatval($this->getRequestParameter($name, $default)));
-		if(is_null($max))
-			return $val;
-			
-		return min($max, $val);
+		return is_null($max) ? $val : min($max, $val);
 	}
   
   
@@ -76,8 +70,8 @@ class thumbnailAction extends sfAction
 		$src_w = $this->getFloatRequestParameter("src_w", 0, 0, 10000);
 		$src_h = $this->getFloatRequestParameter("src_h", 0, 0, 10000);
 		$vid_sec = $this->getFloatRequestParameter("vid_sec", -1, -1);
-		$vid_slice = $this->getRequestParameter("vid_slice", -1);
-		$vid_slices = $this->getRequestParameter("vid_slices", -1);
+		$vid_slice = $this->getIntRequestParameter("vid_slice", -1, -1);
+		$vid_slices = $this->getIntRequestParameter("vid_slices", -1, -1);
 		$density = $this->getFloatRequestParameter("density", 0, 0);
 		$stripProfiles = $this->getRequestParameter("strip", null);
 		$flavor_id = $this->getRequestParameter("flavor_id", null);
@@ -182,6 +176,8 @@ class thumbnailAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::BAD_QUERY, 'vid_slices must be positive');
 		}
+
+		$vid_slice = min($vid_slices, $vid_slice);
 
 		if($vid_slices > 0 && ($vid_slices * $width) >= 65500)
 		{
@@ -321,11 +317,8 @@ class thumbnailAction extends sfAction
 		
 		if ( $nearest_aspect_ratio )
 		{
-			// Get the entry's default thumbnail path (if any)
-			$defaultThumbnailPath = myEntryUtils::getLocalImageFilePathByEntry( $entry, $version );
-			
 			// Get the file path of the thumbnail with the nearest  
-			$selectedThumbnailDescriptor = kThumbnailUtils::getNearestAspectRatioThumbnailDescriptorByEntryId( $entry_id, $width, $height, $defaultThumbnailPath );
+			$selectedThumbnailDescriptor = kThumbnailUtils::getNearestAspectRatioThumbnailDescriptorByEntry($entry, $width, $height, $version);
 
 			if ( $selectedThumbnailDescriptor ) // Note: In case nothing returned, then the entry doesn't have a thumbnail to work with, so we'll do nothing.
 			{

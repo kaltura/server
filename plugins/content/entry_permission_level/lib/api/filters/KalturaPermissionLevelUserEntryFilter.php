@@ -7,7 +7,7 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 {
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$this->typeEqual = RegistrationPlugin::getApiValue(PermissionLevelUserEntryType::PERMISSION_LEVEL);
+		$this->typeEqual = EntryPermissionLevelPlugin::getApiValue(PermissionLevelUserEntryType::PERMISSION_LEVEL);
 		$response = parent::getListResponse($pager, $responseProfile);
 		return $response;
 	}

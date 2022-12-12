@@ -89,7 +89,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult, $dateOfBirth)
 	{
 	    /* @var $bulkUploadResult KalturaBulkUploadResultUser */
-		if (!$bulkUploadResult->userId)
+		if (!$bulkUploadResult->userId && !$bulkUploadResult->externalId)
 		{
 		    $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
@@ -281,6 +281,9 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 
 	    if ($bulkUploadUserResult->partnerData)
 	        $user->partnerData = $bulkUploadUserResult->partnerData;
+		
+		if ($bulkUploadUserResult->externalId)
+			$user->externalId = $bulkUploadUserResult->externalId;
 
 	    return $user;
 	}
@@ -307,7 +310,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    "dateOfBirth",
 			"partnerData",
 			"group",
-			"userRole"
+			"userRole",
+			"externalId"
 		);
 	}
 
