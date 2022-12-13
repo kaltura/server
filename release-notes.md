@@ -1,4 +1,16 @@
 # Rigel-18.19.0
+## Allow C&C
+* Issue Type: Task
+* Issue ID: PLAT-23996
+### Deployment ###
+Add the folowing to admin.ini
+```
+moduls.adminEmailNotifications.enabled = true
+moduls.adminEmailNotifications.permissionType = 2
+moduls.adminEmailNotifications.label = "Allow C&C"
+moduls.adminEmailNotifications.permissionName = FEATURE_ALLOW_CNC_PERMISSION
+moduls.adminEmailNotifications.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 ## Fix permissions for caption_captionasset.get ##
 
 * Issue Type: Task
