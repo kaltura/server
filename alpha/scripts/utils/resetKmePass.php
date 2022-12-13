@@ -1,50 +1,47 @@
 <?php
 require_once(__DIR__ . '/../bootstrap.php');
 
-if($argc < 4)
+if($argc < 3)
 {
 	echo "Arguments missing.\n\n";
-	echo "Usage: php {$argv[0]} <new password> <minPartnerId> <maxPartnerId> [realrun / dryrun]\n";
+	echo "Usage: php {$argv[0]} <new_password> <partner_ids_file_path> [realrun / dryrun]\n";
 	exit;
 }
 
 $dryRun = true;
-if ($argc == 5 && $argv[4] == 'realrun')
+if ($argc == 4 && $argv[3] == 'realrun')
 {
 	$dryRun = false;
 }
 
 $newPass = $argv[1];
-$minPartnerId = $argv[2];
-$maxPartnerId = $argv[3];
+$pidsFilePath = $argv[2];
 
 const CHUNK_SIZE = 500;
 
 const LOG_DIR = '/tmp/kme-reset-pass/';
 
+$pidsList = file_get_contents($pidsFilePath);
+$pidsList = array_filter(explode("\n", $pidsList));
+
 $successfulPids = array();
 $failedPids = array();
 
-$currentPartnerId = $minPartnerId;
+$pidsChunks = array_chunk($pidsList, CHUNK_SIZE);
 
-do
+foreach ($pidsChunks as $pidsChunk)
 {
 	$c = new Criteria();
-	$c->add(PartnerPeer::ID, $currentPartnerId, Criteria::GREATER_THAN);
-	$c->addAnd(PartnerPeer::ID, $maxPartnerId, Criteria::LESS_THAN);
+	$c->add(PartnerPeer::ID, $pidsChunk, Criteria::IN);
 	$c->addAnd(PartnerPeer::STATUS, 1);
-	$c->addAscendingOrderByColumn(PartnerPeer::ID);
-	$c->setLimit(CHUNK_SIZE);
 	$partners = PartnerPeer::doSelect($c);
 
 	KalturaLog::info("partners count is " . count($partners));
 
-	foreach($partners as $partner)
-	{
+	foreach ($partners as $partner) {
 		$currentPartnerId = $partner->getId();
 		$additionalParams = $partner->getAdditionalParams();
-		if (!isset($additionalParams['note']) || $additionalParams['note'] !== 'Created by KME script')
-		{
+		if (!isset($additionalParams['note']) || $additionalParams['note'] !== 'Created by KME script') {
 			KalturaLog::info("skipping partner " . $partner->getId() . " as it wasn't created by KME script");
 			continue;
 		}
@@ -53,19 +50,16 @@ do
 		$loginDataCriteria->add(UserLoginDataPeer::LOGIN_EMAIL, $partner->getAdminEmail());
 		$loginDataCriteria->add(UserLoginDataPeer::CONFIG_PARTNER_ID, $partner->getId());
 		$loginData = UserLoginDataPeer::doSelectOne($loginDataCriteria);
-		if (!$loginData)
-		{
+		if (!$loginData) {
 			$failedPids[] = $partner->getId();
 			continue;
 		}
-		if (!$dryRun)
-		{
+		if (!$dryRun) {
 			$loginData->resetPassword($newPass);
 		}
 		$successfulPids[] = $partner->getId();
 	}
-
-} while (count($partners));
+}
 
 $currentTime = time();
 
