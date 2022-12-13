@@ -161,7 +161,17 @@ if (isPlaykit === '1') {
             playerConfig.provider.ks = data.flashVars.ks;
         }
     }
-    var embedCode = '<scr'+'ipt src="'+ codeUrl +'"></scr'+'ipt><scr'+'ipt> var kalturaPlayer = KalturaPlayer.setup('+ JSON.stringify(playerConfig)+');	kalturaPlayer.loadMedia({entryId: "'+ data.entryId +'"})</scr'+'ipt>';
+    var embedCode = '';
+    if (data.playlistId)
+    {
+        iframeURL = codeUrl + "/playlist_id/" + data.playlistId + "?iframeembed=true";
+        embedCode = '<scr' + 'ipt src="' + codeUrl + '"></scr' + 'ipt><scr' + 'ipt> var kalturaPlayer = KalturaPlayer.setup(' + JSON.stringify(playerConfig) + ');	kalturaPlayer.loadPlaylist({playlistId: "' + data.playlistId + '"})</scr' + 'ipt>';
+    }
+    else
+    {
+        embedCode = '<scr' + 'ipt src="' + codeUrl + '"></scr' + 'ipt><scr' + 'ipt> var kalturaPlayer = KalturaPlayer.setup(' + JSON.stringify(playerConfig) + ');	kalturaPlayer.loadMedia({entryId: "' + data.entryId + '"})</scr' + 'ipt>';
+    }
+    
     code = embedCode;
     if (data.embedType === 'iframe') {
         code = '<iframe id="kaltura_player" src="'+iframeURL+'" width="'+ width +'" height="'+height+'" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" allow="autoplay; fullscreen; encrypted-media" frameborder="0" style="width: '+width+'px; height: '+height+'px;" itemprop="video" itemscope="" itemtype="http://schema.org/VideoObject"></iframe>';
