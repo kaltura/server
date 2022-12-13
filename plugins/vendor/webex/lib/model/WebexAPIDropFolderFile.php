@@ -14,7 +14,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	const RECORDING_START_TIME = 'recording_start_time';
 	
 	/**
-	 * @var int
+	 * @var string
 	 */
 	protected $recordingId;
 	
@@ -50,7 +50,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function getRecordingId()
 	{
@@ -58,7 +58,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	}
 	
 	/**
-	 * @param int $v
+	 * @param string $v
 	 */
 	public function setRecordingId($v)
 	{

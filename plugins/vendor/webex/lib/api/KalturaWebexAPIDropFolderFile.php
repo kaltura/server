@@ -6,7 +6,7 @@
 class KalturaWebexAPIDropFolderFile extends KalturaDropFolderFile
 {
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $recordingId;
 	
