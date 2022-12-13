@@ -1,4 +1,16 @@
 # Rigel-18.19.0
+## Allow CNC Checkbox
+* Issue Type: Task
+* Issue ID: PLAT-23996
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.allowCNC.enabled = true
+moduls.allowCNC.permissionType = 2
+moduls.allowCNC.label = "Allow CNC"
+moduls.allowCNC.permissionName = FEATURE_ALLOW_CNC_PERMISSION
+moduls.allowCNC.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 ## Fix permissions for caption_captionasset.get ##
 
 * Issue Type: Task
