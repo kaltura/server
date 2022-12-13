@@ -133,13 +133,15 @@ class VendorHelper
 		return $categoryDb->getId();
 	}
 	
-	public static function addEntryToCategory($categoryName, $entryId)
+	public static function addEntryToCategory($categoryName, $entryId, $partnerId)
 	{
+		KBatchBase::impersonate($partnerId);
 		$categoryId = self::findCategoryIdByName($categoryName);
 		if ($categoryId)
 		{
 			self::addCategoryEntry($categoryId, $entryId);
 		}
+		KBatchBase::unimpersonate();
 	}
 	
 	public static function findCategoryIdByName($categoryName)
