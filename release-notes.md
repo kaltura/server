@@ -1,5 +1,5 @@
 # Rigel-18.19.0
-## Allow CNC
+## Allow CNC Checkbox
 * Issue Type: Task
 * Issue ID: PLAT-23996
 ### Deployment ###
