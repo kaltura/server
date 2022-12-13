@@ -40,6 +40,11 @@ class KalturaWebexAPIDropFolderFile extends KalturaDropFolderFile
 	 */
 	public $recordingStartTime;
 	
+	/**
+	 * @var string
+	 */
+	public $hostEmail;
+	
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -52,6 +57,7 @@ class KalturaWebexAPIDropFolderFile extends KalturaDropFolderFile
 		'fileExtension',
 		'meetingId',
 		'recordingStartTime',
+		'hostEmail',
 	 );
 		 
 	public function getMapBetweenObjects()

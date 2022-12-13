@@ -7,6 +7,8 @@ class kWebexAPIClient extends kVendorClient
 {
 	const DELETE_SUCCESSFUL_CODE = 204;
 	
+	protected $responseHeader;
+	
 	/**
 	 * kWebexAPIClient constructor.
 	 * @param $webexBaseURL
@@ -71,13 +73,13 @@ class kWebexAPIClient extends kVendorClient
 		$startHour = date($hourFormat, $startTime);
 		$endDate = date($dateFormat, $endTime);
 		$endHour = date($hourFormat, $endTime);
-		$request = "recordings?from=$startDate" . "T$startHour" . "&to=$endDate" . "T$endHour";
+		$request = "admin/recordings?from=$startDate" . "T$startHour" . "&to=$endDate" . "T$endHour";
 		return $this->sendRequest($request);
 	}
 	
-	public function getRecording($recordingId)
+	public function getRecording($recordingId, $hostEmail)
 	{
-		$request = "recordings/$recordingId";
+		$request = "recordings/$recordingId" . "?hostEmail=$hostEmail";
 		return $this->sendRequest($request);
 	}
 	
@@ -91,6 +93,12 @@ class kWebexAPIClient extends kVendorClient
 			return null;
 		}
 		return $response;
+	}
+	
+	public function getMeeting($meetingId)
+	{
+		$request = "meetings/$meetingId";
+		return $this->sendRequest($request);
 	}
 	
 	public function retrieveWebexUser()

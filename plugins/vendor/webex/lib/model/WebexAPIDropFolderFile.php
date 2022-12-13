@@ -12,6 +12,7 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	const FILE_EXTENSION = 'file_extension';
 	const MEETING_ID = 'meeting_id';
 	const RECORDING_START_TIME = 'recording_start_time';
+	const HOST_EMAIL = 'host_email';
 	
 	/**
 	 * @var string
@@ -47,6 +48,11 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	 * @var int
 	 */
 	protected $recordingStartTime;
+	
+	/**
+	 * @var string
+	 */
+	protected $hostEmail;
 
 
 	/**
@@ -159,6 +165,22 @@ class WebexAPIDropFolderFile extends DropFolderFile
 	public function setRecordingStartTime($v)
 	{
 		$this->putInCustomData(self::RECORDING_START_TIME, $v);
+	}
+	
+	/**
+	 * @return string
+	 */
+	public function getHostEmail()
+	{
+		return $this->getFromCustomData(self::HOST_EMAIL);
+	}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setHostEmail($v)
+	{
+		$this->putInCustomData(self::HOST_EMAIL, $v);
 	}
 	
 	public function getFileUrl ()

@@ -70,7 +70,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		if (!isset($recordingsList['items']))
 		{
 			
-			KalturaLog::info('No items in response');
+			KalturaLog::info('No recordings in response');
 			return null;
 		}
 		KalturaLog::info('Response from Webex with ' . count($recordingsList['items']) . ' recordings');
@@ -86,15 +86,24 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 				KalturaLog::warning('Error getting recording id from Webex');
 				continue;
 			}
-			$recordingInfo = $this->webexClient->getRecording($recordingItem['id']);
-			if (!isset($recordingInfo['topic']))
-			{
-				KalturaLog::warning('Error getting recording name from Webex, recording id: ' . $recordingItem['id']);
-				continue;
-			}
-			if (!isset($recordingInfo['meetingId']))
+			if (!isset($recordingItem['meetingId']))
 			{
 				KalturaLog::warning('Error getting meeting id from Webex, recording id: ' . $recordingItem['id']);
+				continue;
+			}
+			$meetingInfo = $this->webexClient->getMeeting($recordingItem['meetingId']);
+			
+			if (!isset($meetingInfo['hostEmail']))
+			{
+				KalturaLog::warning('Error getting meeting host email from Webex, meeting id: ' . $meetingInfo['id']);
+				continue;
+			}
+			$hostEmail = $meetingInfo['hostEmail'];
+			$recordingInfo = $this->webexClient->getRecording($recordingItem['id'], $hostEmail);
+			
+			if (!isset($recordingInfo['topic']))
+			{
+				KalturaLog::warning('Error getting recording name from Webex, recording id: ' . $recordingItem['id'], ', response: ' . print_r($recordingItem, true));
 				continue;
 			}
 			KalturaLog::info('Response from Webex with recording info for: ' . $recordingInfo['topic']);
@@ -115,7 +124,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 			if (count($dropFolderFilesMap) === 0)
 			{
 				KalturaLog::info("Creating Drop Folder File for file: $recordingFileName");
-				$this->addDropFolderFile($recordingInfo);
+				$this->addDropFolderFile($recordingInfo, $hostEmail);
 			}
 			else
 			{
@@ -124,11 +133,11 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		}
 	}
 	
-	protected function addDropFolderFile($recordingInfo)
+	protected function addDropFolderFile($recordingInfo, $hostEmail)
 	{
 		try
 		{
-			$webexDropFolderFile = $this->allocateWebexDropFolderFile($recordingInfo);
+			$webexDropFolderFile = $this->allocateWebexDropFolderFile($recordingInfo, $hostEmail);
 			KalturaLog::info('Adding new WebexDropFolderFile:');
 			KalturaLog::info(print_r($webexDropFolderFile, true));
 			$dropFolderFile = $this->dropFolderFileService->add($webexDropFolderFile);
@@ -141,7 +150,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		}
 	}
 	
-	protected function allocateWebexDropFolderFile($recordingInfo)
+	protected function allocateWebexDropFolderFile($recordingInfo, $hostEmail)
 	{
 		$webexDropFolderFile = new KalturaWebexAPIDropFolderFile();
 		$webexDropFolderFile->dropFolderId = $this->dropFolder->id;
@@ -156,6 +165,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$webexDropFolderFile->urlExpiry = strtotime($recordingInfo['temporaryDirectDownloadLinks']['expiration']);
 		$webexDropFolderFile->meetingId = $recordingInfo['meetingId'];
 		$webexDropFolderFile->recordingStartTime = strtotime($recordingInfo['timeRecorded']);
+		$webexDropFolderFile->hostEmail = $hostEmail;
 		return $webexDropFolderFile;
 	}
 	
@@ -290,7 +300,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		{
 			throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, 'Failed to create new entry');
 		}
-		VendorHelper::addEntryToCategory($this->dropFolder->webexAPIVendorIntegration->webexCategory, $entry->id);
+		VendorHelper::addEntryToCategory($this->dropFolder->webexAPIVendorIntegration->webexCategory, $entry->id, $partnerId);
 		
 		$kFlavorAsset = new KalturaFlavorAsset();
 		$kFlavorAsset->tags = self::TAG_SOURCE;
@@ -373,7 +383,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		KalturaLog::info("Refreshing download link for {$this->dropFolderFile->fileName}");
 		$this->webexClient = $this->initWebexClient();
-		$recordingInfo = $this->webexClient->getRecording($this->dropFolderFile->recordingId);
+		$recordingInfo = $this->webexClient->getRecording($this->dropFolderFile->recordingId, $this->dropFolderFile->hostEmail);
 		
 		if (!isset($recordingInfo['temporaryDirectDownloadLinks']))
 		{
