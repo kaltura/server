@@ -36,6 +36,11 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 	public $webexAccountDescription;
 	
 	/**
+	 * @var KalturaWebexAPIGroupParticipationType
+	 */
+	public $groupParticipationType;
+	
+	/**
 	 * @var string
 	 */
 	public $optOutGroupNames;
@@ -44,11 +49,6 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 	 * @var string
 	 */
 	public $optInGroupNames;
-	
-	/**
-	 * @var KalturaWebexAPIGroupParticipationType
-	 */
-	public $groupParticipationType;
 	
 	
 	/*
@@ -62,9 +62,9 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 		'userMatchingMode',
 		'userPostfix',
 		'webexAccountDescription',
+		'groupParticipationType',
 		'optInGroupNames',
 		'optOutGroupNames',
-		'groupParticipationType',
 	);
 
 	public function getMapBetweenObjects()

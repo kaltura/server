@@ -66,7 +66,6 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		$startTime = $this->lastFileTimestamp;
 		$endTime = $startTime + kTimeConversion::DAY;
 		
-		// TODO - Add Pagination
 		$recordingsList = $this->webexClient->getRecordingsList($startTime, $endTime);
 		if (!isset($recordingsList['items']))
 		{
@@ -231,13 +230,10 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	{
 		KalturaLog::info("Purging drop folder file: {$dropFolderFile->fileName}");
 		$fullPath = $dropFolderFile->fileName;
-		try
+		
+		$response = $this->webexClient->deleteRecording($dropFolderFile->id);
+		if (!$response)
 		{
-			$this->webexClient->deleteRecording($dropFolderFile->id);
-		}
-		catch (Exception $e)
-		{
-			KalturaLog::err("Error when deleting drop folder file - ".$e->getMessage());
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileErrorCode::ERROR_DELETING_FILE,
 				DropFolderPlugin::ERROR_DELETING_FILE_MESSAGE. '['.$fullPath.']');
 		}

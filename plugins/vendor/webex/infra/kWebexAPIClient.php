@@ -88,7 +88,7 @@ class kWebexAPIClient extends kVendorClient
 		if (!$this->errorCode == self::DELETE_SUCCESSFUL_CODE)
 		{
 			KalturaLog::warning("Deleting recording from Webex failed (Code {$this->errorCode}, response from Webex: " . print_r($response, true));
-			throw new KalturaAPIException(KalturaWebexAPIErrors::DELETE_RECORDING_FAILED);
+			return null;
 		}
 		return $response;
 	}
