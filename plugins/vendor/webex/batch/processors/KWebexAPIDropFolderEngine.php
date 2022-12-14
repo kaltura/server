@@ -445,19 +445,15 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		foreach ($additionalUsersWebexResponse as $user)
 		{
-			if (!isset($user['email']))
+			if (!isset($user['email']) || !isset($user['host']))
 			{
-				KalturaLog::warning('Error getting email for participant, participant details: ' . print_r($user, true));
+				KalturaLog::warning('Error getting information for participant, participant details: ' . print_r($user, true));
 				throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::MISSING_MEETING_PARTICIPANTS_INFO);
 			}
-			$userEmail = $user['email'];
-			$isHost = $user['host'];
-			$isCoHost = $user['coHost'];
 			
-			if (!$isHost)
+			if (!$user['host'])
 			{
-				$userEmail = $this->processWebexUserName($userEmail, $this->dropFolder->webexAPIVendorIntegration->userMatchingMode, $this->dropFolder->webexAPIVendorIntegration->userPostfix);
-				$usersList[] = $userEmail;
+				$usersList[] = $this->processWebexUserName($user['email'], $this->dropFolder->webexAPIVendorIntegration->userMatchingMode, $this->dropFolder->webexAPIVendorIntegration->userPostfix);
 			}
 		}
 		
