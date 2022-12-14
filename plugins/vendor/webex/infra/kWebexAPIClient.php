@@ -114,7 +114,7 @@ class kWebexAPIClient extends kVendorClient
 		if (!isset($response['emails']))
 		{
 			KalturaLog::warning("Retrieve user from Webex failed (Code {$this->errorCode}), response from Webex: " . print_r($response, true));
-			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
+			return null;
 		}
 		return $response['emails'][0];
 	}

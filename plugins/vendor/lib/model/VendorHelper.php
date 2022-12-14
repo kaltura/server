@@ -5,7 +5,6 @@
  */
 class VendorHelper
 {
-	const MAX_PUSER_LENGTH = 100;
 	const ERROR_PARENT_CATEGORY_NOT_FOUND = 'Could not find parent category id';
 	
 	/**
@@ -91,10 +90,6 @@ class VendorHelper
 		die();
 	}
 	
-	//
-	//
-	// Create category for vendor integration (From service)
-	
 	/**
 	 * @param int $partnerId
 	 * @param string $categoryFullName
@@ -138,73 +133,6 @@ class VendorHelper
 		return $categoryDb->getId();
 	}
 	
-	//
-	//
-	// Create categoryEntry for vendor integration (From batch)
-	
-	public static function addEntryToCategory($categoryName, $entryId, $partnerId)
-	{
-		KBatchBase::impersonate($partnerId);
-		$categoryId = self::findCategoryIdByName($categoryName);
-		if ($categoryId)
-		{
-			self::addCategoryEntry($categoryId, $entryId);
-		}
-		KBatchBase::unimpersonate();
-	}
-	
-	public static function findCategoryIdByName($categoryName)
-	{
-		$isFullPath = self::isFullPath($categoryName);
-		
-		$categoryFilter = new KalturaCategoryFilter();
-		if ($isFullPath)
-		{
-			$categoryFilter->fullNameEqual = $categoryName;
-		}
-		else
-		{
-			$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
-		}
-		
-		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
-		$categoryId = null;
-		if ($isFullPath)
-		{
-			if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
-			{
-				$categoryId = $categoryResponse->objects[0]->id;
-			}
-		}
-		else
-		{
-			$categoryIds = array();
-			foreach ($categoryResponse->objects as $category)
-			{
-				if ($category->name === $categoryName)
-				{
-					$categoryIds[] = $category->id;
-				}
-			}
-			$categoryId = (count($categoryIds) == 1) ? $categoryIds[0] : null;
-		}
-		return $categoryId;
-	}
-	
-	public static function isFullPath($categoryName)
-	{
-		$numCategories = count(explode('>', $categoryName));
-		return ($numCategories > 1);
-	}
-	
-	public static function addCategoryEntry($categoryId, $entryId)
-	{
-		$categoryEntry = new KalturaCategoryEntry();
-		$categoryEntry->categoryId = $categoryId;
-		$categoryEntry->entryId = $entryId;
-		KBatchBase::$kClient->categoryEntry->add($categoryEntry);
-	}
-	
 	public static function exitWithError($errMsg, $vendorIntegration)
 	{
 		KalturaLog::err($errMsg);
@@ -214,108 +142,5 @@ class VendorHelper
 		}
 		
 		KExternalErrors::dieGracefully();
-	}
-	
-	//
-	//
-	// Opt-in / Opt-out groups (From batch)
-	
-	public static function isUserNotMemberOfGroups($userId, $partnerId, $participationGroupList)
-	{
-		$userFilter = new KalturaGroupUserFilter();
-		$userFilter->userIdEqual = $userId;
-		
-		KBatchBase::impersonate($partnerId);
-		$userGroupsResponse = KBatchBase::$kClient->groupUser->listAction($userFilter);
-		KBatchBase::unimpersonate();
-		
-		$userGroupsArray = $userGroupsResponse->objects;
-		
-		$userGroupNamesArray = array();
-		foreach ($userGroupsArray as $group)
-		{
-			array_push($userGroupNamesArray, $group->groupId);
-		}
-		
-		KalturaLog::debug('User with id ['.$userId.'] is a member of the following groups ['.print_r($userGroupNamesArray, true).']');
-		
-		$intersection = array_intersect($userGroupNamesArray, $participationGroupList);
-		return empty($intersection);
-	}
-	
-	public static function getValidatedUsers($users, $partnerId, $createIfNotFound, $userToExclude)
-	{
-		if (!$users)
-		{
-			return $users;
-		}
-		
-		$validatedUsers = array();
-		foreach ($users as $user)
-		{
-			/* @var $user kVendorUser */
-			/* @var $kUser KalturaUser */
-			$kUser = self::getKalturaUser($partnerId, $user);
-			if ($kUser)
-			{
-				if (strtolower($kUser->id) !== $userToExclude)
-				{
-					$validatedUsers[] = $kUser->id;
-				}
-			}
-			elseif ($createIfNotFound)
-			{
-				self::createNewVendorUser($partnerId, $user->getProcessedName());
-				$validatedUsers[] = $user->getProcessedName();
-			}
-		}
-		return $validatedUsers;
-	}
-	
-	public static function getKalturaUser($partnerId, kVendorUser $vendorUser)
-	{
-		$pager = new KalturaFilterPager();
-		$pager->pageSize = 1;
-		$pager->pageIndex = 1;
-		
-		$filter = new KalturaUserFilter();
-		$filter->partnerIdEqual = $partnerId;
-		$filter->idEqual = $vendorUser->getProcessedName();
-		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
-		if (!$kalturaUser->objects)
-		{
-			$email = $vendorUser->getOriginalName();
-			$filterUser = new KalturaUserFilter();
-			$filterUser->partnerIdEqual = $partnerId;
-			$filterUser->emailStartsWith = $email;
-			$kalturaUser = KBatchBase::$kClient->user->listAction($filterUser, $pager);
-			if (!$kalturaUser->objects || strcasecmp($kalturaUser->objects[0]->email, $email) != 0)
-			{
-				return null;
-			}
-		}
-		
-		if($kalturaUser->objects)
-		{
-			return $kalturaUser->objects[0];
-		}
-		return null;
-	}
-	
-	public static function createNewVendorUser($partnerId, $puserId)
-	{
-		if (!is_null($puserId))
-		{
-			$puserId = substr($puserId, 0, self::MAX_PUSER_LENGTH);
-		}
-		
-		$user = new KalturaUser();
-		$user->id = $puserId;
-		$user->screenName = $puserId;
-		$user->firstName = $puserId;
-		$user->isAdmin = false;
-		$user->type = KalturaUserType::USER;
-		$kalturaUser = KBatchBase::$kClient->user->add($user);
-		return $kalturaUser;
 	}
 }

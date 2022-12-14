@@ -169,6 +169,10 @@ class WebexVendorService extends KalturaBaseService
 		$accessToken = $tokens[kOauth::ACCESS_TOKEN];
 		$client = new kWebexAPIClient($webexBaseURL, null, null, null, $accessToken);
 		$accountId = $client->retrieveWebexUser();
+		if (!$accountId)
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
+		}
 		$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
 		if (!$webexIntegration)
 		{
@@ -246,6 +250,10 @@ class WebexVendorService extends KalturaBaseService
 		$webexBaseURL = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_BASE_URL];
 		$client = new kWebexAPIClient($webexBaseURL, $tokens[kOAuth::REFRESH_TOKEN],null, null, $tokens[kOAuth::ACCESS_TOKEN]);
 		$accountId = $client->retrieveWebexUser();
+		if (!$accountId)
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
+		}
 		$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if ($webexIntegration && $partnerId !==  $webexIntegration->getPartnerId() && $partnerId !== 0)
