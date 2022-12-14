@@ -101,6 +101,12 @@ class kWebexAPIClient extends kVendorClient
 		return $this->sendRequest($request);
 	}
 	
+	public function getMeetingParticipants($meetingId, $hostEmail)
+	{
+		$request = "meetingParticipants?meetingId=$meetingId" . "&hostEmail=$hostEmail";
+		return $this->sendRequest($request);
+	}
+	
 	public function retrieveWebexUser()
 	{
 		$request = 'people/me';

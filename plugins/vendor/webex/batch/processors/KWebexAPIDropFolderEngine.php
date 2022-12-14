@@ -9,6 +9,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	const WEBEX_PREFIX = 'Webex_';
 	const TAG_SOURCE = "source";
 	const SOURCE_FLAVOR_ID = 0;
+	const KALTURA_WEBEX_API_DEFAULT_USER = 'KalturaWebexAPIDefault';
 	
 	/**
 	 * @var kWebexAPIClient
@@ -99,6 +100,13 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 				continue;
 			}
 			$hostEmail = $meetingInfo['hostEmail'];
+			
+			if ($this->excludeRecordingIngestForUser($hostEmail))
+			{
+				KalturaLog::debug("The user [$hostEmail] is configured to not save recordings - Not processing");
+				continue;
+			}
+			
 			$recordingInfo = $this->webexClient->getRecording($recordingItem['id'], $hostEmail);
 			
 			if (!isset($recordingInfo['topic']))
@@ -138,8 +146,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		try
 		{
 			$webexDropFolderFile = $this->allocateWebexDropFolderFile($recordingInfo, $hostEmail);
-			KalturaLog::info('Adding new WebexDropFolderFile:');
-			KalturaLog::info(print_r($webexDropFolderFile, true));
+			KalturaLog::info('Adding new WebexDropFolderFile: ' . print_r($webexDropFolderFile, true));
 			$dropFolderFile = $this->dropFolderFileService->add($webexDropFolderFile);
 			return $dropFolderFile;
 		}
@@ -296,20 +303,53 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function prepareEntryAndFlavorAsset($partnerId)
 	{
-		$entry = $this->createEntryFromRecording($this->dropFolderFile, $partnerId, $this->dropFolder);
+		$ownerId = $this->getEntryOwnerId($this->dropFolderFile->hostEmail);
+		$entry = $this->createEntryFromRecording($ownerId);
 		if (!$entry)
 		{
 			throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, 'Failed to create new entry');
 		}
-		VendorHelper::addEntryToCategory($this->dropFolder->webexAPIVendorIntegration->webexCategory, $entry->id, $partnerId);
 		
-		$kFlavorAsset = new KalturaFlavorAsset();
-		$kFlavorAsset->tags = self::TAG_SOURCE;
-		$kFlavorAsset->flavorParamsId = self::SOURCE_FLAVOR_ID;
-		$kFlavorAsset->fileExt = strtolower($this->dropFolderFile->fileExtension);
-		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->id, $kFlavorAsset);
+		VendorHelper::addEntryToCategory($this->dropFolder->webexAPIVendorIntegration->webexCategory, $entry->id, $partnerId);
+		$entry = $this->handleParticipants($entry, $ownerId);
+		$flavorAsset = $this->createFlavorAssetForEntry($entry->id);
 		
 		return array($entry, $flavorAsset);
+	}
+	
+	protected function getEntryOwnerId($hostEmail)
+	{
+		$partnerId = $this->dropFolder->partnerId;
+		$vendorIntegration = $this->dropFolder->webexAPIVendorIntegration;
+		
+		$defaultUser = $vendorIntegration->defaultUserId;
+		$createUserIfNotExist = $vendorIntegration->createUserIfNotExist;
+		if ($hostEmail == '')
+		{
+			return $createUserIfNotExist ? self::KALTURA_WEBEX_API_DEFAULT_USER : $defaultUser;
+		}
+		$webexUser = new kVendorUser();
+		$webexUser->setOriginalName($hostEmail);
+		$webexUser->setProcessedName($this->processWebexUserName($hostEmail, $this->dropFolder->webexAPIVendorIntegration->userMatchingMode, $this->dropFolder->webexAPIVendorIntegration->userPostfix));
+		/* @var $user KalturaUser */
+		$user = self::getKalturaUser($partnerId, $webexUser);
+		$userId = '';
+		if ($user)
+		{
+			$userId = $user->id;
+		}
+		else
+		{
+			if ($vendorIntegration->createUserIfNotExist)
+			{
+				$userId = $webexUser->getProcessedName();
+			}
+			else if ($vendorIntegration->defaultUserId)
+			{
+				$userId = $vendorIntegration->defaultUserId;
+			}
+		}
+		return $userId;
 	}
 	
 	/**
@@ -319,15 +359,17 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	 * @return KalturaBaseEntry
 	 * @throws Exception
 	 */
-	protected function createEntryFromRecording($dropFolderFile, $ownerId, $dropFolder)
+	protected function createEntryFromRecording($ownerId)
 	{
+		$dropFolderFile = $this->dropFolderFile;
+		
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
 		$newEntry->description = $this->createEntryDescriptionFromRecording($dropFolderFile);
 		$newEntry->name = $dropFolderFile->fileName;
 		$newEntry->userId = $ownerId;
-		$newEntry->conversionProfileId = $dropFolder->conversionProfileId;
+		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		$newEntry->adminTags = self::ADMIN_TAG_WEBEX;
 		$newEntry->referenceId = self::WEBEX_PREFIX . $dropFolderFile->id;
 		KBatchBase::impersonate($this->dropFolder->partnerId);
@@ -351,13 +393,16 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	 * @param array $validatedUsers
 	 * @throws kCoreException
 	 */
-	protected function handleParticipants($entry)
+	protected function handleParticipants($entry, $ownerId)
 	{
-		//$validatedUsers = $this->getAdditionalUsers($this->dropFolderFile->meetingId);
-		$validatedUsers = array();
-		
 		$handleParticipantMode = $this->dropFolder->webexAPIVendorIntegration->handleParticipantsMode;
-		if ($validatedUsers && $handleParticipantMode != kHandleParticipantsMode::IGNORE)
+		if ($handleParticipantMode == kHandleParticipantsMode::IGNORE)
+		{
+			return $entry;
+		}
+		
+		$validatedUsers = $this->getAdditionalUsers($ownerId);
+		if ($validatedUsers)
 		{
 			switch ($handleParticipantMode)
 			{
@@ -367,11 +412,118 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 				case kHandleParticipantsMode::ADD_AS_CO_VIEWERS:
 					$entry->entitledUsersView = implode(',', array_unique($validatedUsers));
 					break;
-				case kHandleParticipantsMode::IGNORE:
 				default:
 					break;
 			}
 		}
+		
+		return $entry;
+	}
+	
+	/**
+	 * @return array|null
+	 */
+	protected function getAdditionalUsers($ownerId)
+	{
+		$meetingId = $this->dropFolderFile->meetingId;
+		$hostEmail = $this->dropFolderFile->hostEmail;
+		$participantsList = $this->webexClient->getMeetingParticipants($meetingId, $hostEmail);
+		if (!isset($participantsList['items']))
+		{
+			KalturaLog::warning("Error getting meeting participants from Webex for meeting id [$meetingId], response: " . print_r($participantsList, true));
+			throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::MISSING_MEETING_PARTICIPANTS_INFO);
+		}
+		
+		$userToExclude = strtolower($ownerId);
+		$additionalWebexUsers = $this->parseAdditionalUsers($participantsList);
+		return VendorHelper::getValidatedUsers($additionalWebexUsers, $this->dropFolder->partnerId, $this->dropFolder->webexAPIVendorIntegration->createUserIfNotExist, $userToExclude);
+	}
+	
+	protected function parseAdditionalUsers($additionalUsersWebexResponse)
+	{
+		$usersList = array();
+		
+		foreach ($additionalUsersWebexResponse as $user)
+		{
+			if (!isset($user['email']))
+			{
+				KalturaLog::warning('Error getting email for participant, participant details: ' . print_r($user, true));
+				throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::MISSING_MEETING_PARTICIPANTS_INFO);
+			}
+			$userEmail = $user['email'];
+			$isHost = $user['host'];
+			$isCoHost = $user['coHost'];
+			
+			if (!$isHost)
+			{
+				$userEmail = $this->processWebexUserName($userEmail, $this->dropFolder->webexAPIVendorIntegration->userMatchingMode, $this->dropFolder->webexAPIVendorIntegration->userPostfix);
+				$usersList[] = $userEmail;
+			}
+		}
+		
+		return $usersList;
+	}
+	
+	protected function processWebexUserName($userName, $userMatchingMode, $postFix)
+	{
+		switch ($userMatchingMode)
+		{
+			case kWebexAPIUsersMatching::ADD_POSTFIX:
+				
+				if (!kString::endsWith($userName, $postFix, false))
+				{
+					$userName = $userName . $postFix;
+				}
+				
+				break;
+			case kWebexAPIUsersMatching::REMOVE_POSTFIX:
+				if (kString::endsWith($userName, $postFix, false))
+				{
+					$userName = substr($userName, 0, strlen($userName) - strlen($postFix));
+				}
+				
+				break;
+			case kWebexAPIUsersMatching::DO_NOT_MODIFY:
+			default:
+				break;
+		}
+		
+		return $userName;
+	}
+	
+	protected function excludeRecordingIngestForUser($hostEmail)
+	{
+		$groupParticipationType = $this->dropFolder->webexAPIVendorIntegration->groupParticipationType;
+		$optInGroupNames = explode("\r\n", $this->dropFolder->webexAPIVendorIntegration->optInGroupNames);
+		$optOutGroupNames = explode("\r\n", $this->dropFolder->webexAPIVendorIntegration->optOutGroupNames);
+		$partnerId = $this->dropFolder->partnerId;
+		
+		$userId = $this->getEntryOwnerId($hostEmail);
+		if (!$userId)
+		{
+			KalturaLog::err('Could not find user');
+			return true;
+		}
+		
+		if ($groupParticipationType == kWebexAPIGroupParticipationType::OPT_IN)
+		{
+			KalturaLog::debug('Account is configured to OPT IN the users that are members of the following groups ['.print_r($optInGroupNames, true).']');
+			return VendorHelper::isUserNotMemberOfGroups($userId, $partnerId, $optInGroupNames);
+		}
+		elseif ($groupParticipationType == kWebexAPIGroupParticipationType::OPT_OUT)
+		{
+			KalturaLog::debug('Account is configured to OPT OUT the users that are members of the following groups ['.print_r($optOutGroupNames, true).']');
+			return !VendorHelper::isUserNotMemberOfGroups($userId, $partnerId, $optOutGroupNames);
+		}
+	}
+	
+	protected function createFlavorAssetForEntry($entryId)
+	{
+		$kFlavorAsset = new KalturaFlavorAsset();
+		$kFlavorAsset->tags = self::TAG_SOURCE;
+		$kFlavorAsset->flavorParamsId = self::SOURCE_FLAVOR_ID;
+		$kFlavorAsset->fileExt = strtolower($this->dropFolderFile->fileExtension);
+		return KBatchBase::$kClient->flavorAsset->add($entryId, $kFlavorAsset);
 	}
 
 	protected function refreshDownloadUrl()
