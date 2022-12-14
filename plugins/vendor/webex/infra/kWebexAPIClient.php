@@ -83,9 +83,9 @@ class kWebexAPIClient extends kVendorClient
 		return $this->sendRequest($request);
 	}
 	
-	public function deleteRecording($recordingId)
+	public function deleteRecording($recordingId, $hostEmail)
 	{
-		$request = "recordings/$recordingId";
+		$request = "recordings/$recordingId" . "?hostEmail=$hostEmail";
 		$response = $this->sendRequest($request, false, true);
 		if (!$this->errorCode == self::DELETE_SUCCESSFUL_CODE)
 		{

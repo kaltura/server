@@ -238,10 +238,11 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function purgeFile(KalturaDropFolderFile $dropFolderFile)
 	{
+		/** @var KalturaWebexApiDropFolderFile $dropFolderFile */
 		KalturaLog::info("Purging drop folder file: {$dropFolderFile->fileName}");
 		$fullPath = $dropFolderFile->fileName;
 		
-		$response = $this->webexClient->deleteRecording($dropFolderFile->id);
+		$response = $this->webexClient->deleteRecording($dropFolderFile->id, $dropFolderFile->hostEmail);
 		if (!$response)
 		{
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileErrorCode::ERROR_DELETING_FILE,
