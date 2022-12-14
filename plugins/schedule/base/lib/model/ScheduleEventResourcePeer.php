@@ -60,6 +60,16 @@ class ScheduleEventResourcePeer extends BaseScheduleEventResourcePeer implements
 		return ScheduleEventResourcePeer::doSelect($criteria);
 	}
 
+	public static function retrieveByResourceId($resourceId, $partnerId = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ScheduleEventResourcePeer::RESOURCE_ID, $resourceId);
+		if($partnerId)
+			$criteria->add(ScheduleEventResourcePeer::PARTNER_ID, $partnerId);
+
+		return ScheduleEventResourcePeer::doSelect($criteria);
+	}
+
 	public static function retrieveByEventIdOrItsParentId($eventId, $partnerId = null)
 	{
 		$criteria = new Criteria();

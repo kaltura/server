@@ -49,6 +49,12 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 			return true;
 		}
 
+		// If schedule resource tags were updated - must update most recent linked events
+		if ($object instanceof ScheduleResource && in_array(ScheduleResourcePeer::TAGS, $modifiedColumns))
+		{
+			return true;
+		}
+
 		return false;
 	}
 
@@ -78,6 +84,10 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		if ($object instanceof ScheduleEvent)
 		{
 			$this->scheduleEventChanged($object, $modifiedColumns);
+		}
+		if($object instanceof ScheduleResource)
+		{
+			$this->scheduleResourceChanged($object);
 		}
 
 		return true;
@@ -188,6 +198,24 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 			{
 				$this->scheduleEventChangedLinkedToChanged($scheduleEvent, $modifiedColumns);
 			}
+		}
+	}
+
+	protected function scheduleResourceChanged (ScheduleResource $object)
+	{
+		$resourceEvents = ScheduleEventResourcePeer::retrieveByResourceId($object->getId(), $object->getPartnerId());
+
+		$count = 0;
+		foreach($resourceEvents as $resourceEvent)
+		{
+			/* @var $resourceEvent ScheduleEventResource */
+			$this->updateScheduleEvent($resourceEvent->getEventId());
+			if ($count > 150)
+			{
+				break;
+			}
+
+			$count++;
 		}
 	}
 	
