@@ -37,7 +37,7 @@ class kWebexAPIClient extends kVendorClient
 	
 	protected function sendRequest($request, $isRequestPost = false, $isRequestDelete = false)
 	{
-		$this->errorCode = 0;
+		$this->httpCode = 0;
 		
 		$requestUrl = $this->baseURL . $request;
 		$authorizationHeader = 'Authorization: Bearer ' . $this->accessToken;
@@ -53,7 +53,7 @@ class kWebexAPIClient extends kVendorClient
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
 		$response = $curlWrapper->exec($requestUrl);
 		
-		$this->errorCode = $curlWrapper->getErrorNumber();
+		$this->httpCode = $curlWrapper->getHttpCode();
 		if (!$response)
 		{
 			$response = $curlWrapper->getErrorMsg();
@@ -87,12 +87,12 @@ class kWebexAPIClient extends kVendorClient
 	{
 		$request = "recordings/$recordingId" . "?hostEmail=$hostEmail";
 		$response = $this->sendRequest($request, false, true);
-		if (!$this->errorCode == self::DELETE_SUCCESSFUL_CODE)
+		if (!$this->httpCode == self::DELETE_SUCCESSFUL_CODE)
 		{
-			KalturaLog::warning("Deleting recording from Webex failed (Code {$this->errorCode}, response from Webex: " . print_r($response, true));
-			return null;
+			KalturaLog::warning("Deleting recording from Webex failed (Code {$this->httpCode}), response from Webex: " . print_r($response, true));
+			return false;
 		}
-		return $response;
+		return true;
 	}
 	
 	public function getMeeting($meetingId)
@@ -107,7 +107,7 @@ class kWebexAPIClient extends kVendorClient
 		$response = $this->sendRequest($request);
 		if (!isset($response['emails']))
 		{
-			KalturaLog::warning("Retrieve user from Webex failed (Code {$this->errorCode}), response from Webex: " . print_r($response, true));
+			KalturaLog::warning("Retrieve user from Webex failed (Code {$this->httpCode}), response from Webex: " . print_r($response, true));
 			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
 		}
 		return $response['emails'][0];

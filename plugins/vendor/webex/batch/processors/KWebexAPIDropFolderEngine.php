@@ -242,8 +242,8 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		KalturaLog::info("Purging drop folder file: {$dropFolderFile->fileName}");
 		$fullPath = $dropFolderFile->fileName;
 		
-		$response = $this->webexClient->deleteRecording($dropFolderFile->recordingId, $dropFolderFile->hostEmail);
-		if (!$response)
+		$wasDeleteSuccessful = $this->webexClient->deleteRecording($dropFolderFile->recordingId, $dropFolderFile->hostEmail);
+		if (!$wasDeleteSuccessful)
 		{
 			$this->handleFileError($dropFolderFile->id, KalturaDropFolderFileStatus::ERROR_DELETING, KalturaDropFolderFileErrorCode::ERROR_DELETING_FILE,
 				DropFolderPlugin::ERROR_DELETING_FILE_MESSAGE. '['.$fullPath.']');
