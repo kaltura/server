@@ -23,6 +23,7 @@ class kEmails
 	const TAG_QR_CODE_LINK          = '@qrCodeLink@';
 	const TAG_LOGIN_LINK            = '@loginLink@';
 	const DYNAMIC_EMAIL_BASE_LINK   = 'dynamic_email_base_link';
+	const DYNAMIC_EMAIL_2FA_BASE_LINK   = 'dynamic_email_2fa_base_link';
 	const DYNAMIC_EMAIL_ROLE_NAMES  = 'dynamic_email_role_names';
 	const DYNAMIC_EMAIL_SUBJECTS    = 'subjects';
 	const DYNAMIC_EMAIL_BODIES      = 'bodies';
@@ -75,9 +76,16 @@ class kEmails
 		return $blockType . '-' . $roleName;
 	}
 	
-	public static function getDynamicTemplateBaseLink($roleName)
+	public static function getDynamicTemplateBaseLink($roleName, $is2FA = false)
 	{
-		$dynamicBaseLink = self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_BASE_LINK, $roleName);
+		if($is2FA)
+		{
+			$dynamicBaseLink = self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_2FA_BASE_LINK, $roleName);
+		}
+		else
+		{
+			$dynamicBaseLink = self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_BASE_LINK, $roleName);
+		}
 		if(kConf::get($dynamicBaseLink, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null))
 		{
 			return kConf::get($dynamicBaseLink, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);

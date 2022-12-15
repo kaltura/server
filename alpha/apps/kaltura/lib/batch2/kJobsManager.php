@@ -205,7 +205,7 @@ class kJobsManager
 	
 	public static function addDynamicEmailJob($partnerId, $mailType, $mailPriority, $loginEmail, $fromMail, $fromName, $dynamicEmailContents)
 	{
-		self::addMailJob(
+		return self::addMailJob(
 			null,
 			0,
 			$partnerId,
