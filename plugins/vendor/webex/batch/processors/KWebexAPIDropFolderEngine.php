@@ -424,7 +424,11 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			
 			if (!$user['host'])
 			{
-				$usersList[] = $this->processWebexUserName($user['email'], $this->dropFolder->webexAPIVendorIntegration->userMatchingMode, $this->dropFolder->webexAPIVendorIntegration->userPostfix);
+				$webexUser = new kVendorUser();
+				$webexUser->setOriginalName($user['email']);
+				$processedName = $this->processWebexUserName($user['email'], $this->dropFolder->webexAPIVendorIntegration->userMatchingMode, $this->dropFolder->webexAPIVendorIntegration->userPostfix);
+				$webexUser->setProcessedName($processedName);
+				$usersList[] = $webexUser;
 			}
 		}
 		
