@@ -294,6 +294,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			{
 				throw new kExternalException(KalturaDropFolderErrorCode::MISSING_CONFIG, DropFolderPlugin::MISSING_CONFIG_MESSAGE);
 			}
+			
+			$this->webexClient = $this->initWebexClient();
 		}
 		catch (Exception $e)
 		{
@@ -404,7 +406,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		}
 		
 		$userToExclude = strtolower($ownerId);
-		$additionalWebexUsers = $this->parseAdditionalUsers($participantsList);
+		$additionalWebexUsers = $this->parseAdditionalUsers($participantsList['items']);
 		return $this->getValidatedUsers($additionalWebexUsers, $this->dropFolder->partnerId, $this->dropFolder->webexAPIVendorIntegration->createUserIfNotExist, $userToExclude);
 	}
 	
@@ -465,7 +467,6 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		}
 		
 		KalturaLog::info("Refreshing download link for {$this->dropFolderFile->fileName}");
-		$this->webexClient = $this->initWebexClient();
 		$recordingInfo = $this->webexClient->getRecording($this->dropFolderFile->recordingId, $this->dropFolderFile->hostEmail);
 		
 		if (!isset($recordingInfo['temporaryDirectDownloadLinks']))

@@ -60,13 +60,11 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function addEntryToCategory($categoryName, $entryId, $partnerId)
 	{
-		KBatchBase::impersonate($partnerId);
 		$categoryId = $this->findCategoryIdByName($categoryName);
 		if ($categoryId)
 		{
 			$this->addCategoryEntry($categoryId, $entryId);
 		}
-		KBatchBase::unimpersonate();
 	}
 	
 	protected function findCategoryIdByName($categoryName)
