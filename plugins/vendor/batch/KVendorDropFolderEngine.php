@@ -10,6 +10,8 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	abstract protected function getDefaultUserString();
 	
+	abstract protected function getEntryOwnerId($vendorIntegration, $hostEmail);
+	
 	protected function excludeRecordingIngestForUser($vendorIntegration, $hostEmail, $groupParticipationType, $optInGroupNames, $optOutGroupNames)
 	{
 		$partnerId = $this->dropFolder->partnerId;
@@ -17,7 +19,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$userId = $this->getEntryOwnerId($vendorIntegration, $hostEmail);
 		if (!$userId)
 		{
-			KalturaLog::err('Could not find user');
+			KalturaLog::err("Could not find user [$hostEmail]");
 			return true;
 		}
 		
@@ -32,8 +34,6 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 			return $this->isUserNotMemberOfGroups($userId, $partnerId, $optOutGroupNames);
 		}
 	}
-	
-	abstract protected function getEntryOwnerId($vendorIntegration, $hostEmail);
 	
 	protected function isUserNotMemberOfGroups($userId, $partnerId, $participationGroupList)
 	{
@@ -119,33 +119,33 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		KBatchBase::$kClient->categoryEntry->add($categoryEntry);
 	}
 	
-	protected function getValidatedUsers($users, $partnerId, $createIfNotFound, $userToExclude)
+	protected function getKalturaUserIdsFromVendorUsers($vendorUsers, $partnerId, $createIfNotFound, $userToExclude)
 	{
-		if (!$users)
+		if (!$vendorUsers)
 		{
-			return $users;
+			return $vendorUsers;
 		}
 		
-		$validatedUsers = array();
-		foreach ($users as $user)
+		$userIdsList = array();
+		foreach ($vendorUsers as $vendorUser)
 		{
-			/* @var $user kVendorUser */
-			/* @var $kUser KalturaUser */
-			$kUser = $this->getKalturaUser($partnerId, $user);
-			if ($kUser)
+			/* @var $vendorUser kVendorUser */
+			/* @var $kalturaUser KalturaUser */
+			$kalturaUser = $this->getKalturaUser($partnerId, $vendorUser);
+			if ($kalturaUser)
 			{
-				if (strtolower($kUser->id) !== $userToExclude)
+				if (strtolower($kalturaUser->id) !== $userToExclude)
 				{
-					$validatedUsers[] = $kUser->id;
+					$userIdsList[] = $kalturaUser->id;
 				}
 			}
 			elseif ($createIfNotFound)
 			{
-				$this->createNewVendorUser($partnerId, $user->getProcessedName());
-				$validatedUsers[] = $user->getProcessedName();
+				$this->createNewVendorUser($partnerId, $vendorUser->getProcessedName());
+				$userIdsList[] = $vendorUser->getProcessedName();
 			}
 		}
-		return $validatedUsers;
+		return $userIdsList;
 	}
 	
 	protected function getKalturaUser($partnerId, kVendorUser $vendorUser)
@@ -195,22 +195,22 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		return $kalturaUser;
 	}
 	
-	protected function handleParticipants($entry, $validatedUsers, $handleParticipantMode)
+	protected function handleParticipants($entry, $userIdsList, $handleParticipantMode)
 	{
 		if ($handleParticipantMode == kHandleParticipantsMode::IGNORE)
 		{
 			return $entry;
 		}
 		
-		if ($validatedUsers)
+		if ($userIdsList)
 		{
 			switch ($handleParticipantMode)
 			{
 				case kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS:
-					$entry->entitledUsersPublish = implode(',', array_unique($validatedUsers));
+					$entry->entitledUsersPublish = implode(',', array_unique($userIdsList));
 					break;
 				case kHandleParticipantsMode::ADD_AS_CO_VIEWERS:
-					$entry->entitledUsersView = implode(',', array_unique($validatedUsers));
+					$entry->entitledUsersView = implode(',', array_unique($userIdsList));
 					break;
 				default:
 					break;

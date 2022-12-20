@@ -5,9 +5,9 @@
 class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 {
 	const DEFAULT_WEBEX_QUERY_TIME_RANGE = 259200; // 3 days
-	const ADMIN_TAG_WEBEX = 'webex_api_entry';
+	const ADMIN_TAG_WEBEX = 'webexapi';
 	const WEBEX_PREFIX = 'Webex_';
-	const KALTURA_WEBEX_API_DEFAULT_USER = 'KalturaWebexAPIDefault';
+	const KALTURA_WEBEX_DEFAULT_USER = 'KalturaWebexDefault';
 	
 	/**
 	 * @var kWebexAPIClient
@@ -314,9 +314,9 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		}
 		
 		$this->addEntryToCategory($this->dropFolder->webexAPIVendorIntegration->webexCategory, $entry->id, $partnerId);
-		$validatedUsers = $this->getAdditionalUsers($ownerId);
+		$userIdsList = $this->getAdditionalUsers($ownerId);
 		$handleParticipantMode = $this->dropFolder->webexAPIVendorIntegration->handleParticipantsMode;
-		$entry = $this->handleParticipants($entry, $validatedUsers, $handleParticipantMode);
+		$entry = $this->handleParticipants($entry, $userIdsList, $handleParticipantMode);
 		$flavorAsset = $this->createFlavorAssetForEntry($entry->id);
 		
 		return array($entry, $flavorAsset);
@@ -407,7 +407,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		
 		$userToExclude = strtolower($ownerId);
 		$additionalWebexUsers = $this->parseAdditionalUsers($participantsList['items']);
-		return $this->getValidatedUsers($additionalWebexUsers, $this->dropFolder->partnerId, $this->dropFolder->webexAPIVendorIntegration->createUserIfNotExist, $userToExclude);
+		return $this->getKalturaUserIdsFromVendorUsers($additionalWebexUsers, $this->dropFolder->partnerId, $this->dropFolder->webexAPIVendorIntegration->createUserIfNotExist, $userToExclude);
 	}
 	
 	protected function parseAdditionalUsers($additionalUsersWebexResponse)
@@ -419,7 +419,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			if (!isset($user['email']) || !isset($user['host']))
 			{
 				KalturaLog::warning('Error getting information for participant, participant details: ' . print_r($user, true));
-				throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::MISSING_MEETING_PARTICIPANTS_INFO);
+				continue;
 			}
 			
 			if (!$user['host'])
@@ -513,6 +513,6 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 	
 	protected function getDefaultUserString()
 	{
-		return self::KALTURA_WEBEX_API_DEFAULT_USER;
+		return self::KALTURA_WEBEX_DEFAULT_USER;
 	}
 }
