@@ -1,0 +1,1 @@
+ALTER TABLE app_token ADD INDEX `partner_id_status` (`partner_id`,`status`);
