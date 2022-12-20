@@ -1,3 +1,7 @@
+# Rigel-18.20.0
+### Deployment Scripts ###
+    php opt/kaltura/app/deployment/updates/scripts/2022_12_19_add_live_languages_ukr_swa.php
+
 # Rigel-18.19.0
 ## Allow CNC Checkbox
 * Issue Type: Task
