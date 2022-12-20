@@ -34,11 +34,18 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		$this->initDropFolderEngine($dropFolder);
-		$recordingsList = $this->retrieveRecordingsList();
-		if ($recordingsList)
+		$paginationLink = null;
+		do
 		{
-			$this->handleRecordingsList($recordingsList);
+			$recordingsList = $this->retrieveRecordingsList($paginationLink);
+			$paginationLink = $this->webexClient->getPaginationLinkFromLastRequest();
+			if ($recordingsList)
+			{
+				$this->handleRecordingsList($recordingsList);
+			}
 		}
+		while ($paginationLink);
+		
 		$this->updateDropFolderLastFileTimestamp();
 		$this->handleDropFolderFiles();
 	}
@@ -61,12 +68,19 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 		return new kWebexAPIClient($this->dropFolder->baseURL, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
 	}
 	
-	protected function retrieveRecordingsList()
+	protected function retrieveRecordingsList($directLink)
 	{
-		$startTime = $this->lastFileTimestamp;
-		$endTime = $startTime + kTimeConversion::DAY;
+		if ($directLink)
+		{
+			$recordingsList = $this->webexClient->getRecordingsListFromDirectLink($directLink);
+		}
+		else
+		{
+			$startTime = $this->lastFileTimestamp;
+			$endTime = $startTime + kTimeConversion::DAY;
+			$recordingsList = $this->webexClient->getRecordingsList($startTime, $endTime);
+		}
 		
-		$recordingsList = $this->webexClient->getRecordingsList($startTime, $endTime);
 		if (!isset($recordingsList['items']))
 		{
 			
@@ -95,7 +109,7 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 			
 			if (!isset($meetingInfo['hostEmail']))
 			{
-				KalturaLog::warning('Error getting meeting host email from Webex, meeting id: ' . $meetingInfo['id']);
+				KalturaLog::warning('Error getting meeting host email from Webex, meeting id: ' . $recordingItem['meetingId']);
 				continue;
 			}
 			$hostEmail = $meetingInfo['hostEmail'];

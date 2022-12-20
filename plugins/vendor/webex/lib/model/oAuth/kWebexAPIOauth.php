@@ -50,7 +50,6 @@ class kWebexAPIOauth extends kOAuth
 		
 		$curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
-		$curlWrapper->setOpt(CURLOPT_HEADER, true);
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $header);
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
 		$response = $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
