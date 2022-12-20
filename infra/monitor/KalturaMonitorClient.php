@@ -21,6 +21,7 @@ class KalturaMonitorClient
 	const EVENT_MEMCACHE       = 'memcache';
 	const EVENT_REDIS          = 'redis';
 	const EVENT_CURL           = 'curl';
+	const EVENT_AXEL           = 'axel';
 	const EVENT_RABBIT         = 'rabbit';
 	const EVENT_SLEEP          = 'sleep';
 	const EVENT_UPLOAD         = 'upload';
@@ -611,6 +612,25 @@ class KalturaMonitorClient
 			}
 		}
 
+		self::writeDeferredEvent($data);
+	}
+
+	public static function monitorAxel($hostName, $timeTook, $errorCode = null)
+	{
+		if (!self::$stream)
+			return;
+		
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_AXEL,
+			self::FIELD_HOST			=> $hostName,
+			self::FIELD_EXECUTION_TIME	=> $timeTook,
+		));
+		
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = $errorCode;
+		}
+		
 		self::writeDeferredEvent($data);
 	}
 

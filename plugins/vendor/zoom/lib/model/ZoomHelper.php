@@ -89,17 +89,6 @@ class ZoomHelper
         return in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions);
     }
 
-	/**
-	 * redirects to new URL
-	 * @param $url
-	 */
-	public static function redirect($url)
-	{
-		$redirect  = new kRendererRedirect($url);
-		$redirect->output();
-		KExternalErrors::dieGracefully();
-	}
-
     /**
      * @param array $tokens
      * @param array $zoomConfiguration
@@ -112,7 +101,7 @@ class ZoomHelper
 		{
 			$page = file_get_contents($file_path);
 			$tokensString = json_encode($tokens);
-			$verificationToken = $zoomConfiguration[kZoomOauth::VERIFICATION_TOKEN];
+			$verificationToken = $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 			list($enc, $iv) = AESEncrypt::encrypt($verificationToken, $tokensString);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace('@encryptData@', base64_encode($enc), $page);
@@ -140,30 +129,6 @@ class ZoomHelper
 		
 		throw new KalturaAPIException('unable to find regional redirect page, please contact support');
 	}
-	
-	/**
-	 * @param ZoomVendorIntegration $zoomIntegration
-	 * @param $accountId
-	 * @param $ks
-	 * @throws Exception
-	 */
-	public static function loadSubmitPage($zoomIntegration, $accountId, $ks)
-	{
-		$file_path = dirname(__FILE__) . '/../api/webPage/KalturaZoomRegistrationPage.html';
-		if (file_exists($file_path))
-		{
-			$page = file_get_contents($file_path);
-			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
-			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
-			$page = str_replace( '@partnerId@',$zoomIntegration->getPartnerId(),$page);
-			$page = str_replace('@accountId@', $accountId , $page);
-
-			echo $page;
-			die();
-		}
-
-		throw new KalturaAPIException('unable to find submit page, please contact support');
-	}
 
 	/**
 	 * @param $data
@@ -183,54 +148,6 @@ class ZoomHelper
 	{
 		$request_body = file_get_contents(self::PHP_INPUT);
         return json_decode($request_body, true);
-	}
-
-	/**
-	 * @param int $partnerId
-	 * @param string $categoryFullName
-	 * @param bool $createIfNotExist
-	 * @return int id;
-	 * @throws PropelException
-	 * @throws Exception
-	 */
-	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist = true)
-	{
-		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
-		if($category)
-		{
-			KalturaLog::debug('Category: ' . $categoryFullName . ' already exist for partner: ' . $partnerId);
-			return $category->getId();
-		}
-
-		if(!$createIfNotExist)
-		{
-			return null;
-		}
-
-		$categoryDb = new category();
-
-		//Check if this is a root category or child , if child get its parent ID
-		$categoryNameArray = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryFullName);
-		$categoryName = end($categoryNameArray);
-		if(count($categoryNameArray) > 1)
-		{
-			$parentCategoryFullNameArray = array_slice ($categoryNameArray,0,-1);
-			$parentCategoryFullName = implode(categoryPeer::CATEGORY_SEPARATOR, $parentCategoryFullNameArray );
-			$parentCategory = categoryPeer::getByFullNameExactMatch($parentCategoryFullName, null, $partnerId);
-			if(!$parentCategory)
-			{
-				self::exitWithError(kZoomErrorMessages::PARENT_CATEGORY_NOT_FOUND . $parentCategoryFullName);
-			}
-
-			$parentCategoryId = $parentCategory->getId();
-			$categoryDb->setParentId($parentCategoryId);
-		}
-
-		$categoryDb->setName($categoryName);
-		$categoryDb->setFullName($categoryFullName);
-		$categoryDb->setPartnerId($partnerId);
-		$categoryDb->save();
-		return $categoryDb->getId();
 	}
 
 	/**

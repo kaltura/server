@@ -110,7 +110,7 @@ class ESearchService extends KalturaBaseService
 
 		$objectStatusesArr = array();
 		$objectStatuses = $coreParams->getObjectStatuses();
-		if (!empty($objectStatuses))
+		if (isset($objectStatuses))
 		{
 			$objectStatusesArr = explode(',', $objectStatuses);
 		}

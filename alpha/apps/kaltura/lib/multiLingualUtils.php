@@ -2,10 +2,11 @@
 
 class multiLingualUtils
 {
-	const MULTI = 'multi';
-	const MULTI_LINGUAL = 'multiLingual';
-	const DEFAULT_LANGUAGE = 'defaultLanguage';
-	const DEFAULT_VALUE = 'defaultValue';
+	const MULTI               = 'multi';
+	const MULTI_LINGUAL       = 'multiLingual';
+	const DEFAULT_LANGUAGE    = 'defaultLanguage';
+	const DEFAULT_VALUE       = 'defaultValue';
+	const LANGUAGE_CODE_REGEX = '/^[a-zA-Z]{2,4}([-_][a-zA-Z]{2,4})?$/';
 	
 	/**
 	 * Returns an array containing the default value of the field and the default language of the object.
@@ -335,5 +336,10 @@ class multiLingualUtils
 		{
 			self::setMultiLanguageMapping($target, $multiLingualMapping);
 		}
+	}
+	
+	public static function validateLanguageCode($languageCode)
+	{
+		return (preg_match(self::LANGUAGE_CODE_REGEX, $languageCode));
 	}
 }

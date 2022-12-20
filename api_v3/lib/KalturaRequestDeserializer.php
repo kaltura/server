@@ -248,7 +248,7 @@ class KalturaRequestDeserializer
 		if ($name === 'language')
 		{
 			$upperCase2charLanguageCode = strtoupper($value);
-			if(!languageCodeManager::getLanguageKey($upperCase2charLanguageCode))
+			if(!multiLingualUtils::validateLanguageCode($upperCase2charLanguageCode))
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_LANGUAGE_CODE, $value);
 			}
