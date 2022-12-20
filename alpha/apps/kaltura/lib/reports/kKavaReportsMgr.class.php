@@ -118,7 +118,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_REACTION_SMILE_COUNT = 'reaction_smile_clicked';
 	const METRIC_UNIQUE_DOMAINS = 'unique_domains';
 	const METRIC_TRANSCODING_USER_CPU_SEC = 'transcoding_user_cpu_sec';
-	const METRIC_DURATION_TOTAL_MIN = 'total_minutes';
+	const METRIC_REACH_DURATION_SEC = 'reach_duration_sec';
+	const METRIC_REACH_DURATION = 'reach_duration';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -1181,6 +1182,9 @@ class kKavaReportsMgr extends kKavaBase
 			self::getLongSumAggregator(
 				self::METRIC_TRANSCODING_USER_CPU_SEC,self::METRIC_USER_CPU));
 
+		self::$aggregations_def[self::METRIC_REACH_DURATION_SEC] = self::getLongSumAggregator(
+				self::METRIC_REACH_DURATION_SEC, self::METRIC_DURATION_SEC);
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1210,11 +1214,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_DURATION_TOTAL_MSEC, self::METRIC_DURATION_SEC, '1000'));
 
-		self::$metrics_def[self::METRIC_DURATION_TOTAL_MIN] = array(
-			self::DRUID_AGGR => array(self::METRIC_DURATION_SEC),
-			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
-				self::METRIC_DURATION_TOTAL_MIN, self::METRIC_DURATION_SEC, '60'));
-		
 		self::$metrics_def[self::METRIC_BANDWIDTH_SIZE_MB] = array(
 			self::DRUID_AGGR => array(self::METRIC_BANDWIDTH_SIZE_BYTES),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
@@ -1274,7 +1273,12 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_VIEW_DVR_COUNT),
 			self::DRUID_POST_AGGR => self::getConstantFactorFieldAccessPostAggr(
 				self::METRIC_VIEW_DVR_PLAY_TIME_SEC, self::METRIC_VIEW_DVR_COUNT, '10'));
-		
+
+		self::$metrics_def[self::METRIC_REACH_DURATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_REACH_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_REACH_DURATION, self::METRIC_REACH_DURATION_SEC, '60'));
+
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
 			self::DRUID_AGGR => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_100),
