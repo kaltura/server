@@ -1,5 +1,13 @@
 # Rigel-18.20.0
 
+## Add partner id status index to app token table ##
+* Issue Type: Task
+* Issue ID: FOUN-915
+
+### Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2022_12_20_app_token_partner_status_index.sql
+
+
 ## Add query cache for app token
 * Issue Type: Task
 * Issue ID: FOUN-912
