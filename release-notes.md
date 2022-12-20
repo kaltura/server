@@ -1,3 +1,12 @@
+# Rigel-18.20.0
+
+## Add query cache for app token
+* Issue Type: Task
+* Issue ID: FOUN-912
+* 
+#### Deployment Scripts ####
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
 # Rigel-18.19.0
 ## Allow CNC Checkbox
 * Issue Type: Task
