@@ -1183,7 +1183,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_TRANSCODING_USER_CPU_SEC,self::METRIC_USER_CPU));
 
 		self::$aggregations_def[self::METRIC_REACH_DURATION_SEC] = self::getLongSumAggregator(
-				self::METRIC_REACH_DURATION_SEC,self::METRIC_DURATION_SEC);
+				self::METRIC_REACH_DURATION_SEC, self::METRIC_DURATION_SEC);
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
