@@ -7,7 +7,7 @@ class kWebexAPIClient extends kVendorClient
 {
 	const DELETE_SUCCESSFUL_CODE = 204;
 	
-	protected $paginationLink;
+	protected $nextPageLink;
 	
 	/**
 	 * kWebexAPIClient constructor.
@@ -41,6 +41,7 @@ class kWebexAPIClient extends kVendorClient
 		$protocol = '';
 		$host = '';
 		KCurlWrapper::setSourceUrl($ch, $requestUrl, $protocol, $host);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
 		curl_setopt($ch, CURLOPT_POST, $isRequestPost);
 		if ($isRequestDelete)
@@ -76,7 +77,7 @@ class kWebexAPIClient extends kVendorClient
 		$ch = $this->initCurl($requestUrl, $requestHeaders, $responseHeaders, $isRequestPost, $isRequestDelete);
 		
 		$response = curl_exec($ch);
-		$this->savePaginationLinkFromHeaders($responseHeaders);
+		$this->saveNextPageLinkFromHeaders($responseHeaders);
 		$this->httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		
 		if (!$response)
@@ -99,16 +100,16 @@ class kWebexAPIClient extends kVendorClient
 		return $request;
 	}
 	
-	public function getPaginationLinkFromLastRequest()
+	public function getNextPageLinkFromLastRequest()
 	{
-		return $this->paginationLink;
+		return $this->nextPageLink;
 	}
 	
-	protected function savePaginationLinkFromHeaders($responseHeaders)
+	protected function saveNextPageLinkFromHeaders($responseHeaders)
 	{
 		if (!isset($responseHeaders['link']) || !is_array($responseHeaders['link']))
 		{
-			$this->paginationLink = null;
+			$this->nextPageLink = null;
 			return;
 		}
 		
@@ -116,7 +117,7 @@ class kWebexAPIClient extends kVendorClient
 		preg_match('/<(.*)>; rel="next"/', $responseHeaders['link'][0], $matchResults);
 		if (isset($matchResults[1]))
 		{
-			$this->paginationLink = $matchResults[1];
+			$this->nextPageLink = $matchResults[1];
 		}
 	}
 	

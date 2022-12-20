@@ -34,17 +34,17 @@ class KWebexAPIDropFolderEngine extends KDropFolderFileTransferEngine
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		$this->initDropFolderEngine($dropFolder);
-		$paginationLink = null;
+		$nextPageLink = null;
 		do
 		{
-			$recordingsList = $this->retrieveRecordingsList($paginationLink);
-			$paginationLink = $this->webexClient->getPaginationLinkFromLastRequest();
+			$recordingsList = $this->retrieveRecordingsList($nextPageLink);
 			if ($recordingsList)
 			{
 				$this->handleRecordingsList($recordingsList);
 			}
+			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
 		}
-		while ($paginationLink);
+		while ($nextPageLink);
 		
 		$this->updateDropFolderLastFileTimestamp();
 		$this->handleDropFolderFiles();
