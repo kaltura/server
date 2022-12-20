@@ -33,38 +33,15 @@ class authenticationUtils
 	public static function addAuthMailJob($partner, $kuser, $mailType)
 	{
 		$loginData = $kuser->getLoginData();
-		$roleNames = $kuser->getUserRoleNames();
 		$loginData->setPasswordHashKey($loginData->newPassHashKey(kConf::get('user_login_qr_page_hash_key_validity')));
 		$loginData->save();
 		$partnerId = $partner->getId();
 		
+		$roleNames = $kuser->getUserRoleNames();
 		$roleNameToUseDynamicEmailTemplate = kEmails::getDynamicEmailUserRoleName($roleNames);
 		if ($roleNameToUseDynamicEmailTemplate)
 		{
-			//QR code link might contain the '|' character used as a separator by the mailer job dispatcher.
-			$qrCodeLink = str_replace("|", "M%7C",
-									  GoogleAuthenticator::getQRCodeGoogleUrl($kuser->getPuserId() . ' ' . kConf::get('www_host') . ' KAC', $kuser->getLoginData()->getSeedFor2FactorAuth()));
-			
-			$dynamicLink = kEmails::getDynamicTemplateBaseLink($roleNames, true);
-			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($kuser->getLoginData()->getPasswordHashKey(), null, $dynamicLink);
-
-			$associativeBodyParams = array(
-				kEmails::TAG_USER_NAME           => $kuser->getFullName(),
-				kEmails::TAG_LOGIN_EMAIL         => $kuser->getEmail(),
-				kEmails::TAG_RESET_PASSWORD_LINK => $resetPasswordLink,
-				kEmails::TAG_ROLE_NAME           => $roleNameToUseDynamicEmailTemplate,
-				kEmails::TAG_QR_CODE_LINK        => $qrCodeLink);
-			$dynamicEmailContents = kEmails::getDynamicEmailData($mailType, $roleNameToUseDynamicEmailTemplate);
-			$dynamicEmailContents->setEmailBody(kEmails::populateCustomEmailBody($dynamicEmailContents->getEmailBody(), $associativeBodyParams));
-			$job = kJobsManager::addDynamicEmailJob(
-				$partnerId,
-				$mailType,
-				kMailJobData::MAIL_PRIORITY_NORMAL,
-				$kuser->getEmail(),
-				'partner_registration_confirmation_email',
-				'partner_registration_confirmation_name',
-				$dynamicEmailContents
-			);
+			return self::addDynamicContentAuthMailJob($partnerId, $kuser, $loginData, $roleNames, $roleNameToUseDynamicEmailTemplate, $mailType);
 		}
 		else
 		{
@@ -117,5 +94,29 @@ class authenticationUtils
 	{
 		$userSeed = $loginData->getSeedFor2FactorAuth();
 		return GoogleAuthenticator::verifyCode ($userSeed, $otp);
+	}
+	
+	protected static function addDynamicContentAuthMailJob($partnerId, $kuser, $loginData, $roleNames, $roleNameToUseDynamicEmailTemplate, $mailType)
+	{
+		$dynamicQrPageBaseLink = kEmails::getDynamicTemplateBaseLink($roleNames, kEmails::DYNAMIC_EMAIL_2FA_BASE_LINK);
+		$qrPageLink = UserLoginDataPeer::getAuthInfoLink($loginData->getPasswordHashKey(), $dynamicQrPageBaseLink);
+		
+		$associativeBodyParams = array(
+			kEmails::TAG_USER_NAME           => $kuser->getFullName(),
+			kEmails::TAG_LOGIN_EMAIL         => $kuser->getEmail(),
+			kEmails::TAG_ROLE_NAME           => $roleNameToUseDynamicEmailTemplate,
+			kEmails::TAG_QR_CODE_LINK        => $qrPageLink,
+			kEmails::TAG_PARTNER_ID          => $partnerId);
+		$dynamicEmailContents = kEmails::getDynamicEmailData($mailType, $roleNameToUseDynamicEmailTemplate);
+		$dynamicEmailContents->setEmailBody(kEmails::populateCustomEmailBody($dynamicEmailContents->getEmailBody(), $associativeBodyParams));
+		return kJobsManager::addDynamicEmailJob(
+			$partnerId,
+			$mailType,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			$kuser->getEmail(),
+			'partner_registration_confirmation_email',
+			'partner_registration_confirmation_name',
+			$dynamicEmailContents
+		);
 	}
 }

@@ -76,16 +76,10 @@ class kEmails
 		return $blockType . '-' . $roleName;
 	}
 	
-	public static function getDynamicTemplateBaseLink($roleName, $is2FA = false)
+	public static function getDynamicTemplateBaseLink($roleName, $baseLinkType)
 	{
-		if($is2FA)
-		{
-			$dynamicBaseLink = self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_2FA_BASE_LINK, $roleName);
-		}
-		else
-		{
-			$dynamicBaseLink = self::getFormattedEmailComponentName(self::DYNAMIC_EMAIL_BASE_LINK, $roleName);
-		}
+		$dynamicBaseLink = self::getFormattedEmailComponentName($baseLinkType, $roleName);
+		
 		if(kConf::get($dynamicBaseLink, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null))
 		{
 			return kConf::get($dynamicBaseLink, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);

@@ -322,7 +322,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		$userName = str_replace('.', ' ', $loginData->getFullName());
-		$dynamicLink = $dynamicTemplateUserRoleName ? kEmails::getDynamicTemplateBaseLink($dynamicTemplateUserRoleName) : null;
+		$dynamicLink = $dynamicTemplateUserRoleName ? kEmails::getDynamicTemplateBaseLink($dynamicTemplateUserRoleName, kEmails::DYNAMIC_EMAIL_BASE_LINK) : null;
 		self::emailResetPassword(0, $loginData->getLoginEmail(), $userName, self::getPassResetLink($loginData->getPasswordHashKey(), $linkType, $dynamicLink), $dynamicTemplateUserRoleName);
 		return true;
 	}
@@ -1011,7 +1011,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return array(array("userLoginData:id=%s", self::ID), array("userLoginData:loginEmail=%s", self::LOGIN_EMAIL));		
 	}
 
-	public static function getAuthInfoLink($hashKey)
+	public static function getAuthInfoLink($hashKey, $dynamicBaseQrLink = null)
 	{
 		if (!$hashKey)
 		{
@@ -1024,8 +1024,16 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		$partnerId = $loginData->getConfigPartnerId();
-		$resetLinksArray = kConf::get('password_reset_links');
-		$qrLink = $resetLinksArray['qr_page'];
+		if (!$dynamicBaseQrLink)
+		{
+			$resetLinksArray = kConf::get('password_reset_links');
+			$qrLink = $resetLinksArray['qr_page'];
+		}
+		else
+		{
+			$qrLink = $dynamicBaseQrLink;
+		}
+		
 
 		$httpsEnforcePermission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partnerId);
 		if(strpos($qrLink, infraRequestUtils::PROTOCOL_HTTPS) === false && $httpsEnforcePermission)
