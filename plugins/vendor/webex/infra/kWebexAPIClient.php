@@ -133,7 +133,7 @@ class kWebexAPIClient extends kVendorClient
 		return $this->sendRequest($request);
 	}
 	
-	public function getRecordingsListFromDirectLink($directLink)
+	public function sendRequestUsingDirectLink($directLink)
 	{
 		return $this->sendRequest($directLink);
 	}
