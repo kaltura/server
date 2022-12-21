@@ -171,7 +171,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 			}
 		}
 		
-		if($kalturaUser->objects)
+		if ($kalturaUser->objects)
 		{
 			return $kalturaUser->objects[0];
 		}
