@@ -76,7 +76,7 @@ class kEmails
 		return $blockType . '-' . $roleName;
 	}
 	
-	public static function getDynamicTemplateBaseLink($roleName, $baseLinkType)
+	public static function getDynamicTemplateBaseLink($roleName, $baseLinkType = kEmails::DYNAMIC_EMAIL_BASE_LINK)
 	{
 		$dynamicBaseLink = self::getFormattedEmailComponentName($baseLinkType, $roleName);
 		
