@@ -162,6 +162,12 @@ class kWebexAPIClient extends kVendorClient
 		return $this->sendRequest($request);
 	}
 	
+	public function getMeetingParticipants($meetingId, $hostEmail)
+	{
+		$request = "meetingParticipants?meetingId=$meetingId" . "&hostEmail=$hostEmail";
+		return $this->sendRequest($request);
+	}
+	
 	public function retrieveWebexUser()
 	{
 		$request = 'people/me';
@@ -169,7 +175,7 @@ class kWebexAPIClient extends kVendorClient
 		if (!isset($response['emails']))
 		{
 			KalturaLog::warning("Retrieve user from Webex failed (Code {$this->httpCode}), response from Webex: " . print_r($response, true));
-			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
+			return null;
 		}
 		return $response['emails'][0];
 	}
