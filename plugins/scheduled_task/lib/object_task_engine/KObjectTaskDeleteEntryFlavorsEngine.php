@@ -209,7 +209,8 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			'zoomentry',
 			'kalturameeting',
 			'expressrecorder',
-			'msteams'
+			'msteams',
+			'webexapi',
 		);
 	}
 }

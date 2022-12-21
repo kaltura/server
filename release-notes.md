@@ -1,3 +1,11 @@
+# Rigel-18.20.0
+## Static Content Conversion Profile For Webex
+* Issue Type: Task
+* Issue ID: PLAT-23958
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2022_12_21_deploy_webex_recordings_conversion_data.php
+
 # Rigel-18.19.0
 ## Allow CNC Checkbox
 * Issue Type: Task
