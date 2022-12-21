@@ -86,6 +86,12 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 	protected $updated_at;
 
 	/**
+	 * The value for the is_managed field.
+	 * @var        int
+	 */
+	protected $is_managed;
+
+	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
@@ -304,6 +310,16 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [is_managed] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getIsManaged()
+	{
+		return $this->is_managed;
 	}
 
 	/**
@@ -622,6 +638,29 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
+	 * Set the value of [is_managed] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     ScheduleResource The current object (for fluent API support)
+	 */
+	public function setIsManaged($v)
+	{
+		if(!isset($this->oldColumnsValues[ScheduleResourcePeer::IS_MANAGED]))
+			$this->oldColumnsValues[ScheduleResourcePeer::IS_MANAGED] = $this->is_managed;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->is_managed !== $v) {
+			$this->is_managed = $v;
+			$this->modifiedColumns[] = ScheduleResourcePeer::IS_MANAGED;
+		}
+
+		return $this;
+	} // setIsManaged()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -689,7 +728,8 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 			$this->status = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
 			$this->created_at = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->updated_at = ($row[$startcol + 10] !== null) ? (string) $row[$startcol + 10] : null;
-			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->is_managed = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
+			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -699,7 +739,7 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 12; // 12 = ScheduleResourcePeer::NUM_COLUMNS - ScheduleResourcePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = ScheduleResourcePeer::NUM_COLUMNS - ScheduleResourcePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ScheduleResource object", $e);
@@ -1253,6 +1293,9 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 				return $this->getUpdatedAt();
 				break;
 			case 11:
+				return $this->getIsManaged();
+				break;
+			case 12:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1287,7 +1330,8 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 			$keys[8] => $this->getStatus(),
 			$keys[9] => $this->getCreatedAt(),
 			$keys[10] => $this->getUpdatedAt(),
-			$keys[11] => $this->getCustomData(),
+			$keys[11] => $this->getIsManaged(),
+			$keys[12] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1353,6 +1397,9 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 				$this->setUpdatedAt($value);
 				break;
 			case 11:
+				$this->setIsManaged($value);
+				break;
+			case 12:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1390,7 +1437,8 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setStatus($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
+		if (array_key_exists($keys[11], $arr)) $this->setIsManaged($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
 	}
 
 	/**
@@ -1413,6 +1461,7 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ScheduleResourcePeer::STATUS)) $criteria->add(ScheduleResourcePeer::STATUS, $this->status);
 		if ($this->isColumnModified(ScheduleResourcePeer::CREATED_AT)) $criteria->add(ScheduleResourcePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(ScheduleResourcePeer::UPDATED_AT)) $criteria->add(ScheduleResourcePeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(ScheduleResourcePeer::IS_MANAGED)) $criteria->add(ScheduleResourcePeer::IS_MANAGED, $this->is_managed);
 		if ($this->isColumnModified(ScheduleResourcePeer::CUSTOM_DATA)) $criteria->add(ScheduleResourcePeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1519,6 +1568,8 @@ abstract class BaseScheduleResource extends BaseObject  implements Persistent {
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
+
+		$copyObj->setIsManaged($this->is_managed);
 
 		$copyObj->setCustomData($this->custom_data);
 

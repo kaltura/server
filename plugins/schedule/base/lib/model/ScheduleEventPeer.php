@@ -27,6 +27,9 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	const BLACKOUT_SESSION_CACHE_RESULT = 'result';
 	const TIME_MARGIN = 21600; // 6 * 60 * 60 = 6 hours
 
+	const SEARCH_TEXT_PREFIX = 'srstart_';
+	const SEARCH_TEXT_SUFFIX = 'srend';
+
 	protected static $blackoutSessionCache = array();
 
 	// cache classes by their type
@@ -407,6 +410,25 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		}
 
 		return $c;
+	}
+
+	public static function getSearchDataValues($eventId)
+	{
+		$pluginData = self::SEARCH_TEXT_PREFIX . kCurrentContext::getCurrentPartnerId();
+		$eventResources = ScheduleEventResourcePeer::retrieveByEventId($eventId);
+		foreach ($eventResources as $eventResource)
+		{
+			/* @var $eventResource ScheduleEventResource */
+			$resource = ScheduleResourcePeer::retrieveByPK($eventResource->getResourceId());
+			if ($resource->getIsManaged())
+			{
+				$pluginData .= ' isManaged ';
+			}
+
+		}
+		$pluginData .= self::SEARCH_TEXT_SUFFIX;
+
+		return $pluginData;
 	}
 	
 	/* (non-PHPdoc)

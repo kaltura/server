@@ -60,10 +60,11 @@ class ScheduleEventResourcePeer extends BaseScheduleEventResourcePeer implements
 		return ScheduleEventResourcePeer::doSelect($criteria);
 	}
 
-	public static function retrieveByResourceId($resourceId, $partnerId = null)
+	public static function retrieveMostRecentByResourceId($resourceId, $partnerId = null)
 	{
 		$criteria = new Criteria();
 		$criteria->add(ScheduleEventResourcePeer::RESOURCE_ID, $resourceId);
+		$criteria->addDescendingOrderByColumn(ScheduleEventResourcePeer::UPDATED_AT);
 		if($partnerId)
 			$criteria->add(ScheduleEventResourcePeer::PARTNER_ID, $partnerId);
 

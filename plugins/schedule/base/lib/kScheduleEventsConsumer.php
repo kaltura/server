@@ -50,7 +50,8 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 		}
 
 		// If schedule resource tags were updated - must update most recent linked events
-		if ($object instanceof ScheduleResource && in_array(ScheduleResourcePeer::TAGS, $modifiedColumns))
+		if ($object instanceof ScheduleResource &&
+			(in_array(ScheduleResourcePeer::TAGS, $modifiedColumns) || in_array(ScheduleResourcePeer::IS_MANAGED, $modifiedColumns)))
 		{
 			return true;
 		}
@@ -203,7 +204,7 @@ class kScheduleEventsConsumer implements kObjectChangedEventConsumer, kObjectDel
 
 	protected function scheduleResourceChanged (ScheduleResource $object)
 	{
-		$resourceEvents = ScheduleEventResourcePeer::retrieveByResourceId($object->getId(), $object->getPartnerId());
+		$resourceEvents = ScheduleEventResourcePeer::retrieveMostRecentByResourceId($object->getId(), $object->getPartnerId());
 
 		$count = 0;
 		foreach($resourceEvents as $resourceEvent)

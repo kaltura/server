@@ -6,6 +6,7 @@
 
 ### Scripts ###
     mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2022_09_27_add_resource_user_table.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2022_12_20_add_scheduleresource_ismanaged_column.sql
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_10_03_add_resource_user_permissions.php
     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
     Client generation required
