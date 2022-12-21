@@ -431,8 +431,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 				continue;
 			}
 			list($parsedCoHosts, $parsedUsers) = $this->parseAdditionalUsers($participantsList['items']);
-			$coHostsList[] = $parsedCoHosts;
-			$usersList[] = $parsedUsers;
+			$coHostsList = array_merge($coHostsList, $parsedCoHosts);
+			$usersList = array_merge($usersList, $parsedUsers);
 			
 			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
 		}
@@ -519,7 +519,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			$updatedEntry = $this->handleParticipants($updatedEntry, $coHostsUserIds, kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS);
 			$updatedEntry = $this->handleParticipants($updatedEntry, $userIds, $handleParticipantMode);
 		}
-		KBatchBase::$kClient->baseEntry->update($entryId->id, $updatedEntry);
+		KBatchBase::$kClient->baseEntry->update($entryId, $updatedEntry);
 	}
 
 	protected function refreshDownloadUrl()

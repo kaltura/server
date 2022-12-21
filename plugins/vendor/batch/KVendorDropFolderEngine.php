@@ -129,20 +129,28 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$userIdsList = array();
 		foreach ($vendorUsers as $vendorUser)
 		{
-			/* @var $vendorUser kVendorUser */
-			/* @var $kalturaUser KalturaUser */
-			$kalturaUser = $this->getKalturaUser($partnerId, $vendorUser);
-			if ($kalturaUser)
+			try
 			{
-				if (strtolower($kalturaUser->id) !== $userToExclude)
+				/* @var $vendorUser kVendorUser */
+				/* @var $kalturaUser KalturaUser */
+				$kalturaUser = $this->getKalturaUser($partnerId, $vendorUser);
+				if ($kalturaUser)
 				{
-					$userIdsList[] = $kalturaUser->id;
+					if (strtolower($kalturaUser->id) !== $userToExclude)
+					{
+						$userIdsList[] = $kalturaUser->id;
+					}
+				}
+				elseif ($createIfNotFound)
+				{
+					$this->createNewVendorUser($partnerId, $vendorUser->getProcessedName());
+					$userIdsList[] = $vendorUser->getProcessedName();
 				}
 			}
-			elseif ($createIfNotFound)
+			catch (Exception $e)
 			{
-				$this->createNewVendorUser($partnerId, $vendorUser->getProcessedName());
-				$userIdsList[] = $vendorUser->getProcessedName();
+				KalturaLog::warning("Error handling user [{$vendorUser->getOriginalName()}] from vendor: " . $e->getMessage());
+				continue;
 			}
 		}
 		return $userIdsList;
