@@ -4,7 +4,16 @@
 * Issue ID: SUP-34126
 ### Deployment Scripts ###
     php opt/kaltura/app/deployment/updates/scripts/2022_12_19_add_live_languages_ukr_swa.php
+## Static Content Conversion Profile For Webex
+* Issue Type: Task
+* Issue ID: PLAT-23958
 
+### Configuration ###
+Add webex static conversion profiles configuration to runtime_config confmap in order to activate it
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2022_12_21_deploy_webex_recordings_conversion_data.ph
+    
 # Rigel-18.19.0
 ## Allow CNC Checkbox
 * Issue Type: Task

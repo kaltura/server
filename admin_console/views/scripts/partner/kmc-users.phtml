@@ -36,8 +36,7 @@
 				<td>
 					<select class="options" onchange="doAction(this.value, '<?php echo $user->partnerId; ?>','<?php echo $user->id; ?>')">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
-						<option value="kmcLogin"><?php echo $this->translate('Login'); ?></option>
-						<option value="kmcNewLogin"><?php echo $this->translate('Login-new'); ?></option>
+						<option value="kmcNewLogin"><?php echo $this->translate('Login - KMCNG'); ?></option>
 						<?php //if (Infra_AclHelper::isAllowed('partner','reset-user-password')): ?>
 							<option value="resetUserPassword" ><?php echo $this->translate('Reset Password'); ?></option>
 						<?php //endif; ?>

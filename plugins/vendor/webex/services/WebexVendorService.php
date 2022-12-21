@@ -168,12 +168,16 @@ class WebexVendorService extends KalturaBaseService
 	{
 		$accessToken = $tokens[kOauth::ACCESS_TOKEN];
 		$client = new kWebexAPIClient($webexBaseURL, null, null, null, $accessToken);
-		$accountId = $client->retrieveWebexUser();
-		$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
+		$webexUser = $client->retrieveWebexUser();
+		if (!$webexUser)
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
+		}
+		$webexIntegration = self::getWebexAPIIntegrationByAccountId($webexUser, true);
 		if (!$webexIntegration)
 		{
 			$webexIntegration = new WebexAPIVendorIntegration();
-			$webexIntegration->setAccountId($accountId);
+			$webexIntegration->setAccountId($webexUser);
 		}
 		else if ($webexIntegration->getStatus() == VendorIntegrationStatus::ACTIVE && $webexIntegration->getPartnerId() != $ks->getPartnerId())
 		{
@@ -245,19 +249,23 @@ class WebexVendorService extends KalturaBaseService
 		$tokens = kOAuth::handleEncryptTokens($tokensData, $iv, $webexConfiguration);
 		$webexBaseURL = $webexConfiguration[WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_BASE_URL];
 		$client = new kWebexAPIClient($webexBaseURL, $tokens[kOAuth::REFRESH_TOKEN],null, null, $tokens[kOAuth::ACCESS_TOKEN]);
-		$accountId = $client->retrieveWebexUser();
-		$webexIntegration = self::getWebexAPIIntegrationByAccountId($accountId, true);
+		$webexUser = $client->retrieveWebexUser();
+		if (!$webexUser)
+		{
+			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
+		}
+		$webexIntegration = self::getWebexAPIIntegrationByAccountId($webexUser, true);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		if ($webexIntegration && $partnerId !==  $webexIntegration->getPartnerId() && $partnerId !== 0)
 		{
-			KalturaLog::info("Webex changing account id: $accountId partner to $partnerId");
+			KalturaLog::info("Webex changing account id: $webexUser partner to $partnerId");
 			$webexIntegration->setPartnerId($partnerId);
 			$webexIntegration->setTokensData($tokens);
 			$webexIntegration->save();
 		}
 		
 		$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
-		VendorHelper::loadSubmitPage($webexIntegration->getPartnerId(), $accountId, $this->getKs(), $filePath);
+		VendorHelper::loadSubmitPage($webexIntegration->getPartnerId(), $webexUser, $this->getKs(), $filePath);
 	}
 	
 	/**

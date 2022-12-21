@@ -133,69 +133,6 @@ class VendorHelper
 		return $categoryDb->getId();
 	}
 	
-	public static function addEntryToCategory($categoryName, $entryId, $partnerId)
-	{
-		KBatchBase::impersonate($partnerId);
-		$categoryId = self::findCategoryIdByName($categoryName);
-		if ($categoryId)
-		{
-			self::addCategoryEntry($categoryId, $entryId);
-		}
-		KBatchBase::unimpersonate();
-	}
-	
-	public static function findCategoryIdByName($categoryName)
-	{
-		$isFullPath = self::isFullPath($categoryName);
-		
-		$categoryFilter = new KalturaCategoryFilter();
-		if ($isFullPath)
-		{
-			$categoryFilter->fullNameEqual = $categoryName;
-		}
-		else
-		{
-			$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
-		}
-		
-		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
-		$categoryId = null;
-		if ($isFullPath)
-		{
-			if ($categoryResponse->objects && count($categoryResponse->objects) == 1)
-			{
-				$categoryId = $categoryResponse->objects[0]->id;
-			}
-		}
-		else
-		{
-			$categoryIds = array();
-			foreach ($categoryResponse->objects as $category)
-			{
-				if ($category->name === $categoryName)
-				{
-					$categoryIds[] = $category->id;
-				}
-			}
-			$categoryId = (count($categoryIds) == 1) ? $categoryIds[0] : null;
-		}
-		return $categoryId;
-	}
-	
-	public static function isFullPath($categoryName)
-	{
-		$numCategories = count(explode('>', $categoryName));
-		return ($numCategories > 1);
-	}
-	
-	public static function addCategoryEntry($categoryId, $entryId)
-	{
-		$categoryEntry = new KalturaCategoryEntry();
-		$categoryEntry->categoryId = $categoryId;
-		$categoryEntry->entryId = $entryId;
-		KBatchBase::$kClient->categoryEntry->add($categoryEntry);
-	}
-	
 	public static function exitWithError($errMsg, $vendorIntegration)
 	{
 		KalturaLog::err($errMsg);
