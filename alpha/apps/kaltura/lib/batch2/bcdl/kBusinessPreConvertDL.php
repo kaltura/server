@@ -20,6 +20,7 @@ class kBusinessPreConvertDL
 	const EXPRESS_RECORDER_CONVERSION_KEY = 'express_recorder';
 	const KALTURA_MEETING_CONVERSION_KEY = 'kaltura_meeting';
 	const MS_TEAMS_CONVERSION_KEY = 'ms_teams';
+	const WEBEX_CONVERSION_KEY = 'webex_api';
 
 	/**
 	 * batch redecideFlavorConvert is the decision layer for a single flavor conversion
@@ -2356,6 +2357,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		elseif (in_array('msteams', $adminTags))
 		{
 			return self::MS_TEAMS_CONVERSION_KEY;
+		}
+		elseif (in_array('webexapi', $adminTags))
+		{
+			return self::WEBEX_CONVERSION_KEY;
 		}
 		return null;
 	}
