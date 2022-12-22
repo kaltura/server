@@ -413,9 +413,18 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		return $c;
 	}
 
-	public static function getSearchDataValues($eventId)
+	public static function getSearchDataValues(ScheduleEvent $event)
 	{
 		$pluginData = self::SEARCH_TEXT_PREFIX . kCurrentContext::getCurrentPartnerId();
+
+		$eventId = $event->getId();
+
+		//If the event is a child in a series, it will have no resource associations.
+		if ($event->getParentId())
+		{
+			$eventId = $event->getParentId();
+		}
+
 		$eventResources = ScheduleEventResourcePeer::retrieveByEventId($eventId);
 
 		$foundManagedResource = false;

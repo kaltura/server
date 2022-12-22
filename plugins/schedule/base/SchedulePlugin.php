@@ -216,7 +216,7 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 	{
 		if($object instanceof ScheduleEvent)
 		{
-			return ScheduleEventPeer::getSearchDataValues($object->getId());
+			return ScheduleEventPeer::getSearchDataValues($object);
 		}
 
 		return null;
