@@ -1,5 +1,20 @@
 # Rigel-18.20.0
-## Update Unique_Kms_New_Item_Pending_Moderation_2 email event notification templates ##
+## Add Swahili and Ukrainian language options for live streams ##
+* Issue Type: Task
+* Issue ID: SUP-34126
+### Deployment Scripts ###
+    php opt/kaltura/app/deployment/updates/scripts/2022_12_19_add_live_languages_ukr_swa.php
+## Static Content Conversion Profile For Webex
+* Issue Type: Task
+* Issue ID: PLAT-23958
+
+### Configuration ###
+Add webex static conversion profiles configuration to runtime_config confmap in order to activate it
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2022_12_21_deploy_webex_recordings_conversion_data.ph
+
+## Update New_Item_Pending_Moderation email event notification templates ##
 * Issue Type: Task
 * Issue ID: SUP-32090
 
