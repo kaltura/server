@@ -26,6 +26,8 @@ abstract class KalturaScheduleResourceBaseFilter extends KalturaRelatedFilter
 		"createdAtLessThanOrEqual" => "_lte_created_at",
 		"updatedAtGreaterThanOrEqual" => "_gte_updated_at",
 		"updatedAtLessThanOrEqual" => "_lte_updated_at",
+		"isManagedEqual" => "_eq_is_managed",
+		"isManagedNotEqual" => "_not_is_managed",
 	);
 
 	static private $order_by_map = array
@@ -130,4 +132,14 @@ abstract class KalturaScheduleResourceBaseFilter extends KalturaRelatedFilter
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $isManagedEqual;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $isManagedNotEqual;
 }

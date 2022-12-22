@@ -78,6 +78,12 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 	 * @filter gte,lte,order
 	 */
 	public $updatedAt;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 * @filter eq,not
+	 */
+	public $isManaged;
 	
 	/*
 	 * Mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -94,6 +100,7 @@ abstract class KalturaScheduleResource extends KalturaObject implements IRelated
 		'tags',
 		'createdAt',
 		'updatedAt',
+		'isManaged'
 	 );
 		 
 	/* (non-PHPdoc)
