@@ -14,17 +14,6 @@ Add webex static conversion profiles configuration to runtime_config confmap in 
 ### Deployment Scripts ###
     php deployment/updates/scripts/2022_12_21_deploy_webex_recordings_conversion_data.ph
 
-## Update New_Item_Pending_Moderation email event notification templates ##
-* Issue Type: Task
-* Issue ID: SUP-32090
-
-#### Configuration ####
-First replace all tokens in the XML file below and remove ".template" from the file name, then run the php update deployment script.
-
-### Deployment scripts ###
-    - deployment/updates/scripts/xml/2022_12_18_updateNewItemPendingModeration.template.xml
-    - php deployment/updates/scripts/2022_12_18_deploy_update_email_event_notification_new_item_pending_moderation.php
-
 # Rigel-18.19.0
 ## Allow CNC Checkbox
 * Issue Type: Task
