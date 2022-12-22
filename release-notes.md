@@ -1,4 +1,15 @@
 # Rigel-18.20.0
+## Update New_Item_Pending_Moderation email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-32090
+
+#### Configuration ####
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php update deployment script.
+
+### Deployment scripts ###
+    - deployment/updates/scripts/xml/2022_12_22_updateNewItemPendingModeration.template.xml
+    - php deployment/updates/scripts/2022_12_22_deploy_update_email_event_notification_new_item_pending_moderation.php
+
 ## Add Swahili and Ukrainian language options for live streams ##
 * Issue Type: Task
 * Issue ID: SUP-34126
