@@ -209,17 +209,16 @@ class SchedulePlugin extends KalturaPlugin implements IKalturaServices,
 		return $currentEvents->dynamicGetter($context, $output);
 	}
 
-    /**
-     * @inheritDoc
-     */
-    public static function getSearchData(BaseObject $object)
-    {
-        if($object instanceof ScheduleEvent)
-        {
-            if(self::isAllowedPartner($object->getPartnerId()))
-                return ScheduleEventPeer::getSearchDataValues($object->getId());
-        }
+	/**
+	 * @inheritDoc
+	 */
+	public static function getSearchData(BaseObject $object)
+	{
+		if($object instanceof ScheduleEvent)
+		{
+			return ScheduleEventPeer::getSearchDataValues($object->getId());
+		}
 
-        return null;
-    }
+		return null;
+	}
 }
