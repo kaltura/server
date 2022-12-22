@@ -29,6 +29,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 
 	const SEARCH_TEXT_PREFIX = 'srstart_';
 	const SEARCH_TEXT_SUFFIX = 'srend';
+	const PLUGINS_DATA_FIELD = 'plugins_data';
 
 	protected static $blackoutSessionCache = array();
 
@@ -416,19 +417,28 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		$pluginData = self::SEARCH_TEXT_PREFIX . kCurrentContext::getCurrentPartnerId();
 		$eventResources = ScheduleEventResourcePeer::retrieveByEventId($eventId);
+
+		$foundManagedResource = false;
 		foreach ($eventResources as $eventResource)
 		{
 			/* @var $eventResource ScheduleEventResource */
 			$resource = ScheduleResourcePeer::retrieveByPK($eventResource->getResourceId());
 			if ($resource->getIsManaged())
 			{
-				$pluginData .= ' isManaged ';
+				$pluginData .= ' isManaged1';
+				$foundManagedResource = true;
+				break;
 			}
-
 		}
-		$pluginData .= self::SEARCH_TEXT_SUFFIX;
 
-		return $pluginData;
+		if(!$foundManagedResource)
+		{
+			$pluginData .= ' isManaged0';
+		}
+
+		$pluginData .= ' ' . self::SEARCH_TEXT_SUFFIX;
+
+		return array(self::PLUGINS_DATA_FIELD => $pluginData);
 	}
 	
 	/* (non-PHPdoc)
