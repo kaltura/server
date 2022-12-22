@@ -1,1 +1,1 @@
-alter table `schedule_resource` add is_managed tinyint(4) NOT NULL after updated_at;
+alter table `schedule_resource` add is_managed tinyint NOT NULL after updated_at;
