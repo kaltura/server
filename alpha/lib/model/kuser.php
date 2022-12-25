@@ -138,6 +138,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			$this->setTags("");
 			$this->setPicture("");
 			$this->setZip("");
+			$this->setExternalId("");
 		}
 		
 		return parent::preSave($con);
