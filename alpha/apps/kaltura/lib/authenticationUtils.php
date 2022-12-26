@@ -35,23 +35,30 @@ class authenticationUtils
 		$loginData = $kuser->getLoginData();
 		$loginData->setPasswordHashKey($loginData->newPassHashKey(kConf::get('user_login_qr_page_hash_key_validity')));
 		$loginData->save();
+		$partnerId = $partner->getId();
+		
+		$roleNames = $kuser->getUserRoleNames();
+		$roleNameToUseDynamicEmailTemplate = kEmails::getDynamicEmailUserRoleName($roleNames);
+		if ($roleNameToUseDynamicEmailTemplate)
+		{
+			return self::addDynamicContentAuthMailJob($partnerId, $kuser, $loginData, $roleNameToUseDynamicEmailTemplate, $mailType);
+		}
+		
+		$publisherName = $partner->getName();
 		$resetPasswordLink = UserLoginDataPeer::getAuthInfoLink($loginData->getPasswordHashKey());
 		if(!$resetPasswordLink)
 		{
 			return null;
 		}
-		$partnerId = $partner->getId();
-		$publisherName = $partner->getName();
 		$bodyParams = array($kuser->getFullName(), $partnerId, $resetPasswordLink, $kuser->getEmail(), $partnerId, $publisherName, $publisherName, $kuser->getUserRoleNames(), $publisherName, $kuser->getPuserId());
-
 		$job = kJobsManager::addMailJob(
 			null,
 			0,
 			$kuser->getPartnerId(),
 			$mailType,
 			kMailJobData::MAIL_PRIORITY_NORMAL,
-			kConf::get ("partner_registration_confirmation_email" ),
-			kConf::get ("partner_registration_confirmation_name" ),
+			kConf::get("partner_registration_confirmation_email"),
+			kConf::get("partner_registration_confirmation_name"),
 			$kuser->getEmail(),
 			$bodyParams
 		);
@@ -85,5 +92,29 @@ class authenticationUtils
 	{
 		$userSeed = $loginData->getSeedFor2FactorAuth();
 		return GoogleAuthenticator::verifyCode ($userSeed, $otp);
+	}
+	
+	protected static function addDynamicContentAuthMailJob($partnerId, $kuser, $loginData, $userRole, $mailType)
+	{
+		$dynamicQrPageBaseLink = kEmails::getDynamicTemplateBaseLink($userRole, kEmails::DYNAMIC_EMAIL_2FA_BASE_LINK);
+		$qrPageLink = UserLoginDataPeer::getAuthInfoLink($loginData->getPasswordHashKey(), $dynamicQrPageBaseLink);
+		
+		$associativeBodyParams = array(
+			kEmails::TAG_USER_NAME           => $kuser->getFullName(),
+			kEmails::TAG_LOGIN_EMAIL         => $kuser->getEmail(),
+			kEmails::TAG_ROLE_NAME           => $userRole,
+			kEmails::TAG_QR_CODE_LINK        => $qrPageLink,
+			kEmails::TAG_PARTNER_ID          => $partnerId);
+		$dynamicEmailContents = kEmails::getDynamicEmailData($mailType, $userRole);
+		$dynamicEmailContents->setEmailBody(kEmails::populateCustomEmailBody($dynamicEmailContents->getEmailBody(), $associativeBodyParams));
+		return kJobsManager::addDynamicEmailJob(
+			$partnerId,
+			$mailType,
+			kMailJobData::MAIL_PRIORITY_NORMAL,
+			$kuser->getEmail(),
+			'partner_registration_confirmation_email',
+			'partner_registration_confirmation_name',
+			$dynamicEmailContents
+		);
 	}
 }

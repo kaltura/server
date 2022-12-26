@@ -1011,7 +1011,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		return array(array("userLoginData:id=%s", self::ID), array("userLoginData:loginEmail=%s", self::LOGIN_EMAIL));		
 	}
 
-	public static function getAuthInfoLink($hashKey)
+	public static function getAuthInfoLink($hashKey, $qrLink = null)
 	{
 		if (!$hashKey)
 		{
@@ -1024,9 +1024,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 
 		$partnerId = $loginData->getConfigPartnerId();
-		$resetLinksArray = kConf::get('password_reset_links');
-		$qrLink = $resetLinksArray['qr_page'];
-
+		if (!$qrLink)
+		{
+			$resetLinksArray = kConf::get('password_reset_links');
+			$qrLink = $resetLinksArray['qr_page'];
+		}
+		
 		$httpsEnforcePermission = PermissionPeer::isValidForPartner(PermissionName::FEATURE_KMC_ENFORCE_HTTPS, $partnerId);
 		if(strpos($qrLink, infraRequestUtils::PROTOCOL_HTTPS) === false && $httpsEnforcePermission)
 			$qrLink = str_replace(infraRequestUtils::PROTOCOL_HTTP , infraRequestUtils::PROTOCOL_HTTPS , $qrLink);

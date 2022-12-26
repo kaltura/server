@@ -139,6 +139,7 @@ class KalturaUser extends KalturaBaseUser
 		"ksPrivileges",
 		"isSsoExcluded",
 		"isGuest",
+		"externalId",
 	);
 
 	public function getMapBetweenObjects ( )

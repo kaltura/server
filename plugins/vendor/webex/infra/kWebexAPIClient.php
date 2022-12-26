@@ -7,7 +7,7 @@ class kWebexAPIClient extends kVendorClient
 {
 	const DELETE_SUCCESSFUL_CODE = 204;
 	
-	protected $responseHeader;
+	protected $nextPageLink;
 	
 	/**
 	 * kWebexAPIClient constructor.
@@ -35,34 +35,90 @@ class kWebexAPIClient extends kVendorClient
 		$this->accessExpiresIn = $accessExpiresIn;
 	}
 	
+	protected function initCurl($requestUrl, $requestHeaders, &$responseHeaders, $isRequestPost = false, $isRequestDelete = false)
+	{
+		$ch = curl_init();
+		$protocol = '';
+		$host = '';
+		KCurlWrapper::setSourceUrl($ch, $requestUrl, $protocol, $host);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
+		curl_setopt($ch, CURLOPT_POST, $isRequestPost);
+		if ($isRequestDelete)
+		{
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+		}
+		
+		curl_setopt($ch, CURLOPT_HEADERFUNCTION,
+			function($curl, $header) use (&$responseHeaders)
+			{
+				$len = strlen($header);
+				$header = explode(':', $header, 2);
+				if (count($header) < 2) // ignore invalid headers
+					return $len;
+				
+				$responseHeaders[strtolower(trim($header[0]))][] = trim($header[1]);
+				
+				return $len;
+			}
+		);
+		
+		return $ch;
+	}
+	
 	protected function sendRequest($request, $isRequestPost = false, $isRequestDelete = false)
 	{
 		$this->httpCode = 0;
 		
-		$requestUrl = $this->baseURL . $request;
+		$requestUrl = $this->addBaseUrlToRequest($request);
 		$authorizationHeader = 'Authorization: Bearer ' . $this->accessToken;
 		$requestHeaders = array($authorizationHeader);
 		
-		$curlWrapper = new KCurlWrapper();
-		$curlWrapper->setOpt(CURLOPT_POST, $isRequestPost);
-		if ($isRequestDelete)
-		{
-			$curlWrapper->setOpt(CURLOPT_CUSTOMREQUEST, 'DELETE');
-		}
-		$curlWrapper->setOpt(CURLOPT_HEADER, true);
-		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $requestHeaders);
-		$response = $curlWrapper->exec($requestUrl);
+		$ch = $this->initCurl($requestUrl, $requestHeaders, $responseHeaders, $isRequestPost, $isRequestDelete);
 		
-		$this->httpCode = $curlWrapper->getHttpCode();
+		$response = curl_exec($ch);
+		$this->saveNextPageLinkFromHeaders($responseHeaders);
+		$this->httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		
 		if (!$response)
 		{
-			$response = $curlWrapper->getErrorMsg();
+			$response = curl_error($ch);
 		}
 		else
 		{
 			$response = json_decode($response, true);
 		}
 		return $response;
+	}
+	
+	protected function addBaseUrlToRequest($request)
+	{
+		if (strpos($request, $this->baseURL) === false)
+		{
+			$request = $this->baseURL . $request;
+		}
+		return $request;
+	}
+	
+	public function getNextPageLinkFromLastRequest()
+	{
+		return $this->nextPageLink;
+	}
+	
+	protected function saveNextPageLinkFromHeaders($responseHeaders)
+	{
+		if (!isset($responseHeaders['link']) || !is_array($responseHeaders['link']))
+		{
+			$this->nextPageLink = null;
+			return;
+		}
+		
+		$matchResults = array();
+		preg_match('/<(.*)>; rel="next"/', $responseHeaders['link'][0], $matchResults);
+		if (isset($matchResults[1]))
+		{
+			$this->nextPageLink = $matchResults[1];
+		}
 	}
 	
 	public function getRecordingsList($startTime, $endTime)
@@ -75,6 +131,11 @@ class kWebexAPIClient extends kVendorClient
 		$endHour = date($hourFormat, $endTime);
 		$request = "admin/recordings?from=$startDate" . "T$startHour" . "&to=$endDate" . "T$endHour";
 		return $this->sendRequest($request);
+	}
+	
+	public function sendRequestUsingDirectLink($directLink)
+	{
+		return $this->sendRequest($directLink);
 	}
 	
 	public function getRecording($recordingId, $hostEmail)
@@ -101,6 +162,12 @@ class kWebexAPIClient extends kVendorClient
 		return $this->sendRequest($request);
 	}
 	
+	public function getMeetingParticipants($meetingId, $hostEmail)
+	{
+		$request = "meetingParticipants?meetingId=$meetingId" . "&hostEmail=$hostEmail";
+		return $this->sendRequest($request);
+	}
+	
 	public function retrieveWebexUser()
 	{
 		$request = 'people/me';
@@ -108,7 +175,7 @@ class kWebexAPIClient extends kVendorClient
 		if (!isset($response['emails']))
 		{
 			KalturaLog::warning("Retrieve user from Webex failed (Code {$this->httpCode}), response from Webex: " . print_r($response, true));
-			throw new KalturaAPIException(KalturaWebexAPIErrors::RETRIEVE_USER_FAILED);
+			return null;
 		}
 		return $response['emails'][0];
 	}

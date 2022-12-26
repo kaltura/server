@@ -1,5 +1,4 @@
 # Rigel-18.20.0
-
 ## Add partner id status index to app token table ##
 * Issue Type: Task
 * Issue ID: FOUN-915
@@ -14,6 +13,22 @@
 * 
 #### Deployment Scripts ####
     php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
+## Add Swahili and Ukrainian language options for live streams ##
+* Issue Type: Task
+* Issue ID: SUP-34126
+### Deployment Scripts ###
+    php opt/kaltura/app/deployment/updates/scripts/2022_12_19_add_live_languages_ukr_swa.php
+## Static Content Conversion Profile For Webex
+* Issue Type: Task
+* Issue ID: PLAT-23958
+
+### Configuration ###
+Add webex static conversion profiles configuration to runtime_config confmap in order to activate it
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2022_12_21_deploy_webex_recordings_conversion_data.ph
+    
 
 # Rigel-18.19.0
 ## Allow CNC Checkbox
