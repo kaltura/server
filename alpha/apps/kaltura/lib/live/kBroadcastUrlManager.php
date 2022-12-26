@@ -93,7 +93,7 @@ class kBroadcastUrlManager
 		return $partner->getLiveStreamBroadcastUrlConfigurations($dc);
 	}
 
-	private static function getLiveIdForHost(BaseEntry $entry)
+	protected static function getLiveIdForHost($entry)
 	{
 		$entryId = str_replace('1_', '', $entry->getId());
 		return str_replace('_', '-', $entryId); // dns resolve don't handle well underscore in host
