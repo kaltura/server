@@ -85,7 +85,7 @@ class AppToken extends BaseAppToken
 	}
 	public function getCacheInvalidationKeys()
 	{
-		return array("appToken:id=".strtolower($this->getId()));
+		return array("appToken:id=".strtolower($this->getId()), "appToken:partnerId=".strtolower($this->getPartnerId()));
 	}
 
 	public static function onUserDeleted($kuserId, $partnerId)

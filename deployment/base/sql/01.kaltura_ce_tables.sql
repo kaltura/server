@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS app_token(
   PRIMARY KEY (`id`),
   KEY `int_id_index` (`int_id`),
   KEY `kuser_id` (`kuser_id`)
+  KEY `partner_id_status` (`partner_id`,`status`)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `audit_trail` (

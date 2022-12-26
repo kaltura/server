@@ -48,7 +48,7 @@ $INVALIDATION_KEYS = array(
 	array('table' => "drm_profile", 					'keys' => array(array("'drmProfile:partnerId='", '@OBJ@.partner_id')),                                                                  'plugin' => 'drm'),
 	array('table' => "scheduler", 						'keys' => array(array("'scheduler:configuredId='", '@OBJ@.configured_id'))),
 	array('table' => "syndication_feed", 				'keys' => array(array("'syndicationFeed:id='", '@OBJ@.id'))),
-	array('table' => "app_token", 						'keys' => array(array("'appToken:id='", '@OBJ@.id'))),
+	array('table' => "app_token", 						'keys' => array(array("'appToken:id='", '@OBJ@.id'), array("'appToken:partnerId='", '@OBJ@.partner_id'))),
 	array('table' => "user_entry", 						'keys' => array(array("'userEntry:kuserId='", '@OBJ@.kuser_id'))),
 	array('table' => "drm_policy", 						'keys' => array(array("'drmPolicy:id='", '@OBJ@.id')),                                                                                   'plugin' => 'drm'),
 	array('table' => "scheduler_worker", 				'keys' => array(array("'schedulerWorker:schedulerConfiguredId='", '@OBJ@.scheduler_configured_id'))),
