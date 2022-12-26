@@ -1878,6 +1878,12 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 			self::REPORT_METRICS => array(self::METRIC_COUNT_ALL_EVENTS),
+		),
+
+		ReportType::SELF_SERVE_BANDWIDTH => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+			self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
 		)
 	);
 

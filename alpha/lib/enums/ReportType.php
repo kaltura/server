@@ -74,6 +74,7 @@ interface ReportType extends BaseEnum
    const CDN_BANDWIDTH_USAGE = 64;
    const REACH_CATALOG_USAGE = 65;
    const REACH_PROFILE_USAGE = 66;
+   const SELF_SERVE_BANDWIDTH = 67;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;
