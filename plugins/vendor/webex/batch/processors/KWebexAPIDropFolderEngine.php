@@ -275,15 +275,11 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
 	{
-		KBatchBase::impersonate($job->partnerId);
-		
 		$this->initProcessFolder($job, $data);
 		list($entry, $flavorAsset) = $this->prepareEntryAndFlavorAsset($job->partnerId);
 		$this->refreshDownloadUrl();
 		$this->setContentOnEntry($entry, $flavorAsset);
 		$this->updateDropFolderFile($entry->id);
-		
-		KBatchBase::unimpersonate();
 	}
 	
 	protected function initProcessFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
@@ -297,7 +293,9 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		$dropFolderFileId = $data->dropFolderFileIds;
 		try
 		{
+			KBatchBase::impersonate($job->partnerId);
 			$this->dropFolderFile = $this->dropFolderFileService->get($dropFolderFileId);
+			KBatchBase::unimpersonate();
 			if (!$this->dropFolderFile)
 			{
 				throw new kApplicativeException(KalturaDropFolderErrorCode::DROP_FOLDER_APP_ERROR, DropFolderPlugin::ERROR_IN_CONTENT_PROCESSOR_MESSAGE);
@@ -330,7 +328,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		$this->addEntryToCategory($this->dropFolder->webexAPIVendorIntegration->webexCategory, $entry->id, $partnerId);
 		list($coHostsUserIds, $userIds) = $this->getAdditionalUsers($ownerId);
 		$this->prepareAndHandleParticipants($entry->id, $coHostsUserIds, $userIds);
-		$flavorAsset = $this->createFlavorAssetForEntry($entry->id);
+		$flavorAsset = $this->createFlavorAssetForEntry($entry->id, $partnerId);
 		
 		return array($entry, $flavorAsset);
 	}
@@ -430,6 +428,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 				KalturaLog::warning("Error getting meeting participants from Webex for meeting id [$meetingId], response: " . print_r($participantsList, true));
 				continue;
 			}
+			KalturaLog::info("Webex meeting id [$meetingId] has [" . count($participantsList['items']) . '] participants');
 			list($parsedCoHosts, $parsedUsers) = $this->parseAdditionalUsers($participantsList['items']);
 			$coHostsList = array_merge($coHostsList, $parsedCoHosts);
 			$usersList = array_merge($usersList, $parsedUsers);
@@ -519,7 +518,9 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			$updatedEntry = $this->handleParticipants($updatedEntry, $coHostsUserIds, kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS);
 			$updatedEntry = $this->handleParticipants($updatedEntry, $userIds, $handleParticipantMode);
 		}
+		KBatchBase::impersonate($this->dropFolder->partnerId);
 		KBatchBase::$kClient->baseEntry->update($entryId, $updatedEntry);
+		KBatchBase::unimpersonate();
 	}
 
 	protected function refreshDownloadUrl()

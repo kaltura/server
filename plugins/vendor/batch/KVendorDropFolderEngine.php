@@ -63,7 +63,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$categoryId = $this->findCategoryIdByName($categoryName);
 		if ($categoryId)
 		{
-			$this->addCategoryEntry($categoryId, $entryId);
+			$this->addCategoryEntry($categoryId, $entryId, $partnerId);
 		}
 	}
 	
@@ -111,12 +111,14 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		return ($numCategories > 1);
 	}
 	
-	protected function addCategoryEntry($categoryId, $entryId)
+	protected function addCategoryEntry($categoryId, $entryId, $partnerId)
 	{
 		$categoryEntry = new KalturaCategoryEntry();
 		$categoryEntry->categoryId = $categoryId;
 		$categoryEntry->entryId = $entryId;
+		KBatchBase::impersonate($partnerId);
 		KBatchBase::$kClient->categoryEntry->add($categoryEntry);
+		KBatchBase::unimpersonate();
 	}
 	
 	protected function getKalturaUserIdsFromVendorUsers($vendorUsers, $partnerId, $createIfNotFound, $userToExclude)
@@ -131,6 +133,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		{
 			try
 			{
+				KalturaLog::info("Attempting to find vendor user {$vendorUser->getOriginalName()} in Kaltura");
 				/* @var $vendorUser kVendorUser */
 				/* @var $kalturaUser KalturaUser */
 				$kalturaUser = $this->getKalturaUser($partnerId, $vendorUser);
@@ -143,6 +146,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 				}
 				elseif ($createIfNotFound)
 				{
+					KalturaLog::info("Vendor user not found in Kaltura, creating new user [{$vendorUser->getProcessedName()}]");
 					$this->createNewVendorUser($partnerId, $vendorUser->getProcessedName());
 					$userIdsList[] = $vendorUser->getProcessedName();
 				}
@@ -165,14 +169,18 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$filter = new KalturaUserFilter();
 		$filter->partnerIdEqual = $partnerId;
 		$filter->idEqual = $vendorUser->getProcessedName();
+		KBatchBase::impersonate($partnerId);
 		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
+		KBatchBase::unimpersonate();
 		if (!$kalturaUser->objects)
 		{
 			$email = $vendorUser->getOriginalName();
 			$filterUser = new KalturaUserFilter();
 			$filterUser->partnerIdEqual = $partnerId;
 			$filterUser->emailStartsWith = $email;
+			KBatchBase::impersonate($partnerId);
 			$kalturaUser = KBatchBase::$kClient->user->listAction($filterUser, $pager);
+			KBatchBase::unimpersonate();
 			if (!$kalturaUser->objects || strcasecmp($kalturaUser->objects[0]->email, $email) != 0)
 			{
 				return null;
@@ -199,7 +207,9 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$user->firstName = $puserId;
 		$user->isAdmin = false;
 		$user->type = KalturaUserType::USER;
+		KBatchBase::impersonate($partnerId);
 		$kalturaUser = KBatchBase::$kClient->user->add($user);
+		KBatchBase::unimpersonate();
 		return $kalturaUser;
 	}
 	
@@ -228,12 +238,15 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		return $entry;
 	}
 	
-	protected function createFlavorAssetForEntry($entryId)
+	protected function createFlavorAssetForEntry($entryId, $partnerId)
 	{
 		$kFlavorAsset = new KalturaFlavorAsset();
 		$kFlavorAsset->tags = self::TAG_SOURCE;
 		$kFlavorAsset->flavorParamsId = self::SOURCE_FLAVOR_ID;
 		$kFlavorAsset->fileExt = strtolower($this->dropFolderFile->fileExtension);
-		return KBatchBase::$kClient->flavorAsset->add($entryId, $kFlavorAsset);
+		KBatchBase::impersonate($partnerId);
+		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entryId, $kFlavorAsset);;
+		KBatchBase::unimpersonate();
+		return $flavorAsset;
 	}
 }

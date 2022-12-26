@@ -38,7 +38,7 @@ First replace all tokens in the XML file below and remove ".template" from the f
 Add webex static conversion profiles configuration to runtime_config confmap in order to activate it
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/2022_12_21_deploy_webex_recordings_conversion_data.ph
+    php deployment/updates/scripts/2022_12_21_deploy_webex_recordings_conversion_data.php
     
 
 # Rigel-18.19.0
