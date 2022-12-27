@@ -5,7 +5,8 @@
  */
 class kWebexAPIClient extends kVendorClient
 {
-	const DELETE_SUCCESSFUL_CODE = 204;
+	const DELETE_RECORDING_SUCCESSFUL_CODE = 204;
+	const GET_TRANSCRIPT_SUCCESSFUL_CODE = 200;
 	
 	protected $nextPageLink;
 	
@@ -148,7 +149,7 @@ class kWebexAPIClient extends kVendorClient
 	{
 		$request = "recordings/$recordingId" . "?hostEmail=$hostEmail";
 		$response = $this->sendRequest($request, false, true);
-		if (!$this->httpCode == self::DELETE_SUCCESSFUL_CODE)
+		if (!$this->httpCode == self::DELETE_RECORDING_SUCCESSFUL_CODE)
 		{
 			KalturaLog::warning("Deleting recording from Webex failed (Code {$this->httpCode}), response from Webex: " . print_r($response, true));
 			return false;
@@ -178,5 +179,28 @@ class kWebexAPIClient extends kVendorClient
 			return null;
 		}
 		return $response['emails'][0];
+	}
+	
+	public function getMeetingTranscripts($meetingId, $hostEmail)
+	{
+		$request = "meetingTranscripts?meetingId=$meetingId&hostEmail=$hostEmail";
+		return $this->sendRequest($request);
+	}
+	
+	public function downloadTranscript($transcriptId)
+	{
+		$request = "meetingTranscripts/$transcriptId/download";
+		$response = $this->sendRequest($request);
+		if (!$this->httpCode == self::GET_TRANSCRIPT_SUCCESSFUL_CODE)
+		{
+			return null;
+		}
+		return $response;
+	}
+	
+	public function getMeetingChat($meetingId)
+	{
+		$request = "meetings/postMeetingChats?meetingId=$meetingId";
+		return $this->sendRequest($request);
 	}
 }

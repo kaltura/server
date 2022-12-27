@@ -8,6 +8,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 	const ADMIN_TAG_WEBEX = 'webexapi';
 	const WEBEX_PREFIX = 'Webex_';
 	const KALTURA_WEBEX_DEFAULT_USER = 'KalturaWebexDefault';
+	const TRANSCRIPT_LABEL = 'Webex';
+	const TRANSCRIPT_FILE_EXT = 'vtt';
 	
 	/**
 	 * @var kWebexAPIClient
@@ -277,6 +279,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 	{
 		$this->initProcessFolder($job, $data);
 		list($entry, $flavorAsset) = $this->prepareEntryAndFlavorAsset($job->partnerId);
+		$this->retrieveAndDownloadMeetingTranscripts($entry->id, $entry->partnerId);
 		$this->refreshDownloadUrl();
 		$this->setContentOnEntry($entry, $flavorAsset);
 		$this->updateDropFolderFile($entry->id);
@@ -520,6 +523,71 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		}
 		KBatchBase::impersonate($this->dropFolder->partnerId);
 		KBatchBase::$kClient->baseEntry->update($entryId, $updatedEntry);
+		KBatchBase::unimpersonate();
+	}
+	
+	protected function retrieveAndDownloadMeetingTranscripts($entryId, $partnerId)
+	{
+		$nextPageLink = null;
+		do
+		{
+			$transcriptsList = $this->retrieveRecordingTranscriptsList($nextPageLink);
+			$this->handleTranscriptsList($entryId, $partnerId, $transcriptsList);
+			
+			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
+		}
+		while ($nextPageLink);
+	}
+	
+	protected function retrieveRecordingTranscriptsList($nextPageLink)
+	{
+		if ($nextPageLink)
+		{
+			$transcriptsList = $this->webexClient->sendRequestUsingDirectLink($nextPageLink);
+		}
+		else
+		{
+			$transcriptsList = $this->webexClient->getMeetingTranscripts($this->dropFolderFile->meetingId, $this->dropFolderFile->hostEmail);
+		}
+		
+		if (!isset($transcriptsList['items']) || !$transcriptsList['items'])
+		{
+			
+			KalturaLog::info("No transcripts for meeting {$this->dropFolderFile->meetingId}");
+			return array();
+		}
+		
+		return $transcriptsList['items'];
+	}
+	
+	protected function handleTranscriptsList($entryId, $partnerId, $transcriptsList)
+	{
+		foreach ($transcriptsList as $transcript)
+		{
+			if (!isset($transcript['id']))
+			{
+				KalturaLog::warning('Error getting transcript id from Webex');
+				continue;
+			}
+			
+			$transcript = $this->webexClient->downloadTranscript($transcript['id']);
+			if (!$transcript)
+			{
+				continue;
+			}
+			
+			$captionAsset = $this->createAssetForTranscript($entryId, $partnerId, self::TRANSCRIPT_LABEL, kRecordingFileType::TRANSCRIPT, self::TRANSCRIPT_FILE_EXT, KalturaCaptionSource::WEBEX);
+			$this->setContentOnCaptionAsset($captionAsset, $transcript, $partnerId);
+		}
+	}
+	
+	protected function setContentOnCaptionAsset($captionAsset, $transcript, $partnerId)
+	{
+		$captionAssetResource = new KalturaStringResource();
+		$captionAssetResource->content = $transcript;
+		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
 		KBatchBase::unimpersonate();
 	}
 

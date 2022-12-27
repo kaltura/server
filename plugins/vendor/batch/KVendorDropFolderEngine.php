@@ -7,6 +7,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 	const MAX_PUSER_LENGTH = 100;
 	const TAG_SOURCE = "source";
 	const SOURCE_FLAVOR_ID = 0;
+	const LABEL_DEL = '_';
 	
 	abstract protected function getDefaultUserString();
 	
@@ -250,5 +251,39 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entryId, $kFlavorAsset);;
 		KBatchBase::unimpersonate();
 		return $flavorAsset;
+	}
+	
+	protected function createAssetForTranscript($entryId, $partnerId, $label, $fileType, $transcriptFileExtension, KalturaCaptionSource $source)
+	{
+		$newCaptionAsset = new KalturaCaptionAsset();
+		$newCaptionAsset->language = KalturaLanguage::EN;
+		$newCaptionAsset->label = $label;
+		$transcriptType = $this->getTranscriptType($fileType);
+		if ($transcriptType != '')
+		{
+			$newCaptionAsset->label = $label . self::LABEL_DEL . $transcriptType;
+		}
+		$transcriptFormat = CaptionPlugin::getCaptionFormatFromExtension($transcriptFileExtension);
+		$newCaptionAsset->format = $transcriptFormat;
+		$newCaptionAsset->fileExt = $transcriptFileExtension;
+		$newCaptionAsset->source = $source;
+		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$captionAsset = $captionPlugin->captionAsset->add($entryId, $newCaptionAsset);
+		KBatchBase::unimpersonate();
+		return $captionAsset;
+	}
+	
+	protected function getTranscriptType($enumFileType)
+	{
+		switch($enumFileType)
+		{
+			case kRecordingFileType::TRANSCRIPT:
+				return 'TRANSCRIPT';
+			case kRecordingFileType::CC:
+				return 'CC';
+			default:
+				return '';
+		}
 	}
 }
