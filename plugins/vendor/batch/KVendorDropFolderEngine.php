@@ -60,14 +60,14 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function addEntryToCategory($categoryName, $entryId, $partnerId)
 	{
-		$categoryId = $this->findCategoryIdByName($categoryName);
+		$categoryId = $this->findCategoryIdByName($categoryName, $partnerId);
 		if ($categoryId)
 		{
 			$this->addCategoryEntry($categoryId, $entryId, $partnerId);
 		}
 	}
 	
-	protected function findCategoryIdByName($categoryName)
+	protected function findCategoryIdByName($categoryName, $partnerId)
 	{
 		$isFullPath = $this->isFullPath($categoryName);
 		
@@ -81,7 +81,9 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 			$categoryFilter->nameOrReferenceIdStartsWith = $categoryName;
 		}
 		
+		KBatchBase::impersonate($partnerId);
 		$categoryResponse = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
+		KBatchBase::unimpersonate();
 		$categoryId = null;
 		if ($isFullPath)
 		{
