@@ -466,7 +466,8 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    {
 	        $categoryFilter = new KalturaCategoryFilter();
 	        $categoryFilter->fullNameEqual = $categoryName;
-	        $res = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
+	        $categoryFilter->statusIn = KalturaCategoryStatus::ACTIVE . ',' . KalturaCategoryStatus::UPDATING;
+		$res = KBatchBase::$kClient->category->listAction($categoryFilter, new KalturaFilterPager());
 	        if (!count($res->objects))
 	        {
 	           $res = $this->createCategoryByPath($categoryName);
