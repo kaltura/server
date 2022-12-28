@@ -398,16 +398,13 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	private function uploadThumbnail($thumbAssetFilePath)
 	{
 		try{
-			$imageSystemId = '';
-			if(!empty($thumbAssetFilePath))
-			{
-				$imageSystemId = $this->mediaUpload($thumbAssetFilePath);
-			}
+			$imageSystemId = $this->mediaUpload($thumbAssetFilePath);
+			KalturaLog::info("Cortex: upload thumbnail succeeded, ImageIdentifier: $imageSystemId");
 			$metadata = array();
 			$metadata["CoreField.Identifier"] = $this->getCortexSystemId();
 			$metadata["CoreField.Representative_DO:"] = "[DataTable/v2.2/Documents.Image.Default:Read?CoreField.Identifier=$imageSystemId]";
 			$this->requestCortex($metadata, self::CORTEX_API_SEND_METADATA);
-			KalturaLog::info("Cortex: upload thumbnail succeeded, ImageIdentifier: $imageSystemId");
+			KalturaLog::info("Cortex: setting thumbnail succeeded, ImageIdentifier: $imageSystemId, VideoIdentifier:".$this->getCortexSystemId());
 		}
 		catch(Exception $e)
 		{
