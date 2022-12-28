@@ -364,8 +364,8 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$metadata["MAY.Kaltura-Record-ID:"] = $fieldValues[CortexApiDistributionField::MEDIA_ID];
 			$metadata["MAY.Playback-URL:"] = $apiDistributionJobProviderData->videoFlavorDownloadUrl;
 			$metadata["MAY.Ticket-Contact-or-Requestor:"] = $fieldValues[CortexApiDistributionField::MEDIA_USER_ID] ?? '';
-			$metadata["MAY.Legacy-Creation-Date:"] = $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE] ?? '';
-			$metadata["MAY.Legacy-Keywords:"] = $fieldValues[CortexApiDistributionField::MEDIA_KEYWORDS] ?? '';
+			$metadata["MAY.Legacy-Creation-Date:"] = $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE] ? date('Ymd', $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE]) : '';
+			$metadata["MAY.Legacy-Keywords:"] = $fieldValues[CortexApiDistributionField::MEDIA_KEYWORDS] ? str_replace(',', ', ', $fieldValues[CortexApiDistributionField::MEDIA_KEYWORDS]) : '';
 			$metadata["MAY.Person(s)-Present:"] = $metadataFields[self::CORTEX_KALTURA_METADATA_FIELD_PRESENTERS];
 			$metadata["MAY.Job-Number:"] = $metadataFields[self::CORTEX_KALTURA_METADATA_FIELD_JOB_NUMBER];
 			$result = $this->requestCortex($metadata, self::CORTEX_API_SEND_METADATA);
