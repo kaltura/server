@@ -73,7 +73,8 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	private function addCaptionsData(KalturaDistributionJobData $distributionJobData) {
+	private function addCaptionsData(KalturaDistributionJobData $distributionJobData)
+	{
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
 		$assetIdsArray = explode ( ',', $distributionJobData->entryDistribution->assetIds );
 		if (empty($assetIdsArray)) return;
@@ -158,7 +159,8 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 	 * @param KalturaDistributionJobData $distributionJobData
 	 * @return KalturaCortexApiCaptionDistributionInfo|void
 	 */
-	private function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData) {
+	private function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData)
+	{
 		$captionInfo = new KalturaCortexApiCaptionDistributionInfo ();
 		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
 		$captionInfo->filePath = $fileSync->getFullPath();
