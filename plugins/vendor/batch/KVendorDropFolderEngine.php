@@ -31,7 +31,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		elseif ($groupParticipationType == kVendorGroupParticipationType::OPT_OUT)
 		{
 			KalturaLog::debug('Account is configured to OPT OUT the users that are members of the following groups ['.print_r($optOutGroupNames, true).']');
-			return $this->isUserNotMemberOfGroups($userId, $partnerId, $optOutGroupNames);
+			return !$this->isUserNotMemberOfGroups($userId, $partnerId, $optOutGroupNames);
 		}
 	}
 	
