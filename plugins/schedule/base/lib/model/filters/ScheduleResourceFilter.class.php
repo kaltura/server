@@ -25,6 +25,8 @@ class ScheduleResourceFilter extends baseObjectFilter
 				"_eq_system_name",
 				"_in_system_name",
 				"_eq_name",
+				"_eq_is_managed",
+				"_not_is_managed",
 			) , NULL );
 
 		$this->allowed_order_fields = array (
