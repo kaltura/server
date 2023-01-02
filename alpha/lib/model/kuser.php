@@ -112,8 +112,35 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 				 	throw new kPermissionException('Account owner must be set with a partner administrator role', kPermissionException::ACCOUNT_OWNER_NEEDS_PARTNER_ADMIN_ROLE);	
 				}
 			}
-		$this->setUpdatedAt(time());
+		
+			$this->setUpdatedAt(time());
 		}
+		
+		if ($this->isColumnModified(kuserPeer::STATUS) && $this->getStatus() == KuserStatus::DELETED &&
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_PURGE_USER_PII_DATA, $this->getPartnerId()))
+		{
+			//remove all pii data
+			$this->setAttendanceInfo("{}");
+			$this->setCompany("");
+			$this->setDateOfBirth(0);
+			$this->setFirstName("");
+			$this->setGender(0);
+			$this->setLastName("");
+			$this->setRegistrationInfo("{}");
+			$this->setTitle("");
+			$this->setCity("");
+			$this->setCountry("");
+			$this->setAboutMe("");
+			$this->setEmail("");
+			$this->setPartnerData("");
+			$this->setScreenName("");
+			$this->setState("");
+			$this->setTags("");
+			$this->setPicture("");
+			$this->setZip("");
+			$this->setExternalId("");
+		}
+		
 		return parent::preSave($con);
 	}
 	

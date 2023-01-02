@@ -144,15 +144,28 @@ class previewAction extends kalturaAction
 			}
 
 			if( $this->playlist_id && $this->playlist_id != 'multitab_playlist') {
-				// build playlist url
-				$playlist_url = $this->partner_host ."/index.php/partnerservices2/executeplaylist?";
-				$playlist_url .= "partner_id=" . $this->partner_id . "&subp_id=" . $this->partner_id . "00&format=8&ks={ks}&playlist_id=" . $this->playlist_id;
-
-				$playlist_name = htmlspecialchars($this->getRequestParameter('playlist_name'));
-
-				// Add playlist flashVars
-				$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
-				$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
+				if($this->isPlaykit)
+				{
+					$playlist = entryPeer::retrieveByPK($this->playlist_id);
+					if($playlist)
+					{
+						$playlist_name = $playlist->getName();
+						$playlist_description = $playlist->getDescription();
+						$embedParams['playlistId'] = $this->playlist_id;
+					}
+				}
+				else
+				{
+					// build playlist url
+					$playlist_url = $this->partner_host . "/index.php/partnerservices2/executeplaylist?";
+					$playlist_url .= "partner_id=" . $this->partner_id . "&subp_id=" . $this->partner_id . "00&format=8&ks={ks}&playlist_id=" . $this->playlist_id;
+					
+					$playlist_name = htmlspecialchars($this->getRequestParameter('playlist_name'));
+					
+					// Add playlist flashVars
+					$flashVars["playlistAPI.kpl0Name"] = $playlist_name;
+					$flashVars["playlistAPI.kpl0Url"] = urlencode($playlist_url);
+				}
 			}
 		}
 		// Don't include flashvars if empty array

@@ -44,9 +44,9 @@ class SessionService extends KalturaBaseService
 		$result = kSessionUtils::startKSession ( $partnerId , $secret , $userId , $ks , $expiry , $type , "" , $privileges );
 
 		if ( $result >= 0 )
-	{
-		return $ks;
-	}
+		{
+			return $ks;
+		}
 		else
 		{
 			throw new KalturaAPIException ( APIErrors::START_SESSION_ERROR ,$partnerId );

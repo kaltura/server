@@ -42,7 +42,7 @@ class AppTokenPeer extends BaseAppTokenPeer {
 	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("appToken:id=%s", self::ID));		
+		return array(array("appToken:id=%s", self::ID), array("appToken:partnerId=%s", self::PARTNER_ID));
 	}
 
 	public static function retrieveByKuserId($kuserId, $partnerId)

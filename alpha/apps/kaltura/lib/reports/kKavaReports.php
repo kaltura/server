@@ -1859,12 +1859,13 @@ class kKavaReports extends kKavaReportsMgr
 		ReportType::REACH_CATALOG_USAGE => array(
 			self::REPORT_DIMENSION_MAP => array(
 				'partner_id' => self::DIMENSION_PARTNER_ID,
-				'catalog_item_id' => self::DIMENSION_CATALOG_ITEM_ID
+				'catalog_item_id' => self::DIMENSION_CATALOG_ITEM_ID,
+				'status' => self::DIMENSION_STATUS
 			),
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
-			self::REPORT_METRICS => array(self::METRIC_DURATION_TOTAL_MIN),
+			self::REPORT_METRICS => array(self::METRIC_REACH_DURATION),
 		),
 
 		ReportType::REACH_PROFILE_USAGE => array(
@@ -1877,6 +1878,12 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 			self::REPORT_METRICS => array(self::METRIC_COUNT_ALL_EVENTS),
+		),
+
+		ReportType::SELF_SERVE_BANDWIDTH => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+			self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
 		)
 	);
 

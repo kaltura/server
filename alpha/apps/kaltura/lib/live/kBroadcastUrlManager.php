@@ -92,13 +92,19 @@ class kBroadcastUrlManager
 		$partner = PartnerPeer::retrieveByPK($this->partnerId);
 		return $partner->getLiveStreamBroadcastUrlConfigurations($dc);
 	}
+
+	protected static function getLiveIdForHost($entry)
+	{
+		$entryId = str_replace('1_', '', $entry->getId());
+		return str_replace('_', '-', $entryId); // dns resolve don't handle well underscore in host
+	}
 	
 	protected function getHostname ($dc, $primary, $entry, $protocol)
 	{
 		$broadcastConfig = $this->getConfiguration($dc);
 		list($domainParam, $portParam) = self::getUrlParamsByProtocol($protocol);
 		$url = $broadcastConfig[$domainParam];
-		$url = str_replace(array('{entryId}', '{primary}'), array($entry->getId(), $primary ? 'p' : 'b'), $url);
+		$url = str_replace(array('{entryId}', '{liveId}', '{primary}'), array($entry->getId(), self::getLiveIdForHost($entry), $primary ? 'p' : 'b'), $url);
 		$url .= ':' . $this->getPort($dc, $portParam, $protocol);
 
 		if ($protocol === kBroadcastUrlManager::PROTOCOL_SRT )

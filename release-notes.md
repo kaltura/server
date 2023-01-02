@@ -1,3 +1,46 @@
+# Rigel-18.20.0
+## Update New_Item_Pending_Moderation email event notification templates ##
+* Issue Type: Task
+* Issue ID: SUP-32090
+
+#### Configuration ####
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php update deployment script.
+
+### Deployment scripts ###
+    - deployment/updates/scripts/xml/2022_12_22_updateNewItemPendingModeration.template.xml
+    - php deployment/updates/scripts/2022_12_22_deploy_update_email_event_notification_new_item_pending_moderation.php
+
+## Add partner id status index to app token table ##
+* Issue Type: Task
+* Issue ID: FOUN-915
+
+### Deployment Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2022_12_20_app_token_partner_status_index.sql
+
+
+## Add query cache for app token
+* Issue Type: Task
+* Issue ID: FOUN-912
+* 
+#### Deployment Scripts ####
+    php /opt/kaltura/app/deployment/base/scripts/createQueryCacheTriggers.php create <myql-server> <mysql-user> <mysql-pass> realrun
+
+## Add Swahili and Ukrainian language options for live streams ##
+* Issue Type: Task
+* Issue ID: SUP-34126
+### Deployment Scripts ###
+    php opt/kaltura/app/deployment/updates/scripts/2022_12_19_add_live_languages_ukr_swa.php
+## Static Content Conversion Profile For Webex
+* Issue Type: Task
+* Issue ID: PLAT-23958
+
+### Configuration ###
+Add webex static conversion profiles configuration to runtime_config confmap in order to activate it
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/2022_12_21_deploy_webex_recordings_conversion_data.php
+    
+
 # Rigel-18.19.0
 ## Allow CNC Checkbox
 * Issue Type: Task
