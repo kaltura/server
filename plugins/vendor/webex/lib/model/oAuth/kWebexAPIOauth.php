@@ -29,7 +29,7 @@ class kWebexAPIOauth extends kOAuth
 		$response = self::curlRetrieveTokensData($webexBaseURL, null, $header, $postFields);
 		if (self::$errorCode == self::ACCESS_TOKEN_NOT_AUTHORIZED_CODE)
 		{
-			KalturaLog::warning('Retrieving access token from Webex was not authorized');
+			KalturaLog::warning('Retrieving access token from Webex was not authorized: ' . print_r($response));
 			return null;
 		}
 		$tokensData = self::retrieveTokensDataFromResponse($response);
