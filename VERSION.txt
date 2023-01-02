@@ -1,1 +1,1 @@
-Rigel-18.20.0
+Scorpius-19.0.0
