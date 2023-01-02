@@ -301,6 +301,7 @@ class WebexVendorService extends KalturaBaseService
 		}
 		
 		$integrationSetting->toInsertableObject($webexIntegration);
+		$webexIntegration->setStatus(1);
 		$webexIntegration->save();
 		
 		return true;
