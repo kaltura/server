@@ -37,11 +37,11 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		do
 		{
 			$recordingsList = $this->retrieveRecordingsList($nextPageLink);
-			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
 			if ($recordingsList)
 			{
 				$this->handleRecordingsList($recordingsList);
 			}
+			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
 		}
 		while ($nextPageLink);
 		
