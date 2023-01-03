@@ -46,7 +46,7 @@ while (count($partners))
 		if(! $dbPermission)
 		{
 			$dbPermission = new Permission();
-			$dbPermission->setType(PermissionType::PLUGIN);
+			$dbPermission->setType(PermissionType::SPECIAL_FEATURE);
 			$dbPermission->setPartnerId($partner->getId());
 			$dbPermission->setName(FEATURE_V3_STUDIO_PERMISSION);
 		}
