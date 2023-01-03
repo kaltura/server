@@ -4,8 +4,8 @@
  *
  *
  * Examples:
- * php enableStudioV3Permission.php
- * php enableStudioV3Permission.php realrun
+ * php 2023_01_03_enable_studio_V3_permission_to_all_partners.php
+ * php 2023_01_03_enable_studio_V3_permission_to_all_partners.php realrun
  *
  * @package Deployment
  * @subpackage updates
