@@ -413,7 +413,6 @@ class myPartnerRegistration
 			
 			//$this->configurePartnerByPackage($newPartner);
 			PermissionPeer::enableForPartner(PermissionName::FEATURE_FILE_TYPE_RESTRICTION_PERMISSION, PermissionType::SPECIAL_FEATURE, $newPartner->getId());
-			PermissionPeer::enableForPartner(PermissionName::FEATURE_V3_STUDIO_PERMISSION, PermissionType::SPECIAL_FEATURE, $newPartner->getId());
 					
 			$this->setAllTemplateEntriesToAdminKuser($newPartner->getId(), $kuserId);
 
