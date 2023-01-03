@@ -16,6 +16,10 @@ moduls.V7Studio.label = "Show V7 Studio"
 moduls.V7Studio.permissionName = FEATURE_V7_STUDIO_PERMISSION
 moduls.V7Studio.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
+Run
+```
+php deployment/updates/scripts/2023_01_03_enable_studio_V3_permission_to_all_partners.php
+```
 # Rigel-18.20.0
 ## Update New_Item_Pending_Moderation email event notification templates ##
 * Issue Type: Task
