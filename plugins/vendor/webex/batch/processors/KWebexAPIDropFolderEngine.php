@@ -33,10 +33,11 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		$this->initDropFolderEngine($dropFolder);
+		$startTime = $this->lastFileTimestamp;
 		$nextPageLink = null;
 		do
 		{
-			$recordingsList = $this->retrieveRecordingsList($nextPageLink);
+			$recordingsList = $this->retrieveRecordingsList($startTime, $nextPageLink);
 			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
 			if ($recordingsList)
 			{
@@ -67,7 +68,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		return new kWebexAPIClient($this->dropFolder->baseURL, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
 	}
 	
-	protected function retrieveRecordingsList($nextPageLink)
+	protected function retrieveRecordingsList($startTime, $nextPageLink)
 	{
 		if ($nextPageLink)
 		{
@@ -75,7 +76,6 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		}
 		else
 		{
-			$startTime = $this->lastFileTimestamp;
 			$endTime = $startTime + kTimeConversion::DAY;
 			$recordingsList = $this->webexClient->getRecordingsList($startTime, $endTime);
 		}
