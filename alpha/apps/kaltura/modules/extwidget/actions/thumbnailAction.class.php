@@ -87,7 +87,7 @@ class thumbnailAction extends sfAction
 		$def_width = $this->getFloatRequestParameter("def_width", -1, -1, 10000);
 		$def_height = $this->getFloatRequestParameter("def_height", -1, -1, 10000);
 
-		$vid_slice = min($vid_slices, $vid_slice);
+		$vid_slice = $vid_slices > 0 && $vid_slice >= $vid_slices ? $vid_slices - 1 : min($vid_slices, $vid_slice);
 
 		if($width == self::DEFAULT_DIMENSION && $height == self::DEFAULT_DIMENSION) // for sake of backward compatibility if no dimensions where specified create 120x90 thumbnail
 		{
