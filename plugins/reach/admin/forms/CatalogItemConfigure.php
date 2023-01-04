@@ -126,6 +126,23 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			));
 		}
 		
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION)
+		{
+			$this->addElement('text', 'flavorParamsId', array(
+				'label' => 'Flavor Params ID:',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'required' 		=> true,
+			));
+			
+			$this->addElement('text', 'clearAudioFlavorParamsId', array(
+				'label' => 'Clear Audio Flavor Params ID:',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'required' 		=> true,
+			));
+		}
+		
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
 		{
 			$this->addElement(
@@ -149,7 +166,8 @@ class Form_CatalogItemConfigure extends ConfigureForm
 					));
 		}
 		
-		if (($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION) && ($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING))
+		if (($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION) &&
+			($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING))
 		{
 			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'), array( null => "PartnerDefault"));
 			$outputFormat->setLabel('Output Format:');
@@ -162,6 +180,16 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$enableSpeakerId->setRequired(true);
 			$enableSpeakerId->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 			$this->addElement($enableSpeakerId);
+		}
+		
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION)
+		{
+			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat',
+			                                                    array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'),
+			                                                    array(null => "PartnerDefault"));
+			$outputFormat->setLabel('Output Format:');
+			$outputFormat->setValue(VendorCatalogItemOutputFormat::VTT);
+			$this->addElement($outputFormat);
 		}
 
 		$allowResubmission = new Kaltura_Form_Element_EnumSelect('allowResubmission', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(

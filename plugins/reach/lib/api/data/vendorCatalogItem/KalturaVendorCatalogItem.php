@@ -223,6 +223,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				$object = new KalturaVendorAudioDescriptionCatalogItem();
 				break;
 			
+			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
+				$object = new KalturaVendorExtendedAudioDescriptionCatalogItem();
+				break;
+			
 			case VendorServiceFeature::CHAPTERING:
 				$object = new KalturaVendorChapteringCatalogItem();
 				break;
