@@ -7,6 +7,7 @@ class kWebexAPIClient extends kVendorClient
 {
 	const DELETE_RECORDING_SUCCESSFUL_CODE = 204;
 	const GET_TRANSCRIPT_SUCCESSFUL_CODE = 200;
+	const GET_CHAT_SUCCESSFUL_CODE = 200;
 	
 	protected $nextPageLink;
 	
@@ -67,7 +68,7 @@ class kWebexAPIClient extends kVendorClient
 		return $ch;
 	}
 	
-	protected function sendRequest($request, $isRequestPost = false, $isRequestDelete = false)
+	protected function sendRequest($request, $isRequestPost = false, $isRequestDelete = false, $decodeJson = true)
 	{
 		$this->httpCode = 0;
 		
@@ -87,7 +88,7 @@ class kWebexAPIClient extends kVendorClient
 		}
 		else
 		{
-			$response = json_decode($response, true);
+			$response = $decodeJson ? json_decode($response, true) : $response;
 		}
 		return $response;
 	}
@@ -134,9 +135,9 @@ class kWebexAPIClient extends kVendorClient
 		return $this->sendRequest($request);
 	}
 	
-	public function sendRequestUsingDirectLink($directLink)
+	public function sendRequestUsingDirectLink($directLink, $decodeJson = true)
 	{
-		return $this->sendRequest($directLink);
+		return $this->sendRequest($directLink, false, false, $decodeJson);
 	}
 	
 	public function getRecording($recordingId, $hostEmail)
@@ -198,9 +199,14 @@ class kWebexAPIClient extends kVendorClient
 		return $response;
 	}
 	
-	public function getMeetingChat($meetingId)
+	public function getMeetingChats($meetingId)
 	{
 		$request = "meetings/postMeetingChats?meetingId=$meetingId";
-		return $this->sendRequest($request);
+		$response = $this->sendRequest($request, false, false, false);
+		if (!$this->httpCode == self::GET_CHAT_SUCCESSFUL_CODE)
+		{
+			return null;
+		}
+		return $response;
 	}
 }

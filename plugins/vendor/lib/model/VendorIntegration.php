@@ -24,6 +24,7 @@ class VendorIntegration extends BaseVendorIntegration
 	const DEFAULT_USER_E_MAIL = 'defaultUserEMail';
 	const LAST_ERROR = 'lastError';
 	const LAST_ERROR_TIMESTAMP = 'lastErrorTimestamp';
+	const ENABLE_MEETING_CHAT = 'enableMeetingChat';
 	
 	public function setAccessToken($v)
 	{
@@ -125,6 +126,16 @@ class VendorIntegration extends BaseVendorIntegration
 	{
 		$this->setLastError($v);
 		$this->save();
+	}
+	
+	public function setEnableMeetingChat($v)
+	{
+		$this->putInCustomData(self::ENABLE_MEETING_CHAT, $v);
+	}
+	
+	public function getEnableMeetingChat()
+	{
+		return $this->getFromCustomData(self::ENABLE_MEETING_CHAT, null, null);
 	}
 	
 	/**

@@ -280,6 +280,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		$this->initProcessFolder($job, $data);
 		list($entry, $flavorAsset) = $this->prepareEntryAndFlavorAsset($job->partnerId);
 		$this->retrieveAndDownloadMeetingTranscripts($entry->id, $entry->partnerId);
+		$this->retrieveAndDownloadMeetingChats($entry->id, $entry->partnerId);
 		$this->refreshDownloadUrl();
 		$this->setContentOnEntry($entry, $flavorAsset);
 		$this->updateDropFolderFile($entry->id);
@@ -528,10 +529,14 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 	
 	protected function retrieveAndDownloadMeetingTranscripts($entryId, $partnerId)
 	{
+		if (!$this->dropFolder->webexAPIVendorIntegration->enableTranscription)
+		{
+			return;
+		}
 		$nextPageLink = null;
 		do
 		{
-			$transcriptsList = $this->retrieveRecordingTranscriptsList($nextPageLink);
+			$transcriptsList = $this->retrieveMeetingTranscriptsList($nextPageLink);
 			$this->handleTranscriptsList($entryId, $partnerId, $transcriptsList);
 			
 			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
@@ -539,7 +544,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		while ($nextPageLink);
 	}
 	
-	protected function retrieveRecordingTranscriptsList($nextPageLink)
+	protected function retrieveMeetingTranscriptsList($nextPageLink)
 	{
 		if ($nextPageLink)
 		{
@@ -573,6 +578,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			$transcript = $this->webexClient->downloadTranscript($transcript['id']);
 			if (!$transcript)
 			{
+				KalturaLog::info("Webex transcript for entry [$entryId] is empty");
 				continue;
 			}
 			
@@ -581,14 +587,39 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		}
 	}
 	
-	protected function setContentOnCaptionAsset($captionAsset, $transcript, $partnerId)
+	protected function retrieveAndDownloadMeetingChats($entryId, $partnerId)
 	{
-		$captionAssetResource = new KalturaStringResource();
-		$captionAssetResource->content = $transcript;
-		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
-		KBatchBase::impersonate($partnerId);
-		$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
-		KBatchBase::unimpersonate();
+		if (!$this->dropFolder->webexAPIVendorIntegration->enableMeetingChat)
+		{
+			return;
+		}
+		
+		$nextPageLink = null;
+		$meetingChats = '';
+		do
+		{
+			$meetingChats .= $this->retrieveMeetingChats($nextPageLink);
+			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
+		}
+		while ($nextPageLink);
+		
+		if (!$meetingChats)
+		{
+			KalturaLog::info("No chats for meeting {$this->dropFolderFile->meetingId}");
+			
+			return;
+		}
+		$attachmentAsset = $this->createAssetForChats($entryId, $partnerId, $this->dropFolderFile->recordingId);
+		$this->setContentOnAttachmentAsset($attachmentAsset, $meetingChats, $partnerId);
+	}
+	
+	protected function retrieveMeetingChats($nextPageLink)
+	{
+		if ($nextPageLink)
+		{
+			return $this->webexClient->sendRequestUsingDirectLink($nextPageLink, false);
+		}
+		return $this->webexClient->getMeetingChats($this->dropFolderFile->meetingId);
 	}
 
 	protected function refreshDownloadUrl()

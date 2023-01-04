@@ -8,6 +8,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 	const TAG_SOURCE = "source";
 	const SOURCE_FLAVOR_ID = 0;
 	const LABEL_DEL = '_';
+	const CHAT_FILE_TYPE = 'txt';
 	
 	abstract protected function getDefaultUserString();
 	
@@ -253,25 +254,25 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		return $flavorAsset;
 	}
 	
-	protected function createAssetForTranscript($entryId, $partnerId, $label, $fileType, $transcriptFileExtension, KalturaCaptionSource $source)
+	protected function createAssetForTranscript($entryId, $partnerId, $label, $fileType, $transcriptFileExtension, $source)
 	{
-		$newCaptionAsset = new KalturaCaptionAsset();
-		$newCaptionAsset->language = KalturaLanguage::EN;
-		$newCaptionAsset->label = $label;
+		$captionAsset = new KalturaCaptionAsset();
+		$captionAsset->language = KalturaLanguage::EN;
+		$captionAsset->label = $label;
 		$transcriptType = $this->getTranscriptType($fileType);
 		if ($transcriptType != '')
 		{
-			$newCaptionAsset->label = $label . self::LABEL_DEL . $transcriptType;
+			$captionAsset->label .= self::LABEL_DEL . $transcriptType;
 		}
 		$transcriptFormat = CaptionPlugin::getCaptionFormatFromExtension($transcriptFileExtension);
-		$newCaptionAsset->format = $transcriptFormat;
-		$newCaptionAsset->fileExt = $transcriptFileExtension;
-		$newCaptionAsset->source = $source;
+		$captionAsset->format = $transcriptFormat;
+		$captionAsset->fileExt = $transcriptFileExtension;
+		$captionAsset->source = $source;
 		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
 		KBatchBase::impersonate($partnerId);
-		$captionAsset = $captionPlugin->captionAsset->add($entryId, $newCaptionAsset);
+		$newCaptionAsset = $captionPlugin->captionAsset->add($entryId, $captionAsset);
 		KBatchBase::unimpersonate();
-		return $captionAsset;
+		return $newCaptionAsset;
 	}
 	
 	protected function getTranscriptType($enumFileType)
@@ -285,5 +286,37 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 			default:
 				return '';
 		}
+	}
+	
+	protected function setContentOnCaptionAsset($captionAsset, $transcript, $partnerId)
+	{
+		$captionAssetResource = new KalturaStringResource();
+		$captionAssetResource->content = $transcript;
+		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
+		KBatchBase::unimpersonate();
+	}
+	
+	protected function createAssetForChats($entryId, $partnerId, $recordingId)
+	{
+		$attachmentAsset = new KalturaAttachmentAsset();
+		$attachmentAsset->filename = "Recording {$recordingId} chat file." . self::CHAT_FILE_TYPE;
+		$attachmentAsset->fileExt = self::CHAT_FILE_TYPE;
+		$attachmentPlugin = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$newAttachmentAsset = $attachmentPlugin->attachmentAsset->add($entryId, $attachmentAsset);
+		KBatchBase::unimpersonate();
+		return $newAttachmentAsset;
+	}
+	
+	protected function setContentOnAttachmentAsset($attachmentAsset, $meetingChats, $partnerId)
+	{
+		$attachmentAssetResource = new KalturaStringResource();
+		$attachmentAssetResource->content = $meetingChats;
+		$attachmentPlugin = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$attachmentPlugin->attachmentAsset->setContent($attachmentAsset->id, $attachmentAssetResource);
+		KBatchBase::unimpersonate();
 	}
 }
