@@ -125,10 +125,10 @@ class kWebexAPIClient extends kVendorClient
 	{
 		$dateFormat = 'Y-m-d';
 		$hourFormat = 'H:i:s';
-		$startDate = date($dateFormat, $startTime);
-		$startHour = date($hourFormat, $startTime);
-		$endDate = date($dateFormat, $endTime);
-		$endHour = date($hourFormat, $endTime);
+		$startDate = gmdate($dateFormat, $startTime);
+		$startHour = gmdate($hourFormat, $startTime);
+		$endDate = gmdate($dateFormat, $endTime);
+		$endHour = gmdate($hourFormat, $endTime);
 		$request = "admin/recordings?from=$startDate" . "T$startHour" . "&to=$endDate" . "T$endHour";
 		return $this->sendRequest($request);
 	}
