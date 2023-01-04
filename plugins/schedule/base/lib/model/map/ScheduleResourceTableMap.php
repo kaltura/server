@@ -48,8 +48,8 @@ class ScheduleResourceTableMap extends TableMap {
 		$this->addColumn('STATUS', 'Status', 'INTEGER', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
-		$this->addColumn('IS_MANAGED', 'IsManaged', 'INTEGER', true, null, null);
 		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
+		$this->addColumn('IS_MANAGED', 'IsManaged', 'INTEGER', true, null, null);
 		// validators
 	} // initialize()
 

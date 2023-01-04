@@ -63,8 +63,8 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="status" type="integer" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
-		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="is_managed" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
+		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="is_managed" type="integer" />
 		<index name="partner_status_type_index">
 			<index-column name="partner_id" />
 			<index-column name="status" />

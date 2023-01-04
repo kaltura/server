@@ -64,11 +64,11 @@ abstract class BaseScheduleResourcePeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'schedule_resource.UPDATED_AT';
 
-	/** the column name for the IS_MANAGED field */
-	const IS_MANAGED = 'schedule_resource.IS_MANAGED';
-
 	/** the column name for the CUSTOM_DATA field */
 	const CUSTOM_DATA = 'schedule_resource.CUSTOM_DATA';
+
+	/** the column name for the IS_MANAGED field */
+	const IS_MANAGED = 'schedule_resource.IS_MANAGED';
 
 	/**
 	 * An identiy map to hold any loaded instances of ScheduleResource objects.
@@ -86,10 +86,10 @@ abstract class BaseScheduleResourcePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'ParentId', 'PartnerId', 'Name', 'SystemName', 'Description', 'Tags', 'Type', 'Status', 'CreatedAt', 'UpdatedAt', 'IsManaged', 'CustomData', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parentId', 'partnerId', 'name', 'systemName', 'description', 'tags', 'type', 'status', 'createdAt', 'updatedAt', 'isManaged', 'customData', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::PARENT_ID, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::TAGS, self::TYPE, self::STATUS, self::CREATED_AT, self::UPDATED_AT, self::IS_MANAGED, self::CUSTOM_DATA, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'parent_id', 'partner_id', 'name', 'system_name', 'description', 'tags', 'type', 'status', 'created_at', 'updated_at', 'is_managed', 'custom_data', ),
+		BasePeer::TYPE_PHPNAME => array ('Id', 'ParentId', 'PartnerId', 'Name', 'SystemName', 'Description', 'Tags', 'Type', 'Status', 'CreatedAt', 'UpdatedAt', 'CustomData', 'IsManaged', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parentId', 'partnerId', 'name', 'systemName', 'description', 'tags', 'type', 'status', 'createdAt', 'updatedAt', 'customData', 'isManaged', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::PARENT_ID, self::PARTNER_ID, self::NAME, self::SYSTEM_NAME, self::DESCRIPTION, self::TAGS, self::TYPE, self::STATUS, self::CREATED_AT, self::UPDATED_AT, self::CUSTOM_DATA, self::IS_MANAGED, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'parent_id', 'partner_id', 'name', 'system_name', 'description', 'tags', 'type', 'status', 'created_at', 'updated_at', 'custom_data', 'is_managed', ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
@@ -100,10 +100,10 @@ abstract class BaseScheduleResourcePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ParentId' => 1, 'PartnerId' => 2, 'Name' => 3, 'SystemName' => 4, 'Description' => 5, 'Tags' => 6, 'Type' => 7, 'Status' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, 'IsManaged' => 11, 'CustomData' => 12, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parentId' => 1, 'partnerId' => 2, 'name' => 3, 'systemName' => 4, 'description' => 5, 'tags' => 6, 'type' => 7, 'status' => 8, 'createdAt' => 9, 'updatedAt' => 10, 'isManaged' => 11, 'customData' => 12, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARENT_ID => 1, self::PARTNER_ID => 2, self::NAME => 3, self::SYSTEM_NAME => 4, self::DESCRIPTION => 5, self::TAGS => 6, self::TYPE => 7, self::STATUS => 8, self::CREATED_AT => 9, self::UPDATED_AT => 10, self::IS_MANAGED => 11, self::CUSTOM_DATA => 12, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent_id' => 1, 'partner_id' => 2, 'name' => 3, 'system_name' => 4, 'description' => 5, 'tags' => 6, 'type' => 7, 'status' => 8, 'created_at' => 9, 'updated_at' => 10, 'is_managed' => 11, 'custom_data' => 12, ),
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ParentId' => 1, 'PartnerId' => 2, 'Name' => 3, 'SystemName' => 4, 'Description' => 5, 'Tags' => 6, 'Type' => 7, 'Status' => 8, 'CreatedAt' => 9, 'UpdatedAt' => 10, 'CustomData' => 11, 'IsManaged' => 12, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parentId' => 1, 'partnerId' => 2, 'name' => 3, 'systemName' => 4, 'description' => 5, 'tags' => 6, 'type' => 7, 'status' => 8, 'createdAt' => 9, 'updatedAt' => 10, 'customData' => 11, 'isManaged' => 12, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::PARENT_ID => 1, self::PARTNER_ID => 2, self::NAME => 3, self::SYSTEM_NAME => 4, self::DESCRIPTION => 5, self::TAGS => 6, self::TYPE => 7, self::STATUS => 8, self::CREATED_AT => 9, self::UPDATED_AT => 10, self::CUSTOM_DATA => 11, self::IS_MANAGED => 12, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent_id' => 1, 'partner_id' => 2, 'name' => 3, 'system_name' => 4, 'description' => 5, 'tags' => 6, 'type' => 7, 'status' => 8, 'created_at' => 9, 'updated_at' => 10, 'custom_data' => 11, 'is_managed' => 12, ),
 		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
@@ -185,8 +185,8 @@ abstract class BaseScheduleResourcePeer {
 		$criteria->addSelectColumn(ScheduleResourcePeer::STATUS);
 		$criteria->addSelectColumn(ScheduleResourcePeer::CREATED_AT);
 		$criteria->addSelectColumn(ScheduleResourcePeer::UPDATED_AT);
-		$criteria->addSelectColumn(ScheduleResourcePeer::IS_MANAGED);
 		$criteria->addSelectColumn(ScheduleResourcePeer::CUSTOM_DATA);
+		$criteria->addSelectColumn(ScheduleResourcePeer::IS_MANAGED);
 	}
 
 	/**

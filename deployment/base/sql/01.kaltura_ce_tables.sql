@@ -2119,8 +2119,8 @@ CREATE TABLE IF NOT EXISTS `schedule_resource` (
   `status` int(11) NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
-  `is_managed` tinyint NOT NULL,
   `custom_data` text,
+  `is_managed` tinyint NOT NULL,
   PRIMARY KEY (`id`),
   KEY `partner_status_type_index` (`partner_id`,`status`,`type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
