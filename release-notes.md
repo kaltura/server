@@ -8,7 +8,7 @@ Update the following in admin.ini
 moduls.V3Studio.label = "Show Studio"
 ```
 
-Remove the following to admin.ini
+Remove the following from admin.ini
 ```
 moduls.V7Studio.enabled = true
 moduls.V7Studio.permissionType = 2
@@ -16,7 +16,7 @@ moduls.V7Studio.label = "Show V7 Studio"
 moduls.V7Studio.permissionName = FEATURE_V7_STUDIO_PERMISSION
 moduls.V7Studio.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
-Run
+To enable this to all partners run:
 ```
 php deployment/updates/scripts/2023_01_03_enable_studio_V3_permission_to_all_partners.php
 ```
