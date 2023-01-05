@@ -14,13 +14,7 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		/** @var KalturaDeleteEntryFlavorsObjectTask $objectTask */
 		$objectTask = $this->getObjectTask();
 		$deleteType = $objectTask->deleteType;
-		
-		if ($this->shouldSkipStaticContent($deleteType, $object))
-		{
-			KalturaLog::notice("Entry ID: [$object->id] content is 'static' - skipping MR actions");
-			return;
-		}
-		
+
 		$flavorParamsIds = explode(',', $objectTask->flavorParamsIds);
 		$client = $this->getClient();
 
@@ -43,6 +37,12 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 		KalturaLog::info('Found '.count($flavors). ' flavors');
 		if (!count($flavors))
 			return;
+
+		if ($this->shouldSkipStaticContent($deleteType, $object, $flavors))
+		{
+		    KalturaLog::notice("Entry ID: [$object->id] content is 'static' - skipping MR actions");
+		    return;
+		}
 
 		KalturaLog::info('Delete type is '.$deleteType);
 		switch($deleteType)
@@ -166,12 +166,29 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 	/**
 	 * @param KalturaMediaEntry $object
 	 */
-	protected function shouldSkipStaticContent($deleteType, $object)
+	protected function shouldSkipStaticContent($deleteType, $object, $flavors)
 	{
 		// if should 'keep_smallest' asset, no need to check 'static' content
 		if ($deleteType == KalturaDeleteFlavorsLogicType::DELETE_KEEP_SMALLEST)
 		{
 			KalturaLog::notice("Entry ID: [$object->id] delete Type is: [$deleteType] - proceeding with MR actions");
+			return false;
+		}
+
+		$baseSourceFlavorFound = null;
+		foreach ($flavors as $flavor)
+		{
+			/* @var $flavor KalturaFlavorAsset */
+			if($flavor->flavorParamsId == 0)
+			{
+			    $baseSourceFlavorFound = $flavor;
+			    break;
+			}
+		}
+
+		if($baseSourceFlavorFound == true)
+		{
+			KalturaLog::notice("Found source asset with flavor params id 0 [$baseSourceFlavorFound->id], proceeding with MR action");
 			return false;
 		}
 		
