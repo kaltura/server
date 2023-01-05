@@ -181,7 +181,7 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			/* @var $flavor KalturaFlavorAsset */
 			if($flavor->flavorParamsId == 0)
 			{
-                $baseSourceFlavor = $flavor;
+				$baseSourceFlavor = $flavor;
 			    break;
 			}
 		}
