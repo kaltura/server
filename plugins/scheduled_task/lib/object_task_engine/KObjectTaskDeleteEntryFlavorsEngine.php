@@ -175,20 +175,20 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			return false;
 		}
 
-		$baseSourceFlavorFound = null;
+		$baseSourceFlavor = null;
 		foreach ($flavors as $flavor)
 		{
 			/* @var $flavor KalturaFlavorAsset */
 			if($flavor->flavorParamsId == 0)
 			{
-			    $baseSourceFlavorFound = $flavor;
+                $baseSourceFlavor = $flavor;
 			    break;
 			}
 		}
 
-		if($baseSourceFlavorFound == true)
+		if($baseSourceFlavor)
 		{
-			KalturaLog::notice("Found source asset with flavor params id 0 [$baseSourceFlavorFound->id], proceeding with MR action");
+			KalturaLog::notice("Found source asset with flavor params id 0 [$baseSourceFlavor->id], proceeding with MR action");
 			return false;
 		}
 		
