@@ -13,6 +13,7 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 
 	protected function getItemList($filter, $pager)
 	{
+		KBatchBase::$kClient->setClientTag(KBatchBase::$clientTag . " useESearch");
 		return KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
 	}
 
