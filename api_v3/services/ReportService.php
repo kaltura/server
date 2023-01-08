@@ -313,7 +313,7 @@ class ReportService extends KalturaBaseService
 		if(!$ks || !($ks->isAdmin() || $ks->verifyPrivileges(ks::PRIVILEGE_DOWNLOAD, $id)))
 			KExternalErrors::dieError(KExternalErrors::ACCESS_CONTROL_RESTRICTED);
 
-		if(!preg_match('/^[\w-_]*$/', $id))
+		if(!preg_match('/^[\w\-_]*$/', $id))
 			throw new KalturaAPIException(KalturaErrors::REPORT_NOT_FOUND, $id);
 
 		$partner_id = $this->getPartnerId();
