@@ -1497,8 +1497,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 			$remote_dc_file_sync->setIsDir( $source_file_sync->getIsDir() );
 			$remote_dc_file_sync->setSrcDc( $source_file_sync->getSrcDc() );
-			$remote_dc_file_sync->getSrcPath( $source_file_sync->getSrcPath() );
-			$remote_dc_file_sync->getSrcEncKey( $source_file_sync->getSrcEncKey() );
+			$remote_dc_file_sync->setSrcPath( $source_file_sync->getSrcPath() );
+			$remote_dc_file_sync->setSrcEncKey( $source_file_sync->getSrcEncKey() );
 
 			if($source_file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
