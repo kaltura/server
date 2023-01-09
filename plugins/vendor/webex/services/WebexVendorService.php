@@ -299,7 +299,7 @@ class WebexVendorService extends KalturaBaseService
 		{
 			$webexIntegration->unsetCategory();
 		}
-		
+		$integrationSetting->enableMeetingChat = true;
 		$integrationSetting->toInsertableObject($webexIntegration);
 		$webexIntegration->save();
 		

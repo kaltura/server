@@ -13,7 +13,9 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	const OPT_OUT_GROUP_NAMES = 'optOutGroupNames';
 	const OPT_IN_GROUP_NAMES = 'optInGroupNames';
 	const GROUP_PARTICIPATION_TYPE = 'groupParticipationType';
-
+	const SITE_URL = 'site_url';
+	
+	
 	public function setWebexCategory($v)	{ $this->putInCustomData ( self::WEBEX_CATEGORY, $v); }
 	public function getWebexCategory( )	{ return $this->getFromCustomData(self::WEBEX_CATEGORY); }
 	public function unsetCategory( ) 	{ return $this->removeFromCustomData(self::WEBEX_CATEGORY); }
@@ -85,6 +87,17 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	public function getGroupParticipationType()
 	{
 		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kWebexAPIGroupParticipationType::NO_CLASSIFICATION);
+	}
+	
+	
+	public function getSiteUrl()
+	{
+		return $this->getFromCustomData(self::SITE_URL);
+	}
+	
+	public function setSiteUrl($v)
+	{
+		$this->putInCustomData(self::SITE_URL, $v);
 	}
 
 	public function setTokensData($tokensDataAsArray)

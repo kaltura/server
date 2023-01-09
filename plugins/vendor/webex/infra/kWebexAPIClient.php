@@ -123,15 +123,26 @@ class kWebexAPIClient extends kVendorClient
 		}
 	}
 	
-	public function getRecordingsList($startTime, $endTime)
+	protected function convertTimeToWebexFormat($time)
 	{
 		$dateFormat = 'Y-m-d';
 		$hourFormat = 'H:i:s';
-		$startDate = gmdate($dateFormat, $startTime);
-		$startHour = gmdate($hourFormat, $startTime);
-		$endDate = gmdate($dateFormat, $endTime);
-		$endHour = gmdate($hourFormat, $endTime);
-		$request = "admin/recordings?from=$startDate" . "T$startHour" . "&to=$endDate" . "T$endHour";
+		$formattedDate = gmdate($dateFormat, $time);
+		$formattedHour = gmdate($hourFormat, $time);
+		return $formattedDate . 'T' . $formattedHour;
+	}
+	
+	public function getRecordingsList($startTime, $endTime)
+	{
+		$formattedStartTime = $this->convertTimeToWebexFormat($startTime);
+		$formattedEndTime = $this->convertTimeToWebexFormat($endTime);
+		$request = "admin/recordings?from=$formattedStartTime&to=$formattedEndTime";
+		return $this->sendRequest($request);
+	}
+	
+	public function getMeetingRecordingsList($meetingId)
+	{
+		$request = "admin/recordings?meetingId=$meetingId";
 		return $this->sendRequest($request);
 	}
 	
@@ -150,7 +161,7 @@ class kWebexAPIClient extends kVendorClient
 	{
 		$request = "recordings/$recordingId" . "?hostEmail=$hostEmail";
 		$response = $this->sendRequest($request, false, true);
-		if (!$this->httpCode == self::DELETE_RECORDING_SUCCESSFUL_CODE)
+		if ($this->httpCode != self::DELETE_RECORDING_SUCCESSFUL_CODE)
 		{
 			KalturaLog::warning("Deleting recording from Webex failed (Code {$this->httpCode}), response from Webex: " . print_r($response, true));
 			return false;
@@ -188,11 +199,19 @@ class kWebexAPIClient extends kVendorClient
 		return $this->sendRequest($request);
 	}
 	
+	public function getTranscriptsBetweenTimes($siteUrl, $startTime, $endTime)
+	{
+		$formattedStartTime = $this->convertTimeToWebexFormat($startTime);
+		$formattedEndTime = $this->convertTimeToWebexFormat($endTime);
+		$request = "admin/meetingTranscripts?siteUrl=$siteUrl&from=$formattedStartTime&to=$formattedEndTime";
+		return $this->sendRequest($request);
+	}
+	
 	public function downloadTranscript($transcriptId)
 	{
 		$request = "meetingTranscripts/$transcriptId/download";
-		$response = $this->sendRequest($request);
-		if (!$this->httpCode == self::GET_TRANSCRIPT_SUCCESSFUL_CODE)
+		$response = $this->sendRequest($request, false, false, false);
+		if ($this->httpCode != self::GET_TRANSCRIPT_SUCCESSFUL_CODE)
 		{
 			return null;
 		}
@@ -203,7 +222,7 @@ class kWebexAPIClient extends kVendorClient
 	{
 		$request = "meetings/postMeetingChats?meetingId=$meetingId";
 		$response = $this->sendRequest($request, false, false, false);
-		if (!$this->httpCode == self::GET_CHAT_SUCCESSFUL_CODE)
+		if ($this->httpCode != self::GET_CHAT_SUCCESSFUL_CODE)
 		{
 			return null;
 		}

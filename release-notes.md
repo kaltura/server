@@ -20,6 +20,18 @@ To enable this to all partners run:
 ```
 php deployment/updates/scripts/2023_01_03_enable_studio_V3_permission_to_all_partners.php
 ```
+
+## Configure time frame in hours to look for recent Webex transcripts ##
+* Issue Type: Task
+* Issue ID: PLAT-23900
+
+### Configuration ###
+Add the following to vendor.ini under WebexAccount (Replace all tokens below)
+```
+[WebexAccount]
+transcriptTimeFrameHours = @TRANSCRIPT_TIME_FRAME_HOURS@
+```
+
 # Rigel-18.20.0
 ## Update New_Item_Pending_Moderation email event notification templates ##
 * Issue Type: Task

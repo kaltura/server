@@ -9,7 +9,6 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 	const WEBEX_PREFIX = 'Webex_';
 	const KALTURA_WEBEX_DEFAULT_USER = 'KalturaWebexDefault';
 	const TRANSCRIPT_LABEL = 'Webex';
-	const TRANSCRIPT_FILE_EXT = 'vtt';
 	
 	/**
 	 * @var kWebexAPIClient
@@ -50,6 +49,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		
 		$this->updateDropFolderLastFileTimestamp();
 		$this->handleDropFolderFiles();
+		$this->findTranscriptsForExistingEntries();
 	}
 	
 	protected function initDropFolderEngine(KalturaDropFolder $dropFolder)
@@ -155,6 +155,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			{
 				KalturaLog::info("File already exists for: $recordingFileName");
 			}
+			
+			$this->updateIntegrationSiteUrl($recordingInfo);
 		}
 	}
 	
@@ -172,6 +174,27 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			KalturaLog::err('Cannot add new drop folder file with name ['. $recordingInfo['topic'] .'] - ' . $e->getMessage());
 			return null;
 		}
+	}
+	
+	protected function updateIntegrationSiteUrl($recordingInfo)
+	{
+		if ($this->dropFolder->webexAPIVendorIntegration->siteUrl)
+		{
+			return;
+		}
+		if (!isset($recordingInfo['siteUrl']))
+		{
+			KalturaLog::warning('Error getting site url time from Webex, recording id: ' . $recordingInfo['id']);
+			return;
+		}
+		
+		$this->dropFolder->webexAPIVendorIntegration->siteUrl = $recordingInfo['siteUrl'];
+		
+		$updatedVendorIntegration = new KalturaWebexAPIIntegrationSetting();
+		$updatedVendorIntegration->siteUrl = $recordingInfo['siteUrl'];
+		KBatchBase::impersonate($this->dropFolder->partnerId);
+		KBatchBase::$kClient->vendorIntegration->update($this->dropFolder->webexAPIVendorIntegration->id, $updatedVendorIntegration);
+		KBatchBase::unimpersonate();
 	}
 	
 	protected function allocateWebexDropFolderFile($recordingInfo, $hostEmail)
@@ -273,6 +296,113 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 				DropFolderPlugin::ERROR_DELETING_FILE_MESSAGE. '['.$fullPath.']');
 		}
 		$this->handleFilePurged($dropFolderFile->id);
+	}
+	
+	protected function findTranscriptsForExistingEntries()
+	{
+		if (!$this->dropFolder->webexAPIVendorIntegration->siteUrl)
+		{
+			KalturaLog::info('Cannot search for transcripts, site url is not configured in vendor integration');
+			return;
+		}
+		$nextPageLink = null;
+		do
+		{
+			if ($nextPageLink)
+			{
+				$transcriptsList = $this->webexClient->sendRequestUsingDirectLink($nextPageLink);
+			}
+			else
+			{
+				$transcriptsList = $this->retrieveRecentTranscripts();
+			}
+			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
+			
+			$this->handleRecentTranscriptsList($transcriptsList);
+		}
+		while ($nextPageLink);
+	}
+	
+	protected function retrieveRecentTranscripts()
+	{
+		$transcriptTimeFrameHours = kConf::getArrayValue(WebexAPIDropFolderPlugin::CONFIGURATION_TRANSCRIPT_TIME_FRAME_HOURS, WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, WebexAPIDropFolderPlugin::CONFIGURATION_VENDOR_MAP, 12);
+		$endTime = $this->dropFolder->lastFileTimestamp;
+		$startTime = $endTime - $transcriptTimeFrameHours * 3600;
+		$transcriptsList = $this->webexClient->getTranscriptsBetweenTimes($this->dropFolder->webexAPIVendorIntegration->siteUrl, $startTime, $endTime);
+		if (!isset($transcriptsList['items']) || !($transcriptsList['items']))
+		{
+			KalturaLog::info('No transcripts in response: ' . print_r($transcriptsList, true));
+			return array();
+		}
+		
+		return $transcriptsList['items'];
+	}
+	
+	protected function handleRecentTranscriptsList($transcriptsList)
+	{
+		foreach ($transcriptsList as $transcript)
+		{
+			if (!isset($transcript['id']))
+			{
+				KalturaLog::warning('Error getting transcript id from Webex');
+				continue;
+			}
+			if (!isset($transcript['meetingId']))
+			{
+				KalturaLog::warning('Error getting meeting id from transcript, transcript id: ' . $transcript['id']);
+				continue;
+			}
+			
+			$downloadedTranscript = $this->webexClient->downloadTranscript($transcript['id']);
+			if (!$downloadedTranscript)
+			{
+				KalturaLog::info("Webex transcript [{$transcript['id']}] is empty");
+				continue;
+			}
+			
+			$recordingsList = $this->webexClient->getMeetingRecordingsList($transcript['meetingId']);
+			if (!isset($recordingsList['items']) || !($recordingsList['items']))
+			{
+				KalturaLog::info('No recordings in response');
+				continue;
+			}
+			
+			$this->addTranscriptToRecordingsEntries($downloadedTranscript, $recordingsList['items']);
+		}
+	}
+	
+	protected function addTranscriptToRecordingsEntries($downloadedTranscript, $recordingsList)
+	{
+		foreach ($recordingsList as $recordingItem)
+		{
+			if (!isset($recordingItem['topic']))
+			{
+				KalturaLog::warning('Error getting recording name from Webex, recording id: ' . $recordingItem['id'], ', response: ' . print_r($recordingItem, true));
+				continue;
+			}
+			$entryFilter = new KalturaBaseEntryFilter();
+			$entryFilter->nameEqual = $this->prepareNameForDropFolderFile($recordingItem['topic']);
+			
+			$pager = new KalturaFilterPager();
+			$pager->pageIndex = 1;
+			
+			do
+			{
+				KBatchBase::impersonate($this->dropFolder->partnerId);
+				$entriesList = KBatchBase::$kClient->baseEntry->listAction($entryFilter, $pager);
+				KBatchBase::unimpersonate();
+				if (count($entriesList->objects) === 0)
+				{
+					break;
+				}
+				foreach ($entriesList->objects as $entry)
+				{
+					$this->createAndSetTranscriptOnEntry($downloadedTranscript, $entry->id, self::TRANSCRIPT_LABEL, kRecordingFileType::TRANSCRIPT, KalturaCaptionSource::WEBEX);
+				}
+				$pager->pageIndex += 1;
+			}
+			while (true);
+		}
 	}
 
 	public function processFolder(KalturaBatchJob $job, KalturaDropFolderContentProcessorJobData $data)
@@ -537,7 +667,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		do
 		{
 			$transcriptsList = $this->retrieveMeetingTranscriptsList($nextPageLink);
-			$this->handleTranscriptsList($entryId, $partnerId, $transcriptsList);
+			$this->handleMeetingTranscriptsList($entryId, $partnerId, $transcriptsList);
 			
 			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
 		}
@@ -565,7 +695,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		return $transcriptsList['items'];
 	}
 	
-	protected function handleTranscriptsList($entryId, $partnerId, $transcriptsList)
+	protected function handleMeetingTranscriptsList($entryId, $partnerId, $transcriptsList)
 	{
 		foreach ($transcriptsList as $transcript)
 		{
@@ -582,8 +712,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 				continue;
 			}
 			
-			$captionAsset = $this->createAssetForTranscript($entryId, $partnerId, self::TRANSCRIPT_LABEL, kRecordingFileType::TRANSCRIPT, self::TRANSCRIPT_FILE_EXT, KalturaCaptionSource::WEBEX);
-			$this->setContentOnCaptionAsset($captionAsset, $transcript, $partnerId);
+			$this->createAndSetTranscriptOnEntry($transcript, $entryId, self::TRANSCRIPT_LABEL, kRecordingFileType::TRANSCRIPT, KalturaCaptionSource::WEBEX);
 		}
 	}
 	
@@ -640,19 +769,6 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		}
 		$this->dropFolderFile->contentUrl = $recordingInfo['temporaryDirectDownloadLinks']['recordingDownloadLink'];
 		$this->dropFolderFile->urlExpiry = strtotime($recordingInfo['temporaryDirectDownloadLinks']['expiration']);
-	}
-	
-	protected function setContentOnEntry($entry, $flavorAsset)
-	{
-		$resource = new KalturaUrlResource();
-		$resource->url = $this->dropFolderFile->contentUrl;
-		$resource->forceAsyncDownload = true;
-		
-		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
-		$assetParamsResourceContainer->resource = $resource;
-		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
-		
-		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
 	}
 	
 	protected function updateDropFolderFile($entryId)

@@ -8,6 +8,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 	const TAG_SOURCE = "source";
 	const SOURCE_FLAVOR_ID = 0;
 	const LABEL_DEL = '_';
+	const TRANSCRIPT_FILE_EXT = 'vtt';
 	const CHAT_FILE_TYPE = 'txt';
 	
 	abstract protected function getDefaultUserString();
@@ -254,16 +255,44 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		return $flavorAsset;
 	}
 	
+	protected function setContentOnEntry($entry, $flavorAsset)
+	{
+		$resource = new KalturaUrlResource();
+		$resource->url = $this->dropFolderFile->contentUrl;
+		$resource->forceAsyncDownload = true;
+		
+		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
+		$assetParamsResourceContainer->resource = $resource;
+		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
+		
+		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
+	}
+	
+	protected function createAndSetTranscriptOnEntry($transcript, $entryId, $label, $fileType, $source)
+	{
+		$captionAsset = $this->createAssetForTranscript($entryId, $this->dropFolder->partnerId, $label, $fileType, self::TRANSCRIPT_FILE_EXT, $source);
+		if (!$captionAsset)
+		{
+			return;
+		}
+		$this->setContentOnCaptionAsset($captionAsset, $transcript, $this->dropFolder->partnerId);
+	}
+	
 	protected function createAssetForTranscript($entryId, $partnerId, $label, $fileType, $transcriptFileExtension, $source)
 	{
+		if ($this->doesCaptionExistForEntry($entryId, $partnerId))
+		{
+			return null;
+		}
+		
 		$captionAsset = new KalturaCaptionAsset();
 		$captionAsset->language = KalturaLanguage::EN;
-		$captionAsset->label = $label;
 		$transcriptType = $this->getTranscriptType($fileType);
 		if ($transcriptType != '')
 		{
-			$captionAsset->label .= self::LABEL_DEL . $transcriptType;
+			$label .= self::LABEL_DEL . $transcriptType;
 		}
+		$captionAsset->label = $label;
 		$transcriptFormat = CaptionPlugin::getCaptionFormatFromExtension($transcriptFileExtension);
 		$captionAsset->format = $transcriptFormat;
 		$captionAsset->fileExt = $transcriptFileExtension;
@@ -273,6 +302,25 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$newCaptionAsset = $captionPlugin->captionAsset->add($entryId, $captionAsset);
 		KBatchBase::unimpersonate();
 		return $newCaptionAsset;
+	}
+	
+	protected function doesCaptionExistForEntry($entryId, $partnerId)
+	{
+		$assetFilter = new KalturaAssetFilter();
+		$assetFilter->entryIdEqual = $entryId;
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 1;
+		$pager->pageIndex = 1;
+		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$captionAssetsList = $captionPlugin->captionAsset->listAction($assetFilter, $pager);
+		KBatchBase::unimpersonate();
+		if (count($captionAssetsList->objects) === 1)
+		{
+			return true;
+		}
+		
+		return false;
 	}
 	
 	protected function getTranscriptType($enumFileType)
