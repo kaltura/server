@@ -102,7 +102,6 @@ webexBaseUrl = @WEBEX_BASE_URL@
 redirectUrl = @REDIRECT_URL@
 clientId = @CLIENT_ID@
 clientSecret = @CLIENT_SECRET@
-scope = @SCOPE@
 state = @STATE@
 host = @HOST@
 tokenExpiryGrace = @TOKEN_EXPIRY_GRACE@
