@@ -1649,8 +1649,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
 			$firstLink->setIsDir($fileSync->getIsDir());
 			$firstLink->setSrcDc($fileSync->getSrcDc());
-			$firstLink->getSrcPath($fileSync->getSrcPath());
-			$firstLink->getSrcEncKey($fileSync->getSrcEncKey());
+			$firstLink->setSrcPath($fileSync->getSrcPath());
+			$firstLink->setSrcEncKey($fileSync->getSrcEncKey());
 
 			if (!is_null($fileSync->getOriginalDc()))
 			{
