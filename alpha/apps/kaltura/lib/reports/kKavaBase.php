@@ -433,6 +433,7 @@ class kKavaBase extends kDruidBase
 		'kmsnativeandroid' => 'KMS GO Android',
 		'kmsnativeios' => 'KMS GO iOS',
 		'kalturameeting' => 'Kaltura Meeting',
+		'webexapi' => 'Webex API',
 	);
 
 	protected static $sourceTypes = array(
