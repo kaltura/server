@@ -9,6 +9,7 @@ class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 	(
 		"partnerParentIdEqual" => "_eq_partner_parent_id",
 		"partnerParentIdIn" => "_in_partner_parent_id",
+		"adminEmailEqual" => "_eq_admin_email"
 	);
 	
 	public function getMapBetweenObjects()
@@ -27,4 +28,11 @@ class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 	 * @requiresPermission all
 	 */
 	public $partnerParentIdIn;
+
+    /**
+     * @var string
+     * @requiresPermission all
+     */
+    public $adminEmailEqual;
+
 }

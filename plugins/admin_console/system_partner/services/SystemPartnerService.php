@@ -139,11 +139,11 @@ class SystemPartnerService extends KalturaBaseService
 	
 	/**
 	 * @action list
-	 * @param KalturaPartnerFilter $filter
+	 * @param KalturaSystemPartnerFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaPartnerListResponse
 	 */
-	public function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	public function listAction(KalturaSystemPartnerFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 		
@@ -387,6 +387,4 @@ class SystemPartnerService extends KalturaBaseService
 			
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
-	
-	
 }
