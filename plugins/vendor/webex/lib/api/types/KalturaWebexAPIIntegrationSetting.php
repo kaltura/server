@@ -50,6 +50,11 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 	 */
 	public $optInGroupNames;
 	
+	/**
+	 * @var string
+	 */
+	public $siteUrl;
+	
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -65,6 +70,7 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 		'groupParticipationType',
 		'optInGroupNames',
 		'optOutGroupNames',
+		'siteUrl',
 	);
 
 	public function getMapBetweenObjects()

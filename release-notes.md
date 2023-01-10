@@ -20,6 +20,19 @@ To enable this to all partners run:
 ```
 php deployment/updates/scripts/2023_01_03_enable_studio_V3_permission_to_all_partners.php
 ```
+
+## Webex transcripts support ##
+* Issue Type: Task
+* Issue ID: PLAT-23900
+
+### Configuration ###
+Add the following to vendor.ini under WebexAccount (Replace all tokens below).
+It configures how many hours to look before and after last downloaded recording for new transcripts.
+```
+[WebexAccount]
+transcriptTimeFrameHours = @TRANSCRIPT_TIME_FRAME_HOURS@
+```
+
 # Rigel-18.20.0
 ## Update New_Item_Pending_Moderation email event notification templates ##
 * Issue Type: Task
@@ -102,6 +115,7 @@ webexBaseUrl = @WEBEX_BASE_URL@
 redirectUrl = @REDIRECT_URL@
 clientId = @CLIENT_ID@
 clientSecret = @CLIENT_SECRET@
+scope = @SCOPE@
 state = @STATE@
 host = @HOST@
 tokenExpiryGrace = @TOKEN_EXPIRY_GRACE@
