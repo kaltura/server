@@ -29,10 +29,10 @@ class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 	 */
 	public $partnerParentIdIn;
 
-    /**
-     * @var string
-     * @requiresPermission all
-     */
-    public $adminEmailEqual;
+	/**
+	 * @var string
+	 * @requiresPermission all
+	 */
+	public $adminEmailEqual;
 
 }
