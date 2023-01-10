@@ -135,7 +135,7 @@ class VendorIntegration extends BaseVendorIntegration
 	
 	public function getEnableMeetingChat()
 	{
-		return $this->getFromCustomData(self::ENABLE_MEETING_CHAT, null, null);
+		return $this->getFromCustomData(self::ENABLE_MEETING_CHAT, null, true);
 	}
 	
 	/**

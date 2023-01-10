@@ -6,8 +6,7 @@
 class kWebexAPIClient extends kVendorClient
 {
 	const DELETE_RECORDING_SUCCESSFUL_CODE = 204;
-	const GET_TRANSCRIPT_SUCCESSFUL_CODE = 200;
-	const GET_CHAT_SUCCESSFUL_CODE = 200;
+	const GET_SUCCESSFUL_CODE = 200;
 	
 	protected $nextPageLink;
 	
@@ -211,7 +210,7 @@ class kWebexAPIClient extends kVendorClient
 	{
 		$request = "meetingTranscripts/$transcriptId/download";
 		$response = $this->sendRequest($request, false, false, false);
-		if ($this->httpCode != self::GET_TRANSCRIPT_SUCCESSFUL_CODE)
+		if ($this->httpCode != self::GET_SUCCESSFUL_CODE)
 		{
 			return null;
 		}
@@ -222,7 +221,7 @@ class kWebexAPIClient extends kVendorClient
 	{
 		$request = "meetings/postMeetingChats?meetingId=$meetingId";
 		$response = $this->sendRequest($request, false, false, false);
-		if ($this->httpCode != self::GET_CHAT_SUCCESSFUL_CODE)
+		if ($this->httpCode != self::GET_SUCCESSFUL_CODE)
 		{
 			return null;
 		}
