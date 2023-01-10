@@ -249,7 +249,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		}
 		else
 		{
-			$deleteTime = $dropFolderFile->updatedAt + $this->dropFolder->autoFileDeleteDays * kTimeConversion::DAY;
+			$autoFileDeleteDays = $this->dropFolder->autoFileDeleteDays >= 1 ? $this->dropFolder->autoFileDeleteDays : 1;
+			$deleteTime = $dropFolderFile->updatedAt + $autoFileDeleteDays * kTimeConversion::DAY;
 			if (($dropFolderFile->status == KalturaDropFolderFileStatus::HANDLED && $this->dropFolder->fileDeletePolicy != KalturaDropFolderFileDeletePolicy::MANUAL_DELETE && time() > $deleteTime) ||
 				$dropFolderFile->status == KalturaDropFolderFileStatus::DELETED)
 			{
