@@ -193,7 +193,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		$updatedVendorIntegration = new KalturaWebexAPIIntegrationSetting();
 		$updatedVendorIntegration->siteUrl = $recordingInfo['siteUrl'];
 		KBatchBase::impersonate($this->dropFolder->partnerId);
-		KBatchBase::$kClient->vendorIntegration->update($this->dropFolder->webexAPIVendorIntegration->id, $updatedVendorIntegration);
+		$vendorPlugin = KalturaVendorClientPlugin::get(KBatchBase::$kClient);
+		$vendorPlugin->vendorIntegration->update($this->dropFolder->webexAPIVendorIntegration->id, $updatedVendorIntegration);
 		KBatchBase::unimpersonate();
 	}
 	
