@@ -148,7 +148,7 @@ class SystemPartnerService extends KalturaBaseService
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 		
 		if (is_null($filter))
-			$filter = new KalturaPartnerFilter();
+			$filter = new KalturaSystemPartnerFilter();
 			
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();

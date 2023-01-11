@@ -694,6 +694,14 @@ class PartnerController extends Zend_Controller_Action
 		    }
 		
 		}
+        if ($filterType == 'byAdminEmail')
+        {
+            $filter->adminEmailEqual = $filterInput;
+        }
+        if ($filterType == 'byParentId')
+        {
+            $filter->partnerParentIdEqual = $filterInput;
+        }
 		if($filterType == 'byUIConfId')
 		{
 		    $client = Infra_ClientHelper::getClient();
