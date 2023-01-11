@@ -5,7 +5,6 @@
  */
 class WebexAPIDropFolder extends RemoteDropFolder
 {
-	
 	const WEBEX_API_VENDOR_INTEGRATION_ID = 'webexapi_vendor_integration_id';
 	
 	/**
