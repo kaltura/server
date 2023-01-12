@@ -130,7 +130,7 @@ class ReportController extends Zend_Controller_Action
 				$reportFilter->partnerIdIn = $filterInput;
 				break;
 			case 'by-partner-name':
-				$partnerFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
+				$partnerFilter = new Kaltura_Client_Type_PartnerFilter();
 				$partnerFilter->nameLike = $filterInput;
 				$statuses = array();
 				$statuses[] = Kaltura_Client_Enum_PartnerStatus::ACTIVE;

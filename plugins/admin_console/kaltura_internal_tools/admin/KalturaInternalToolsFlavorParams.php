@@ -68,7 +68,7 @@ class KalturaInternalToolsPluginFlavorParams extends KalturaApplicationPlugin
                 {
 
                     $systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
-                    $filter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
+                    $filter = new Kaltura_Client_Type_PartnerFilter();
                     $partner = $systemPartnerPlugin -> systemPartner -> get($fp -> partnerId);
 
                     $oldKs = $client -> getKs();

@@ -56,7 +56,7 @@ class PartnerController extends Zend_Controller_Action
 		$systemPartnerPlugin->systemPartner->getPackagesVertical();
 		$systemPartnerPlugin->systemPartner->getPackagesClassOfService();
 		//Retrieve partner 0 template partners.
-		$partnerFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
+		$partnerFilter = new Kaltura_Client_Type_PartnerFilter();
 		$partnerFilter->partnerGroupTypeEqual = Kaltura_Client_Enum_PartnerGroupType::TEMPLATE;
 		$partnerFilter->partnerParentIdEqual = 0;
 		$partnerFilter->statusEqual = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
@@ -668,7 +668,7 @@ class PartnerController extends Zend_Controller_Action
 	
 	private function getPartnerFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
-		$filter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
+		$filter = new Kaltura_Client_Type_PartnerFilter();
 		$filterType = $request->getParam('filter_type');
 		$filterInput = $request->getParam('filter_input');
 		$filterIncludActive = $request->getParam('include_active');

@@ -17,7 +17,7 @@ class Kaltura_FilterPaginatorWithPartnerLoader extends Infra_FilterPaginator
 		foreach($objects as $object)
 			$partners[$object->partnerId] = null;
 		
-		$filter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
+		$filter = new Kaltura_Client_Type_PartnerFilter();
 		$filter->idIn = implode(',', array_keys($partners));
 		$client = Infra_ClientHelper::getClient();
 		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
