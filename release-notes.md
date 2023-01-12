@@ -33,6 +33,9 @@ It configures how many hours to look before and after last downloaded recording 
 transcriptTimeFrameHours = @TRANSCRIPT_TIME_FRAME_HOURS@
 ```
 
+### Deployment scripts ###
+    - php deployment/updates/scripts/add_permissions/2023_01_1_update_permissions_vendor_integration.php
+
 # Rigel-18.20.0
 ## Update New_Item_Pending_Moderation email event notification templates ##
 * Issue Type: Task
