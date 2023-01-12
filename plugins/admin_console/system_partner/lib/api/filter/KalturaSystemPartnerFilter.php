@@ -16,6 +16,14 @@ class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
+	/* (non-PHPdoc)
+ * @see KalturaFilter::getCoreFilter()
+ */
+	protected function getCoreFilter()
+	{
+		return new systemPartnerFilter();
+	}
 	
 	/**
 	 * @var int
