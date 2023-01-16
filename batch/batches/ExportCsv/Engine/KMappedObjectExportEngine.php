@@ -51,12 +51,8 @@ abstract class KMappedObjectExportEngine extends KObjectExportEngine
 
 		$lastCreatedAtObjectIdList = array();
 		$totalCount = 0;
-		
-		if (!isset($filter->orderBy))
-		{
-			$filter->orderBy = $this->getFilterOrderBy();
-		}
-		
+		$filter->orderBy = $this->getFilterOrderBy();
+
 		do
 		{
 			try
