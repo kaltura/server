@@ -153,7 +153,7 @@ class SystemPartnerService extends KalturaBaseService
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();
 
-		$partnerFilter = new partnerFilter();
+		$partnerFilter = new systemPartnerFilter();
 		$filter->toObject($partnerFilter);
 		if (kCurrentContext::getCurrentPartnerId() != Partner::BATCH_PARTNER_ID)
 		{

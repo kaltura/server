@@ -43,4 +43,9 @@ class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 	 */
 	public $adminEmailEqual;
 
+    public function toObject ( $object_to_fill = null, $props_to_skip = array() )
+    {
+        $this->adminEmailEqual = trim($this->adminEmailEqual);
+        return parent::toObject($object_to_fill,$props_to_skip);
+    }
 }
