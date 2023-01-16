@@ -151,7 +151,7 @@ class PartnerUsageController extends Zend_Controller_Action
 	
 	private function getPartnerFilterFromForm(Zend_Form $form)
 	{
-		$filter = new Kaltura_Client_Type_PartnerFilter();
+		$filter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
 		$filterType = $form->getValue('filter_type');
 		$filterInput = $form->getValue('filter_input');
 		$includeActive = $form->getValue('include_active');

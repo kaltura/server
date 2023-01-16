@@ -213,7 +213,7 @@ class WidgetController extends Zend_Controller_Action
 				$uiConfFilter->partnerIdIn = $filterInput;
 				break;
 			case 'by-partner-name':
-				$partnerFilter = new Kaltura_Client_Type_PartnerFilter();
+				$partnerFilter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
 				$partnerFilter->nameLike = $filterInput;
 				$statuses = array();
 				$statuses[] = Kaltura_Client_Enum_PartnerStatus::ACTIVE;
