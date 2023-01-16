@@ -271,7 +271,6 @@ class kString
 
 	public static function xmlEncode($str)
 	{
-		$str = preg_replace('/[\x00-\x1F\x7F]/', '', $str);
 		return str_replace ( array ( "&", '"' , '<', '>', "'" ) , array ( "&amp;", "&quot;" , "&lt;", "&gt;", "&apos;" ), $str );
 	}
 	

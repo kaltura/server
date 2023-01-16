@@ -1495,11 +1495,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$remote_dc_file_sync->setOriginal ( $current_dc_source_file == $source_file_sync );
 			$remote_dc_file_sync->setFileSize ( -1 );
 
-			$remote_dc_file_sync->setIsDir( $source_file_sync->getIsDir() );
-			$remote_dc_file_sync->setSrcDc( $source_file_sync->getSrcDc() );
-			$remote_dc_file_sync->setSrcPath( $source_file_sync->getSrcPath() );
-			$remote_dc_file_sync->setSrcEncKey( $source_file_sync->getSrcEncKey() );
-
 			if($source_file_sync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
 				$remote_dc_file_sync->setFileType ( FileSync::FILE_SYNC_FILE_TYPE_URL );
@@ -1648,10 +1643,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$firstLink->setEncryptionKey($fileSync->getEncryptionKey());
 			$firstLink->setLinkedId(0); // keep it zero instead of null, that's the only way to know it used to be a link.
 			$firstLink->setIsDir($fileSync->getIsDir());
-			$firstLink->setSrcDc($fileSync->getSrcDc());
-			$firstLink->setSrcPath($fileSync->getSrcPath());
-			$firstLink->setSrcEncKey($fileSync->getSrcEncKey());
-
 			if (!is_null($fileSync->getOriginalDc()))
 			{
 				$firstLink->setOriginalDc($fileSync->getOriginalDc());
