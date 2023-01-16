@@ -6,6 +6,7 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 {
 	const PLUGIN_NAME = 'WebexAPIDropFolder';
 	const CONFIGURATION_VENDOR_MAP = 'vendor';
+	const CONFIGURATION_DISABLE_WEBEX_DROP_FOLDER = 'DisableWebexAPIDropFolder';
 	const CONFIGURATION_WEBEX_ACCOUNT_PARAM = 'WebexAccount';
 	const CONFIGURATION_WEBEX_BASE_URL = 'webexBaseUrl';
 	const CONFIGURATION_REDIRECT_URL = 'redirectUrl';
@@ -17,6 +18,7 @@ class WebexAPIDropFolderPlugin extends KalturaPlugin implements IKalturaEnumerat
 	const CONFIGURATION_TOKEN_EXPIRY_GRACE = 'tokenExpiryGrace';
 	const CONFIGURATION_DOWNLOAD_EXPIRY_GRACE = 'downloadExpiryGrace';
 	const CONFIGURATION_AUTO_DELETE_FILE_DAYS = 'autoDeleteFileDays';
+	const CONFIGURATION_TRANSCRIPT_TIME_FRAME_HOURS = 'transcriptTimeFrameHours';
 	
 	public static function dependsOn()
 	{

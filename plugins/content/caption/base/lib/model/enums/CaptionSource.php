@@ -7,4 +7,5 @@ interface CaptionSource extends BaseEnum
 {
 	const UNKNOWN = 0;
 	const ZOOM = 1;
+	const WEBEX = 2;
 }

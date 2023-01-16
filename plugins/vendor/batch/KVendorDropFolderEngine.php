@@ -7,6 +7,9 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 	const MAX_PUSER_LENGTH = 100;
 	const TAG_SOURCE = "source";
 	const SOURCE_FLAVOR_ID = 0;
+	const LABEL_DEL = '_';
+	const TRANSCRIPT_FILE_EXT = 'vtt';
+	const CHAT_FILE_TYPE = 'txt';
 	
 	abstract protected function getDefaultUserString();
 	
@@ -250,5 +253,118 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entryId, $kFlavorAsset);;
 		KBatchBase::unimpersonate();
 		return $flavorAsset;
+	}
+	
+	protected function setContentOnEntry($entry, $flavorAsset)
+	{
+		$resource = new KalturaUrlResource();
+		$resource->url = $this->dropFolderFile->contentUrl;
+		$resource->forceAsyncDownload = true;
+		
+		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
+		$assetParamsResourceContainer->resource = $resource;
+		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
+		
+		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
+	}
+	
+	protected function createAndSetTranscriptOnEntry($transcript, $entryId, $label, $fileType, $source)
+	{
+		$captionAsset = $this->createAssetForTranscript($entryId, $this->dropFolder->partnerId, $label, $fileType, self::TRANSCRIPT_FILE_EXT, $source);
+		if (!$captionAsset)
+		{
+			return;
+		}
+		$this->setContentOnCaptionAsset($captionAsset, $transcript, $this->dropFolder->partnerId);
+	}
+	
+	protected function createAssetForTranscript($entryId, $partnerId, $label, $fileType, $transcriptFileExtension, $source)
+	{
+		if ($this->doesCaptionExistForEntry($entryId, $partnerId))
+		{
+			return null;
+		}
+		
+		$captionAsset = new KalturaCaptionAsset();
+		$captionAsset->language = KalturaLanguage::EN;
+		$transcriptType = $this->getTranscriptType($fileType);
+		if ($transcriptType != '')
+		{
+			$label .= self::LABEL_DEL . $transcriptType;
+		}
+		$captionAsset->label = $label;
+		$transcriptFormat = CaptionPlugin::getCaptionFormatFromExtension($transcriptFileExtension);
+		$captionAsset->format = $transcriptFormat;
+		$captionAsset->fileExt = $transcriptFileExtension;
+		$captionAsset->source = $source;
+		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$newCaptionAsset = $captionPlugin->captionAsset->add($entryId, $captionAsset);
+		KBatchBase::unimpersonate();
+		return $newCaptionAsset;
+	}
+	
+	protected function doesCaptionExistForEntry($entryId, $partnerId)
+	{
+		$assetFilter = new KalturaAssetFilter();
+		$assetFilter->entryIdEqual = $entryId;
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 1;
+		$pager->pageIndex = 1;
+		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$captionAssetsList = $captionPlugin->captionAsset->listAction($assetFilter, $pager);
+		KBatchBase::unimpersonate();
+		if (count($captionAssetsList->objects) === 1)
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	protected function getTranscriptType($enumFileType)
+	{
+		switch($enumFileType)
+		{
+			case kRecordingFileType::TRANSCRIPT:
+				return 'TRANSCRIPT';
+			case kRecordingFileType::CC:
+				return 'CC';
+			default:
+				return '';
+		}
+	}
+	
+	protected function setContentOnCaptionAsset($captionAsset, $transcript, $partnerId)
+	{
+		$captionAssetResource = new KalturaStringResource();
+		$captionAssetResource->content = $transcript;
+		$captionPlugin = KalturaCaptionClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
+		KBatchBase::unimpersonate();
+	}
+	
+	protected function createAssetForChats($entryId, $partnerId, $recordingId)
+	{
+		$attachmentAsset = new KalturaAttachmentAsset();
+		$attachmentAsset->filename = "Recording {$recordingId} chat file." . self::CHAT_FILE_TYPE;
+		$attachmentAsset->fileExt = self::CHAT_FILE_TYPE;
+		$attachmentPlugin = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$newAttachmentAsset = $attachmentPlugin->attachmentAsset->add($entryId, $attachmentAsset);
+		KBatchBase::unimpersonate();
+		return $newAttachmentAsset;
+	}
+	
+	protected function setContentOnAttachmentAsset($attachmentAsset, $meetingChats, $partnerId)
+	{
+		$attachmentAssetResource = new KalturaStringResource();
+		$attachmentAssetResource->content = $meetingChats;
+		$attachmentPlugin = KalturaAttachmentClientPlugin::get(KBatchBase::$kClient);
+		KBatchBase::impersonate($partnerId);
+		$attachmentPlugin->attachmentAsset->setContent($attachmentAsset->id, $attachmentAssetResource);
+		KBatchBase::unimpersonate();
 	}
 }

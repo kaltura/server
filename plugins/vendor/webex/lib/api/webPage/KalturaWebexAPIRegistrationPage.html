@@ -15,27 +15,20 @@
         var partnerId= '@partnerId@';
         var submitUrl = baseServiceUrl+'/api_v3/service/webexapidropfolder_webexvendor/action/submitRegistration';
         var getUrl = baseServiceUrl + '/api_v3/service/webexapidropfolder_webexvendor/action/list?format=1';
-        const CMS_USER_ID=3;
-        const RECORDING_OWNER_BASED_ON_WEBEX_USER_ID=1;
     </script>
     <script>
         function trySubmit() {
             $('body').css('cursor','progress');
-            let defaultUserId = $('#defaultUserId').val().trim();
-            let webexCategory  = $('#webexCategory').val().trim();
-            let enableRecordingUpload = $('#enableRecordingUpload').is(':checked');
-            let enableMeetingUpload = $('#enableMeetingUpload').is(':checked');
-            let createUserIfNotExist = $('#createUserIfNotExist').is(':checked');
-            let deletionPolicy = $('#deletionPolicy').is(':checked');
-            let enableTranscription = $('#enableTranscription').is(':checked');
-
-            let userMatchingMode = $('[name=userMatchingMode]:checked').val();
-            if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_WEBEX_USER_ID) {
-                userMatchingMode = CMS_USER_ID;
-            }
-            let userPostfix = $('#userPostfix').val().trim();
-
-            let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
+            let defaultUserId = 'defaultUserID';
+            let webexCategory  = 'webexCategory';
+            let enableRecordingUpload = false;
+            let enableMeetingUpload = true;
+            let createUserIfNotExist = true;
+            let deletionPolicy = false;
+            let enableTranscription = true;
+            let userMatchingMode = 0;
+            let userPostfix = '';
+            let handleParticipantsMode = 2;
 
             $.ajax({
                 url : submitUrl,
@@ -77,8 +70,8 @@
                 }
             });
         }
-        function  onSuccess() {
-            alert('Saved Successfully');
+        function onSuccess() {
+            window.location.replace(baseServiceUrl + "/index.php/kmcng/settings/integrationSettings");
         }
         function onFail(errorMessage) {
             alert('Data was Not Saved.\n'+errorMessage);
@@ -89,7 +82,6 @@
             {
                 return;
             }
-            setDefaultValues();
             $.ajax({
                 url: getUrl,
                 type: 'post',
@@ -109,7 +101,6 @@
                                     if(res.objects[i].accountId === accountId)
                                     {
                                         console.log("Found " + accountId);
-                                        loadParameters(res.objects[i]);
                                     }
                                 }
                             }
@@ -121,166 +112,11 @@
                     console.log('err during api call');
                 }
             });
-        }
-
-        function setDefaultValues(){
-            $('#enableRecordingUpload').prop('checked',true);
-            $('#enableMeetingUpload').prop('checked',true);
-            $('#enableTranscription').prop('checked',true);
-            $('input:radio[name=userMatchingMode]').val(['0']).prop('checked',true);
-            $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
-            $('#createUserIfNotExist').prop('checked',true);
-        }
-        function loadParameters(p) {
-         jQuery.each(p, function(i,v) {
-                console.log(i,v);
-                switch (i) {
-                    case 'defaultUserId':
-                    case 'webexCategory':
-                    case 'userPostfix':
-                        $('#'+i).val(v);
-                        break;
-                    case 'deletionPolicy':
-                    case 'enableTranscription':
-                    case 'enableRecordingUpload':
-                    case 'enableMeetingUpload':
-                    case 'createUserIfNotExist':
-                        $('#'+i).prop('checked', v);
-                        break;
-                    case 'userMatchingMode':
-                    {
-                        //check user matching mode
-                        if(v==3)
-                        {
-                            $('input:radio[name=recordingOwner][value="1"]').prop('checked', true);
-                            $('#matchingWebexUserBasedOnWebexUserId').hide();
-                        }
-                        else
-                        {
-                            $('input:radio[name=recordingOwner][value="0"]').prop('checked', true);
-                            $('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
-                            $('#matchingWebexUserBasedOnWebexUserId').show();
-                        }
-                    }
-                    break;
-                    case 'handleParticipantsMode':
-                        $('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
-                        break;
-                }
-
-            });
-        }
-
-        function recordingOwnerChanged(e) {
-            if(e) {
-                $('#matchingWebexUserBasedOnWebexUserId').show();
-            }
-            else {
-                $('#matchingWebexUserBasedOnWebexUserId').hide();
-            }
+            trySubmit();
         }
     </script>
 
     <title>Kaltura-Webex registration</title>
 </head>
-<body onload="onLoad()" style="max-width: 600px;margin: auto">
-    <form>
-        <div class='imgcontainer'>
-            <img src='https://developer.kaltura.com/homepage/assets/images/Kaltura-logo.png' width='256' class='mx-auto d-block'>
-        </div>
-        <div class='form-group  container p-2 my-2 border'>
-            <div class='form-group'>
-                <label><h7>Default User ID</h7></label>
-                <input type='text' value='@defaultUserID@' id='defaultUserId' class='form-control' name='defaultUserId' required>
-            </div>
-            <div class='form-group'>
-                <label for='webexCategory'><h7>Webex Category</h7></label>
-                <input type='text' value='@webexCategory@' id='webexCategory' class='form-control' name='webexCategory' required>
-            </div>
-            <h7>Settings</h7>
-            <div class='container p-2 my-2 border'>
-                <div class='custom-control custom-switch'>
-                    <input type='checkbox' class='custom-control-input' id='enableRecordingUpload' name='enableRecordingUpload'>
-                    <label class='custom-control-label' for='enableRecordingUpload'>Enable Integration</label>
-                </div>
-                <div class='custom-control custom-switch'>
-                    <input type='checkbox' class='custom-control-input' id='enableMeetingUpload' name='enableMeetingUpload'>
-                    <label class='custom-control-label' for='enableMeetingUpload'>Enable meeting upload</label>
-                </div>
-            </div>
-        </div>
-
-        <div class='form-group  container p-2 my-2 border'>
-            <h7 >Setting owner for recordings</h7>
-            <div>
-                <div class='container p-2 my-2 border'>
-                    <div class='custom-control custom-switch'>
-                        <input type='checkbox' class='custom-control-input' id='createUserIfNotExist' name='createUserIfNotExist'>
-                        <label class='custom-control-label' for='createUserIfNotExist'>Create new user if no match is found</label>
-                    </div>
-                    <div class='custom-control custom-switch'>
-                        <input type='checkbox' class='custom-control-input' id='deletionPolicy' name='deletionPolicy' >
-                        <label class='custom-control-label' for='deletionPolicy'>Enable automatic deletion of files</label>
-                    </div>
-                    <div class='custom-control custom-switch'>
-                        <input type='checkbox' class='custom-control-input' id='enableTranscription' name='enableTranscription' >
-                        <label class='custom-control-label' for='enableTranscription'>Enable Transcriptions</label>
-                    </div>
-                </div>
-            </div>
-            <div class='form-check'>
-                <label class='form-check-label'>
-                <input type='radio'  id='recordingOwnerBasedOnWebexId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(this.checked)' value='0' checked>
-                    Based on Webex User ID</label>
-            </div>
-
-            <div id='matchingWebexUserBasedOnWebexUserId' class='container-fluid p-3 my-2 mx-auto border' style='width: 97%;'>
-                <p class='form-check-label'>How matching Webex users should be handled:</p>
-                <div class='form-check-inline'>
-                    <input type='radio' class='form-check-input'
-                           name='userMatchingMode' value='0' >
-                    <label class='form-check-label'>Do not modify</label>
-                </div>
-                <div class='form-check-inline'>
-                    <input type='radio' class='form-check-input'
-                           name='userMatchingMode' value='1'>
-                    <label class='form-check-label'>Add postfix</label>
-                </div>
-                <div class='form-check-inline'>
-                    <input type='radio' class='form-check-input'
-                           name='userMatchingMode' value='2'>
-                    <label class='form-check-label'>Remove postfix</label>
-                </div>
-                <div class='form-group'>
-                    <label class='form-check-label'>Postfix</label>
-                    <input type='text' value='' id='userPostfix' class='form-control' name='userPostfix'>
-                </div>
-            </div>
-            <div class='form-check'>
-                <label class='form-check-label'>
-                    <input type='radio'  id='recordingOwnerBasedOnCmsUserId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(!this.checked)' value='1'>
-                    Based on cms_user_id (SAML mapping)</label>
-            </div>
-        </div>
-        <div class='form-group container p-2 my-2 border'>
-            <p class='form-check-label'><h7>How meeting participants should be handled:</h7></p>
-            <div class='form-check-inline'>
-                <label class='form-check-label'>
-                <input type='radio' class='form-check-input'
-                       name='handleParticipantsMode' value='0'>Add as Co publishers </label>
-            </div>
-            <div class='form-check-inline'>
-                <label class='form-check-label'>
-                <input type='radio' class='form-check-input'
-                       name='handleParticipantsMode' value='1'>Add as Co viewers </label>
-            </div>
-            <div class='form-check-inline'>
-                <label class='form-check-label'>
-                <input type='radio' class='form-check-input'
-                       name='handleParticipantsMode' value='2'>Ignore participants </label>
-            </div>
-        </div>
-        <button type='button' id='submitBtn' class='btn btn-block btn-primary' onclick='trySubmit()'>Submit</button>
-    </form>
-</body>
+<body onload="onLoad()" style="max-width: 600px;margin: auto"></body>
 </html>

@@ -13,7 +13,7 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if (kConf::getArrayValue('DisableWebexAPIDropFolder', WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, kConfMapNames::VENDOR, true))
+		if (kConf::getArrayValue(WebexAPIDropFolderPlugin::CONFIGURATION_DISABLE_WEBEX_DROP_FOLDER, WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, kConfMapNames::VENDOR, true))
 		{
 			return true;
 		}
@@ -213,7 +213,7 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 		if ($vendorIntegrationObject->getDeletionPolicy())
 		{
 			$dropFolder->setFileDeletePolicy(DropFolderFileDeletePolicy::AUTO_DELETE);
-			$daysToDelete = kConf::getArrayValue(CONFIGURATION_AUTO_DELETE_FILE_DAYS, WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, WebexAPIDropFolderPlugin::CONFIGURATION_VENDOR_MAP, 1);
+			$daysToDelete = kConf::getArrayValue(WebexAPIDropFolderPlugin::CONFIGURATION_AUTO_DELETE_FILE_DAYS, WebexAPIDropFolderPlugin::CONFIGURATION_WEBEX_ACCOUNT_PARAM, WebexAPIDropFolderPlugin::CONFIGURATION_VENDOR_MAP, 1);
 			$dropFolder->setAutoFileDeleteDays($daysToDelete);
 		}
 		else

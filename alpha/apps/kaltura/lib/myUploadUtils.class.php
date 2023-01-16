@@ -210,7 +210,7 @@ class myUploadUtils
 
 	public static function checkIfFileIsAllowed($uploadFilePath)
 	{
-		$fileType = kFileUtils::getMimeType($uploadFilePath);
+		$fileType = strtolower(kFileUtils::getMimeType($uploadFilePath));
 
 		KalturaLog::debug("File type: $fileType");
 
