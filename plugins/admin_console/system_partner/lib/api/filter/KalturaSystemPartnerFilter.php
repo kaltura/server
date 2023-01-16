@@ -18,8 +18,8 @@ class KalturaSystemPartnerFilter extends KalturaPartnerFilter
 	}
 
 	/* (non-PHPdoc)
- * @see KalturaFilter::getCoreFilter()
- */
+	 * @see KalturaFilter::getCoreFilter()
+	 */
 	protected function getCoreFilter()
 	{
 		return new systemPartnerFilter();
