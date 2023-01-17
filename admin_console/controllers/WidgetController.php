@@ -10,7 +10,11 @@ class WidgetController extends Zend_Controller_Action
 		$request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		
+		$params = $this->_getAllParams();
+		foreach ($params as $param => $val)
+		{
+			$this->_setParam($param, htmlspecialchars($val));
+		}	
 		$action = $this->view->url(array('controller' => $request->getControllerName(), 'action' => $request->getActionName()), null, true);
 
 		$newButton = new Form_NewButton(array('showPartnerId' => false));
