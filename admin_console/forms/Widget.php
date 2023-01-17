@@ -52,6 +52,7 @@ class Form_Widget extends Infra_Form
 			'multiOptions' 		=> array(
 				Kaltura_Client_Enum_UiConfCreationMode::ADVANCED => 'Advanced',
 				Kaltura_Client_Enum_UiConfCreationMode::WIZARD => 'AppStudio Wizard',
+				Kaltura_Client_Enum_UiConfCreationMode::SYSTEM => 'System',
 			)
 		));
 
