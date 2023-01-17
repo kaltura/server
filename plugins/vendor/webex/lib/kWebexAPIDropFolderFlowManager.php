@@ -33,20 +33,8 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 		}
 		if (self::wasStatusChanged($object, $modifiedColumns))
 		{
-			self::setDefaultValuesIntegration($object);
 			list($partnerWebexDropFolder, $partnerWebexDropFoldersCount) = self::getWebexAPIDropFolderRelatedInfo($object);
-			if ($partnerWebexDropFolder)
-			{
-				if ($partnerWebexDropFolder->getStatus() != DropFolderStatus::ENABLED && $object->getStatus() == VendorIntegrationStatus::ACTIVE)
-				{
-					self::verifyAndSetDropFolderConfig($partnerWebexDropFolder);
-				}
-
-				$partnerWebexDropFolder->setStatus(VendorHelper::getDropFolderStatus($object->getStatus()));
-				$partnerWebexDropFolderModified = true;
-				KalturaLog::debug('WebexAPIDropFolder with vendorId ' . $object->getId() . ' updated status to ' . $partnerWebexDropFolder->getStatus());
-			}
-			else
+			if (!$partnerWebexDropFolder)
 			{
 				if ($partnerWebexDropFoldersCount <= self::MAX_WEBEX_API_DROP_FOLDERS)
 				{
@@ -56,6 +44,18 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 				{
 					throw new KalturaAPIException(KalturaWebexAPIErrors::EXCEEDED_MAX_WEBEX_API_DROP_FOLDERS);
 				}
+			}
+			elseif ($partnerWebexDropFolder->getStatus() != DropFolderStatus::ENABLED && $object->getStatus() == VendorIntegrationStatus::ACTIVE
+				|| $partnerWebexDropFolder->getStatus() == DropFolderStatus::ENABLED && $object->getStatus() != VendorIntegrationStatus::ACTIVE)
+			{
+				if ($partnerWebexDropFolder->getStatus() != DropFolderStatus::ENABLED && $object->getStatus() == VendorIntegrationStatus::ACTIVE)
+				{
+					self::verifyAndSetDropFolderConfig($partnerWebexDropFolder);
+				}
+
+				$partnerWebexDropFolder->setStatus(VendorHelper::getDropFolderStatus($object->getStatus()));
+				$partnerWebexDropFolderModified = true;
+				KalturaLog::debug('WebexAPIDropFolder with vendorId ' . $object->getId() . ' updated status to ' . $partnerWebexDropFolder->getStatus());
 			}
 		}
 
@@ -144,23 +144,6 @@ class kWebexAPIDropFolderFlowManager implements kObjectChangedEventConsumer
 		return ($object instanceof WebexAPIVendorIntegration)
 			&& in_array(entryPeer::CUSTOM_DATA, $modifiedColumns)
 			&& $object->isColumnModified('refreshToken');
-	}
-	
-	protected static function setDefaultValuesIntegration(WebexAPIVendorIntegration $vendorIntegrationObject)
-	{
-		if ($vendorIntegrationObject->getEnableMeetingUpload() === null)
-		{
-			$vendorIntegrationObject->setEnableMeetingUpload(true);
-		}
-		if ($vendorIntegrationObject->getDeletionPolicy() === null)
-		{
-			$vendorIntegrationObject->setDeletionPolicy(false);
-		}
-		if ($vendorIntegrationObject->getEnableTranscription() === null)
-		{
-			$vendorIntegrationObject->setEnableTranscription(true);
-		}
-		$vendorIntegrationObject->save();
 	}
 	
 	protected static function createNewWebexAPIDropFolder(WebexAPIVendorIntegration $vendorIntegrationObject)

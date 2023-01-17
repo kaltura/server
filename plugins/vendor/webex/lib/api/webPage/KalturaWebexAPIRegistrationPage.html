@@ -29,6 +29,7 @@
             let userMatchingMode = 0;
             let userPostfix = '';
             let handleParticipantsMode = 2;
+            let enableMeetingChat = true;
 
             $.ajax({
                 url : submitUrl,
@@ -45,6 +46,7 @@
                     'integrationSetting:userMatchingMode':userMatchingMode,
                     'integrationSetting:userPostfix':userPostfix,
                     'integrationSetting:handleParticipantsMode':handleParticipantsMode,
+                    'integrationSetting:enableMeetingChat':enableMeetingChat,
 
                     'format': 1 },
                 success : function(res) {

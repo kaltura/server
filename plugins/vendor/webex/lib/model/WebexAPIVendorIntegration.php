@@ -14,10 +14,11 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	const OPT_IN_GROUP_NAMES = 'optInGroupNames';
 	const GROUP_PARTICIPATION_TYPE = 'groupParticipationType';
 	const SITE_URL = 'site_url';
+	const DEFAULT_WEBEX_CATEGORY = 'webexCategory';
 	
 	
 	public function setWebexCategory($v)	{ $this->putInCustomData ( self::WEBEX_CATEGORY, $v); }
-	public function getWebexCategory( )	{ return $this->getFromCustomData(self::WEBEX_CATEGORY); }
+	public function getWebexCategory( )	{ return $this->getFromCustomData(self::WEBEX_CATEGORY, null, self::DEFAULT_WEBEX_CATEGORY); }
 	public function unsetCategory( ) 	{ return $this->removeFromCustomData(self::WEBEX_CATEGORY); }
 	
 	public function setUserMatchingMode($v)	{ $this->putInCustomData ( self::USER_MATCHING_MODE, $v); }
@@ -27,7 +28,7 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	public function getUserPostfix( )	{ return $this->getFromCustomData(self::USER_POSTFIX); }
 	
 	public function setEnableTranscription($v)	{ $this->putInCustomData(self::ENABLE_TRANSCRIPTION, $v); }
-	public function getEnableTranscription( )	{ return $this->getFromCustomData(self::ENABLE_TRANSCRIPTION); }
+	public function getEnableTranscription( )	{ return $this->getFromCustomData(self::ENABLE_TRANSCRIPTION, null, true); }
 	
 	public function setWebexAccountDescription ($v)	{ $this->putInCustomData ( self::WEBEX_ACCOUNT_DESCRIPTION, $v);	}
 	public function getWebexAccountDescription ( )	{ return $this->getFromCustomData(self::WEBEX_ACCOUNT_DESCRIPTION);	}
