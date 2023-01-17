@@ -24,7 +24,8 @@ class MicroServiceBaseService
 			return null;
 
 		list($adminSecret, $userSecret, $ksVersion) = $secrets;
-		return kSessionBase::generateSession($ksVersion, $adminSecret, 'admin', kSessionBase::SESSION_TYPE_ADMIN, $partnerId, 3600, '');
+		$privileges = "*,disableentitlement";
+		return kSessionBase::generateSession($ksVersion, $adminSecret, 'admin', kSessionBase::SESSION_TYPE_ADMIN, $partnerId, 3600, $privileges);
 	}
 
 	/**
@@ -36,8 +37,7 @@ class MicroServiceBaseService
 	private function initService($microServicePrefix, $microServiceUrl)
 	{
 		// service url
-		//$serviceUrl = kConf::get("microservice_url");
-		$serviceUrl = "http://plat-[micro-url-prefix].nvp1.ovp.kaltura.prod/api/v1/";
+		$serviceUrl = kConf::get("microservice_url");
 		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $microServicePrefix, $serviceUrl);
 		$this->serviceUrl = trim($serviceUrl, "\/") . '/' . trim($microServiceUrl, "\/");
 
