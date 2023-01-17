@@ -1,4 +1,12 @@
 # Scorpius-19.1.0
+## Add baseEntry get permission for game service partner
+* Issue type: Feature
+* Issue Id: PLAT-24098
+### Deployment ###
+run the following script:
+```
+php deployment/updates/scripts/add_permissions/2023_01_17_update_baseentry_permission.php
+```
 ## Allow search partners by admin email or parentId
 * Issue type: Feature
 * Issue Id: PLAT-24069
