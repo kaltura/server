@@ -65,6 +65,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		
 		foreach($this->_types as $typeReflector)
 		{
+			/* @var $typeReflector KalturaTypeReflector */
 			if ($typeReflector->isEnum() || $typeReflector->isStringEnum())
 			{
 				$enumElement = $this->getEnumElement($typeReflector);
@@ -100,6 +101,10 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			ksort($serviceActionItem->actionMap);
 			foreach($serviceActionItem->actionMap as $actionId => $actionReflector)
 			{
+				//In cases is set @clientgenerator ignore, $actionReflector will not be generated
+				if(!($actionReflector instanceof KalturaActionReflector))
+					continue;
+
 				/* @var $actionReflector KalturaActionReflector */
 				$actionInfo = $actionReflector->getActionInfo();
 				
