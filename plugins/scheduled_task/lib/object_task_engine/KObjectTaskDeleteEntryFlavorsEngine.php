@@ -182,7 +182,7 @@ class KObjectTaskDeleteEntryFlavorsEngine extends KObjectTaskEntryEngineBase
 			if($flavor->flavorParamsId == 0)
 			{
 				$baseSourceFlavor = $flavor;
-			    break;
+				break;
 			}
 		}
 
