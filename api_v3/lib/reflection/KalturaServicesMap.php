@@ -127,8 +127,6 @@ class KalturaServicesMap
 			$serviceMapEntry->serviceId = $serviceId;
 			$serviceMapEntry->serviceClass = $serviceClass;
 			$serviceMapEntry->serviceInfo = $serviceReflectionClass->getServiceInfo();
-			if (strpos($serviceMapEntry->serviceInfo->clientgenerator, "ignore") !== false)
-				continue;
 
             $actionMap = array();
             $nativeActions = $serviceReflectionClass->getActions();
