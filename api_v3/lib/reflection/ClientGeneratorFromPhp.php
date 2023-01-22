@@ -278,8 +278,10 @@ abstract class ClientGeneratorFromPhp
 		    foreach ($serviceActionItem->actionMap as $actionId => $actionCallback)
 		    {
       			$actionReflector = new KalturaActionReflector($serviceId, $actionId, $actionCallback);
-      			if ($this->shouldUseServiceAction($actionReflector))      			
+      			if ($this->shouldUseServiceAction($actionReflector))
       				$serviceActionItemToAdd->actionMap[$actionId] = $actionReflector;
+      			else
+      				unset($serviceActionItem->actionMap[$actionId]);
 		    }
 		    
 		    if ( count($serviceActionItem->actionMap) )
