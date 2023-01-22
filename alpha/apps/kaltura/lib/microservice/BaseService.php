@@ -5,8 +5,8 @@
 class MicroServiceBaseService
 {
 	const MICRO_SERVICE_PREFIX_PLACEHOLDER = "[micro-url-prefix]";
-	private $serviceUrl = '';
-	private $requestHeaders = [];
+	protected $serviceUrl = '';
+	protected $requestHeaders = array();
 
 	/**
 	 * @param string $microServicePrefix - the service url prefix (app-registry.service-url/micro-service-url)
@@ -21,7 +21,9 @@ class MicroServiceBaseService
 	{
 		$secrets = kSessionBase::getSecretsFromCache($partnerId);
 		if (!$secrets)
+		{
 			return null;
+		}
 
 		list($adminSecret, $userSecret, $ksVersion) = $secrets;
 		$privileges = "*,disableentitlement";
@@ -41,7 +43,8 @@ class MicroServiceBaseService
 		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $microServicePrefix, $serviceUrl);
 		$this->serviceUrl = trim($serviceUrl, "\/") . '/' . trim($microServiceUrl, "\/");
 
-		if(strpos($this->serviceUrl, 'https://') !== false) {
+		if(strpos($this->serviceUrl, 'https://') !== false)
+		{
 			$header = "X-FORWARDED-PROTO: https"; // standard, in AWS deployment
 			array_push($this->requestHeaders,  $header);
 		}
@@ -94,23 +97,29 @@ class MicroServiceBaseService
 		curl_close($ch);
 
 		// curl errors - throws exception
-		if (!empty($curlError)) {
+		if (!empty($curlError))
+		{
 			//TODO: handle error
 		}
 
 		// parse response
 		$result = json_decode($response);
-		if (empty($result)) {
+		if (empty($result))
+		{
 			KalturaLog::err("MicroService: error contacting service " . $requestUrl . ": " .$response);
 		}
 
-		$statusCode = $result->statusCode ?? 200;
-		$error = $result->error ?? '';
-		$errorMessage = $result->message ?? '';
-		$errorMessage = is_array($errorMessage) ? $errorMessage[0] ?? '' : $errorMessage;
+		$statusCode = $result->statusCode ? $result->statusCode : 200;
+		$error = $result->error ? $result->error : '';
+		$errorMessage = $result->message ? $result->message : '';
+		if (is_array($errorMessage))
+		{
+			$errorMessage = $errorMessage[0] ? $errorMessage[0] : '';
+		}
 
 		// service errors - throws exception
-		if ($statusCode !== 200 ) {
+		if ($statusCode !== 200)
+		{
 			$error =  $statusCode . ':' . $error . ':' . $errorMessage;
 			KalturaLog::err("MicroService: error contacting service " . $requestUrl . ": " .$error);
 		}

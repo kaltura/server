@@ -9,8 +9,8 @@ class MicroServiceAppRegistry extends MicroServiceBaseService
 		parent::__construct('app-registry','app-registry');
 	}
 
-	public function list($partnerId, $filter, $pager = [])
+	public function list($partnerId, $filter, $pager = array())
 	{
-		return $this->serve($partnerId,'list', ['filter' => $filter, 'pager' => $pager]);
+		return $this->serve($partnerId,'list', array('filter' => $filter, 'pager' => $pager));
 	}
 }
