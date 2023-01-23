@@ -219,7 +219,7 @@ class myPackagerUtils
 		return $url;
 	}
 
-	public static function getFlavorSupportedByPackagerForThumbCapture($entryId)
+	protected static function getFlavorSupportedByPackagerForThumbCapture($entryId)
 	{
 		//look for the highest bitrate flavor tagged with thumbsource
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entryId, flavorParams::TAG_THUMBSOURCE);
