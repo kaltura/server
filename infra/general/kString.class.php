@@ -271,10 +271,10 @@ class kString
 
 	public static function xmlEncode($str)
 	{
-		$notAllowedChars = kConf::get("not_allowed_chars", "runtime_config", array());
-		foreach ($notAllowedChars as $notAllowedChar)
+		$charsNotAllowed = kConf::get("chars_not_allowed", "runtime_config", array());
+		foreach ($charsNotAllowed as $charNotAllowed)
 		{
-			$str = str_replace(chr($notAllowedChar), "", $str);
+			$str = str_replace(chr($charNotAllowed), "", $str);
 		}
 		return str_replace ( array ( "&", '"' , '<', '>', "'" ) , array ( "&amp;", "&quot;" , "&lt;", "&gt;", "&apos;" ), $str );
 	}
