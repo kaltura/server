@@ -129,9 +129,11 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 
 		$url = $recordingFile->download_url;
 		$headers = array("Authorization: Bearer {$event->downloadToken}");
-		$redirectUrl = ZoomHelper::getRedirectUrl($url);
+		$redirectUrl = ZoomHelper::getRedirectUrl($url, $headers);
 		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($entry->getPartnerId(), $entry->getId(), $recordingFile->fileExtension);
-		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $redirectUrl, $flavorAsset, null, null, false, $headers);
+		$jobData = new kImportJobData();
+		$jobData->setUrlHeaders($headers);
+		kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $redirectUrl, $flavorAsset, null, $jobData);
 		return $entry;
 	}
 

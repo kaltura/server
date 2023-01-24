@@ -82,30 +82,26 @@ abstract class zoomProcessor
 	
 	protected function getZoomRedirectUrlFromFile($recording)
 	{
-		$url = null;
-		$redirectUrl = null;
-		$urlAccessToken = "?" . self::URL_ACCESS_TOKEN;
-		if(strpos($recording->recordingFile->downloadUrl, "?") !== false)
+		if (!isset($recording->recordingFile->downloadToken) && !isset($this->dropFolder->accessToken) && !isset($this->dropFolder->jwtToken))
 		{
-			$urlAccessToken = "&" . self::URL_ACCESS_TOKEN;
+			return null;
 		}
+		
 		if (isset($recording->recordingFile->downloadToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $recording->recordingFile->downloadToken;
+			$accessToken = $recording->recordingFile->downloadToken;
 		}
 		else if (isset($this->dropFolder->accessToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $this->dropFolder->accessToken;
+			$accessToken = $this->dropFolder->accessToken;
 		}
 		else if (isset($this->dropFolder->jwtToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $this->dropFolder->jwtToken;
+			$accessToken = $this->dropFolder->jwtToken;
 		}
 		
-		if ($url)
-		{
-			$redirectUrl = ZoomHelper::getRedirectUrl($url);
-		}
-		return $redirectUrl;
+		$urlHeaders = array("Authorization: Bearer $accessToken");
+		$redirectUrl = ZoomHelper::getRedirectUrl($recording->recordingFile->downloadUrl, $urlHeaders);
+		return array($redirectUrl, $urlHeaders);
 	}
 }
