@@ -33,6 +33,7 @@ class zoomTranscriptProcessor extends zoomProcessor
 			$captionAssetResource = new KalturaUrlResource();
 			list($redirectUrl, $urlHeaders) = $this->getZoomRedirectUrlFromFile($recording);
 			$captionAssetResource->url = $redirectUrl;
+			$captionAssetResource->urlHeaders = $urlHeaders;
 			$captionPlugin->captionAsset->setContent($captionAsset->id, $captionAssetResource);
 			KBatchBase::unimpersonate();
 		}
