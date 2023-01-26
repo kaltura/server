@@ -712,7 +712,7 @@ class myEntryUtils
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
 
-		KalturaLog::debug("Path for saving capture thumbnail is [$finalThumbPath]");
+		KalturaLog::debug("Path for saving thumbnail is [$finalThumbPath]");
 		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
 		{
 			header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
@@ -748,13 +748,12 @@ class myEntryUtils
 
 		if ($captureRequest)
 		{
-			KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
-			$captureFlavorAsset = self::getFlavorAssetForLocalCapture($entity);
-			if (is_null($captureFlavorAsset))
+			$captureFlavorAsset = self::getFlavorAssetForLocalCapture($entity, true);
+			if (!is_null($captureFlavorAsset))
 			{
-				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+				KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
+				list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbNameAttributes, $entity->getCacheFlavorVersion() . ".jpg", $format, $entity->getCacheFlavorVersion(), $thumbDirs, $contentPath, false, $processingThumbPath);
 			}
-			list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbNameAttributes, $entity->getCacheFlavorVersion() . ".jpg", $format, $entity->getCacheFlavorVersion(), $thumbDirs, $contentPath, false, $processingThumbPath);
 		}
 
 		return array($finalThumbPath, $processingThumbPath);
@@ -1170,7 +1169,7 @@ class myEntryUtils
 	 * @return flavorAsset
 	 * @throws PropelException
 	 */
-	public static function getFlavorAssetForLocalCapture($entry)
+	public static function getFlavorAssetForLocalCapture($entry, $allowNull = false)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset))
@@ -1199,7 +1198,7 @@ class myEntryUtils
 			}
 		}
 
-		if (is_null($flavorAsset))
+		if (is_null($flavorAsset) && !$allowNull)
 		{
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		}
