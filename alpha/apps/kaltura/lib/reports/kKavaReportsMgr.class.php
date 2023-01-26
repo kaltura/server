@@ -27,6 +27,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_FLAVOR_SWITCHES = 'flavorSwitches';
 	const METRIC_SEGMENT_DOWNLOAD_TIME_SUM = 'segmentDownloadTimeSum';
 	const METRIC_MANIFEST_DOWNLOAD_TIME_SUM = 'manifestDownloadTimeSum';
+	const METRIC_VIEW_TIME_SUM = 'viewTimeSum';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -67,6 +68,10 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DURATION_ADDED_MSEC = 'added_msecs';
 	const METRIC_DURATION_DELETED_MSEC = 'deleted_msecs';
 	const METRIC_DURATION_TOTAL_MSEC = 'total_msecs';
+	const METRIC_RECORDED_MSECS_ADDED = 'added_recording_msecs';
+	const METRIC_RECORDED_MSECS_DELETED = 'deleted_recording_msecs';
+	const METRIC_RECORDED_MSECS_TOTAL = 'total_recording_msecs';
+	const METRIC_RECORDED_HOURS_ADDED = 'added_recording_hours';
 	const METRIC_BUFFER_TIME_RATIO = 'avg_buffer_time';
 	const METRIC_LIVE_BUFFER_TIME_RATIO = 'avg_live_buffer_time';
 	const METRIC_AVG_BITRATE = 'avg_bitrate';
@@ -120,6 +125,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_TRANSCODING_USER_CPU_SEC = 'transcoding_user_cpu_sec';
 	const METRIC_REACH_DURATION_SEC = 'reach_duration_sec';
 	const METRIC_REACH_DURATION = 'reach_duration';
+	const METRIC_MEETING_VIEW_TIME = 'meeting_view_time';
+
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -137,6 +144,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC = 'live_view_period_buffer_time';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
 	const METRIC_TOTAL_JOBS = 'total_jobs';
+	const METRIC_MEETING_VIEW_TIME_SEC = 'meeting_view_time_sec';
 
 
 	// non druid metrics
@@ -779,6 +787,8 @@ class kKavaReportsMgr extends kKavaBase
 			array(self::METRIC_COUNT, self::METRIC_ENTRIES_TOTAL, self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, null),
 			array(self::METRIC_COUNT, self::METRIC_INTERACTIVE_VIDEOS_TOTAL, self::METRIC_INTERACTIVE_VIDEOS_ADDED, self::METRIC_INTERACTIVE_VIDEOS_DELETED,
 				self::getSelectorFilter(self::DIMENSION_SOURCE_TYPE, self::SOURCE_INTERACTIVE_VIDEO)),
+			array(self::METRIC_DURATION_SEC, self::METRIC_RECORDED_MSECS_TOTAL, self::METRIC_RECORDED_MSECS_ADDED, self::METRIC_RECORDED_MSECS_DELETED,
+				self::getSelectorFilter(self::DIMENSION_SOURCE_TYPE, self::SOURCE_MEETING)),
 			array(self::METRIC_COUNT, self::METRIC_USERS_TOTAL, self::METRIC_USERS_ADDED, self::METRIC_USERS_DELETED, null),
 		);
 
@@ -1185,6 +1195,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_REACH_DURATION_SEC] = self::getLongSumAggregator(
 				self::METRIC_REACH_DURATION_SEC, self::METRIC_DURATION_SEC);
 
+		self::$aggregations_def[self::METRIC_MEETING_VIEW_TIME_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getLongSumAggregator(self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1278,6 +1292,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_REACH_DURATION_SEC),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_REACH_DURATION, self::METRIC_REACH_DURATION_SEC, '60'));
+
+		self::$metrics_def[self::METRIC_RECORDED_HOURS_ADDED] = array(
+			self::DRUID_AGGR => array(self::METRIC_RECORDED_MSECS_ADDED),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_RECORDED_HOURS_ADDED, self::METRIC_RECORDED_MSECS_ADDED, '3600000'));
 
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
@@ -1546,6 +1565,11 @@ class kKavaReportsMgr extends kKavaBase
 						self::getFieldAccessPostAggregator(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC),
 						self::getFieldAccessPostAggregator(self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC))),
 					self::getFieldAccessPostAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC))));
+
+		self::$metrics_def[self::METRIC_MEETING_VIEW_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_MEETING_VIEW_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_MEETING_VIEW_TIME, self::METRIC_MEETING_VIEW_TIME_SEC, '60'));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
