@@ -18,7 +18,6 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_API_USAGE = 'api-usage';
 	const DATASOURCE_VE_REGISTRATION = 'virtual-events-registration';
 	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
-	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
