@@ -360,7 +360,9 @@ class ZoomHelper
 			$parsedUrl = parse_url($url);
 			parse_str($parsedUrl['query'], $queryParams);
 			$accessToken = $queryParams['access_token'];
-			$url = str_replace('access_token','unused', $url);
+			unset($queryParams['access_token']);
+			$parsedUrl['query'] = http_build_query($queryParams);
+			$url = KCurlWrapper::buildUrlFromParts($parsedUrl);
 			$urlHeaders = "Authorization: Bearer $accessToken";
 		}
 		$curl = curl_init($url);

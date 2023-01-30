@@ -86,7 +86,9 @@ class KAsyncImport extends KJobHandlerWorker
 			$parsedUrl = parse_url($sourceUrl);
 			parse_str($parsedUrl['query'], $queryParams);
 			$accessToken = $queryParams['access_token'];
-			$sourceUrl = str_replace('access_token','unused', $sourceUrl);
+			unset($queryParams['access_token']);
+			$parsedUrl['query'] = http_build_query($queryParams);
+			$sourceUrl = KCurlWrapper::buildUrlFromParts($parsedUrl);
 			$urlHeaders = "Authorization: Bearer $accessToken";
 			$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $urlHeaders);
 		}
