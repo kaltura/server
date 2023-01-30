@@ -353,11 +353,25 @@ class ZoomHelper
 	public static function getRedirectUrl($url)
 	{
 		$redirectUrl = $url;
+		$urlHeaders = null;
+		if (strpos('access_token', $url))
+		{
+			$queryParams = null;
+			$parsedUrl = parse_url($url);
+			parse_str($parsedUrl['query'], $queryParams);
+			$accessToken = $queryParams['access_token'];
+			$url = str_replace('access_token','unused', $url);
+			$urlHeaders = "Authorization: Bearer $accessToken";
+		}
 		$curl = curl_init($url);
 		curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt ($curl, CURLOPT_HEADER, true);
 		curl_setopt ($curl, CURLOPT_NOBODY, true);
+		if ($urlHeaders)
+		{
+			curl_setopt($curl, CURLOPT_HTTPHEADER, $urlHeaders);
+		}
 		$result = curl_exec($curl);
 		if ($result !== false)
 		{
