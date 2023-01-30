@@ -57,6 +57,10 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
         if ($serverTypesNotIn)
         {
             $serverNodes = KBatchBase::tryExecuteApiCall(array('KAsyncValidateLiveMediaServers','getExcludeServerNodesFromAPI'), array($serverTypesNotIn));
+            if ($serverNodes === false)
+            {
+                throw new Exception("Cannot fetched the exclude serverNode from API - stopping the process");
+            }
             if ($serverNodes && $serverNodes->objects)
             {
                 foreach($serverNodes->objects as $serverNode)

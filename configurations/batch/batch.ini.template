@@ -684,6 +684,7 @@ type												= KAsyncValidateLiveMediaServers
 scriptPath											= batches/ValidateLiveMediaServers/KAsyncValidateLiveMediaServersExe.php
 sleepBetweenStopStart								= 30
 params.minCreationTime								= 120
+params.serverTypesNotIn								= liveCluster.LIVE_CLUSTER_MEDIA_SERVER
 
 
 
