@@ -362,7 +362,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$metadata["CoreField.title:"] = $fieldValues[CortexApiDistributionField::MEDIA_TITLE] ?? '';
 			$metadata["CoreField.description:"] = $fieldValues[CortexApiDistributionField::MEDIA_DESCRIPTION] ?? '';
 			$metadata["MAY.Kaltura-Record-ID:"] = $fieldValues[CortexApiDistributionField::MEDIA_ID];
-			$metadata["MAY.Playback-URL:"] = $apiDistributionJobProviderData->videoFlavorDownloadUrl;
+			$metadata["MAY.Playback-URL:"] = $apiDistributionJobProviderData->videoFlavorDownloadUrl;//
 			$metadata["MAY.Ticket-Contact-or-Requestor:"] = $fieldValues[CortexApiDistributionField::MEDIA_USER_ID] ?? '';
 			$metadata["MAY.Person(s)-Present:"] = $metadataFields[self::CORTEX_KALTURA_METADATA_FIELD_PRESENTERS];
 			$metadata["CoreField.Creation-Date:"] = $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE] ? date('Y-m-d', $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE]) : '';
