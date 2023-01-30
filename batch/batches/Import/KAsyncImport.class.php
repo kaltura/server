@@ -74,6 +74,23 @@ class KAsyncImport extends KJobHandlerWorker
 		if($resumeOffset)
 			$curlWrapper->setResumeOffset($resumeOffset);
 		$protocol					= $curlWrapper->getSourceUrlProtocol($sourceUrl);
+		
+		$removeAccessTokenHost = null;
+		if (isset(self::$taskConfig->params->removeAccessTokenHost))
+		{
+			$removeAccessTokenHost = self::$taskConfig->params->host;
+		}
+		if ($removeAccessTokenHost && strpos($removeAccessTokenHost, $sourceUrl) && (strpos('access_token', $sourceUrl)))
+		{
+			$queryParams = null;
+			$parsedUrl = parse_url($sourceUrl);
+			parse_str($parsedUrl['query'], $queryParams);
+			$accessToken = $queryParams['access_token'];
+			$sourceUrl = str_replace('access_token','unused', $sourceUrl);
+			$urlHeaders = "Authorization: Bearer $accessToken";
+			$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $urlHeaders);
+		}
+		
 		if($protocol				== KCurlWrapper::HTTP_PROTOCOL_HTTP)
 		{
 			$curlWrapper->setTimeout(self::IMPORT_TIMEOUT);
