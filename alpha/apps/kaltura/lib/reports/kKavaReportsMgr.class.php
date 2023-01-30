@@ -451,7 +451,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => 'floor',
 		self::METRIC_UNIQUE_SESSIONS => 'floor',
 		self::METRIC_UNIQUE_VIEWERS => 'floor',
-		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'floor',
+		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'self::floorAndLimitPercentage',
 		self::METRIC_UNIQUE_OWNERS => 'floor',
 		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
@@ -6836,6 +6836,11 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function limitPercentages($value)
 	{
 		return min($value, 100);
+	}
+
+	protected static function floorAndLimitPercentage($value)
+	{
+		return min(floor($value), 100);
 	}
 
 }

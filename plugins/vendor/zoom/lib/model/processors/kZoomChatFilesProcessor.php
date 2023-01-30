@@ -43,7 +43,8 @@ class kZoomChatFilesProcessor extends kZoomProcessor
 		{
 			$attachmentAsset = $this->createAttachmentAssetForChatFile($recording->id, $entry);
 			$attachmentAssetResource = new KalturaUrlResource();
-			$attachmentAssetResource->url = $chatDownloadUrl . self::URL_ACCESS_TOKEN . $downloadToken;
+			$attachmentAssetResource->url = $chatDownloadUrl;
+			$attachmentAssetResource->urlHeaders = array("Authorization: Bearer $downloadToken");
 			$this->initUserPermissions($dbUser, true);
 			$attachmentAssetService = new AttachmentAssetService();
 			$attachmentAssetService->initService('attachment_attachmentasset', 'attachmentAsset', 'setContent');

@@ -139,21 +139,21 @@ class SystemPartnerService extends KalturaBaseService
 	
 	/**
 	 * @action list
-	 * @param KalturaPartnerFilter $filter
+	 * @param KalturaSystemPartnerFilter $filter
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaPartnerListResponse
 	 */
-	public function listAction(KalturaPartnerFilter $filter = null, KalturaFilterPager $pager = null)
+	public function listAction(KalturaSystemPartnerFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL2;
 		
 		if (is_null($filter))
-			$filter = new KalturaPartnerFilter();
+			$filter = new KalturaSystemPartnerFilter();
 			
 		if (is_null($pager))
 			$pager = new KalturaFilterPager();
 
-		$partnerFilter = new partnerFilter();
+		$partnerFilter = new systemPartnerFilter();
 		$filter->toObject($partnerFilter);
 		if (kCurrentContext::getCurrentPartnerId() != Partner::BATCH_PARTNER_ID)
 		{
@@ -387,6 +387,4 @@ class SystemPartnerService extends KalturaBaseService
 			
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
-	
-	
 }

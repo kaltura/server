@@ -8,7 +8,6 @@ abstract class zoomProcessor
 	const ONE_DAY_IN_SECONDS = 86400;
 	const ZOOM_PREFIX = 'Zoom_';
 	const ZOOM_LOCK_TTL = 120;
-	const URL_ACCESS_TOKEN = 'access_token=';
 	const REFERENCE_FILTER = '_eq_reference_id';
 	const CMS_USER_FIELD = 'cms_user_id';
 	const MAX_PUSER_LENGTH = 100;
@@ -82,30 +81,28 @@ abstract class zoomProcessor
 	
 	protected function getZoomRedirectUrlFromFile($recording)
 	{
-		$url = null;
-		$redirectUrl = null;
-		$urlAccessToken = "?" . self::URL_ACCESS_TOKEN;
-		if(strpos($recording->recordingFile->downloadUrl, "?") !== false)
+		if (!isset($recording->recordingFile->downloadToken) && !isset($this->dropFolder->accessToken) && !isset($this->dropFolder->jwtToken))
 		{
-			$urlAccessToken = "&" . self::URL_ACCESS_TOKEN;
+			return null;
 		}
+		
 		if (isset($recording->recordingFile->downloadToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $recording->recordingFile->downloadToken;
+			$accessToken = $recording->recordingFile->downloadToken;
 		}
 		else if (isset($this->dropFolder->accessToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $this->dropFolder->accessToken;
+			$accessToken = $this->dropFolder->accessToken;
 		}
 		else if (isset($this->dropFolder->jwtToken))
 		{
-			$url = $recording->recordingFile->downloadUrl . $urlAccessToken . $this->dropFolder->jwtToken;
+			$accessToken = $this->dropFolder->jwtToken;
 		}
 		
-		if ($url)
-		{
-			$redirectUrl = ZoomHelper::getRedirectUrl($url);
-		}
-		return $redirectUrl;
+		$authorizationHeader = "Authorization: Bearer $accessToken";
+		$redirectUrl = ZoomHelper::getRedirectUrl($recording->recordingFile->downloadUrl, array($authorizationHeader));
+		$headerStringObject = new KalturaString();
+		$headerStringObject->value = $authorizationHeader;
+		return array($redirectUrl, array($headerStringObject));
 	}
 }

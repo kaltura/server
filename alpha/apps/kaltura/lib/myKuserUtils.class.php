@@ -51,7 +51,7 @@ class myKuserUtils
 		}
 		
 		$userId = self::normalizeKuserId($userId);
-		return hash_hmac("sha256", $userId, $encKey);
+		return hash_hmac("sha256", kCurrentContext::getCurrentPartnerId() . "_" . $userId, $encKey);
 	}
 	
 	public static function normalizeKuserId($userId)

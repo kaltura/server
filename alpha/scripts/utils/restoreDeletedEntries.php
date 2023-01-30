@@ -59,7 +59,7 @@ foreach ($entries as $deletedEntry)
 			if ($assetfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_DELETED) 
 			{
 			    $file_full_path=$assetfileSync->getFullPath();
-			    if (file_exists($file_full_path)){
+			    if (kFile::checkFileExists($file_full_path)){
 				    echo('LOG: Changing status of file_sync '. $assetfileSync->getId().' to: '. FileSync::FILE_SYNC_STATUS_READY.".\n");
 				    $assetfileSync->setStatus (FileSync::FILE_SYNC_STATUS_READY);
 				    $assetfileSync->save ();
@@ -77,7 +77,7 @@ foreach ($entries as $deletedEntry)
 			if ($assetConvertLogfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_DELETED) 
 			{
 			    $file_full_path=$assetConvertLogfileSync->getFullPath();
-			    if (file_exists($file_full_path)){
+			    if (kFile::checkFileExists($file_full_path)){
 				    $assetConvertLogfileSync->setStatus (FileSync::FILE_SYNC_STATUS_READY);
 				    $assetConvertLogfileSync->save ();
 			    }else{

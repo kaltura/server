@@ -112,9 +112,17 @@ class KalturaWebexAPIIntegrationSetting extends KalturaIntegrationSetting
 		}
 		if (!$relatedDropFolder)
 		{
-			$this->enableTranscription = null;
-			$this->deletionPolicy = null;
-			$this->enableMeetingUpload = null;
+			$this->enableMeetingUpload = false;
 		}
+	}
+	
+	public function toInsertableObject($dbObject = null, $skip = array())
+	{
+		if (is_null($dbObject))
+		{
+			$dbObject = new WebexAPIVendorIntegration();
+		}
+		
+		return parent::toInsertableObject($dbObject);
 	}
 }

@@ -1,3 +1,21 @@
+# Scorpius-19.1.0
+## Add baseEntry get permission for game service partner
+* Issue type: Feature
+* Issue Id: PLAT-24098
+### Deployment ###
+run the following script:
+```
+php deployment/updates/scripts/add_permissions/2023_01_17_update_baseentry_permission.php
+```
+## Allow search partners by admin email or parentId
+* Issue type: Feature
+* Issue Id: PLAT-24069
+### Deployment ###
+run the following script:
+```
+php deployment/updates/scripts/add_permissions/2023_01_10_self_serve_add_permission_systempartner_list.php
+```
+
 # Scorpius-19.0.0
 ## Enable studio V7 to all KMC users
 * Issue Type: Task

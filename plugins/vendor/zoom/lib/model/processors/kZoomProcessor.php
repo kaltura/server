@@ -9,7 +9,6 @@ abstract class kZoomProcessor
 	const ONE_DAY_IN_SECONDS = 86400;
 	const ZOOM_PREFIX = 'Zoom_';
 	const ZOOM_LOCK_TTL = 120;
-	const URL_ACCESS_TOKEN = '?access_token=';
 	const REFERENCE_FILTER = '_eq_reference_id';
 	const CMS_USER_FIELD = 'cms_user_id';
 

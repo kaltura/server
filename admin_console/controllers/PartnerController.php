@@ -668,7 +668,7 @@ class PartnerController extends Zend_Controller_Action
 	
 	private function getPartnerFilterFromRequest(Zend_Controller_Request_Abstract $request)
 	{
-		$filter = new Kaltura_Client_Type_PartnerFilter();
+		$filter = new Kaltura_Client_SystemPartner_Type_SystemPartnerFilter();
 		$filterType = $request->getParam('filter_type');
 		$filterInput = $request->getParam('filter_input');
 		$filterIncludActive = $request->getParam('include_active');
@@ -693,6 +693,14 @@ class PartnerController extends Zend_Controller_Action
 		        $filter->idIn = "-99";
 		    }
 		
+		}
+		if ($filterType == 'byAdminEmail')
+		{
+			$filter->adminEmailEqual = $filterInput;
+		}
+		if ($filterType == 'byParentId')
+		{
+			$filter->partnerParentIdEqual = $filterInput;
 		}
 		if($filterType == 'byUIConfId')
 		{

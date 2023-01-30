@@ -123,7 +123,7 @@ class KAsyncImport extends KJobHandlerWorker
 		self::$currentEngine = self::AXEL_DOWNLOAD_ENGINE;
 	}
 	
-	private function downloadExec($sourceUrl, $localPath, $resumeOffset=0)
+	private function downloadExec($sourceUrl, $localPath, $resumeOffset = 0, $urlHeaders = null)
 	{
 		if(self::$currentEngine == self::AXEL_DOWNLOAD_ENGINE)
 		{
@@ -132,7 +132,7 @@ class KAsyncImport extends KJobHandlerWorker
 		}
 		
 		KalturaLog::debug("Import via cURL");
-		return $this->curlExec($sourceUrl, $localPath, $resumeOffset);
+		return $this->curlExec($sourceUrl, $localPath, $resumeOffset, $urlHeaders);
 	}
 	
 	private function axelExec($sourceUrl, $localPath, $resumeOffset=0)
@@ -155,17 +155,23 @@ class KAsyncImport extends KJobHandlerWorker
 	}
 	
 	/* Will download $sourceUrl to $localPath and will monitor progress with watchDog*/
-	private function curlExec($sourceUrl,$localPath,$resumeOffset=0)
+	private function curlExec($sourceUrl, $localPath, $resumeOffset = 0, $urlHeaders = null)
 	{
 		self::$startTime			= time();
 		self::$downloadedSoFar		= 0;
 		$progressCallBack			= null;
 		$curlWrapper				= new KCurlWrapper(self::$taskConfig->params);
 		self::$currentResource  	= $curlWrapper->ch;
-		if($resumeOffset)
+		if ($resumeOffset)
+		{
 			$curlWrapper->setResumeOffset($resumeOffset);
+		}
 		$protocol					= $curlWrapper->getSourceUrlProtocol($sourceUrl);
-		if($protocol				== KCurlWrapper::HTTP_PROTOCOL_HTTP)
+		if ($urlHeaders)
+		{
+			$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $urlHeaders);
+		}
+		if ($protocol == KCurlWrapper::HTTP_PROTOCOL_HTTP)
 		{
 			$curlWrapper->setTimeout(self::IMPORT_TIMEOUT);
 			$progressCallBack 		= array('KAsyncImport', 'progressWatchDog');
@@ -286,7 +292,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			$this->shouldUseAxelDownloadEngine($job->partnerId, $jobSubType, $sourceUrl);
-			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->downloadExec($sourceUrl, $data->destFileLocalPath,$resumeOffset);
+			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->downloadExec($sourceUrl, $data->destFileLocalPath, $resumeOffset, $data->urlHeaders);
 
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
 			{

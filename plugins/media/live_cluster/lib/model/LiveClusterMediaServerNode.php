@@ -47,7 +47,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
     public function getEnvDc()
     {
-        return self::ENVIRONMENT . '/' . $this->getEnvironment();
+        return self::ENVIRONMENT . '/' . $this->getName();
     }
 
     public static function getSessionType($entryServerNode)

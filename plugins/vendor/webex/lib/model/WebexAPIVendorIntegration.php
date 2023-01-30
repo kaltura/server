@@ -27,7 +27,7 @@ class WebexAPIVendorIntegration extends VendorIntegration
 	public function getUserPostfix( )	{ return $this->getFromCustomData(self::USER_POSTFIX); }
 	
 	public function setEnableTranscription($v)	{ $this->putInCustomData(self::ENABLE_TRANSCRIPTION, $v); }
-	public function getEnableTranscription( )	{ return $this->getFromCustomData(self::ENABLE_TRANSCRIPTION); }
+	public function getEnableTranscription( )	{ return $this->getFromCustomData(self::ENABLE_TRANSCRIPTION, null, true); }
 	
 	public function setWebexAccountDescription ($v)	{ $this->putInCustomData ( self::WEBEX_ACCOUNT_DESCRIPTION, $v);	}
 	public function getWebexAccountDescription ( )	{ return $this->getFromCustomData(self::WEBEX_ACCOUNT_DESCRIPTION);	}
