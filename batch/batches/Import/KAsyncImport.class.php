@@ -78,7 +78,7 @@ class KAsyncImport extends KJobHandlerWorker
 		$removeAccessTokenHost = null;
 		if (isset(self::$taskConfig->params->removeAccessTokenHost))
 		{
-			$removeAccessTokenHost = self::$taskConfig->params->host;
+			$removeAccessTokenHost = self::$taskConfig->params->removeAccessTokenHost;
 		}
 		if ($removeAccessTokenHost && strpos($removeAccessTokenHost, $sourceUrl) && (strpos('access_token', $sourceUrl)))
 		{
