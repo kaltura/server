@@ -17,6 +17,6 @@ class MicroServiceUserProfile extends MicroServiceBaseService
 	 */
 	public function list($partnerId, $filter, $pager = array())
 	{
-		return $this->serve($partnerId, 'list', array('filter' => $filter, 'pager' => $pager);
+		return $this->serve($partnerId, 'list', array('filter' => $filter, 'pager' => $pager));
 	}
 }

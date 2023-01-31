@@ -109,9 +109,9 @@ class MicroServiceBaseService
 			KalturaLog::err("MicroService: error contacting service " . $requestUrl . ": " .$response);
 		}
 
-		$statusCode = $result->statusCode ? $result->statusCode : 200;
-		$error = $result->error ? $result->error : '';
-		$errorMessage = $result->message ? $result->message : '';
+		$statusCode = isset($result->statusCode) ? $result->statusCode : 200;
+		$error = isset($result->error) ? $result->error : '';
+		$errorMessage = isset($result->message) ? $result->message : '';
 		if (is_array($errorMessage))
 		{
 			$errorMessage = $errorMessage[0] ? $errorMessage[0] : '';
