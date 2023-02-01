@@ -165,6 +165,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVERAGE_DURATION_MSEC = 'average_msecs';
 	const METRIC_LATEST_DURATION_MSEC = 'latest_msecs';
 	const METRIC_CONTRIBUTOR_RANKING = 'contributor_ranking';
+	const METRIC_COMBINED_LIVE_VIEW_TIME = 'combined_live_view_time';
 	
 	// player-events-realtime specific metrics
 	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
@@ -3889,6 +3890,25 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
+	protected static function addCombinedLiveViewTimeGraph(&$result, $dates)
+	{
+		if (!$dates)
+		{
+			$result[self::METRIC_COMBINED_LIVE_VIEW_TIME] = array(
+				reset($result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME]) +
+				reset($result[self::METRIC_MEETING_VIEW_TIME]));
+
+			return;
+		}
+
+		foreach ($dates as $date)
+		{
+			$result[self::METRIC_COMBINED_LIVE_VIEW_TIME][$date] =
+				$result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME][$date] +
+				$result[self::METRIC_MEETING_VIEW_TIME][$date];
+		}
+	}
+
 	/// table enrich functions
 	protected static function getEntriesNames($ids, $partner_id)
 	{
@@ -5965,6 +5985,23 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($result[1] as &$row)
 		{
 			$row[] = $row[$bandwidth] + $row[$storage]; 
+		}
+	}
+
+	protected static function addCombinedLiveViewTimeColumn(&$result, $input_filter)
+	{
+		$headers = $result[0];
+		$player_live_time = array_search(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, $headers);
+		$meeting_live_time = array_search(self::METRIC_MEETING_VIEW_TIME, $headers);
+		if ($player_live_time === false || $meeting_live_time === false)
+		{
+			return;
+		}
+
+		$result[0][] = self::METRIC_COMBINED_LIVE_VIEW_TIME;
+		foreach ($result[1] as &$row)
+		{
+			$row[] = $row[$player_live_time] + $row[$meeting_live_time];
 		}
 	}
 
