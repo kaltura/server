@@ -9,10 +9,6 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 	 * @var string
 	 */
 	public $videoAssetFilePath;
-	/**
-	 * @var string
-	 */
-	public $videoFlavorDownloadUrl;
 	
 	/**
 	 * @var string
@@ -46,7 +42,6 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 			if(kFileSyncUtils::fileSync_exists($syncKey))
 			{
 				$this->videoAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
-				$this->videoFlavorDownloadUrl = $flavorAsset->getDownloadUrl();
 			}
 		}
 		
