@@ -1,3 +1,16 @@
+# Scorpius-19.2.0
+## Add partners for messaging ##
+
+- Issue Type: Feature
+- Issue ID: FOUN-892
+
+### Configuration ###
+    Replace all tokens from the ini file (under 'messaing') and remove".template" from the file name: 
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_02_01_add_messaging_service_partner_and_permissions.php
+
 # Scorpius-19.1.0
 ## Add baseEntry get permission for game service partner
 * Issue type: Feature
