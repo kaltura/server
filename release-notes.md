@@ -11,6 +11,16 @@
 ### Deployment Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_02_01_add_messaging_partner_and_permissions.php
 
+
+## Add metadata list permission for game service partner
+* Issue type: Feature
+* Issue Id: PLAT-24146
+### Deployment ###
+run the following script:
+```
+php deployment/updates/scripts/add_permissions/2023_02_05_update_metadata_permission.php
+```
+
 # Scorpius-19.1.0
 ## Add baseEntry get permission for game service partner
 * Issue type: Feature
