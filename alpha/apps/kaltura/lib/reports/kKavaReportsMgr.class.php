@@ -4104,25 +4104,50 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getEntriesSource($ids, $partner_id, $context)
 	{
-		$context['peer'] = 'entryPeer';
-		if (!isset($context['columns']))
-			$context['columns'] = array();
-		$context['columns'][] = 'SOURCE';
-		$context['columns'][] = 'ADMIN_TAGS';
-		$context['columns'][] = 'CUSTOM_DATA';
+                $context['peer'] = 'entryPeer';
+                if (!isset($context['columns']))
+                        $context['columns'] = array();
+                $context['columns'][] = 'SOURCE';
+                $context['columns'][] = 'ADMIN_TAGS';
+                $context['columns'][] = 'CUSTOM_DATA';
+                $replaceFields = isset($context['fields']) ? true : false;
 
-		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
-		foreach ($enrichedResult as $id => $row)
-		{
-			$customData = array_pop($row);
-			$adminTags = array_pop($row);
-			$sourceType = array_pop($row);
-			$source = self::getEntrySourceType($sourceType, $adminTags, $customData);
-			$result[$id] = $row;
-			$result[$id][] = $source;
-		}
+                $enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
+                foreach ($enrichedResult as $id => $row)
+                {
+                        $customData = array_pop($row);
+                        $adminTags = array_pop($row);
+                        $sourceType = array_pop($row);
+                        $source = self::getEntrySourceType($sourceType, $adminTags, $customData);
+                        $row = $replaceFields ? self::replaceFieldsFromCustomData($context, $row, $customData) : $row;
+                        $result[$id] = $row;
+                        $result[$id][] = $source;
+                }
 
-		return $result;
+                return $result;
+	}
+
+        protected static function replaceFieldsFromCustomData($context, $row, $customData)
+        {
+                if (!isset($context['columns']) || !isset($context['fields']))
+                {
+                        return $row;
+                }
+                $parsedData = unserialize($customData);
+                foreach ($context['fields'] as $fieldToReplace => $fieldFromCustomData)
+                {
+                        $key = array_search($fieldToReplace, $context['columns']);
+                        if ($key !== false && isset($parsedData[$fieldFromCustomData]))
+                        {
+                                $replacedValue = $parsedData[$fieldFromCustomData];
+                                if ($fieldToReplace[0] !== '@')
+                                {
+                                        $replacedValue = strval($replacedValue);
+                                }
+                                $row[$key] = $replacedValue;
+                        }
+                }
+		return $row;
 	}
 
 	protected static function getBaseUsersInfo($ids, $partner_id, $context)

@@ -1308,6 +1308,9 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT', 'STATUS', 'MEDIA_TYPE', 'LENGTH_IN_MSECS'),
+						'fields' => array(
+							'KUSER_ID' => 'creatorKuserId'
+						)
 					)
 				),
 				array(
@@ -1455,6 +1458,9 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT', 'STATUS', 'MEDIA_TYPE', 'LENGTH_IN_MSECS'),
+						'fields' => array(
+							'KUSER_ID' => 'creatorKuserId'
+						)
 					)
 				),
 				array(
