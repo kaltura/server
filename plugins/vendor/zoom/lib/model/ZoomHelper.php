@@ -383,11 +383,11 @@ class ZoomHelper
 			{
 				if (strpos($redirectUrl, '?') + 1 == strlen($redirectUrl))
 				{
-					$redirectUrl .= '&access_token=' . $accessToken;
+					$redirectUrl .= 'access_token=' . $accessToken;
 				}
 				elseif (strpos($redirectUrl, '?') !== false)
 				{
-					$redirectUrl .= 'access_token=' . $accessToken;
+					$redirectUrl .= '&access_token=' . $accessToken;
 				}
 				else
 				{
