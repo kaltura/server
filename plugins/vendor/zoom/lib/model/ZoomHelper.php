@@ -354,7 +354,7 @@ class ZoomHelper
 	{
 		$redirectUrl = $url;
 		$urlHeaders = null;
-		if (strpos('access_token', $url))
+		if (strpos($url, 'access_token'))
 		{
 			$queryParams = null;
 			$parsedUrl = parse_url($url);
