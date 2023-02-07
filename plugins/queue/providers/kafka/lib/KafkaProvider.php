@@ -5,60 +5,48 @@ class KafkaProvider extends QueueProvider
 	protected $topic = null;
 	protected $producer = null;
 	protected $flushTtl = null;
-	
+	protected $brokers = '';
+
 	const DEFAULT_FLUSH_TTL = 500;
 	const DEFAULT_PORT = 29092;
 	const MAX_RETRIES = 3;
-	
+	const KAFKA_ACTION_SEND_MESSAGE = 'send_message';
+	const KAFKA_ACTION_CONNECT_TOPIC = 'connect_topic';
+
 	public function __construct(array $kafkaConfig)
 	{
-		$brokersArray = array();
+		if (!isset($kafkaConfig['brokers']) && !(isset($kafkaConfig['host']) && isset($kafkaConfig['port'])))
+		{
+			KalturaLog::debug("No Kafka brokers configured message will not be sent");
+			return;
+		}
+
 		if (isset($kafkaConfig['brokers']))
 		{
-			$brokers = $kafkaConfig['brokers'];
-			$brokers = explode(",", $brokers);
-			
-			foreach ($brokers as $broker)
-			{
-				list($host, $port) = explode(":", $broker);
-				if(!$port)
-				{
-					$port = self::DEFAULT_PORT;
-				}
-				
-				$brokersArray[] = "$host:$port";
-			}
+			$this->brokers = $kafkaConfig['brokers'];
 		}
 		else
 		{
-			$server = $kafkaConfig['server'];
-			$port = $kafkaConfig['port'];
+			$this->brokers = $kafkaConfig['host'] . ":" . $kafkaConfig['port'];
 		}
-		
+
 		$conf = new RdKafka\Conf();
 		$conf->set('log_level', (string)LOG_DEBUG);
-		if ($server)
-		{
-			$conf->set('metadata.broker.list', $server . ':' . $port);
-		}
-		
+		$conf->set('metadata.broker.list', $this->brokers);
+
 		if (isset($kafkaConfig['username']) && isset($kafkaConfig['password']))
 		{
 			$conf->set('sasl.username', $kafkaConfig['username']);
 			$conf->set('sasl.password', $kafkaConfig['password']);
 		}
-		
+
 		$producer = new RdKafka\Producer($conf);
-		if (count($brokersArray))
-		{
-			$producer->addBrokers(implode(',', $brokersArray));
-		}
-		
+		$producer->addBrokers($this->brokers);
+
 		$this->producer = $producer;
 		$this->flushTtl = isset($kafkaConfig['flushTtl']) ? $kafkaConfig['flushTtl'] : self::DEFAULT_FLUSH_TTL;
-		KalturaLog::log("Kafka connection Initialized");
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see QueueProvider::send()
@@ -69,33 +57,38 @@ class KafkaProvider extends QueueProvider
 	 */
 	public function send($topicName, $message, $msgArgs = array())
 	{
-		for ($retry = 1; ; $retry++)
+		$retry = 1;
+		$msgSendStart = microtime(true);
+
+		try
 		{
-			try
+			$this->create($topicName);
+			$this->topic->produce(RD_KAFKA_PARTITION_UA, 0, $message, $msgArgs["partitionKey"]);
+			$this->producer->poll(0);
+			$result = $this->producer->flush($this->flushTtl);
+
+			while ($this->producer->getOutQLen() > 0 && $retry <= self::MAX_RETRIES)
 			{
-				$this->create($topicName);
-				$this->topic->produce(RD_KAFKA_PARTITION_UA, 0, $message, $msgArgs["partitionKey"]);
-				$this->producer->poll(0);
-				$result = $this->producer->flush($this->flushTtl);
-				break;
-			}
-			catch (Exception $e)
-			{
-				if ($retry == self::MAX_RETRIES)
-				{
-					throw $e;
-				}
+				$this->producer->poll(1);
+				$retry++;
 			}
 		}
-		
-		if (!RD_KAFKA_RESP_ERR_NO_ERROR === $result)
+		catch (Exception $e)
 		{
+			$this->writeToMonitor("Failed to publish message to topic name $topicName iteration $i", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $start, $topicName, strlen($message), $e->getCode());
+			throw $e;
+		}
+
+		if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result)
+		{
+			$this->writeToMonitor("Failed to publish message to topic name $topicName", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message), $result);
 			KalturaLog::err("producing kafka msg failed");
 		}
-		
+
+		$this->writeToMonitor("Msg sent to $topicName", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message));
 		//$this->producer->purge(RD_KAFKA_PURGE_F_QUEUE);
 	}
-	
+
 	public function produce($topic, $partitionKey, $kafkaPayload)
 	{
 		for ($retry = 1; ; $retry++)
@@ -171,5 +164,15 @@ class KafkaProvider extends QueueProvider
 	{
 		$this->producer->flush($this->flushTtl);
 	}
-	
+
+	protected function writeToMonitor($logStr, $dataSource, $queryType, $queryTook, $tableName = null, $querySize = null, $errorType = '')
+	{
+		if (class_exists('KalturaLog')) {
+			KalturaLog::debug($logStr);
+		}
+
+		if (class_exists('KalturaMonitorClient')) {
+			KalturaMonitorClient::monitorKafkaAccess($dataSource, $queryType, $queryTook, $tableName, $querySize, $errorType);
+		}
+	}
 }
