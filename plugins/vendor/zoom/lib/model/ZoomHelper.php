@@ -354,7 +354,6 @@ class ZoomHelper
 	{
 		$redirectUrl = $url;
 		$urlHeaders = null;
-		$accessToken = null;
 		if (strpos($url, 'access_token'))
 		{
 			$queryParams = null;
@@ -373,27 +372,12 @@ class ZoomHelper
 		curl_setopt ($curl, CURLOPT_NOBODY, true);
 		if ($urlHeaders)
 		{
-			curl_setopt($curl, CURLOPT_HTTPHEADER, $urlHeaders);
+			curl_setopt($curl, CURLOPT_HTTPHEADER, array($urlHeaders));
 		}
 		$result = curl_exec($curl);
 		if ($result !== false)
 		{
 			$redirectUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-			if ($accessToken)
-			{
-				if (strpos($redirectUrl, '?') + 1 == strlen($redirectUrl))
-				{
-					$redirectUrl .= 'access_token=' . $accessToken;
-				}
-				elseif (strpos($redirectUrl, '?') !== false)
-				{
-					$redirectUrl .= '&access_token=' . $accessToken;
-				}
-				else
-				{
-					$redirectUrl .= '?access_token=' . $accessToken;
-				}
-			}
 		}
 		return $redirectUrl;
 	}
