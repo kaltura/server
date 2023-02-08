@@ -4557,6 +4557,85 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getAppGuidByEventId($partner_id, $virtual_event_id)
+	{
+		$filter = array('appCustomIdIn' => array($virtual_event_id));
+		$service = new MicroServiceAppRegistry();
+		$result = $service->list($partner_id, $filter);
+		$app_ids = array();
+		foreach ($result->objects as $app)
+		{
+			$app_ids[] = $app->id;
+		}
+		return $app_ids;
+	}
+
+	protected static function getUserProfileData($partner_id, $app_guid, $puser_ids)
+	{
+		$filter = array('appGuidIn' => $app_guid,
+						'userIdIn' => $puser_ids);
+		$service = new MicroServiceUserProfile();
+		$result = $service->list($partner_id, $filter);
+		return $result->objects;
+	}
+	protected static function getUsersInfoFromUserProfile($ids, $partner_id, $context)
+	{
+		$enriched_info_fields = $context['info_fields'];
+		$virtual_event_id = $context['virtual_event_id'];
+
+		$app_guid = self::getAppGuidByEventId($partner_id, $virtual_event_id);
+		$result = array();
+		$kuser_context = array();
+		$kuser_context['peer'] = 'kuserPeer';
+		$kuser_context['columns'][] = 'PUSER_ID';
+
+		$rows = self::genericQueryEnrich($ids, $partner_id, $kuser_context);
+		$pusers_to_kusers = array();
+		foreach ($rows as $id => $columns)
+		{
+			if (!is_array($columns)) {
+				$result[$id] = $id;
+				continue;
+			}
+			$puser = array_shift($columns);
+			$result[$id] = $puser;
+			$pusers_to_kusers[$puser] = $id;
+		}
+
+		$user_profiles = self::getUserProfileData($partner_id, $app_guid, array_keys($pusers_to_kusers));
+		foreach ($user_profiles as $user_profile)
+		{
+			$puser_id = $user_profile->userId;
+			$output = array();
+			$output[] = $puser_id;
+			foreach ($enriched_info_fields as $enriched_info_field) {
+				$field_path = explode(".", $enriched_info_field);
+				$curr_obj = $user_profile;
+				$value = '';
+				foreach ($field_path as $key)
+				{
+					$value = $curr_obj->$key ?? '';
+					if (is_object($value))
+					{
+						$curr_obj = $curr_obj->$key;
+					}
+					else
+					{
+						break;
+					}
+				}
+				$output[] = $value;
+			}
+			$kuser_id = $pusers_to_kusers[$puser_id];
+			if (isset($kuser_id))
+			{
+				$result[$kuser_id] = $output;
+			}
+		}
+
+		return $result;
+	}
+
 	protected static function convertTime($dates, $partner_id, $context)
 	{
 		$granularity = self::GRANULARITY_DAY;
