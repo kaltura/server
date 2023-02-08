@@ -23,6 +23,7 @@ class KalturaMonitorClient
 	const EVENT_CURL           = 'curl';
 	const EVENT_AXEL           = 'axel';
 	const EVENT_RABBIT         = 'rabbit';
+	const EVENT_KAFKA         = 'kafka';
 	const EVENT_SLEEP          = 'sleep';
 	const EVENT_UPLOAD         = 'upload';
 	const EVENT_EXEC           = 'exec';
@@ -718,6 +719,30 @@ class KalturaMonitorClient
 		if ($errorCode)
 		{
 			$data[self::FIELD_ERROR_CODE] = 'AMQP_' . $errorCode;
+		}
+
+		self::writeDeferredEvent($data);
+	}
+
+	public static function monitorKafkaAccess($dataSource, $queryType, $queryTook, $tableName = null, $querySize = null, $errorCode = '')
+	{
+		if (!self::$stream)
+		{
+			return;
+		}
+
+		$data = array_merge(self::$basicEventInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_KAFKA,
+			self::FIELD_DATABASE		=> $dataSource,
+			self::FIELD_TABLE			=> $tableName,
+			self::FIELD_QUERY_TYPE		=> $queryType,
+			self::FIELD_EXECUTION_TIME	=> $queryTook,
+			self::FIELD_LENGTH			=> $querySize ? $querySize : 0,
+			));
+
+		if ($errorCode)
+		{
+			$data[self::FIELD_ERROR_CODE] = 'KAFKA_' . $errorCode;
 		}
 
 		self::writeDeferredEvent($data);
