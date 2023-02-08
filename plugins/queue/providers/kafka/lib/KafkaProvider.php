@@ -75,7 +75,7 @@ class KafkaProvider extends QueueProvider
 		}
 		catch (Exception $e)
 		{
-			$this->writeToMonitor("Failed to publish message to topic name $topicName iteration $i", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $start, $topicName, strlen($message), $e->getCode());
+			$this->writeToMonitor("Failed to publish message to topic name $topicName", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message), $e->getCode());
 			throw $e;
 		}
 
