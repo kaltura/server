@@ -15,6 +15,8 @@ class myPackagerUtils
 	const RECORDING_LIVE_TYPE = 'recording';
 	const MP4_FILENAME_PARAMETER = '/name/a.mp4';
 
+	protected static $sessionCache = array();
+
 	/**
 	 * @param entry $entry
 	 * @param $capturedThumbPath
@@ -25,9 +27,9 @@ class myPackagerUtils
 	 * @return bool
 	 * @throws Exception
 	 */
-	public static function captureThumb($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null, $maxWidth = null)
+	public static function captureThumb($entry, $capturedThumbPath, $calc_vid_sec, &$flavorAssetId, $width = null, $height = null, $maxWidth = null, $serveVodFromLive = false)
 	{
-		if(myEntryUtils::shouldServeVodFromLive($entry))
+		if($serveVodFromLive)
 		{
 			return self::captureLiveThumb($entry, $capturedThumbPath, $calc_vid_sec, $width, $height);
 		}
@@ -36,15 +38,23 @@ class myPackagerUtils
 			return self::capturePlaylistThumb($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 		}
 
-		$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getEntryId());
-		if(!$flavorAsset)
+		if(is_null($flavorAssetId))
 		{
-			KalturaLog::info("No suitable packager flavor found for entry {$entry->getEntryId()}");
-			return false;
-		}
+			$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getEntryId());
+			if(!$flavorAsset)
+			{
+				KalturaLog::info("No suitable packager flavor found for entry {$entry->getEntryId()}");
+				return false;
+			}
 
-		$flavorAssetId = $flavorAsset->getId();
-		KalturaLog::info("Found flavor asset {$flavorAssetId}");
+			$flavorAssetId = $flavorAsset->getId();
+			self::$sessionCache["asset_".$flavorAssetId] = $flavorAsset;
+			KalturaLog::info("Found flavor asset {$flavorAssetId}");
+		}
+		else
+		{
+			$flavorAsset = self::$sessionCache["flavorAsset_".$flavorAssetId];
+		}
 
 		if(!$width && !$height && $maxWidth && $flavorAsset->getWidth() > $maxWidth)
 		{
@@ -59,7 +69,17 @@ class myPackagerUtils
 		$fileSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$currentDcId = kDataCenterMgr::getCurrentDcId();
 		$preferredStorageId = self::getPreferredStorageId($currentDcId);
-		list ($fileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($fileSyncKey, $flavorAsset, $preferredStorageId, null);
+
+		if(!isset(self::$sessionCache['assetInfo_'.$flavorAssetId]))
+		{
+			list ($fileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($fileSyncKey, $flavorAsset, $preferredStorageId, null);
+			self::$sessionCache['assetInfo_'.$flavorAssetId] = list ($fileSync, $path, $sourceType);
+		}
+		else
+		{
+			list ($fileSync, $path, $sourceType) = self::$sessionCache['assetInfo_'.$flavorAssetId];
+		}
+
 		if(!$fileSync)
 		{
 			return self::captureRemoteThumbByDeliveryProfile($capturedThumbPath, $calc_vid_sec, $flavorAsset, $width, $height);

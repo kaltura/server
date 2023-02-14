@@ -29,3 +29,4 @@ DbManager::initialize();
 ActKeyUtils::checkCurrent();
 KalturaMonitorClient::monitorPs2Start();
 sfContext::getInstance()->getController()->dispatch();
+KalturaMonitorClient::monitorRequestEnd();
