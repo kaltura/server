@@ -4280,6 +4280,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getEntriesCategories($ids, $partner_id, $context)
 	{
+		$delimiter = isset($context['delimiter']) ? $context['delimiter'] : ",";
 		// get the category ids of the entries
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 
@@ -4350,7 +4351,7 @@ class kKavaReportsMgr extends kKavaBase
 			
 			$result[$entry_id] = array(
 				'"' . str_replace('"', '""', implode(',', $categories_ids)) . '"', 
-				'"' . str_replace('"', '""', implode(',', $names)) . '"',
+				'"' . str_replace('"', '""', implode($delimiter, $names)) . '"',
 			);
 		}
 		
