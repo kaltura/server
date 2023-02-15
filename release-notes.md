@@ -2,16 +2,16 @@
 - Issue Type: Feature
 - Issue ID: FOUN-1047
 
-### Deployment scripts ###
+### Configuration ###
 First replace all tokens in the XML file below and remove ".template" from the file name:
   - /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2023_02_14_add_virtual_event_response_profiles.template.xml
   - /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2023_02_13_add_kafka_virtual_event_events.template.xml
 
-Run deployment script:
-  - php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php
+To enable this feature plugin add the following to your plugins.ini file:
+  - virtualEventEventNotifications
 
 ### Deployment Scripts ###
-    php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php 
+    - php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php 
 
 # Scorpius-19.2.0
 ## Add partners for messaging ##
