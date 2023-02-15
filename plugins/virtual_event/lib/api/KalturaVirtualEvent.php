@@ -93,7 +93,14 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $registrationFormSchema;
-	
+
+
+	/**
+	 * The Virtual Event Url
+	 * @var string
+	 */
+	public $eventUrl;
+
 	/*
 	 */
 	private static $map_between_objects = array(
@@ -111,7 +118,8 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'createdAt',
 		'updatedAt',
 		'deletionDueDate',
-		'registrationFormSchema'
+		'registrationFormSchema',
+		'eventUrl'
 	);
 	
 	/* (non-PHPdoc)

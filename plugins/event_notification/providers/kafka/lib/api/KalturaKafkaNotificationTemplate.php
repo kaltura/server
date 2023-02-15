@@ -33,12 +33,19 @@ class KalturaKafkaNotificationTemplate extends KalturaEventNotificationTemplate
 	 * @requiresPermission update
 	 */
 	public $apiObjectType;
-	
+
+	/**
+	 * Kaltura response-profile system name
+	 * @var int
+	 */
+	public $responseProfileSystemName;
+
 	private static $map_between_objects = array(
 		'topicName',
 		'partitionKey',
 		'messageFormat',
 		'apiObjectType',
+		'responseProfileSystemName',
 	);
 	
 	public function __construct()

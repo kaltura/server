@@ -126,7 +126,18 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 				'KalturaCameraScheduleResource' => 'Schedule Camera Resource',
 				'KalturaScheduleEventResource' => 'Schedule Event-Resource',
 				'KalturaClippingTaskEntryServerNode' => 'Clipping Task Entry-Server-Node',
+				'KalturaVirtualEvent' => 'Virtual Event',
 			),
 		));
+
+		$responseProfile = new Kaltura_Form_Element_ObjectSelect('response_profile_system_name', array(
+			'label' => 'Response Profile:',
+			'nameAttribute' => 'name',
+			'service' => 'responseProfile',
+			'pageSize' => 500,
+			'impersonate' => $eventNotificationTemplate->partnerId,
+			'addNull' => true,
+		));
+		$this->addElements(array($responseProfile));
 	}
 }

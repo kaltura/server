@@ -1,3 +1,12 @@
+# Scorpius-19.3.0
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+  - /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2023_02_14_add_virtual_event_response_profiles.template.xml
+
+Run deployment script:
+  - php /opt/kaltura/app/deployment/updates/scripts/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php
+
 # Scorpius-19.2.0
 ## Add partners for messaging ##
 
