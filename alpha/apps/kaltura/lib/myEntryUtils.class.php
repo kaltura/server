@@ -921,8 +921,8 @@ class myEntryUtils
 		$shouldServeVodFromLive = myEntryUtils::shouldServeVodFromLive($entry);
 		$flavorAssetId = $forceRotation = $last_calc_vid_sec = $w = $h = $calc_vid_sec = null;
 		$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-		list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 		$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
+		list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
