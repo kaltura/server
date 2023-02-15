@@ -7,6 +7,9 @@ First replace all tokens in the XML file below and remove ".template" from the f
 Run deployment script:
   - php /opt/kaltura/app/deployment/updates/scripts/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php
 
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_02_01_add_messaging_partner_and_permissions.php
+
 # Scorpius-19.2.0
 ## Add partners for messaging ##
 
