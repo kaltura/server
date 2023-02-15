@@ -65,11 +65,11 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 		));
 		$this->addElements(array($element));
 		
-		$this->addElement('select', 'api_object_type', array(
+		$this->addElement('select', 'event_object_type', array(
 			'label' => 'Object Type (KalturaObject):',
-			'default' => $eventNotificationTemplate->apiObjectType,
+			'default' => $eventNotificationTemplate->eventObjectType,
 			'filters' => array('StringTrim'),
-			'required' => true,
+			'readOnly' => true,
 			'multiOptions' => array(
 				'KalturaBaseEntry' => 'Base Entry',
 				'KalturaDataEntry' => 'Data Entry',
@@ -126,7 +126,7 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 				'KalturaCameraScheduleResource' => 'Schedule Camera Resource',
 				'KalturaScheduleEventResource' => 'Schedule Event-Resource',
 				'KalturaClippingTaskEntryServerNode' => 'Clipping Task Entry-Server-Node',
-				'KalturaVirtualEvent' => 'Virtual Event',
+				'virtualEventEventNotifications.VirtualEvent' => 'Virtual Event',
 			),
 		));
 

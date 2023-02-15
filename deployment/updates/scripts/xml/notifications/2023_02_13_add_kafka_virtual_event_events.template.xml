@@ -22,12 +22,12 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>5</eventType>
                 <!-- EventNotificationEventType::OBJECT_CREATED -->
-                <eventObjectType>virtualEventEventNotifications.virtualEvent</eventObjectType>
+                <eventObjectType>virtualEventEventNotifications.VirtualEvent</eventObjectType>
                 <topicName>@TOPIC_NAME@</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
-                <apiObjectType>KalturaVirtualEven</apiObjectType>
+                <apiObjectType>KalturaVirtualEvent</apiObjectType>
             </template>
         </request>
         <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -44,12 +44,12 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>3</eventType>
                 <!-- EventNotificationEventType::OBJECT_CHANGED -->
-                <eventObjectType>virtualEventEventNotifications.virtualEvent</eventObjectType>
+                <eventObjectType>virtualEventEventNotifications.VirtualEvent</eventObjectType>
                 <topicName>@TOPIC_NAME@</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
-                <apiObjectType>KalturaVirtualEven</apiObjectType>
+                <apiObjectType>KalturaVirtualEvent</apiObjectType>
             </template>
         </request>
         <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -66,12 +66,12 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>7</eventType>
                 <!-- EventNotificationEventType::OBJECT_DELETED -->
-                <eventObjectType>virtualEventEventNotifications.virtualEvent</eventObjectType>
+                <eventObjectType>virtualEventEventNotifications.VirtualEvent</eventObjectType>
                 <topicName>@TOPIC_NAME@</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
-                <apiObjectType>KalturaUser</apiObjectType>
+                <apiObjectType>KalturaVirtualEvent</apiObjectType>
             </template>
         </request>
         <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">

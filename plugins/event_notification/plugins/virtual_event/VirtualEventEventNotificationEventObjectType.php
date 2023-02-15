@@ -5,7 +5,7 @@
  */
 class VirtualEventEventNotificationEventObjectType implements IKalturaPluginEnum, EventNotificationEventObjectType
 {
-	const VIRTUAL_EVENT = 'virtualEvent';
+	const VIRTUAL_EVENT = 'VirtualEvent';
 	
 	/**
 	 * 

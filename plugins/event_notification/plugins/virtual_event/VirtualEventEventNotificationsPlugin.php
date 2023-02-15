@@ -64,7 +64,7 @@ class VirtualEventEventNotificationsPlugin extends KalturaPlugin implements IKal
 	{
 		if($baseClass == 'EventNotificationEventObjectType' && $enumValue == self::getEventNotificationEventObjectTypeCoreValue(VirtualEventEventNotificationEventObjectType::VIRTUAL_EVENT))
 		{
-			return 'virtualEvent';
+			return 'VirtualEvent';
 		}
 
 		return null;
