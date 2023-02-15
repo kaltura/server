@@ -24,6 +24,7 @@
                 <!-- EventNotificationEventType::OBJECT_CREATED -->
                 <eventObjectType>virtualEventEventNotifications.VirtualEvent</eventObjectType>
                 <topicName>@TOPIC_NAME@</topicName>
+                <responseProfileSystemName>VIRTUAL_EVENT</responseProfileSystemName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
@@ -46,6 +47,7 @@
                 <!-- EventNotificationEventType::OBJECT_CHANGED -->
                 <eventObjectType>virtualEventEventNotifications.VirtualEvent</eventObjectType>
                 <topicName>@TOPIC_NAME@</topicName>
+                <responseProfileSystemName>VIRTUAL_EVENT</responseProfileSystemName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
@@ -68,6 +70,7 @@
                 <!-- EventNotificationEventType::OBJECT_DELETED -->
                 <eventObjectType>virtualEventEventNotifications.VirtualEvent</eventObjectType>
                 <topicName>@TOPIC_NAME@</topicName>
+                <responseProfileSystemName>VIRTUAL_EVENT</responseProfileSystemName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
