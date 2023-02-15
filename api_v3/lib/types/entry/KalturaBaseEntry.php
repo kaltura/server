@@ -411,6 +411,20 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @var bool
 	 */
 	public $blockAutoTranscript;
+	
+	/**
+	 * Timestamp when the entry was recycled
+	 *
+	 * @var int
+	 */
+	public $recycledAt;
+	
+	/**
+	 * DisplayInSearch status of the entry before it was recycled
+	 *
+	 * @var int
+	 */
+	public $statusBeforeRecycle;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -463,6 +477,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"application",
 		"applicationVersion",
 		"blockAutoTranscript",
+		"recycledAt",
+		"statusBeforeRecycle",
 	 );
 		 
 	public function getMapBetweenObjects()
@@ -736,7 +752,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 			return;
 
 		if ($this->displayInSearch === EntryDisplayInSearchType::PARTNER_ONLY ||
-			$this->displayInSearch === EntryDisplayInSearchType::SYSTEM)
+			$this->displayInSearch === EntryDisplayInSearchType::SYSTEM ||
+			$this->displayInSearch === EntryDisplayInSearchType::RECYCLED)
 			return;
 
 		// only for update scenario check against old object
@@ -756,16 +773,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		$this->validateCategories();
 		$this->validateParentEntryId($sourceObject);
 		$this->validatePropertyMinLength('referenceId', 2, true);
-		
-//		if($this->referenceId)
-//		{
-//			$c = KalturaCriteria::create(entryPeer::OM_CLASS);
-//			$c->add('entry.ID', $sourceObject->getId(), Criteria::NOT_EQUAL);
-//			$c->add('entry.REFERENCE_ID', $this->referenceId);
-//			$c->applyFilters();
-//			if(count($c->getFetchedIds()))
-//				throw new KalturaAPIException(KalturaErrors::REFERENCE_ID_ALREADY_EXISTS, $this->referenceId);
-//		}
 				
 		$this->validateObjectsExist($sourceObject);
 

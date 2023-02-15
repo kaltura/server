@@ -1971,6 +1971,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setBlockAutoTranscript($v)  {$this->putInCustomData('blockAutoTranscript', $v);}
 	public function getBlockAutoTranscript()    {return $this->getFromCustomData('blockAutoTranscript', null, false);}
 	
+	public function setRecycledAt($v)  {$this->putInCustomData('recycledAt', $v);}
+	public function getRecycledAt()    {return $this->getFromCustomData('recycledAt', null, null);}
+	
+	public function setStatusBeforeRecycle($v)  {$this->putInCustomData('statusBeforeRecycle', $v);}
+	public function getStatusBeforeRecycle()    {return $this->getFromCustomData('statusBeforeRecycle', null, null);}
+	
 	
 	public function getParentEntry()
 	{

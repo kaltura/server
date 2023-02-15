@@ -593,6 +593,12 @@ class KalturaErrors extends APIErrors
 	const ENTRY_CATEGORY_FIELD_IS_DEPRECATED = "ENTRY_CATEGORY_FIELD_IS_DEPRECATED;;entry->categories and entry->categoriesIds fields are deprecated - user categoryEntry service";
 
 	const ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED = "ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED;DISPLAY_IN_SEARCH_NEW_VALUE;Cannot set the value of DISPLAY_IN_SEARCH to [\"@DISPLAY_IN_SEARCH_NEW_VALUE@\"]";
+	
+	const CANNOT_UPDATE_RECYCLED_ENTRY = "CANNOT_UPDATE_RECYCLED_ENTRY;;Cannot update an entry with status recycled";
+	
+	const ENTRY_STATUS_CANNOT_RECYCLE = "ENTRY_STATUS_CANNOT_RECYCLE;;Only entry of status READY or NO_CONTENT be can be recycled";
+	
+	const RESTORE_ONLY_RECYCLED_ENTRY = "RESTORE_ONLY_RECYCLED_ENTRY;;Only entry of status RECYCLED be can be restored";
 
 	/**
 	 * categoryEntry
@@ -682,6 +688,8 @@ class KalturaErrors extends APIErrors
 	const ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN = "ASSIGNING_INFO_TO_ENTRY_WITH_PARENT_IS_FORBIDDEN;ID;assigning categories|scheduling|access control to entry with parent entry \"@ID@\" is not allowed";
 
 	const PARENT_ENTRY_ID_NOT_FOUND = "PARENT_ENTRY_ID_NOT_FOUND;ID;parent entry id \"@ID@\" not found";
+	
+	const FEATURE_RECYCLE_BIN_DISABLED = "FEATURE_RECYCLE_BIN_DISABLED;; Feature recycle bin is disabled for partner";
 
 	/*
 	 * FileAsset Service

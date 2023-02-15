@@ -1068,5 +1068,62 @@ class BaseEntryService extends KalturaEntryService
 		$key = md5(md5(kConf::get(self::PLAYBACK_SECRET) . $partner->getId()) . $entryId, true);
 		return new kRendererString($key, kMimeTypes::TYPE_TEXT);
 	}
-
+	
+	/**
+	 * Move the entry to the recycle bin
+	 *
+	 * @action recycle
+	 * @param string $entryId
+	 * @return KalturaBaseEntry The moved entry
+	 */
+	public function recycleAction($entryId)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECYCLE_BIN, $entry->getPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::FEATURE_RECYCLE_BIN_DISABLED);
+		}
+		if ($entry->getStatus() !== entryStatus::READY && $entry->getStatus() !== entryStatus::NO_CONTENT)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_STATUS_CANNOT_RECYCLE);
+		}
+		
+		$entry->setRecycledAt(time());
+		$entry->setStatusBeforeRecycle($entry->getDisplayInSearch());
+		$entry->setDisplayInSearch(KalturaEntryDisplayInSearchType::RECYCLED);
+		$entry->save();
+		
+		return $this->getEntry($entryId);
+	}
+	
+	/**
+	 * Move the entry to the recycle bin
+	 *
+	 * @action restoreRecycled
+	 * @param string $entryId
+	 * @return KalturaBaseEntry The moved entry
+	 */
+	public function restoreRecycledAction($entryId)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		if ($entry->getDisplayInSearch() !== KalturaEntryDisplayInSearchType::RECYCLED)
+		{
+			throw new KalturaAPIException(KalturaErrors::RESTORE_ONLY_RECYCLED_ENTRY);
+		}
+		
+		$entry->setDisplayInSearch($entry->getStatusBeforeRecycle());
+		$entry->setStatusBeforeRecycle(null);
+		$entry->setRecycledAt(null);
+		$entry->save();
+		
+		return $this->getEntry($entryId);
+	}
 }
