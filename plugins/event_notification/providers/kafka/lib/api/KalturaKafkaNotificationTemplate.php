@@ -36,7 +36,7 @@ class KalturaKafkaNotificationTemplate extends KalturaEventNotificationTemplate
 
 	/**
 	 * Kaltura response-profile system name
-	 * @var int
+	 * @var string
 	 */
 	public $responseProfileSystemName;
 

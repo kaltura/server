@@ -137,6 +137,7 @@ class Form_KafkaNotificationTemplateConfiguration extends Form_EventNotification
 			'pageSize' => 500,
 			'impersonate' => $eventNotificationTemplate->partnerId,
 			'addNull' => true,
+			'idAttribute' => 'responseProfileSystemName'
 		));
 		$this->addElements(array($responseProfile));
 	}
