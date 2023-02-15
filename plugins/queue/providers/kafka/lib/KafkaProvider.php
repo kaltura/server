@@ -81,8 +81,8 @@ class KafkaProvider extends QueueProvider
 
 		if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result)
 		{
-			$this->writeToMonitor("Failed to publish message to topic name $topicName", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message), $result);
-			KalturaLog::err("producing kafka msg failed");
+			$this->writeToMonitor("Failed to publish message to topic name $topicName with error $result", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message), $result);
+			KalturaLog::err("producing kafka msg failed with error [$result]");
 			return;
 		}
 
