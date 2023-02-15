@@ -8,7 +8,7 @@ First replace all tokens in the XML file below and remove ".template" from the f
   - /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2023_02_13_add_kafka_virtual_event_events.template.xml
 
 Run deployment script:
-  - php /opt/kaltura/app/deployment/updates/scripts/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php
+  - php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php
 
 ### Deployment Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php 
