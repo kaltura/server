@@ -83,6 +83,7 @@ class KafkaProvider extends QueueProvider
 		{
 			$this->writeToMonitor("Failed to publish message to topic name $topicName", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message), $result);
 			KalturaLog::err("producing kafka msg failed");
+			return;
 		}
 
 		$this->writeToMonitor("Msg sent to $topicName", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message));
