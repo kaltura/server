@@ -38,7 +38,7 @@ class myPackagerUtils
 			return self::capturePlaylistThumb($entry, $capturedThumbPath, $calc_vid_sec, $flavorAssetId, $width, $height);
 		}
 
-		if(is_null($flavorAssetId))
+		if(is_null($flavorAssetId) || ($flavorAssetId && !isset(self::$sessionCache["flavorAsset_".$flavorAssetId])))
 		{
 			$flavorAsset = self::getFlavorSupportedByPackagerForThumbCapture($entry->getEntryId());
 			if(!$flavorAsset)
@@ -48,7 +48,7 @@ class myPackagerUtils
 			}
 
 			$flavorAssetId = $flavorAsset->getId();
-			self::$sessionCache["asset_".$flavorAssetId] = $flavorAsset;
+			self::$sessionCache["flavorAsset_".$flavorAssetId] = $flavorAsset;
 			KalturaLog::info("Found flavor asset {$flavorAssetId}");
 		}
 		else
@@ -73,7 +73,7 @@ class myPackagerUtils
 		if(!isset(self::$sessionCache['assetInfo_'.$flavorAssetId]))
 		{
 			list ($fileSync, $path, $sourceType) = kFileSyncUtils::getFileSyncServeFlavorFields($fileSyncKey, $flavorAsset, $preferredStorageId, null);
-			self::$sessionCache['assetInfo_'.$flavorAssetId] = list ($fileSync, $path, $sourceType);
+			self::$sessionCache['assetInfo_'.$flavorAssetId] = array ($fileSync, $path, $sourceType);
 		}
 		else
 		{
@@ -362,7 +362,7 @@ class myPackagerUtils
 		}
 		
 		$currentEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndServerTypes($entry->getRootEntryId(), array(EntryServerNodeType::LIVE_PRIMARY, EntryServerNodeType::LIVE_BACKUP));
-		usort($liveEntryServerNodes, function ($a, $b) {return $a->getServerType() - $b->getServerType();}); // Primary first and secondary last
+		usort($currentEntryServerNodes, function ($a, $b) {return $a->getServerType() - $b->getServerType();}); // Primary first and secondary last
 		
 		if (!$currentEntryServerNodes)
 		{
