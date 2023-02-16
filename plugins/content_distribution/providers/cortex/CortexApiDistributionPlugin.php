@@ -223,9 +223,9 @@ class CortexApiDistributionPlugin extends KalturaPlugin implements IKalturaPermi
 	 */
 	public static function contributeMRSS(EntryDistribution $entryDistribution, SimpleXMLElement $mrss)
 	{
-	    // append Cortex specific report statistics
+	    	// append Cortex specific report statistics
 		/** @var CortexApiDistributionProfile $distributionProfile */
-	    $distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
+		$distributionProfile = DistributionProfilePeer::retrieveByPK($entryDistribution->getDistributionProfileId());
 		$mrss->addChild('host', $distributionProfile->getHost());
 		$mrss->addChild('username', $distributionProfile->getUsername());
 		$mrss->addChild('password', $distributionProfile->getPassword());
