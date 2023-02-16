@@ -25,16 +25,25 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		parent::__construct($distributionJobData);
 	    
 		if(!$distributionJobData)
+		{
 			return;
+		}
 		
 		if(!($distributionJobData->distributionProfile instanceof KalturaCortexApiDistributionProfile))
+		{
 			return;
+		}
 			
 		$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
-		if(count($flavorAssets)) // if we have specific flavor assets for this distribution, grab the first one
+		if(count($flavorAssets))  // if we have specific flavor assets for this distribution, grab the first one
+		{
 			$flavorAsset = reset($flavorAssets);
+		}
 		else // take the source asset
+		{
 			$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($distributionJobData->entryDistribution->entryId);
+		}
+
 		
 		if($flavorAsset) 
 		{
@@ -50,7 +59,9 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		{
 			$syncKey = reset($thumbAssets)->getSyncKey(thumbAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			if(kFileSyncUtils::fileSync_exists($syncKey))
+			{
 				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
+			}
 		}
 		
 		$this->addCaptionsData($distributionJobData);
@@ -72,7 +83,10 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 	{
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
 		$assetIdsArray = explode ( ',', $distributionJobData->entryDistribution->assetIds );
-		if (empty($assetIdsArray)) return;
+		if (empty($assetIdsArray))
+		{
+			return;
+		}
 		$assets = array ();
 		$this->captionsInfo = new KalturaCortexApiCaptionDistributionInfoArray();
 		
@@ -93,7 +107,8 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 
 		foreach ( $assets as $asset ) {
 			$assetType = $asset->getType ();
-			if($assetType == CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION )){
+			if($assetType == CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ))
+			{
 				$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
 				if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
 					$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
@@ -121,7 +136,9 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		{
 			$languageCode = $languageReflector->getConstantName($language);
 			if($languageCode)
+			{
 				return $languageCodeReflector->getConstantValue($languageCode);
+			}
 		}
 		return null;
 	}
@@ -142,17 +159,22 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		$captionInfo->fileExt = $asset->getFileExt();
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
 		$distributed = false;
-		foreach ( $distributionJobData->mediaFiles as $mediaFile ) {
-			if ($mediaFile->assetId == $asset->getId ()) {
+		foreach ( $distributionJobData->mediaFiles as $mediaFile )
+		{
+			if ($mediaFile->assetId == $asset->getId ())
+			{
 				$distributed = true;
-				if ($asset->getVersion () > $mediaFile->version) {
+				if ($asset->getVersion () > $mediaFile->version)
+				{
 					$captionInfo->action = KalturaCortexApiDistributionCaptionAction::UPDATE_ACTION;
 				}
 				break;
 			}
 		}
 		if (! $distributed)
+		{
 			$captionInfo->action = KalturaCortexApiDistributionCaptionAction::SUBMIT_ACTION;
+		}
 		elseif ($captionInfo->action != KalturaCortexApiDistributionCaptionAction::UPDATE_ACTION) {
 			return;
 		}
