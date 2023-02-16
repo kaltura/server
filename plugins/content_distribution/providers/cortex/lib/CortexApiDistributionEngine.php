@@ -95,7 +95,8 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 */
 	private function updateCustomMetadata(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
-		try{
+		try
+		{
 			if(empty($this->getDistributionProfile()->metadataprofileid))
 			{
 				return;
@@ -113,7 +114,8 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		/** @var MetadataPlugin $metadataPlugin */
 		$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
 		$fieldValues = unserialize($apiDistributionJobProviderData->fieldValues);
-		try{
+		try
+		{
 			$metadataPlugin->metadata->add($this->getDistributionProfile()->metadataprofileid, KalturaMetadataObjectType::ENTRY, $fieldValues[CortexApiDistributionField::MEDIA_ID], $this->getMetadataXMLByResult($result));
 		}
 		catch(Exception $e)
@@ -146,7 +148,8 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		$metadataPager = new KalturaFilterPager();
 		$metadataPager->pageSize = 1;
 		/** @var KalturaMetadataListResponse $metadataListResponse */
-		try{
+		try
+		{
 			$metadataListResponse = $metadataPlugin->metadata->listAction($metadataFilter, $metadataPager);
 		}
 		catch(Exception $e)
@@ -354,7 +357,8 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 */
 	private function submitMetadata(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
-		try{
+		try
+		{
 			$fieldValues = unserialize($apiDistributionJobProviderData->fieldValues);
 			$metadataFields = $this->getMetadataFields($fieldValues[CortexApiDistributionField::MEDIA_ID]);
 			$metadata = array();
@@ -379,7 +383,8 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 */
 	private function uploadVideo(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
-		try{
+		try
+		{
 			$SystemIdentifier = $this->mediaUpload($apiDistributionJobProviderData->videoAssetFilePath);
 			KalturaLog::info("Cortex: upload video succeeded, SystemIdentifier: $SystemIdentifier");
 			$this->setCortexSystemId($SystemIdentifier);
@@ -396,7 +401,8 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 */
 	private function uploadThumbnail($thumbAssetFilePath)
 	{
-		try{
+		try
+		{
 			$imageSystemId = $this->mediaUpload($thumbAssetFilePath);
 			KalturaLog::info("Cortex: upload thumbnail succeeded, ImageIdentifier: $imageSystemId");
 			$metadata = array();
@@ -468,7 +474,8 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			'format' => $captionInfo->fileExt,
 			'content' => addslashes($captionAssetContent)
 		);
-		try{
+		try
+		{
 			$cookiesStr = $this->authorizeCortexAccountWithCookie();
 			$this->requestCortex($params, self::CORTEX_API_UPLOAD_CAPTIONS.'/'.$this->getRecordId(), true, 200, array('Content-Type: application/json', 'Cookie: '.$cookiesStr), false);
 		}
