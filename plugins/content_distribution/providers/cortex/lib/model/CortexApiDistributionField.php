@@ -5,7 +5,7 @@
  */ 
 interface CortexApiDistributionField extends BaseEnum
 {
-    const MEDIA_TITLE  = 'MEDIA_TITLE';
+	const MEDIA_TITLE  = 'MEDIA_TITLE';
 	const MEDIA_DESCRIPTION  = 'MEDIA_DESCRIPTION';
 	const MEDIA_KEYWORDS  = 'MEDIA_KEYWORDS';
 	const MEDIA_ID = 'MEDIA_ID';
