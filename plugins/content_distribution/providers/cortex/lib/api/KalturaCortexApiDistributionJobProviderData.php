@@ -93,44 +93,22 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 
 		foreach ( $assets as $asset ) {
 			$assetType = $asset->getType ();
-			switch ($assetType) {
-				case CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ):
-					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
-					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
-						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
-						if ($captionInfo)
-						{
-							$captionInfo->label = $asset->getLabel();
-							if(!$captionInfo->label)
-								$captionInfo->label = $asset->getLanguage();
-							$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
-							if ($captionInfo->language)
-								$this->captionsInfo [] = $captionInfo;
-							else
-								KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().']'); 
-						}
+			if($assetType == CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION )){
+				$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
+				if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
+					$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
+					if ($captionInfo)
+					{
+						$captionInfo->label = $asset->getLabel();
+						if(!$captionInfo->label)
+							$captionInfo->label = $asset->getLanguage();
+						$captionInfo->language = $this->getLanguageCode($asset->getLanguage());
+						if ($captionInfo->language)
+							$this->captionsInfo [] = $captionInfo;
+						else
+							KalturaLog::err('The caption ['.$asset->getId().'] has unrecognized language ['.$asset->getLanguage().']');
 					}
-					break;
-				case AttachmentPlugin::getAssetTypeCoreValue ( AttachmentAssetType::ATTACHMENT ) :
-					/* @var $asset AttachmentAsset */
-					$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
-					if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
-						$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
-						if ($captionInfo)
-						{
-							//language code should be set in the attachments title
-							$captionInfo->label = $asset->getTitle();
-							$captionInfo->language = $asset->getTitle();
-							
-							$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
-							//check if the language code exists 
-						    if($languageCodeReflector && $languageCodeReflector->getConstantName($captionInfo->language))
-								$this->captionsInfo [] = $captionInfo;
-							else
-								KalturaLog::err('The attachment ['.$asset->getId().'] has unrecognized language ['.$asset->getTitle().']'); 		    
-						}
-					}
-					break;
+				}
 			}
 		}
 	}
