@@ -90,14 +90,16 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		$assets = array ();
 		$this->captionsInfo = new KalturaCortexApiCaptionDistributionInfoArray();
 		
-		foreach ( $assetIdsArray as $assetId ) {
+		foreach ( $assetIdsArray as $assetId )
+		{
 			$asset = assetPeer::retrieveByIdNoFilter( $assetId );
 			if (!$asset)
 			{
 				KalturaLog::err("Asset [$assetId] not found");
 				continue;
 			}
-			if ($asset->getStatus() == asset::ASSET_STATUS_READY) {
+			if ($asset->getStatus() == asset::ASSET_STATUS_READY)
+			{
 				$assets [] = $asset;
 			}
 			else{
@@ -105,12 +107,14 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 			}
 		}
 
-		foreach ( $assets as $asset ) {
+		foreach ( $assets as $asset )
+		{
 			$assetType = $asset->getType ();
 			if($assetType == CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ))
 			{
 				$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
-				if (kFileSyncUtils::fileSync_exists ( $syncKey )) {
+				if (kFileSyncUtils::fileSync_exists ( $syncKey ))
+				{
 					$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 					if ($captionInfo)
 					{
@@ -175,7 +179,8 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		{
 			$captionInfo->action = KalturaCortexApiDistributionCaptionAction::SUBMIT_ACTION;
 		}
-		elseif ($captionInfo->action != KalturaCortexApiDistributionCaptionAction::UPDATE_ACTION) {
+		elseif ($captionInfo->action != KalturaCortexApiDistributionCaptionAction::UPDATE_ACTION)
+		{
 			return;
 		}
 		return $captionInfo;
