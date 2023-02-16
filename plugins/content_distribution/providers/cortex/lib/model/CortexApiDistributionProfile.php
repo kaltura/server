@@ -69,19 +69,19 @@ class CortexApiDistributionProfile extends ConfigurableDistributionProfile
 	
 	protected function getDefaultFieldConfigArray()
 	{	    
-	    $fieldConfigArray = parent::getDefaultFieldConfigArray();
+		$fieldConfigArray = parent::getDefaultFieldConfigArray();
 		//entry title
-	    $fieldConfig = new DistributionFieldConfig();
-	    $fieldConfig->setFieldName(CortexApiDistributionField::MEDIA_TITLE);
-	    $fieldConfig->setUserFriendlyFieldName('Entry name');
-	    $fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
-	    $fieldConfig->setUpdateOnChange(true);
-	    $fieldConfig->setUpdateParams(array(entryPeer::NAME));
-	    $fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
-	    $fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
+		$fieldConfig = new DistributionFieldConfig();
+		 $fieldConfig->setFieldName(CortexApiDistributionField::MEDIA_TITLE);
+		$fieldConfig->setUserFriendlyFieldName('Entry name');
+		$fieldConfig->setEntryMrssXslt('<xsl:value-of select="string(title)" />');
+		$fieldConfig->setUpdateOnChange(true);
+		$fieldConfig->setUpdateParams(array(entryPeer::NAME));
+		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
+		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 	    
 	    
-	    //entry description
+		//entry description
 		$fieldConfig = new DistributionFieldConfig();
 		$fieldConfig->setFieldName(CortexApiDistributionField::MEDIA_DESCRIPTION);
 		$fieldConfig->setUserFriendlyFieldName('Video description');
@@ -130,7 +130,7 @@ class CortexApiDistributionProfile extends ConfigurableDistributionProfile
 		$fieldConfig->setIsRequired(DistributionFieldRequiredStatus::REQUIRED_BY_PROVIDER);
 		$fieldConfigArray[$fieldConfig->getFieldName()] = $fieldConfig;
 
-	    return $fieldConfigArray;
+		return $fieldConfigArray;
 	}
 
 	public function postInsert(PropelPDO $con = null)
