@@ -18,8 +18,7 @@ class Form_CortexApiProfileConfiguration extends Form_ConfigurableProfileConfigu
 	
 	protected function addProviderElements()
 	{
-	    $this->setDescription(null);
-	    
+	    	$this->setDescription(null);
 		$element = new Zend_Form_Element_Hidden('providerElements');
 		$element->setLabel('Cortex Specific Configuration');
 		$element->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
