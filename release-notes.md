@@ -1,3 +1,17 @@
+# Scorpius-19.3.0
+
+## Add a new distribution profile provider: Cortex ##
+- Issue Type: Story
+- Issue ID: PSVAMB-37604
+
+Enable plugin:
+
+	To enable this feature plugin add the following to your plugins.ini file:
+	- CortexApiDistribution
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
 # Scorpius-19.2.0
 ## Add partners for messaging ##
 
