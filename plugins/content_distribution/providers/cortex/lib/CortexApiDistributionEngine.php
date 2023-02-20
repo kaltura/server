@@ -93,7 +93,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return void
 	 * @throws Exception
 	 */
-	private function updateCustomMetadata(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
+	protected function updateCustomMetadata(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
 		try
 		{
@@ -122,8 +122,15 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		{
 			if($e->getCode() == 'METADATA_ALREADY_EXISTS')
 			{
-				$metadataPlugin->metadata->delete($e->getArgument('ID'));
-				$metadataPlugin->metadata->add($this->getDistributionProfile()->metadataprofileid, KalturaMetadataObjectType::ENTRY, $fieldValues[CortexApiDistributionField::MEDIA_ID], $this->getMetadataXMLByResult($result));
+				try
+				{
+					$metadataPlugin->metadata->delete($e->getArgument('ID'));
+					$metadataPlugin->metadata->add($this->getDistributionProfile()->metadataprofileid, KalturaMetadataObjectType::ENTRY, $fieldValues[CortexApiDistributionField::MEDIA_ID], $this->getMetadataXMLByResult($result));
+				}
+				catch(Exception $exception)
+				{
+					KalturaLog::err("Cant add/delete metadata {$e->getArgument('ID')} (Msg:{$exception->getMessage()})");
+				}
 			}
 		}
 	}
@@ -132,7 +139,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return string[]
 	 * @throws Exception
 	 */
-	private function getMetadataFields(string $entryId)
+	protected function getMetadataFields(string $entryId)
 	{
 		$result = array(self::CORTEX_KALTURA_METADATA_FIELD_PRESENTERS => '', self::CORTEX_KALTURA_METADATA_FIELD_JOB_NUMBER => '');
 		if(empty($this->getDistributionProfile()->metadataprofileidpushing))
@@ -168,14 +175,14 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @param SimpleXMLElement $result
 	 * @return string
 	 */
-	private function getMetadataXMLByResult(SimpleXMLElement $result)
+	protected function getMetadataXMLByResult(SimpleXMLElement $result)
 	{
 		$createdAtField = self::CORTEX_KALTURA_METADATA_FIELD_CREATED_DATE;
 		$idField = self::CORTEX_KALTURA_METADATA_FIELD_ID;
 		$recordIdField = self::CORTEX_KALTURA_METADATA_FIELD_RECORD_ID;
 		$createdAtValue = $result->{"CoreField.CreateDate"} ?? '';
 		$idValue = $result->{"CoreField.Unique-identifier"} ?? '';
-		$recordId = $result->{"RecordID"} ??  '';
+		$recordId = !empty($result->{"RecordID"}) ? $result->{"RecordID"} : '';
 		$url = $this->getDistributionProfile()->host.'/'.str_replace('[RECORD_ID]', $recordId, self::CORTEX_URL_ASSET_FIELD_VALUE);
 		$recordValue = $recordId ? $url : '';
 		return "<metadata><$idField>$idValue</$idField><$createdAtField>$createdAtValue</$createdAtField><$recordIdField>$recordValue</$recordIdField></metadata>";
@@ -184,7 +191,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return SimpleXMLElement
 	 * @throws Exception
 	 */
-	private function getMetadataFromCortex()
+	protected function getMetadataFromCortex()
 	{
 		$params = array(
 			'CoreField.unique-identifier' => $this->getCortexSystemId()
@@ -195,7 +202,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return void
 	 * @throws Exception
 	 */
-	private function authorizeCortexAccount()
+	protected function authorizeCortexAccount()
 	{
 		$params = array(
 			'Login' => $this->getDistributionProfile()->username,
@@ -219,7 +226,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return SimpleXMLElement|string
 	 * @throws Exception
 	 */
-	private function requestCortex(array $params, string $apiName, bool $post = false, int $httpSuccessCode = 200, array $headers = array(), bool $xmlResponse = true)
+	protected function requestCortex(array $params, string $apiName, bool $post = false, int $httpSuccessCode = 200, array $headers = array(), bool $xmlResponse = true)
 	{
 		$data = array(
 			'params' => $params,
@@ -272,7 +279,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return string
 	 * @throws Exception
 	 */
-	private function authorizeCortexAccountWithCookie()
+	protected function authorizeCortexAccountWithCookie()
 	{
 		$params = array(
 			'Login' => $this->getDistributionProfile()->username,
@@ -315,7 +322,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return SimpleXMLElement
 	 * @throws Exception
 	 */
-	private function getResponseFromXml(SimpleXMLElement $xmlLoad)
+	protected function getResponseFromXml(SimpleXMLElement $xmlLoad)
 	{
 		if(isset($xmlLoad->APIResponse->Code))
 		{
@@ -339,13 +346,27 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		{
 			$this->throwError("Cortex Response unrecognized");
 		}
-		return $xmlLoad->APIResponse ?? ($xmlLoad->Response->RecordsAffected->Result ?? $xmlLoad->Response->Record);
+		if(isset($xmlLoad->APIResponse))
+		{
+			return $xmlLoad->APIResponse;
+		}
+		else
+		{
+			if(isset($xmlLoad->Response->RecordsAffected->Result))
+			{
+				return $xmlLoad->Response->RecordsAffected->Result;
+			}
+			else
+			{
+				return $xmlLoad->Response->Record;
+			}
+		}
 	}
 	/**
 	 * @param string $errorMessage
 	 * @throws Exception
 	 */
-	private function throwError(string $errorMessage)
+	protected function throwError(string $errorMessage)
 	{
 		KalturaLog::err($errorMessage);
 		throw new Exception($errorMessage);
@@ -355,7 +376,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return void
 	 * @throws Exception
 	 */
-	private function submitMetadata(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
+	protected function submitMetadata(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
 		try
 		{
@@ -374,14 +395,15 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$result = $this->requestCortex($metadata, self::CORTEX_API_SEND_METADATA);
 			$this->setRecordId($result->RecordID ?? '');
 		}
-		catch(Exception $e){}
+		catch(Exception $e)
+		{}
 	}
 	/**
 	 * @param KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData
 	 * @return bool
 	 * @throws Exception
 	 */
-	private function uploadVideo(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
+	protected function uploadVideo(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
 		try
 		{
@@ -399,7 +421,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @param string $thumbAssetFilePath
 	 * @throws Exception
 	 */
-	private function uploadThumbnail($thumbAssetFilePath)
+	protected function uploadThumbnail($thumbAssetFilePath)
 	{
 		try
 		{
@@ -421,7 +443,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return string
 	 * @throws Exception
 	 */
-	private function mediaUpload(string $assetFilePath)
+	protected function mediaUpload(string $assetFilePath)
 	{
 		$cFile = curl_file_create($assetFilePath);
 		$fileDetails = array(
@@ -443,7 +465,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return void
 	 * @throws Exception
 	 */
-	private function uploadCaption(KalturaCortexApiCaptionDistributionInfo $captionInfo)
+	protected function uploadCaption(KalturaCortexApiCaptionDistributionInfo $captionInfo)
 	{
 		if(empty($this->getRecordId()))
 		{
@@ -479,14 +501,15 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$cookiesStr = $this->authorizeCortexAccountWithCookie();
 			$this->requestCortex($params, self::CORTEX_API_UPLOAD_CAPTIONS.'/'.$this->getRecordId(), true, 200, array('Content-Type: application/json', 'Cookie: '.$cookiesStr), false);
 		}
-		catch(Exception $e){}
+		catch(Exception $e)
+		{}
 
 	}
 
 	/**
 	 * @return string
 	 */
-	private function getToken()
+	protected function getToken()
 	{
 		return $this->token;
 	}
@@ -494,7 +517,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	/**
 	 * @param string $token
 	 */
-	private function setToken(string $token)
+	protected function setToken(string $token)
 	{
 		$this->token = $token;
 	}
@@ -502,7 +525,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	/**
 	 * @return KalturaCortexApiDistributionProfile
 	 */
-	private function getDistributionProfile()
+	protected function getDistributionProfile()
 	{
 		return $this->distributionProfile;
 	}
@@ -510,7 +533,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	/**
 	 * @param KalturaCortexApiDistributionProfile $distributionProfile
 	 */
-	private function setDistributionProfile(KalturaCortexApiDistributionProfile $distributionProfile)
+	protected function setDistributionProfile(KalturaCortexApiDistributionProfile $distributionProfile)
 	{
 		$this->distributionProfile = $distributionProfile;
 	}
@@ -518,7 +541,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	/**
 	 * @return string
 	 */
-	private function getCortexSystemId()
+	protected function getCortexSystemId()
 	{
 		return $this->cortexSystemId;
 	}
@@ -526,7 +549,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	/**
 	 * @param string $cortexSystemId
 	 */
-	private function setCortexSystemId(string $cortexSystemId)
+	protected function setCortexSystemId(string $cortexSystemId)
 	{
 		$this->cortexSystemId = $cortexSystemId;
 	}
@@ -534,7 +557,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	/**
 	 * @return string
 	 */
-	private function getRecordId()
+	protected function getRecordId()
 	{
 		return $this->recordId;
 	}
@@ -542,7 +565,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	/**
 	 * @param string $recordId
 	 */
-	private function setRecordId(string $recordId)
+	protected function setRecordId(string $recordId)
 	{
 		$this->recordId = $recordId;
 	}

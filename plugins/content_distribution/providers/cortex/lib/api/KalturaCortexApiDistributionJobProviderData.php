@@ -79,7 +79,7 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
 	
-	private function addCaptionsData(KalturaDistributionJobData $distributionJobData)
+	protected function addCaptionsData(KalturaDistributionJobData $distributionJobData)
 	{
 		/* @var $mediaFile KalturaDistributionRemoteMediaFile */
 		$assetIdsArray = explode ( ',', $distributionJobData->entryDistribution->assetIds );
@@ -132,7 +132,7 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		}
 	}
 	
-	private function getLanguageCode($language = null)
+	protected function getLanguageCode($language = null)
 	{
 		$languageReflector = KalturaTypeReflectorCacher::get('KalturaLanguage');
 		$languageCodeReflector = KalturaTypeReflectorCacher::get('KalturaLanguageCode');
@@ -153,7 +153,7 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 	 * @param KalturaDistributionJobData $distributionJobData
 	 * @return KalturaCortexApiCaptionDistributionInfo|void
 	 */
-	private function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData)
+	protected function getCaptionInfo($asset, $syncKey, KalturaDistributionJobData $distributionJobData)
 	{
 		$captionInfo = new KalturaCortexApiCaptionDistributionInfo ();
 		$fileSync = kFileSyncUtils::getResolveLocalFileSyncForKey($syncKey);
