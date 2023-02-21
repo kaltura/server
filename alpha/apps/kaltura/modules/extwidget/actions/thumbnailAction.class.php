@@ -502,6 +502,9 @@ class thumbnailAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::ENTRY_DELETED_MODERATED);
 		}
 
+		//Calculate last modified before resizing thumb to avoid re-establishing closed connection
+		$lastModified = $this->getLastModified($entry, $isCapturing);
+
 		if (!$tempThumbPath)
 		{
 			try
@@ -576,9 +579,6 @@ class thumbnailAction extends sfAction
 				
 			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
 		}
-
-
-		$lastModified = $this->getLastModified($entry, $isCapturing);
 
 		$entryKey = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
 		$entryIv = $entryKey ? $entry->getEncryptionIv() : null;

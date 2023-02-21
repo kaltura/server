@@ -39,6 +39,7 @@ class kReportExportGraphEngine extends kReportExportEngine
 
 	protected function buildCsv($result)
 	{
+		fwrite($this->fp, "\xEF\xBB\xBF");
 		$this->writeReportTitle();
 		$graphType = $this->getGraphType();
 		switch ($graphType)

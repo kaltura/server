@@ -17,6 +17,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_REACH_USAGE = 'reach-usage';
 	const DATASOURCE_API_USAGE = 'api-usage';
 	const DATASOURCE_VE_REGISTRATION = 'virtual-events-registration';
+	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -171,6 +172,7 @@ class kKavaBase extends kDruidBase
 
 	// source type
 	const SOURCE_INTERACTIVE_VIDEO = 'Interactive Video';
+	const SOURCE_MEETING = 'Kaltura Meeting';
 
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
@@ -410,6 +412,24 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_ORIGIN => 1,
+		),
+		self::DATASOURCE_MEETING_HISTORICAL => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_USER_ENGAGEMENT => 1,
 		),
 	);
 

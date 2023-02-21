@@ -3424,8 +3424,8 @@ class kFlowHelper
 		$partner = PartnerPeer::retrieveByPK ($partner_id);
 		$secret = $partner->getSecret ();
 		$privilege = ks::PRIVILEGE_DOWNLOAD . ":" . $file_name;
-		//ks will expire after 3 hours
-		$expiry = 10800;
+		//ks will expire after 24 hours
+		$expiry = 86400;
 		$result = kSessionUtils::startKSession($partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege);
 
 		if ($result < 0)

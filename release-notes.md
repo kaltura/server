@@ -1,3 +1,54 @@
+# Scorpius-19.3.0
+
+## Add a new distribution profile provider: Cortex ##
+- Issue Type: Story
+- Issue ID: PSVAMB-37604
+
+Enable plugin:
+
+	To enable this feature plugin add the following to your plugins.ini file:
+	- CortexApiDistribution
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Enable Certifications Checkbox
+* Issue Type: Task
+* Issue ID: PLAT-24162
+
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.certifications.enabled = true
+moduls.certifications.permissionType = 2
+moduls.certifications.label = "Enable Certifications"
+moduls.certifications.permissionName = FEATURE_CERTIFICATIONS
+moduls.certifications.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Scorpius-19.2.0
+## Add partners for messaging ##
+
+- Issue Type: Feature
+- Issue ID: FOUN-892
+
+### Configuration ###
+    Replace all tokens from the ini file (under 'messaing') and remove".template" from the file name: 
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_02_01_add_messaging_partner_and_permissions.php
+
+
+## Add metadata list permission for game service partner
+* Issue type: Feature
+* Issue Id: PLAT-24146
+### Deployment ###
+run the following script:
+```
+php deployment/updates/scripts/add_permissions/2023_02_05_update_metadata_permission.php
+```
+
 # Scorpius-19.1.0
 ## Add baseEntry get permission for game service partner
 * Issue type: Feature

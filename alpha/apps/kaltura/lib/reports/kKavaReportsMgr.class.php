@@ -27,6 +27,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_FLAVOR_SWITCHES = 'flavorSwitches';
 	const METRIC_SEGMENT_DOWNLOAD_TIME_SUM = 'segmentDownloadTimeSum';
 	const METRIC_MANIFEST_DOWNLOAD_TIME_SUM = 'manifestDownloadTimeSum';
+	const METRIC_VIEW_TIME_SUM = 'viewTimeSum';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -67,6 +68,10 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DURATION_ADDED_MSEC = 'added_msecs';
 	const METRIC_DURATION_DELETED_MSEC = 'deleted_msecs';
 	const METRIC_DURATION_TOTAL_MSEC = 'total_msecs';
+	const METRIC_MEETING_RECORDING_MSECS_ADDED = 'added_meeting_recording_msecs';
+	const METRIC_MEETING_RECORDING_MSECS_DELETED = 'deleted_meeting_recording_msecs';
+	const METRIC_MEETING_RECORDING_MSECS_TOTAL = 'total_meeting_recording_msecs';
+	const METRIC_MEETING_RECORDING_HOURS_ADDED = 'added_meeting_recording_hours';
 	const METRIC_BUFFER_TIME_RATIO = 'avg_buffer_time';
 	const METRIC_LIVE_BUFFER_TIME_RATIO = 'avg_live_buffer_time';
 	const METRIC_AVG_BITRATE = 'avg_bitrate';
@@ -120,6 +125,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_TRANSCODING_USER_CPU_SEC = 'transcoding_user_cpu_sec';
 	const METRIC_REACH_DURATION_SEC = 'reach_duration_sec';
 	const METRIC_REACH_DURATION = 'reach_duration';
+	const METRIC_MEETING_VIEW_TIME = 'meeting_view_time';
+
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -137,6 +144,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_LIVE_VIEW_PERIOD_BUFFER_TIME_SEC = 'live_view_period_buffer_time';
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
 	const METRIC_TOTAL_JOBS = 'total_jobs';
+	const METRIC_MEETING_VIEW_TIME_SEC = 'meeting_view_time_sec';
 
 
 	// non druid metrics
@@ -157,6 +165,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVERAGE_DURATION_MSEC = 'average_msecs';
 	const METRIC_LATEST_DURATION_MSEC = 'latest_msecs';
 	const METRIC_CONTRIBUTOR_RANKING = 'contributor_ranking';
+	const METRIC_COMBINED_LIVE_VIEW_TIME = 'combined_live_view_time';
 	
 	// player-events-realtime specific metrics
 	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
@@ -779,6 +788,8 @@ class kKavaReportsMgr extends kKavaBase
 			array(self::METRIC_COUNT, self::METRIC_ENTRIES_TOTAL, self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, null),
 			array(self::METRIC_COUNT, self::METRIC_INTERACTIVE_VIDEOS_TOTAL, self::METRIC_INTERACTIVE_VIDEOS_ADDED, self::METRIC_INTERACTIVE_VIDEOS_DELETED,
 				self::getSelectorFilter(self::DIMENSION_SOURCE_TYPE, self::SOURCE_INTERACTIVE_VIDEO)),
+			array(self::METRIC_DURATION_SEC, self::METRIC_MEETING_RECORDING_MSECS_TOTAL, self::METRIC_MEETING_RECORDING_MSECS_ADDED, self::METRIC_MEETING_RECORDING_MSECS_DELETED,
+				self::getSelectorFilter(self::DIMENSION_SOURCE_TYPE, self::SOURCE_MEETING)),
 			array(self::METRIC_COUNT, self::METRIC_USERS_TOTAL, self::METRIC_USERS_ADDED, self::METRIC_USERS_DELETED, null),
 		);
 
@@ -1185,6 +1196,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_REACH_DURATION_SEC] = self::getLongSumAggregator(
 				self::METRIC_REACH_DURATION_SEC, self::METRIC_DURATION_SEC);
 
+		self::$aggregations_def[self::METRIC_MEETING_VIEW_TIME_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getLongSumAggregator(self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1278,6 +1293,11 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_REACH_DURATION_SEC),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_REACH_DURATION, self::METRIC_REACH_DURATION_SEC, '60'));
+
+		self::$metrics_def[self::METRIC_MEETING_RECORDING_HOURS_ADDED] = array(
+			self::DRUID_AGGR => array(self::METRIC_MEETING_RECORDING_MSECS_ADDED),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_MEETING_RECORDING_HOURS_ADDED, self::METRIC_MEETING_RECORDING_MSECS_ADDED, '3600000'));
 
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
@@ -1546,6 +1566,11 @@ class kKavaReportsMgr extends kKavaBase
 						self::getFieldAccessPostAggregator(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC),
 						self::getFieldAccessPostAggregator(self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC))),
 					self::getFieldAccessPostAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC))));
+
+		self::$metrics_def[self::METRIC_MEETING_VIEW_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_MEETING_VIEW_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_MEETING_VIEW_TIME, self::METRIC_MEETING_VIEW_TIME_SEC, '60'));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 	}
@@ -3865,6 +3890,25 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
+	protected static function addCombinedLiveViewTimeGraph(&$result, $dates)
+	{
+		if (!$dates)
+		{
+			$result[self::METRIC_COMBINED_LIVE_VIEW_TIME] = array(
+				reset($result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME]) +
+				reset($result[self::METRIC_MEETING_VIEW_TIME]));
+
+			return;
+		}
+
+		foreach ($dates as $date)
+		{
+			$result[self::METRIC_COMBINED_LIVE_VIEW_TIME][$date] =
+				$result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME][$date] +
+				$result[self::METRIC_MEETING_VIEW_TIME][$date];
+		}
+	}
+
 	/// table enrich functions
 	protected static function getEntriesNames($ids, $partner_id)
 	{
@@ -4510,6 +4554,85 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			$result[$id] = $output;
 		}
+		return $result;
+	}
+
+	protected static function getAppGuidByEventId($partner_id, $virtual_event_id)
+	{
+		$filter = array('appCustomIdIn' => array($virtual_event_id));
+		$service = new MicroServiceAppRegistry();
+		$result = $service->list($partner_id, $filter);
+		$app_ids = array();
+		foreach ($result->objects as $app)
+		{
+			$app_ids[] = $app->id;
+		}
+		return $app_ids;
+	}
+
+	protected static function getUserProfileData($partner_id, $app_guid, $puser_ids)
+	{
+		$filter = array('appGuidIn' => $app_guid,
+						'userIdIn' => $puser_ids);
+		$service = new MicroServiceUserProfile();
+		$result = $service->list($partner_id, $filter);
+		return $result->objects;
+	}
+	protected static function getUsersInfoFromUserProfile($ids, $partner_id, $context)
+	{
+		$enriched_info_fields = $context['info_fields'];
+		$virtual_event_id = $context['virtual_event_id'];
+
+		$app_guid = self::getAppGuidByEventId($partner_id, $virtual_event_id);
+		$result = array();
+		$kuser_context = array();
+		$kuser_context['peer'] = 'kuserPeer';
+		$kuser_context['columns'][] = 'PUSER_ID';
+
+		$rows = self::genericQueryEnrich($ids, $partner_id, $kuser_context);
+		$pusers_to_kusers = array();
+		foreach ($rows as $id => $columns)
+		{
+			if (!is_array($columns)) {
+				$result[$id] = $id;
+				continue;
+			}
+			$puser = array_shift($columns);
+			$result[$id] = $puser;
+			$pusers_to_kusers[$puser] = $id;
+		}
+
+		$user_profiles = self::getUserProfileData($partner_id, $app_guid, array_keys($pusers_to_kusers));
+		foreach ($user_profiles as $user_profile)
+		{
+			$puser_id = $user_profile->userId;
+			$output = array();
+			$output[] = $puser_id;
+			foreach ($enriched_info_fields as $enriched_info_field) {
+				$field_path = explode(".", $enriched_info_field);
+				$curr_obj = $user_profile;
+				$value = '';
+				foreach ($field_path as $key)
+				{
+					$value = $curr_obj->$key ?? '';
+					if (is_object($value))
+					{
+						$curr_obj = $curr_obj->$key;
+					}
+					else
+					{
+						break;
+					}
+				}
+				$output[] = $value;
+			}
+			$kuser_id = $pusers_to_kusers[$puser_id];
+			if (isset($kuser_id))
+			{
+				$result[$kuser_id] = $output;
+			}
+		}
+
 		return $result;
 	}
 
@@ -5941,6 +6064,23 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($result[1] as &$row)
 		{
 			$row[] = $row[$bandwidth] + $row[$storage]; 
+		}
+	}
+
+	protected static function addCombinedLiveViewTimeColumn(&$result, $input_filter)
+	{
+		$headers = $result[0];
+		$player_live_time = array_search(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, $headers);
+		$meeting_live_time = array_search(self::METRIC_MEETING_VIEW_TIME, $headers);
+		if ($player_live_time === false || $meeting_live_time === false)
+		{
+			return;
+		}
+
+		$result[0][] = self::METRIC_COMBINED_LIVE_VIEW_TIME;
+		foreach ($result[1] as &$row)
+		{
+			$row[] = $row[$player_live_time] + $row[$meeting_live_time];
 		}
 	}
 

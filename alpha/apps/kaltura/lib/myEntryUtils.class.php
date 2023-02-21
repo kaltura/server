@@ -712,7 +712,7 @@ class myEntryUtils
 			$processingThumbPath = kFile::replaceExt($processingThumbPath, $format);
 		}
 
-		KalturaLog::debug("Path for saving capture thumbnail is [$finalThumbPath]");
+		KalturaLog::debug("Path for saving thumbnail is [$finalThumbPath]");
 		if(kFile::checkFileExists($finalThumbPath) && @kFile::fileSize($finalThumbPath))
 		{
 			header(self::CACHED_THUMB_EXISTS_HEADER . md5($finalThumbPath));
@@ -748,13 +748,12 @@ class myEntryUtils
 
 		if ($captureRequest)
 		{
-			KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
-			$captureFlavorAsset = self::getFlavorAssetForLocalCapture($entity);
-			if (is_null($captureFlavorAsset))
+			$captureFlavorAsset = self::getFlavorAssetForLocalCapture($entity, true);
+			if (!is_null($captureFlavorAsset))
 			{
-				KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
+				KalturaLog::debug("Capture thumbnail request, updating the path for saving thumbnail");
+				list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbNameAttributes, $entity->getCacheFlavorVersion() . ".jpg", $format, $entity->getCacheFlavorVersion(), $thumbDirs, $contentPath, false, $processingThumbPath);
 			}
-			list ($finalThumbPath, $processingThumbPath) = self::createThumbPaths($captureFlavorAsset, $thumbNameAttributes, $entity->getCacheFlavorVersion() . ".jpg", $format, $entity->getCacheFlavorVersion(), $thumbDirs, $contentPath, false, $processingThumbPath);
 		}
 
 		return array($finalThumbPath, $processingThumbPath);
@@ -902,9 +901,6 @@ class myEntryUtils
 		if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
 			trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
 			KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
-								    
-		$flavorAssetId = null;
-		$packagerRetries = 3;
 
 		if ($entry->getType() == entryType::PLAYLIST)
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
@@ -921,12 +917,15 @@ class myEntryUtils
 			$start_sec = 0;
 		}
 
-		$last_calc_vid_sec = $w = $h = $calc_vid_sec = null;
+		$packagerRetries = 3;
+		$shouldServeVodFromLive = myEntryUtils::shouldServeVodFromLive($entry);
+		$flavorAssetId = $forceRotation = $last_calc_vid_sec = $w = $h = $calc_vid_sec = null;
+		$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
+		$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
+		list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 		while($count--)
 		{
 			$thumbCaptureByPackager = false;
-			$params = array($density, $quality, $src_x, $src_y, $src_w, $src_h, $stripProfiles);
-			$shouldResizeByPackager = KThumbnailCapture::shouldResizeByPackager($params, $type, array($width, $height));
 			if (
 				// need to create a thumb if either:
 				// 1. entry is a video and a specific second was requested OR a slices were requested
@@ -986,9 +985,8 @@ class myEntryUtils
 					$success = false;
 					if( ($multi || $servingVODfromLive || $isStaticPlaylist) && $packagerRetries)
 					{
-						list($picWidth, $picHeight) = $shouldResizeByPackager ? array($width, $height) : array(null, null);
 						$destPath = $shouldResizeByPackager ? $capturedThumbPath . uniqid() : $capturedThumbPath;
-						$success = myPackagerUtils::captureThumb($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight, floor(65500 / $vid_slices));
+						$success = myPackagerUtils::captureThumb($entry, $destPath, $calc_vid_sec, $flavorAssetId, $picWidth, $picHeight, floor(65500 / $vid_slices), $shouldServeVodFromLive);
 						$packagerResizeFullPath = $destPath . self::TEMP_FILE_POSTFIX;
 						KalturaLog::debug("Packager capture is [$success] with dimension [$picWidth,$picHeight] and packagerResize [$shouldResizeByPackager] in path [$packagerResizeFullPath]");
 						if(!$success)
@@ -1026,7 +1024,10 @@ class myEntryUtils
 				}
 			}
 
-			$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+			if(is_null($forceRotation))
+			{
+				$forceRotation = ($vid_slices > -1) ? self::getRotate($flavorAssetId) : 0;
+			}
 			// close db connections as we won't be requiring the database anymore and image manipulation may take a long time
 			kFile::closeDbConnections();
 
@@ -1074,7 +1075,7 @@ class myEntryUtils
 			}
 			
 			// die if resize operation failed
-			if ($convertedImagePath === null || !@filesize($convertedImagePath)) {
+			if ($convertedImagePath === null || !@kFile::fileSize($convertedImagePath)) {
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 			}
 			
@@ -1090,7 +1091,7 @@ class myEntryUtils
 				++$vid_slice;
 			}
 
-			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi && file_exists($packagerResizeFullPath))
+			if ($thumbCaptureByPackager && $shouldResizeByPackager && $multi && kFile::checkFileExists($packagerResizeFullPath))
 			{
 				unlink($packagerResizeFullPath);
 			}
@@ -1098,7 +1099,7 @@ class myEntryUtils
 			if ($isEncryptionNeeded)
 			{
 				$fileSync->deleteTempClear();
-				if (self::isTempFile($orig_image_path) && file_exists($orig_image_path))
+				if (self::isTempFile($orig_image_path) && kFile::checkFileExists($orig_image_path))
 				{
 					unlink($orig_image_path);
 				}
@@ -1170,7 +1171,7 @@ class myEntryUtils
 	 * @return flavorAsset
 	 * @throws PropelException
 	 */
-	public static function getFlavorAssetForLocalCapture($entry)
+	public static function getFlavorAssetForLocalCapture($entry, $allowNull = false)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset))
@@ -1199,7 +1200,7 @@ class myEntryUtils
 			}
 		}
 
-		if (is_null($flavorAsset))
+		if (is_null($flavorAsset) && !$allowNull)
 		{
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		}
