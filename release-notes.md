@@ -12,6 +12,20 @@ Enable plugin:
 ### Deployment Scripts ###
     php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
+## Enable Certifications Checkbox
+* Issue Type: Task
+* Issue ID: PLAT-24162
+
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.certifications.enabled = true
+moduls.certifications.permissionType = 2
+moduls.certifications.label = "Enable Certifications"
+moduls.certifications.permissionName = FEATURE_CERTIFICATIONS
+moduls.certifications.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Scorpius-19.2.0
 ## Add partners for messaging ##
 
