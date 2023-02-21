@@ -227,7 +227,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		
 		$front->registerPlugin(new Infra_AuthPlugin());
 		$front->registerPlugin(new Infra_PreventFramesPlugin());
-		
+		$front->registerPlugin(new Infra_RequestFilterPlugin());		
 		$acl = Zend_Registry::get('acl');
 		$config = $this->getConfig();
 		$front->registerPlugin(new Infra_ControllerPluginAcl($acl, Infra_AclHelper::getCurrentRole()));
