@@ -113,7 +113,7 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 			if($assetType == CaptionPlugin::getAssetTypeCoreValue ( CaptionAssetType::CAPTION ))
 			{
 				$syncKey = $asset->getSyncKey ( asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET );
-				if (kFileSyncUtils::fileSync_exists ( $syncKey ))
+				if (kFileSyncUtils::fileSync_exists ( $syncKey ) && $asset->getStatus() == KalturaCaptionAssetStatus::READY)
 				{
 					$captionInfo = $this->getCaptionInfo($asset, $syncKey, $distributionJobData);
 					if ($captionInfo)
