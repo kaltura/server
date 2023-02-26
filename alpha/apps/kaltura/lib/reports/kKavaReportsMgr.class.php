@@ -2977,17 +2977,19 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	protected static function getGranularityDef($granularity, $input_filter)
+	protected static function getGranularityDef($granularity, $input_filter, $intervals)
 	{
 		if ($granularity != self::GRANULARITY_DYNAMIC && !isset(self::$granularity_mapping[$granularity]))
 		{
 			return self::DRUID_GRANULARITY_ALL;
 		}
 
+		list($fromTime, $toTime) = explode("/", reset($intervals));
 		$granularity_def = array(
 			self::DRUID_TYPE => self::DRUID_GRANULARITY_PERIOD,
 			self::DRUID_GRANULARITY_PERIOD => self::getGranularityPeriodFromFilter($granularity, $input_filter),
-			self::DRUID_TIMEZONE => self::getDruidTimezoneName($input_filter->timeZoneOffset)
+			self::DRUID_TIMEZONE => self::getDruidTimezoneName($input_filter->timeZoneOffset),
+			self::DRUID_ORIGIN => $fromTime
 		);
 		return $granularity_def;
 	}
@@ -3200,7 +3202,7 @@ class kKavaReportsMgr extends kKavaBase
 			break;
 		}
 		
-		$granularity_def = self::getGranularityDef($granularity, $input_filter);
+		$granularity_def = self::getGranularityDef($granularity, $input_filter, $intervals);
 
 		// run the query
 		switch ($graph_type)
@@ -5213,7 +5215,7 @@ class kKavaReportsMgr extends kKavaBase
 			if (is_array($dimension) && in_array(self::DIMENSION_TIME, $dimension))
 			{
 				$granularity = $report_def[self::REPORT_GRANULARITY];
-				$granularity_def = self::getGranularityDef($granularity, $input_filter);
+				$granularity_def = self::getGranularityDef($granularity, $input_filter, $intervals);
 
 				// remove the time dimension from the list
 				$timeKey = array_search(self::DIMENSION_TIME, $dimension);
@@ -5311,7 +5313,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else
 		{
-			$granularity_def = $granularity == self::GRANULARITY_DYNAMIC ? self::getGranularityDef($granularity, $input_filter) : null;
+			$granularity_def = $granularity == self::GRANULARITY_DYNAMIC ? self::getGranularityDef($granularity, $input_filter, $intervals) : null;
 			$query = self::getTopReport($data_source, $partner_id, $intervals, $metrics, 
 				$dimension, $druid_filter, $order_by, $order_by_dir, $threshold, null, $granularity_def);
 		}
