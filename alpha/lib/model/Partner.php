@@ -2003,6 +2003,10 @@ class Partner extends BasePartner
 	public function setCdnHostWhiteList($whiteListRegEx)
 	{
 		$whiteListArr = explode(',', rtrim($whiteListRegEx, ','));
+		$whiteListArr = array_filter($whiteListArr, 'trim');
+		if(!count($whiteListArr)) {
+			return;
+		}
 		$this->putInCustomData(self::CDN_HOST_WHITE_LIST, serialize($whiteListArr));
 	}
 
