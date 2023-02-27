@@ -68,9 +68,9 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DURATION_ADDED_MSEC = 'added_msecs';
 	const METRIC_DURATION_DELETED_MSEC = 'deleted_msecs';
 	const METRIC_DURATION_TOTAL_MSEC = 'total_msecs';
-	const METRIC_MEETING_RECORDING_MSECS_ADDED = 'added_meeting_recording_msecs';
-	const METRIC_MEETING_RECORDING_MSECS_DELETED = 'deleted_meeting_recording_msecs';
-	const METRIC_MEETING_RECORDING_MSECS_TOTAL = 'total_meeting_recording_msecs';
+	const METRIC_MEETING_RECORDING_SECS_ADDED = 'added_meeting_recording_secs';
+	const METRIC_MEETING_RECORDING_SECS_DELETED = 'deleted_meeting_recording_secs';
+	const METRIC_MEETING_RECORDING_SECS_TOTAL = 'total_meeting_recording_secs';
 	const METRIC_MEETING_RECORDING_HOURS_ADDED = 'added_meeting_recording_hours';
 	const METRIC_BUFFER_TIME_RATIO = 'avg_buffer_time';
 	const METRIC_LIVE_BUFFER_TIME_RATIO = 'avg_live_buffer_time';
@@ -788,7 +788,7 @@ class kKavaReportsMgr extends kKavaBase
 			array(self::METRIC_COUNT, self::METRIC_ENTRIES_TOTAL, self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED, null),
 			array(self::METRIC_COUNT, self::METRIC_INTERACTIVE_VIDEOS_TOTAL, self::METRIC_INTERACTIVE_VIDEOS_ADDED, self::METRIC_INTERACTIVE_VIDEOS_DELETED,
 				self::getSelectorFilter(self::DIMENSION_SOURCE_TYPE, self::SOURCE_INTERACTIVE_VIDEO)),
-			array(self::METRIC_DURATION_SEC, self::METRIC_MEETING_RECORDING_MSECS_TOTAL, self::METRIC_MEETING_RECORDING_MSECS_ADDED, self::METRIC_MEETING_RECORDING_MSECS_DELETED,
+			array(self::METRIC_DURATION_SEC, self::METRIC_MEETING_RECORDING_SECS_TOTAL, self::METRIC_MEETING_RECORDING_SECS_ADDED, self::METRIC_MEETING_RECORDING_SECS_DELETED,
 				self::getSelectorFilter(self::DIMENSION_SOURCE_TYPE, self::SOURCE_MEETING)),
 			array(self::METRIC_COUNT, self::METRIC_USERS_TOTAL, self::METRIC_USERS_ADDED, self::METRIC_USERS_DELETED, null),
 		);
@@ -1295,9 +1295,9 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_REACH_DURATION, self::METRIC_REACH_DURATION_SEC, '60'));
 
 		self::$metrics_def[self::METRIC_MEETING_RECORDING_HOURS_ADDED] = array(
-			self::DRUID_AGGR => array(self::METRIC_MEETING_RECORDING_MSECS_ADDED),
+			self::DRUID_AGGR => array(self::METRIC_MEETING_RECORDING_SECS_ADDED),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
-				self::METRIC_MEETING_RECORDING_HOURS_ADDED, self::METRIC_MEETING_RECORDING_MSECS_ADDED, '3600000'));
+				self::METRIC_MEETING_RECORDING_HOURS_ADDED, self::METRIC_MEETING_RECORDING_SECS_ADDED, '3600'));
 
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
@@ -4280,6 +4280,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getEntriesCategories($ids, $partner_id, $context)
 	{
+		$delimiter = isset($context['delimiter']) ? $context['delimiter'] : ",";
 		// get the category ids of the entries
 		$c = KalturaCriteria::create(categoryEntryPeer::OM_CLASS);
 
@@ -4350,7 +4351,7 @@ class kKavaReportsMgr extends kKavaBase
 			
 			$result[$entry_id] = array(
 				'"' . str_replace('"', '""', implode(',', $categories_ids)) . '"', 
-				'"' . str_replace('"', '""', implode(',', $names)) . '"',
+				'"' . str_replace('"', '""', implode($delimiter, $names)) . '"',
 			);
 		}
 		

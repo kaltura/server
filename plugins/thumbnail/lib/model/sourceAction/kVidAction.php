@@ -91,7 +91,8 @@ abstract class kVidAction extends kSourceAction
 	 */
 	protected function captureThumb($entry, $destPath, $second)
 	{
-		$success = myPackagerUtils::captureThumb($entry, $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight);
+		$shouldServeVodFromLive = myEntryUtils::shouldServeVodFromLive($entry);
+		$success = myPackagerUtils::captureThumb($entry, $destPath, $second, $flavorAssetId, $this->newWidth, $this->newHeight, null, $shouldServeVodFromLive);
 		if(!$success)
 		{
 			if ($entry->getType() == entryType::PLAYLIST)

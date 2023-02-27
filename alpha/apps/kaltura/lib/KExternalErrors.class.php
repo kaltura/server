@@ -203,6 +203,7 @@ class KExternalErrors
 
 		if (class_exists('KalturaMonitorClient'))
 		{
+			KalturaMonitorClient::monitorRequestEnd();
 			KalturaMonitorClient::monitorApiEnd($errorCode);
 		}
 	}

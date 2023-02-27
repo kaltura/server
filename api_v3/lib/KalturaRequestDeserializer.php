@@ -418,6 +418,8 @@ class KalturaRequestDeserializer
 				$obj->$name = $arrayObj;
 				if ($type == 'KalturaMultiLingualStringArray' && !is_array($value))
 				{
+					if(!kXml::isXMLValidContent($value))
+						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
 					$this->generateMultiLingualStringFromString($obj, $name, $value);
 				}
 				continue;

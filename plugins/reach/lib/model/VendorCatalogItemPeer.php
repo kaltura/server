@@ -19,6 +19,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const TRANSLATION_OM_CLASS = 'VendorTranslationCatalogItem';
 	const ALIGNMENT_OM_CLASS = 'VendorAlignmentCatalogItem';
 	const AUDIO_DESCRIPTION_OM_CLASS = 'VendorAudioDescriptionCatalogItem';
+	const EXTENDED_AUDIO_DESCRIPTION_OM_CLASS = 'VendorExtendedAudioDescriptionCatalogItem';
 	const CHAPTERING_OM_CLASS = 'VendorChapteringCatalogItem';
 	const DUBBING_OM_CLASS = 'VendorDubbingCatalogItem';
 	const INTELLIGENT_TAGGING_OM_CLASS = 'VendorIntelligentTaggingCatalogItem';
@@ -30,6 +31,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::CAPTIONS => self::CAPTIONS_OM_CLASS,
 		VendorServiceFeature::ALIGNMENT => self::ALIGNMENT_OM_CLASS,
 		VendorServiceFeature::AUDIO_DESCRIPTION => self::AUDIO_DESCRIPTION_OM_CLASS,
+		VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION => self::EXTENDED_AUDIO_DESCRIPTION_OM_CLASS,
 		VendorServiceFeature::CHAPTERING => self::CHAPTERING_OM_CLASS,
 		VendorServiceFeature::DUBBING => self::DUBBING_OM_CLASS,
 		VendorServiceFeature::INTELLIGENT_TAGGING => self::INTELLIGENT_TAGGING_OM_CLASS,
