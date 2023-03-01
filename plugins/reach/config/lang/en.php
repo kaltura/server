@@ -46,6 +46,7 @@ return array (
 
     'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::US' => "US",
     'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::EU' => "EU",
+    'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::CA' => "CA",
 
     'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED' => "Deprecated",
     'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED' => "Deleted",
