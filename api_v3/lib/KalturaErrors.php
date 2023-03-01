@@ -689,7 +689,7 @@ class KalturaErrors extends APIErrors
 
 	const PARENT_ENTRY_ID_NOT_FOUND = "PARENT_ENTRY_ID_NOT_FOUND;ID;parent entry id \"@ID@\" not found";
 	
-	const FEATURE_RECYCLE_BIN_DISABLED = "FEATURE_RECYCLE_BIN_DISABLED;; Feature recycle bin is disabled for partner";
+	const FEATURE_RECYCLE_BIN_DISABLED = "FEATURE_RECYCLE_BIN_DISABLED;;Feature recycle bin is disabled for partner";
 
 	/*
 	 * FileAsset Service
