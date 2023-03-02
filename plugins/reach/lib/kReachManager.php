@@ -74,6 +74,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				continue;
 			}
 
+			$featureType = $catalogItemToAdd->getServiceFeature();
+			if(!kReachUtils::isFeatureTypeSupportedForEntry($entry, $featureType))
+			{
+				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for entry Id $entryId");
+				continue;
+			}
+
 			//Pass the object Id as the context of the task
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
 			self::addEntryVendorTaskByObjectIds($entry, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
