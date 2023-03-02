@@ -1068,5 +1068,65 @@ class BaseEntryService extends KalturaEntryService
 		$key = md5(md5(kConf::get(self::PLAYBACK_SECRET) . $partner->getId()) . $entryId, true);
 		return new kRendererString($key, kMimeTypes::TYPE_TEXT);
 	}
-
+	
+	/**
+	 * Move the entry to the recycle bin
+	 *
+	 * @action recycle
+	 * @param string $entryId
+	 * @return KalturaBaseEntry The moved entry
+	 */
+	public function recycleAction($entryId)
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECYCLE_BIN, $partnerId))
+		{
+			throw new KalturaAPIException(KalturaErrors::FEATURE_RECYCLE_BIN_DISABLED);
+		}
+		
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		
+		if ($entry->getStatus() !== entryStatus::READY && $entry->getStatus() !== entryStatus::NO_CONTENT)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS_FOR_RECYCLE);
+		}
+		
+		$entry->setRecycledAt(time());
+		$entry->setPreviousDisplayInSearchStatus($entry->getDisplayInSearch());
+		$entry->setDisplayInSearch(KalturaEntryDisplayInSearchType::RECYCLED);
+		$entry->save();
+		
+		return $this->getEntry($entryId);
+	}
+	
+	/**
+	 * Restore the entry from the recycle bin
+	 *
+	 * @action restoreRecycled
+	 * @param string $entryId
+	 * @return KalturaBaseEntry The restored entry
+	 */
+	public function restoreRecycledAction($entryId)
+	{
+		$entry = entryPeer::retrieveByPKNoFilter($entryId);
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		if ($entry->getDisplayInSearch() !== KalturaEntryDisplayInSearchType::RECYCLED)
+		{
+			throw new KalturaAPIException(KalturaErrors::RESTORE_ONLY_RECYCLED_ENTRY);
+		}
+		
+		$entry->setDisplayInSearch($entry->getPreviousDisplayInSearchStatus());
+		$entry->setPreviousDisplayInSearchStatus(null);
+		$entry->setRecycledAt(null);
+		$entry->save();
+		
+		return $this->getEntry($entryId);
+	}
 }

@@ -116,6 +116,8 @@ class Partner extends BasePartner
 	
 	const EVENT_PLATFORM_ALLOWED_TEMPLATES = 'event_platform_allowed_templates';
 	
+	const DAYS_BEFORE_RECYCLE_BIN_DELETION = 'days_before_recycle_bin_deletion';
+	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2360,5 +2362,14 @@ class Partner extends BasePartner
 	{
 		return $this->putInCustomData(self::EVENT_PLATFORM_ALLOWED_TEMPLATES, $v);
 	}
+	
+	public function getDaysBeforeRecycleBinDeletion()
+	{
+		return $this->getFromCustomData(self::DAYS_BEFORE_RECYCLE_BIN_DELETION, null, 0);
+	}
+	
+	public function setDaysBeforeRecycleBinDeletion($v)
+	{
+		return $this->putInCustomData(self::DAYS_BEFORE_RECYCLE_BIN_DELETION, $v);
+	}
 }
-

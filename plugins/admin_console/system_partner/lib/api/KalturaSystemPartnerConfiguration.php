@@ -501,6 +501,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $eventPlatformAllowedTemplates;
 	
+	/**
+	 * @var int
+	 */
+	public $daysBeforeRecycleBinDeletion;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -597,6 +602,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'purifyImageContent',
 		'isSelfServe',
 		'eventPlatformAllowedTemplates',
+		'daysBeforeRecycleBinDeletion',
 	);
 
 	public function getMapBetweenObjects()

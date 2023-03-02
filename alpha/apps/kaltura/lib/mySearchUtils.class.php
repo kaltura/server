@@ -5,7 +5,8 @@ class mySearchUtils
 	const MODE_ENTRY = "ENTRY";
 	const MODE_KSHOW = "KSHOW";
 	const MODE_ALL = "ALL";
-
+	
+	const DISPLAY_IN_SEARCH_RECYCLED = EntryDisplayInSearchType::RECYCLED;
 	const DISPLAY_IN_SEARCH_SYSTEM = EntryDisplayInSearchType::SYSTEM;
 	const DISPLAY_IN_SEARCH_NONE = EntryDisplayInSearchType::NONE;
 	const DISPLAY_IN_SEARCH_PARTNER_ONLY = EntryDisplayInSearchType::PARTNER_ONLY;

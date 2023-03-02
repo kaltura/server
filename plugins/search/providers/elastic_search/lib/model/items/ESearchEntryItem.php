@@ -62,6 +62,7 @@ class ESearchEntryItem extends ESearchItem
 		'plays' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'rank' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'votes' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
+		'display_in_search' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 	);
 
 	protected static $field_boost_values = array(
@@ -85,6 +86,7 @@ class ESearchEntryItem extends ESearchItem
 	private static $ignoreDisplayInSearchFields = array(
 		ESearchEntryFieldName::PARENT_ENTRY_ID,
 		ESearchEntryFieldName::ID,
+		ESearchEntryFieldName::DISPLAY_IN_SEARCH,
 	);
 
 	protected static $searchHistoryFields = array(
