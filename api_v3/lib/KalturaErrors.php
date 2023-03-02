@@ -596,7 +596,7 @@ class KalturaErrors extends APIErrors
 	
 	const INVALID_ENTRY_STATUS_FOR_RECYCLE = "INVALID_ENTRY_STATUS_FOR_RECYCLE;;The entry displayInStatus is invalid for recycle";
 	
-	const INVALID_ENTRY_STATUS_FOR_RESTORE = "INVALID_ENTRY_STATUS_FOR_RESTORE;;Only entry in displayInStatus RECYCLED be can be restored";
+	const INVALID_ENTRY_STATUS_FOR_RESTORE = "INVALID_ENTRY_STATUS_FOR_RESTORE;;Only entry in displayInStatus RECYCLED can be restored";
 
 	/**
 	 * categoryEntry
