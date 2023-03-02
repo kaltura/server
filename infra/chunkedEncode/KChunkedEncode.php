@@ -1901,7 +1901,7 @@ $vMax*=2;
 				if(strstr($filter, "aresample")!==false) {
 					$skipArr[$idx] = 1;
 				}
-				else if($mode=='audio' && preg_match("/\b(pan|amix|amerge)\b/", $filter)==1) { 
+				else if($mode=='audio' && preg_match("/\b(pan|amix|amerge|loudnorm)\b/", $filter)==1) { 
 					$filterArrOut[$idx] = $filter;
 				}
 				else if($mode=='video' && preg_match("/\b(scale|fade|crop|overlay|rotate|yadif|subtitles)\b/", $filter)==1) { 
