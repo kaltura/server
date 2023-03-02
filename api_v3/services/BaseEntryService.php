@@ -1078,22 +1078,25 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	public function recycleAction($entryId)
 	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECYCLE_BIN, $partnerId))
+		{
+			throw new KalturaAPIException(KalturaErrors::FEATURE_RECYCLE_BIN_DISABLED);
+		}
+		
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$entry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
-		if (!PermissionPeer::isValidForPartner(PermissionName::FEATURE_RECYCLE_BIN, $entry->getPartnerId()))
-		{
-			throw new KalturaAPIException(KalturaErrors::FEATURE_RECYCLE_BIN_DISABLED);
-		}
+		
 		if ($entry->getStatus() !== entryStatus::READY && $entry->getStatus() !== entryStatus::NO_CONTENT)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_STATUS_CANNOT_RECYCLE);
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS_FOR_RECYCLE);
 		}
 		
 		$entry->setRecycledAt(time());
-		$entry->setStatusBeforeRecycle($entry->getDisplayInSearch());
+		$entry->setPreviousDisplayInSearchStatus($entry->getDisplayInSearch());
 		$entry->setDisplayInSearch(KalturaEntryDisplayInSearchType::RECYCLED);
 		$entry->save();
 		
@@ -1101,11 +1104,11 @@ class BaseEntryService extends KalturaEntryService
 	}
 	
 	/**
-	 * Move the entry to the recycle bin
+	 * Restore the entry from the recycle bin
 	 *
 	 * @action restoreRecycled
 	 * @param string $entryId
-	 * @return KalturaBaseEntry The moved entry
+	 * @return KalturaBaseEntry The restored entry
 	 */
 	public function restoreRecycledAction($entryId)
 	{
@@ -1119,8 +1122,8 @@ class BaseEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::RESTORE_ONLY_RECYCLED_ENTRY);
 		}
 		
-		$entry->setDisplayInSearch($entry->getStatusBeforeRecycle());
-		$entry->setStatusBeforeRecycle(null);
+		$entry->setDisplayInSearch($entry->getPreviousDisplayInSearchStatus());
+		$entry->setPreviousDisplayInSearchStatus(null);
 		$entry->setRecycledAt(null);
 		$entry->save();
 		

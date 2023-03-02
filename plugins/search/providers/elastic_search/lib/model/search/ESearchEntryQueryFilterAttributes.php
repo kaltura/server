@@ -7,8 +7,8 @@ class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 {
 	public function getDisplayInSearchFilter()
 	{
-		$displayInSearchStatuses = array(EntryDisplayInSearchType::RECYCLED, EntryDisplayInSearchType::SYSTEM);
-		$displayInSearchQuery = new kESearchTermsQuery(ESearchEntryFieldName::DISPLAY_IN_SEARCH, $displayInSearchStatuses);
+		$excludedDisplayInSearchStatuses = array(EntryDisplayInSearchType::RECYCLED, EntryDisplayInSearchType::SYSTEM);
+		$displayInSearchQuery = new kESearchTermsQuery(ESearchEntryFieldName::DISPLAY_IN_SEARCH, $excludedDisplayInSearchStatuses);
 		$mustNotDisplayInSearchBoolQuery = new kESearchBoolQuery();
 		$mustNotDisplayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
 		

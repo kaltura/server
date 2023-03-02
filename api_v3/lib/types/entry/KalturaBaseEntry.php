@@ -411,20 +411,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * @var bool
 	 */
 	public $blockAutoTranscript;
-	
-	/**
-	 * Timestamp when the entry was recycled
-	 *
-	 * @var int
-	 */
-	public $recycledAt;
-	
-	/**
-	 * DisplayInSearch status of the entry before it was recycled
-	 *
-	 * @var int
-	 */
-	public $statusBeforeRecycle;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -477,8 +463,6 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"application",
 		"applicationVersion",
 		"blockAutoTranscript",
-		"recycledAt",
-		"statusBeforeRecycle",
 	 );
 		 
 	public function getMapBetweenObjects()

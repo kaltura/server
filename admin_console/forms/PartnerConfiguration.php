@@ -15,7 +15,7 @@ class Form_PartnerConfiguration extends Infra_Form
     const SECURITY_OPTIONS = 'GROUP_SECURITY_OPTIONS';
     const ELASTIC_OPTIONS = 'GROUP_ELASTIC_OPTIONS';
     const GROUP_AUTHENTICATION_SETTING = 'GROUP_AUTHENTICATION_SETTING';
-	const RECYCLE_BIN_OPTIONS = 'GROUP_RECYCLE_BIN_OPTIONS';
+    const RECYCLE_BIN_OPTIONS = 'GROUP_RECYCLE_BIN_OPTIONS';
    	
     protected $limitSubForms = array();
     

@@ -594,11 +594,9 @@ class KalturaErrors extends APIErrors
 
 	const ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED = "ENTRY_DISPLAY_IN_SEARCH_VALUE_NOT_ALLOWED;DISPLAY_IN_SEARCH_NEW_VALUE;Cannot set the value of DISPLAY_IN_SEARCH to [\"@DISPLAY_IN_SEARCH_NEW_VALUE@\"]";
 	
-	const CANNOT_UPDATE_RECYCLED_ENTRY = "CANNOT_UPDATE_RECYCLED_ENTRY;;Cannot update an entry with status recycled";
+	const INVALID_ENTRY_STATUS_FOR_RECYCLE = "INVALID_ENTRY_STATUS_FOR_RECYCLE;;The entry displayInStatus is invalid for recycle";
 	
-	const ENTRY_STATUS_CANNOT_RECYCLE = "ENTRY_STATUS_CANNOT_RECYCLE;;Only entry of status READY or NO_CONTENT be can be recycled";
-	
-	const RESTORE_ONLY_RECYCLED_ENTRY = "RESTORE_ONLY_RECYCLED_ENTRY;;Only entry of status RECYCLED be can be restored";
+	const INVALID_ENTRY_STATUS_FOR_RESTORE = "INVALID_ENTRY_STATUS_FOR_RESTORE;;Only entry in displayInStatus RECYCLED be can be restored";
 
 	/**
 	 * categoryEntry
