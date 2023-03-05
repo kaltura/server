@@ -500,6 +500,21 @@ class BulkService extends KalturaBaseService
 		$bulkUpload = $this->bulkDelete($bulkUploadData, $bulkUploadObjectType);
 		return $bulkUpload->id;
 	}
+	
+	/**
+	 * @action entryBulkDelete
+	 * @actionAlias baseEntry.bulkDelete
+	 * Action delete entry objects from filter in bulk
+	 * @param KalturaBaseEntryFilter $filter
+	 * @throws KalturaErrors::FAILED_TO_CREATE_BULK_DELETE
+	 * @return int
+	 */
+	public function entryBulkDeleteAction(KalturaBaseEntryFilter $filter)
+	{
+		$dbJob = kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::ENTRY, $filter->toObject());
+		
+		return $dbJob->getId();
+	}
 
 	protected function bulkDelete(KalturaBulkServiceFilterDataBase $bulkUploadData, $bulkUploadObjectType)
 	{

@@ -1,3 +1,11 @@
+# Scorpius-19.5.0
+## Support for clearing the Recycle Bin ##
+- Issue Type: Story
+- Issue ID: PLAT-24171
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_03_05_add_bulkdelete_entry.php
+
 # Scorpius-19.4.0
 ## Recycle Bin for entries ##
 - Issue Type: Story
