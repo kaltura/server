@@ -101,6 +101,17 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	 */
 	public $eventUrl;
 
+	/**
+	 * The Virtual Event WebHook registration URL
+	 * @var string
+	 */
+	public $webhookRegistrationUrl;
+
+	/**
+	 * The Virtual Event WebHook registration token
+	 * @var string
+	 */
+	public $webhookRegistrationToken;
 	/*
 	 */
 	private static $map_between_objects = array(
@@ -119,7 +130,9 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'updatedAt',
 		'deletionDueDate',
 		'registrationFormSchema',
-		'eventUrl'
+		'eventUrl',
+		'webhookRegistrationUrl',
+		'webhookRegistrationToken',
 	);
 	
 	/* (non-PHPdoc)
