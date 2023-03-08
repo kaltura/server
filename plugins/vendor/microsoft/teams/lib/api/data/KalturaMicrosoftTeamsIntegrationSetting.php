@@ -30,7 +30,8 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 
     /**
      * Encryption key used for encrypting/decrypting user auth data.
-     * @requiresPermission all
+     * @readonly
+     * @requiresPermission read
      * @var string
      */
 	public $encryptionKey;
@@ -67,6 +68,7 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 			$dbObject = new MicrosoftTeamsIntegration();
 		}
 		$dbObject->setVendorType(MicrosoftTeamsDropFolderPlugin::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS));
+        $dbObject->setEncryptionKey(md5(KCryptoWrapper::random_pseudo_bytes(16)));
 
 		return parent::toInsertableObject($dbObject, $skip);
 	}
@@ -77,9 +79,6 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
-
-		$this->validatePropertyNotNull('clientSecret');
-		$this->validatePropertyNotNull('clientId');
 
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
@@ -99,6 +98,9 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 		if (!MicrosoftTeamsDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId())) {
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
+
+        $this->validatePropertyNotNull('clientSecret');
+        $this->validatePropertyNotNull('clientId');
 
 		parent::validateForUpdate($propertiesToSkip);
 	}
