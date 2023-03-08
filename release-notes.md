@@ -1,5 +1,4 @@
 # Scorpius-19.4.0
-
 ## Support Kafka Events for virtual event ##
 - Issue Type: Feature
 - Issue ID: FOUN-1047
@@ -59,7 +58,6 @@ moduls.certifications.label = "Enable Certifications"
 moduls.certifications.permissionName = FEATURE_CERTIFICATIONS
 moduls.certifications.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
-
 
 # Scorpius-19.2.0
 ## Add partners for messaging ##
