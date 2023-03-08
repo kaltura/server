@@ -9,7 +9,7 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 	const CLIENT_ID = 'client_id';
 	const USER_METADATA_PROFILE_ID = 'user_metadata_profile_id';
 	const ENCRYPTION_KEY = 'encryption_key';
-	const SCOPES = 'SCOPES';
+	const SCOPES = 'scopes';
 
 	/**
 	 * @return string
@@ -80,7 +80,7 @@ class MicrosoftTeamsIntegration extends VendorIntegration
      */
     public function getScopes()
     {
-        return $this->getFromCustomData(self::ENCRYPTION_KEY);
+        return $this->getFromCustomData(self::SCOPES);
     }
 
     /**

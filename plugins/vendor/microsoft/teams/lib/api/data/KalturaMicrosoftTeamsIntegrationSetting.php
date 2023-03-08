@@ -55,7 +55,7 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject)) {
-			$dbObject = new MiscrosoftTeamsIntegration();
+			$dbObject = new MicrosoftTeamsIntegration();
 		}
 
 		return parent::toObject($dbObject, $skip);
