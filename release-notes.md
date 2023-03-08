@@ -60,7 +60,6 @@ moduls.certifications.permissionName = FEATURE_CERTIFICATIONS
 moduls.certifications.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
-
 # Scorpius-19.2.0
 ## Add partners for messaging ##
 
