@@ -7,7 +7,9 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 {
 	const CLIENT_SECRET = 'client_secret';
 	const CLIENT_ID = 'client_id';
-	const SECRET_EXPIRATION_DATE = 'secret_expiration_date';
+	const USER_METADATA_PROFILE_ID = 'user_metadata_profile_id';
+	const ENCRYPTION_KEY = 'encryption_key';
+	const SCOPES = 'SCOPES';
 
 	/**
 	 * @return string
@@ -28,17 +30,17 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 	/**
 	 * @return int
 	 */
-	public function getSecretExpirationDate()
+	public function getUserMetadataProfileId()
 	{
-		return $this->getFromCustomData(self::SECRET_EXPIRATION_DATE);
+		return $this->getFromCustomData(self::USER_METADATA_PROFILE_ID);
 	}
 
 	/**
-	 * @param int $secretExpirationDate
+	 * @param int $metadataProfileId
 	 */
-	public function setSecretExpirationDate($secretExpirationDate)
+	public function seUserMetadataProfileId($metadataProfileId)
 	{
-		$this->putInCustomData(self::SECRET_EXPIRATION_DATE, $secretExpirationDate);
+		$this->putInCustomData(self::USER_METADATA_PROFILE_ID, $metadataProfileId);
 	}
 
 	/**
@@ -57,4 +59,35 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 		$this->putInCustomData(self::CLIENT_ID, $clientId);
 	}
 
+    /**
+     * @return string
+     */
+    public function getEncryptionKey()
+    {
+        return $this->getFromCustomData(self::ENCRYPTION_KEY);
+    }
+
+    /**
+     * @param string $clientId
+     */
+    public function setEncryptionKey($key)
+    {
+        $this->putInCustomData(self::ENCRYPTION_KEY, $key);
+    }
+
+    /**
+     * @return string
+     */
+    public function getScopes()
+    {
+        return $this->getFromCustomData(self::ENCRYPTION_KEY);
+    }
+
+    /**
+     * @param string $scopes
+     */
+    public function setScopes($scopes)
+    {
+        $this->putInCustomData(self::SCOPES, $scopes);
+    }
 }

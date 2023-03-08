@@ -16,11 +16,24 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	 */
 	public $clientId;
 
-	/**
-	 * @var int
-	 */
-	public $secretExpirationDate;
+    /**
+     * User-level custom metadata profile ID which will contain encrypted user-level Graph access data.
+     * @var int
+     */
+	public $userMetadataProfileId;
 
+    /**
+     * MS Graph permission scopes for delegate auth
+     * @var string
+     */
+	public $scopes;
+
+    /**
+     * Encryption key used for encrypting/decrypting user auth data.
+     * @requiresPermission all
+     * @var string
+     */
+	public $encryptionKey;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -29,7 +42,9 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	(
 		'clientSecret',
 		'clientId',
-		'secretExpirationDate',
+        'userMetadataProfileId',
+        'scopes',
+        'encryptionKey'
 	);
 
 	public function getMapBetweenObjects()
