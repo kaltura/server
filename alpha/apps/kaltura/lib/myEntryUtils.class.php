@@ -8,6 +8,7 @@ class myEntryUtils
 	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
 	const CACHED_THUMB_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
+	protected static $sessionCache = array();
 
 	static private $liveSourceType = array
 	(
@@ -1210,10 +1211,21 @@ class myEntryUtils
 
 	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1)
 	{
-		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
-		$flavorAssetId = $flavorAsset->getId();
-		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset);
+		if(!$flavorAssetId || !isset(self::$sessionCache['asset_info_'.$flavorAssetId]))
+		{
+			$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
+			$flavorAssetId = $flavorAsset->getId();
+			$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
+			$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset);
+			self::$sessionCache['asset_info_'.$flavorAssetId] = array($flavorAsset, $flavorAssetId, $entry_data_path);
+			KalturaLog::debug("Saving session cache for: [$flavorAssetId]");
+		}
+		else
+		{
+			KalturaLog::debug("Fetching session cache for: [$flavorAssetId]");
+			list($flavorAsset, $flavorAssetId, $entry_data_path) = self::$sessionCache['asset_info_'.$flavorAssetId];
+		}
+
 		
 		if (!$entry_data_path)
 			return false;
