@@ -193,6 +193,11 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'placement' => 'prepend',
 				'readonly' => $this->disableAttributes,
 			));
+
+			$contentTransferMethod = new Kaltura_Form_Element_EnumSelect('contentTransferMethod', array('enum' => 'Kaltura_Client_Reach_Enum_VendorContentTransferMethod'));
+			$contentTransferMethod->setLabel('Content Transfer Method:');
+			$contentTransferMethod->setRequired(true);
+			$this->addElement($contentTransferMethod);
 		}
 
 		$this->addLine("Pricing Line");

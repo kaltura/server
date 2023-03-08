@@ -130,4 +130,7 @@ return array (
     'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::ABORTED' => 'Aborted',
     'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING_ENTRY_READY' => 'Pending Entry Ready',
 
+	'Kaltura_Client_Reach_Enum_VendorContentTransferMethod::RTMP' => 'RTMP',
+	'Kaltura_Client_Reach_Enum_VendorContentTransferMethod::RTMPS' => 'RTMPS',
+	'Kaltura_Client_Reach_Enum_VendorContentTransferMethod::WEBSOCKET' => 'WEBSOCKET',
 );

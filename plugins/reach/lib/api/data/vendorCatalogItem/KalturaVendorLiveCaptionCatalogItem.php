@@ -20,12 +20,18 @@ class KalturaVendorLiveCaptionCatalogItem extends KalturaVendorCaptionsCatalogIt
 	 */
 	public $durationLimit;
 
+	/**
+	 * @var KalturaVendorContentTransferMethod
+	 */
+	public $contentTransferMethod;
+
 
 	private static $map_between_objects = array
 	(
 		'minimalRefundTime',
 		'minimalOrderTime',
 		'durationLimit',
+		'contentTransferMethod',
 	);
 
 	protected function getServiceFeature()
