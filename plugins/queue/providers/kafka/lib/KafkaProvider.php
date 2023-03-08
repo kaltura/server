@@ -8,10 +8,8 @@ class KafkaProvider extends QueueProvider
 	protected $brokers = '';
 
 	const DEFAULT_FLUSH_TTL = 500;
-	const DEFAULT_PORT = 29092;
 	const MAX_RETRIES = 3;
 	const KAFKA_ACTION_SEND_MESSAGE = 'send_message';
-	const KAFKA_ACTION_CONNECT_TOPIC = 'connect_topic';
 
 	public function __construct(array $kafkaConfig)
 	{
