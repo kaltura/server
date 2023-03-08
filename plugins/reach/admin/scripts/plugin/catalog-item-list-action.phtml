@@ -480,6 +480,10 @@
             jQuery('#filterSourceLanguage').removeAttr('hidden');
         }
 
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+		}
+
         if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING; ?>) {
             jQuery('#filterSourceLanguage').removeAttr('hidden');
         }

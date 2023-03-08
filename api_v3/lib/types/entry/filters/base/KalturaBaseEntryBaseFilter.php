@@ -91,6 +91,7 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaRelatedFilter
 		"tagsNameMultiLikeAnd" => "_mlikeand_tags-name",
 		"tagsAdminTagsMultiLikeAnd" => "_mlikeand_tags-admin_tags",
 		"tagsAdminTagsNameMultiLikeAnd" => "_mlikeand_tags-admin_tags-name",
+		"displayInSearchEqual" => "_eq_display_in_search",
 	);
 
 	static private $order_by_map = array
@@ -595,4 +596,9 @@ abstract class KalturaBaseEntryBaseFilter extends KalturaRelatedFilter
 	 * @var string
 	 */
 	public $tagsAdminTagsNameMultiLikeAnd;
+	
+	/**
+	 * @var KalturaEntryDisplayInSearchType
+	 */
+	public $displayInSearchEqual;
 }

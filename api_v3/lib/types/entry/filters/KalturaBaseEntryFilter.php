@@ -189,8 +189,11 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		{
 			$this->setDefaultStatus();
 			$this->setDefaultModerationStatus($this);
-			if(($this->parentEntryIdEqual == null) && ($this->idIn == null))
-				$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+			if (($this->parentEntryIdEqual == null) && ($this->idIn == null) && ($this->displayInSearchEqual == null))
+			{
+				$displayInSearchStatusNotIn = array(mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+				$c->add(entryPeer::DISPLAY_IN_SEARCH, $displayInSearchStatusNotIn, Criteria::NOT_IN);
+			}
 		}
 		
 		$this->fixFilterUserId($this);

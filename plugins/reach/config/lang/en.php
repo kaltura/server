@@ -5,6 +5,7 @@ return array (
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION' => 'TRANSLATION',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT' => 'ALIGNMENT',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION' => 'AUDIO_DESCRIPTION',
+    'Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION' => 'EXTENDED_AUDIO_DESCRIPTION',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING' => 'CHAPTERING',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING' => 'DUBBING',
     'Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING' => 'INTELLIGENT_TAGGING',
@@ -41,9 +42,11 @@ return array (
 
     'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
     'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
+    'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::VTT' => "VTT",
 
     'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::US' => "US",
     'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::EU' => "EU",
+    'Kaltura_Client_Reach_Enum_VendorTaskProcessingRegion::CA' => "CA",
 
     'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED' => "Deprecated",
     'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED' => "Deleted",

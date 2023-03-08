@@ -1,18 +1,65 @@
-# Scorpius-19.3.0
+# Scorpius-19.4.0
+
+## Support Kafka Events for virtual event ##
 - Issue Type: Feature
 - Issue ID: FOUN-1047
 
 ### Configuration ###
 First replace all tokens in the XML file below and remove ".template" from the file name:
-  - /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2023_02_14_add_virtual_event_response_profiles.template.xml
-  - /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2023_02_13_add_kafka_virtual_event_events.template.xml
+- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2023_02_14_add_virtual_event_response_profiles.template.xml
+- /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2023_02_13_add_kafka_virtual_event_events.template.xml
 
 To enable this feature plugin add the following to your plugins.ini file:
-  - VirtualEventEventNotifications
+- VirtualEventEventNotifications
 
 ### Deployment Scripts ###
     - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-    - php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php 
+    - php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php
+
+## Recycle Bin for entries ##
+- Issue Type: Story
+- Issue ID: PLAT-24131
+
+### Configuration ###
+Add the following to admin.ini
+```
+moduls.recycleBin.enabled = true
+moduls.recycleBin.permissionType = 2
+moduls.recycleBin.label = "Enable Recycle Bin"
+moduls.recycleBin.permissionName = FEATURE_RECYCLE_BIN
+moduls.recycleBin.group = GROUP_RECYCLE_BIN_OPTIONS
+```
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_01_31_update_permission_baseentry.php
+
+# Scorpius-19.3.0
+## Add a new distribution profile provider: Cortex ##
+- Issue Type: Story
+- Issue ID: PSVAMB-37604
+
+Enable plugin:
+
+	To enable this feature plugin add the following to your plugins.ini file:
+	- CortexApiDistribution
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Enable Certifications Checkbox
+* Issue Type: Task
+* Issue ID: PLAT-24162
+
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.certifications.enabled = true
+moduls.certifications.permissionType = 2
+moduls.certifications.label = "Enable Certifications"
+moduls.certifications.permissionName = FEATURE_CERTIFICATIONS
+moduls.certifications.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 
 # Scorpius-19.2.0
 ## Add partners for messaging ##
