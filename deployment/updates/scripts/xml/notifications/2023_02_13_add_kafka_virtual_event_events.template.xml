@@ -29,6 +29,7 @@
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
                 <apiObjectType>KalturaVirtualEvent</apiObjectType>
+                <requiresPermissions>VIRTUALEVENT_PLUGIN_PERMISSION</requiresPermissions>
             </template>
         </request>
         <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -52,6 +53,7 @@
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
                 <apiObjectType>KalturaVirtualEvent</apiObjectType>
+                <requiresPermissions>VIRTUALEVENT_PLUGIN_PERMISSION</requiresPermissions>
             </template>
         </request>
         <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
@@ -75,6 +77,7 @@
                 <messageFormat>1</messageFormat>
                 <!-- EventNotificationEventObjectType::VIRTUAL_EVENT -->
                 <apiObjectType>KalturaVirtualEvent</apiObjectType>
+                <requiresPermissions>VIRTUALEVENT_PLUGIN_PERMISSION</requiresPermissions>
             </template>
         </request>
         <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
