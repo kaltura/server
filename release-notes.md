@@ -3,6 +3,16 @@
 - Issue Type: Story
 - Issue ID: PLAT-24171
 
+### Configuration ###
+Add the following to batch.ini under KAsyncDelete worker
+```
+[KAsyncDelete : JobHandlerWorker]
+id					                                = 430
+...
+params.entriesToDeletePerRequest					= 35
+params.waitBetweenRequestsInSeconds					= 10
+```
+
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2023_03_05_add_bulkdelete_entry.php
 

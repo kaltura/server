@@ -506,11 +506,16 @@ class BulkService extends KalturaBaseService
 	 * @actionAlias baseEntry.bulkDelete
 	 * Action delete entry objects from filter in bulk
 	 * @param KalturaBaseEntryFilter $filter
-	 * @throws KalturaErrors::FAILED_TO_CREATE_BULK_DELETE
+	 * @throws KalturaErrors::ENTRY_BULK_DELETE_ONLY_RECYCLED
 	 * @return int
 	 */
 	public function entryBulkDeleteAction(KalturaBaseEntryFilter $filter)
 	{
+		if ($filter->displayInSearchEqual != KalturaEntryDisplayInSearchType::RECYCLED)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_BULK_DELETE_ONLY_RECYCLED);
+		}
+		
 		$dbJob = kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::ENTRY, $filter->toObject());
 		
 		return $dbJob->getId();

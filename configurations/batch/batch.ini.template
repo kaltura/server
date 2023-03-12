@@ -615,8 +615,8 @@ friendlyName										= Delete
 type												= KAsyncDelete
 maximumExecutionTime								= 1200
 scriptPath											= batches/Delete/KAsyncDeleteExe.php
-
-
+params.entriesToDeletePerRequest					= 35
+params.waitBetweenRequestsInSeconds					= 10
 
 [KAsyncMoveCategoryEntries : JobHandlerWorker]
 id													= 440

@@ -19,7 +19,10 @@ class KDeletingEntryEngine extends KDeletingEngine
 	 */
 	protected function deleteEntries(KalturaBaseEntryFilter $filter)
 	{
-		//$filter->orderBy = KalturaBaseEntryFilter::;
+		if (!$filter->orderBy)
+		{
+			$filter->orderBy = KalturaBaseEntryOrderBy::UPDATED_AT_ASC;
+		}
 		
 		$entriesList = KBatchBase::$kClient->baseEntry->listAction($filter, $this->pager);
 		if (!$entriesList->objects || !count($entriesList->objects))
@@ -27,21 +30,35 @@ class KDeletingEntryEngine extends KDeletingEngine
 			return 0;
 		}
 		
-		KBatchBase::$kClient->startMultiRequest();
-		foreach($entriesList->objects as $entry)
+		$entriesToDeletePerRequest = KBatchBase::$taskConfig->params->entriesToDeletePerRequest;
+		$waitBetweenRequestsInSeconds = KBatchBase::$taskConfig->params->waitBetweenRequestsInSeconds;
+		
+		$entriesCount = 0;
+		$countResults = 0;
+		while ($entriesCount < count($entriesList->objects))
 		{
-			/* @var $entry KalturaBaseEntry */
-			KBatchBase::$kClient->baseEntry->delete($entry->id);
-		}
-		$results = KBatchBase::$kClient->doMultiRequest();
-		foreach ($results as $index => $result)
-		{
-			if (is_array($result) && isset($result['code']))
+			KBatchBase::$kClient->startMultiRequest();
+			for ($i = $entriesCount; $i < min($entriesCount + $entriesToDeletePerRequest, count($entriesList->objects)); $i++)
 			{
-				unset($results[$index]);
+				$entry = $entriesList->objects[$i];
+				/* @var $entry KalturaBaseEntry */
+				KBatchBase::$kClient->baseEntry->delete($entry->id);
 			}
+			$results = KBatchBase::$kClient->doMultiRequest();
+			
+			foreach ($results as $index => $result)
+			{
+				if (is_array($result) && isset($result['code']))
+				{
+					unset($results[$index]);
+				}
+			}
+			$countResults += count($results);
+			
+			$entriesCount += $entriesToDeletePerRequest;
+			sleep($waitBetweenRequestsInSeconds);
 		}
 
-		return count($results);
+		return $countResults;
 	}
 }
