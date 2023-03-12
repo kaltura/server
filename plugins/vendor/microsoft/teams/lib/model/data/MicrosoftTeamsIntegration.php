@@ -38,7 +38,7 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 	/**
 	 * @param int $metadataProfileId
 	 */
-	public function seUserMetadataProfileId($metadataProfileId)
+	public function setUserMetadataProfileId($metadataProfileId)
 	{
 		$this->putInCustomData(self::USER_METADATA_PROFILE_ID, $metadataProfileId);
 	}
