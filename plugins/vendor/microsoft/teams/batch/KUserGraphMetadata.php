@@ -51,7 +51,7 @@ class KUserGraphMetadata
         }
 
         $this->encryptionKey = $encryptionKey;
-        $decryptedValue = unserialize($this->decryptAuthInfo($this->encryptionKey, strval($metadataObject->xpath('.//GraphAuthData')[0])));
+        $decryptedValue = unserialize($this->decryptAuthInfo(strval($metadataObject->xpath('.//GraphAuthData')[0])));
         if (empty($decryptedValue[self::MICROSOFT_GRAPH_BEARER_TOKEN]) ||
             empty($decryptedValue[self::MICROSOFT_GRAPH_REFRESH_TOKEN]) ||
             empty($decryptedValue[self::MICROSOFT_GRAPH_TOKEN_EXPIRY]))
@@ -89,7 +89,7 @@ class KUserGraphMetadata
         ));
 
         $iv = openssl_random_pseudo_bytes(16);
-        $value = \openssl_encrypt(
+        $value = openssl_encrypt(
             $message,
             self::CSRF_CIPHER_METHOD, $this->encryptionKey, 0, $iv
         );
@@ -160,5 +160,10 @@ class KUserGraphMetadata
     private function validPayload($payload)
     {
         return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']);
+    }
+
+    protected static function hash($iv, $value, $key)
+    {
+        return hash_hmac('sha256', $iv.$value, $key);
     }
 }

@@ -61,21 +61,15 @@ class KMicrosoftGraphClient
         ];
 	}
 
-	public function getCallRecord($callRecordId)
-	{
-		$service = "v1.0/communications/callRecords/$callRecordId";
-		return $this->sendGraphRequest($service);
-	}
-
 	public function getUser($userId)
 	{
-		$service = "v1.0/me";
+		$service = "me";
 		return $this->sendGraphRequest($service);
 	}
 
 	public function getDriveItem($driveId, $driveItemId)
 	{
-		$service = $this->apiUrl .  "/v1.0/drives/$driveId/items/$driveItemId";
+		$service = "drives/$driveId/items/$driveItemId";
 		$response = $this->sendGraphRequest($service);
 
 		if ($response)
@@ -88,7 +82,7 @@ class KMicrosoftGraphClient
 
 	public function sendGraphRequest ($serviceUri, $requestType = 'GET', $parameters = array(), $contentType = null)
 	{
-        $ch = curl_init("{$this->apiUr}/$serviceUri");
+        $ch = curl_init("{$this->apiUrl}/$serviceUri");
 
 		$authHeader = "Authorization: Bearer {$this->bearerToken}";
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

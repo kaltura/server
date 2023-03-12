@@ -7,10 +7,11 @@
 class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 {
 	const ADMIN_TAG_TEAMS = 'msTeams';
+    const MS_GRAPH_METADATA = 'ms_graph_metadata';
 
-	const ASC_LAST_ACCESSED_DATE = '+/*[local-name()="metadata"]/*[local-name()="LastAccessedDate"]';
-	const OPT_IN_XPATH = '/*[local-name()="metadata"]/*[local-name()="OptIn"]';
-	const OPT_IN_VALUE = 'true';
+	const ASC_LAST_ACCESSED_DATE = "+/*[local-name()='metadata']/*[local-name()='LastAccessed']";
+	const OPT_IN_XPATH = "/*[local-name()='metadata']/*[local-name()='HasOptIn']";
+	const OPT_IN_VALUE = 'True';
 	const PERSONAL_RECORDINGS_DIRECTORY_URL = 'me/drive/root:/Recordings:/delta?token=%s';
 
 	/**
@@ -52,7 +53,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
         $pager->pageIndex = 1;
         $pager->pageSize = KBatchBase::$taskConfig->params->teams->userPageSize;
 
-        KBatchBase::$kClient->responseProfile = $this->constructResponseProfile();
+        KBatchBase::$kClient->setResponseProfile($this->constructResponseProfile($vendorIntegrationSetting->userMetadataProfileId));
 
         $response = KBatchBase::$kClient->user->listAction($userFilter, $pager);
 
@@ -63,6 +64,18 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 
             try {
                 $userTeamsData = new KUserGraphMetadata($userMetadataObj->xml, $vendorIntegrationSetting->encryptionKey);
+                if (!$userTeamsData)
+                {
+                    if ($user instanceof KalturaGroup)
+                    {
+                        $userTeamsData->recordingType = 'GROUP';
+                    }
+                    else
+                    {
+                        $userTeamsData->recordingType = 'PERSONAL';
+                    }
+                }
+
             } catch (Exception $e) {
                 KalturaLog::err('Could not instantiate this user\'s MS Graph data. Continuing to the next user.');
                 continue;
@@ -74,9 +87,12 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
                 KalturaLog::info('User ' . $user->id . ' requires a new bearer token.');
                 list($userTeamsData->authToken, $userTeamsData->refreshToken, $userTeamsData->authTokenExpiry) = $graphClient->refreshToken($userTeamsData->refreshToken, $vendorIntegrationSetting->scopes);
             }
+            else
+            {
+                $graphClient->bearerToken = $userTeamsData->authToken;
+            }
 
-
-            $driveLastPageUrl = sprintf(self::PERSONAL_RECORDINGS_DIRECTORY_URL, $userTeamsData->token ? $userTeamsData->token : 'latest' );
+            $driveLastPageUrl = sprintf(self::PERSONAL_RECORDINGS_DIRECTORY_URL, $userTeamsData->deltaToken ? $userTeamsData->deltaToken : 'latest' );
 			KalturaLog::info("Handling drive for user ID: {$user->id}, drive URL: $driveLastPageUrl");
 			$items = $graphClient->sendGraphRequest($driveLastPageUrl);
 			if (!$items)
@@ -213,6 +229,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
         $responseProfile->relatedProfiles = array();
 
         $metadataItemProfile = new KalturaDetachedResponseProfile();
+        $metadataItemProfile->name = self::MS_GRAPH_METADATA;
         $metadataItemProfile->filter = new KalturaMetadataFilter();
         $metadataItemProfile->filter->metadataObjectTypeEqual = KalturaMetadataObjectType::USER;
         $metadataItemProfile->filter->metadataProfileIdEqual = $metadataProfileId;
