@@ -7,9 +7,9 @@
 Add the following to batch.ini under KAsyncDelete worker
 ```
 [KAsyncDelete : JobHandlerWorker]
-id					                                = 430
+id					                                = @WORKER_ID@
 ...
-params.entriesToDeletePerRequest					= 35
+params.entriesToDeletePerRequest					= 30
 params.waitBetweenRequestsInSeconds					= 10
 ```
 

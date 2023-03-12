@@ -23,24 +23,35 @@ class KDeletingEntryEngine extends KDeletingEngine
 		{
 			$filter->orderBy = KalturaBaseEntryOrderBy::UPDATED_AT_ASC;
 		}
-		
-		$entriesList = KBatchBase::$kClient->baseEntry->listAction($filter, $this->pager);
-		if (!$entriesList->objects || !count($entriesList->objects))
-		{
-			return 0;
-		}
-		
 		$entriesToDeletePerRequest = KBatchBase::$taskConfig->params->entriesToDeletePerRequest;
 		$waitBetweenRequestsInSeconds = KBatchBase::$taskConfig->params->waitBetweenRequestsInSeconds;
-		
-		$entriesCount = 0;
-		$countResults = 0;
-		while ($entriesCount < count($entriesList->objects))
+		if (!$entriesToDeletePerRequest || !$waitBetweenRequestsInSeconds)
 		{
-			KBatchBase::$kClient->startMultiRequest();
-			for ($i = $entriesCount; $i < min($entriesCount + $entriesToDeletePerRequest, count($entriesList->objects)); $i++)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_BULK_DELETE_MISSING_WORKER_PARAMS);
+		}
+		
+		$this->pager->pageIndex = 0;
+		$this->pager->pageSize = $entriesToDeletePerRequest;
+		
+		$numberOfHandledEntries = 0;
+		do
+		{
+			$this->pager->pageIndex++;
+			
+			$entriesList = KBatchBase::$kClient->baseEntry->listAction($filter, $this->pager);
+			if (!$entriesList->objects || !count($entriesList->objects))
 			{
-				$entry = $entriesList->objects[$i];
+				break;
+			}
+			
+			if ($numberOfHandledEntries)
+			{
+				sleep($waitBetweenRequestsInSeconds);
+			}
+			
+			KBatchBase::$kClient->startMultiRequest();
+			foreach ($entriesList->objects as $entry)
+			{
 				/* @var $entry KalturaBaseEntry */
 				KBatchBase::$kClient->baseEntry->delete($entry->id);
 			}
@@ -53,12 +64,15 @@ class KDeletingEntryEngine extends KDeletingEngine
 					unset($results[$index]);
 				}
 			}
-			$countResults += count($results);
+			$numberOfHandledEntries += count($results);
 			
-			$entriesCount += $entriesToDeletePerRequest;
-			sleep($waitBetweenRequestsInSeconds);
+		} while (count($entriesList->objects) >= $this->pager->pageSize);
+		
+		if (!$numberOfHandledEntries)
+		{
+			return 0;
 		}
 
-		return $countResults;
+		return $numberOfHandledEntries;
 	}
 }

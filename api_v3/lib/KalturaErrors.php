@@ -599,6 +599,8 @@ class KalturaErrors extends APIErrors
 	const INVALID_ENTRY_STATUS_FOR_RESTORE = "INVALID_ENTRY_STATUS_FOR_RESTORE;;Only entry in displayInStatus RECYCLED can be restored";
 	
 	const ENTRY_BULK_DELETE_ONLY_RECYCLED = "ENTRY_BULK_DELETE_ONLY_RECYCLED;;Bulk delete for entries is allowed only for RECYCLED entries";
+	
+	const ENTRY_BULK_DELETE_MISSING_WORKER_PARAMS = "ENTRY_BULK_DELETE_MISSING_WORKER_PARAMS;;Bulk delete for entries is missing worker params";
 
 	/**
 	 * categoryEntry
