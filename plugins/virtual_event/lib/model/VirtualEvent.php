@@ -21,7 +21,9 @@
 	const CUSTOM_DATA_FIELD_AGENDA_SE_ID = 'agendaScheduleEventId';
 	const CUSTOM_DATA_FIELD_DELETION_DUE_DATE = 'deletionDueDate';
 	const CUSTOM_DATA_FIELD_REGISTRATION_FORM_SCHEMA = 'registrationFormSchema';
-	
+	const CUSTOM_DATA_FIELD_EVENT_URL = 'eventUrl';
+	const CUSTOM_DATA_FIELD_WEBHOOK_REGISTRATION_TOKEN = 'webhookRegistrationToken';
+
 	
 	public function __construct ()
 	{
@@ -108,5 +110,25 @@
 	 {
 		 $v = str_replace(array("\n", "\r", "\t", "\v", " "), '', $v);
 		 return $this->putInCustomData(self::CUSTOM_DATA_FIELD_REGISTRATION_FORM_SCHEMA, $v);
+	 }
+
+	 public function getEventUrl()
+	 {
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_EVENT_URL);
+	 }
+
+	 public function setEventUrl($v)
+	 {
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_EVENT_URL, $v);
+	 }
+
+	 public function getWebhookRegistrationToken()
+	 {
+		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_WEBHOOK_REGISTRATION_TOKEN);
+	 }
+
+	 public function setWebhookRegistrationToken($v)
+	 {
+		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_WEBHOOK_REGISTRATION_TOKEN, $v);
 	 }
  }

@@ -8,10 +8,8 @@ class KafkaProvider extends QueueProvider
 	protected $brokers = '';
 
 	const DEFAULT_FLUSH_TTL = 500;
-	const DEFAULT_PORT = 29092;
 	const MAX_RETRIES = 3;
 	const KAFKA_ACTION_SEND_MESSAGE = 'send_message';
-	const KAFKA_ACTION_CONNECT_TOPIC = 'connect_topic';
 
 	public function __construct(array $kafkaConfig)
 	{
@@ -81,8 +79,9 @@ class KafkaProvider extends QueueProvider
 
 		if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result)
 		{
-			$this->writeToMonitor("Failed to publish message to topic name $topicName", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message), $result);
-			KalturaLog::err("producing kafka msg failed");
+			$this->writeToMonitor("Failed to publish message to topic name $topicName with error $result", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message), $result);
+			KalturaLog::err("producing kafka msg failed with error [$result]");
+			return;
 		}
 
 		$this->writeToMonitor("Msg sent to $topicName", $this->brokers, self::KAFKA_ACTION_SEND_MESSAGE, microtime(true) - $msgSendStart, $topicName, strlen($message));
