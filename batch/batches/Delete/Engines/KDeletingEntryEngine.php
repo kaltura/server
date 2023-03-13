@@ -67,11 +67,6 @@ class KDeletingEntryEngine extends KDeletingEngine
 			$numberOfHandledEntries += count($results);
 			
 		} while (count($entriesList->objects) >= $this->pager->pageSize);
-		
-		if (!$numberOfHandledEntries)
-		{
-			return 0;
-		}
 
 		return $numberOfHandledEntries;
 	}
