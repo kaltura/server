@@ -102,12 +102,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 	public $eventUrl;
 
 	/**
-	 * The Virtual Event WebHook registration URL
-	 * @var string
-	 */
-	public $webhookRegistrationUrl;
-
-	/**
 	 * The Virtual Event WebHook registration token
 	 * @var string
 	 */
@@ -131,7 +125,6 @@ class KalturaVirtualEvent extends KalturaObject implements IFilterable
 		'deletionDueDate',
 		'registrationFormSchema',
 		'eventUrl',
-		'webhookRegistrationUrl',
 		'webhookRegistrationToken',
 	);
 	

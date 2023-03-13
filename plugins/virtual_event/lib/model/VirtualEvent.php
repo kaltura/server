@@ -22,7 +22,6 @@
 	const CUSTOM_DATA_FIELD_DELETION_DUE_DATE = 'deletionDueDate';
 	const CUSTOM_DATA_FIELD_REGISTRATION_FORM_SCHEMA = 'registrationFormSchema';
 	const CUSTOM_DATA_FIELD_EVENT_URL = 'eventUrl';
-	const CUSTOM_DATA_FIELD_WEBHOOK_REGISTRATION_URL = 'webhookRegistrationUrl';
 	const CUSTOM_DATA_FIELD_WEBHOOK_REGISTRATION_TOKEN = 'webhookRegistrationToken';
 
 	
@@ -121,16 +120,6 @@
 	 public function setEventUrl($v)
 	 {
 		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_EVENT_URL, $v);
-	 }
-
-	 public function getWebhookRegistrationUrl()
-	 {
-		 return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_WEBHOOK_REGISTRATION_URL);
-	 }
-
-	 public function setWebhookRegistrationUrl($v)
-	 {
-		 $this->putInCustomData(self::CUSTOM_DATA_FIELD_WEBHOOK_REGISTRATION_URL, $v);
 	 }
 
 	 public function getWebhookRegistrationToken()
