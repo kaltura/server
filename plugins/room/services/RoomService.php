@@ -60,7 +60,7 @@ class RoomService extends KalturaEntryService
 
 	/**
 	 *
-	 * @action update
+	 * @action delete
 	 * @param string $roomId
 	 * @throws KalturaAPIException
 	 */
