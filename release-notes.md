@@ -1,5 +1,22 @@
-# Scorpius-19.3.0
+# Scorpius-19.4.0
+## Recycle Bin for entries ##
+- Issue Type: Story
+- Issue ID: PLAT-24131
 
+### Configuration ###
+Add the following to admin.ini
+```
+moduls.recycleBin.enabled = true
+moduls.recycleBin.permissionType = 2
+moduls.recycleBin.label = "Enable Recycle Bin"
+moduls.recycleBin.permissionName = FEATURE_RECYCLE_BIN
+moduls.recycleBin.group = GROUP_RECYCLE_BIN_OPTIONS
+```
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_01_31_update_permission_baseentry.php
+
+# Scorpius-19.3.0
 ## Add a new distribution profile provider: Cortex ##
 - Issue Type: Story
 - Issue ID: PSVAMB-37604

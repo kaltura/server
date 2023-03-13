@@ -68,7 +68,9 @@ class KalturaReachErrors implements kReachErrors
 	const CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE = "CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE;ID,OLD_STATUS,NEW_STATUS;Cannot update status from [@OLD_STATUS@] to [@NEW_STATUS@] for task with id [@ID@], since task is in final status";
 	
 	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED;TYPE;Requesting tasks for entry type [@TYPE@] is not supported";
-	
+
+	const FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY = "FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY;FEATURE,ID;Requesting tasks of feature [@FEATURE@] for entry id [@ID@] is not supported";
+
 	const ENTRY_NOT_READY = "ENTRY_NOT_READY;;Ordering task is not allowed for entries which are not ins status ready";
 	
 	const CANNOT_EXTEND_ACCESS_KEY = "CANNOT_EXTEND_ACCESS_KEY;;Extending accessKey for non processing task is not allowed";

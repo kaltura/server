@@ -967,10 +967,11 @@ KalturaLog::log("fetchedFileSize:".filesize($fetchedChunkName));
 
 			$cmdLine = $this->setup->ffmpegBin." $this->concatSettings";
 			if($this->chunkFileFormat=="mpegts"){
-					// Main/High h264 porfiles come with larger (1.48) offset
+					/* Main/High h264 porfiles come with larger (1.48) offset
+						*** it turned ou thet on fix flow it should be always 1.4
 				if($params->vcodec=="libx264" && $params->vprofile!="baseline")
 					$cmdLine.= " -itsoffset -1.48";
-				else
+				else */
 					$cmdLine.= " -itsoffset -1.4";
 			}
 			if(isset($params->fps)) 
@@ -1900,7 +1901,7 @@ $vMax*=2;
 				if(strstr($filter, "aresample")!==false) {
 					$skipArr[$idx] = 1;
 				}
-				else if($mode=='audio' && preg_match("/\b(pan|amix|amerge)\b/", $filter)==1) { 
+				else if($mode=='audio' && preg_match("/\b(pan|amix|amerge|loudnorm)\b/", $filter)==1) { 
 					$filterArrOut[$idx] = $filter;
 				}
 				else if($mode=='video' && preg_match("/\b(scale|fade|crop|overlay|rotate|yadif|subtitles)\b/", $filter)==1) { 

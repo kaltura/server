@@ -190,6 +190,17 @@ class kReachUtils
 		EntryVendorTaskService::tryToSave($entryVendorTask);
 	}
 
+	public static function isFeatureTypeSupportedForEntry($entry, $featureType)
+	{
+		if(in_array($featureType, array(VendorServiceFeature::AUDIO_DESCRIPTION, VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION)))
+		{
+			if($entry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($entry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 
 	public static function reachStrToTime($offset , $value)
 	{
