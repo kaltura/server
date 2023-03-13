@@ -43,7 +43,7 @@ class KalturaKafkaNotificationTemplate extends KalturaEventNotificationTemplate
 	/**
 	 * Partner permissions needed to trigger the notification (comma seperated list of permissions)
 	 * @var string
-	 * @requiresPermission insert,update
+	 * @requiresPermission update
 	 */
 	public $requiresPermissions;
 
