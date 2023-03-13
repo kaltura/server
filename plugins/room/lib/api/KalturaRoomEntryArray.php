@@ -19,7 +19,7 @@ class KalturaRoomEntryArray extends KalturaTypedArray
 			return $newArr;
 		}
 
-		foreach($arr as $obj)
+		foreach ($arr as $obj)
 		{
 			$nObj = KalturaEntryFactory::getInstanceByType($obj->getType());
 			$nObj->fromObject($obj, $responseProfile);

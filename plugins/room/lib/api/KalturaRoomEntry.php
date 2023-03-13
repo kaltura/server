@@ -19,7 +19,7 @@ class KalturaRoomEntry extends KalturaBaseEntry
 
 	public function __construct()
 	{
-			$this->type = RoomPlugin::getApiValue(RoomEntryType::ROOM);
+		$this->type = RoomPlugin::getApiValue(RoomEntryType::ROOM);
 	}
 
 	public function getMapBetweenObjects()
