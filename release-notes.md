@@ -1,3 +1,21 @@
+# Scorpius-19.5.0
+## Support for clearing the Recycle Bin ##
+- Issue Type: Story
+- Issue ID: PLAT-24171
+
+### Configuration ###
+Add the following to batch.ini under KAsyncDelete worker
+```
+[KAsyncDelete : JobHandlerWorker]
+id					                                = @WORKER_ID@
+...
+params.entriesToDeletePerRequest					= 30
+params.waitBetweenRequestsInSeconds					= 10
+```
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_03_05_add_bulkdelete_entry.php
+
 # Scorpius-19.4.0
 
 ## Support Kafka Events for virtual event ##

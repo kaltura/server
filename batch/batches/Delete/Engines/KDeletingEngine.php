@@ -47,8 +47,11 @@ abstract class KDeletingEngine
 			case KalturaDeleteObjectType::CATEGORY_ENTRY_AGGREGATION:
  				return new KDeletingAggregationChannelEngine();
 				
-			case KalturaDeleteObjectType::USER_ENTRY :
+			case KalturaDeleteObjectType::USER_ENTRY:
  				return new KDeletingUserEntryEngine();
+			
+			case KalturaDeleteObjectType::ENTRY:
+				return new KDeletingEntryEngine();
 			
 			default:
 				return KalturaPluginManager::loadObject('KDeletingEngine', $objectType);
