@@ -17,6 +17,8 @@ To enable this feature plugin add the following to your plugins.ini file:
     - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
     - php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php
 
+# Scorpius-19.4.0
+
 ## Recycle Bin for entries ##
 - Issue Type: Story
 - Issue ID: PLAT-24131
