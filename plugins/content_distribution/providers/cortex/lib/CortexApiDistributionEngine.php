@@ -7,7 +7,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	IDistributionEngineSubmit,
 	IDistributionEngineDelete
 {
-    protected $tempXmlPath;
+    	protected $tempXmlPath;
 	const CORTEX_API_LOGIN = 'API/Authentication/v1.0/Login';
 	const CORTEX_API_SEND_METADATA = 'API/v2.2/DataTable/Documents.Video.General-Library-Video:Update';
 	const CORTEX_API_UPLOAD_NEW_MEDIA = 'API/UploadMedia/v3.0/UploadNewMedia';
