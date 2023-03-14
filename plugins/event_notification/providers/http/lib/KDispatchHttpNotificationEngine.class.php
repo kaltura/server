@@ -186,15 +186,16 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
         $header_size = curl_getinfo($curlWrapper->ch, CURLINFO_HEADER_SIZE);
         $headers = substr($results, 0, $header_size);
-        $body = substr($results, $header_size);
+        $body = strip_tags(substr($results, $header_size));
 
 		$curlWrapper->close();
 
         KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results] Headers [$headers] Body [$body]");
         if(!$results || $httpCode != 200)
 		{
+            $body = substr($body, 0, 1000);
 			throw new kTemporaryException("Sending HTTP request failed [$errCode] httpCode [$httpCode]
-			    			    url [$url]: $errMessage Headers [$headers] Body [$body]", $httpCode);
+			    			    url: [$url] \n $errMessage \n Headers:\n [$headers] \n Body:\n [$body]", $httpCode);
         }
 		
 		return true;
