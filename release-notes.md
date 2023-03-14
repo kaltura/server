@@ -10,7 +10,7 @@ Enable plugin:
 	- Room
 
 ### Deployment scripts ###
-    1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+	1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
 
 	2. Run deployment script:
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_03_06_add_room_permissions.php
