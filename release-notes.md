@@ -1,4 +1,13 @@
 # Scorpius-19.5.0
+## Add Permissions to Gaming-Services Partner ##
+Add permissions to Gaming-Services partner to start session
+
+* Issue Type: Task
+* Issue ID: PLAT-24195
+
+#### Deployment Script ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_03_14_update_gaming_partner_impersonate_permission.php
+
 ## Support for clearing the Recycle Bin ##
 - Issue Type: Story
 - Issue ID: PLAT-24171
