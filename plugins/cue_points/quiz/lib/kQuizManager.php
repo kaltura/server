@@ -21,6 +21,7 @@ class kQuizManager implements kObjectChangedEventConsumer
 	const NUM_OF_QUESTIONS = 'numOfQuestions';
 	const NUM_OF_RELEVANT_QUESTIONS = 'numOfRelevnatQuestions';
 	const CALCULATED_SCORE = 'calculatedScore';
+	const VIRTUAL_EVENT_ID = 'virtualEventId';
 	const INTERNAL_ANALYTICS_HOST = 'internal_analytics_host';
 	
 	/**
@@ -82,7 +83,8 @@ class kQuizManager implements kObjectChangedEventConsumer
 			self::NUM_OF_CORRECT_ANSWERS => $quizUserEntry->getNumOfCorrectAnswers(),
 			self::NUM_OF_QUESTIONS => $quizUserEntry->getNumOfQuestions(),
 			self::NUM_OF_RELEVANT_QUESTIONS => $quizUserEntry->getNumOfRelevnatQuestions(),
-			self::CALCULATED_SCORE => self::normalizeScore($quizUserEntry->getCalculatedScore())
+			self::CALCULATED_SCORE => self::normalizeScore($quizUserEntry->getCalculatedScore()),
+			self::VIRTUAL_EVENT_ID => kCurrentContext::$virtual_event_id
 		);
 		if ($quizUserEntry->getkuser())
 		{

@@ -15,7 +15,53 @@ Enable plugin:
 	2. Run deployment script:
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_03_06_add_room_permissions.php
 
+## Add Permissions to Gaming-Services Partner ##
+Add permissions to Gaming-Services partner to start session
+
+* Issue Type: Task
+* Issue ID: PLAT-24195
+
+#### Deployment Script ####
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_03_14_update_gaming_partner_impersonate_permission.php
+
+## Support for clearing the Recycle Bin ##
+- Issue Type: Story
+- Issue ID: PLAT-24171
+
+### Configuration ###
+Add the following to batch.ini under KAsyncDelete worker
+```
+[KAsyncDelete : JobHandlerWorker]
+id					                                = @WORKER_ID@
+...
+params.entriesToDeletePerRequest					= 30
+params.waitBetweenRequestsInSeconds					= 10
+```
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_03_05_add_bulkdelete_entry.php
+
 # Scorpius-19.4.0
+
+## Support Kafka Events for virtual event ##
+- Issue Type: Feature
+- Issue ID: FOUN-1047
+
+### Configuration ###
+First replace all tokens in the XML file below and remove ".template" from the file name:
+- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2023_02_14_add_virtual_event_response_profiles.template.xml
+- /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2023_02_13_add_kafka_virtual_event_events.template.xml
+- /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2023_03_08_update_kafka_kuser_notifications.template.xml
+
+To enable this feature plugin add the following to your plugins.ini file:
+- VirtualEventEventNotifications
+
+### Deployment Scripts ###
+    - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    - php /opt/kaltura/app/deployment/updates/scripts/2023_02_14_add_virtual_event_response_profile_and_events.php
+
+# Scorpius-19.4.0
+
 ## Recycle Bin for entries ##
 - Issue Type: Story
 - Issue ID: PLAT-24131

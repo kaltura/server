@@ -16,6 +16,8 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	const CUSTOM_DATA_PARTITION_KEY = 'partitionKey';
 	const CUSTOM_DATA_MESSAGE_FORMAT = 'messageFormat';
 	const CUSTOM_DATA_API_OBJECT_TYPE = 'apiObjectType';
+	const CUSTOM_DATA_RESPONSE_PROFILE_SYSTEM_NAME = 'responseProfileSystemName';
+	const CUSTOM_DATA_REQUIRES_PERMISSIONS = 'requiresPermissions';
 	const SCHEMA_ID = 'schemaId';
 	const SCHEMA = 'schema';
 	
@@ -75,6 +77,26 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_API_OBJECT_TYPE);
 	}
+
+	public function setResponseProfileSystemName($value)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATA_RESPONSE_PROFILE_SYSTEM_NAME, $value);
+	}
+
+	public function getResponseProfileSystemName()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_RESPONSE_PROFILE_SYSTEM_NAME);
+	}
+
+	public function setRequiresPermissions($value)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATA_REQUIRES_PERMISSIONS, $value);
+	}
+
+	public function getRequiresPermissions()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_REQUIRES_PERMISSIONS);
+	}
 	
 	public function dispatch(kScope $scope)
 	{
@@ -90,7 +112,28 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			KalturaLog::debug("Kafka configuration file (kafka.ini) wasn't found!");
 			return;
 		}
-		
+
+		$requiredPermissions = explode(",", $this->getRequiresPermissions());
+		if(count($requiredPermissions))
+		{
+			KalturaLog::debug("Checking if partner has permissions required to dispatch [{$this->getRequiresPermissions()}]");
+			$found = false;
+			foreach($requiredPermissions as $requiredPermission)
+			{
+				$found = PermissionPeer::isValidForPartner($requiredPermission, kCurrentContext::getCurrentPartnerId());
+				if($found)
+				{
+					break;
+				}
+			}
+
+			if(!$found)
+			{
+				KalturaLog::debug("Failed to find required permission to dispatch!");
+				return;
+			}
+		}
+
 		$object = $scope->getEvent()->getObject();
 		if(!$object)
 		{
@@ -119,9 +162,15 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			$modifiedColumns = $scope->getEvent()->getModifiedColumns();
 			$modifiedColumns = $this->buildMessageOldValues($modifiedColumns);
 		}
-		
+
+		$responseProfile = null;
+		if($this->getResponseProfileSystemName())
+		{
+			$responseProfile = ResponseProfilePeer::retrieveBySystemName($this->getResponseProfileSystemName());
+		}
+
 		$apiObjectType = $this->getApiObjectType();
-		$apiObject = call_user_func(kCurrentContext::$serializeCallback, $object, $apiObjectType, 1);
+		$apiObject = call_user_func(kCurrentContext::$serializeCallback, $object, $apiObjectType, 1, $responseProfile);
 		$apiObject = json_decode($apiObject, true);
 		
 		$apiObjectAdditionalParams = $this->getContentParameters();
