@@ -36,20 +36,20 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 */
 	private $recordId;
 
-    public function configure()
-    {
-        if(KBatchBase::$taskConfig->params->tempXmlPath)
-        {
-            $this->tempXmlPath = KBatchBase::$taskConfig->params->tempXmlPath;
-            if(!kFile::isDir($this->tempXmlPath))
-                kFile::mkdir($this->tempXmlPath, 0777, true);
-        }
-        else
-        {
-            KalturaLog::err("params.tempXmlPath configuration not supplied");
-            $this->tempXmlPath = sys_get_temp_dir();
-        }
-    }
+	public function configure()
+	{
+		if(KBatchBase::$taskConfig->params->tempXmlPath)
+		{
+			$this->tempXmlPath = KBatchBase::$taskConfig->params->tempXmlPath;
+			if(!kFile::isDir($this->tempXmlPath))
+				kFile::mkdir($this->tempXmlPath, 0777, true);
+        	}
+		else
+		{
+			KalturaLog::err("params.tempXmlPath configuration not supplied");
+			$this->tempXmlPath = sys_get_temp_dir();
+		}
+	}
 	/**
 	 * @param KalturaDistributionSubmitJobData $data
 	 * @return bool
@@ -423,42 +423,45 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	{
 		try
 		{
-            $needDel = false;
-            $videoFilePath = $apiDistributionJobProviderData->videoAssetFilePath;
-            if (!$videoFilePath)
-                throw new KalturaException('No video asset to distribute, the job will fail',KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
+			$needDel = false;
+			$videoFilePath = $apiDistributionJobProviderData->videoAssetFilePath;
+			if(!$videoFilePath)
+			{
+				throw new KalturaException('No video asset to distribute, the job will fail',KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND);
+			}
 
-            if (!kFile::checkFileExists($videoFilePath))
-                throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
+			if(!kFile::checkFileExists($videoFilePath))
+			{
+				throw new KalturaDistributionException('The file ['.$videoFilePath.'] was not found (probably not synced yet), the job will retry');
+			}
+			list($isRemote, $remoteUrl) = kFile::resolveFilePath($videoFilePath);
+			$tempVideoFilePath = !$isRemote ? null : kFile::getExternalFile($remoteUrl, null, basename($videoFilePath));
 
-            list($isRemote, $remoteUrl) = kFile::resolveFilePath($videoFilePath);
-            $tempVideoFilePath = !$isRemote ? null : kFile::getExternalFile($remoteUrl, null, basename($videoFilePath));
-
-            if (FALSE === strstr($videoFilePath, "."))
-            {
-                $videoFilePathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
-                if (!kFile::checkFileExists($videoFilePathNew))
-                {
-                    $copyFrom = $tempVideoFilePath ? $tempVideoFilePath : $videoFilePath;
-                    kFile::copy($copyFrom,$videoFilePathNew);
-                    $needDel = true;
-                }
-                $videoFilePath = $videoFilePathNew;
-            }
-            elseif($isRemote)
-            {
-                $videoFilePath = $tempVideoFilePath;
-            }
+			if(FALSE === strstr($videoFilePath, "."))
+			{
+				$videoFilePathNew = $this->tempXmlPath . "/" . uniqid() . ".dme";
+				if (!kFile::checkFileExists($videoFilePathNew))
+				{
+					$copyFrom = $tempVideoFilePath ? $tempVideoFilePath : $videoFilePath;
+					kFile::copy($copyFrom,$videoFilePathNew);
+					$needDel = true;
+				}
+				$videoFilePath = $videoFilePathNew;
+			}
+			elseif($isRemote)
+			{
+				$videoFilePath = $tempVideoFilePath;
+			}
 			$SystemIdentifier = $this->mediaUpload($videoFilePath);
 			KalturaLog::info("Cortex: upload video succeeded, SystemIdentifier: $SystemIdentifier");
-            if ($needDel == true)
-            {
-                kFile::unlink($videoFilePath);
-            }
-            if($isRemote)
-            {
-                kFile::unlink($tempVideoFilePath);
-            }
+			if ($needDel == true)
+			{
+				kFile::unlink($videoFilePath);
+			}
+			if($isRemote)
+			{
+				kFile::unlink($tempVideoFilePath);
+			}
 			$this->setCortexSystemId($SystemIdentifier);
 			return true;
 		}
