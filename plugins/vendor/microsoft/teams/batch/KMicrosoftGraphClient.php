@@ -57,7 +57,7 @@ class KMicrosoftGraphClient
 			];
 	}
 
-	public function getUser($userId)
+	public function getUser()
 	{
 		$service = "me";
 		return $this->sendGraphRequest($service);
