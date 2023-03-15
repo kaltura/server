@@ -68,7 +68,7 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 	}
 
 	/**
-	 * @param string $clientId
+	 * @param string $key
 	 */
 	public function setEncryptionKey($key)
 	{
