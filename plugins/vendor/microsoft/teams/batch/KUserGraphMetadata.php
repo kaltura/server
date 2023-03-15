@@ -33,7 +33,7 @@ class KUserGraphMetadata
 	public $lastAccessed;
 
 	/**
-	 * @var int
+	 * @var string
 	 */
 	public $recordingType;
 
@@ -80,7 +80,7 @@ class KUserGraphMetadata
 		return $metadataObject->saveXML();
 	}
 
-	private function encryptAuthInfo()
+	protected function encryptAuthInfo()
 	{
 		$message = serialize(array(
 			self::MICROSOFT_GRAPH_BEARER_TOKEN => $this->authToken,
@@ -102,14 +102,14 @@ class KUserGraphMetadata
 		return base64_encode($json);
 	}
 
-	private function decryptAuthInfo($encryptedValue)
+	protected function decryptAuthInfo($encryptedValue)
 	{
 		$payload = $this->getJsonPayload($encryptedValue, $this->encryptionKey);
 		$iv = base64_decode($payload['iv']);
 		return openssl_decrypt($payload['value'], self::CSRF_CIPHER_METHOD, $this->encryptionKey, 0, $iv);
 	}
 
-	private function getJsonPayload($payload, $key)
+	protected function getJsonPayload($payload, $key)
 	{
 		$payload = json_decode(base64_decode($payload), true);
 		if (! self::validPayload($payload)) {
@@ -129,7 +129,7 @@ class KUserGraphMetadata
 	 * @param  string  $key
 	 * @return string
 	 */
-	private function calculateMac($payload, $bytes, $key)
+	protected function calculateMac($payload, $bytes, $key)
 	{
 		return hash_hmac(
 			'sha256', self::hash($payload['iv'], $payload['value'], $key), $bytes, true
@@ -143,7 +143,7 @@ class KUserGraphMetadata
 	 * @param  string  $key
 	 * @return bool
 	 */
-	private function validMac($payload, $key)
+	protected function validMac($payload, $key)
 	{
 		$calculated = self::calculateMac($payload, $bytes = openssl_random_pseudo_bytes(16), $key);
 		return hash_equals(
@@ -157,7 +157,7 @@ class KUserGraphMetadata
 	 * @param  mixed  $payload
 	 * @return bool
 	 */
-	private function validPayload($payload)
+	protected function validPayload($payload)
 	{
 		return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']);
 	}
