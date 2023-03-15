@@ -8,10 +8,6 @@ class KMicrosoftGraphClient
 {
 	const AUTH_URL = 'https://login.microsoftonline.com/{tenantId}/oauth2/token';
 
-	const TEAMS_APPLICATION_VALUE = 'Teams';
-
-	const MEETING_SOURCE_VALUE = 'Meeting';
-
 	public $apiUrl;
 
 	public $tenantId;
@@ -52,13 +48,13 @@ class KMicrosoftGraphClient
 		$response = json_decode($curlResponse, true);
 
 		KalturaLog::info('Auth token generated: [' . $response[MicrosoftGraphFieldNames::ACCESS_TOKEN] . '], expiry: ' . date('c', $response[MicrosoftGraphFieldNames::EXPIRES_ON]));
-        $this->bearerToken = $response['access_token'];
+		$this->bearerToken = $response['access_token'];
 
 		return [
-		    $response['access_token'],
-            $response['refresh_token'],
-            $response['expires_on'],
-        ];
+			$response['access_token'],
+			$response['refresh_token'],
+			$response['expires_on'],
+			];
 	}
 
 	public function getUser($userId)
@@ -82,7 +78,7 @@ class KMicrosoftGraphClient
 
 	public function sendGraphRequest ($serviceUri, $requestType = 'GET', $parameters = array(), $contentType = null)
 	{
-        $ch = curl_init("{$this->apiUrl}/$serviceUri");
+		$ch = curl_init("{$this->apiUrl}/$serviceUri");
 
 		$authHeader = "Authorization: Bearer {$this->bearerToken}";
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

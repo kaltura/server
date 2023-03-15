@@ -16,24 +16,24 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	 */
 	public $clientId;
 
-    /**
-     * User-level custom metadata profile ID which will contain encrypted user-level Graph access data.
-     * @var int
-     */
+	/**
+	 * User-level custom metadata profile ID which will contain encrypted user-level Graph access data.
+	 * @var int
+	 */
 	public $userMetadataProfileId;
 
-    /**
-     * MS Graph permission scopes for delegate auth
-     * @var string
-     */
+	/**
+	 * MS Graph permission scopes for delegate auth
+	 * @var string
+	 */
 	public $scopes;
 
-    /**
-     * Encryption key used for encrypting/decrypting user auth data.
-     * @readonly
-     * @requiresPermission read
-     * @var string
-     */
+	/**
+	 * Encryption key used for encrypting/decrypting user auth data.
+	 * @readonly
+	 * @requiresPermission read
+	 * @var string
+	 */
 	public $encryptionKey;
 
 	/*
@@ -43,9 +43,9 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	(
 		'clientSecret',
 		'clientId',
-        'userMetadataProfileId',
-        'scopes',
-        'encryptionKey'
+		'userMetadataProfileId',
+		'scopes',
+		'encryptionKey'
 	);
 
 	public function getMapBetweenObjects()
@@ -68,7 +68,7 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 			$dbObject = new MicrosoftTeamsIntegration();
 		}
 		$dbObject->setVendorType(MicrosoftTeamsDropFolderPlugin::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS));
-        $dbObject->setEncryptionKey(md5(KCryptoWrapper::random_pseudo_bytes(16)));
+		$dbObject->setEncryptionKey(md5(KCryptoWrapper::random_pseudo_bytes(16)));
 
 		return parent::toInsertableObject($dbObject, $skip);
 	}
@@ -99,8 +99,8 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
 
-        $this->validatePropertyNotNull('clientSecret');
-        $this->validatePropertyNotNull('clientId');
+		$this->validatePropertyNotNull('clientSecret');
+		$this->validatePropertyNotNull('clientId');
 
 		parent::validateForUpdate($propertiesToSkip);
 	}

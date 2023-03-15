@@ -59,35 +59,35 @@ class MicrosoftTeamsIntegration extends VendorIntegration
 		$this->putInCustomData(self::CLIENT_ID, $clientId);
 	}
 
-    /**
-     * @return string
-     */
-    public function getEncryptionKey()
-    {
-        return $this->getFromCustomData(self::ENCRYPTION_KEY);
-    }
+	/**
+	 * @return string
+	 */
+	public function getEncryptionKey()
+	{
+		return $this->getFromCustomData(self::ENCRYPTION_KEY);
+	}
 
-    /**
-     * @param string $clientId
-     */
-    public function setEncryptionKey($key)
-    {
-        $this->putInCustomData(self::ENCRYPTION_KEY, $key);
-    }
+	/**
+	 * @param string $clientId
+	 */
+	public function setEncryptionKey($key)
+	{
+		$this->putInCustomData(self::ENCRYPTION_KEY, $key);
+	}
 
-    /**
-     * @return string
-     */
-    public function getScopes()
-    {
-        return $this->getFromCustomData(self::SCOPES);
-    }
+	/**
+	 * @return string
+	 */
+	public function getScopes()
+	{
+		return $this->getFromCustomData(self::SCOPES);
+	}
 
-    /**
-     * @param string $scopes
-     */
-    public function setScopes($scopes)
-    {
-        $this->putInCustomData(self::SCOPES, $scopes);
-    }
+	/**
+	 * @param string $scopes
+	 */
+	public function setScopes($scopes)
+	{
+		$this->putInCustomData(self::SCOPES, $scopes);
+	}
 }

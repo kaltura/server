@@ -33,66 +33,66 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		$vendorIntegrationSetting = $this->vendorPlugin->vendorIntegration->get($dropFolder->integrationId);
 		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
 
-        $existingDropFolderFiles = $this->loadDropFolderFiles();
+		$existingDropFolderFiles = $this->loadDropFolderFiles();
 
 		// Retrieve all user custom metadata objects for the metadata profile specified on the drop folder's integration ID
-        $userMetadataSearchItem = new KalturaMetadataSearchItem();
-        $userMetadataSearchItem->metadataProfileId = $vendorIntegrationSetting->userMetadataProfileId;
-        $userMetadataSearchItem->orderBy = self::ASC_LAST_ACCESSED_DATE;
+		$userMetadataSearchItem = new KalturaMetadataSearchItem();
+		$userMetadataSearchItem->metadataProfileId = $vendorIntegrationSetting->userMetadataProfileId;
+		$userMetadataSearchItem->orderBy = self::ASC_LAST_ACCESSED_DATE;
 
-        $condition = new KalturaSearchMatchCondition();
-        $condition->field = self::OPT_IN_XPATH;
-        $condition->value = self::OPT_IN_VALUE;
+		$condition = new KalturaSearchMatchCondition();
+		$condition->field = self::OPT_IN_XPATH;
+		$condition->value = self::OPT_IN_VALUE;
 
-        $userMetadataSearchItem->items = [ $condition ];
+		$userMetadataSearchItem->items = [ $condition ];
 
-        $userFilter = new KalturaUserFilter();
-        $userFilter->advancedSearch = $userMetadataSearchItem;
+		$userFilter = new KalturaUserFilter();
+		$userFilter->advancedSearch = $userMetadataSearchItem;
 
-        $pager = new KalturaFilterPager();
-        $pager->pageIndex = 1;
-        $pager->pageSize = KBatchBase::$taskConfig->params->teams->userPageSize;
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 1;
+		$pager->pageSize = KBatchBase::$taskConfig->params->teams->userPageSize;
 
-        KBatchBase::$kClient->setResponseProfile($this->constructResponseProfile($vendorIntegrationSetting->userMetadataProfileId));
+		KBatchBase::$kClient->setResponseProfile($this->constructResponseProfile($vendorIntegrationSetting->userMetadataProfileId));
 
-        $response = KBatchBase::$kClient->user->listAction($userFilter, $pager);
+		$response = KBatchBase::$kClient->user->listAction($userFilter, $pager);
 
 		foreach ($response->objects as $user)
 		{
 		    /* @var $user KalturaUser  */
-            $userMetadataObj = $user->relatedObjects[self::MS_GRAPH_METADATA]->objects[0];
+			$userMetadataObj = $user->relatedObjects[self::MS_GRAPH_METADATA]->objects[0];
 
-            try {
-                $userTeamsData = new KUserGraphMetadata($userMetadataObj->xml, $vendorIntegrationSetting->encryptionKey);
-                if (!$userTeamsData)
-                {
-                    if ($user instanceof KalturaGroup)
-                    {
-                        $userTeamsData->recordingType = 'GROUP';
-                    }
-                    else
-                    {
-                        $userTeamsData->recordingType = 'PERSONAL';
-                    }
-                }
+			try {
+				$userTeamsData = new KUserGraphMetadata($userMetadataObj->xml, $vendorIntegrationSetting->encryptionKey);
+				if (!$userTeamsData)
+				{
+					if ($user instanceof KalturaGroup)
+					{
+					    $userTeamsData->recordingType = 'GROUP';
+					}
+					else
+					{
+					    $userTeamsData->recordingType = 'PERSONAL';
+					}
+				}
 
-            } catch (Exception $e) {
-                KalturaLog::err('Could not instantiate this user\'s MS Graph data. Continuing to the next user.');
-                continue;
-            }
+			} catch (Exception $e) {
+			    KalturaLog::err('Could not instantiate this user\'s MS Graph data. Continuing to the next user.');
+			    continue;
+			}
 
-            $graphClient = new KMicrosoftGraphClient($dropFolder->tenantId, $dropFolder->path, $dropFolder->clientId, $dropFolder->clientSecret);
-            if ($userTeamsData->authTokenExpiry < time())
-            {
-                KalturaLog::info('User ' . $user->id . ' requires a new bearer token.');
-                list($userTeamsData->authToken, $userTeamsData->refreshToken, $userTeamsData->authTokenExpiry) = $graphClient->refreshToken($userTeamsData->refreshToken, $vendorIntegrationSetting->scopes);
-            }
-            else
-            {
-                $graphClient->bearerToken = $userTeamsData->authToken;
-            }
+			$graphClient = new KMicrosoftGraphClient($dropFolder->tenantId, $dropFolder->path, $dropFolder->clientId, $dropFolder->clientSecret);
+			if ($userTeamsData->authTokenExpiry < time())
+			{
+				KalturaLog::info('User ' . $user->id . ' requires a new bearer token.');
+				list($userTeamsData->authToken, $userTeamsData->refreshToken, $userTeamsData->authTokenExpiry) = $graphClient->refreshToken($userTeamsData->refreshToken, $vendorIntegrationSetting->scopes);
+			}
+			else
+			{
+				$graphClient->bearerToken = $userTeamsData->authToken;
+			}
 
-            $driveLastPageUrl = sprintf(self::PERSONAL_RECORDINGS_DIRECTORY_URL, $userTeamsData->deltaToken ? $userTeamsData->deltaToken : 'latest' );
+			$driveLastPageUrl = sprintf(self::PERSONAL_RECORDINGS_DIRECTORY_URL, $userTeamsData->deltaToken ? $userTeamsData->deltaToken : 'latest' );
 			KalturaLog::info("Handling drive for user ID: {$user->id}, drive URL: $driveLastPageUrl");
 			$items = $graphClient->sendGraphRequest($driveLastPageUrl);
 			if (!$items)
@@ -142,27 +142,27 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			$args = explode('&', parse_url($nextLink, PHP_URL_QUERY));
 
 			foreach ($args as $arg)
-            {
-                list($key, $value) = explode('=', $arg);
-                if ($key == MicrosoftGraphFieldNames::TOKEN_QUERY_PARAM)
-                {
-                    $userTeamsData->deltaToken = $value;
-                    break;
-                }
-            }
+			{
+				list($key, $value) = explode('=', $arg);
+				if ($key == MicrosoftGraphFieldNames::TOKEN_QUERY_PARAM)
+				{
+					$userTeamsData->deltaToken = $value;
+					break;
+				}
+			}
 
 			$userTeamsData->lastAccessed = time();
 
 			$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
-            try {
-                $metadataPlugin->metadata->update($userMetadataObj->id, $userTeamsData->getXmlFormatted());
-            }
+			try
+			{
+				$metadataPlugin->metadata->update($userMetadataObj->id, $userTeamsData->getXmlFormatted());
+			}
 			catch (Exception $e)
-            {
-                KalturaLog::err('An error occurred attempting to save the user metadata. ' . $e->getMessage());
-            }
+			{
+				KalturaLog::err('An error occurred attempting to save the user metadata. ' . $e->getMessage());
+			}
 		}
-
 	}
 
 	protected function updateDropFolderFile (KalturaDropFolderFile $currentDropFolderFile, array $driveItem)
@@ -218,31 +218,31 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		}
 	}
 
-    /**
-     * @param $metadataProfileId
-     * @return KalturaDetachedResponseProfile
-     * @throws KalturaClientException
-     */
+	/**
+	 * @param $metadataProfileId
+	 * @return KalturaDetachedResponseProfile
+	 * @throws KalturaClientException
+	 */
 	protected function constructResponseProfile($metadataProfileId)
-    {
-        $responseProfile = new KalturaDetachedResponseProfile();
-        $responseProfile->relatedProfiles = array();
+	{
+		$responseProfile = new KalturaDetachedResponseProfile();
+		$responseProfile->relatedProfiles = array();
 
-        $metadataItemProfile = new KalturaDetachedResponseProfile();
-        $metadataItemProfile->name = self::MS_GRAPH_METADATA;
-        $metadataItemProfile->filter = new KalturaMetadataFilter();
-        $metadataItemProfile->filter->metadataObjectTypeEqual = KalturaMetadataObjectType::USER;
-        $metadataItemProfile->filter->metadataProfileIdEqual = $metadataProfileId;
+		$metadataItemProfile = new KalturaDetachedResponseProfile();
+		$metadataItemProfile->name = self::MS_GRAPH_METADATA;
+		$metadataItemProfile->filter = new KalturaMetadataFilter();
+		$metadataItemProfile->filter->metadataObjectTypeEqual = KalturaMetadataObjectType::USER;
+		$metadataItemProfile->filter->metadataProfileIdEqual = $metadataProfileId;
 
-        $metadataItemProfile->mappings = array();
-        $mapping = new KalturaResponseProfileMapping();
-        $mapping->parentProperty = 'id';
-        $mapping->filterProperty = 'objectIdEqual';
-        $metadataItemProfile->mappings[] = $mapping;
-        $responseProfile->relatedProfiles[] = $metadataItemProfile;
+		$metadataItemProfile->mappings = array();
+		$mapping = new KalturaResponseProfileMapping();
+		$mapping->parentProperty = 'id';
+		$mapping->filterProperty = 'objectIdEqual';
+		$metadataItemProfile->mappings[] = $mapping;
+		$responseProfile->relatedProfiles[] = $metadataItemProfile;
 
-        return $responseProfile;
-    }
+		return $responseProfile;
+	}
 
 	protected function getUpdatedFileSize (KalturaDropFolderFile $dropFolderFile)
 	{
