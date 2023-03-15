@@ -123,20 +123,17 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 					}
 					else
 					{
-						$result = $this->handleFileAdded($extendedItem, $dropFolder->id, $vendorIntegrationSetting);
+						$result = $this->handleFileAdded($extendedItem, $dropFolder->id, $user->id);
 					}
 				}
 			}
 
-			$nextLink = '';
-			if(isset($items['@odata.nextLink']))
+			if(!isset($items['@odata.nextLink']) || !isset($items['@odata.deltaLink']))
 			{
-				$nextLink = $items['@odata.nextLink'];
+				throw new Exception("Next page parameter for user {$user->id} cannot be determined!");
 			}
-			else
-			{
-				$nextLink = $items['@odata.deltaLink'];
-			}
+
+			$nextLink = isset($items['@odata.nextLink']) ? $items['@odata.nextLink'] : (isset($items['@odata.deltaLink']) ? $items['@odata.deltaLink'] : '');
 
 			KalturaLog::info("Next page for user {$user->id}: $nextLink");
 			$args = explode('&', parse_url($nextLink, PHP_URL_QUERY));
@@ -187,7 +184,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		}
 	}
 
-	protected function handleFileAdded($extendedItem, $dropFolderId, KalturaIntegrationSetting $integrationData)
+	protected function handleFileAdded($extendedItem, $dropFolderId, $userId)
 	{
 		KalturaLog::info('Handling drive item with ID ' . $extendedItem[MicrosoftGraphFieldNames::ID_FIELD]);
 		$dropFolderFile = new KalturaMicrosoftTeamsDropFolderFile();
@@ -202,8 +199,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			$dropFolderFile->description = $extendedItem[MicrosoftGraphFieldNames::DESCRIPTION];
 		}
 
-		$dropFolderFile->ownerId = $this->retrieveUserId($extendedItem[MicrosoftGraphFieldNames::CREATED_BY]);
-
+		$dropFolderFile->ownerId = $userId;
 		try
 		{
 			$dropFolderFile = $this->dropFolderFileService->add($dropFolderFile);
