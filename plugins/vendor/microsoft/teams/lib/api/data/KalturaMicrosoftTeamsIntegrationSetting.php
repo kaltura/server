@@ -99,6 +99,13 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
 
+		$existingMSGraphIntegration = VendorIntegrationPeer::retrieveSingleVendorByPartner(kCurrentContext::getCurrentPartnerId(), MicrosoftTeamsDropFolderPlugin::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS));
+		if ($existingMSGraphIntegration)
+		{
+			KalturaLog::err('Only 1 MS Teams integration is allowed per partner ID');
+			throw new KalturaAPIException(KalturaVendorIntegrationErrors::INTEGRATION_ALREADY_EXIST);
+		}
+
 		$this->validatePropertyNotNull('clientSecret');
 		$this->validatePropertyNotNull('clientId');
 
