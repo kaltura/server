@@ -1090,7 +1090,7 @@ class BaseEntryService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 		
-		if ($entry->getStatus() !== entryStatus::READY && $entry->getStatus() !== entryStatus::NO_CONTENT)
+		if ($entry->getDisplayInSearch() === KalturaEntryDisplayInSearchType::RECYCLED)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS_FOR_RECYCLE);
 		}
@@ -1119,7 +1119,7 @@ class BaseEntryService extends KalturaEntryService
 		}
 		if ($entry->getDisplayInSearch() !== KalturaEntryDisplayInSearchType::RECYCLED)
 		{
-			throw new KalturaAPIException(KalturaErrors::RESTORE_ONLY_RECYCLED_ENTRY);
+			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS_FOR_RESTORE);
 		}
 		
 		$entry->setDisplayInSearch($entry->getPreviousDisplayInSearchStatus());

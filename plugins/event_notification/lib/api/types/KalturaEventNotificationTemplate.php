@@ -88,7 +88,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	public $eventType;
 
 	/**
-	 * Define the object that raied the event that should trigger this notification
+	 * Define the object that raised the event that should trigger this notification
 	 * 
 	 * @var KalturaEventNotificationEventObjectType
 	 * @requiresPermission update

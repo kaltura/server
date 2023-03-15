@@ -33,12 +33,27 @@ class KalturaKafkaNotificationTemplate extends KalturaEventNotificationTemplate
 	 * @requiresPermission update
 	 */
 	public $apiObjectType;
-	
+
+	/**
+	 * Kaltura response-profile system name
+	 * @var string
+	 */
+	public $responseProfileSystemName;
+
+	/**
+	 * Partner permissions needed to trigger the notification (comma seperated list of permissions)
+	 * @var string
+	 * @requiresPermission update
+	 */
+	public $requiresPermissions;
+
 	private static $map_between_objects = array(
 		'topicName',
 		'partitionKey',
 		'messageFormat',
 		'apiObjectType',
+		'responseProfileSystemName',
+		'requiresPermissions',
 	);
 	
 	public function __construct()
