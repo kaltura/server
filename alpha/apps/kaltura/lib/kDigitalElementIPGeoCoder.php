@@ -40,10 +40,10 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 				
 				// read proxy type and description lookup
 				$types = trim(fgets(self::$readerAnonymous));
-				self::$typeLookup = explode(",", $types);
+				self::$typeLookup = explode(";", $types);
 				
 				$descriptions = trim(fgets(self::$readerAnonymous));
-				self::$descLookup = explode(",", $descriptions);
+				self::$descLookup = explode(";", $descriptions);
 				
 				self::$dataOffset = ftell(self::$readerAnonymous);
 				self::$lastRecord = (filesize($dbFilePath) - self::$dataOffset) / self::RECORD_LEN - 1;
