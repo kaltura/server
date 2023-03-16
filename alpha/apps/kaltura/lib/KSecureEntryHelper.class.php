@@ -158,7 +158,6 @@ class KSecureEntryHelper
 
 	public function validateForPlay($performApiAccessCheck = true)
 	{
-		KalturaLog::info("Dror verifying entry id {$this->entry->getId()} - {$this->entry->getDisplayInSearch()}");
 		if ($this->entry->getDisplayInSearch() === EntryDisplayInSearchType::RECYCLED &&
 			!($this->entry->isOwnerActionsAllowed(kCurrentContext::getCurrentKsKuserId()) || $this->isKsAdmin()))
 		{
