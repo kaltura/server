@@ -67,6 +67,7 @@ class KExternalErrors
 	const DATABASE_ERROR = 55;
 	const MISSING_BUNDLE_CONFIGURATION = 56;
 	const ACTION_RATE_LIMIT = 57;
+	const RECYCLED_ENTRY_UNAVAILABLE = 58;
 	const HTTP_STATUS_NOT_FOUND = 404;
 
 	private static $errorCodeMap = array(
@@ -130,7 +131,8 @@ class KExternalErrors
 		self::MISSING_LIVE_CONFIGURATION => "Missing live configuration",
 		self::DATABASE_ERROR => 'Database error',
 		self::INVALID_AUTH_HEADER => 'Invalid auth header',
-		self::ACTION_RATE_LIMIT => 'Access to service was rate limited'
+		self::ACTION_RATE_LIMIT => 'Access to service was rate limited',
+		self::RECYCLED_ENTRY_UNAVAILABLE => 'Recycled entry is unavailable',
 	);
 
 	public static function dieError($errorCode, $message = null)
