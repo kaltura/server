@@ -233,7 +233,8 @@
 					},
 					"raw": {
 						"type": "keyword",
-						"normalizer": "kaltura_keyword_normalizer"
+						"normalizer": "kaltura_keyword_normalizer",
+						"ignore_above": 8191
 					},
 					"english": {
 						"type": "text",
