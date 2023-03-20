@@ -1,4 +1,20 @@
 # Scorpius-19.5.0
+## Add new Room plugin ##
+- Issue Type: Feature
+- Issue ID: NR2-7286
+
+### configuration ###
+Enable plugin:
+
+	To enable this plugin add the following to your plugins.ini file:
+	- Room
+
+### Deployment scripts ###
+	1. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php (New clients will be required after this step)
+
+	2. Run deployment script:
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_03_06_add_room_permissions.php
+
 ## Add Permissions to Gaming-Services Partner ##
 Add permissions to Gaming-Services partner to start session
 
