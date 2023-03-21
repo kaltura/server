@@ -7,7 +7,7 @@
 class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 {
 	const ADMIN_TAG_TEAMS = 'msTeams';
-    const MS_GRAPH_METADATA = 'ms_graph_metadata';
+	const MS_GRAPH_METADATA = 'ms_graph_metadata';
 
 	const ASC_LAST_ACCESSED_DATE = "+/*[local-name()='metadata']/*[local-name()='LastAccessed']";
 	const OPT_IN_XPATH = "/*[local-name()='metadata']/*[local-name()='HasOptIn']";
@@ -59,7 +59,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 
 		foreach ($response->objects as $user)
 		{
-		    /* @var $user KalturaUser  */
+			/* @var $user KalturaUser  */
 			$userMetadataObj = $user->relatedObjects[self::MS_GRAPH_METADATA]->objects[0];
 
 			try {
@@ -68,17 +68,17 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 				{
 					if ($user instanceof KalturaGroup)
 					{
-					    $userTeamsData->recordingType = 'GROUP';
+						$userTeamsData->recordingType = 'GROUP';
 					}
 					else
 					{
-					    $userTeamsData->recordingType = 'PERSONAL';
+						$userTeamsData->recordingType = 'PERSONAL';
 					}
 				}
 
 			} catch (Exception $e) {
-			    KalturaLog::err('Could not instantiate this user\'s MS Graph data. Continuing to the next user.');
-			    continue;
+				KalturaLog::err('Could not instantiate this user\'s MS Graph data. Continuing to the next user.');
+				continue;
 			}
 
 			$graphClient = new KMicrosoftGraphClient($dropFolder->tenantId, $dropFolder->path, $dropFolder->clientId, $dropFolder->clientSecret);

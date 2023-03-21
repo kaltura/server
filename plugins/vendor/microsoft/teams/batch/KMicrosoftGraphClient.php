@@ -70,7 +70,7 @@ class KMicrosoftGraphClient
 
 		if ($response)
 		{
-        	return $response;
+			return $response;
 		}
 
 		return null;
