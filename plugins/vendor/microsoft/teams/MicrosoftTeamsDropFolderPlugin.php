@@ -118,7 +118,7 @@ class MicrosoftTeamsDropFolderPlugin extends KalturaPlugin implements IKalturaPe
 	{
 		$dropFolderDependency = new KalturaDependency(DropFolderPlugin::PLUGIN_NAME);
 		$vendorDependency = new KalturaDependency(VendorPlugin::PLUGIN_NAME);
-        $metadataDependency = new KalturaDependency(MetadataPlugin::PLUGIN_NAME);
+		$metadataDependency = new KalturaDependency(MetadataPlugin::PLUGIN_NAME);
 
 		return array($dropFolderDependency, $vendorDependency, $metadataDependency);
 	}
