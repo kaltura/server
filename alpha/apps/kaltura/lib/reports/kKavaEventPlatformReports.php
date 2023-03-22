@@ -56,17 +56,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 		{
 			return null;
 		}
-
-		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
-		{
-			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_HISTORICAL;
-		}
-
-		if (!isset($report_def[self::REPORT_PLAYBACK_TYPES]))
-		{
-			$report_def[self::REPORT_PLAYBACK_TYPES] = array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR);
-		}
-
+		
 		self::initTransformTimeDimensions();
 
 		return $report_def;
