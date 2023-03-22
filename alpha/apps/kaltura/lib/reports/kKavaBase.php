@@ -152,6 +152,9 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VE_INVITED = 'invited';
 	const EVENT_TYPE_VE_CREATED = 'created';
 
+	// event types - meeting events
+	const EVENT_TYPE_JOIN_SESSION = 'joinSession';
+
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
 	const VIEW_EVENT_PERIOD = 'PT10S';	

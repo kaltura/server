@@ -28,6 +28,9 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_SEGMENT_DOWNLOAD_TIME_SUM = 'segmentDownloadTimeSum';
 	const METRIC_MANIFEST_DOWNLOAD_TIME_SUM = 'manifestDownloadTimeSum';
 	const METRIC_VIEW_TIME_SUM = 'viewTimeSum';
+	const METRIC_UNIQUE_LIVE_VIEWERS = 'unique_live_viewers';
+	const METRIC_UNIQUE_VOD_VIEWERS = 'unique_vod_viewers';
+	const METRIC_UNIQUE_VOD_LIVE_VIEWERS = 'unique_vod_live_viewers';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -166,6 +169,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_LATEST_DURATION_MSEC = 'latest_msecs';
 	const METRIC_CONTRIBUTOR_RANKING = 'contributor_ranking';
 	const METRIC_COMBINED_LIVE_VIEW_TIME = 'combined_live_view_time';
+	const METRIC_COMBINED_VOD_LIVE_VIEW_TIME = 'combined_view_time';
 	
 	// player-events-realtime specific metrics
 	const METRIC_VIEW_PLAY_TIME_SEC = 'sum_view_time';
@@ -220,6 +224,7 @@ class kKavaReportsMgr extends kKavaBase
 	const KAVA_QOE_REPORTS_CLASS = 'kKavaQoeReports';
 	const KAVA_WEBCAST_REPORTS_CLASS = 'kKavaWebcastReports';
 	const KAVA_VE_REGISTRATION_CLASS = 'kKavaVeRegistrationReports';
+	const KAVA_EP_REPORTS_CLASS = 'kKavaEventPlatformReports';
 
 	/// report settings
 	// report settings - common
@@ -228,6 +233,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_JOIN_REPORTS = 'report_join_reports';
 	const REPORT_COLUMN_MAP = 'report_column_map';
 	const REPORT_BASE_DEF = 'report_base_definition';
+	const REPORT_UNION_DATA_SOURCES = 'report_union_datasource';
 
 	// report settings - filter
 	const REPORT_FILTER = 'report_filter';
@@ -466,6 +472,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 		self::METRIC_UNIQUE_DOMAINS => 'floor',
+		self::METRIC_UNIQUE_LIVE_VIEWERS => 'floor',
+		self::METRIC_UNIQUE_VOD_VIEWERS => 'floor',
+		self::METRIC_UNIQUE_VOD_LIVE_VIEWERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -515,6 +524,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC => true,
 		self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC => true,
 		self::METRIC_UNIQUE_DOMAINS => true,
+		self::METRIC_UNIQUE_LIVE_VIEWERS => true,
+		self::METRIC_UNIQUE_VOD_VIEWERS => true,
+		self::METRIC_UNIQUE_VOD_LIVE_VIEWERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -638,11 +650,13 @@ class kKavaReportsMgr extends kKavaBase
 		3 => self::KAVA_QOE_REPORTS_CLASS,
 		4 => self::KAVA_WEBCAST_REPORTS_CLASS,
 		5 => self::KAVA_VE_REGISTRATION_CLASS,
+		6 => self::KAVA_EP_REPORTS_CLASS,
 	);
 	
 	protected static $aggregations_def = array();
 	protected static $metrics_def = array();
 	protected static $headers_to_metrics = array();
+	protected static $combined_metrics = array();
 
 	protected static function getIniDef($obj, $prefix = '')
 	{
@@ -965,6 +979,30 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_VIEWERS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_LIVE_VIEWERS] = self::getFilteredAggregator(
+			self::getOrFilter(array(
+				self::getAndFilter(array(
+					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+					self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_JOIN_SESSION))
+			),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_LIVE_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_VOD_LIVE_VIEWERS] = self::getFilteredAggregator(
+			self::getOrFilter(array(
+					self::getAndFilter(array(
+						self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+						self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
+					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_JOIN_SESSION))
+			),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_VOD_LIVE_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_VOD_VIEWERS] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
+				self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD))),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_VOD_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_ENGAGED_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -1573,6 +1611,11 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_MEETING_VIEW_TIME, self::METRIC_MEETING_VIEW_TIME_SEC, '60'));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
+
+		self::$combined_metrics = array(
+			array(self::METRIC_COMBINED_LIVE_VIEW_TIME, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_MEETING_VIEW_TIME),
+			array(self::METRIC_COMBINED_VOD_LIVE_VIEW_TIME, self::METRIC_COMBINED_LIVE_VIEW_TIME, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME),
+		);
 	}
 
 	protected static function initDynamicMetrics($partner_id, &$report_def, $input_filter, $object_ids, $response_options, $isGraph = false)
@@ -2116,10 +2159,14 @@ class kKavaReportsMgr extends kKavaBase
 		return isset($report_def[self::REPORT_GRAPH_METRICS]) ? $report_def[self::REPORT_GRAPH_METRICS] : null;
 	}
 
-
-	protected static function getDataSource($report_def)
+	protected static function getDataSource($report_def, $default_ds = self::DATASOURCE_HISTORICAL)
 	{
-		return isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : self::DATASOURCE_HISTORICAL;
+		if (isset($report_def[self::REPORT_UNION_DATA_SOURCES]))
+		{
+			return array(self::DRUID_TYPE => self::DRUID_UNION,
+						 self::DRUID_DATASOURCES => $report_def[self::REPORT_UNION_DATA_SOURCES]);
+		}
+		return isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : $default_ds;
 	}
 
 	protected static function mapMetricsToHeaders($metrics)
@@ -2418,7 +2465,7 @@ class kKavaReportsMgr extends kKavaBase
 				self::DRUID_VALUES => $playback_types
 			);
 		}
-		elseif (!isset($report_def[self::REPORT_DATA_SOURCE]) &&
+		elseif (!isset($report_def[self::REPORT_DATA_SOURCE]) && !isset($report_def[self::REPORT_UNION_DATA_SOURCES]) &&
 			(is_null($input_filter->playback_types) || trim($input_filter->playback_types === "")))
 		{
 			$druid_filter[] = array(
@@ -2797,16 +2844,32 @@ class kKavaReportsMgr extends kKavaBase
 
 		$filter_values = array();
 		$filter_def = array();
-		$valid_dimensions_to_filter = self::$datasources_dimensions[$data_source];
+		//$valid_dimensions_to_filter = self::$datasources_dimensions[$data_source];
+		$data_sources = is_array($data_source) ? $data_source[self::DRUID_DATASOURCES] : array($data_source);
+
 		//optimize
 		foreach ($filter as $cur_filter)
 		{
+			$valid_filter = true;
 			$dimension = isset($cur_filter[self::DRUID_DIMENSION]) ? $cur_filter[self::DRUID_DIMENSION] : null;
-			if ($dimension && !isset($valid_dimensions_to_filter[$dimension]))
+			if ($dimension)
 			{
-				KalturaLog::log("Invalid filter for dimension [$dimension] in data source [$data_source]. Filter is ignored.");
+				foreach ($data_sources as $curr_data_source)
+				{
+					$valid_dimensions_to_filter = self::$datasources_dimensions[$curr_data_source];
+					if (!isset($valid_dimensions_to_filter[$dimension])) {
+						KalturaLog::log("Invalid filter for dimension [$dimension] in data source [$curr_data_source]. Filter is ignored.");
+						$valid_filter = false;
+						continue;
+					}
+				}
+			}
+
+			if (!$valid_filter)
+			{
 				continue;
 			}
+
 			if (isset($cur_filter[self::DRUID_TYPE]))
 			{
 				$filter_def[] = $cur_filter;
@@ -3175,7 +3238,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		
 		$start = microtime(true);
-		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
+		$data_source = self::getDataSource($report_def, null);
 		$metrics = $report_def[self::REPORT_GRAPH_METRICS];
 		$intervals = self::getFilterIntervals($report_def, $input_filter);
 		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options);
@@ -3906,6 +3969,32 @@ class kKavaReportsMgr extends kKavaBase
 			$result[self::METRIC_COMBINED_LIVE_VIEW_TIME][$date] =
 				$result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME][$date] +
 				$result[self::METRIC_MEETING_VIEW_TIME][$date];
+		}
+	}
+
+	protected static function addCombinedLiveVodGraph(&$result, $dates)
+	{
+		foreach (self::$combined_metrics as $combined_metric )
+		{
+			$combined_header = $combined_metric[0];
+			$first_metric_to_add = $combined_metric[1];
+			$second_metric_to_add = $combined_metric[2];
+
+			if (!$dates)
+			{
+				$result[$combined_header] = array(
+				reset($result[$first_metric_to_add]) +
+				reset($result[$second_metric_to_add]));
+			}
+			else
+			{
+				foreach ($dates as $date)
+				{
+					$result[$combined_header][$date] =
+						$result[$first_metric_to_add][$date] +
+						$result[$second_metric_to_add][$date];
+				}
+			}
 		}
 	}
 
@@ -5065,7 +5154,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
-		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
+		$data_source = self::getDataSource($report_def, null);
 
 		$query = self::getDimCardinalityReport($data_source, $partner_id, $intervals, $dimension, $druid_filter, self::getMetrics($report_def));
 
@@ -5097,7 +5186,7 @@ class kKavaReportsMgr extends kKavaBase
 		$total_count = null;
 		$order_found = false;
 
-		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
+		$data_source = self::getDataSource($report_def, null);
 		$intervals = self::getFilterIntervals($report_def, $input_filter);
 		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options);
 		$dimension = self::getDimension($report_def, $object_ids);
@@ -6085,6 +6174,47 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
+	protected static function addCombinedLiveVodColumn(&$result, $input_filter)
+	{
+		foreach (self::$combined_metrics as $combined_metric )
+		{
+			$headers = $result[0];
+			$combined_header = $combined_metric[0];
+			$first_metric_to_add = $combined_metric[1];
+			$second_metric_to_add = $combined_metric[2];
+			$first_metric_index = array_search($first_metric_to_add, $headers);
+			$second_metric_index = array_search($second_metric_to_add, $headers);
+			if ($first_metric_index === false || $second_metric_index === false)
+			{
+				continue;
+			}
+			$result[0][] = $combined_header;
+			foreach ($result[1] as &$row)
+			{
+				$row[] = $row[$first_metric_index] + $row[$second_metric_index];
+			}
+		}
+	}
+
+	protected static function addTotalCombinedLiveVodColumn(&$result)
+	{
+		foreach (self::$combined_metrics as $combined_metric )
+		{
+			$headers = $result[0];
+			$combined_header = $combined_metric[0];
+			$first_metric_to_add = $combined_metric[1];
+			$second_metric_to_add = $combined_metric[2];
+			$first_metric_index = array_search($first_metric_to_add, $headers);
+			$second_metric_index = array_search($second_metric_to_add, $headers);
+			if ($first_metric_index === false || $second_metric_index === false)
+			{
+				continue;
+			}
+			$result[0][] = $combined_header;
+			$result[1][] = $result[1][$first_metric_index] + $result[1][$second_metric_index];
+		}
+	}
+
 	protected static function getRollupRow($data)
 	{
 		$row = reset($data);
@@ -6273,7 +6403,7 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getSimpleTotalImpl($partner_id, $report_def, reportsInputFilter $input_filter, $object_ids, $response_options)
 	{
 		$start = microtime(true);
-		$data_source = isset($report_def[self::REPORT_DATA_SOURCE]) ? $report_def[self::REPORT_DATA_SOURCE] : null;
+		$data_source = self::getDataSource($report_def, null);
 		$intervals = self::getFilterIntervals($report_def, $input_filter);
 		$druid_filter = self::getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options);
 		
