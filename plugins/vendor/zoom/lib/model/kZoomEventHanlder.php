@@ -25,16 +25,26 @@ class kZoomEventHanlder
 	
 	/**
 	 * @return kZoomEvent
+	 * @param array $data
 	 * @throws Exception
 	 */
-	public function parseEvent()
+	public function parseEvent($data)
 	{
 		kZoomOauth::verifyHeaderToken($this->zoomConfiguration);
-		$data = $this->getRequestData();
 		KalturaLog::debug('Zoom event data is ' . print_r($data, true));
 		$event = new kZoomEvent();
 		$event->parseData($data);
 		return $event;
+	}
+
+	public function processUrlValidationEvent($data)
+	{
+		$response = new KalturaEndpointValidationResponse();
+		$payload = $data[kZoomEvent::PAYLOAD];
+		$response->plainToken = $payload[kZoomEvent::PLAIN_TOKEN];
+		$secretToken = $this->zoomConfiguration[kOAuth::SECRET_TOKEN];
+		$response->encryptedToken = hash_hmac("sha256", $response->plainToken, $secretToken);
+		return $response;
 	}
 
 	/**
@@ -416,7 +426,7 @@ class kZoomEventHanlder
 	 * @return mixed
 	 * @throws Exception
 	 */
-	protected function getRequestData()
+	public function getRequestData()
 	{
 		$request_body = file_get_contents(self::PHP_INPUT);
 		return json_decode($request_body, true);

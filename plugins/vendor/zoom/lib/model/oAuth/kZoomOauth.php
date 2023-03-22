@@ -108,10 +108,24 @@ class kZoomOauth extends kOAuth
 	public static function verifyHeaderToken($zoomConfiguration)
 	{
 		$headers = getallheaders();
+
 		if (isset($headers[self::AUTHORIZATION_HEADER]))
 		{
 			$verificationToken = $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 			if ($verificationToken === $headers[self::AUTHORIZATION_HEADER])
+			{
+				return;
+			}
+		}
+
+		if(isset($headers[self::X_ZM_SIGNATURE]) && isset($headers[self::X_ZM_REQUEST_TIMESTAMP]))
+		{
+			$signatureTimestamp = $headers[self::X_ZM_REQUEST_TIMESTAMP];
+			$secretToken = $zoomConfiguration[kOAuth::SECRET_TOKEN];
+			$body = file_get_contents(ZoomHelper::PHP_INPUT);
+			$signature = "v0=" . hash_hmac("sha256", "v0:$signatureTimestamp:$body", $secretToken);
+
+			if($signature == $headers[self::X_ZM_SIGNATURE])
 			{
 				return;
 			}
