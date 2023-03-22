@@ -138,6 +138,13 @@ class multiLingualUtils
 					$multiLingualMapping[$field][$languageKey] = $languageValue;
 				}
 			}
+			if ($missingLanguages = array_diff_key($multiLingualMapping[$field], $valueToAdd))
+			{
+				foreach ($missingLanguages as $languageKey => $languageValue)
+				{
+					unset($multiLingualMapping[$field][$languageKey]);
+				}
+			}
 		}
 	}
 	
@@ -206,6 +213,7 @@ class multiLingualUtils
 			return;
 		}
 		$defaultLanguage = self::getDefaultLanguage($dbObject);
+		$responseObject->defaultLanguage = $defaultLanguage;
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		foreach ($supportedFields as $fieldName)
 		{
@@ -215,7 +223,9 @@ class multiLingualUtils
 			}
 			if ($responseObject->$fieldName)
 			{
-				$multiLanguageMap[$fieldName][$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
+				$defaultValueMapping[$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
+				$tempFieldMapping = array_merge($defaultValueMapping, $multiLanguageMap[$fieldName]);
+				$multiLanguageMap[$fieldName] = $tempFieldMapping;
 			}
 			$responseObject->$fieldName = KalturaMultiLingualStringArray::fromMultiLingualStringArray($multiLanguageMap[$fieldName]);
 		}
