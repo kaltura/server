@@ -138,7 +138,8 @@ class multiLingualUtils
 					$multiLingualMapping[$field][$languageKey] = $languageValue;
 				}
 			}
-			if ($missingLanguages = array_diff_key($multiLingualMapping[$field], $valueToAdd))
+			$missingLanguages = array_diff_key($multiLingualMapping[$field], $valueToAdd);
+			if ($missingLanguages)
 			{
 				foreach ($missingLanguages as $languageKey => $languageValue)
 				{

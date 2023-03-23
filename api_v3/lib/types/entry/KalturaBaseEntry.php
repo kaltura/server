@@ -413,11 +413,10 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	public $blockAutoTranscript;
 	
 	/**
-	 *
+	 * Entry's default language if the entry is multi lingual
 	 *
 	 * @var string
 	 * @readonly
-	 * @filter eq,in
 	 */
 	public $defaultLanguage;
 
