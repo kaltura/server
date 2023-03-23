@@ -204,6 +204,7 @@ class multiLingualUtils
 		{
 			self::setRequestedLanguageStringInField($responseObject, $dbObject, $multiLanguageMap, $requestLanguage, $responseProfile);
 		}
+		$responseObject->defaultLanguage = self::getDefaultLanguage($dbObject);
 	}
 	
 	protected static function setMultiLanguageStringInField(&$responseObject, $dbObject, $multiLanguageMap, KalturaDetachedResponseProfile $responseProfile = null)
@@ -213,7 +214,6 @@ class multiLingualUtils
 			return;
 		}
 		$defaultLanguage = self::getDefaultLanguage($dbObject);
-		$responseObject->defaultLanguage = $defaultLanguage;
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		foreach ($supportedFields as $fieldName)
 		{
