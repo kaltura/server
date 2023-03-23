@@ -472,7 +472,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		"application",
 		"applicationVersion",
 		"blockAutoTranscript",
-	    "defaultLanguage",
+		"defaultLanguage",
 	 );
 		 
 	public function getMapBetweenObjects()
