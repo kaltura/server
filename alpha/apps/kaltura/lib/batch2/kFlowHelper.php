@@ -3205,11 +3205,16 @@ class kFlowHelper
 		if (array_key_exists($dbBatchJob->getPartnerId(), $expiryByPartner))
 		{
 			$expiry = $expiryByPartner[$dbBatchJob->getPartnerId()];
-			$privilegeActionsLimit = kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":1";
+			$privilegeActionsLimit = kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":3";
 		}
 		else
 		{
 			$expiry = kConf::get("report_export_expiry", 'local', self::REPORT_EXPIRY_TIME);
+		}
+		$actionsLimitByPartner = kConf::get("report_export_actions_limit_by_partner", 'analytics', array());
+		if (array_key_exists($dbBatchJob->getPartnerId(), $actionsLimitByPartner))
+		{
+			$privilegeActionsLimit = kSessionBase::PRIVILEGE_ACTIONS_LIMIT . ":" . $actionsLimitByPartner;
 		}
 
 		$links = array();
