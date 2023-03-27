@@ -151,7 +151,7 @@ class ZoomHelper
 		{
 			return $request_body;
 		}
-        return json_decode($request_body, true);
+		return json_decode($request_body, true);
 	}
 
 	/**
