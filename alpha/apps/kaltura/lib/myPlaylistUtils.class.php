@@ -390,6 +390,7 @@ class myPlaylistUtils
 		$filter->setPartnerSearchScope(baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE);
 		$filter->attachToCriteria($c);
 		
+		$c->addAnd(entryPeer::DISPLAY_IN_SEARCH, EntryDisplayInSearchType::RECYCLED, Criteria::NOT_EQUAL);
 		
 		if (!self::$isAdminKs)
 		{

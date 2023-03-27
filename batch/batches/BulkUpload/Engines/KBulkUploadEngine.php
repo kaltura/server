@@ -322,8 +322,14 @@ abstract class KBulkUploadEngine
 	 */
 	protected function addBulkUploadResult(KalturaBulkUploadResult $bulkUploadResult)
 	{
-		$pluginsData = $bulkUploadResult->pluginsData;
-		$bulkUploadResult->pluginsData = null;
+		if($bulkUploadResult->status == KalturaBulkUploadResultStatus::ERROR)
+		{
+			$pluginsData = null;
+		}
+		else
+		{
+			$pluginsData = $bulkUploadResult->pluginsData;
+		}
 		KBatchBase::$kClient->batch->addBulkUploadResult($bulkUploadResult, $pluginsData);
 	}
 

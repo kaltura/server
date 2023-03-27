@@ -158,6 +158,12 @@ class KSecureEntryHelper
 
 	public function validateForPlay($performApiAccessCheck = true)
 	{
+		if ($this->entry->getDisplayInSearch() === EntryDisplayInSearchType::RECYCLED &&
+			!($this->entry->isOwnerActionsAllowed(kCurrentContext::getCurrentKsKuserId()) || $this->isKsAdmin()))
+		{
+			KExternalErrors::dieError(KExternalErrors::RECYCLED_ENTRY_UNAVAILABLE);
+		}
+		
 	    if ($this->contexts != array(ContextType::THUMBNAIL))
         {
             if ( ! ($this->ks &&
