@@ -101,7 +101,7 @@ class ZoomHelper
 		{
 			$page = file_get_contents($file_path);
 			$tokensString = json_encode($tokens);
-			$secretToken = $zoomConfiguration[kOAuth::SECRET_TOKEN];
+			$secretToken = $zoomConfiguration[kOAuth::SECRET_TOKEN] ?? $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 			list($enc, $iv) = AESEncrypt::encrypt($secretToken, $tokensString);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace('@encryptData@', base64_encode($enc), $page);
@@ -144,9 +144,13 @@ class ZoomHelper
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public static function getPayloadData()
+	public static function getPayloadData($plain=false)
 	{
 		$request_body = file_get_contents(self::PHP_INPUT);
+		if($plain)
+		{
+			return $request_body;
+		}
         return json_decode($request_body, true);
 	}
 

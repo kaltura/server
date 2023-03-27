@@ -252,7 +252,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	protected function handleEncryptTokens($tokensData, $iv, $zoomConfiguration)
 	{
-		$secretToken = $zoomConfiguration[kOAuth::SECRET_TOKEN];
+		$secretToken = $zoomConfiguration[kOAuth::SECRET_TOKEN] ?? $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 		$tokensResponse = AESEncrypt::decrypt($secretToken, $tokensData, $iv);
 		$tokens = kOAuth::parseTokensResponse($tokensResponse);
 		if (!kOAuth::validateTokens($tokens))
@@ -340,7 +340,7 @@ class ZoomVendorService extends KalturaBaseService
 		KalturaResponseCacher::disableCache();
 		myPartnerUtils::resetAllFilters();
 		$kZoomEventHandler = new kZoomEventHanlder(self::getZoomConfiguration());
-		$data = $kZoomEventHandler->getRequestData();
+		$data = ZoomHelper::getPayloadData();
 
 		if($data[kZoomEvent::EVENT] == kZoomEvent::ENDPOINT_URL_VALIDATION)
 		{

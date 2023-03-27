@@ -6,7 +6,6 @@
 
 class kZoomEventHanlder
 {
-	const PHP_INPUT = 'php://input';
 	protected $zoomConfiguration;
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const MAP_NAME = 'vendor';
@@ -422,13 +421,4 @@ class kZoomEventHanlder
 		return $dropFolderFiles;
 	}
 
-	/**
-	 * @return mixed
-	 * @throws Exception
-	 */
-	public function getRequestData()
-	{
-		$request_body = file_get_contents(self::PHP_INPUT);
-		return json_decode($request_body, true);
-	}
 }

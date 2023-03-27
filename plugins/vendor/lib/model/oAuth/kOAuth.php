@@ -10,8 +10,6 @@ abstract class kOAuth
 	const EXPIRES_IN = 'expires_in';
 	const VERIFICATION_TOKEN = 'verificationToken';
 	const SECRET_TOKEN = 'secretToken';
-	const X_ZM_SIGNATURE = 'x-zm-signature';
-	const X_ZM_REQUEST_TIMESTAMP = 'x-zm-request-timestamp';
 
 	protected static $errorCode;
 	

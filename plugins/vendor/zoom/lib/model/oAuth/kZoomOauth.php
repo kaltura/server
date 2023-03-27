@@ -11,6 +11,8 @@ class kZoomOauth extends kOAuth
 	const SCOPE = 'scope';
 	const MAP_NAME = 'vendor';
 	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
+	const X_ZM_SIGNATURE = 'x-zm-signature';
+	const X_ZM_REQUEST_TIMESTAMP = 'x-zm-request-timestamp';
 
 	/**
 	 * @param ZoomVendorIntegration $vendorIntegration
@@ -104,6 +106,7 @@ class kZoomOauth extends kOAuth
 	/**
 	 * verify header token, if not equal die
 	 * @param array $zoomConfiguration
+	 * @throws Exception
 	 */
 	public static function verifyHeaderToken($zoomConfiguration)
 	{
@@ -121,14 +124,19 @@ class kZoomOauth extends kOAuth
 		if(isset($headers[self::X_ZM_SIGNATURE]) && isset($headers[self::X_ZM_REQUEST_TIMESTAMP]))
 		{
 			$signatureTimestamp = $headers[self::X_ZM_REQUEST_TIMESTAMP];
+			$signatureHeader = $headers[self::X_ZM_SIGNATURE];
 			$secretToken = $zoomConfiguration[kOAuth::SECRET_TOKEN];
-			$body = file_get_contents(ZoomHelper::PHP_INPUT);
+			$body = ZoomHelper::getPayloadData(true);
 			$signature = "v0=" . hash_hmac("sha256", "v0:$signatureTimestamp:$body", $secretToken);
 
-			if($signature == $headers[self::X_ZM_SIGNATURE])
+			if($signature == $signatureHeader)
 			{
 				return;
 			}
+
+			KalturaLog::debug("Zoom signature header received [$signatureHeader]");
+			KalturaLog::debug("Zoom request timestamp header received [$signatureTimestamp]");
+			KalturaLog::debug("Signature created for comparison [$signature]");
 		}
 
 		ZoomHelper::exitWithError(kZoomErrorMessages::FAILED_VERIFICATION);
