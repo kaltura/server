@@ -134,11 +134,26 @@ class kZoomOauth extends kOAuth
 				return;
 			}
 
-			KalturaLog::debug("Zoom signature header received [$signatureHeader]");
-			KalturaLog::debug("Zoom request timestamp header received [$signatureTimestamp]");
-			KalturaLog::debug("Signature created for comparison [$signature]");
+			KalturaLog::debug("Zoom signature mismatch: request timestamp [$signatureTimestamp],
+							request signature [$signatureHeader], calculated signature [$signature]");
 		}
 
 		ZoomHelper::exitWithError(kZoomErrorMessages::FAILED_VERIFICATION);
+	}
+
+	/**
+	 * @param array $zoomConfiguration
+	 * @return string
+	 */
+	public static function getSecretTokenForEncryption($zoomConfiguration)
+	{
+		if(isset($zoomConfiguration[kOAuth::SECRET_TOKEN]))
+		{
+			return $zoomConfiguration[kOAuth::SECRET_TOKEN];
+		}
+		else
+		{
+			return $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
+		}
 	}
 }
