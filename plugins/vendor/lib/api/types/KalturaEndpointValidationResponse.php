@@ -5,7 +5,7 @@
  * @subpackage api.objects
  */
 
-class KalturaEndpointValidationResponse
+class KalturaEndpointValidationResponse extends KalturaObject
 {
 	/**
 	 * @var string
