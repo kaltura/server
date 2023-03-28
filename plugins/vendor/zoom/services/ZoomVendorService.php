@@ -252,7 +252,7 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	protected function handleEncryptTokens($tokensData, $iv, $zoomConfiguration)
 	{
-		$secretToken = kZoomOauth::getSecretTokenForEncryption($zoomConfiguration);
+		$secretToken = kZoomOauth::getTokenForEncryption($zoomConfiguration);
 		$tokensResponse = AESEncrypt::decrypt($secretToken, $tokensData, $iv);
 		$tokens = kOAuth::parseTokensResponse($tokensResponse);
 		if (!kOAuth::validateTokens($tokens))

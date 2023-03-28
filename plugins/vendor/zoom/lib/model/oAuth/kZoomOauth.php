@@ -145,7 +145,7 @@ class kZoomOauth extends kOAuth
 	 * @param array $zoomConfiguration
 	 * @return string
 	 */
-	public static function getSecretTokenForEncryption($zoomConfiguration)
+	public static function getTokenForEncryption($zoomConfiguration)
 	{
 		if(isset($zoomConfiguration[kOAuth::SECRET_TOKEN]))
 		{
