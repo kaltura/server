@@ -1,3 +1,16 @@
+# Scorpius-19.6.0
+## Teams Integration Update ##
+- Issue Type: Feature 
+- Issue ID: PSVAMB-41577
+
+### Configuration ###
+Partner-level feature flag
+
+### Deployment scripts ###
+    1. Client generation
+    2. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    3. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_03_20_add_new_object_permission_ms_team_integration.php
+
 # Scorpius-19.5.0
 ## Add new Room plugin ##
 - Issue Type: Feature
