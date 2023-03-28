@@ -17,10 +17,24 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	public $clientId;
 
 	/**
+	 * User-level custom metadata profile ID which will contain encrypted user-level Graph access data.
 	 * @var int
 	 */
-	public $secretExpirationDate;
+	public $userMetadataProfileId;
 
+	/**
+	 * MS Graph permission scopes for delegate auth
+	 * @var string
+	 */
+	public $scopes;
+
+	/**
+	 * Encryption key used for encrypting/decrypting user auth data.
+	 * @readonly
+	 * @requiresPermission read
+	 * @var string
+	 */
+	public $encryptionKey;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -29,7 +43,9 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	(
 		'clientSecret',
 		'clientId',
-		'secretExpirationDate',
+		'userMetadataProfileId',
+		'scopes',
+		'encryptionKey'
 	);
 
 	public function getMapBetweenObjects()
@@ -40,7 +56,7 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 	public function toObject($dbObject = null, $skip = array())
 	{
 		if (is_null($dbObject)) {
-			$dbObject = new MiscrosoftTeamsIntegration();
+			$dbObject = new MicrosoftTeamsIntegration();
 		}
 
 		return parent::toObject($dbObject, $skip);
@@ -52,6 +68,7 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 			$dbObject = new MicrosoftTeamsIntegration();
 		}
 		$dbObject->setVendorType(MicrosoftTeamsDropFolderPlugin::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS));
+		$dbObject->setEncryptionKey(md5(KCryptoWrapper::random_pseudo_bytes(16)));
 
 		return parent::toInsertableObject($dbObject, $skip);
 	}
@@ -62,9 +79,6 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 		{
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
-
-		$this->validatePropertyNotNull('clientSecret');
-		$this->validatePropertyNotNull('clientId');
 
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 	}
@@ -84,6 +98,16 @@ class KalturaMicrosoftTeamsIntegrationSetting extends KalturaIntegrationSetting
 		if (!MicrosoftTeamsDropFolderPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId())) {
 			throw new KalturaAPIException (KalturaErrors::PERMISSION_NOT_FOUND, 'Permission not found to use the Microsoft Teams Drop Folder feature.');
 		}
+
+		$existingMSGraphIntegration = VendorIntegrationPeer::retrieveSingleVendorByPartner(kCurrentContext::getCurrentPartnerId(), MicrosoftTeamsDropFolderPlugin::getVendorTypeCoreValue(MicrosoftTeamsVendorType::MS_TEAMS));
+		if ($existingMSGraphIntegration)
+		{
+			KalturaLog::err('Only 1 MS Teams integration is allowed per partner ID');
+			throw new KalturaAPIException(KalturaVendorIntegrationErrors::INTEGRATION_ALREADY_EXIST);
+		}
+
+		$this->validatePropertyNotNull('clientSecret');
+		$this->validatePropertyNotNull('clientId');
 
 		parent::validateForUpdate($propertiesToSkip);
 	}
