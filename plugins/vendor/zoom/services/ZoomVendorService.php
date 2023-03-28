@@ -252,8 +252,8 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	protected function handleEncryptTokens($tokensData, $iv, $zoomConfiguration)
 	{
-		$verificationToken = $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
-		$tokensResponse = AESEncrypt::decrypt($verificationToken, $tokensData, $iv);
+		$secretToken = kZoomOauth::getTokenForEncryption($zoomConfiguration);
+		$tokensResponse = AESEncrypt::decrypt($secretToken, $tokensData, $iv);
 		$tokens = kOAuth::parseTokensResponse($tokensResponse);
 		if (!kOAuth::validateTokens($tokens))
 		{
@@ -332,17 +332,30 @@ class ZoomVendorService extends KalturaBaseService
 	/**
 	 * @action recordingComplete
 	 * @throws Exception
+	 * @return KalturaEndpointValidationResponse|null
 	 */
 	public function recordingCompleteAction()
 	{
+		$eventResponse = null;
 		KalturaResponseCacher::disableCache();
 		myPartnerUtils::resetAllFilters();
 		$kZoomEventHandler = new kZoomEventHanlder(self::getZoomConfiguration());
-		$event = $kZoomEventHandler->parseEvent();
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($event->accountId);
-		ZoomHelper::verifyZoomIntegration($zoomIntegration);
-		$this->setPartnerFilters($zoomIntegration->getPartnerId());
-		$kZoomEventHandler->processEvent($event);
+		$data = ZoomHelper::getPayloadData();
+
+		if($data[kZoomEvent::EVENT] == kZoomEvent::ENDPOINT_URL_VALIDATION)
+		{
+			$eventResponse = $kZoomEventHandler->processUrlValidationEvent($data);
+		}
+		else
+		{
+			$event = $kZoomEventHandler->parseEvent($data);
+			$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($event->accountId);
+			ZoomHelper::verifyZoomIntegration($zoomIntegration);
+			$this->setPartnerFilters($zoomIntegration->getPartnerId());
+			$kZoomEventHandler->processEvent($event);
+		}
+
+		return $eventResponse;
 	}
 	
 	/**
