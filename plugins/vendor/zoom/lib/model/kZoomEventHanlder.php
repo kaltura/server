@@ -64,7 +64,7 @@ class kZoomEventHanlder
 				if ($zoomDropFolderId)
 				{
 					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration,
-					                               $zoomDropFolder->getConversionProfileId(), $zoomClient, $zoomDropFolder->getFileDeletePolicy());
+					                               $zoomDropFolder->getConversionProfileId(), $zoomDropFolder->getFileDeletePolicy());
 				}
 				else
 				{
@@ -216,7 +216,7 @@ class kZoomEventHanlder
 	}
 	
 	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId, $partnerId, ZoomVendorIntegration $zoomVendorIntegration,
-	                                                   $conversionProfileId, kZoomClient $zoomClient = null, $fileDeletionPolicy = null)
+	                                                   $conversionProfileId, $fileDeletionPolicy = null)
 	{
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
@@ -233,7 +233,7 @@ class kZoomEventHanlder
 		foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 		{
 			$parentEntry = null;
-			self::handleAudioFiles($recordingFilesPerTimeSlot, $kMeetingMetaData->getUuid(), $zoomClient ,$fileDeletionPolicy);
+			self::handleAudioFiles($recordingFilesPerTimeSlot, $kMeetingMetaData->getUuid() ,$fileDeletionPolicy);
 			/* @var kZoomRecordingFile $recordingFile*/
 			foreach ($recordingFilesPerTimeSlot as $recordingFile)
 			{
@@ -283,7 +283,7 @@ class kZoomEventHanlder
 		}
 	}
 
-	protected static function handleAudioFiles(&$recordingFilesPerTimeSlot, $meetingFileUuid, kZoomClient $zoomClient, $fileDeletionPolicy)
+	protected static function handleAudioFiles(&$recordingFilesPerTimeSlot, $meetingFileUuid, $fileDeletionPolicy)
 	{
 		$foundMP4 = false;
 		$audioKeys = array();
