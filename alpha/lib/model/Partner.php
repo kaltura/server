@@ -1564,7 +1564,7 @@ class Partner extends BasePartner
 	
 	public function getI18nTemplatePartnerId ()
 	{
-		$this->getFromCustomData('i18n_template_partner_id');
+		return $this->getFromCustomData('i18n_template_partner_id');
 	}
 	
 	
