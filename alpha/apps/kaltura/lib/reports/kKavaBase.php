@@ -92,6 +92,7 @@ class kKavaBase extends kDruidBase
 	const PLAYBACK_TYPE_VOD = 'vod';
 	const PLAYBACK_TYPE_LIVE = 'live';
 	const PLAYBACK_TYPE_DVR = 'dvr';
+	const PLAYBACK_TYPE_OFFLINE = 'offline';
 
 	// event types - player events
 	const EVENT_TYPE_PLAYER_IMPRESSION = 'playerImpression';

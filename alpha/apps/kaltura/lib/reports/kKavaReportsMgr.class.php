@@ -1247,12 +1247,12 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-					self::getNotFilter(self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD)))),
+					self::getNotFilter(self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_OFFLINE))))),
 			self::getLongSumAggregator(self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT] = self::getFilteredAggregator(
 				self::getAndFilter(array(
-					self::getNotFilter(self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD)),
+					self::getNotFilter(self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_OFFLINE))),
 					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 					self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, array_merge(self::$good_engagement, array(self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN), self::$meeting_engagement)))),
 			self::getLongSumAggregator(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT, self::METRIC_COUNT));

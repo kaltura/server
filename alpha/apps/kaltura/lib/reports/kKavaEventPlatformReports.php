@@ -70,7 +70,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_DIMENSION_MAP => array(
 				'position' => self::DIMENSION_POSITION,
 			),
-			self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
+			self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
 			self::REPORT_TABLE_FINALIZE_FUNC => "self::addZeroMinutes",
 		),
 	);
