@@ -204,6 +204,9 @@ class kKavaBase extends kDruidBase
 	const USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN = 'SoundOffTabNotFocusedFullScreen';
 	const USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN_OFF = 'SoundOffTabNotFocusedFullScreenOff';
 
+	// user engagement meeting values
+	const USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON = 'TabFocusedMicUnmutedFullScreenCameraOnSoundOn';
+
 	protected static $realtime_engagement = array(
 		self::USER_SOUND_ON_TAB_FOCUSED,
 		self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN,
@@ -231,6 +234,10 @@ class kKavaBase extends kDruidBase
 		self::USER_SOUND_OFF_TAB_NOT_FOCUSED,
 		self::USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN_OFF,
 		self::USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN,
+	);
+
+	protected $meeting_engagement = array(
+		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON
 	);
 
 	//general values

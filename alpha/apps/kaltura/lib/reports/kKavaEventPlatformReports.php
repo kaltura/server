@@ -41,12 +41,38 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				),
 				array(
 					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_LIVE_VIEWERS, self::METRIC_UNIQUE_VOD_LIVE_VIEWERS),
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_LIVE_VIEWERS, self::METRIC_UNIQUE_VOD_LIVE_VIEWERS),
-					self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_LIVE_VIEWERS, self::METRIC_UNIQUE_VOD_LIVE_VIEWERS)
+					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_UNIQUE_VOD_LIVE_VIEWERS),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_UNIQUE_VOD_LIVE_VIEWERS),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_UNIQUE_VOD_LIVE_VIEWERS)
 				),
 			)
-		)
+		),
+
+		ReportType::EP_WEBCAST_ENGAGEMENT => array(
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+					self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO)
+				),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_METRICS => array(self::METRIC_REACTION_CLICKED_USER_RATIO),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_REACTION_CLICKED_USER_RATIO),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_REACTION_CLICKED_USER_RATIO)
+				),
+			)
+		),
+
+		ReportType::EP_WEBCAST_ENGAGEMENT_TIMELINE => array(
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_DIMENSION_MAP => array(
+				'position' => self::DIMENSION_POSITION,
+			),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
+			self::REPORT_TABLE_FINALIZE_FUNC => "self::addZeroMinutes",
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter)
@@ -56,7 +82,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 		{
 			return null;
 		}
-		
+
 		self::initTransformTimeDimensions();
 
 		return $report_def;

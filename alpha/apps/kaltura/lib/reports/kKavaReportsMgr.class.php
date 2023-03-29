@@ -28,7 +28,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_SEGMENT_DOWNLOAD_TIME_SUM = 'segmentDownloadTimeSum';
 	const METRIC_MANIFEST_DOWNLOAD_TIME_SUM = 'manifestDownloadTimeSum';
 	const METRIC_VIEW_TIME_SUM = 'viewTimeSum';
-	const METRIC_UNIQUE_LIVE_VIEWERS = 'unique_live_viewers';
+	const METRIC_UNIQUE_COMBINED_LIVE_VIEWERS = 'unique_combined_live_viewers';
 	const METRIC_UNIQUE_VOD_VIEWERS = 'unique_vod_viewers';
 	const METRIC_UNIQUE_VOD_LIVE_VIEWERS = 'unique_vod_live_viewers';
 
@@ -129,7 +129,11 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_REACH_DURATION_SEC = 'reach_duration_sec';
 	const METRIC_REACH_DURATION = 'reach_duration';
 	const METRIC_MEETING_VIEW_TIME = 'meeting_view_time';
-
+	const METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT = 'combined_live_view_period_count';
+	const METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT = 'combined_live_engaged_users_count';
+	const METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO = 'combined_live_engaged_users_ratio';
+	const METRIC_REACTION_CLICKED_UNIQUE_USERS = 'reaction_clicked_unique_users';
+	const METRIC_REACTION_CLICKED_USER_RATIO = 'reaction_clicked_user_ratio';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -472,9 +476,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
 		self::METRIC_UNIQUE_DOMAINS => 'floor',
-		self::METRIC_UNIQUE_LIVE_VIEWERS => 'floor',
+		self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS => 'floor',
 		self::METRIC_UNIQUE_VOD_VIEWERS => 'floor',
 		self::METRIC_UNIQUE_VOD_LIVE_VIEWERS => 'floor',
+		self::METRIC_REACTION_CLICKED_UNIQUE_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -524,9 +529,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC => true,
 		self::METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC => true,
 		self::METRIC_UNIQUE_DOMAINS => true,
-		self::METRIC_UNIQUE_LIVE_VIEWERS => true,
+		self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS => true,
 		self::METRIC_UNIQUE_VOD_VIEWERS => true,
 		self::METRIC_UNIQUE_VOD_LIVE_VIEWERS => true,
+		self::METRIC_REACTION_CLICKED_UNIQUE_USERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -980,14 +986,14 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
 
-		self::$aggregations_def[self::METRIC_UNIQUE_LIVE_VIEWERS] = self::getFilteredAggregator(
+		self::$aggregations_def[self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS] = self::getFilteredAggregator(
 			self::getOrFilter(array(
 				self::getAndFilter(array(
 					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PLAY),
 					self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)))),
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_JOIN_SESSION))
 			),
-			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_LIVE_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_UNIQUE_VOD_LIVE_VIEWERS] = self::getFilteredAggregator(
 			self::getOrFilter(array(
@@ -1237,6 +1243,23 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_MEETING_VIEW_TIME_SEC] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 			self::getLongSumAggregator(self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+					self::getNotFilter(self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD)))),
+			self::getLongSumAggregator(self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT] = self::getFilteredAggregator(
+				self::getAndFilter(array(
+					self::getNotFilter(self::getSelectorFilter(self::DIMENSION_PLAYBACK_TYPE, self::PLAYBACK_TYPE_VOD)),
+					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+					self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, array_merge(self::$good_engagement, array(self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN), self::$meeting_engagement)))),
+			self::getLongSumAggregator(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_REACTION_CLICKED_UNIQUE_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_REACTION_CLICKED),
+			self::getHyperUniqueAggregator(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -1609,6 +1632,20 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_MEETING_VIEW_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_MEETING_VIEW_TIME, self::METRIC_MEETING_VIEW_TIME_SEC, '60'));
+
+		self::$metrics_def[self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT, self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO,
+				self::METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT,
+				self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT));
+
+		self::$metrics_def[self::METRIC_REACTION_CLICKED_USER_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_UNIQUE_VIEWERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_REACTION_CLICKED_USER_RATIO, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_REACTION_CLICKED_UNIQUE_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_VIEWERS))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 

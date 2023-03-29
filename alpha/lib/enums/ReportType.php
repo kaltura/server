@@ -210,5 +210,7 @@ interface ReportType extends BaseEnum
    // event platform reports
    const EP_WEBCAST_HIGHLIGHTS = 60001;
    const EP_WEBCAST_UNIQUE_USERS = 60002;
+   const EP_WEBCAST_ENGAGEMENT = 60003;
+   const EP_WEBCAST_ENGAGEMENT_TIMELINE = 60004;
 
 }
