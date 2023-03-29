@@ -40,6 +40,7 @@ class kZoomEventHanlder
 	{
 		$response = new KalturaEndpointValidationResponse();
 		$payload = $data[kZoomEvent::PAYLOAD];
+		KalturaLog::debug("Zoom endpoint validation payload: " . print_r($payload, true));
 		$response->plainToken = $payload[kZoomEvent::PLAIN_TOKEN];
 		$secretToken = $this->zoomConfiguration[kOAuth::SECRET_TOKEN];
 		$response->encryptedToken = hash_hmac("sha256", $response->plainToken, $secretToken);
