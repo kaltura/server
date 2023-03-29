@@ -2756,7 +2756,7 @@ class kKavaReportsMgr extends kKavaBase
 	protected static function getFilteredEventTypes($aggr_filter)
 	{
 		$event_types = array();
-		if (isset($aggr_filter[self::DRUID_TYPE]) && $aggr_filter[self::DRUID_TYPE] == self::DRUID_AND)
+		if (isset($aggr_filter[self::DRUID_TYPE]) && ($aggr_filter[self::DRUID_TYPE] == self::DRUID_AND || $aggr_filter[self::DRUID_TYPE] == self::DRUID_OR))
 		{
 			foreach ($aggr_filter[self::DRUID_FIELDS] as $filter)
 			{
