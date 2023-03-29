@@ -236,7 +236,7 @@ class kKavaBase extends kDruidBase
 		self::USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN,
 	);
 
-	protected $meeting_engagement = array(
+	protected static $meeting_engagement = array(
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON
 	);
 
