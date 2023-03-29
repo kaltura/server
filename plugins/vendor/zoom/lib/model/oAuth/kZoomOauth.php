@@ -114,6 +114,7 @@ class kZoomOauth extends kOAuth
 
 		if (isset($headers[self::AUTHORIZATION_HEADER]))
 		{
+			KalturaLog::debug("Zoom authorization header [" . $headers[self::AUTHORIZATION_HEADER] . "]");
 			$verificationToken = $zoomConfiguration[kOAuth::VERIFICATION_TOKEN];
 			if ($verificationToken === $headers[self::AUTHORIZATION_HEADER])
 			{
@@ -129,13 +130,13 @@ class kZoomOauth extends kOAuth
 			$body = ZoomHelper::getPayloadData(true);
 			$signature = "v0=" . hash_hmac("sha256", "v0:$signatureTimestamp:$body", $secretToken);
 
+			KalturaLog::debug("Zoom signature: request timestamp [$signatureTimestamp],
+								request signature [$signatureHeader], calculated signature [$signature]");
+
 			if($signature == $signatureHeader)
 			{
 				return;
 			}
-
-			KalturaLog::debug("Zoom signature mismatch: request timestamp [$signatureTimestamp],
-							request signature [$signatureHeader], calculated signature [$signature]");
 		}
 
 		ZoomHelper::exitWithError(kZoomErrorMessages::FAILED_VERIFICATION);
