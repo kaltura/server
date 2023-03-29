@@ -145,6 +145,10 @@ class multiLingualUtils
 				{
 					unset($multiLingualMapping[$field][$languageKey]);
 				}
+				if (count($multiLingualMapping[$field]))
+				{
+					unset($multiLingualMapping[$field]);
+				}
 			}
 		}
 	}
@@ -213,7 +217,10 @@ class multiLingualUtils
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		if (!$multiLanguageMap)
 		{
-			self::getMappingForDefaultLanguage($responseObject,$multiLanguageMap, $dbObject, $supportedFields, $defaultLanguage);
+			if ($defaultLanguage)
+			{
+				self::getMappingForDefaultLanguage($responseObject, $multiLanguageMap, $dbObject, $supportedFields, $defaultLanguage);
+			}
 			return;
 		}
 		foreach ($supportedFields as $fieldName)
@@ -232,7 +239,7 @@ class multiLingualUtils
 		}
 	}
 	
-	protected static function getMappingForDefaultLanguage( &$responseObject, &$multiLanguageMap, $dbObject, $supportedFields, $defaultLanguage)
+	protected static function getMappingForDefaultLanguage(&$responseObject, &$multiLanguageMap, $dbObject, $supportedFields, $defaultLanguage)
 	{
 		foreach ($supportedFields as $fieldName)
 		{
