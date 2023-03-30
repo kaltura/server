@@ -11,6 +11,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 	 * @var string
 	 */
 	protected $tempFolderPath;
+	const MAX_BODY_SIZE = 1000;
 	
 	/* (non-PHPdoc)
 	 * @see KDispatchEventNotificationEngine::__construct()
@@ -88,6 +89,8 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		}
 
 		$curlWrapper = new KCurlWrapper();
+        	$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, 1);
+        	$curlWrapper->setOpt(CURLOPT_HEADER, 1);
 
 		if(count($headers))
 			$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $headers);
@@ -182,13 +185,18 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		$errCode = $curlWrapper->getErrorNumber();
 		$errMessage = $curlWrapper->getError();
 
+		$header_size = curl_getinfo($curlWrapper->ch, CURLINFO_HEADER_SIZE);
+		$headers = substr($results, 0, $header_size);
+		$body = strip_tags(substr($results, $header_size));
+
 		$curlWrapper->close();
 
-		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results]");
+        	KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results] Headers [$headers] Body [$body]");
 		if(!$results || $httpCode != 200)
 		{
+            		$body = substr($body, 0, self::MAX_BODY_SIZE);
 			throw new kTemporaryException("Sending HTTP request failed [$errCode] httpCode [$httpCode]
-			    url [$url]: $errMessage", $httpCode);
+			    			    \n url: [$url] \n $errMessage \n Headers:\n [$headers] \n Body:\n [$body]", $httpCode);
 		}
 		
 		return true;
