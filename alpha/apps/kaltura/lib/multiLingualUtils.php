@@ -232,7 +232,7 @@ class multiLingualUtils
 			if ($responseObject->$fieldName)
 			{
 				$defaultValueMapping[$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
-				$tempFieldMapping = array_merge($defaultValueMapping, $multiLanguageMap[$fieldName]);
+				$tempFieldMapping = ($multiLanguageMap[$fieldName]) ? array_merge($defaultValueMapping, $multiLanguageMap[$fieldName]) : $defaultValueMapping;
 				$multiLanguageMap[$fieldName] = $tempFieldMapping;
 			}
 			$responseObject->$fieldName = KalturaMultiLingualStringArray::fromMultiLingualStringArray($multiLanguageMap[$fieldName]);
