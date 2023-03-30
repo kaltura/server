@@ -1,3 +1,15 @@
+# Scorpius-19.6.0
+## Increase ActionsLimit For Analytics ##
+- Issue Type: Task
+- Issue ID: SUP-36491
+
+### Configuration ###
+Add the following section to analytics confMap:
+```
+[report_export_actions_limit_by_partner]
+partnerId=numberOfMaxActionsLimit
+```
+
 # Scorpius-19.5.0
 ## Add new Room plugin ##
 - Issue Type: Feature
