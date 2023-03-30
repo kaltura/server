@@ -2,9 +2,12 @@
 
 require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
 if ($argc < 2)
-	die("Usage: php $argv[0] partnerId <realrun | dryrun>"."\n");
+	die("Usage: php $argv[0] kuserIdsFile <realrun | dryrun>"."\n");
 
-$partnerId = $argv[1] ;
+$kuserIdsFilePath = $argv[1];
+$kuserIdsArr = file_get_contents($kuserIdsFilePath);
+$kuserIdsArr = array_filter(explode("\n", $kuserIdsArr));
+
 $dryrun = true;
 if($argc == 3 && $argv[2] == 'realrun')
 {
@@ -13,7 +16,6 @@ if($argc == 3 && $argv[2] == 'realrun')
 KalturaStatement::setDryRun($dryrun);
 KalturaLog::debug('dryrun value: ['.$dryrun.']');
 
-$kuserIdsArr = getKuserIds($partnerId);
 KalturaLog::debug("total deleted users: " . count($kuserIdsArr));
 
 $start = 0;
@@ -28,22 +30,12 @@ while($start < count($kuserIdsArr))
 
 KalturaLog::debug('DONE!');
 
-function getKuserIds($partnerId)
-{
-	$c = new Criteria();
-	$c->add(kuserPeer::PARTNER_ID, $partnerId);
-	$c->add(kuserPeer::STATUS, KuserStatus::DELETED);
-	$c->addSelectColumn(kuserPeer::ID);
-	// to avoid filter out deleted users
-	kuserPeer::setUseCriteriaFilter(false);
-	$stmt = kuserPeer::doSelectStmt($c);
-	return $stmt->fetchAll(PDO::FETCH_COLUMN);
-}
-
 function updateStatuses($kuserIds, $dryrun)
 {
 	$c = new Criteria();
 	$c->add(kuserPeer::ID, $kuserIds, Criteria::IN);
+	// to avoid filter out deleted users
+	kuserPeer::setUseCriteriaFilter(false);
 	$kusers = kuserPeer::doSelect($c);
 
 	foreach ($kusers as $kuser)
