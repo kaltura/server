@@ -2887,23 +2887,24 @@ class kKavaReportsMgr extends kKavaBase
 		//optimize
 		foreach ($filter as $cur_filter)
 		{
-			$valid_filter = true;
+			$valid_filter = false;
 			$dimension = isset($cur_filter[self::DRUID_DIMENSION]) ? $cur_filter[self::DRUID_DIMENSION] : null;
 			if ($dimension)
 			{
 				foreach ($data_sources as $curr_data_source)
 				{
 					$valid_dimensions_to_filter = self::$datasources_dimensions[$curr_data_source];
-					if (!isset($valid_dimensions_to_filter[$dimension])) {
-						KalturaLog::log("Invalid filter for dimension [$dimension] in data source [$curr_data_source]. Filter is ignored.");
-						$valid_filter = false;
-						continue;
+					if (isset($valid_dimensions_to_filter[$dimension]))
+					{
+						$valid_filter = true;
 					}
 				}
 			}
 
 			if (!$valid_filter)
 			{
+				$data_sources_names = implode(" ", $data_sources);
+				KalturaLog::log("Invalid filter for dimension [$dimension] in data source(s) [$data_sources_names]. Filter is ignored.");
 				continue;
 			}
 
@@ -4011,7 +4012,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function addCombinedLiveVodGraph(&$result, $dates)
 	{
-		foreach (self::$combined_metrics as $combined_metric )
+		foreach (self::$combined_metrics as $combined_metric)
 		{
 			$combined_header = $combined_metric[0];
 			$first_metric_to_add = $combined_metric[1];
@@ -6213,7 +6214,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function addCombinedLiveVodColumn(&$result, $input_filter)
 	{
-		foreach (self::$combined_metrics as $combined_metric )
+		foreach (self::$combined_metrics as $combined_metric)
 		{
 			$headers = $result[0];
 			$combined_header = $combined_metric[0];
@@ -6235,7 +6236,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function addTotalCombinedLiveVodColumn(&$result)
 	{
-		foreach (self::$combined_metrics as $combined_metric )
+		foreach (self::$combined_metrics as $combined_metric)
 		{
 			$headers = $result[0];
 			$combined_header = $combined_metric[0];
