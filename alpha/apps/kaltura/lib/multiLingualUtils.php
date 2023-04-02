@@ -145,7 +145,7 @@ class multiLingualUtils
 				{
 					unset($multiLingualMapping[$field][$languageKey]);
 				}
-				if (count($multiLingualMapping[$field]))
+				if (count($multiLingualMapping[$field]) == 0)
 				{
 					unset($multiLingualMapping[$field]);
 				}
