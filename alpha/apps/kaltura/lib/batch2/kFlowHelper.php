@@ -2956,6 +2956,50 @@ class kFlowHelper
 				break;
 		}
 	}
+	
+	/**
+	 * @param entry $entry
+	 * @throws PropelException
+	 */
+	public static function handleEntryChangedDisplayInSearch(entry $entry)
+	{
+		if ($entry->getDisplayInSearch() == EntryDisplayInSearchType::RECYCLED)
+		{
+			kFlowHelper::updateUserEntriesWithDisplayInSearchStatus($entry, UserEntryStatus::ACTIVE, UserEntryStatus::RECYCLED);
+		}
+		else
+		{
+			kFlowHelper::updateUserEntriesWithDisplayInSearchStatus($entry, UserEntryStatus::RECYCLED, UserEntryStatus::ACTIVE);
+		}
+	}
+	
+	/**
+	 * @param entry $entry
+	 * @param $oldUserEntryStatus
+	 * @param $newUserEntryStatus
+	 * @throws PropelException
+	 */
+	public static function updateUserEntriesWithDisplayInSearchStatus(entry $entry, $oldUserEntryStatus, $newUserEntryStatus)
+	{
+		$userEntryCriteria = new Criteria();
+		$userEntryCriteria->add(UserEntryPeer::PARTNER_ID, $entry->getPartnerId());
+		$userEntryCriteria->add(UserEntryPeer::ENTRY_ID, $entry->getId());
+		$userEntryCriteria->add(UserEntryPeer::STATUS, array($oldUserEntryStatus), Criteria::IN);
+		UserEntryPeer::setUseCriteriaFilter(false);
+		$userEntriesList = UserEntryPeer::doSelect($userEntryCriteria);
+		UserEntryPeer::setUseCriteriaFilter(true);
+		if (!$userEntriesList)
+		{
+			return;
+		}
+		
+		foreach ($userEntriesList as $userEntry)
+		{
+			/** @var UserEntry $userEntry */
+			$userEntry->setStatus($newUserEntryStatus);
+			$userEntry->save();
+		}
+	}
 
 	public static function handleIndexPending(BatchJob $dbBatchJob, kIndexJobData $data)
 	{
