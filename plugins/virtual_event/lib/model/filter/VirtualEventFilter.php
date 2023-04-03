@@ -17,9 +17,8 @@ class VirtualEventFilter extends baseObjectFilter
 			'_gte_updated_at',
 			'_lte_updated_at',
 		), null);
-		
-		$this->allowed_order_fields = array(
-		);
+
+		$this->allowed_order_fields = array ( "created_at" , "updated_at" );
 	}
 	
 	public function getFieldNameFromPeer($field_name)
