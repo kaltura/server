@@ -64,7 +64,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 
 			try {
 				$userTeamsData = new KUserGraphMetadata($userMetadataObj->xml, $vendorIntegrationSetting->encryptionKey);
-				if (!$userTeamsData)
+				if (!$userTeamsData->recordingType)
 				{
 					if ($user instanceof KalturaGroup)
 					{
@@ -92,7 +92,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 				$graphClient->bearerToken = $userTeamsData->authToken;
 			}
 
-			$driveLastPageUrl = sprintf(self::PERSONAL_RECORDINGS_DIRECTORY_URL, $userTeamsData->deltaToken ? $userTeamsData->deltaToken : 'latest' );
+			$driveLastPageUrl = sprintf(self::PERSONAL_RECORDINGS_DIRECTORY_URL, ($userTeamsData->deltaToken ? $userTeamsData->deltaToken : 'latest') );
 			KalturaLog::info("Handling drive for user ID: {$user->id}, drive URL: $driveLastPageUrl");
 			$items = $graphClient->sendGraphRequest($driveLastPageUrl);
 			if (!$items)
@@ -128,7 +128,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 				}
 			}
 
-			if(!isset($items['@odata.nextLink']) || !isset($items['@odata.deltaLink']))
+			if(!isset($items['@odata.nextLink']) && !isset($items['@odata.deltaLink']))
 			{
 				throw new Exception("Next page parameter for user {$user->id} cannot be determined!");
 			}
