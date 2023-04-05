@@ -394,6 +394,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
             ESearchEntryFilterFields::LAST_PLAYED_AT => ESearchEntryOrderByFieldName::LAST_PLAYED_AT,
             ESearchEntryFilterFields::PLAYS => ESearchEntryFieldName::PLAYS,
             ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE => ESearchEntryFieldName::EXTERNAL_SOURCE_TYPE,
+			ESearchEntryFilterFields::RECYCLED_AT => ESearchEntryOrderByFieldName::RECYCLED_AT,
         );
 
         if (array_key_exists($field, $fieldsMap)) {
