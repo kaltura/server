@@ -21,4 +21,5 @@ class KalturaESearchEntryOrderByFieldName extends KalturaStringEnum
 	const PLAYS_LAST_7_DAYS = 'plays_last_7_days';
 	const VIEWS_LAST_1_DAY = 'views_last_1_day';
 	const PLAYS_LAST_1_DAY = 'plays_last_1_day';
+	const RECYCLED_AT = 'recycled_at';
 }

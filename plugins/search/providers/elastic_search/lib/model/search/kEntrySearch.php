@@ -23,7 +23,10 @@ class kEntrySearch extends kBaseESearch
             return;
 
         $displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter();
-        $this->mainBoolQuery->addToFilter($displayInSearchQuery);
+		if ($displayInSearchQuery)
+		{
+			$this->mainBoolQuery->addToFilter($displayInSearchQuery);
+		}
     }
 
     public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectId = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
