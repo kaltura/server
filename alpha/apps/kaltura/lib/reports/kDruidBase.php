@@ -32,7 +32,6 @@ class kDruidBase
 	const DRUID_GRANULARITY = 'granularity';
 	const DRUID_GRANULARITY_ALL = 'all';
 	const DRUID_DATASOURCE = 'dataSource';
-	const DRUID_DATASOURCES = 'dataSources';
 	const DRUID_INTERVALS = 'intervals';
 	const DRUID_FIELD = 'field';
 	const DRUID_FIELDS = 'fields';
@@ -82,7 +81,6 @@ class kDruidBase
 	const DRUID_EXTRACTION = 'extraction';
 	const DRUID_EXTRACTION_FUNC = 'extractionFn';
 	const DRUID_TIME_FORMAT = 'timeFormat';
-	const DRUID_UNION = 'union';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
