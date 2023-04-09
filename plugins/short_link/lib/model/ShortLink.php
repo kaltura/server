@@ -83,10 +83,15 @@ class ShortLink extends BaseShortLink implements IBaseObject {
 	protected function calculateId()
 	{
 		$allChars = '0123456789abcdefghijklmnopqrstuvwxyz';
-		$dcChars = str_split($allChars, strlen($allChars) / count(kDataCenterMgr::getAllDcs(true)));
+		$allDcs = kDataCenterMgr::getAllDcs(true);
+		$allCharsSplit = str_split($allChars, strlen($allChars) / count($allDcs));
+		//Build $dcChars array while using dcId for cases where you have single dc and its id is not 0
+		foreach ($allDcs as $dc) {
+			$dcChars[(int) $dc['id']] = array_shift($allCharsSplit);
+		}
 		
-		$dc = kDataCenterMgr::getCurrentDc();
-		$dcId = (int) $dc["id"];
+		$currentDc = kDataCenterMgr::getCurrentDc();
+		$dcId = (int) $currentDc["id"];
 		$currentDcChars = $dcChars[$dcId];
 		
 		for ($i = 0; $i < 10; $i++)
