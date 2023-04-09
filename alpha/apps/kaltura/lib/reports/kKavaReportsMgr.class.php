@@ -2899,15 +2899,15 @@ class kKavaReportsMgr extends kKavaBase
 						$valid_filter = true;
 					}
 				}
-			}
 
-			if (!$valid_filter)
-			{
-				$data_sources_names = implode(" ", $data_sources);
-				KalturaLog::log("Invalid filter for dimension [$dimension] in data source(s) [$data_sources_names]. Filter is ignored.");
-				continue;
+				if (!$valid_filter)
+				{
+					$data_sources_names = implode(" ", $data_sources);
+					KalturaLog::log("Invalid filter for dimension [$dimension] in data source(s) [$data_sources_names]. Filter is ignored.");
+					continue;
+				}
 			}
-
+			
 			if (isset($cur_filter[self::DRUID_TYPE]))
 			{
 				$filter_def[] = $cur_filter;
