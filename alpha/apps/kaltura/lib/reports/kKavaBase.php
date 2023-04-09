@@ -92,7 +92,6 @@ class kKavaBase extends kDruidBase
 	const PLAYBACK_TYPE_VOD = 'vod';
 	const PLAYBACK_TYPE_LIVE = 'live';
 	const PLAYBACK_TYPE_DVR = 'dvr';
-	const PLAYBACK_TYPE_OFFLINE = 'offline';
 
 	// event types - player events
 	const EVENT_TYPE_PLAYER_IMPRESSION = 'playerImpression';
@@ -153,9 +152,6 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VE_INVITED = 'invited';
 	const EVENT_TYPE_VE_CREATED = 'created';
 
-	// event types - meeting events
-	const EVENT_TYPE_JOIN_SESSION = 'joinSession';
-
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
 	const VIEW_EVENT_PERIOD = 'PT10S';	
@@ -205,9 +201,6 @@ class kKavaBase extends kDruidBase
 	const USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN = 'SoundOffTabNotFocusedFullScreen';
 	const USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN_OFF = 'SoundOffTabNotFocusedFullScreenOff';
 
-	// user engagement meeting values
-	const USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON = 'TabFocusedMicUnmutedFullScreenCameraOnSoundOn';
-
 	protected static $realtime_engagement = array(
 		self::USER_SOUND_ON_TAB_FOCUSED,
 		self::USER_SOUND_ON_TAB_FOCUSED_FULL_SCREEN,
@@ -235,10 +228,6 @@ class kKavaBase extends kDruidBase
 		self::USER_SOUND_OFF_TAB_NOT_FOCUSED,
 		self::USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN_OFF,
 		self::USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN,
-	);
-
-	protected static $meeting_engagement = array(
-		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON
 	);
 
 	//general values
