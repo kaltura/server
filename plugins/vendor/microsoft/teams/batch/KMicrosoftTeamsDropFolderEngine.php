@@ -7,20 +7,17 @@
 class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 {
 	const ADMIN_TAG_TEAMS = 'msTeams';
+	const MS_GRAPH_METADATA = 'ms_graph_metadata';
 
-	const LOCKED_FILE_MIDFIX = '.locked.';
-
-	const LAST_TIMESTAMP_POSTFIX = '_lastTimestamp';
+	const ASC_LAST_ACCESSED_DATE = "+/*[local-name()='metadata']/*[local-name()='LastAccessed']";
+	const OPT_IN_XPATH = "/*[local-name()='metadata']/*[local-name()='HasOptIn']";
+	const OPT_IN_VALUE = 'True';
+	const PERSONAL_RECORDINGS_DIRECTORY_URL = 'me/drive/root:/Recordings:/delta?token=%s';
 
 	/**
 	 * @var VendorPlugin
 	 */
 	protected $vendorPlugin;
-
-	/**
-	 * @var KMicrosoftGraphClient
-	 */
-	protected $graphClient;
 
 	/**
 	 * @var array
@@ -32,81 +29,82 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		/* @var $dropFolder KalturaMicrosoftTeamsDropFolder */
 		$this->dropFolder = $dropFolder;
 		$this->vendorPlugin = KalturaVendorClientPlugin::get(KBatchBase::$kClient);
-		$this->graphClient = new KMicrosoftGraphClient($dropFolder->tenantId, $dropFolder->path, $dropFolder->clientId, $dropFolder->clientSecret);
 
 		$vendorIntegrationSetting = $this->vendorPlugin->vendorIntegration->get($dropFolder->integrationId);
 		KalturaLog::info('Watching folder ['.$this->dropFolder->id.']');
-		$driveLocationsDir =  KBatchBase::$taskConfig->params->teams->driveLocationsDir;
-		$driveLocationsFileNamePrefix = KBatchBase::$taskConfig->params->teams->driveLocationsFileNamePrefix;
 
 		$existingDropFolderFiles = $this->loadDropFolderFiles();
 
-		$files = scandir($driveLocationsDir);
+		// Retrieve all user custom metadata objects for the metadata profile specified on the drop folder's integration ID
+		$userMetadataSearchItem = new KalturaMetadataSearchItem();
+		$userMetadataSearchItem->metadataProfileId = $vendorIntegrationSetting->userMetadataProfileId;
+		$userMetadataSearchItem->orderBy = self::ASC_LAST_ACCESSED_DATE;
 
-		$currentFile = null;
-		foreach ($files as $file)
+		$condition = new KalturaSearchMatchCondition();
+		$condition->field = self::OPT_IN_XPATH;
+		$condition->value = self::OPT_IN_VALUE;
+
+		$userMetadataSearchItem->items = [ $condition ];
+
+		$userFilter = new KalturaUserFilter();
+		$userFilter->advancedSearch = $userMetadataSearchItem;
+
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 1;
+		$pager->pageSize = KBatchBase::$taskConfig->params->teams->userPageSize;
+
+		KBatchBase::$kClient->setResponseProfile($this->constructResponseProfile($vendorIntegrationSetting->userMetadataProfileId));
+
+		$response = KBatchBase::$kClient->user->listAction($userFilter, $pager);
+
+		foreach ($response->objects as $user)
 		{
-			if ($file == '.' || $file == '..' || strpos($file,self::LOCKED_FILE_MIDFIX) || strpos($file, $driveLocationsFileNamePrefix . $this->dropFolder->id) === false)
-			{
+			/* @var $user KalturaUser  */
+			$userMetadataObj = $user->relatedObjects[self::MS_GRAPH_METADATA]->objects[0];
+
+			try {
+				$userTeamsData = new KUserGraphMetadata($userMetadataObj->xml, $vendorIntegrationSetting->encryptionKey);
+				if (!$userTeamsData->recordingType)
+				{
+					if ($user instanceof KalturaGroup)
+					{
+						$userTeamsData->recordingType = 'GROUP';
+					}
+					else
+					{
+						$userTeamsData->recordingType = 'PERSONAL';
+					}
+				}
+
+			} catch (Exception $e) {
+				KalturaLog::err('Could not instantiate this user\'s MS Graph data. Continuing to the next user.');
 				continue;
+			}
+
+			$graphClient = new KMicrosoftGraphClient($dropFolder->tenantId, $dropFolder->path, $dropFolder->clientId, $dropFolder->clientSecret);
+			if ($userTeamsData->authTokenExpiry < time())
+			{
+				KalturaLog::info('User ' . $user->id . ' requires a new bearer token.');
+				list($userTeamsData->authToken, $userTeamsData->refreshToken, $userTeamsData->authTokenExpiry) = $graphClient->refreshToken($userTeamsData->refreshToken, $vendorIntegrationSetting->scopes);
 			}
 			else
 			{
-				$currentFile = $file;
-				break;
+				$graphClient->bearerToken = $userTeamsData->authToken;
 			}
-		}
 
-		if (!$currentFile)
-		{
-			KalturaLog::info('No iterable file found. Skipping.');
-			return;
-		}
-
-		KalturaLog::info("On this iteration, processing file $currentFile");
-
-		$currentFilePieces = explode('.', $currentFile, 2);
-		$lockedFileName = $currentFilePieces[0] . self::LOCKED_FILE_MIDFIX . $currentFilePieces[1];
-
-		rename($driveLocationsDir . DIRECTORY_SEPARATOR . $currentFile, $driveLocationsDir . DIRECTORY_SEPARATOR . $lockedFileName);
-
-		$itemCount = 0;
-
-		$drivesFileHandle = fopen($driveLocationsDir . DIRECTORY_SEPARATOR . $lockedFileName, 'r+');
-
-		$newDriveUrlAssoc = array();
-		$line = fgetcsv($drivesFileHandle);
-
-		while ($line)
-		{
-			list ($userId, $driveLastPageUrl) = $line;
-			KalturaLog::info("Handling drive for user ID: $userId, drive URL: $driveLastPageUrl");
-			$items = $this->graphClient->sendGraphRequest($driveLastPageUrl);
+			$driveLastPageUrl = sprintf(self::PERSONAL_RECORDINGS_DIRECTORY_URL, ($userTeamsData->deltaToken ? $userTeamsData->deltaToken : 'latest') );
+			KalturaLog::info("Handling drive for user ID: {$user->id}, drive URL: $driveLastPageUrl");
+			$items = $graphClient->sendGraphRequest($driveLastPageUrl);
 			if (!$items)
 			{
 				KalturaLog::info('Graph request could not be completed. This drive URL will be retried on the next iteration of this file.');
-				$newDriveUrlAssoc[] = array($userId, $driveLastPageUrl);
-				$line = fgetcsv($drivesFileHandle);
-
 				continue;
 			}
 
 			foreach ($items[MicrosoftGraphFieldNames::VALUE] as $item)
 			{
-				if (isset($item[MicrosoftGraphFieldNames::FOLDER_FACET]))
-				{
-					KalturaLog::info('Item ' . $item[MicrosoftGraphFieldNames::ID_FIELD] . ' is a folder. Skipping');
-					continue;
-				}
-
-				if (isset($item[MicrosoftGraphFieldNames::DELETED_FACET]))
-				{
-					KalturaLog::info('Item ' . $item[MicrosoftGraphFieldNames::ID_FIELD] . ' is deleted. Skipping');
-					continue;
-				}
-
 				//Get extended item (provided it is a recorded meeting) and its download URL
-				$extendedItem = $this->graphClient->getDriveItem($item[MicrosoftGraphFieldNames::PARENT_REFERENCE][MicrosoftGraphFieldNames::DRIVE_ID], $item[MicrosoftGraphFieldNames::ID_FIELD]);
+				$extendedItem = $graphClient->getDriveItem($item[MicrosoftGraphFieldNames::PARENT_REFERENCE][MicrosoftGraphFieldNames::DRIVE_ID], $item[MicrosoftGraphFieldNames::ID_FIELD]);
 				if ($extendedItem)
 				{
 					$this->singleRunFoundItems[$extendedItem[MicrosoftGraphFieldNames::ID_FIELD]] = $extendedItem;
@@ -125,49 +123,43 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 					}
 					else
 					{
-						$result = $this->handleFileAdded($extendedItem, $dropFolder->id, $vendorIntegrationSetting);
-					}
-
-					if ($result)
-					{
-						$itemCount++;
+						$result = $this->handleFileAdded($extendedItem, $dropFolder->id, $user->id);
 					}
 				}
 			}
 
-			$nextLink = '';
-			if(isset($items['@odata.nextLink']))
+			if(!isset($items['@odata.nextLink']) && !isset($items['@odata.deltaLink']))
 			{
-				$nextLink = $items['@odata.nextLink'];
-			}
-			else
-			{
-				$nextLink = $items['@odata.deltaLink'];
+				throw new Exception("Next page parameter for user {$user->id} cannot be determined!");
 			}
 
-			KalturaLog::info("Next page for user $userId: $nextLink");
-			$newDriveUrlAssoc[] = array($userId, $nextLink);
-			$line = fgetcsv($drivesFileHandle);
+			$nextLink = isset($items['@odata.nextLink']) ? $items['@odata.nextLink'] : (isset($items['@odata.deltaLink']) ? $items['@odata.deltaLink'] : '');
+
+			KalturaLog::info("Next page for user {$user->id}: $nextLink");
+			$args = explode('&', parse_url($nextLink, PHP_URL_QUERY));
+
+			foreach ($args as $arg)
+			{
+				list($key, $value) = explode('=', $arg);
+				if ($key == MicrosoftGraphFieldNames::TOKEN_QUERY_PARAM)
+				{
+					$userTeamsData->deltaToken = $value;
+					break;
+				}
+			}
+
+			$userTeamsData->lastAccessed = time();
+
+			$metadataPlugin = KalturaMetadataClientPlugin::get(KBatchBase::$kClient);
+			try
+			{
+				$metadataPlugin->metadata->update($userMetadataObj->id, $userTeamsData->getXmlFormatted());
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err('An error occurred attempting to save the user metadata. ' . $e->getMessage());
+			}
 		}
-
-		$newFileName = $driveLocationsDir . DIRECTORY_SEPARATOR . $driveLocationsFileNamePrefix . $this->dropFolder->id . self::LAST_TIMESTAMP_POSTFIX . time() . '.csv';
-		KalturaLog::info("Creating new file: $newFileName. Inserting " . count($newDriveUrlAssoc) . ' lines.');
-
-		$newFileHandle = fopen($newFileName, 'w+');
-		foreach ($newDriveUrlAssoc as $line)
-		{
-			fputcsv($newFileHandle, $line);
-		}
-		fclose($newFileHandle);
-		fclose($drivesFileHandle);
-
-		if (!file_exists($newFileName))
-		{
-			KalturaLog::info("New filename $newFileName was NOT created!");
-			KalturaLog::info(print_r($newDriveUrlAssoc, true));
-		}
-
-		unlink($driveLocationsDir . DIRECTORY_SEPARATOR . $lockedFileName);
 	}
 
 	protected function updateDropFolderFile (KalturaDropFolderFile $currentDropFolderFile, array $driveItem)
@@ -192,7 +184,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		}
 	}
 
-	protected function handleFileAdded($extendedItem, $dropFolderId, KalturaIntegrationSetting $integrationData)
+	protected function handleFileAdded($extendedItem, $dropFolderId, $userId)
 	{
 		KalturaLog::info('Handling drive item with ID ' . $extendedItem[MicrosoftGraphFieldNames::ID_FIELD]);
 		$dropFolderFile = new KalturaMicrosoftTeamsDropFolderFile();
@@ -207,9 +199,7 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			$dropFolderFile->description = $extendedItem[MicrosoftGraphFieldNames::DESCRIPTION];
 		}
 
-		$dropFolderFile->ownerId = $this->retrieveUserId($extendedItem[MicrosoftGraphFieldNames::CREATED_BY]);
-		$dropFolderFile->additionalUserIds = $this->retrieveParticipants($extendedItem);
-
+		$dropFolderFile->ownerId = $userId;
 		try
 		{
 			$dropFolderFile = $this->dropFolderFileService->add($dropFolderFile);
@@ -222,30 +212,32 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 			KalturaLog::err('Cannot add new drop folder file with name ['.$extendedItem[MicrosoftGraphFieldNames::ID_FIELD].'] - '.$e->getMessage());
 			return null;
 		}
-
 	}
 
-	protected function retrieveParticipants($item)
+	/**
+	 * @param $metadataProfileId
+	 * @return KalturaDetachedResponseProfile
+	 * @throws KalturaClientException
+	 */
+	protected function constructResponseProfile($metadataProfileId)
 	{
-		$participants = array();
+		$responseProfile = new KalturaDetachedResponseProfile();
+		$responseProfile->relatedProfiles = array();
 
-		$callRecordId = $item[MicrosoftGraphFieldNames::SOURCE][MicrosoftGraphFieldNames::EXTERNAL_ID];
-		$callRecord = $this->graphClient->getCallRecord($callRecordId);
+		$metadataItemProfile = new KalturaDetachedResponseProfile();
+		$metadataItemProfile->name = self::MS_GRAPH_METADATA;
+		$metadataItemProfile->filter = new KalturaMetadataFilter();
+		$metadataItemProfile->filter->metadataObjectTypeEqual = KalturaMetadataObjectType::USER;
+		$metadataItemProfile->filter->metadataProfileIdEqual = $metadataProfileId;
 
-		if ($callRecord)
-		{
-			foreach ($callRecord[MicrosoftGraphFieldNames::PARTICIPANTS] as $participant)
-			{
-				$userId = $participant[MicrosoftGraphFieldNames::USER][MicrosoftGraphFieldNames::ID_FIELD];
-				$user = $this->graphClient->getUser($userId);
-				if ($user)
-				{
-					$participants[] = $user[MicrosoftGraphFieldNames::MAIL];
-				}
-			}
-		}
+		$metadataItemProfile->mappings = array();
+		$mapping = new KalturaResponseProfileMapping();
+		$mapping->parentProperty = 'id';
+		$mapping->filterProperty = 'objectIdEqual';
+		$metadataItemProfile->mappings[] = $mapping;
+		$responseProfile->relatedProfiles[] = $metadataItemProfile;
 
-		return implode(',', $participants);
+		return $responseProfile;
 	}
 
 	protected function getUpdatedFileSize (KalturaDropFolderFile $dropFolderFile)
@@ -316,9 +308,6 @@ class KMicrosoftTeamsDropFolderEngine extends KDropFolderEngine
 		$newEntry->creatorId = $newEntry->userId;
 		$newEntry->referenceId = $dropFolderFile->remoteId;
 		$newEntry->adminTags = self::ADMIN_TAG_TEAMS;
-		//$newEntry->entitledUsersPublish = $dropFolderFile->additionalUserIds;
-		//$newEntry->entitledUsersView = $dropFolderFile->additionalUserIds;
-		//$newEntry->entitledUsersEdit = $dropFolderFile->additionalUserIds;
 
 		KBatchBase::$kClient->startMultiRequest();
 		$addedEntry = KBatchBase::$kClient->media->add($newEntry, null);

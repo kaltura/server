@@ -37,4 +37,5 @@ class MicrosoftGraphFieldNames
 
 	//List response field names
 	const VALUE = 'value';
+	const TOKEN_QUERY_PARAM = 'token';
 }

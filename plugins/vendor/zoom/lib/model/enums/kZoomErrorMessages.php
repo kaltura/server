@@ -13,7 +13,7 @@ interface kZoomErrorMessages extends BaseEnum
 	const PARENT_CATEGORY_NOT_FOUND = 'Could not find parent category id ';
 	const UPLOAD_DISABLED = 'Uploads are disabled for current Partner';
 	const TOKEN_PARSING_FAILED = 'Parse Tokens failed, response received from zoom is: ';
-	const FAILED_VERIFICATION = 'ZOOM - verification token is different from existing token';
+	const FAILED_VERIFICATION = 'Event verification failed, could not validate Zoom tokens';
 	const MISSING_ENTRY_FOR_ZOOM_RECORDING = 'Could not find entry for recording id: ';
 	const MISSING_ENTRY_FOR_CHAT = 'Missing entry for the chat file';
 	const ERROR_HANDLING_CHAT = 'Error while trying to handle chat file';
