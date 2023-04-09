@@ -85,7 +85,7 @@ class ShortLink extends BaseShortLink implements IBaseObject {
 		$allChars = '0123456789abcdefghijklmnopqrstuvwxyz';
 		$allDcs = kDataCenterMgr::getAllDcs(true);
 		$allCharsSplit = str_split($allChars, strlen($allChars) / count($allDcs));
-		//Build $dcChars array while using dcId for cases wher you have single dc and its id is not 0
+		//Build $dcChars array while using dcId for cases where you have single dc and its id is not 0
 		foreach ($allDcs as $dc) {
 			$dcChars[(int) $dc['id']] = array_shift($allCharsSplit);
 		}
