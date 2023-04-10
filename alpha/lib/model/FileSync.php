@@ -520,13 +520,20 @@ class FileSync extends BaseFileSync implements IBaseObject
 	 */
 	public function cloneToAnotherStorage($storageId)
 	{
-        //This method clones file syncs from local to shared thus it marks the file type as file and not url
 		$newfileSync = $this->copy(true);
 		$newfileSync->m_custom_data = null; // force reload of custom data
 		$newfileSync->setStatus(FileSync::FILE_SYNC_STATUS_PENDING);
 		$newfileSync->setSrcPath($this->getFullPath());
 		$newfileSync->setSrcEncKey($this->getSrcEncKey());
-		$newfileSync->setFileType(FileSync::FILE_SYNC_FILE_TYPE_FILE);
+
+		//Support clone to both local shared and remote DC
+		$fileType = FileSync::FILE_SYNC_FILE_TYPE_URL;
+		if(kDataCenterMgr::isDcIdShared($storageId))
+		{
+			$fileType = FileSync::FILE_SYNC_FILE_TYPE_FILE;
+		}
+
+		$newfileSync->setFileType($fileType);
 		$newfileSync->setDc($storageId);
     
 		$fileSyncKey = kFileSyncUtils::getKeyForFileSync($newfileSync);
