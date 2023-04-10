@@ -283,6 +283,21 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 				$nextVidIn = "subtitled";
 			}
 		}
+		
+		// Support turning 9:16 content to 16:9, via padding
+		if($vid->_arProcessingMode==6){
+// [out]scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:(ow-iw)/2:(oh-ih)/2,setsar=1
+			$padTo16x9=sprintf("scale=%d:%d:force_original_aspect_ratio=decrease,pad=%d:%d:(ow-iw)/2:(oh-ih)/2,setsar=1",
+					$vid->_height,$vid->_width,$vid->_height,$vid->_width);
+			if(count($filters)>0){
+				$filters[$idxFlt] = $filters[$idxFlt]."[$nextVidIn]";
+				$idxFlt++;
+				$padTo16x9 = "[$nextVidIn]$padTo16x9";
+				$nextVidIn = "padTo16x9";
+			}
+			$filters[] = $padTo16x9;
+		}
+
 		return $filters;
 	}
 	
