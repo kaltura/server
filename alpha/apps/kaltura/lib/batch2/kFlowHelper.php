@@ -72,7 +72,7 @@ class kFlowHelper
 		return $flavorAsset;
 	}
 	
-	public static function createAdditionalFlavorAsset($partnerId, $entryId, $fileExt = null, $flavorParamsId)
+	public static function createAdditionalFlavorAsset($partnerId, $entryId, $flavorParamsId, $fileExt = null)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
@@ -397,7 +397,7 @@ class kFlowHelper
 		if(count($files) > 1)
 		{
 			$lockKey = "create_replacing_entry_" . $recordedEntry->getId();
-			$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, $asset, count($files)));
+			$replacingEntry = kLock::runLocked($lockKey, array('kFlowHelper', 'getReplacingEntry'), array($recordedEntry, count($files), $asset));
 			if(!$replacingEntry)
 			{
 				KalturaLog::err('Failed to allocate replacing entry');
@@ -489,7 +489,7 @@ class kFlowHelper
 		return $replacingEntry;
 	}
 
-	public static function getReplacingEntry($recordedEntry, $asset = null, $liveSegmentCount, $flavorParamsId = null)
+	public static function getReplacingEntry($recordedEntry, $liveSegmentCount, $asset = null, $flavorParamsId = null)
 	{
 		//Reload entry before tryign to get the replacing entry id from it to avoid creating 2 different replacing entries for different flavors
 		$recordedEntry->reload();
@@ -3525,6 +3525,12 @@ class kFlowHelper
 		if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
 		{
 			$kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
+			//Validate group exists to avoid exception
+			if(!$kgroup)
+			{
+				return;
+			}
+
 			$numberOfUsersPerGroup = $kgroup->getMembersCount();
 			$kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
 			$kgroup->save();
