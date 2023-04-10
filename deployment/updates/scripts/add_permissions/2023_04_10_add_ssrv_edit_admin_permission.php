@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage rigel.roles_and_permissions
+ * @subpackage scorpius.roles_and_permissions
  */
 
 $addPermissionsAndItemsScript = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
