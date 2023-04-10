@@ -1,3 +1,11 @@
+# Scorpius-19.7.0
+## Add self serve admin edit permission
+* Issue Type: Task
+* Issue ID: SSRV-1138
+
+### Deployment Scripts ###
+php deployment/updates/scripts/add_permissions/2023_04_10_add_ssrv_edit_admin_permission.php
+
 # Scorpius-19.6.0
 ## Increase ActionsLimit For Analytics ##
 - Issue Type: Task
@@ -21,14 +29,6 @@ Partner-level feature flag
     1. Client generation
     2. php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
     3. php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_03_20_add_new_object_permission_ms_team_integration.php
-
-## Add self serve admin edit permission
-* Issue Type: Task
-* Issue ID: SSRV-1138
-
-### Deployment Scripts ###
-php deployment/updates/scripts/add_permissions/2023_04_10_add_ssrv_edit_admin_permission.php
-
 
 # Scorpius-19.5.0
 ## Add new Room plugin ##
