@@ -18,7 +18,7 @@ class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 		{
 			if ($key == ESearchEntryFieldName::RECYCLED_AT)
 			{
-				$queryContainsDisplayInSearch = true;
+				return null;
 			}
 			elseif ($value)
 			{
