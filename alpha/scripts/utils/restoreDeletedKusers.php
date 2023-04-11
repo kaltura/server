@@ -5,8 +5,8 @@ if ($argc < 2)
 	die("Usage: php $argv[0] kuserIdsFile <realrun | dryrun>"."\n");
 
 $kuserIdsFilePath = $argv[1];
-$kuserIdsArr = file_get_contents($kuserIdsFilePath);
-$kuserIdsArr = array_filter(explode("\n", $kuserIdsArr));
+$kuserIdsArr = file($kuserIdsFilePath);
+$kuserIdsArr = array_map('trim', $kuserIdsArr);
 
 $dryrun = true;
 if($argc == 3 && $argv[2] == 'realrun')
@@ -32,11 +32,10 @@ KalturaLog::debug('DONE!');
 
 function updateStatuses($kuserIds, $dryrun)
 {
-	$c = new Criteria();
-	$c->add(kuserPeer::ID, $kuserIds, Criteria::IN);
 	// to avoid filter out deleted users
 	kuserPeer::setUseCriteriaFilter(false);
-	$kusers = kuserPeer::doSelect($c);
+	$kusers = kuserPeer::retrieveByPKs($kuserIds);
+	kuserPeer::setUseCriteriaFilter(true);
 
 	foreach ($kusers as $kuser)
 	{
