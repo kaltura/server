@@ -21,5 +21,5 @@ interface ESearchEntryOrderByFieldName extends BaseEnum
     const PLAYS_LAST_7_DAYS = 'plays_7days';
     const VIEWS_LAST_1_DAY = 'views_1day';
     const PLAYS_LAST_1_DAY = 'plays_1day';
-	const RECYCLED_AT = 'recycled_at';
+    const RECYCLED_AT = 'recycled_at';
 }
