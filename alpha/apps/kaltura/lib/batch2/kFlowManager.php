@@ -606,7 +606,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		
 		if (
 			$object instanceof entry
-			&&	in_array(entryPeer::DISPLAY_IN_SEARCH, $modifiedColumns)
+			&& in_array(entryPeer::DISPLAY_IN_SEARCH, $modifiedColumns)
 			&& $object->isCustomDataModified('previousDisplayInSearchStatus')
 		)
 		{
