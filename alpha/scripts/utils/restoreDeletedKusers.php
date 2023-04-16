@@ -22,8 +22,8 @@ $start = 0;
 $length = 100;
 while($start < count($kuserIdsArr))
 {
-	$kuserIdsToUpdate = array_slice($kuserIdsArr, $start , $length);
-	updateStatuses($kuserIdsToUpdate ,$dryrun);
+	$kuserIdsToUpdate = array_slice($kuserIdsArr, $start, $length);
+	updateStatuses($kuserIdsToUpdate, $dryrun);
 	$start += $length;
 	sleep(1);
 }
