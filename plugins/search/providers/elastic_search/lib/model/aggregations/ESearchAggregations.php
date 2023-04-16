@@ -15,6 +15,8 @@ class ESearchAggregations extends BaseObject
 	const PATH = 'path';
 	const KEY = 'key';
 	const BUCKETS = 'buckets';
+	const EXECUTION_HINT = 'execution_hint';
+	const MAP = 'map';
 	/**
 	 * @var array
 	 */

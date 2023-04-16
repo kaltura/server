@@ -43,6 +43,23 @@ abstract class KalturaESearchAggregationItem extends KalturaObject
 
 	abstract public function coreToApiResponse($coreResponse, $fieldName = null);
 
+	public static function coreBucketToApiResponse($coreResponse)
+	{
+		$bucketsArray = new KalturaESearchAggregationBucketsArray();
+		$buckets = $coreResponse[ESearchAggregations::BUCKETS];
+		if ($buckets)
+		{
+			foreach ($buckets as $bucket)
+			{
+				$responseBucket = new KalturaESearchAggregationBucket();
+				$responseBucket->fromArray($bucket);
+				$bucketsArray[] = $responseBucket;
+			}
+		}
+
+		return $bucketsArray;
+	}
+
 	public function validateForUsage($sourceObject, $propertiesToSkip = array())
 	{
 		if(is_null($this->fieldName))

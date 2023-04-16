@@ -51,6 +51,38 @@ class ESearchHistoryService extends KalturaBaseService
             $this->handleSearchHistoryException($e);
         }
     }
+	/**
+	 * add batch job that sends an email with a link to download a CSV that contains search_terms and their count
+	 *
+	 * @action exportToCsv
+	 * @param KalturaESearchHistoryFilter $filter A filter used to aggregate the search terms
+	 * @return string
+	 */
+	function exportToCsvAction(KalturaESearchHistoryFilter $filter)
+	{
+		if(!$filter)
+		{
+			$filter = new KalturaESearchHistoryFilter();
+		}
+
+		$dbFilter = new ESearchHistoryFilter();
+		$filter->toObject($dbFilter);
+
+		$kuser = $this->getKuser();
+		if(!$kuser || !$kuser->getEmail())
+		{
+			throw new KalturaAPIException(APIErrors::USER_EMAIL_NOT_FOUND, $kuser);
+		}
+
+		$jobData = new kSearchHistoryCsvJobData();
+		$jobData->setFilter($dbFilter);
+		$jobData->setUserMail($kuser->getEmail());
+		$jobData->setUserName($kuser->getPuserId());
+
+		kJobsManager::addExportCsvJob($jobData, $this->getPartnerId(), SearchHistoryPlugin::getExportTypeCoreValue(SearchHistoryExportObjectType::SEARCH_TERM));
+
+		return $kuser->getEmail();
+	}
 
     private function handleSearchHistoryException($exception)
     {

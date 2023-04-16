@@ -10,4 +10,10 @@ class KalturaESearchHistoryListResponse extends KalturaListResponse
      * @readonly
      */
     public $objects;
+
+	/**
+	 * @var KalturaESearchAggregationResponseArray
+	 * @readonly
+	 */
+	public $aggregations;
 }
