@@ -12,6 +12,7 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		{
 			require_once 'Zend/Config/Exception.php';
 			require_once 'Zend/Config/Ini.php';
+			require_once __DIR__ . '/../kZendConfigIni.php';
 		}
 		parent::__construct();
 	}
@@ -63,7 +64,7 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		{
 			if(file_exists($iniFile))
 			{
-				$config = new Zend_Config_Ini($iniFile);
+				$config = new kZendConfigIni($iniFile);
 				if($result)
 				{
 					$result = kEnvironment::mergeConfigItem($result, $config->toArray());
@@ -138,7 +139,7 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 			return array (null, null ,null);
 		}
 
-		$fsMap = new Zend_Config_Ini($iniFile);
+		$fsMap = new kZendConfigIni($iniFile);
 		$content = json_encode($fsMap->toArray());
 		return array ($mapName, $hostname ,$content);
 	}

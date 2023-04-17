@@ -34,7 +34,7 @@ $loggerConfigPath = realpath(KALTURA_ROOT_PATH . DIRECTORY_SEPARATOR . "configur
 
 try // we don't want to fail when logger is not configured right
 {
-	$config = new Zend_Config_Ini($loggerConfigPath);
+	$config = new kZendConfigIni($loggerConfigPath);
 	$deploy = $config->deploy;
 	
 	KalturaLog::initLog($deploy);

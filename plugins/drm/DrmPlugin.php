@@ -283,7 +283,7 @@ class DrmPlugin extends BaseDrmPlugin implements IKalturaServices, IKalturaAdmin
 	{
 		$path = dirname(__FILE__) . '/config/drm.ini';
 		if($configName == 'admin' && file_exists($path))
-			return new Zend_Config_Ini($path);
+			return new kZendConfigIni($path);
 		return null;
 	}
 	

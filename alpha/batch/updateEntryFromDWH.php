@@ -25,7 +25,7 @@ KAutoloader::register();
 date_default_timezone_set(kConf::get("date_default_timezone"));
 
 $loggerConfigPath = KALTURA_ROOT_PATH . '/scripts/logger.ini';
-$config = new Zend_Config_Ini($loggerConfigPath);
+$config = new kZendConfigIni($loggerConfigPath);
 KalturaLog::initLog($config);
 KalturaLog::setContext(basename(__FILE__));
 KalturaLog::info("Starting script");

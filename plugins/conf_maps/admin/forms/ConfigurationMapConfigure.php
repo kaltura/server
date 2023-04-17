@@ -128,7 +128,7 @@ class Form_ConfigurationMapConfigure extends ConfigureForm
 		}
 		$content = preg_replace('/^;.*$/m', '', $data['rawData']); // remove comments
 		$content = preg_replace('/^\h*\v+/m', '', $content ); // remove empty line
-		if ( preg_match('/^((?!(\[.*\])|(.*=.)).)*$/im',$content , $matches)) //match invalid ini lines
+		if ( preg_match('/^((?!(\[.*\])|(.*=.)|({%.*%})|({{.*}})).)*$/im',$content , $matches)) //match invalid ini lines
 		{
 				return false;
 		}

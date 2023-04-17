@@ -742,7 +742,7 @@ class puserKuserConsolidator
 		{
 			$dirname = dirname(__FILE__);
 			$logFilePath = "{$this->logFileName}.{$this->currentlogNumber}";
-			$config = new Zend_Config_Ini("$dirname/logger.ini");
+			$config = new kZendConfigIni("$dirname/logger.ini");
 			$config->writers->stream->stream = $logFilePath;
 		}
 		catch(Zend_Config_Exception $ex)

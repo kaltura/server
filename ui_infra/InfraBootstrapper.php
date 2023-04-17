@@ -44,7 +44,7 @@ class InfraBootstrapper extends Zend_Application_Bootstrap_Bootstrap
 		else
 			$loggerConfigPath = realpath(APPLICATION_PATH . '/../configurations/logger.ini');
 			
-		$loggerConfig = new Zend_Config_Ini($loggerConfigPath);
+		$loggerConfig = new kZendConfigIni($loggerConfigPath);
 		$loggerName = $configSettings->applicationName;
 		$appLogger = $loggerConfig->get($loggerName);
 		KalturaLog::initLog($appLogger);

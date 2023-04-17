@@ -33,7 +33,7 @@ $loggerConfigPath = KALTURA_ROOT_PATH . "/configurations/logger.ini";
 
 try // we don't want to fail when logger is not configured right
 {
-	$config = new Zend_Config_Ini($loggerConfigPath);
+	$config = new kZendConfigIni($loggerConfigPath);
 	KalturaLog::initLog($config->batch_scheduler);
 	KalturaLog::setContext("BATCH");
 }

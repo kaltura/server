@@ -58,7 +58,7 @@ class IniUtils
 		{
 			self::safeLog("Could not write ini content to file $tempIniFile");
 		}
-		$ini = new Zend_Config_Ini($tempIniFile);
+		$ini = new kZendConfigIni($tempIniFile);
 		unlink($tempIniFile);
 		return $ini->toArray();
 	}
