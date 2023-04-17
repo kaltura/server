@@ -21,7 +21,7 @@ class kZendConfigIni extends Zend_Config_Ini
 		$baseName = basename($filename);
 		$this->fileSystemLoader->setPaths($dirName);
 
-		$twig = new Environment($this->fileSystemLoader, array('cache' => '/tmp/compilation_cache'));
+		$twig = new Environment($this->fileSystemLoader); //, array('cache' => '/tmp/compilation_cache'));
 		$twig->addExtension(new twigExtensions());
 
 		$tmpFileName = tempnam(sys_get_temp_dir(), $baseName);
