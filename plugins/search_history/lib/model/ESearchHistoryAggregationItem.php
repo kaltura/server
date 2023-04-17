@@ -5,7 +5,6 @@
  */
 class ESearchHistoryAggregationItem extends ESearchAggregationItem
 {
-
 	/**
 	 * @var string
 	 */
