@@ -72,6 +72,7 @@ enabledWorkers.KSyncReachCreditTaskRunner	    = 0
 enabledWorkers.KAsyncExportCsv                      = 0
 enabledWorkers.KAsyncLiveEntryArchive               = 0
 enabledWorkers.KAsyncStorageUpdate                  = 1
+enabledWorkers.KAsyncRecycleBin                     = 1
 
 
 [mainTemplate : template]
@@ -716,6 +717,10 @@ maximumExecutionTime								= 600
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
 sleepBetweenStopStart								= 21600
 maxTotalCountAllowed								= 50
+
+[KAsyncRecycleBin : KScheduledTaskRunner]
+id                                                  = 611
+params.recycleBin                                   = 1
 
 [KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
 id													= 550

@@ -5,6 +5,8 @@
  */
 class KScheduledTaskRunner extends KPeriodicWorker
 {
+	const recycleBin = 'recycleBin';
+	
 	/**
 	 * @var array
 	 */
@@ -112,11 +114,19 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	protected function getProcessor($profile)
 	{
 		if ($this->isReachProfile($profile))
+		{
 			return new KReachProcessor($this);
+		}
 		if ($this->isMediaRepurposingProfile($profile))
+		{
 			return new KMediaRepurposingProcessor($this);
-		else
-			return new KGenericProcessor($this);
+		}
+		if ($this->isRecycleBinProfile($profile))
+		{
+			return new KRecycleBinProcessor($this);
+		}
+		
+		return new KGenericProcessor($this);
 	}
 
 	private function isMediaRepurposingProfile(KalturaScheduledTaskProfile $profile)
@@ -127,6 +137,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	private function isReachProfile(KalturaScheduledTaskProfile $profile)
 	{
 		return $profile->objectFilterEngineType == ObjectFilterEngineType::ENTRY_VENDOR_TASK;
+	}
+	
+	private function isRecycleBinProfile(KalturaScheduledTaskProfile $profile)
+	{
+		return $profile->objectFilterEngineType == ObjectFilterEngineType::RECYCLE_BIN_CLEANUP;
 	}
 
 	/**
@@ -143,6 +158,12 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$filter->lastExecutionStartedAtLessThanOrEqualOrNull = strtotime('today UTC');
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = $maxProfiles;
+		
+		// Check if worker is for clearing the Recycle Bin
+		if ($this->getParams(KScheduledTaskRunner::recycleBin))
+		{
+			$filter->objectFilterEngineTypeEqual = ObjectFilterEngineType::RECYCLE_BIN_CLEANUP;
+		}
 
 		$result = $scheduledTaskClient->scheduledTaskProfile->listAction($filter, $pager);
 		if (empty($result))
