@@ -21,18 +21,18 @@ class twigExtensions extends AbstractExtension
 	 */
 	public function getEnvironmentVariable($varName, $default = null)
 	{
-		$varValue = '';
+		$defaultValue = ($default === null) ? '' : $default;
 		$varName = strtoupper($varName);
 
 		if(empty($varName))
 		{
-			return $varValue;
+			return $defaultValue;
 		}
 
-		$varValue = getenv($varName,true);
-		if($varValue === false && $default !== null)
+		$varValue = getenv($varName, true);
+		if($varValue === false)
 		{
-			$varValue = $default;
+			$varValue = $defaultValue;
 		}
 
 		return $varValue;
