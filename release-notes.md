@@ -1,3 +1,13 @@
+# Scorpius-19.7.0
+## Add 'recycledAt' to ESearch for entry ##
+- Issue Type: Task
+- Issue ID: PLAT-24227
+
+### Deployment ###
+Replace 'esearch_host', 'esearch_port', 'entry_index_name' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping/entry" -H 'Content-Type: application/json' -d'{"properties": {"recycled_at" : {"type" : "date", "format": "epoch_second"}}}'
+
 # Scorpius-19.6.0
 ## Increase ActionsLimit For Analytics ##
 - Issue Type: Task
