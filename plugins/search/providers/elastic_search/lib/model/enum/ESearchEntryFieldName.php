@@ -47,4 +47,5 @@ interface ESearchEntryFieldName extends BaseEnum
 	const PLAYS = 'plays';
 	const RANK = 'rank';
 	const VOTES = 'votes';
+	const RECYCLED_AT = 'recycled_at';
 }

@@ -1113,7 +1113,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	// will work only for types that the data can be served as an a response to the service
 	public function setDataContent ( $v , $increment_version = true , $allow_type_roughcut = false )
 	{
-		if($v && $v == $this->getDataContent())
+		// simple patch when setDataContent is called with $v = '' so that we check if that's the current active file_sync content and avoid writing new fs to db.
+		// avoiding a more elegant fixes like 'empty($v)' or '!is_null($v)' because '$v = null' is being used intentionally at entry.php:312
+		// and other places may return 'false' when fetching $v like DataService.php:239 which will change backward compatability
+		if(($v || $v === '') && $v == $this->getDataContent())
 		{
 			return;
 		}
@@ -4106,6 +4109,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			'plays_7days' => $this->getPlaysLast7Days(),
 			'views_1day' => $this->getViewsLastDay(),
 			'plays_1day' => $this->getPlaysLastDay(),
+			'recycled_at' => $this->getRecycledAt(),
 		);
 
 		$this->addCategoriesToObjectParams($body);
