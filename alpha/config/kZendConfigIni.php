@@ -21,13 +21,16 @@ class kZendConfigIni extends Zend_Config_Ini
 		$baseName = basename($filename);
 		$this->fileSystemLoader->setPaths($dirName);
 
-		$twig = new Environment($this->fileSystemLoader); //, array('cache' => '/tmp/compilation_cache'));
+		$twig = new Environment($this->fileSystemLoader);
 		$twig->addExtension(new twigExtensions());
 
 		$tmpFileName = tempnam(sys_get_temp_dir(), $baseName);
 		$renderedOutput = $twig->render($baseName);
-		//TODO check put content was successful
-		file_put_contents($tmpFileName, $renderedOutput);
+
+		if (file_put_contents($tmpFileName, $renderedOutput) === false)
+		{
+			throw new Zend_Config_Exception("Unable to write to $tmpFileName");
+		}
 
 		$result = parent::__construct($tmpFileName, $section, $options);
 		unlink($tmpFileName);
