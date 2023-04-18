@@ -16,7 +16,11 @@ class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 		$ignoreDisplayInSearchQueries = array();
 		foreach	($this->ignoreDisplayInSearchValues as $key => $value)
 		{
-			if ($value)
+			if ($key == ESearchEntryFieldName::RECYCLED_AT)
+			{
+				return null;
+			}
+			elseif ($value)
 			{
 				$ignoreDisplayInSearchQueries[] = new kESearchTermsQuery($key, $value);
 				if ($key == ESearchEntryFieldName::DISPLAY_IN_SEARCH)
