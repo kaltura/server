@@ -208,7 +208,7 @@ class FilesystemLoader implements LoaderInterface, ExistsLoaderInterface, Source
         try {
             list($namespace, $shortname) = $this->parseName($name);
             
-            $this->validateName($name);
+            $this->validateName($shortname);
         } catch (LoaderError $e) {
             if (!$throw) {
                 return false;
