@@ -24,7 +24,7 @@ class twigExtensions extends AbstractExtension
 		$varValue = '';
 		$varName = strtoupper($varName);
 
-		if(empty($varName))// || !kString::beginsWith($varName, "KALTURA_"))
+		if(empty($varName))
 		{
 			return $varValue;
 		}

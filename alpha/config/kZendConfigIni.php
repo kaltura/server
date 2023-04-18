@@ -30,7 +30,7 @@ class kZendConfigIni extends Zend_Config_Ini
 		file_put_contents($tmpFileName, $renderedOutput);
 
 		$result = parent::__construct($tmpFileName, $section, $options);
-		//unlink($tmpFileName);
+		unlink($tmpFileName);
 		return $result;
 	}
 
