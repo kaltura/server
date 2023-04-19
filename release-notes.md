@@ -1,4 +1,11 @@
 # Scorpius-19.7.0
+## Add self serve admin edit permission
+* Issue Type: Task
+* Issue ID: SSRV-1138
+
+### Deployment Scripts ###
+php deployment/updates/scripts/add_permissions/2023_04_10_add_ssrv_edit_admin_permission.php
+
 ## Add 'recycledAt' to ESearch for entry ##
 - Issue Type: Task
 - Issue ID: PLAT-24227
