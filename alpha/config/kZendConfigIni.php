@@ -32,7 +32,16 @@ class kZendConfigIni extends Zend_Config_Ini
 			throw new Zend_Config_Exception("Unable to write to $tmpFileName");
 		}
 
-		$result = parent::__construct($tmpFileName, $section, $options);
+		try
+		{
+			$result = parent::__construct($tmpFileName, $section, $options);
+		}
+		catch(Zend_Config_Exception $e)
+		{
+			unlink($tmpFileName);
+			throw $e;
+		}
+		
 		unlink($tmpFileName);
 		return $result;
 	}
