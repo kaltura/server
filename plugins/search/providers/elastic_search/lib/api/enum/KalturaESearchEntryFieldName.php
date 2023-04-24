@@ -46,4 +46,5 @@ class KalturaESearchEntryFieldName extends KalturaStringEnum
 	const RANK = 'rank';
 	const VOTES = 'votes';
 	const DISPLAY_IN_SEARCH = 'display_in_search';
+	const RECYCLED_AT = 'recycled_at';
 }

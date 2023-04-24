@@ -603,6 +603,15 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			&&	$object->getReplacedEntryId()
 		)
 			return true;
+		
+		if (
+			$object instanceof entry
+			&& in_array(entryPeer::DISPLAY_IN_SEARCH, $modifiedColumns)
+			&& $object->isCustomDataModified('previousDisplayInSearchStatus')
+		)
+		{
+			return true;
+		}
 
 		if(
 			$object instanceof UploadToken
@@ -665,7 +674,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			return true;
 		}
 		
-		if(
+		if (
 			$object instanceof entry
 			&&	in_array(entryPeer::STATUS, $modifiedColumns)
 			&&	($object->getStatus() == entryStatus::READY || $object->getStatus() == entryStatus::ERROR_CONVERTING)
@@ -673,6 +682,15 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		)
 		{
 			kFlowHelper::handleEntryReplacement($object);
+			return true;
+		}
+		
+		if ($object instanceof entry
+			&& in_array(entryPeer::DISPLAY_IN_SEARCH, $modifiedColumns)
+			&& $object->isCustomDataModified('previousDisplayInSearchStatus')
+		)
+		{
+			kFlowHelper::handleEntryChangedDisplayInSearch($object);
 			return true;
 		}
 
