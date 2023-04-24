@@ -8,6 +8,7 @@ Add the following section to elastic confMap:
 ```
 [search_history]
 aggregationRangeInMonths=6
+aggregationSize=1000
 ```
 
 ### Deployment Scripts ###
