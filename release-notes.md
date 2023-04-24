@@ -1,3 +1,18 @@
+# Scorpius-19.8.0
+## Add search term aggregation to SearchHistory plugin
+* Issue Type: Story
+* Issue ID: PLAT-23876
+
+### Configuration ###
+Add the following section to elastic confMap:
+```
+[search_history]
+aggregationRangeInMonths=6
+```
+
+### Deployment Scripts ###
+php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_07_add_searchhistory_permissions.php
+
 # Scorpius-19.7.0
 ## Add self serve admin edit permission
 * Issue Type: Task
