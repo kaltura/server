@@ -13,6 +13,7 @@ class KExportSearchHistoryEngine extends KObjectExportEngine
 
 		try
 		{
+			//searchHistory list action accepts filter only
 			$searchHistoryList = KBatchBase::$kClient->searchHistory->listAction($filter);
 		}
 		catch (Exception $e)
@@ -33,7 +34,7 @@ class KExportSearchHistoryEngine extends KObjectExportEngine
 		KCsvWrapper::sanitizedFputCsv($csvFile, explode(',', 'searchTerm,count'));
 	}
 
-	protected function addItemsToCsv($aggregations, $csvFile)
+	protected function addItemsToCsv($aggregations, &$csvFile)
 	{
 		if(count($aggregations) != 1)
 		{

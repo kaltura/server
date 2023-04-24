@@ -28,7 +28,7 @@ class KalturaSearchHistoryCsvJobData extends KalturaExportCsvJobData
 	 */
 	public function toObject($dbData = null, $props_to_skip = array())
 	{
-		if(is_null($dbData))
+		if (is_null($dbData))
 		{
 			$dbData = new kSearchHistoryCsvJobData();
 		}

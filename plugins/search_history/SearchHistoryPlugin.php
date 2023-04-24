@@ -90,7 +90,7 @@ class SearchHistoryPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			}
 		}
 
-		if($baseClass == 'KalturaJobData' && $enumValue == BatchJobType::EXPORT_CSV && (isset($constructorArgs['coreJobSubType']) &&  $constructorArgs['coreJobSubType']== self::getExportTypeCoreValue(SearchHistoryExportObjectType::SEARCH_TERM)))
+		if ($baseClass == 'KalturaJobData' && $enumValue == BatchJobType::EXPORT_CSV && (isset($constructorArgs['coreJobSubType']) &&  $constructorArgs['coreJobSubType'] == self::getExportTypeCoreValue(SearchHistoryExportObjectType::SEARCH_TERM)))
 		{
 			return new KalturaSearchHistoryCsvJobData();
 		}
@@ -99,7 +99,6 @@ class SearchHistoryPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		{
 			return new KExportSearchHistoryEngine($constructorArgs);
 		}
-
 
 		return null;
 	}
@@ -130,13 +129,19 @@ class SearchHistoryPlugin extends KalturaPlugin implements IKalturaPending, IKal
 	public static function getEnums($baseEnumName = null)
 	{
 		if (is_null($baseEnumName))
+		{
 			return array('SearchHistorySearchTermCsvBatchType', 'SearchHistoryExportObjectType');
+		}
 
 		if ($baseEnumName == 'BatchJobType')
+		{
 			return array('SearchHistorySearchTermCsvBatchType');
+		}
 
 		if ($baseEnumName == 'ExportObjectType')
+		{
 			return array('SearchHistoryExportObjectType');
+		}
 
 		return array();
 	}

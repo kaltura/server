@@ -11,9 +11,9 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 	const DEFAULT_LIST_SIZE = 500;
 	const MAX_SEARCH_TERM_LENGTH = 64;
 	const MAX_AGGREGATION_SIZE = 100;
-	const LIMIT_IN_MONTHS = 6;
-	const SECONDS_IN_DAY = 24*60*60;
-	const DAYS_IN_MONTH = 31;
+	const LIMIT_IN_MONTHS = 3;
+	const SECONDS_IN_DAY = 86400;
+	const MAX_DAYS_IN_MONTH = 31;
 
 
 	const SUGGEST_SEARCH_HISTORY = 'suggest_search_history';
@@ -112,7 +112,7 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 
 	protected function applyFilter()
 	{
-		if($this->getAggregation())
+		if ($this->getAggregation())
 		{
 			$this->applyFilterForAggregation();
 		}
@@ -150,15 +150,6 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		$partnerIdQuery = new kESearchTermQuery(ESearchHistoryFieldName::PARTNER_ID, $partnerId);
 		$boolQuery->addToFilter($partnerIdQuery);
 
-		$timestampRange = $this->getTimestampRange();
-		if(!$timestampRange)
-		{
-			$timestampRangeLimited = new ESearchRange();
-			$timestamp = time() - $this->getAggregationTimestampLimit() * self::DAYS_IN_MONTH * self::SECONDS_IN_DAY;
-			$timestampRangeLimited->setGreaterThanOrEqual($timestamp);
-			$this->setTimestampRange($timestampRangeLimited);
-		}
-
 		$this->applyFilterFields($boolQuery, true);
 
 		$aggregationKey = ESearchHistoryAggregationItem::KEY . ':' . $this->aggregation->getFieldName();
@@ -166,6 +157,8 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		$aggregations[$aggregationKey] = $this->aggregation->getAggregationCommand();
 
 		$this->query[ESearchAggregations::AGGS] = $aggregations;
+
+		//query size is 0 because we don't want to return hits, only aggregation results
 		$this->query[kESearchQueryManager::SIZE_KEY] = 0;
 	}
 
@@ -182,20 +175,21 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 			$boolQuery->addToFilter($searchTermStartsWithQuery);
 		}
 
-		if($this->searchedObjectIn)
+		if ($this->searchedObjectIn)
 		{
 			$searchedObjects = $this->getSearchedObjectsArray();
 			$searchObjectsQuery = new kESearchTermsQuery(ESearchHistoryFieldName::SEARCHED_OBJECT, $searchedObjects);
 			$boolQuery->addToFilter($searchObjectsQuery);
 		}
 
-		$timestampRange = $this->getTimestampRange();
-		if($timestampRange)
+		if ($limitTimestamp)
 		{
-			if ($limitTimestamp)
-			{
-				$this->validateTimestampLimit();
-			}
+			$this->validateTimestampLimit();
+		}
+
+		$timestampRange = $this->getTimestampRange();
+		if ($timestampRange)
+		{
 			$rangeQuery = new kESearchRangeQuery($timestampRange, ESearchHistoryFieldName::TIMESTAMP);
 			$boolQuery->addToFilter($rangeQuery);
 		}
@@ -206,13 +200,18 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 
 	protected function validateTimestampLimit()
 	{
-		$limitInMonths = $this->getAggregationTimestampLimit();
-		$ceilingTimestamp = $this->getCeilingTimestamp();
-		$floorTimestamp = $this->getFloorTimestamp();
-
-		if($floorTimestamp)
+		if (!$this->getTimestampRange())
 		{
-			if( (int)(($ceilingTimestamp - $floorTimestamp) / self::SECONDS_IN_DAY) > $limitInMonths * self::DAYS_IN_MONTH)
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "timestampRange");
+		}
+
+		$limitInMonths = $this->getAggregationTimestampLimit();
+		$endTimestamp = $this->getEndTimestamp();
+		$startTimestamp = $this->getStartTimestamp();
+
+		if ($startTimestamp)
+		{
+			if ((int)(($endTimestamp - $startTimestamp) / self::SECONDS_IN_DAY) > $limitInMonths * self::MAX_DAYS_IN_MONTH)
 			{
 				throw new KalturaAPIException(KalturaESearchHistoryErrors::TIME_RANGE_EXCEEDED_LIMIT, $limitInMonths);
 			}
@@ -223,12 +222,12 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		}
 	}
 
-	protected function getCeilingTimestamp()
+	protected function getEndTimestamp()
 	{
 		$timestampRange = $this->getTimestampRange();
 		$lessThanOrEqual = $timestampRange->getLessThanOrEqual();
 		$lessThan = $timestampRange->getLessThan();
-		if($lessThanOrEqual)
+		if ($lessThanOrEqual)
 		{
 			return $lessThan ? min($lessThan, $lessThanOrEqual) : $lessThanOrEqual;
 		}
@@ -238,7 +237,7 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		}
 	}
 
-	protected function getFloorTimestamp()
+	protected function getStartTimestamp()
 	{
 		$timestampRange = $this->getTimestampRange();
 		return max($timestampRange->getGreaterThanOrEqual(), $timestampRange->getGreaterThan());
@@ -247,7 +246,7 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 	protected function getQueryPageSize()
 	{
 		$searchHistoryConfig = kConf::get('search_history', 'elastic', array());
-		if($this->getSearchTermStartsWith())
+		if ($this->getSearchTermStartsWith())
 		{
 			return isset($searchHistoryConfig['completionListSize']) ? $searchHistoryConfig['completionListSize'] : self::STARTS_WITH_PAGE_SIZE;
 		}
