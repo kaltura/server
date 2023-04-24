@@ -1007,7 +1007,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
+		if ($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 			return true;
 		
 		if ($object instanceof UserRole && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER &&
@@ -1025,8 +1025,12 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
+		if ($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 		{
+			if ($object->getName() == PermissionName::FEATURE_RECYCLE_BIN)
+			{
+				self::handleRecycleBinPermission($object);
+			}
 			self::markPartnerRoleCacheDirty($object->getPartnerId());
 			return true;
 		}
@@ -1056,7 +1060,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		if($object instanceof Permission)
+		if ($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 			return true;
 		
 		if ($object instanceof PermissionToPermissionItem)
@@ -1070,14 +1074,15 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 */
 	public function objectCreated(BaseObject $object)
 	{
-		if($object instanceof Permission)
+		if ($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 		{
-			// changes in permissions for partner, may require new cache generation
-			if ($object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
+			if ($object->getName() == PermissionName::FEATURE_RECYCLE_BIN)
 			{
-				self::markPartnerRoleCacheDirty($object->getPartnerId());
-				return true;
+				self::handleRecycleBinPermission($object);
 			}
+			// changes in permissions for partner, may require new cache generation
+			self::markPartnerRoleCacheDirty($object->getPartnerId());
+			return true;
 		}
 		
 		if ($object instanceof PermissionToPermissionItem)
@@ -1091,6 +1096,64 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 		
 		return true;
+	}
+	
+	protected static function handleRecycleBinPermission($permission)
+	{
+		if ($permission->getStatus() == PermissionStatus::ACTIVE)
+		{
+			self::enableRecycleBinScheduledTaskProfile($permission->getPartnerId());
+		}
+		elseif ($permission->getStatus() == PermissionStatus::BLOCKED)
+		{
+			self::disableRecycleBinScheduledTaskProfile($permission->getPartnerId());
+		}
+	}
+	
+	protected static function enableRecycleBinScheduledTaskProfile($partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(ScheduledTaskProfilePeer::NAME, 'recycleBinCleanup', Criteria::EQUAL);
+		$c->addAnd(ScheduledTaskProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		$results = ScheduledTaskProfilePeer::doSelect($c);
+		
+		if ($results)
+		{
+			$scheduledTaskProfile = $results[0];
+			$scheduledTaskProfile->setStatus(ScheduledTaskProfileStatus::ACTIVE);
+			$scheduledTaskProfile->save();
+		}
+		else
+		{
+			$scheduledTaskProfile = new ScheduledTaskProfile();
+			$scheduledTaskProfile->setName('recycleBinCleanup');
+			$scheduledTaskProfile->setStatus(ScheduledTaskProfileStatus::ACTIVE);
+			$scheduledTaskProfile->setObjectFilterEngineType(ObjectFilterEngineType::RECYCLE_BIN_CLEANUP);
+			$scheduledTaskProfile->setPartnerId($partnerId);
+			$filter = new mediaEntryFilter;
+			$scheduledTaskProfile->setObjectFilter($filter);
+			$objectTasks = new kObjectTask();
+			$objectTasks->setType(ObjectTaskType::DELETE_ENTRY);
+			$objectTasks->setStopProcessingOnError(true);
+			$scheduledTaskProfile->setObjectTasks($objectTasks);
+			$scheduledTaskProfile->setMaxTotalCountAllowed(50);
+			$scheduledTaskProfile->save();
+		}
+	}
+	
+	protected static function disableRecycleBinScheduledTaskProfile($partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(ScheduledTaskProfilePeer::NAME, 'recycleBinCleanup', Criteria::EQUAL);
+		$c->addAnd(ScheduledTaskProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		$results = ScheduledTaskProfilePeer::doSelect($c);
+		
+		if ($results)
+		{
+			$scheduledTaskProfile = $results[0];
+			$scheduledTaskProfile->setStatus(ScheduledTaskProfileStatus::DISABLED);
+			$scheduledTaskProfile->save();
+		}
 	}
 	
 	private static function markPartnerRoleCacheDirty($partnerId)

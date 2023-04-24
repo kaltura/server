@@ -717,10 +717,11 @@ maximumExecutionTime								= 600
 scriptPath											= ../plugins/scheduled_task/batch/ScheduledTaskRunner/KScheduledTaskRunnerExe.php
 sleepBetweenStopStart								= 21600
 maxTotalCountAllowed								= 50
+params.runnerTypes                                  = 1,2
 
 [KAsyncRecycleBin : KScheduledTaskRunner]
 id                                                  = 611
-params.recycleBin                                   = 1
+params.runnerTypes                                  = 3
 
 [KAsyncSyncCategoryPrivacyContext : JobHandlerWorker]
 id													= 550
