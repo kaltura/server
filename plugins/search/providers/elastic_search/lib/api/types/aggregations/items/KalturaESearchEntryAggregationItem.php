@@ -37,20 +37,8 @@ class KalturaESearchEntryAggregationItem extends KalturaESearchAggregationItem
 		$agg = new KalturaESearchAggregationResponseItem();
 		$agg->fieldName = $fieldName;
 		$agg->name = ESearchEntryAggregationItem::KEY;
-		$bucketsArray = new KalturaESearchAggregationBucketsArray();
-		$buckets = $coreResponse[ESearchAggregations::BUCKETS];
-		if ($buckets)
-		{
-			foreach ($buckets as $bucket)
-			{
-				$responseBucket = new KalturaESearchAggregationBucket();
-				$responseBucket->fromArray($bucket);
-				$bucketsArray[] = $responseBucket;
-			}
-		}
-		$agg->buckets = $bucketsArray;
+		$agg->buckets = parent::coreBucketToApiResponse($coreResponse);
 		return array($agg);
 	}
-
 
 }
