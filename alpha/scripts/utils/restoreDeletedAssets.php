@@ -3,8 +3,8 @@ ini_set('memory_limit','1024M');
 if ($argc < 3)
 {
 	echo PHP_EOL . ' ---- Restore Deleted Assets ---- ' . PHP_EOL;
-	echo ' Execute: php ' . $argv[0] . ' [ /path/to/assets_id_list || assetId_1,assetId_2,.. || asset_id ]	[partnerId] [realrun / dryrun]' . PHP_EOL;
-	die(' Error: missing assets_ids file, csv or single asset ' . PHP_EOL . PHP_EOL);
+	echo ' Execute: php ' . $argv[0] . ' [ /path/to/assets_id_list || assetId_1,assetId_2,.. || asset_id ] [partnerId] [real-run / dryrun]' . PHP_EOL;
+	die(' Error: missing assets_ids or partner_id ' . PHP_EOL . PHP_EOL);
 }
 
 
@@ -27,8 +27,10 @@ else
 
 require_once(__DIR__ . '/../bootstrap.php');
 $partnerId = $argv[2];
-
-KalturaStatement::setDryRun(!isset($argv[3]) || (isset($argv[3]) && $argv[3] !== 'real-run'));
+$dryRun = true;
+if (isset($argv[3]) && $argv[3] === 'real-run')
+	$dryRun = false;
+KalturaStatement::setDryRun($dryRun);
 
 if (!PartnerPeer::retrieveByPK($partnerId)){
 	die ("Partner ID not found.\n");
@@ -45,7 +47,6 @@ foreach ($assetsIds as $deletedAssetId)
 	$c->add(assetPeer::ID,$deletedAssetId);
 	assetPeer::setUseCriteriaFilter(false);
 	$assets = assetPeer::doSelect($c);
-	KalturaLog::debug(var_dump($assets));
 	if (count($assets) > 0)
 		$deletedAsset = $assets[0];
 	else
