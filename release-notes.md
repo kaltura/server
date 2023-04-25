@@ -12,6 +12,7 @@ aggregationSize=1000
 ```
 
 ### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_07_add_searchhistory_permissions.php
 
 # Scorpius-19.7.0
