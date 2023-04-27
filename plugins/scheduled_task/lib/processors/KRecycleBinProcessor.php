@@ -48,7 +48,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 			$deleteResults = $this->deleteEntries($entriesList);
 			$numberOfHandledEntries += count($deleteResults);
 			$pageIndex++;
-			$entriesList = $this->runSearch($pageIndex);
+			$entriesList = $this->runSearch($pageIndex, $daysBeforeDelete);
 		}
 		
 		KalturaLog::info("Number of recycled entries deleted for partner [{$profile->partnerId}]: $numberOfHandledEntries");
@@ -100,7 +100,10 @@ class KRecycleBinProcessor extends KGenericProcessor
 			KBatchBase::$kClient->baseEntry->delete($entry->object->id);
 		}
 		$results = KBatchBase::$kClient->doMultiRequest();
-		
+		if (!$results)
+		{
+			return array();
+		}
 		foreach ($results as $index => $result)
 		{
 			if (is_array($result) && isset($result['code']))

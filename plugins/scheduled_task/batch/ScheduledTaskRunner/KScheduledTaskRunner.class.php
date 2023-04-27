@@ -5,7 +5,7 @@
  */
 class KScheduledTaskRunner extends KPeriodicWorker
 {
-	const recycleBin = 'recycleBin';
+	const runnerTypes = 'runnerTypes';
 	
 	/**
 	 * @var array
@@ -159,10 +159,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = $maxProfiles;
 		
-		// Check if worker is for clearing the Recycle Bin
-		if ($this->getParams(KScheduledTaskRunner::recycleBin))
+		$runnerTypes = $this->getAdditionalParams(KScheduledTaskRunner::runnerTypes);
+		if ($runnerTypes)
 		{
-			$filter->objectFilterEngineTypeEqual = ObjectFilterEngineType::RECYCLE_BIN_CLEANUP;
+			$filter->objectFilterEngineTypeIn = $runnerTypes;
 		}
 
 		$result = $scheduledTaskClient->scheduledTaskProfile->listAction($filter, $pager);
