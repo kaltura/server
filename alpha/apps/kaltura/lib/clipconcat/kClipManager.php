@@ -223,7 +223,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @return int
 	 * @throws kCoreException
 	 */
-	private function cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey = null, $isAudio)
+	private function cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey = null, $isAudio = false)
 	{
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
@@ -396,14 +396,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	protected function addClipJobsFromBatchJob($batchJob, $jobData)
 	{
-		$flavorAssetsToBeProcessed = assetPeer::retrieveAudioFlavorsByEntryID($jobData->getSourceEntryId(), array(asset::ASSET_STATUS_READY));
+		$audioAssets = assetPeer::retrieveAudioFlavorsByEntryID($jobData->getSourceEntryId(), array(asset::ASSET_STATUS_READY));
+		$flavorAssetsToBeProcessed = $audioAssets;
 		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getTempEntryId());
 		array_push($flavorAssetsToBeProcessed, $originalFlavorAsset);
+		KalturaLog::debug(var_dump($audioAssets));
 		foreach($flavorAssetsToBeProcessed as $asset)
 		{
 			/** @var flavorAsset $asset */
 			//start child clip jobs
-			$isAudio = $asset->getId() != $originalFlavorAsset->getId();
+			$isAudio = false;
+			if (in_array($asset, $audioAssets))
+				$isAudio = true;
 			$errDesc = '';
 			$this -> addClipJobs($batchJob, $jobData->getTempEntryId(), $errDesc, $jobData->getPartnerId(),
 								 $jobData->getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY, $asset->getId(), $isAudio);
@@ -751,7 +755,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param bool $isAudio
 	 * @return string
 	 */
-	private function editConversionEngineExtraParam($conversionEngines, $singleAttribute, $isAudio, $conversionExtraParamsArray = array())
+	private function editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParamsArray = array(), $isAudio = false)
 	{
 		$newConversionExtraParams = array();
 		for ($i = 0; $i < count($conversionEngines) ; $i++)
@@ -776,11 +780,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
 		if (is_null($originalConversionEnginesExtraParams))
-			$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $isAudio);
+			$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, null, $isAudio);
 		else {
 			$conversionExtraParams = explode('|', $originalConversionEnginesExtraParams);
 			$newExtraConversionParams =
-				$this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $isAudio, $conversionExtraParams);
+				$this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParams, $isAudio);
 		}
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
 	}
