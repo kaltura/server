@@ -34,16 +34,15 @@ class kZendConfigIni extends Zend_Config_Ini
 
 		try
 		{
-			$result = parent::__construct($tmpFileName, $section, $options);
+			parent::__construct($tmpFileName, $section, $options);
 		}
 		catch(Zend_Config_Exception $e)
 		{
 			unlink($tmpFileName);
 			throw $e;
 		}
-		
+
 		unlink($tmpFileName);
-		return $result;
 	}
 
 }
