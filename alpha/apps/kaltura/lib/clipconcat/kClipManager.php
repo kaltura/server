@@ -400,7 +400,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorAssetsToBeProcessed = $audioAssets;
 		$originalFlavorAsset = assetPeer::retrieveOriginalByEntryId($jobData->getTempEntryId());
 		array_push($flavorAssetsToBeProcessed, $originalFlavorAsset);
-		KalturaLog::debug(var_dump($audioAssets));
 		foreach($flavorAssetsToBeProcessed as $asset)
 		{
 			/** @var flavorAsset $asset */
