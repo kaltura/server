@@ -128,18 +128,18 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		
 		return new KGenericProcessor($this);
 	}
-
-	private function isMediaRepurposingProfile(KalturaScheduledTaskProfile $profile)
+	
+	protected function isMediaRepurposingProfile(KalturaScheduledTaskProfile $profile)
 	{
 		return ($profile->systemName == "MRP") || (kString::beginsWith($profile->name, 'MR_'));
 	}
-
-	private function isReachProfile(KalturaScheduledTaskProfile $profile)
+	
+	protected function isReachProfile(KalturaScheduledTaskProfile $profile)
 	{
 		return $profile->objectFilterEngineType == ObjectFilterEngineType::ENTRY_VENDOR_TASK;
 	}
 	
-	private function isRecycleBinProfile(KalturaScheduledTaskProfile $profile)
+	protected function isRecycleBinProfile(KalturaScheduledTaskProfile $profile)
 	{
 		return $profile->objectFilterEngineType == ObjectFilterEngineType::RECYCLE_BIN_CLEANUP;
 	}

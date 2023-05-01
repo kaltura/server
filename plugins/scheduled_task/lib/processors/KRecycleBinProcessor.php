@@ -42,13 +42,17 @@ class KRecycleBinProcessor extends KGenericProcessor
 		$numberOfHandledEntries = 0;
 		$pageIndex = 1;
 		$daysBeforeDelete = $this->getPartnerDaysBeforeDelete($profile->partnerId);
-		$entriesList = $this->runSearch($pageIndex, $daysBeforeDelete);
+		if (!$daysBeforeDelete)
+		{
+			return;
+		}
+		$entriesList = $this->getOverdueRecycledEntries($pageIndex, $daysBeforeDelete);
 		while ($entriesList && $entriesList->totalCount);
 		{
 			$deleteResults = $this->deleteEntries($entriesList);
 			$numberOfHandledEntries += count($deleteResults);
 			$pageIndex++;
-			$entriesList = $this->runSearch($pageIndex, $daysBeforeDelete);
+			$entriesList = $this->getOverdueRecycledEntries($pageIndex, $daysBeforeDelete);
 		}
 		
 		KalturaLog::info("Number of recycled entries deleted for partner [{$profile->partnerId}]: $numberOfHandledEntries");
@@ -63,23 +67,39 @@ class KRecycleBinProcessor extends KGenericProcessor
 		KBatchBase::impersonate($partnerId);
 		$partner = KBatchBase::$kClient->partner->get($partnerId);
 		KBatchBase::unimpersonate();
+		if (!$partner)
+		{
+			KalturaLog::err("Could not retrieve partner [$partnerId]");
+			return null;
+		}
+		if (!$partner->daysBeforeRecycleBinDeletion || 1 > $partner->daysBeforeRecycleBinDeletion)
+		{
+			KalturaLog::err("Could not retrieve daysBeforeRecycleBinDeletion for partner [$partnerId]");
+			return null;
+		}
 		return $partner->daysBeforeRecycleBinDeletion;
 	}
 	
-	protected function runSearch($pageIndex, $daysBeforeDelete)
+	protected function getOverdueRecycledEntries($pageIndex, $daysBeforeDelete)
 	{
 		$pager = new KalturaPager();
 		$pager->pageIndex = $pageIndex;
 		$pager->pageSize = 50;
+		
 		$range = new KalturaESearchRange();
 		$range->lessThanOrEqual = time() - kTimeConversion::DAYS * $daysBeforeDelete;
-		$entryItem = new KalturaESearchEntryItem();
-		$entryItem->itemType = KalturaESearchItemType::RANGE;
-		$entryItem->range = $range;
-		$entryItem->fieldName = KalturaESearchEntryFieldName::RECYCLED_AT;
+		$recycledAtRange = new KalturaESearchEntryItem();
+		$recycledAtRange->fieldName = KalturaESearchEntryFieldName::RECYCLED_AT;
+		$recycledAtRange->itemType = KalturaESearchItemType::RANGE;
+		$recycledAtRange->range = $range;
+		$displayInSearchValue = new KalturaESearchEntryItem();
+		$displayInSearchValue->fieldName = KalturaESearchEntryFieldName::DISPLAY_IN_SEARCH;
+		$displayInSearchValue->itemType = KalturaESearchItemType::EXACT_MATCH;
+		$displayInSearchValue->searchTerm = KalturaEntryDisplayInSearchType::RECYCLED;
 		$operator = new KalturaESearchEntryOperator();
 		$operator->operator = KalturaESearchOperatorType::AND_OP;
-		$operator->searchItems[] = $entryItem;
+		$operator->searchItems[] = $displayInSearchValue;
+		$operator->searchItems[] = $recycledAtRange;
 		$entryOrderByItem = new KalturaESearchEntryOrderByItem();
 		$entryOrderByItem->sortOrder = KalturaESearchSortOrder::ORDER_BY_ASC;
 		$entryOrderByItem->sortField = KalturaESearchEntryOrderByFieldName::RECYCLED_AT;
