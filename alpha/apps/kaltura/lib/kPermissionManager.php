@@ -15,6 +15,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	const PARTNER_GROUP_ARRAY_NAME  = 'partner_group';    // name of $map's partner group array
 	const PERMISSION_NAMES_ARRAY    = 'permission_names'; // name of $map's permission names array
 	const DEFAULT_ID = 'default';
+	const RECYCLE_BIN_CLEANUP = 'recycleBinCleanup';
 			
 	private static $lastInitializedContext = null; // last initialized security context (ks + partner id)
 	private static $cacheWatcher = null;
@@ -1112,28 +1113,26 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	protected static function enableRecycleBinScheduledTaskProfile($partnerId)
 	{
-		$c = new Criteria();
-		$c->addAnd(ScheduledTaskProfilePeer::NAME, 'recycleBinCleanup', Criteria::EQUAL);
-		$c->addAnd(ScheduledTaskProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-		$results = ScheduledTaskProfilePeer::doSelect($c);
+		$c = self::getCriteriaForRecycleBinScheduledTaskProfile($partnerId);
+		$scheduledTaskProfile = ScheduledTaskProfilePeer::doSelectOne($c);
 		
-		if ($results)
+		if ($scheduledTaskProfile)
 		{
-			$scheduledTaskProfile = $results[0];
 			$scheduledTaskProfile->setStatus(ScheduledTaskProfileStatus::ACTIVE);
 			$scheduledTaskProfile->save();
 		}
 		else
 		{
 			$scheduledTaskProfile = new ScheduledTaskProfile();
-			$scheduledTaskProfile->setName('recycleBinCleanup');
+			$scheduledTaskProfile->setName(self::RECYCLE_BIN_CLEANUP);
+			$scheduledTaskProfile->setSystemName(self::RECYCLE_BIN_CLEANUP);
 			$scheduledTaskProfile->setStatus(ScheduledTaskProfileStatus::ACTIVE);
 			$scheduledTaskProfile->setObjectFilterEngineType(ObjectFilterEngineType::RECYCLE_BIN_CLEANUP);
 			$scheduledTaskProfile->setPartnerId($partnerId);
 			$filter = new mediaEntryFilter;
 			$scheduledTaskProfile->setObjectFilter($filter);
 			$objectTasks = new kObjectTask();
-			$objectTasks->setType(ObjectTaskType::DELETE_ENTRY);
+			$objectTasks->setType(ObjectTaskType::RECYCLE_BIN_CLEANUP);
 			$objectTasks->setStopProcessingOnError(true);
 			$scheduledTaskProfile->setObjectTasks($objectTasks);
 			$scheduledTaskProfile->setMaxTotalCountAllowed(50);
@@ -1143,17 +1142,26 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	
 	protected static function disableRecycleBinScheduledTaskProfile($partnerId)
 	{
-		$c = new Criteria();
-		$c->addAnd(ScheduledTaskProfilePeer::NAME, 'recycleBinCleanup', Criteria::EQUAL);
-		$c->addAnd(ScheduledTaskProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-		$results = ScheduledTaskProfilePeer::doSelect($c);
+		$c = self::getCriteriaForRecycleBinScheduledTaskProfile($partnerId);
+		$scheduledTaskProfileList = ScheduledTaskProfilePeer::doSelect($c);
 		
-		if ($results)
+		if (is_empty($scheduledTaskProfileList))
 		{
-			$scheduledTaskProfile = $results[0];
+			return;
+		}
+		foreach ($scheduledTaskProfileList as $scheduledTaskProfile)
+		{
 			$scheduledTaskProfile->setStatus(ScheduledTaskProfileStatus::DISABLED);
 			$scheduledTaskProfile->save();
 		}
+	}
+	
+	protected static function getCriteriaForRecycleBinScheduledTaskProfile($partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(ScheduledTaskProfilePeer::SYSTEM_NAME, self::RECYCLE_BIN_CLEANUP, Criteria::EQUAL);
+		$c->addAnd(ScheduledTaskProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		return $c;
 	}
 	
 	private static function markPartnerRoleCacheDirty($partnerId)

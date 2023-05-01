@@ -20,4 +20,6 @@ interface ObjectTaskType extends BaseEnum
 	const MODIFY_ENTRY = 7;
 
 	const MAIL_NOTIFICATION = 8;
+	
+	const RECYCLE_BIN_CLEANUP = 9;
 }

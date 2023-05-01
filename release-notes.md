@@ -6,7 +6,7 @@
 ### Configuration ###
 Add the following to batch.ini under KScheduledTaskRunner worker
 ```
-[KAsyncRecycleBin : KScheduledTaskRunner]
+[KScheduledTaskRunner : PeriodicWorker]
 id                                                  = 610
 params.runnerTypes                                  = 1,2
 ```
