@@ -1145,7 +1145,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$c = self::getCriteriaForRecycleBinScheduledTaskProfile($partnerId);
 		$scheduledTaskProfileList = ScheduledTaskProfilePeer::doSelect($c);
 		
-		if (is_empty($scheduledTaskProfileList))
+		if (!$scheduledTaskProfileList)
 		{
 			return;
 		}
