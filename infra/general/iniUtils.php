@@ -1,6 +1,6 @@
 <?php
 /**
- *  Ini files manipulation utlities
+ *  Ini files manipulation utilities
  *
  *  @package infra
  *  @subpackage utils
