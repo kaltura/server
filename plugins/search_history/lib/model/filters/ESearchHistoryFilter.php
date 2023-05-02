@@ -153,7 +153,10 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		$this->applyFilterFields($boolQuery, true);
 
 		$aggregationKey = ESearchHistoryAggregationItem::KEY . ':' . $this->aggregation->getFieldName();
-		$this->aggregation->setSize($this->getAggregationSize());
+		if($this->aggregation->getSize() > $this->getMaxAggregationSize())
+		{
+			throw new KalturaAPIException(KalturaESearchHistoryErrors::AGGREGATION_SIZE_EXCEEDED_LIMIT, $this->getMaxAggregationSize());
+		}
 		$aggregations[$aggregationKey] = $this->aggregation->getAggregationCommand();
 
 		$this->query[ESearchAggregations::AGGS] = $aggregations;
@@ -256,11 +259,10 @@ class ESearchHistoryFilter extends ESearchBaseFilter
 		}
 	}
 
-	protected function getAggregationSize()
+	protected function getMaxAggregationSize()
 	{
 		$searchHistoryConfig = kConf::get('search_history', 'elastic', array());
-		$aggregationSize = isset($searchHistoryConfig['aggregationSize']) ? $searchHistoryConfig['aggregationSize'] : self::MAX_AGGREGATION_SIZE;
-		return min($this->aggregation->getSize(), $aggregationSize);
+		return isset($searchHistoryConfig['aggregationSize']) ? $searchHistoryConfig['aggregationSize'] : self::MAX_AGGREGATION_SIZE;
 	}
 
 	protected function getAggregationTimestampLimit()
