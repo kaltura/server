@@ -1131,6 +1131,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$scheduledTaskProfile->setPartnerId($partnerId);
 			$filter = new mediaEntryFilter;
 			$scheduledTaskProfile->setObjectFilter($filter);
+			$scheduledTaskProfile->setObjectFilterApiType('KalturaMediaEntryFilter');
 			$objectTask = new kObjectTask();
 			$objectTask->setType(ObjectTaskType::RECYCLE_BIN_CLEANUP);
 			$objectTask->setStopProcessingOnError(true);
