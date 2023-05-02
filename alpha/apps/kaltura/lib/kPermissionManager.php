@@ -1131,10 +1131,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$scheduledTaskProfile->setPartnerId($partnerId);
 			$filter = new mediaEntryFilter;
 			$scheduledTaskProfile->setObjectFilter($filter);
-			$objectTasks = new kObjectTask();
-			$objectTasks->setType(ObjectTaskType::RECYCLE_BIN_CLEANUP);
-			$objectTasks->setStopProcessingOnError(true);
-			$scheduledTaskProfile->setObjectTasks($objectTasks);
+			$objectTask = new kObjectTask();
+			$objectTask->setType(ObjectTaskType::RECYCLE_BIN_CLEANUP);
+			$objectTask->setStopProcessingOnError(true);
+			$scheduledTaskProfile->setObjectTasks(array($objectTask));
 			$scheduledTaskProfile->setMaxTotalCountAllowed(50);
 			$scheduledTaskProfile->save();
 		}
