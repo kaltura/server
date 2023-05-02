@@ -1,5 +1,5 @@
 <?php
-require_once('/opt/kaltura/app/vendor/twig/autoload.php');
+require_once(realpath(__DIR__) . '/../../vendor/twig/autoload.php');
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
