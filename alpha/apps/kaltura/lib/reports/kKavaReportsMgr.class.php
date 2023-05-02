@@ -134,6 +134,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO = 'combined_live_engaged_users_ratio';
 	const METRIC_REACTION_CLICKED_UNIQUE_USERS = 'reaction_clicked_unique_users';
 	const METRIC_REACTION_CLICKED_USER_RATIO = 'reaction_clicked_user_ratio';
+	const METRIC_VOD_AVG_PLAY_TIME = 'vod_avg_play_time';
+	const METRIC_COMBINED_LIVE_AVG_PLAY_TIME = 'combined_live_avg_play_time';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -533,6 +535,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_VOD_VIEWERS => true,
 		self::METRIC_UNIQUE_VOD_LIVE_VIEWERS => true,
 		self::METRIC_REACTION_CLICKED_UNIQUE_USERS => true,
+		self::METRIC_VOD_AVG_PLAY_TIME => true,
+		self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1646,6 +1650,22 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_REACTION_CLICKED_USER_RATIO, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_REACTION_CLICKED_UNIQUE_USERS),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_VIEWERS))));
+
+		self::$metrics_def[self::METRIC_VOD_AVG_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_UNIQUE_VOD_VIEWERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_VOD_AVG_PLAY_TIME, "/", array(
+				self::getConstantRatioPostAggr('subVodPlayTime', self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VOD_VIEWERS, self::METRIC_UNIQUE_VOD_VIEWERS))));
+
+		self::$metrics_def[self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME, "/", array(
+				self::getArithmeticPostAggregator("sumLiveAndMeeting", "+", array(
+					self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+					self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'))),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 
