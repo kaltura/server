@@ -44,6 +44,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 	 */
 	protected function handleProcess(KalturaScheduledTaskProfile $profile, $maxTotalCountAllowed)
 	{
+		KBatchBase::impersonate($profile->partnerId);
 		$daysBeforeDelete = $this->getPartnerDaysBeforeDelete($profile->partnerId);
 		if (!$daysBeforeDelete)
 		{
@@ -51,6 +52,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 		}
 		$entriesListsToDelete = $this->getEntriesListsToDelete($daysBeforeDelete);
 		$numberOfHandledEntries = $this->handleEntriesListsToDelete($entriesListsToDelete);
+		KBatchBase::unimpersonate();
 		KalturaLog::info("Number of recycled entries deleted for partner [{$profile->partnerId}]: $numberOfHandledEntries");
 	}
 	
@@ -60,9 +62,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 	 */
 	protected function getPartnerDaysBeforeDelete($partnerId)
 	{
-		KBatchBase::impersonate($partnerId);
 		$partner = KBatchBase::$kClient->partner->get($partnerId);
-		KBatchBase::unimpersonate();
 		if (!$partner)
 		{
 			KalturaLog::err("Could not retrieve partner [$partnerId]");
