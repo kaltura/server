@@ -8,7 +8,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 {
 	const ENTRIES_PAGE_SIZE = 500;
 	const ENTRIES_NUMBER_OF_PAGES = 2;
-	const ENTRIES_DELETE_RETRY = 3;
+	const ENTRIES_DELETE_RETRY_LIMIT = 3;
 	const WAIT_BETWEEN_REQUESTS_IN_SECONDS = 2;
 	
 	/**
@@ -144,12 +144,12 @@ class KRecycleBinProcessor extends KGenericProcessor
 	
 	protected function deleteEntries($entriesList)
 	{
-		$retries = self::ENTRIES_DELETE_RETRY;
+		$retries = self::ENTRIES_DELETE_RETRY_LIMIT;
 		$results = array();
 		while ($retries > 0)
 		{
 			KBatchBase::$kClient->startMultiRequest();
-			foreach ($entriesList->objects as $entry)
+			foreach ($entriesList as $entry)
 			{
 				KBatchBase::$kClient->baseEntry->delete($entry->object->id);
 			}
