@@ -8,8 +8,6 @@ class KRecycleBinProcessor extends KGenericProcessor
 {
 	const ENTRIES_PAGE_SIZE = 500;
 	const ENTRIES_NUMBER_OF_PAGES = 2;
-	const ENTRIES_DELETE_RETRY_LIMIT = 3;
-	const WAIT_BETWEEN_REQUESTS_IN_SECONDS = 2;
 	
 	/**
 	 * @param KalturaScheduledTaskProfile $profile
@@ -144,27 +142,15 @@ class KRecycleBinProcessor extends KGenericProcessor
 	
 	protected function deleteEntries($entriesList)
 	{
-		$retries = self::ENTRIES_DELETE_RETRY_LIMIT;
-		$results = array();
-		while ($retries > 0)
+		KBatchBase::$kClient->startMultiRequest();
+		foreach ($entriesList as $entry)
 		{
-			KBatchBase::$kClient->startMultiRequest();
-			foreach ($entriesList as $entry)
-			{
-				KBatchBase::$kClient->baseEntry->delete($entry->object->id);
-			}
-			$results = KBatchBase::$kClient->doMultiRequest();
-			if (!$results)
-			{
-				return array();
-			}
-			
-			if (!$this->wasActionLimitReached($results))
-			{
-				break;
-			}
-			$retries--;
-			sleep(self::WAIT_BETWEEN_REQUESTS_IN_SECONDS);
+			KBatchBase::$kClient->baseEntry->delete($entry->object->id);
+		}
+		$results = KBatchBase::$kClient->doMultiRequest();
+		if (!$results)
+		{
+			return array();
 		}
 		
 		foreach ($results as $index => $result)
@@ -175,15 +161,6 @@ class KRecycleBinProcessor extends KGenericProcessor
 			}
 		}
 		return $results;
-	}
-	
-	protected function wasActionLimitReached($results)
-	{
-		if (isset($results['code']) && $results['code'] == KalturaErrors::ACTION_BLOCKED)
-		{
-			return true;
-		}
-		return false;
 	}
 	
 	protected function wasHandledToday($time)
