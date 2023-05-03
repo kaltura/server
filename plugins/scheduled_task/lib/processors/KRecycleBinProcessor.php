@@ -6,6 +6,11 @@
  */
 class KRecycleBinProcessor extends KGenericProcessor
 {
+	const ENTRIES_PAGE_SIZE = 500;
+	const ENTRIES_NUMBER_OF_PAGES = 2;
+	const ENTRIES_DELETE_RETRY = 3;
+	const WAIT_BETWEEN_REQUESTS_IN_SECONDS = 2;
+	
 	/**
 	 * @param KalturaScheduledTaskProfile $profile
 	 */
@@ -39,22 +44,13 @@ class KRecycleBinProcessor extends KGenericProcessor
 	 */
 	protected function handleProcess(KalturaScheduledTaskProfile $profile, $maxTotalCountAllowed)
 	{
-		$numberOfHandledEntries = 0;
-		$pageIndex = 1;
 		$daysBeforeDelete = $this->getPartnerDaysBeforeDelete($profile->partnerId);
 		if (!$daysBeforeDelete)
 		{
 			return;
 		}
-		$entriesList = $this->getOverdueRecycledEntries($pageIndex, $daysBeforeDelete);
-		while ($entriesList && $entriesList->totalCount);
-		{
-			$deleteResults = $this->deleteEntries($entriesList);
-			$numberOfHandledEntries += count($deleteResults);
-			$pageIndex++;
-			$entriesList = $this->getOverdueRecycledEntries($pageIndex, $daysBeforeDelete);
-		}
-		
+		$entriesListsToDelete = $this->getEntriesListsToDelete($daysBeforeDelete);
+		$numberOfHandledEntries = $this->handleEntriesListsToDelete($entriesListsToDelete);
 		KalturaLog::info("Number of recycled entries deleted for partner [{$profile->partnerId}]: $numberOfHandledEntries");
 	}
 	
@@ -80,11 +76,34 @@ class KRecycleBinProcessor extends KGenericProcessor
 		return $partner->daysBeforeRecycleBinDeletion;
 	}
 	
+	protected function getEntriesListsToDelete($daysBeforeDelete)
+	{
+		$pageIndex = 1;
+		$entriesList = $this->getOverdueRecycledEntries($pageIndex, $daysBeforeDelete);
+		if (!$entriesList || !$entriesList->objects)
+		{
+			return array();
+		}
+		$entriesToDelete = array($entriesList->objects);
+		while (count($entriesList->objects) >= self::ENTRIES_PAGE_SIZE && self::ENTRIES_NUMBER_OF_PAGES >= $pageIndex)
+		{
+			$pageIndex++;
+			$entriesList = $this->getOverdueRecycledEntries($pageIndex, $daysBeforeDelete);
+			if (!$entriesList || !$entriesList->objects)
+			{
+				return $entriesToDelete;
+			}
+			$entriesToDelete[] = $entriesList;
+		}
+		
+		return $entriesToDelete;
+	}
+	
 	protected function getOverdueRecycledEntries($pageIndex, $daysBeforeDelete)
 	{
 		$pager = new KalturaPager();
 		$pager->pageIndex = $pageIndex;
-		$pager->pageSize = 50;
+		$pager->pageSize = self::ENTRIES_PAGE_SIZE;
 		
 		$range = new KalturaESearchRange();
 		$range->lessThanOrEqual = time() - kTimeConversion::DAYS * $daysBeforeDelete;
@@ -112,18 +131,42 @@ class KRecycleBinProcessor extends KGenericProcessor
 		return $eSearchClientPlugin->eSearch->searchEntry($searchParams, $pager);
 	}
 	
+	protected function handleEntriesListsToDelete($entriesListsToDelete)
+	{
+		$numberOfHandledEntries = 0;
+		foreach ($entriesListsToDelete as $entriesList)
+		{
+			$deleteResults = $this->deleteEntries($entriesList);
+			$numberOfHandledEntries += count($deleteResults);
+		}
+		return $numberOfHandledEntries;
+	}
+	
 	protected function deleteEntries($entriesList)
 	{
-		KBatchBase::$kClient->startMultiRequest();
-		foreach ($entriesList->objects as $entry)
+		$retries = self::ENTRIES_DELETE_RETRY;
+		$results = array();
+		while ($retries > 0)
 		{
-			KBatchBase::$kClient->baseEntry->delete($entry->object->id);
+			KBatchBase::$kClient->startMultiRequest();
+			foreach ($entriesList->objects as $entry)
+			{
+				KBatchBase::$kClient->baseEntry->delete($entry->object->id);
+			}
+			$results = KBatchBase::$kClient->doMultiRequest();
+			if (!$results)
+			{
+				return array();
+			}
+			
+			if (!$this->wasActionLimitReached($results))
+			{
+				break;
+			}
+			$retries--;
+			sleep(self::WAIT_BETWEEN_REQUESTS_IN_SECONDS);
 		}
-		$results = KBatchBase::$kClient->doMultiRequest();
-		if (!$results)
-		{
-			return array();
-		}
+		
 		foreach ($results as $index => $result)
 		{
 			if (is_array($result) && isset($result['code']))
@@ -132,6 +175,15 @@ class KRecycleBinProcessor extends KGenericProcessor
 			}
 		}
 		return $results;
+	}
+	
+	protected function wasActionLimitReached($results)
+	{
+		if (isset($results['code']) && $results['code'] == KalturaErrors::ACTION_BLOCKED)
+		{
+			return true;
+		}
+		return false;
 	}
 	
 	protected function wasHandledToday($time)
