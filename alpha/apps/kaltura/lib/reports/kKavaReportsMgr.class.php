@@ -399,6 +399,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_VE_UNREGISTERED,
 		self::EVENT_TYPE_VE_INVITED,
 		self::EVENT_TYPE_VE_CREATED,
+		self::EVENT_TYPE_PAUSE,
+		self::EVENT_TYPE_RESUME,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -456,6 +458,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED => 'count_add_to_calendar_clicked',
 		self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED => 'count_download_attachment_clicked',
 		self::EVENT_TYPE_REACTION_CLICKED => 'count_reaction_clicked',
+		self::EVENT_TYPE_PAUSE => 'count_pause_clicked',
+		self::EVENT_TYPE_RESUME => 'count_resume_clicked',
 	);
 
 	//global transform
