@@ -1,4 +1,8 @@
 <?php
+
+use Twig\Loader\FilesystemLoader;
+use Twig\Environment;
+
 /**
  *  Ini files manipulation utilities
  *
@@ -9,6 +13,8 @@ class IniUtils
 {
 	const GLOBAL_INI_SECTION_REGEX = '/^\s*\[.*\S.*\]/m';
 	const EMPTY_LINE_REGEX = '/^\h*\v+/m';
+
+	private static $fileSystemLoader = null;
 
 	/**
 	 * Given an associative array, this function will generate INI file string that represent it.
@@ -167,5 +173,31 @@ class IniUtils
 		$d->close();
 
 		return $configFilePaths;
+	}
+
+	public static function parseIniFile($filename, $process_sections = false, $scanner_mode = INI_SCANNER_NORMAL)
+	{
+		if(!self::$fileSystemLoader)
+		{
+			self::$fileSystemLoader = new FilesystemLoader();
+		}
+
+		$tmpFileName = kConf::get("cache_root_path") . '/twig/' . $filename;
+		if (!kFile::checkFileExists($tmpFileName))
+		{
+			$dirName = dirname($filename);
+			$baseName = basename($filename);
+			self::$fileSystemLoader->setPaths($dirName);
+	
+			$twig = new Environment(self::$fileSystemLoader);
+			$twig->addExtension(new twigExtensions());
+	
+			$renderedOutput = $twig->render($baseName);
+
+			kFile::fullMkDir($tmpFileName);
+			kFile::filePutContents($tmpFileName, $renderedOutput);
+		}
+
+		return parse_ini_file($tmpFileName, $process_sections, $scanner_mode);
 	}
 }

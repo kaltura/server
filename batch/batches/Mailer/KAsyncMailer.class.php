@@ -280,7 +280,7 @@ class KAsyncMailer extends KJobHandlerWorker
 					KalturaLog::crit( 'Fatal:::: Cannot find file: '.$filename );
 					continue;
 				}
-				$ini_array = parse_ini_file( $filename, true );
+				$ini_array = IniUtils::parseIniFile( $filename, true );
 				$this->texts_array[$language] = array( 'subjects' => $ini_array['subjects'],
 				'bodies'=>$ini_array['bodies'] ,
 				'common_text'=> $ini_array['common_text'] );
