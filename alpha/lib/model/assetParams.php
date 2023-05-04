@@ -10,6 +10,7 @@
  */ 
 class assetParams extends BaseassetParams implements IBaseObject
 {
+	// video/audio container formats
 	const CONTAINER_FORMAT_FLV = "flv";
 	const CONTAINER_FORMAT_FLASH_VIDEO = "flash video";
 	const CONTAINER_FORMAT_MP4 = "mp4";
@@ -45,15 +46,17 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_F4V = "f4v";
 	const CONTAINER_FORMAT_QT = "qt";
 	const CONTAINER_FORMAT_QUICKTIME = "quicktime";
-
+	const TS_FILE_EXTENSION = 'ts';
+	const M3U8_FILE_EXTENSION = 'm3u8';
+	const MPG_FILE_EXTENSION = 'mpg';
+	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
+	
+	// document container formats
 	const CONTAINER_FORMAT_PDF = 'pdf';
 	const CONTAINER_FORMAT_SWF = 'swf';
-	
 	const CONTAINER_FORMAT_JPG = 'jpg';
 	const CONTAINER_FORMAT_BMP = 'bmp';
 	const CONTAINER_FORMAT_PNG = 'png';
-	
-	// list was translated from 'plugins/content/document/lib/events/DocumentCreatedHandler.php:9'
 	const CONTAINER_FORMAT_DOC = 'doc';
 	const CONTAINER_FORMAT_DOCX = 'docx';
 	const CONTAINER_FORMAT_DOCM = 'docm';
@@ -91,12 +94,6 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_OTS = 'ots';
 	const CONTAINER_FORMAT_OTT = 'ott';
 	const CONTAINER_FORMAT_OXT = 'oxt';
-	
-	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
-
-	const TS_FILE_EXTENSION = 'ts';
-	const M3U8_FILE_EXTENSION = 'm3u8';
-	const MPG_FILE_EXTENSION = 'mpg';
 
 	const TAG_SOURCE = "source";
 	const TAG_SAVE_SOURCE = "save_source";
