@@ -10,6 +10,7 @@
  */ 
 class assetParams extends BaseassetParams implements IBaseObject
 {
+	// video/audio container formats
 	const CONTAINER_FORMAT_FLV = "flv";
 	const CONTAINER_FORMAT_FLASH_VIDEO = "flash video";
 	const CONTAINER_FORMAT_MP4 = "mp4";
@@ -45,19 +46,54 @@ class assetParams extends BaseassetParams implements IBaseObject
 	const CONTAINER_FORMAT_F4V = "f4v";
 	const CONTAINER_FORMAT_QT = "qt";
 	const CONTAINER_FORMAT_QUICKTIME = "quicktime";
-
-	const CONTAINER_FORMAT_PDF = 'pdf';
-	const CONTAINER_FORMAT_SWF = 'swf';
-	
-	const CONTAINER_FORMAT_JPG = 'jpg';
-	const CONTAINER_FORMAT_BMP = 'bmp';
-	const CONTAINER_FORMAT_PNG = 'png';
-	
-	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
-
 	const TS_FILE_EXTENSION = 'ts';
 	const M3U8_FILE_EXTENSION = 'm3u8';
 	const MPG_FILE_EXTENSION = 'mpg';
+	const CONTAINER_FORMAT_WIDEVINE = 'wvm';
+	
+	// document container formats
+	const CONTAINER_FORMAT_PDF = 'pdf';
+	const CONTAINER_FORMAT_SWF = 'swf';
+	const CONTAINER_FORMAT_JPG = 'jpg';
+	const CONTAINER_FORMAT_BMP = 'bmp';
+	const CONTAINER_FORMAT_PNG = 'png';
+	const CONTAINER_FORMAT_DOC = 'doc';
+	const CONTAINER_FORMAT_DOCX = 'docx';
+	const CONTAINER_FORMAT_DOCM = 'docm';
+	const CONTAINER_FORMAT_DOTX = 'dotx';
+	const CONTAINER_FORMAT_DOTM = 'dotm';
+	const CONTAINER_FORMAT_XLS = 'xls';
+	const CONTAINER_FORMAT_XLSX = 'xlsx';
+	const CONTAINER_FORMAT_XLSM = 'xlsm';
+	const CONTAINER_FORMAT_XLTX = 'xltx';
+	const CONTAINER_FORMAT_XLTM = 'xltm';
+	const CONTAINER_FORMAT_XLSB = 'xlsb';
+	const CONTAINER_FORMAT_XLAM = 'xlam';
+	const CONTAINER_FORMAT_PPT = 'ppt';
+	const CONTAINER_FORMAT_PPTX = 'pptx';
+	const CONTAINER_FORMAT_PPTM = 'pptm';
+	const CONTAINER_FORMAT_POTX = 'potx';
+	const CONTAINER_FORMAT_POTM = 'potm';
+	const CONTAINER_FORMAT_PPAM = 'ppam';
+	const CONTAINER_FORMAT_PPSM = 'ppsm';
+	const CONTAINER_FORMAT_ODB = 'odb';
+	const CONTAINER_FORMAT_ODC = 'odc';
+	const CONTAINER_FORMAT_ODF = 'odf';
+	const CONTAINER_FORMAT_ODG = 'odg';
+	const CONTAINER_FORMAT_ODI = 'odi';
+	const CONTAINER_FORMAT_ODM = 'odm';
+	const CONTAINER_FORMAT_ODP = 'odp';
+	const CONTAINER_FORMAT_ODS = 'ods';
+	const CONTAINER_FORMAT_ODT = 'odt';
+	const CONTAINER_FORMAT_OTC = 'otc';
+	const CONTAINER_FORMAT_OTF = 'otf';
+	const CONTAINER_FORMAT_OTG = 'otg';
+	const CONTAINER_FORMAT_OTH = 'oth';
+	const CONTAINER_FORMAT_OTI = 'oti';
+	const CONTAINER_FORMAT_OTP = 'otp';
+	const CONTAINER_FORMAT_OTS = 'ots';
+	const CONTAINER_FORMAT_OTT = 'ott';
+	const CONTAINER_FORMAT_OXT = 'oxt';
 
 	const TAG_SOURCE = "source";
 	const TAG_SAVE_SOURCE = "save_source";

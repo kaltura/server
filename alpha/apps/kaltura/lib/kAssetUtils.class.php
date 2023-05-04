@@ -316,6 +316,62 @@ class kAssetUtils
 
 		return $result;
 	}
+	
+	public static function isImage($containerFormat)
+	{
+		switch ($containerFormat)
+		{
+			case assetParams::CONTAINER_FORMAT_JPG:
+			case assetParams::CONTAINER_FORMAT_SWF:
+			case assetParams::CONTAINER_FORMAT_PDF:
+			case assetParams::CONTAINER_FORMAT_BMP:
+			case assetParams::CONTAINER_FORMAT_PNG:
+			case assetParams::CONTAINER_FORMAT_DOC:
+			case assetParams::CONTAINER_FORMAT_DOCX:
+			case assetParams::CONTAINER_FORMAT_DOCM:
+			case assetParams::CONTAINER_FORMAT_DOTX:
+			case assetParams::CONTAINER_FORMAT_DOTM:
+			case assetParams::CONTAINER_FORMAT_XLS:
+			case assetParams::CONTAINER_FORMAT_XLSX:
+			case assetParams::CONTAINER_FORMAT_XLSM:
+			case assetParams::CONTAINER_FORMAT_XLTX:
+			case assetParams::CONTAINER_FORMAT_XLTM:
+			case assetParams::CONTAINER_FORMAT_XLSB:
+			case assetParams::CONTAINER_FORMAT_XLAM:
+			case assetParams::CONTAINER_FORMAT_PPT:
+			case assetParams::CONTAINER_FORMAT_PPTX:
+			case assetParams::CONTAINER_FORMAT_PPTM:
+			case assetParams::CONTAINER_FORMAT_POTX:
+			case assetParams::CONTAINER_FORMAT_POTM:
+			case assetParams::CONTAINER_FORMAT_PPAM:
+			case assetParams::CONTAINER_FORMAT_PPSM:
+			case assetParams::CONTAINER_FORMAT_ODB:
+			case assetParams::CONTAINER_FORMAT_ODC:
+			case assetParams::CONTAINER_FORMAT_ODF:
+			case assetParams::CONTAINER_FORMAT_ODG:
+			case assetParams::CONTAINER_FORMAT_ODI:
+			case assetParams::CONTAINER_FORMAT_ODM:
+			case assetParams::CONTAINER_FORMAT_ODP:
+			case assetParams::CONTAINER_FORMAT_ODS:
+			case assetParams::CONTAINER_FORMAT_ODT:
+			case assetParams::CONTAINER_FORMAT_OTC:
+			case assetParams::CONTAINER_FORMAT_OTF:
+			case assetParams::CONTAINER_FORMAT_OTG:
+			case assetParams::CONTAINER_FORMAT_OTH:
+			case assetParams::CONTAINER_FORMAT_OTI:
+			case assetParams::CONTAINER_FORMAT_OTP:
+			case assetParams::CONTAINER_FORMAT_OTS:
+			case assetParams::CONTAINER_FORMAT_OTT:
+			case assetParams::CONTAINER_FORMAT_OXT:
+				$result = true;
+				break;
+			default:
+				$result = false;
+				break;
+		}
+		
+		return $result;
+	}
 
 	public static function getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir)
 	{
