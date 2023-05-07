@@ -406,7 +406,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			//start child clip jobs
 			$isAudio = false;
 			if (in_array($asset, $audioAssets))
+			{
 				$isAudio = true;
+			}
 			$errDesc = '';
 			$this -> addClipJobs($batchJob, $jobData->getTempEntryId(), $errDesc, $jobData->getPartnerId(),
 								 $jobData->getOperationAttributes(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY, $asset->getId(), $isAudio);
@@ -783,7 +785,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		else {
 			$conversionExtraParams = explode('|', $originalConversionEnginesExtraParams);
 			$newExtraConversionParams =
-				$this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParams, $isAudio);
+				$this->editConversionEngineExtraParam($conversionEngines, $singleAttribute,$conversionExtraParams,$isAudio);
 		}
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
 	}
