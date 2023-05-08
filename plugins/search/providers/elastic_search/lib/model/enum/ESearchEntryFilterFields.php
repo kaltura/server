@@ -58,4 +58,5 @@ class ESearchEntryFilterFields extends KalturaEnum
 	const LAST_PLAYED_AT = 'last_played_at';
 	const DURATION_TYPE = 'duration_type';
 	const EXTERNAL_SOURCE_TYPE = 'plugins_data';
+	const RECYCLED_AT = 'recycled_at';
 }

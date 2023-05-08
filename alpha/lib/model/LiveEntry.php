@@ -311,7 +311,7 @@ abstract class LiveEntry extends entry
 	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
 
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
-	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );	}
+	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, '%i' );	}
 	
 	protected function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}

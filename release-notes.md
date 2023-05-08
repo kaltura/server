@@ -1,3 +1,37 @@
+# Scorpius-19.8.0
+## Add search term aggregation to SearchHistory plugin
+* Issue Type: Story
+* Issue ID: PLAT-23876
+
+### Configuration ###
+Add the following section to elastic confMap:
+```
+[search_history]
+aggregationRangeInMonths=6
+aggregationSize=1000
+```
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_07_add_searchhistory_permissions.php
+
+# Scorpius-19.7.0
+## Add self serve admin edit permission
+* Issue Type: Task
+* Issue ID: SSRV-1138
+
+### Deployment Scripts ###
+php deployment/updates/scripts/add_permissions/2023_04_10_add_ssrv_edit_admin_permission.php
+
+## Add 'recycledAt' to ESearch for entry ##
+- Issue Type: Task
+- Issue ID: PLAT-24227
+
+### Deployment ###
+Replace 'esearch_host', 'esearch_port', 'entry_index_name' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping/entry" -H 'Content-Type: application/json' -d'{"properties": {"recycled_at" : {"type" : "date", "format": "epoch_second"}}}'
+
 # Scorpius-19.6.0
 ## Increase ActionsLimit For Analytics ##
 - Issue Type: Task

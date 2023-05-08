@@ -108,7 +108,7 @@ class multiLingualUtils
 		$value = $newMultiLingualMapping[$defaultLanguage];
 		$currentMultiLingualMapping = json_decode(self::getMultiLanguageMapping($object), true);
 		
-		if(!$value) // new mapping does not contain value in default language or input was a single string converted into array
+		if(!$value && $newMultiLingualMapping[$defaultLanguage]) // new mapping does not contain value in default language or input was a single string converted into array
 		{
 			if (!isset($currentMultiLingualMapping[$field]) ||
 				kCurrentContext::$language === self::getDefaultLanguage($object) ||
@@ -229,12 +229,9 @@ class multiLingualUtils
 			{
 				continue;
 			}
-			if ($responseObject->$fieldName)
-			{
-				$defaultValueMapping[$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
-				$tempFieldMapping = ($multiLanguageMap[$fieldName]) ? array_merge($defaultValueMapping, $multiLanguageMap[$fieldName]) : $defaultValueMapping;
-				$multiLanguageMap[$fieldName] = $tempFieldMapping;
-			}
+			$defaultValueMapping[$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
+			$tempFieldMapping = ($multiLanguageMap[$fieldName]) ? array_merge($defaultValueMapping, $multiLanguageMap[$fieldName]) : $defaultValueMapping;
+			$multiLanguageMap[$fieldName] = $tempFieldMapping;
 			$responseObject->$fieldName = KalturaMultiLingualStringArray::fromMultiLingualStringArray($multiLanguageMap[$fieldName]);
 		}
 	}
@@ -243,17 +240,15 @@ class multiLingualUtils
 	{
 		foreach ($supportedFields as $fieldName)
 		{
-			if ($responseObject->$fieldName)
-			{
-				$multiLanguageMap[$fieldName][$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
-			}
+			$multiLanguageMap[$fieldName][$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
 			$responseObject->$fieldName = KalturaMultiLingualStringArray::fromMultiLingualStringArray($multiLanguageMap[$fieldName]);
 		}
 	}
 	
 	protected static function setRequestedLanguageStringInField(&$responseObject, $dbObject, $newMultiLingualMapping, $requestLanguage = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$language = $requestLanguage ? $requestLanguage : self::getDefaultLanguage($dbObject);
+		$defaultLanguage = self::getDefaultLanguage($dbObject);
+		$language = ($requestLanguage && $defaultLanguage) ? $requestLanguage : $defaultLanguage;
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		$supportedFieldsInRequestedLang = array();
 		foreach ($supportedFields as $fieldName)
@@ -264,8 +259,17 @@ class multiLingualUtils
 			}
 			$supportedFieldsInRequestedLang[$fieldName] = self::getFieldValueByLanguage($newMultiLingualMapping, $fieldName, $language);
 			
-			$responseObject->$fieldName = ($supportedFieldsInRequestedLang[$fieldName] && $supportedFieldsInRequestedLang[$fieldName] !== '') ?
-				$supportedFieldsInRequestedLang[$fieldName] : $dbObject->getDefaultFieldValue($fieldName);
+			$fieldValueToExpose = $dbObject->getDefaultFieldValue($fieldName);
+			if ($supportedFieldsInRequestedLang[$fieldName])
+			{
+				$fieldValueToExpose = $supportedFieldsInRequestedLang[$fieldName];
+			}
+			elseif ($language !== $defaultLanguage)
+			{
+				$fieldValueToExpose = '';
+			}
+
+			$responseObject->$fieldName = $fieldValueToExpose;
 		}
 	}
 	
@@ -302,7 +306,7 @@ class multiLingualUtils
 		{
 			throw new KalturaAPIException(KalturaErrors::WRONG_REQUEST_LANGUAGE, kCurrentContext::$language);
 		}
-		return isset(kCurrentContext::$language);
+		return (isset(kCurrentContext::$language) && !isset($newMapping['default']));
 	}
 	
 

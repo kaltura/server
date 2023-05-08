@@ -62,7 +62,8 @@ class ESearchEntryItem extends ESearchItem
 		'plays' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'rank' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'votes' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
-		'display_in_search' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
+		'display_in_search' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
+		'recycled_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 	);
 
 	protected static $field_boost_values = array(
@@ -87,6 +88,7 @@ class ESearchEntryItem extends ESearchItem
 		ESearchEntryFieldName::PARENT_ENTRY_ID,
 		ESearchEntryFieldName::ID,
 		ESearchEntryFieldName::DISPLAY_IN_SEARCH,
+		ESearchEntryFieldName::RECYCLED_AT,
 	);
 
 	protected static $searchHistoryFields = array(
@@ -203,8 +205,7 @@ class ESearchEntryItem extends ESearchItem
 				KalturaLog::log("Undefined item type[" . $this->getItemType() . "]");
 		}
 
-		if ($this->getItemType() == ESearchItemType::EXACT_MATCH
-			&& in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields)
+		if (in_array($this->getFieldName(), self::$ignoreDisplayInSearchFields)
 			&& $this->getIgnoreDisplayInSearch())
 		{
 			$queryAttributes->getQueryFilterAttributes()->addValueToIgnoreDisplayInSearch($this->getFieldName(), $this->getSearchTerm());
