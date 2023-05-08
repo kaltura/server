@@ -564,6 +564,8 @@ class KalturaErrors extends APIErrors
 	 * user service
 	 */
 	const INVALID_ID = "INVALID_ID;ID;Id \"@ID@\" contains invalid chars";
+	
+	const NEW_USER_DIRECT_LOGIN_NOT_ALLOWED = "NEW_USER_DIRECT_LOGIN_NOT_ALLOWED;;Adding new users with direct login is not allowed";
 
 	/**
 	 * categoryUser service
