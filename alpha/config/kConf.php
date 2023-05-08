@@ -15,6 +15,7 @@ set_include_path($include_path);
 
 require_once __DIR__ . '/../../infra/kEnvironment.php';
 require_once __DIR__ . '/kConfCacheManager.php';
+require_once __DIR__ . '/kZendConfigIni.php';
 
 /**
  * Manages all Kaltura configurations

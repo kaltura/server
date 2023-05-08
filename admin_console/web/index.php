@@ -19,6 +19,7 @@ set_include_path(implode(PATH_SEPARATOR, array(
 
 /** Zend_Application */
 require_once 'Zend/Application.php';
+require_once(__DIR__ . '/../../alpha/config/kZendConfigIni.php');
 
 $configPath = realpath(APPLICATION_PATH . '/../configurations/admin.ini');
 if(!file_exists($configPath))
@@ -28,11 +29,11 @@ if(!file_exists($configPath))
 	error_log($msg);
 	die($msg);
 }
-
+$config = new kZendConfigIni($configPath,APPLICATION_ENV);
 // Create application, bootstrap, and run
 $application = new Zend_Application(
     APPLICATION_ENV,
-    $configPath
+    $config
 );
 $application->bootstrap()
             ->run();

@@ -2,6 +2,7 @@
 
 require_once(realpath(__DIR__) . '/../../vendor/twig/autoload.php');
 require_once(realpath(__DIR__) . '/twigExtensions.php');
+require_once(realpath(__DIR__) . '/../../vendor/ZendFramework/library/Zend/Config/Ini.php');
 
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;

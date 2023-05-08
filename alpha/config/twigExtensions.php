@@ -10,6 +10,7 @@ class twigExtensions extends AbstractExtension
 	{
 		return [
 			new TwigFunction('get_env', [$this, 'getEnvironmentVariable']),
+			new TwigFunction('secret', [$this, 'getSecretFileContents']),
 		];
 	}
 
@@ -36,5 +37,29 @@ class twigExtensions extends AbstractExtension
 		}
 
 		return $varValue;
+	}
+
+	/**
+	 * Return the content of a specific file in the secrets folder.
+	 *
+	 * @param String $fileName
+	 * @return String
+	 */
+	public function getSecretFileContents($fileName, $default = null)
+	{
+		$defaultValue = ($default === null) ? '' : $default;
+		if(empty($fileName))
+		{
+			return $defaultValue;
+		}
+
+		$dir = realpath(__DIR__) . '/../../../secrets';
+		$fileName = realpath($dir . DIRECTORY_SEPARATOR . basename(strtoupper($fileName)));
+		$content = @file_get_contents($fileName);
+		if($content === false)
+		{
+			return $defaultValue;
+		}
+		return $content;
 	}
 }

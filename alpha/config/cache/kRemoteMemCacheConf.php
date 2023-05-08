@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/kBaseMemcacheConf.php';
 require_once (__DIR__ . '/../../../infra/general/iniUtils.php');
+
 class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterface,kMapCacheInterface
 {
 	const MAP_LIST_KEY = 'MAP_LIST_KEY';
