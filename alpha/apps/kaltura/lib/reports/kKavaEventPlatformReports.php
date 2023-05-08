@@ -94,7 +94,42 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 				),
 			)
-		)
+		),
+
+		ReportType::EP_WEBCAST_MAP_OVERLAY_COUNTRY => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'object_id' => self::DIMENSION_LOCATION_COUNTRY,
+				'country' => self::DIMENSION_LOCATION_COUNTRY,
+				'coordinates' => self::DIMENSION_LOCATION_COUNTRY,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'object_id',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toShortName',
+				),
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
+			),
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS),
+				),
+				array(
+					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
+				),
+			)
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter)
