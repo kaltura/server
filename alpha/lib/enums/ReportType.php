@@ -213,5 +213,6 @@ interface ReportType extends BaseEnum
    const EP_WEBCAST_ENGAGEMENT = 60003;
    const EP_WEBCAST_ENGAGEMENT_TIMELINE = 60004;
    const EP_WEBCAST_TOP_RECORDING = 60005;
+   const EP_WEBCAST_TOP_PLATFORMS = 60006;
 
 }
