@@ -157,11 +157,11 @@ class KalturaConfMaps extends KalturaObject implements IRelatedFilterable
 				$existingMapsContent = json_decode($configurationMap->content, true);
 				if (!is_null($existingMapsContent))
 				{
-					IniUtils::splitContent($existingMapsContent, $globalContent, $sectionsContent);//split contect to global and sections
+					IniUtils::splitContent($existingMapsContent, $globalContent, $sectionsContent);//split content to global and sections
 				}
 			}
 		}
-		IniUtils::splitContent($content, $globalContent, $sectionsContent);//merge new contect to global and sections content
+		IniUtils::splitContent($content, $globalContent, $sectionsContent);//merge new content to global and sections content
 		try
 		{
 			//To validate that we can transform the content to a valid ini file
