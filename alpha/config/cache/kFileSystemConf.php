@@ -12,7 +12,6 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		{
 			require_once 'Zend/Config/Exception.php';
 			require_once 'Zend/Config/Ini.php';
-			require_once __DIR__ . '/../kZendConfigIni.php';
 		}
 		parent::__construct();
 	}

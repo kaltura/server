@@ -7,17 +7,6 @@ class kRemoteMemCacheConf extends kBaseMemcacheConf implements kKeyCacheInterfac
 	const MAP_LIST_KEY = 'MAP_LIST_KEY';
 	const MAP_DELIMITER = '|';
 
-	function __construct()
-	{
-		if(!class_exists('kZendConfigIni'))
-		{
-			require_once 'Zend/Config/Exception.php';
-			require_once 'Zend/Config/Ini.php';
-			require_once __DIR__ . '/../kZendConfigIni.php';
-		}
-		parent::__construct();
-	}
-
 	public function loadKey()
 	{
 		$key=null;
