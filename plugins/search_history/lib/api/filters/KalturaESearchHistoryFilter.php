@@ -16,9 +16,23 @@ class KalturaESearchHistoryFilter extends KalturaESearchBaseFilter
 	 */
 	public $searchedObjectIn;
 
+	/**
+	 * @var KalturaESearchRange
+	 */
+	public $timestampRange;
+
+	/**
+	 * @var KalturaESearchHistoryAggregationItem
+	 * @requiresPermission all
+	 */
+	public $aggregation;
+
+
 	private static $map_between_objects = array(
 		'searchTermStartsWith',
 		'searchedObjectIn',
+		'timestampRange',
+		'aggregation',
 	);
 
 	public function getMapBetweenObjects()
@@ -32,13 +46,13 @@ class KalturaESearchHistoryFilter extends KalturaESearchBaseFilter
 			$object_to_fill = new ESearchHistoryFilter();
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
-
 	public function getListResponse()
 	{
 		$coreFilter = $this->toObject();
-		list($coreObjects, $totalCount) = $coreFilter->execQueryFromFilter();
+		list($coreObjects, $totalCount, $aggregations) = $coreFilter->execQueryFromFilter();
 		$response = new KalturaESearchHistoryListResponse();
 		$response->objects = KalturaESearchHistoryArray::fromDbArray($coreObjects);
+		$response->aggregations = $aggregations;
 		$response->totalCount = $totalCount;
 		return $response;
 	}

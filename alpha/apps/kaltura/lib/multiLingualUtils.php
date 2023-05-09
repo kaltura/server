@@ -240,10 +240,7 @@ class multiLingualUtils
 	{
 		foreach ($supportedFields as $fieldName)
 		{
-			if ($responseObject->$fieldName)
-			{
-				$multiLanguageMap[$fieldName][$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
-			}
+			$multiLanguageMap[$fieldName][$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
 			$responseObject->$fieldName = KalturaMultiLingualStringArray::fromMultiLingualStringArray($multiLanguageMap[$fieldName]);
 		}
 	}
