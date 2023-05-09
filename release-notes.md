@@ -1,4 +1,4 @@
-# Scorpius-19.8.0
+# Scorpius-19.9.0
 ## Add Recycle Bin batch for auto deletion
 * Issue Type: Task
 * Issue ID: PLAT-24229
