@@ -316,7 +316,7 @@ class multiLingualUtils
 		$mapping = self::getMultiLanguageMapping($dbObject);
 		if (!$mapping || ($mapping == ''))
 		{
-			return explode(',', $dbValue);
+			return $fieldName === entry::TAGS ? explode(',', $dbValue): $dbValue;
 		}
 		return self::getMultiLingualValuesArrayForField($dbValue, $mapping, $fieldName, $isCommaSeparatedString);
 	}
