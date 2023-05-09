@@ -68,6 +68,8 @@ abstract class KalturaObjectTask extends KalturaObject
 				return new KalturaModifyEntryObjectTask();
 			case ObjectTaskType::MAIL_NOTIFICATION:
 				return new KalturaMailNotificationObjectTask();
+			case ObjectTaskType::RECYCLE_BIN_CLEANUP:
+				return new KalturaRecycleBinCleanupObjectTask();
 			default:
 				return KalturaPluginManager::loadObject('KalturaObjectTask', $dbObject->getType());
 		}

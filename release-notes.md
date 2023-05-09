@@ -1,3 +1,22 @@
+# Scorpius-19.8.0
+## Add Recycle Bin batch for auto deletion
+* Issue Type: Task
+* Issue ID: PLAT-24229
+
+### Configuration ###
+Add the following to batch.ini under KScheduledTaskRunner worker
+```
+[KScheduledTaskRunner : PeriodicWorker]
+id                                                  = 610
+params.runnerTypes                                  = 1,2
+```
+Add the following to batch.ini
+```
+[KAsyncRecycleBin : KScheduledTaskRunner]
+id                                                  = 611
+params.runnerTypes                                  = 3
+```
+
 # Scorpius-19.7.0
 ## Add self serve admin edit permission
 * Issue Type: Task
