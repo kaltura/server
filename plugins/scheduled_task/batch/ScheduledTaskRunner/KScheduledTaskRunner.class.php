@@ -5,6 +5,8 @@
  */
 class KScheduledTaskRunner extends KPeriodicWorker
 {
+	const runnerTypes = 'runnerTypes';
+	
 	/**
 	 * @var array
 	 */
@@ -112,21 +114,34 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	protected function getProcessor($profile)
 	{
 		if ($this->isReachProfile($profile))
+		{
 			return new KReachProcessor($this);
+		}
 		if ($this->isMediaRepurposingProfile($profile))
+		{
 			return new KMediaRepurposingProcessor($this);
-		else
-			return new KGenericProcessor($this);
+		}
+		if ($this->isRecycleBinProfile($profile))
+		{
+			return new KRecycleBinProcessor($this);
+		}
+		
+		return new KGenericProcessor($this);
 	}
-
-	private function isMediaRepurposingProfile(KalturaScheduledTaskProfile $profile)
+	
+	protected function isMediaRepurposingProfile(KalturaScheduledTaskProfile $profile)
 	{
 		return ($profile->systemName == "MRP") || (kString::beginsWith($profile->name, 'MR_'));
 	}
-
-	private function isReachProfile(KalturaScheduledTaskProfile $profile)
+	
+	protected function isReachProfile(KalturaScheduledTaskProfile $profile)
 	{
 		return $profile->objectFilterEngineType == ObjectFilterEngineType::ENTRY_VENDOR_TASK;
+	}
+	
+	protected function isRecycleBinProfile(KalturaScheduledTaskProfile $profile)
+	{
+		return $profile->objectFilterEngineType == ObjectFilterEngineType::RECYCLE_BIN_CLEANUP;
 	}
 
 	/**
@@ -143,6 +158,12 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$filter->lastExecutionStartedAtLessThanOrEqualOrNull = strtotime('today UTC');
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = $maxProfiles;
+		
+		$runnerTypes = $this->getAdditionalParams(KScheduledTaskRunner::runnerTypes);
+		if ($runnerTypes)
+		{
+			$filter->objectFilterEngineTypeIn = $runnerTypes;
+		}
 
 		$result = $scheduledTaskClient->scheduledTaskProfile->listAction($filter, $pager);
 		if (empty($result))

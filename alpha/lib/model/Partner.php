@@ -2365,7 +2365,7 @@ class Partner extends BasePartner
 	
 	public function getDaysBeforeRecycleBinDeletion()
 	{
-		return $this->getFromCustomData(self::DAYS_BEFORE_RECYCLE_BIN_DELETION, null, 0);
+		return $this->getFromCustomData(self::DAYS_BEFORE_RECYCLE_BIN_DELETION, null, 30);
 	}
 	
 	public function setDaysBeforeRecycleBinDeletion($v)
