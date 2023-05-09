@@ -10,7 +10,7 @@ class twigExtensions extends AbstractExtension
 	{
 		return [
 			new TwigFunction('get_env', [$this, 'getEnvironmentVariable']),
-			new TwigFunction('secret', [$this, 'getSecretFileContents']),
+			new TwigFunction('get_secret', [$this, 'getSecretFileContents']),
 		];
 	}
 
