@@ -40,17 +40,6 @@ class ZoomVendorService extends KalturaBaseService
 	}
 	
 	/**
-	 * @return bool
-	 * @throws KalturaAPIException
-	 * @throws Exception
-	 */
-	public static function shouldUseOAuth2AuthenticationMethod()
-	{
-		$zoomConfiguration = self::getZoomConfiguration();
-		return isset($zoomConfiguration['clientSecret']);
-	}
-	
-	/**
 	 * @param $serviceId
 	 * @param $serviceName
 	 * @param $actionName
@@ -104,7 +93,7 @@ class ZoomVendorService extends KalturaBaseService
 			$authCode = $_GET[self::AUTH_CODE];
 			$tokens  = kZoomOauth::requestAuthorizationTokens($authCode);
 			$accessToken = $tokens[kOAuth::ACCESS_TOKEN];
-			$client = new kZoomClient($zoomBaseURL, null, null, null, null, $accessToken );
+			$client = new kZoomClient($zoomBaseURL, null, null, $accessToken);
 			$permissions = $client->retrieveTokenZoomUserPermissions();
 			$user = $client->retrieveTokenZoomUser();
 			$accountId = $user[ZoomHelper::ACCOUNT_ID];
@@ -186,7 +175,7 @@ class ZoomVendorService extends KalturaBaseService
 		$zoomConfiguration = self::getZoomConfiguration();
 		$tokens = $this->handleEncryptTokens($tokensData, $iv, $zoomConfiguration);
 		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
-		$client = new kZoomClient($zoomBaseURL,null,$tokens[kZoomTokens::REFRESH_TOKEN],null,null,$tokens[kZoomTokens::ACCESS_TOKEN]);
+		$client = new kZoomClient($zoomBaseURL, null, $tokens[kZoomTokens::REFRESH_TOKEN], $tokens[kZoomTokens::ACCESS_TOKEN]);
 		$accountId = $this->getAccountId($client->retrieveTokenZoomUser());
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 		$partnerId = kCurrentContext::getCurrentPartnerId();
@@ -204,23 +193,13 @@ class ZoomVendorService extends KalturaBaseService
 	
 	/**
 	 * @action localRegistrationPage
-	 * @param string $jwt
+	 * @param string $zoomAccountId
 	 * @throws KalturaAPIException
 	 * @throws PropelException
 	 * @throws Exception
 	 */
-	public function localRegistrationPageAction($jwt)
+	public function localRegistrationPageAction($zoomAccountId)
 	{
-		$isOAuth2Authentication = self::shouldUseOAuth2AuthenticationMethod();
-		
-		if ($isOAuth2Authentication)
-		{
-			throw new KalturaAPIException(KalturaZoomErrors::NOT_ALLOWED_ON_THIS_INSTANCE);
-		}
-		$zoomConfiguration = self::getZoomConfiguration();
-		$zoomBaseURL = $zoomConfiguration[kZoomClient::ZOOM_BASE_URL];
-		$client = new kZoomClient($zoomBaseURL,$jwt,null,null,null,null);
-		$zoomAccountId = $this->getAccountId($client->retrieveTokenZoomUser());
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($zoomAccountId);
 		if(!$zoomIntegration)
 		{
@@ -228,10 +207,10 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->setAccountId($zoomAccountId);
 			$zoomIntegration->setPartnerId(kCurrentContext::getCurrentPartnerId());
 			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
+			$zoomIntegration->setZoomAuthType(kZoomAuthTypes::SERVER_TO_SERVER);
+			$zoomIntegration->save();
 		}
-		$zoomIntegration->setJwtToken($jwt);
-		$zoomIntegration->save();
-		
+
 		$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
 		VendorHelper::loadSubmitPage($zoomIntegration->getPartnerId(), $zoomAccountId, $this->getKs(), $filePath);
 	}

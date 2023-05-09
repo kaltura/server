@@ -16,19 +16,38 @@ class kZoomOauth extends kOAuth
 
 	/**
 	 * @param ZoomVendorIntegration $vendorIntegration
-	 * @return array
+	 * @return array|null
 	 * @throws Exception
 	 */
 	public static function refreshTokens($vendorIntegration)
 	{
-		KalturaLog::info('Refreshing tokens');
 		list($zoomBaseURL, , $header, $userPwd) = self::getHeaderData();
-		$oldRefreshToken = $vendorIntegration->getRefreshToken();
-		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
-		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
-		$tokensData = self::retrieveTokensDataFromResponse($response);
-		$vendorIntegration->saveTokensData($tokensData);
-		return $tokensData;
+		switch ($vendorIntegration->getZoomAuthType())
+		{
+			case kZoomAuthTypes::SERVER_TO_SERVER:
+				KalturaLog::debug("Generate server-to-server access token");
+				$postFields = "grant_type=account_credentials&account_id=" . $vendorIntegration->getAccountId();
+				$header = self::AUTHORIZATION_HEADER . ":Basic " . base64_encode($userPwd);
+				$response = self::curlRetrieveTokensData($zoomBaseURL, null, $header, $postFields);
+				$tokensData = self::retrieveAccessTokenDataFromResponse($response);
+				$vendorIntegration->saveAccessTokenData($tokensData);
+				return $tokensData;
+
+			case kZoomAuthTypes::OAUTH:
+				KalturaLog::info('Refreshing tokens');
+				$oldRefreshToken = $vendorIntegration->getRefreshToken();
+				$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
+				$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+				$tokensData = self::retrieveTokensDataFromResponse($response);
+				$vendorIntegration->saveTokensData($tokensData);
+				return $tokensData;
+
+			default:
+				KalturaLog::err("Unknown Zoom authentication type, will not authenticate");
+
+		}
+
+		return null;
 	}
 	
 
@@ -55,7 +74,10 @@ class kZoomOauth extends kOAuth
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
 		$curlWrapper->setOpt(CURLOPT_HEADER, true);
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $header);
-		$curlWrapper->setOpt(CURLOPT_USERPWD, $userPwd);
+		if($userPwd)
+		{
+			$curlWrapper->setOpt(CURLOPT_USERPWD, $userPwd);
+		}
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
 		return $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
 	}
@@ -93,13 +115,12 @@ class kZoomOauth extends kOAuth
 	 * @return string
 	 * @throws kZoomErrorMessages
 	 */
-	public static function getValidAccessToken($zoomIntegration)
+	public static function getValidAccessTokenAndSave($zoomIntegration)
 	{
 		if (time() >= $zoomIntegration->getExpiresIn()) // token have expired -> refresh
 		{
 			self::refreshTokens($zoomIntegration);
 		}
-
 		return $zoomIntegration->getAccessToken();
 	}
 

@@ -44,6 +44,23 @@ abstract class kOAuth
 		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($tokensData[self::EXPIRES_IN]);
 		return $tokensData;
 	}
+
+	/**
+	 * @param $response
+	 * @return array $tokensData
+	 * @throws Exception
+	 */
+	protected static function retrieveAccessTokenDataFromResponse($response)
+	{
+		$tokensData = self::parseTokensResponse($response);
+		if (!$tokensData || !isset($tokensData[self::ACCESS_TOKEN]) || !isset($tokensData[self::EXPIRES_IN]))
+		{
+			throw new KalturaAPIException(KalturaVendorIntegrationErrors::TOKEN_PARSING_FAILED);
+		}
+		$tokensData = self::extractAccessTokenFromData($tokensData);
+		$tokensData[self::EXPIRES_IN] = self::getTokenExpiryRelativeTime($tokensData[self::EXPIRES_IN]);
+		return $tokensData;
+	}
 	
 	/**
 	 * @param string $response
@@ -75,6 +92,15 @@ abstract class kOAuth
 	{
 		return array(self::ACCESS_TOKEN => $data[self::ACCESS_TOKEN], self::REFRESH_TOKEN => $data[self::REFRESH_TOKEN],
 			self::EXPIRES_IN => $data[self::EXPIRES_IN]);
+	}
+
+	/**
+	 * @param array $data
+	 * @return array accessToken
+	 */
+	public static function extractAccessTokenFromData($data)
+	{
+		return array(self::ACCESS_TOKEN => $data[self::ACCESS_TOKEN], self::EXPIRES_IN => $data[self::EXPIRES_IN]);
 	}
 	
 	/**

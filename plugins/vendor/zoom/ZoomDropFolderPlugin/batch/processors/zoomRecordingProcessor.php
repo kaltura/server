@@ -32,23 +32,6 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	}
 	
 	/**
-	 * @param kalturaZoomDropFolderFile $recording
-	 * @return bool
-	 * @throws PropelException
-	 * @throws kCoreException
-	 */
-	protected function wasEventHandled($recording)
-	{
-		if($this->getZoomEntryByRecordingId($recording->meetingMetadata->uuid, $recording->partnerId))
-		{
-			KalturaLog::debug("Recording {$recording->meetingMetadata->uuid} already processed");
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
 	 * @param KalturaZoomDropFolderFile $recording
 	 * @return KalturaMediaEntry
 	 * @throws kCoreException
@@ -74,7 +57,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		else if($recording->recordingFile->fileType == KalturaRecordingFileType::CHAT)
 		{
 			$chatFilesProcessor = new zoomChatFilesProcessor($this->zoomBaseUrl, $this->dropFolder);
-			$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recording->recordingFile->downloadUrl);
+			$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording);
 			$entry = $this->mainEntry;
 		}
 		return $entry;

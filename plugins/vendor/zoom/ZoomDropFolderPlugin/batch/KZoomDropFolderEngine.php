@@ -161,25 +161,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return true;
 	}
 
-	protected function getLastHandledMeetingTime($meetingFilesOrdered)
-	{
-		$lastMeeting = end($meetingFilesOrdered);
-		$lastHandledMeetingTime = kTimeZoneUtils::strToZuluTime($lastMeeting[self::START_TIME]);
-		KalturaLog::info('Last meeting is: '. print_r($lastMeeting, true));
-		KalturaLog::info('Last handled meeting time from DF is: '. $this->dropFolder->lastHandledMeetingTime);
-		KalturaLog::info('Last meeting time'. $lastHandledMeetingTime);
-		return $lastHandledMeetingTime;
-	}
-
 	protected function initZoomClient(KalturaDropFolder $dropFolder)
 	{
-		$jwtToken = isset($dropFolder->jwtToken) ? $dropFolder->jwtToken : null;
+		$accountId = isset($dropFolder->accountId) ? $dropFolder->accountId : null;
 		$refreshToken = isset($dropFolder->refreshToken) ? $dropFolder->refreshToken : null;
-		$clientId = isset($dropFolder->clientId) ? $dropFolder->clientId : null;
-		$clientSecret = isset($dropFolder->clientSecret) ? $dropFolder->clientSecret : null;
 		$accessToken = isset($dropFolder->accessToken) ? $dropFolder->accessToken : null;
 		$accessExpiresIn = isset($dropFolder->accessExpiresIn) ? $dropFolder->accessExpiresIn : null;
-		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
+		$zoomAuthType = isset($dropFolder->zoomAuthType) ? $dropFolder->zoomAuthType : null;
+		return new kZoomClient($dropFolder->baseURL, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType);
 	}
 	
 	protected function getMeetingsFromZoom()
@@ -277,7 +266,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 			{
 				$parentEntry = null;
-				$this->handleAudioFiles($recordingFilesPerTimeSlot, $meetingFile[self::UUID]);
+				$this->handleAudioFiles($recordingFilesPerTimeSlot);
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
@@ -366,7 +355,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		KalturaLog::debug('Last handled meetings time is: '. $lastHandledMeetingTime);
 	}
 
-	protected function handleAudioFiles(&$recordingFilesPerTimeSlot, $meetingFileUuid)
+	protected function handleAudioFiles(&$recordingFilesPerTimeSlot)
 	{
 		$foundMP4 = false;
 		$audioKeys = array();

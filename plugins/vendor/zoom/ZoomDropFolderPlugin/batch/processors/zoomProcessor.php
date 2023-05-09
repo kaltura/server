@@ -27,12 +27,12 @@ abstract class zoomProcessor
 	 */
 	public function __construct($zoomBaseUrl, KalturaZoomDropFolder $folder)
 	{
-		$jwtToken = isset($folder->jwtToken) ? $folder->jwtToken : null;
+		$accountId = isset($folder->accountId) ? $folder->accountId : null;
 		$refreshToken = isset($folder->refreshToken) ? $folder->refreshToken : null;
-		$clientId = isset($folder->clientId) ? $folder->clientId : null;
-		$clientSecret = isset($folder->clientSecret) ? $folder->clientSecret : null;
 		$accessToken = isset($folder->accessToken) ? $folder->accessToken : null;
-		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
+		$accessExpiresIn = isset($folder->accessExpiresIn) ? $folder->accessExpiresIn : null;
+		$zoomAuthType = isset($folder->zoomAuthType) ? $folder->zoomAuthType : null;
+		$this->zoomClient = new kZoomClient($zoomBaseUrl, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType);
 		$this->dropFolder = $folder;
 	}
 	
@@ -81,7 +81,7 @@ abstract class zoomProcessor
 	
 	protected function getZoomRedirectUrlFromFile($recording)
 	{
-		if (!isset($recording->recordingFile->downloadToken) && !isset($this->dropFolder->accessToken) && !isset($this->dropFolder->jwtToken))
+		if (!isset($recording->recordingFile->downloadToken) && !isset($this->dropFolder->accessToken))
 		{
 			return null;
 		}
@@ -93,10 +93,6 @@ abstract class zoomProcessor
 		else if (isset($this->dropFolder->accessToken))
 		{
 			$accessToken = $this->dropFolder->accessToken;
-		}
-		else if (isset($this->dropFolder->jwtToken))
-		{
-			$accessToken = $this->dropFolder->jwtToken;
 		}
 		
 		$authorizationHeader = "Authorization: Bearer $accessToken";
