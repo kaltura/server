@@ -1,0 +1,1 @@
+ALTER TABLE scheduled_task_profile ADD INDEX `partner_id_object_filter_engine_type` (`partner_id`,`object_filter_engine_type`);
