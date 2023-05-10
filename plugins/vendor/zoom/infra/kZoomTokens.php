@@ -32,29 +32,18 @@ class kZoomTokens
 		$header = self::getHeaderData();
 		$response = self::curlRetrieveTokensData($postFields, $header);
 		$tokensData = $this->parseTokensResponse($response);
-		$this->validateAccessTokenResponse($tokensData);
 		KalturaLog::debug('New access token response' . print_r($tokensData, true));
 		return $tokensData;
 	}
-	
+
 	protected function parseTokensResponse($response)
 	{
-		$dataAsArray = json_decode($response, true);
-		if(strpos($response, 'error'))
-		{
-			KalturaLog::ERR('Error calling Zoom: ' . $dataAsArray['reason']);
-			throw new KalturaAPIException ('Error calling Zoom: ' . $dataAsArray['reason']);
-		}
-		KalturaLog::debug(print_r($dataAsArray, true));
-		return $dataAsArray;
-	}
-
-	protected function validateAccessTokenResponse($tokensData)
-	{
+		$tokensData = json_decode($response, true);
 		if (!$tokensData || !isset($tokensData[self::ACCESS_TOKEN]) || !isset($tokensData[self::EXPIRES_IN]))
 		{
 			ZoomHelper::exitWithError(kZoomErrorMessages::TOKEN_PARSING_FAILED . print_r($tokensData, true));
 		}
+		return $tokensData;
 	}
 
 	protected function getHeaderData()
@@ -62,7 +51,7 @@ class kZoomTokens
 		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
 		$clientId = $zoomConfiguration['clientId'];
 		$clientSecret = $zoomConfiguration['clientSecret'];
-		$header = self::AUTHORIZATION_HEADER . ":Basic " . base64_encode("$clientId:$clientSecret");
+		$header = array(self::AUTHORIZATION_HEADER . ":Basic " . base64_encode("$clientId:$clientSecret"));
 		return $header;
 	}
 	

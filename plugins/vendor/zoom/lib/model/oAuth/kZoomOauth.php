@@ -27,7 +27,7 @@ class kZoomOauth extends kOAuth
 			case kZoomAuthTypes::SERVER_TO_SERVER:
 				KalturaLog::debug("Generate server-to-server access token");
 				$postFields = "grant_type=account_credentials&account_id=" . $vendorIntegration->getAccountId();
-				$header = self::AUTHORIZATION_HEADER . ":Basic " . base64_encode($userPwd);
+				$header = array(self::AUTHORIZATION_HEADER . ":Basic " . base64_encode($userPwd));
 				$response = self::curlRetrieveTokensData($zoomBaseURL, null, $header, $postFields);
 				$tokensData = self::retrieveAccessTokenDataFromResponse($response);
 				$vendorIntegration->saveAccessTokenData($tokensData);
