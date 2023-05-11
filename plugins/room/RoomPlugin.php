@@ -2,7 +2,7 @@
 /**
  * @package plugins.room
  */
-class RoomPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor, IKalturaTypeExtender
+class RoomPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEnumerator, IKalturaObjectLoader, IKalturaSearchDataContributor
 {
 
 	const PLUGIN_NAME = 'room';
@@ -87,19 +87,5 @@ class RoomPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEnum
 
 		return null;
 	}
-	
-	/* (non-PHPdoc)
-	 * @see IKalturaTypeExtender::getExtendedTypes()
-	 */
-	public static function getExtendedTypes($baseClass, $enumValue)
-	{
-		if ($baseClass == entryPeer::OM_CLASS && $enumValue == entryType::LIVE_STREAM)
-		{
-			return array(
-				RoomPlugin::getEntryTypeCoreValue(RoomEntryType::ROOM),
-			);
-		}
-		
-		return null;
-	}
+
 }
