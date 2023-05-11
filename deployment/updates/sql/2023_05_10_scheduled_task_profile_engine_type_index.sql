@@ -1,1 +1,0 @@
-ALTER TABLE scheduled_task_profile ADD INDEX `status_object_filter_engine_type` (`status`,`object_filter_engine_type`);
