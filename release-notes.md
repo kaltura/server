@@ -17,9 +17,6 @@ id                                                  = 611
 params.runnerTypes                                  = 3
 ```
 
-### Deployment Scripts ####
-    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2023_05_10_scheduled_task_profile_engine_type_index.sql
-
 # Scorpius-19.8.0
 ## Add search term aggregation to SearchHistory plugin
 * Issue Type: Story
