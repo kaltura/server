@@ -20,6 +20,15 @@ params.runnerTypes                                  = 3
 ### Deployment Scripts ####
     mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2023_05_10_scheduled_task_profile_engine_type_index.sql
 
+## Add 'RoomType' to ESearch for entry ##
+- Issue Type: Task
+- Issue ID: PLAT-24248
+
+### Deployment Scripts ###
+Replace 'esearch_host', 'esearch_port', 'entry_index_name' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping/entry" -H 'Content-Type: application/json' -d'{"properties": {"room_type" : {"type" : "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
+
 # Scorpius-19.8.0
 ## Add search term aggregation to SearchHistory plugin
 * Issue Type: Story

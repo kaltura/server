@@ -665,6 +665,10 @@
 					"type" : "date",
 					"format": "epoch_second"
 				},
+				"room_type": {
+					"type" : "keyword",
+					"normalizer" : "kaltura_keyword_normalizer"
+				},
 				"parent_entry" : {
 					"properties" : {
 						"entry_id" : {
