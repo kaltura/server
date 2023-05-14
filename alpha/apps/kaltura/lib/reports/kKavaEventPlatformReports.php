@@ -191,6 +191,47 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				),
 			)
 		),
+
+		ReportType::EP_WEBCAST_LIVE_USER_ENGAGEMENT => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'user_id' => self::DIMENSION_KUSER_ID,
+				'user_name' => self::DIMENSION_KUSER_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
+				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
+			),
+			self::REPORT_JOIN_REPORTS => array(
+				// player events - live
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_METRICS => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::EVENT_TYPE_REACTION_CLICKED),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::EVENT_TYPE_REACTION_CLICKED),
+				),
+				// kme
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_MEETING_HISTORICAL,
+					self::REPORT_METRICS => array(self::METRIC_MEETING_VIEW_TIME, self::EVENT_TYPE_MEETING_RAISE_HAND),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_MEETING_VIEW_TIME, self::EVENT_TYPE_MEETING_RAISE_HAND),
+				),
+				array(
+					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+					self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO),
+				)
+
+			),
+			self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_VIEW_TIME),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_COMBINED_LIVE_VIEW_TIME),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedLiveVodColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addTotalCombinedLiveVodColumn',
+			self::REPORT_COLUMN_MAP => array(
+				'live_view_time' => self::METRIC_COMBINED_LIVE_VIEW_TIME,
+				'count_reaction_clicked' => self::EVENT_TYPE_REACTION_CLICKED,
+				'count_raise_hand_clicked' => self::EVENT_TYPE_MEETING_RAISE_HAND,
+				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO
+			),
+		)
 	);
 
 	public static function getReportDef($report_type, $input_filter)
