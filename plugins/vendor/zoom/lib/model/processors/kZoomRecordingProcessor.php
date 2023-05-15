@@ -32,8 +32,8 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$this->mainEntry = null;
 		$this->zoomBaseUrl = $zoomBaseUrl;
 		$this->zoomIntegration = ZoomHelper::getZoomIntegration();
-		parent::__construct($zoomBaseUrl, $this->zoomIntegration->getJwtToken(), $this->zoomIntegration->getRefreshToken(), null, null,
-		                    $this->zoomIntegration->getAccessToken());
+		parent::__construct($zoomBaseUrl, $this->zoomIntegration->getAccountId(), $this->zoomIntegration->getRefreshToken(),
+		                    $this->zoomIntegration->getAccessToken(), $this->zoomIntegration->getExpiresIn(), $this->zoomIntegration->getZoomAuthType());
 	}
 
 	/**
@@ -88,8 +88,9 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 
 			if (isset($recordingFilesPerTimeSlot[kRecordingFileType::CHAT]))
 			{
-				$chatFilesProcessor = new kZoomChatFilesProcessor($this->zoomBaseUrl, $this->zoomIntegration->getJwtToken(),
-				                                                  $this->zoomIntegration->getRefreshToken(), null, null, $this->zoomIntegration->getAccessToken());
+				$chatFilesProcessor = new kZoomChatFilesProcessor($this->zoomBaseUrl, $this->zoomIntegration->getAccountId(),
+											$this->zoomIntegration->getRefreshToken(), $this->zoomIntegration->getAccessToken(),
+											$this->zoomIntegration->getExpiresIn(), $this->zoomIntegration->getZoomAuthType());
 
 				foreach($recordingFilesPerTimeSlot[kRecordingFileType::CHAT] as $recordingFile)
 				{
@@ -234,7 +235,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 
 	/**
 	 * @param string $recordingId
-	 * @param sting $userToExclude
+	 * @param string $userToExclude
 	 * @return array|null
 	 */
 	protected function getAdditionalUsers($recordingId, $userToExclude)
@@ -245,13 +246,13 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		}
 
 		$userToExclude = strtolower($userToExclude);
-		$accessToken = kZoomOauth::getValidAccessToken($this->zoomIntegration);
-		$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($accessToken, $recordingId);
+		kZoomOauth::getValidAccessTokenAndSave($this->zoomIntegration);
+		$additionalUsersZoomResponse = $this->getAdditionalUsersFromZoom($recordingId);
 		$additionalZoomUsers = $this->parseAdditionalUsers($additionalUsersZoomResponse);
 		return $this->getValidatedUsers($additionalZoomUsers, $this->zoomIntegration->getPartnerId(), $this->zoomIntegration->getCreateUserIfNotExist(), $userToExclude);
 	}
 
-	protected abstract function getAdditionalUsersFromZoom($accessToken, $recordingId);
+	protected abstract function getAdditionalUsersFromZoom($recordingId);
 
 	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse);
 }
