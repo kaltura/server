@@ -6,8 +6,8 @@
  */
 class KRecycleBinProcessor extends KGenericProcessor
 {
-	const ENTRIES_PAGE_SIZE = 500;
-	const ENTRIES_NUMBER_OF_PAGES = 2;
+	const ENTRIES_PAGE_SIZE = 50;
+	const ENTRIES_NUMBER_OF_PAGES = 20;
 	
 	/**
 	 * @param KalturaScheduledTaskProfile $profile
@@ -43,12 +43,12 @@ class KRecycleBinProcessor extends KGenericProcessor
 	protected function handleProcess(KalturaScheduledTaskProfile $profile, $maxTotalCountAllowed)
 	{
 		KBatchBase::impersonate($profile->partnerId);
-		$daysBeforeDelete = $this->getPartnerDaysBeforeDelete($profile->partnerId);
-		if (!$daysBeforeDelete)
+		$recycleBinRetentionPeriod = $this->getPartnerRecycleBinRetentionPeriod($profile->partnerId);
+		if (!$recycleBinRetentionPeriod)
 		{
 			return;
 		}
-		$entriesListsToDelete = $this->getEntriesListsToDelete($daysBeforeDelete);
+		$entriesListsToDelete = $this->getEntriesListsToDelete($recycleBinRetentionPeriod);
 		$numberOfHandledEntries = $this->handleEntriesListsToDelete($entriesListsToDelete);
 		KBatchBase::unimpersonate();
 		KalturaLog::info("Number of recycled entries deleted for partner [{$profile->partnerId}]: $numberOfHandledEntries");
@@ -58,7 +58,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 	 * @param $partnerId
 	 * @return MultiRequestSubResult
 	 */
-	protected function getPartnerDaysBeforeDelete($partnerId)
+	protected function getPartnerRecycleBinRetentionPeriod($partnerId)
 	{
 		$partner = KBatchBase::$kClient->partner->get($partnerId);
 		if (!$partner)
@@ -66,18 +66,18 @@ class KRecycleBinProcessor extends KGenericProcessor
 			KalturaLog::err("Could not retrieve partner [$partnerId]");
 			return null;
 		}
-		if (!$partner->daysBeforeRecycleBinDeletion || 1 > $partner->daysBeforeRecycleBinDeletion)
+		if (!$partner->recycleBinRetentionPeriod || 1 > $partner->recycleBinRetentionPeriod)
 		{
-			KalturaLog::err("Could not retrieve daysBeforeRecycleBinDeletion for partner [$partnerId]");
+			KalturaLog::err("Could not retrieve recycleBinRetentionPeriod for partner [$partnerId]");
 			return null;
 		}
-		return $partner->daysBeforeRecycleBinDeletion;
+		return $partner->recycleBinRetentionPeriod;
 	}
 	
-	protected function getEntriesListsToDelete($daysBeforeDelete)
+	protected function getEntriesListsToDelete($recycleBinRetentionPeriod)
 	{
 		$pageIndex = 1;
-		$entriesList = $this->getOverdueRecycledEntries($pageIndex, $daysBeforeDelete);
+		$entriesList = $this->getOverdueRecycledEntries($pageIndex, $recycleBinRetentionPeriod);
 		if (!$entriesList || !$entriesList->objects)
 		{
 			return array();
@@ -86,7 +86,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 		while (count($entriesList->objects) >= self::ENTRIES_PAGE_SIZE && self::ENTRIES_NUMBER_OF_PAGES >= $pageIndex)
 		{
 			$pageIndex++;
-			$entriesList = $this->getOverdueRecycledEntries($pageIndex, $daysBeforeDelete);
+			$entriesList = $this->getOverdueRecycledEntries($pageIndex, $recycleBinRetentionPeriod);
 			if (!$entriesList || !$entriesList->objects)
 			{
 				return $entriesToDelete;
@@ -97,14 +97,14 @@ class KRecycleBinProcessor extends KGenericProcessor
 		return $entriesToDelete;
 	}
 	
-	protected function getOverdueRecycledEntries($pageIndex, $daysBeforeDelete)
+	protected function getOverdueRecycledEntries($pageIndex, $recycleBinRetentionPeriod)
 	{
 		$pager = new KalturaPager();
 		$pager->pageIndex = $pageIndex;
 		$pager->pageSize = self::ENTRIES_PAGE_SIZE;
 		
 		$range = new KalturaESearchRange();
-		$range->lessThanOrEqual = time() - kTimeConversion::DAYS * $daysBeforeDelete;
+		$range->lessThanOrEqual = time() - kTimeConversion::DAYS * $recycleBinRetentionPeriod;
 		$recycledAtRange = new KalturaESearchEntryItem();
 		$recycledAtRange->fieldName = KalturaESearchEntryFieldName::RECYCLED_AT;
 		$recycledAtRange->itemType = KalturaESearchItemType::RANGE;

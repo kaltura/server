@@ -614,12 +614,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 //--------------------------- Recycle Bin Settings ---------------------------
 		
-		$this->addElement('text', 'days_before_recycle_bin_deletion', array(
-			'label'	  => 'Days before delete',
-		));
-		
-		$daysBeforeDelete = $this->getElement('days_before_recycle_bin_deletion');
-		$daysBeforeDelete->addValidator($intValidator);
+		$recycleBinRetentionPeriod = new Kaltura_Form_Element_EnumSelect('recycle_bin_retention_period', array('enum' => 'Kaltura_Client_Enum_RecycleBinRetentionPeriod'));
+		$recycleBinRetentionPeriod->setLabel('Recycle Bin retention period');
+		$this->addElements(array($recycleBinRetentionPeriod));
 		
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
@@ -1065,7 +1062,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		                                   array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram'),
 											array('crossLine'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
-		$this->addDisplayGroup(array_merge($permissionNames[self::RECYCLE_BIN_OPTIONS], array('days_before_recycle_bin_deletion')),'recycleBin', array('legend' => 'Recycle Bin Options'));
+		$this->addDisplayGroup(array_merge($permissionNames[self::RECYCLE_BIN_OPTIONS], array('recycle_bin_retention_period')),'recycleBin', array('legend' => 'Recycle Bin Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
 		$this->addDisplayGroup(array('monitor_usage_history'), 'accountOptionsMonitorView', array('legend' => 'New Account Options'));
