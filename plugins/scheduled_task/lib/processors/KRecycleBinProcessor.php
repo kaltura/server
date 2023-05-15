@@ -6,8 +6,8 @@
  */
 class KRecycleBinProcessor extends KGenericProcessor
 {
-	const ENTRIES_PAGE_SIZE = 500;
-	const ENTRIES_NUMBER_OF_PAGES = 2;
+	const ENTRIES_PAGE_SIZE = 50;
+	const ENTRIES_NUMBER_OF_PAGES = 20;
 	
 	/**
 	 * @param KalturaScheduledTaskProfile $profile

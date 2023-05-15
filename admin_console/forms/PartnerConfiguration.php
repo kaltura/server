@@ -614,12 +614,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 //--------------------------- Recycle Bin Settings ---------------------------
 		
-		$this->addElement('text', 'days_before_recycle_bin_deletion', array(
-			'label'	  => 'Days before delete',
-		));
-		
-		$daysBeforeDelete = $this->getElement('days_before_recycle_bin_deletion');
-		$daysBeforeDelete->addValidator($intValidator);
+		$daysBeforeDelete = new Kaltura_Form_Element_EnumSelect('days_before_recycle_bin_deletion', array('enum' => 'Kaltura_Client_Enum_DaysBeforeRecycleBinDeletion'));
+		$daysBeforeDelete->setLabel('Days before entry deletion');
+		$this->addElements(array($daysBeforeDelete));
 		
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;

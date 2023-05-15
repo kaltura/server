@@ -17,14 +17,13 @@ id                                                  = 611
 params.runnerTypes                                  = 3
 ```
 
-### Deployment Scripts ####
-    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2023_05_10_scheduled_task_profile_engine_type_index.sql
-
 ## Add 'RoomType' to ESearch for entry ##
 - Issue Type: Task
 - Issue ID: PLAT-24248
 
 ### Deployment Scripts ###
+Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping.
+
 Replace 'esearch_host', 'esearch_port', 'entry_index_name' and execute the curl command
 
     curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping/entry" -H 'Content-Type: application/json' -d'{"properties": {"room_type" : {"type" : "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
