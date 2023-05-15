@@ -176,6 +176,16 @@ class multiLingualUtils
 		}
 		return $newMultiLingualMapping[$field][$language];
 	}
+//
+//	public static function getMappedLanguages($dbObject, $supportedFields)
+//	{
+//		$mapping = self::getMultiLanguageMapping($dbObject);
+//		$mappedLanguages = [];
+//		foreach ($supportedFields as $field)
+//		{
+//			$mappedLanguages =+ (isset($mapping[$field]))
+//		}
+//	}
 	
 	public static function getDefaultLanguage($object)
 	{
@@ -251,6 +261,7 @@ class multiLingualUtils
 		$language = ($requestLanguage && $defaultLanguage) ? $requestLanguage : $defaultLanguage;
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		$supportedFieldsInRequestedLang = array();
+		$isLanguageMapped = false;
 		foreach ($supportedFields as $fieldName)
 		{
 			if (!$responseObject->shouldGet($fieldName, $responseProfile))
@@ -263,13 +274,15 @@ class multiLingualUtils
 			if ($supportedFieldsInRequestedLang[$fieldName])
 			{
 				$fieldValueToExpose = $supportedFieldsInRequestedLang[$fieldName];
-			}
-			elseif ($language !== $defaultLanguage)
-			{
-				$fieldValueToExpose = '';
+				$isLanguageMapped = $isLanguageMapped || true;
 			}
 
 			$responseObject->$fieldName = $fieldValueToExpose;
+		}
+		$responseObject->responseLanguage = $language;
+		if (!$isLanguageMapped)
+		{
+			$responseObject->responseLanguage = $defaultLanguage;
 		}
 	}
 	
