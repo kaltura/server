@@ -116,7 +116,7 @@ class Partner extends BasePartner
 	
 	const EVENT_PLATFORM_ALLOWED_TEMPLATES = 'event_platform_allowed_templates';
 	
-	const DAYS_BEFORE_RECYCLE_BIN_DELETION = 'days_before_recycle_bin_deletion';
+	const RECYCLE_BIN_RETENTION_PERIOD = 'recycle_bin_retention_period';
 	
 	private $cdnWhiteListCache = array();
 
@@ -2363,13 +2363,13 @@ class Partner extends BasePartner
 		return $this->putInCustomData(self::EVENT_PLATFORM_ALLOWED_TEMPLATES, $v);
 	}
 	
-	public function getDaysBeforeRecycleBinDeletion()
+	public function getRecycleBinRetentionPeriod()
 	{
-		return $this->getFromCustomData(self::DAYS_BEFORE_RECYCLE_BIN_DELETION, null, DaysBeforeRecycleBinDeletion::DAYS_30);
+		return $this->getFromCustomData(self::RECYCLE_BIN_RETENTION_PERIOD, null, RecycleBinRetentionPeriod::DAYS_30);
 	}
 	
-	public function setDaysBeforeRecycleBinDeletion($v)
+	public function setRecycleBinRetentionPeriod($v)
 	{
-		return $this->putInCustomData(self::DAYS_BEFORE_RECYCLE_BIN_DELETION, $v);
+		return $this->putInCustomData(self::RECYCLE_BIN_RETENTION_PERIOD, $v);
 	}
 }
