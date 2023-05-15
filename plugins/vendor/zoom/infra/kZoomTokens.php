@@ -65,7 +65,8 @@ class kZoomTokens
 
 	public static function isExpired($expiresIn)
 	{
-		if ($expiresIn <= time() + kconf::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
+		if ($expiresIn <= time() +
+			kconf::getArrayValue('tokenExpiryGrace', ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP, 600))
 		{
 			return true;
 		}
