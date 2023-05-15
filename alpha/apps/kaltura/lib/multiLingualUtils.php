@@ -245,13 +245,25 @@ class multiLingualUtils
 		}
 	}
 	
+	protected static function getMappedLanguages($newMultiLingualMapping, $supportedFields)
+	{
+		$mappedLanguages = array();
+		foreach ($supportedFields as $field)
+		{
+			array_push($mappedLanguages, array_keys($newMultiLingualMapping[$field]));
+		}
+		
+		return array_unique($mappedLanguages);
+	}
+	
 	protected static function setRequestedLanguageStringInField(&$responseObject, $dbObject, $newMultiLingualMapping, $requestLanguage = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$defaultLanguage = self::getDefaultLanguage($dbObject);
 		$language = ($requestLanguage && $defaultLanguage) ? $requestLanguage : $defaultLanguage;
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		$supportedFieldsInRequestedLang = array();
-		$isLanguageMapped = false;
+		$mappedLanguages = self::getMappedLanguages($newMultiLingualMapping, $supportedFields);
+		$isLanguageMapped = in_array($language, $mappedLanguages[0]);
 		foreach ($supportedFields as $fieldName)
 		{
 			if (!$responseObject->shouldGet($fieldName, $responseProfile))
@@ -264,7 +276,10 @@ class multiLingualUtils
 			if ($supportedFieldsInRequestedLang[$fieldName])
 			{
 				$fieldValueToExpose = $supportedFieldsInRequestedLang[$fieldName];
-				$isLanguageMapped = $isLanguageMapped || true;
+			}
+			elseif ($isLanguageMapped)
+			{
+				$fieldValueToExpose = '';
 			}
 
 			$responseObject->$fieldName = $fieldValueToExpose;
