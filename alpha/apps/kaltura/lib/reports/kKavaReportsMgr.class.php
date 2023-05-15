@@ -4759,7 +4759,6 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$puser_id = $user_profile->userId;
 			$output = array();
-			$output[] = $puser_id;
 			foreach ($enriched_info_fields as $enriched_info_field) {
 				$field_path = explode(".", $enriched_info_field);
 				$curr_obj = $user_profile;
