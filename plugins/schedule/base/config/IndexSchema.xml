@@ -32,6 +32,7 @@
 	        <field name="template_entry_categories_ids" indexName="template_entry_categories_ids" getter="templateEntryCategoriesIdsForIndex" type="string" matchable="yes" />
 	        <field name="resource_system_names" indexName="resource_system_names" getter="resourceSystemNamesForIndex" type="string" matchable="yes" />
 	        <field name="template_entry_id" indexName="template_entry_id" getter="templateEntryId" type="string" matchable="yes" />
+			<field name="source_entry_id" indexName="source_entry_id" getter="sourceEntryId" type="string" matchable="yes" />
 	        <field name="sphinx_match_optimizations" indexName="sphinx_match_optimizations" type="string" />
 			<index format="P%sST%s">
 				<value field="partner_id" />

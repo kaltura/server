@@ -74,6 +74,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'template_entry_categories_ids' => 'templateEntryCategoriesIdsForIndex',
 				'resource_system_names' => 'resourceSystemNamesForIndex',
 				'template_entry_id' => 'templateEntryId',
+				'source_entry_id' => 'sourceEntryId',
 				'sphinx_match_optimizations' => 'sphinxMatchOptimizations',
 			);
 		}
@@ -118,6 +119,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'template_entry_categories_ids' => IIndexable::FIELD_TYPE_STRING,
 				'resource_system_names' => IIndexable::FIELD_TYPE_STRING,
 				'template_entry_id' => IIndexable::FIELD_TYPE_STRING,
+				'source_entry_id' => IIndexable::FIELD_TYPE_STRING,
 				'sphinx_match_optimizations' => IIndexable::FIELD_TYPE_STRING,
 			);
 		}
@@ -174,6 +176,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				'schedule_event.TEMPLATE_ENTRY_CATEGORIES_IDS' => 'template_entry_categories_ids',
 				'schedule_event.RESOURCE_SYSTEM_NAMES' => 'resource_system_names',
 				'schedule_event.TEMPLATE_ENTRY_ID' => 'template_entry_id',
+				'schedule_event.SOURCE_ENTRY_ID' => 'source_entry_id',
 				'schedule_event.SPHINX_MATCH_OPTIMIZATIONS' => 'sphinx_match_optimizations',
 			);
 		}
@@ -225,6 +228,7 @@ class ScheduleEventIndex extends BaseIndexObject
 				"template_entry_categories_ids",
 				"resource_system_names",
 				"template_entry_id",
+				"source_entry_id",
 			);
 		}
 		return self::$matchableFields;
