@@ -9,8 +9,6 @@ class kZoomOauth extends kOAuth
 	const AUTHORIZATION_HEADER = 'Authorization';
 	const TOKEN_TYPE = 'token_type';
 	const SCOPE = 'scope';
-	const MAP_NAME = 'vendor';
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const X_ZM_SIGNATURE = 'x-zm-signature';
 	const X_ZM_REQUEST_TIMESTAMP = 'x-zm-request-timestamp';
 
@@ -100,7 +98,7 @@ class kZoomOauth extends kOAuth
 	 */
 	protected static function getHeaderData()
 	{
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];

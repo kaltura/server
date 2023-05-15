@@ -5,8 +5,6 @@
  */
 class kZoomTokens
 {
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-	const MAP_NAME = 'vendor';
 	const OAUTH_TOKEN_PATH = '/oauth/token';
 	const ACCESS_TOKEN = 'access_token';
 	const REFRESH_TOKEN = 'refresh_token';
@@ -29,7 +27,7 @@ class kZoomTokens
 	{
 		KalturaLog::info('Generating new Zoom serve-to-server access token');
 		$postFields = "grant_type=account_credentials&account_id=" . $this->accountId;
-		$header = self::getHeaderData();
+		$header = self::getAuthorizationHeaderData();
 		$response = self::curlRetrieveTokensData($postFields, $header);
 		$tokensData = $this->parseTokensResponse($response);
 		KalturaLog::debug('New access token response' . print_r($tokensData, true));
@@ -46,9 +44,9 @@ class kZoomTokens
 		return $tokensData;
 	}
 
-	protected function getHeaderData()
+	protected function getAuthorizationHeaderData()
 	{
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
 		$clientId = $zoomConfiguration['clientId'];
 		$clientSecret = $zoomConfiguration['clientSecret'];
 		$header = array(self::AUTHORIZATION_HEADER . ":Basic " . base64_encode("$clientId:$clientSecret"));
@@ -64,5 +62,13 @@ class kZoomTokens
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
 		return $curlWrapper->exec($this->zoomBaseURL . self::OAUTH_TOKEN_PATH);
 	}
-	
+
+	public static function isExpired($expiresIn)
+	{
+		if ($expiresIn <= time() + kconf::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
+		{
+			return true;
+		}
+		return false;
+	}
 }

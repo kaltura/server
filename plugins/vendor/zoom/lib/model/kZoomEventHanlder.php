@@ -7,8 +7,6 @@
 class kZoomEventHanlder
 {
 	protected $zoomConfiguration;
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-	const MAP_NAME = 'vendor';
 	const EMAIL = 'email';
 	const CMS_USER_FIELD = 'cms_user_id';
 	const KALTURA_ZOOM_DEFAULT_USER = 'KalturaZoomDefault';
@@ -204,7 +202,7 @@ class kZoomEventHanlder
 		$accessToken = $zoomVendorIntegration->getAccessToken();
 		$accessExpiresIn = $zoomVendorIntegration->getExpiresIn();
 		$zoomAuthType = $zoomVendorIntegration->getZoomAuthType();
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		return new kZoomClient($zoomBaseURL, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType);
 	}

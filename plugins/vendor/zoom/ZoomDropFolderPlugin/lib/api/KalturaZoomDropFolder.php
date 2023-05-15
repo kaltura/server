@@ -6,8 +6,7 @@
  */
 class KalturaZoomDropFolder extends KalturaDropFolder
 {
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-	const MAP_NAME = 'vendor';
+
 	const ZOOM_BASE_URL = 'ZoomBaseUrl';
 	
 	/**
@@ -99,9 +98,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 				$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
 				$this->zoomAuthType = $vendorIntegration->getZoomAuthType();
 
-				if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID &&
-					$vendorIntegration->getExpiresIn() <= time() +
-					kconf::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
+				if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kZoomTokens::isExpired($vendorIntegration->getExpiresIn()))
 				{
 					KalturaLog::debug('Token expired for account id: ' . $vendorIntegration->getAccountId() . ' renewing with the new tokens');
 					$freshTokens = kZoomOauth::refreshTokens($vendorIntegration);
@@ -155,7 +152,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	
 	protected static function getZoomHeaderData()
 	{
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		$clientSecret = $zoomConfiguration['clientSecret'];

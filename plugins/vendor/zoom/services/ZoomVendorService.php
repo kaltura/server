@@ -6,8 +6,6 @@
  */
 class ZoomVendorService extends KalturaBaseService
 {
-	const MAP_NAME = 'vendor';
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const INTEGRATION_CODE = 'integrationCode';
 	const AUTH_CODE = 'code';
 	const REGISTRATION_PAGE_PATH = '/../lib/api/webPage/KalturaZoomRegistrationPage.html';
@@ -31,12 +29,12 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public static function getZoomConfiguration()
 	{
-		if(!kConf::hasMap(self::MAP_NAME))
+		if(!kConf::hasMap(ZoomHelper::VENDOR_MAP))
 		{
 			throw new KalturaAPIException(KalturaZoomErrors::NO_VENDOR_CONFIGURATION);
 		}
 		
-		return kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		return kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
 	}
 	
 	/**

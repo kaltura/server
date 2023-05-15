@@ -231,13 +231,12 @@ class kZoomClient extends kVendorClient
 		return $this->baseURL . $apiPath . '?';
 	}
 
-	public function validateAccessToken()
+	public function getValidAccessToken()
 	{
 		switch ($this->zoomAuthType)
 		{
 			case kZoomAuthTypes::SERVER_TO_SERVER:
-				if ($this->accessExpiresIn <= time() +
-					kconf::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
+				if (kZoomTokens::isExpired($this->accessExpiresIn))
 				{
 					$tokens = $this->zoomTokensHelper->generateServerToServerToken();
 					$this->accessToken = $tokens[kZoomTokens::ACCESS_TOKEN];
@@ -249,11 +248,7 @@ class kZoomClient extends kVendorClient
 				// do not renew access token without saving the refresh token on the integration
 			default:
 		}
-	}
 
-	public function getValidAccessToken()
-	{
-		$this->validateAccessToken();
 		return $this->accessToken;
 	}
 	
