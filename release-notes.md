@@ -5,14 +5,14 @@
 - Issue ID: FOUN-1131
 
 ### Configuration ###
-- update sphinx kaltura.conf:
+update sphinx kaltura.conf:
 
   	Add the following to kaltura_schedule_event index:
   	- rt_field = source_entry_id
 
 #### Deployment Scripts ####
-
-		- Need to re-build & re-index the schedule event sphinx table.
+    
+    - Need to re-build & re-index the schedule event sphinx table.
 
 #### Known Issues & Limitations ####
 
