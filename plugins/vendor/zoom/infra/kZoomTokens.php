@@ -63,7 +63,7 @@ class kZoomTokens
 		return $curlWrapper->exec($this->zoomBaseURL . self::OAUTH_TOKEN_PATH);
 	}
 
-	public static function isExpired($expiresIn)
+	public static function isTokenExpired($expiresIn)
 	{
 		if ($expiresIn <= time() +
 			kconf::getArrayValue('tokenExpiryGrace', ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP, 600))

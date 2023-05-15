@@ -236,7 +236,7 @@ class kZoomClient extends kVendorClient
 		switch ($this->zoomAuthType)
 		{
 			case kZoomAuthTypes::SERVER_TO_SERVER:
-				if (kZoomTokens::isExpired($this->accessExpiresIn))
+				if (kZoomTokens::isTokenExpired($this->accessExpiresIn))
 				{
 					$tokens = $this->zoomTokensHelper->generateServerToServerToken();
 					$this->accessToken = $tokens[kZoomTokens::ACCESS_TOKEN];

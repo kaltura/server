@@ -98,7 +98,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 				$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
 				$this->zoomAuthType = $vendorIntegration->getZoomAuthType();
 
-				if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kZoomTokens::isExpired($vendorIntegration->getExpiresIn()))
+				if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kZoomTokens::isTokenExpired($vendorIntegration->getExpiresIn()))
 				{
 					KalturaLog::debug('Token expired for account id: ' . $vendorIntegration->getAccountId() . ' renewing with the new tokens');
 					$freshTokens = kZoomOauth::refreshTokens($vendorIntegration);
