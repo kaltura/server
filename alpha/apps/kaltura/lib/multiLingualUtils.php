@@ -213,6 +213,7 @@ class multiLingualUtils
 	
 	protected static function setMultiLanguageStringInField(&$responseObject, $dbObject, $multiLanguageMap, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		$responseObject->responseLanguage = self::MULTI;
 		$defaultLanguage = self::getDefaultLanguage($dbObject);
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		if (!$multiLanguageMap)
@@ -245,6 +246,10 @@ class multiLingualUtils
 		}
 	}
 	
+	/*
+	 * Return an array containing all the languages that are mapped in the entry, even if a language is mapped to part of the fields.
+	 * If a language appears in the mapping, the entry supports it
+	 */
 	protected static function getMappedLanguages($newMultiLingualMapping, $supportedFields)
 	{
 		$mappedLanguages = array();
@@ -253,7 +258,7 @@ class multiLingualUtils
 			array_push($mappedLanguages, array_keys($newMultiLingualMapping[$field]));
 		}
 		
-		return array_unique($mappedLanguages);
+		return array_unique($mappedLanguages)[0];
 	}
 	
 	protected static function setRequestedLanguageStringInField(&$responseObject, $dbObject, $newMultiLingualMapping, $requestLanguage = null, KalturaDetachedResponseProfile $responseProfile = null)
@@ -263,7 +268,9 @@ class multiLingualUtils
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		$supportedFieldsInRequestedLang = array();
 		$mappedLanguages = self::getMappedLanguages($newMultiLingualMapping, $supportedFields);
-		$isLanguageMapped = in_array($language, $mappedLanguages[0]);
+		
+		$isLanguageMapped = !(empty($mappedLanguages)) && in_array($language, $mappedLanguages);
+		
 		foreach ($supportedFields as $fieldName)
 		{
 			if (!$responseObject->shouldGet($fieldName, $responseProfile))
