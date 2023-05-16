@@ -269,7 +269,14 @@ class multiLingualUtils
 		$supportedFieldsInRequestedLang = array();
 		$mappedLanguages = self::getMappedLanguages($newMultiLingualMapping, $supportedFields);
 		
-		$isLanguageMapped = !(empty($mappedLanguages)) && in_array($language, $mappedLanguages);
+		if (empty($mappedLanguages))
+		{
+			$isLanguageMapped = false;
+		}
+		else
+		{
+			$isLanguageMapped = in_array($language, $mappedLanguages);
+		}
 		
 		foreach ($supportedFields as $fieldName)
 		{
