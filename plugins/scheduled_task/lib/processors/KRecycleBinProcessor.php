@@ -76,7 +76,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 	
 	protected function getEntriesListsToDelete($recycleBinRetentionPeriod)
 	{
-		$pageIndex = 1;
+		$pageIndex = 0;
 		$entriesList = $this->getOverdueRecycledEntries($pageIndex, $recycleBinRetentionPeriod);
 		if (!$entriesList || !$entriesList->objects)
 		{
@@ -91,7 +91,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 			{
 				return $entriesToDelete;
 			}
-			$entriesToDelete[] = $entriesList;
+			$entriesToDelete[] = $entriesList->objects;
 		}
 		
 		return $entriesToDelete;
