@@ -590,7 +590,8 @@ class BaseEntryService extends KalturaEntryService
 		$c = KalturaCriteria::create(entryPeer::OM_CLASS);
 		$pager->attachToCriteria($c);
 		$entryFilter->attachToCriteria($c);
-		$c->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+		$displayInSearchStatusNotIn = array(mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+		$c->addAnd(entryPeer::DISPLAY_IN_SEARCH, $displayInSearchStatusNotIn, Criteria::NOT_IN);
 				
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 
