@@ -118,8 +118,6 @@ class Partner extends BasePartner
 	
 	const DAYS_BEFORE_RECYCLE_BIN_DELETION = 'days_before_recycle_bin_deletion';
 	
-	const BLOCK_CONFIGURE_DIRECT_LOGIN = 'blockConfigureDirectLogin';
-	
 	private $cdnWhiteListCache = array();
 
 	public function save(PropelPDO $con = null)
@@ -2226,16 +2224,6 @@ class Partner extends BasePartner
 	public function setBlockDirectLogin($v)
 	{
 		$this->putInCustomData("blockDirectLogin", $v);
-	}
-	
-	public function getBlockConfigureDirectLogin()
-	{
-		return $this->getFromCustomData(self::BLOCK_CONFIGURE_DIRECT_LOGIN, null, false);
-	}
-	
-	public function setBlockConfigureDirectLogin($v)
-	{
-		$this->putInCustomData(self::BLOCK_CONFIGURE_DIRECT_LOGIN, $v);
 	}
 
 	public function getAuthenticationType()

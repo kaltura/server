@@ -16,6 +16,7 @@ class Form_PartnerConfiguration extends Infra_Form
     const ELASTIC_OPTIONS = 'GROUP_ELASTIC_OPTIONS';
     const GROUP_AUTHENTICATION_SETTING = 'GROUP_AUTHENTICATION_SETTING';
     const RECYCLE_BIN_OPTIONS = 'GROUP_RECYCLE_BIN_OPTIONS';
+    const LOGIN_SSO_OPTIONS = 'LOGIN_SSO_OPTIONS';
    	
     protected $limitSubForms = array();
     
@@ -49,6 +50,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::SECURITY_OPTIONS] = array();
 		$permissionNames[self::ELASTIC_OPTIONS] = array();
 		$permissionNames[self::RECYCLE_BIN_OPTIONS] = array();
+		$permissionNames[self::LOGIN_SSO_OPTIONS] = array();
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
@@ -591,11 +593,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
 		
-		$this->addElement('checkbox', 'block_configure_direct_login', array(
-			'label'	  => 'Block adding direct login users',
-			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
-		));
-		
 		$twoFactorAuthenticationMode = array (
 			Kaltura_Client_Enum_TwoFactorAuthenticationMode::ALL => 'On all users',
 			Kaltura_Client_Enum_TwoFactorAuthenticationMode::ADMIN_USERS_ONLY => 'Admin users only',
@@ -671,6 +668,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			ksort($permissionNames[self::SECURITY_OPTIONS]);
 			ksort($permissionNames[self::ELASTIC_OPTIONS]);
 			ksort($permissionNames[self::RECYCLE_BIN_OPTIONS]);
+			ksort($permissionNames[self::LOGIN_SSO_OPTIONS]);
 			$this->addAllDisplayGroups($permissionNames);
 		}
 		
@@ -1066,10 +1064,10 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array_merge(array('secondary_secret_role_id',),
 		                                   array('crossLine')), 'security', array('legend' => 'Security'));
-		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'block_configure_direct_login', 'two_factor_authentication_mode') ,
-		                                   array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
+		$this->addDisplayGroup(array_merge(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'two_factor_authentication_mode'),
+		                                   $permissionNames[self::LOGIN_SSO_OPTIONS], array('crossLine')), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram'),
-											array('crossLine'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
+		                                   array('crossLine'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
 		$this->addDisplayGroup(array_merge($permissionNames[self::RECYCLE_BIN_OPTIONS], array('days_before_recycle_bin_deletion')),'recycleBin', array('legend' => 'Recycle Bin Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');

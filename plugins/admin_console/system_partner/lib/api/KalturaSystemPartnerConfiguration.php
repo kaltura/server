@@ -408,11 +408,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var bool
 	 */
-	public $blockConfigureDirectLogin;
-	
-	/**
-	 * @var bool
-	 */
 	public $ignoreSynonymEsearch;
 
 	/**
@@ -590,7 +585,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"useTwoFactorAuthentication",
 		"useSso",
 		"blockDirectLogin",
-		"blockConfigureDirectLogin",
 		"ignoreSynonymEsearch",
 		"avoidIndexingSearchHistory",
 		"usagePercent",
