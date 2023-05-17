@@ -64,6 +64,7 @@ class ESearchEntryItem extends ESearchItem
 		'votes' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'display_in_search' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
 		'recycled_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		'room_type' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
 	);
 
 	protected static $field_boost_values = array(

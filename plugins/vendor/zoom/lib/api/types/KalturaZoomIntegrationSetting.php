@@ -34,11 +34,6 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableWebinarUploads;
-
-	/**
-	 * @var string
-	 */
-	public $jwtToken;
 	
 	/**
 	 * @var KalturaNullableBoolean
@@ -77,7 +72,6 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'zoomWebinarCategory',
 		'enableWebinarUploads',
 		'enableRecordingUpload' => 'status',
-		'jwtToken',
 		'enableZoomTranscription',
 		'zoomAccountDescription',
 		'groupParticipationType',

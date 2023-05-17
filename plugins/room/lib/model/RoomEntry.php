@@ -17,5 +17,15 @@ class RoomEntry extends entry
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_ROOM_TYPE, $v);
 	}
-
+	
+	public function getObjectParams($params = null)
+	{
+		$body = array(
+			'room_type' => $this->getRoomType(),
+		);
+		
+		elasticSearchUtils::cleanEmptyValues($body);
+		
+		return array_merge(parent::getObjectParams($params), $body);
+	}
 }

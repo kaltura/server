@@ -7,8 +7,6 @@
 class kZoomEventHanlder
 {
 	protected $zoomConfiguration;
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-	const MAP_NAME = 'vendor';
 	const EMAIL = 'email';
 	const CMS_USER_FIELD = 'cms_user_id';
 	const KALTURA_ZOOM_DEFAULT_USER = 'KalturaZoomDefault';
@@ -100,10 +98,9 @@ class kZoomEventHanlder
 				}
 				else
 				{
-					$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL],
-					                                                    $zoomVendorIntegration->getJwtToken(),
-					                                                    $zoomVendorIntegration->getRefreshToken(),
-					                                                    null, null, $zoomVendorIntegration->getAccessToken());
+					$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL], $zoomVendorIntegration->getAccountId(),
+												$zoomVendorIntegration->getRefreshToken(), $zoomVendorIntegration->getAccessToken(),
+												$zoomVendorIntegration->getExpiresIn(), $zoomVendorIntegration->getZoomAuthType());
 					$transcriptProcessor->handleRecordingTranscriptComplete($event);
 				}
 				break;
@@ -200,14 +197,14 @@ class kZoomEventHanlder
 	
 	protected function initZoomClient(ZoomVendorIntegration $zoomVendorIntegration)
 	{
-		$jwtToken = $zoomVendorIntegration->getJwtToken();
+		$accountId = $zoomVendorIntegration->getAccountId();
 		$refreshToken = $zoomVendorIntegration->getRefreshToken();
 		$accessToken = $zoomVendorIntegration->getAccessToken();
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-		$clientId = $zoomConfiguration['clientId'];
+		$accessExpiresIn = $zoomVendorIntegration->getExpiresIn();
+		$zoomAuthType = $zoomVendorIntegration->getZoomAuthType();
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$clientSecret = $zoomConfiguration['clientSecret'];
-		return new kZoomClient($zoomBaseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
+		return new kZoomClient($zoomBaseURL, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType);
 	}
 	
 	
@@ -243,7 +240,7 @@ class kZoomEventHanlder
 		foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 		{
 			$parentEntry = null;
-			self::handleAudioFiles($recordingFilesPerTimeSlot, $kMeetingMetaData->getUuid() ,$fileDeletionPolicy);
+			self::handleAudioFiles($recordingFilesPerTimeSlot);
 			/* @var kZoomRecordingFile $recordingFile*/
 			foreach ($recordingFilesPerTimeSlot as $recordingFile)
 			{
@@ -293,7 +290,7 @@ class kZoomEventHanlder
 		}
 	}
 
-	protected static function handleAudioFiles(&$recordingFilesPerTimeSlot, $meetingFileUuid, $fileDeletionPolicy)
+	protected static function handleAudioFiles(&$recordingFilesPerTimeSlot)
 	{
 		$foundMP4 = false;
 		$audioKeys = array();

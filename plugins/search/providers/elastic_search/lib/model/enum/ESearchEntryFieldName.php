@@ -48,4 +48,5 @@ interface ESearchEntryFieldName extends BaseEnum
 	const RANK = 'rank';
 	const VOTES = 'votes';
 	const RECYCLED_AT = 'recycled_at';
+	const ROOM_TYPE = 'room_type';
 }

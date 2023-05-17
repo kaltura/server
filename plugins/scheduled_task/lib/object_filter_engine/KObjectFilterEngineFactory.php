@@ -16,6 +16,7 @@ class KObjectFilterEngineFactory
 		switch($type)
 		{
 			case KalturaObjectFilterEngineType::ENTRY:
+			case KalturaObjectFilterEngineType::RECYCLE_BIN_CLEANUP:
 				return new KObjectFilterBaseEntryEngine($client);
 			case KalturaObjectFilterEngineType::ENTRY_VENDOR_TASK:
 				return new KObjectFilterEntryVendorTaskEngine($client);

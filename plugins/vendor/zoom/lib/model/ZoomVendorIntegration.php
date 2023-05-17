@@ -11,15 +11,15 @@ class ZoomVendorIntegration extends VendorIntegration
 	const USER_MATCHING = 'userMatching';
 	const USER_POSTFIX = 'UserPostfix';
 	const ENABLE_WEBINAR_UPLOADS = 'enableWebinarUploads';
-	const JWT_TOKEN = 'jwtToken';
+	const ZOOM_AUTH_TYPE = 'zoomAuthType';
 	const ENABLE_ZOOM_TRANSCRIPTION =  'enableZoomTranscription';
 	const ZOOM_ACCOUNT_DESCRIPTION = 'zoomAccountDescription';
 	const OPT_OUT_GROUP_NAMES = 'optOutGroupNames';
 	const OPT_IN_GROUP_NAMES = 'optInGroupNames';
 	const GROUP_PARTICIPATION_TYPE = 'groupParticipationType';
-	
-	public function setJwtToken ($v)	{ $this->putInCustomData ( self::JWT_TOKEN, $v);	}
-	public function getJwtToken ( )	{ return $this->getFromCustomData(self::JWT_TOKEN);	}
+
+	public function setZoomAuthType($v)	{ $this->putInCustomData ( self::ZOOM_AUTH_TYPE, $v); }
+	public function getZoomAuthType()	{ return $this->getFromCustomData(self::ZOOM_AUTH_TYPE, null, kZoomAuthTypes::OAUTH); }
 	
 	public function setEnableZoomTranscription ($v)	{ $this->putInCustomData ( self::ENABLE_ZOOM_TRANSCRIPTION, $v);	}
 	public function getEnableZoomTranscription ( )	{ return $this->getFromCustomData(self::ENABLE_ZOOM_TRANSCRIPTION);	}
@@ -44,20 +44,10 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function setZoomAccountDescription ($v)	{ $this->putInCustomData ( self::ZOOM_ACCOUNT_DESCRIPTION, $v);	}
 	public function getZoomAccountDescription ( )	{ return $this->getFromCustomData(self::ZOOM_ACCOUNT_DESCRIPTION);	}
 
-	/**
-	 * returns all tokens as array
-	 * @return array
-	 */
-	public function getTokens()
-	{
-		return array(kOAuth::ACCESS_TOKEN => $this->getAccessToken(), kOAuth::REFRESH_TOKEN => $this->getRefreshToken(),
-			kOAuth::EXPIRES_IN => $this->getExpiresIn(), self::JWT_TOKEN => $this->getJwtToken());
-	}
 
 	public function setTokensData($tokensDataAsArray)
 	{
 		parent::setTokensData($tokensDataAsArray);
-		$this->setJwtToken($tokensDataAsArray[self::JWT_TOKEN]);
 		$this->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 	}
 	
@@ -142,5 +132,12 @@ class ZoomVendorIntegration extends VendorIntegration
 			return false;
 		}
 		return true;
+	}
+
+	public function saveAccessTokenData($tokensDataAsArray)
+	{
+		$this->setExpiresIn($tokensDataAsArray[kOAuth::EXPIRES_IN]);
+		$this->setAccessToken($tokensDataAsArray[kOAuth::ACCESS_TOKEN]);
+		$this->save();
 	}
 }
