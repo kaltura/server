@@ -86,10 +86,10 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::UPDATING_USER_ID_FOR_HASHED_USER_NOT_ALLOWED);
 		}
 		
-		if (PermissionPeer::isValidForPartner(PermissionName::BLOCK_NEW_DIRECT_LOGIN, $this->getPartnerId())
+		if (!PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $this->getPartnerId())
 			&& ($user->isSsoExcluded || (!isset($user->isSsoExcluded) && $dbUser->getIsSsoExcluded())))
 		{
-			throw new kUserException('', kUserException::USER_WITH_DIRECT_LOGIN_NOT_ALLOWED);
+			throw new kUserException('', kUserException::SETTING_SSO_PER_USER_NOT_ALLOWED);
 		}
 
 		// update user
