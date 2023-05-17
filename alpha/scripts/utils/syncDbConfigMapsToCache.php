@@ -9,6 +9,7 @@ require_once __DIR__ . '/../../config/cache/kRemoteMemCacheConf.php';
 
 $port = $argv[1];
 $cacheHostList = explode(',',$argv[2]);
+$forceSync = isset($argv[3]) ? $argv[3] : false;
 const DB_MAP_NAME = 'db_sync';
 //Init all cache items
 $cacheObjects = array();
@@ -28,8 +29,11 @@ $dbConnection = getPdoConnection();
 //Find all exsiting map names in DB
 $cmdLine = 'select map_name , host_name from conf_maps where status=1 group by map_name,host_name;';
 $mapsInfo = query($dbConnection,$cmdLine);
+$modifiedMapFound = $forceSync;
+
 foreach($mapsInfo as $mapInfo)
 {
+	$isMapModified = false;
 	$rawMapName =$mapInfo['map_name'];
 	if(trim($rawMapName)=='')
 	{
@@ -44,13 +48,27 @@ foreach($mapsInfo as $mapInfo)
 	$version = $output2[0]['version'];
 	$content = $output2[0]['content'];
 	if(!isset($mapListInCache[$mapName]))
+	{
 		echo("\nNOTICE - Map {$mapName} is new! adding it to the list in cache\n");
+		$isMapModified = true;
+	}
 	//check if need to update version
 	else if($mapListInCache[$mapName]!=$version)
+	{
 		echo("\nNOTICE - Map {$mapName} version needs to be updated to {$version}\n");
+		$isMapModified = true;
+	}
 	else
+	{
 		echo("\nINFO - Map {$mapName} already found in cache with version {$version}\n");
+	}
 
+	if(!$isMapModified)
+	{
+		continue;
+	}
+
+	$modifiedMapFound = true;
 	$mapListInCache[$mapName]=$version;//set version
 	foreach ($cacheObjects as $cacheObject)
 	{
@@ -58,24 +76,29 @@ foreach($mapsInfo as $mapInfo)
 	}
 }
 
-//Set map list to all cache items
-$mapListInCache['UPDATED_AT']=date("Y-m-d H:i:s");
-foreach ($cacheObjects as $cacheObject)
+if($atLeastOneMapModified)
 {
-	$cacheObject->set(kRemoteMemCacheConf::MAP_LIST_KEY, $mapListInCache);
+	echo("\nFound at least one map that was modified, clearing kConf map cache\n");
+	//Set map list to all cache items
+	$mapListInCache['UPDATED_AT']=date("Y-m-d H:i:s");
+	foreach ($cacheObjects as $cacheObject)
+	{
+		$cacheObject->set(kRemoteMemCacheConf::MAP_LIST_KEY, $mapListInCache);
+	}
+
+	//Set key in all cache items
+	$chacheKey = kBaseConfCache::generateKey();
+	foreach ($cacheObjects as $cacheObject)
+	{
+		$ret = $cacheObject->set(kBaseConfCache::CONF_CACHE_VERSION_KEY, $chacheKey);
+		if(!$ret)
+			die ("\nFailed inserting key to cache\n");
+		print_r($cacheObject);
+		echo("\nKey - {$chacheKey} was added to cache successfully\n");
+	}
 }
 
-//Set key in all cache items
-$chacheKey = kBaseConfCache::generateKey();
-foreach ($cacheObjects as $cacheObject)
-{
-	$ret = $cacheObject->set(kBaseConfCache::CONF_CACHE_VERSION_KEY, $chacheKey);
-	if(!$ret)
-		die ("\nFailed inserting key to cache\n");
-	print_r($cacheObject);
-	echo("\nKey - {$chacheKey} was added to cache successfully\n");
-}
-
+echo("\nDone syncing conf maps to cache [$atLeastOneMapModified]\n");
 
 function getPdoConnection()
 {
