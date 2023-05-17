@@ -76,7 +76,7 @@ foreach($mapsInfo as $mapInfo)
 	}
 }
 
-if($atLeastOneMapModified)
+if($modifiedMapFound)
 {
 	echo("\nFound at least one map that was modified, clearing kConf map cache\n");
 	//Set map list to all cache items
