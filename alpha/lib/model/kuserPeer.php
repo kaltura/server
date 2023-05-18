@@ -464,7 +464,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			throw new kUserException('', kUserException::USER_ALREADY_EXISTS);
 		}
 		
-		if (!PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $user->getPartnerId()) && $user->getIsSsoExcluded())
+		if ($user->getPartner()->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $user->getPartnerId())
+			&& $user->getIsSsoExcluded())
 		{
 			throw new kUserException('', kUserException::SETTING_SSO_PER_USER_NOT_ALLOWED);
 		}

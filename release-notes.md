@@ -10,7 +10,8 @@ moduls.loginSSO.enabled = true
 moduls.loginSSO.permissionType = 2
 moduls.loginSSO.label = "Allow setting SSO per user"
 moduls.loginSSO.permissionName = ALLOW_SSO_PER_USER
-moduls.loginSSO.group = LOGIN_SSO_OPTIONS
+moduls.loginSSO.group = GROUP_LOGIN_SSO_OPTIONS
+moduls.loginSSO.skip = true
 ```
 
 # Scorpius-19.9.0
