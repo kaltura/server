@@ -99,9 +99,7 @@ class kBroadcastUrlManager
 		$entryId = str_replace('1_', '', $entry->getId());
 		$liveId = str_replace('_', '-', $entryId); // dns resolve don't handle well underscore in host
 
-		$liveId = self::addLiveBackendId($liveId);
-
-		return $liveId;
+		return self::addLiveBackendId($liveId);
 	}
 	
 	protected function getHostname ($dc, $primary, $entry, $protocol)
@@ -278,15 +276,9 @@ class kBroadcastUrlManager
 
 	private static function addLiveBackendId($id)
 	{
-		$liveId = $id;
-
 		$backendId = kConf::get(self::LIVE_BACKEND_ID_PARAM, kConfMapNames::LIVE_SETTINGS, null);
-		if(!is_null($backendId))
-		{
-			$liveId = "$backendId-$liveId";
-		}
 
-		return $liveId;
+		return !is_null($backendId) ? "$backendId-$id" : $id;
 	}
 
 	public function createSrtStreamId(LiveStreamEntry $entry, $sessionType)
