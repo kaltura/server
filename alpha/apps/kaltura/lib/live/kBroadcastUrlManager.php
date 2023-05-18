@@ -28,6 +28,7 @@ class kBroadcastUrlManager
 
 	const LIVE_ENCRYPTION_KEY_PARAM = 'live_security_key';
 	const LIVE_SRT_IV_PARAM = 'stream_id_security_key';
+	const LIVE_BACKEND_ID_PARAM = 'backend_id';
 
 	
 	protected $partnerId;
@@ -96,7 +97,15 @@ class kBroadcastUrlManager
 	protected static function getLiveIdForHost($entry)
 	{
 		$entryId = str_replace('1_', '', $entry->getId());
-		return str_replace('_', '-', $entryId); // dns resolve don't handle well underscore in host
+		$liveId = str_replace('_', '-', $entryId); // dns resolve don't handle well underscore in host
+
+		$backendId = kConf::get(self::LIVE_BACKEND_ID_PARAM, kConfMapNames::LIVE_SETTINGS, null);
+		if(!is_null($backendId))
+		{
+			$liveId = "$backendId-$liveId";
+		}
+
+		return $liveId;
 	}
 	
 	protected function getHostname ($dc, $primary, $entry, $protocol)
