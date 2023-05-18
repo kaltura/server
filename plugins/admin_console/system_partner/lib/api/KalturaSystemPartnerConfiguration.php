@@ -504,7 +504,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	/**
 	 * @var int
 	 */
-	public $daysBeforeRecycleBinDeletion;
+	public $recycleBinRetentionPeriod;
 	
 	
 	private static $map_between_objects = array
@@ -602,7 +602,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'purifyImageContent',
 		'isSelfServe',
 		'eventPlatformAllowedTemplates',
-		'daysBeforeRecycleBinDeletion',
+		'recycleBinRetentionPeriod',
 	);
 
 	public function getMapBetweenObjects()

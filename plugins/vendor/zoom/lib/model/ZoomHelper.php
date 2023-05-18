@@ -6,6 +6,8 @@
  */
 class ZoomHelper
 {
+	const VENDOR_MAP = 'vendor';
+	const ZOOM_ACCOUNT_PARAM = 'ZoomAccount';
 	/** payload data */
 	const ACCOUNT_ID = "account_id";
 	const PAYLOAD = 'payload';

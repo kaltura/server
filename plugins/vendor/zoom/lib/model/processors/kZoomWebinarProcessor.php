@@ -23,9 +23,9 @@ class kZoomWebinarProcessor extends kZoomRecordingProcessor
 		}
 	}
 
-	protected function getAdditionalUsersFromZoom($accessToken, $recordingId)
+	protected function getAdditionalUsersFromZoom($recordingId)
 	{
-		return $this->zoomClient->retrieveWebinarPanelists($accessToken, $recordingId);
+		return $this->zoomClient->retrieveWebinarPanelists($recordingId);
 	}
 
 	protected function parseAdditionalUsers($additionalUsersZoomResponse)

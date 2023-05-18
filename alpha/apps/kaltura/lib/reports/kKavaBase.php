@@ -154,7 +154,8 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VE_CREATED = 'created';
 
 	// event types - meeting events
-	const EVENT_TYPE_JOIN_SESSION = 'joinSession';
+	const EVENT_TYPE_MEETING_JOIN_SESSION = 'joinSession';
+	const EVENT_TYPE_MEETING_RAISE_HAND = 'raiseHand';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -207,6 +208,9 @@ class kKavaBase extends kDruidBase
 
 	// user engagement meeting values
 	const USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON = 'TabFocusedMicUnmutedFullScreenCameraOnSoundOn';
+	const USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON = 'TabFocusedMicUnmutedFullScreenOffCameraOnSoundOn';
+	const USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_ON = 'TabFocusedMicUnmutedFullScreenCameraOffSoundOn';
+	const USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON = 'TabFocusedMicUnmutedFullScreenOffCameraOffSoundOn';
 
 	protected static $realtime_engagement = array(
 		self::USER_SOUND_ON_TAB_FOCUSED,
@@ -238,7 +242,10 @@ class kKavaBase extends kDruidBase
 	);
 
 	protected static $meeting_engagement = array(
-		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON
+		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON,
+		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_ON,
+		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON,
+		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON,
 	);
 
 	//general values

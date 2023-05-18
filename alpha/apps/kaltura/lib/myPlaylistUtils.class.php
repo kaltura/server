@@ -811,7 +811,8 @@ class myPlaylistUtils
 			
 			$c->addAnd ( entryPeer::TYPE , array_unique($typeArray) , Criteria::IN ); // search only for clips or roughcuts
 			$c->addAnd ( entryPeer::STATUS , entryStatus::READY ); // search only for READY entries 
-			$c->addAnd ( entryPeer::DISPLAY_IN_SEARCH , mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+			$displayInSearchStatusNotIn = array(mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+			$c->addAnd(entryPeer::DISPLAY_IN_SEARCH, $displayInSearchStatusNotIn, Criteria::NOT_IN);
 
 			if ( $display_in_search >= 2 )
 			{
