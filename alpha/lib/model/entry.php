@@ -351,6 +351,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return self::$multiLingualSupportedFields;
 	}
 	
+	public function getDefaultLanguage()
+	{
+		return $this->getFromCustomData('defaultLanguage',null, null);
+	}
+	
+	public function getResponseLanguage()
+	{
+		return $this->getFromCustomData('responseLanguage', null, null);
+	}
+	
 	/**
 	 * @param $v
 	 * @param $fieldName
