@@ -255,7 +255,10 @@ class multiLingualUtils
 		$mappedLanguages = array();
 		foreach ($supportedFields as $field)
 		{
-			array_push($mappedLanguages, array_keys($newMultiLingualMapping[$field]));
+			if ($newMultiLingualMapping && $newMultiLingualMapping[$field])
+			{
+				array_push($mappedLanguages, array_keys($newMultiLingualMapping[$field]));
+			}
 		}
 		
 		return array_unique($mappedLanguages)[0];
