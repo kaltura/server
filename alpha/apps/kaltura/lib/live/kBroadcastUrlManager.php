@@ -274,7 +274,7 @@ class kBroadcastUrlManager
 		return kDeliveryUtils::urlsafeB64Encode($encryptedToken);
 	}
 
-	private static function addLiveBackendId($id)
+	protected static function addLiveBackendId($id)
 	{
 		$backendId = kConf::get(self::LIVE_BACKEND_ID_PARAM, kConfMapNames::LIVE_SETTINGS, null);
 
