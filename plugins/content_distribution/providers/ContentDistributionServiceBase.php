@@ -99,7 +99,8 @@ abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	protected function getEntries($context, $orderBy = null, $limit = null) 
 	{
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+		$displayInSearchStatusNotIn = array(mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+		$baseCriteria->addAnd(entryPeer::DISPLAY_IN_SEARCH, $displayInSearchStatusNotIn, Criteria::NOT_IN);
 		if(!is_null($limit))
 			$baseCriteria->setLimit($limit);
 		if(!is_null($orderBy)) {
