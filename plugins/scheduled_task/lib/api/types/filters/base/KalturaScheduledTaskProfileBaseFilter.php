@@ -23,6 +23,7 @@ abstract class KalturaScheduledTaskProfileBaseFilter extends KalturaFilter
 		"lastExecutionStartedAtGreaterThanOrEqual" => "_gte_last_execution_started_at",
 		"lastExecutionStartedAtLessThanOrEqual" => "_lte_last_execution_started_at",
 		"lastExecutionStartedAtLessThanOrEqualOrNull" => "_lteornull_last_execution_started_at",
+		"objectFilterEngineTypeIn" => "_in_object_filter_engine_type",
 	);
 
 	static private $order_by_map = array
@@ -121,4 +122,9 @@ abstract class KalturaScheduledTaskProfileBaseFilter extends KalturaFilter
 	 * @var time
 	 */
 	public $lastExecutionStartedAtLessThanOrEqualOrNull;
+	
+	/**
+	 * @var string
+	 */
+	public $objectFilterEngineTypeIn;
 }

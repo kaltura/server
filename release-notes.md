@@ -1,3 +1,33 @@
+# Scorpius-19.9.0
+## Add Recycle Bin batch for auto deletion
+* Issue Type: Task
+* Issue ID: PLAT-24229
+
+### Configuration ###
+Add the following to batch.ini under KScheduledTaskRunner worker
+```
+[KScheduledTaskRunner : PeriodicWorker]
+id                                                  = 610
+params.runnerTypes                                  = 1,2
+```
+Add the following to batch.ini
+```
+[KAsyncRecycleBin : KScheduledTaskRunner]
+id                                                  = 611
+params.runnerTypes                                  = 3
+```
+
+## Add 'RoomType' to ESearch for entry ##
+- Issue Type: Task
+- Issue ID: PLAT-24248
+
+### Deployment Scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port', 'entry_index_name' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"room_type" : {"type" : "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
+
 # Scorpius-19.8.0
 ## Add search term aggregation to SearchHistory plugin
 * Issue Type: Story
@@ -27,10 +57,12 @@ php deployment/updates/scripts/add_permissions/2023_04_10_add_ssrv_edit_admin_pe
 - Issue Type: Task
 - Issue ID: PLAT-24227
 
-### Deployment ###
+### Deployment Scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
 Replace 'esearch_host', 'esearch_port', 'entry_index_name' and execute the curl command
 
-    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping/entry" -H 'Content-Type: application/json' -d'{"properties": {"recycled_at" : {"type" : "date", "format": "epoch_second"}}}'
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"recycled_at" : {"type" : "date", "format": "epoch_second"}}}'
 
 # Scorpius-19.6.0
 ## Increase ActionsLimit For Analytics ##

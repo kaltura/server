@@ -481,6 +481,12 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $verticalClassificationId;
 	
+	/**
+	 * @var int
+	 * @readonly
+	 */
+	public $recycleBinRetentionPeriod;
+	
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'blockDirectLogin',
@@ -493,8 +499,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'publisherEnvironmentType', 'ovpEnvironmentUrl', 'ottEnvironmentUrl', 'authenticationType', 'extendedFreeTrailExpiryReason', 'extendedFreeTrailExpiryDate',
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
 		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe', 'allowedDomains',
-		'excludedAdminRoleName', 'eventPlatformAllowedTemplates', 'verticalClassificationId' => 'verticalClasiffication', 'allowDefaultPasswordRestrictions'
-
+		'excludedAdminRoleName', 'eventPlatformAllowedTemplates', 'verticalClassificationId' => 'verticalClasiffication', 'allowDefaultPasswordRestrictions', 'recycleBinRetentionPeriod',
 	);
 	
 	public function getMapBetweenObjects ( )

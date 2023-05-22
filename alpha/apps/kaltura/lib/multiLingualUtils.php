@@ -213,6 +213,7 @@ class multiLingualUtils
 	
 	protected static function setMultiLanguageStringInField(&$responseObject, $dbObject, $multiLanguageMap, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		$responseObject->responseLanguage = self::MULTI;
 		$defaultLanguage = self::getDefaultLanguage($dbObject);
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		if (!$multiLanguageMap)
@@ -245,12 +246,38 @@ class multiLingualUtils
 		}
 	}
 	
+	/*
+	 * Return an array containing all the languages that are mapped in the entry, even if a language is mapped to part of the fields.
+	 * If a language appears in the mapping, the entry supports it
+	 */
+	protected static function getMappedLanguages($newMultiLingualMapping, $supportedFields)
+	{
+		$mappedLanguages = array();
+		foreach ($supportedFields as $field)
+		{
+			array_push($mappedLanguages, array_keys($newMultiLingualMapping[$field]));
+		}
+		
+		return array_unique($mappedLanguages)[0];
+	}
+	
 	protected static function setRequestedLanguageStringInField(&$responseObject, $dbObject, $newMultiLingualMapping, $requestLanguage = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$defaultLanguage = self::getDefaultLanguage($dbObject);
 		$language = ($requestLanguage && $defaultLanguage) ? $requestLanguage : $defaultLanguage;
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		$supportedFieldsInRequestedLang = array();
+		$mappedLanguages = self::getMappedLanguages($newMultiLingualMapping, $supportedFields);
+		
+		if (empty($mappedLanguages))
+		{
+			$isLanguageMapped = false;
+		}
+		else
+		{
+			$isLanguageMapped = in_array($language, $mappedLanguages);
+		}
+		
 		foreach ($supportedFields as $fieldName)
 		{
 			if (!$responseObject->shouldGet($fieldName, $responseProfile))
@@ -264,12 +291,20 @@ class multiLingualUtils
 			{
 				$fieldValueToExpose = $supportedFieldsInRequestedLang[$fieldName];
 			}
-			elseif ($language !== $defaultLanguage)
+			elseif ($isLanguageMapped)
 			{
 				$fieldValueToExpose = '';
 			}
 
 			$responseObject->$fieldName = $fieldValueToExpose;
+		}
+		
+		//Only when a specific requested language is not mapped at all, fall to the default and add it to the response,
+		//so that the user or client will know that the wrong language was returned
+		$responseObject->responseLanguage = $language;
+		if (!$isLanguageMapped)
+		{
+			$responseObject->responseLanguage = $defaultLanguage;
 		}
 	}
 	
@@ -316,7 +351,7 @@ class multiLingualUtils
 		$mapping = self::getMultiLanguageMapping($dbObject);
 		if (!$mapping || ($mapping == ''))
 		{
-			return $dbValue;
+			return $fieldName === entry::TAGS ? explode(',', $dbValue): $dbValue;
 		}
 		return self::getMultiLingualValuesArrayForField($dbValue, $mapping, $fieldName, $isCommaSeparatedString);
 	}
