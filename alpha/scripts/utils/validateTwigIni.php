@@ -14,7 +14,16 @@ for ($i=1; $i < $argc; $i++) {
         IniUtils::parseIniFile( $filename, true );
     } catch (\Throwable $th) {
         KalturaLog::crit("Validation failed on [$filename] with error [$th]");
-        KalturaLog::info('Faulty ini content:' . PHP_EOL . file_get_contents($filename) . PHP_EOL);
+
+        $fileString = file_get_contents($filename);
+        $lines = explode(PHP_EOL, $fileString);
+        $linedFile = '';
+        foreach ($lines as $key => $value)
+        {
+            $linedFile .= $key + 1 . "\t$value". PHP_EOL;
+        }
+    
+        KalturaLog::info('Faulty ini content:' . PHP_EOL . $linedFile . PHP_EOL);
         exit(1);
     }
     
