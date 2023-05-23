@@ -464,6 +464,12 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			throw new kUserException('', kUserException::USER_ALREADY_EXISTS);
 		}
 		
+		if ($user->getPartner()->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $user->getPartnerId())
+			&& $user->getIsSsoExcluded())
+		{
+			throw new kUserException('', kUserException::SETTING_SSO_PER_USER_NOT_ALLOWED);
+		}
+		
 		// check if roles are valid - may throw exceptions
 		if (!$user->getRoleIds() && $user->getIsAdmin()) {
 			// assign default role according to user type admin / normal

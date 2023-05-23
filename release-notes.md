@@ -1,3 +1,19 @@
+# Scorpius-19.10.0
+## Add permission to allow setting SSO per user ##
+- Issue Type: Story
+- Issue ID: PLAT-24238
+
+### Configuration ###
+Add the following to admin.ini
+```
+moduls.loginSSO.enabled = true
+moduls.loginSSO.permissionType = 2
+moduls.loginSSO.label = "Allow setting SSO per user"
+moduls.loginSSO.permissionName = ALLOW_SSO_PER_USER
+moduls.loginSSO.group = GROUP_LOGIN_SSO_OPTIONS
+moduls.loginSSO.skip = true
+```
+
 # Scorpius-19.9.0
 ## Add Recycle Bin batch for auto deletion
 * Issue Type: Task
