@@ -3,6 +3,7 @@ require_once(realpath(__DIR__) . '/../../vendor/twig/autoload.php');
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Twig\TwigFilter;
 
 class twigExtensions extends AbstractExtension
 {
@@ -11,8 +12,18 @@ class twigExtensions extends AbstractExtension
 		return [
 			new TwigFunction('get_env', [$this, 'getEnvironmentVariable']),
 			new TwigFunction('get_secret', [$this, 'getSecretFileContents']),
+			new TwigFunction('get_json_secret', [$this, 'getJsonSecretFileContents']),
 		];
 	}
+
+	public function getFilters()
+    {
+        return [
+            new TwigFilter('base64_encode', 'base64_encode'),
+            new TwigFilter('base64_decode', 'base64_decode'),
+        ];
+    }
+
 
 	/**
 	 * Return the value of the requested environment variable.
@@ -61,5 +72,16 @@ class twigExtensions extends AbstractExtension
 			return $defaultValue;
 		}
 		return $content;
+	}
+
+	/**
+	 * Return the content of a specific file in the secrets folder.
+	 *
+	 * @param String $fileName
+	 * @return String
+	 */
+	public function getJsonSecretFileContents($fileName, $default = null)
+	{
+		return json_decode($this->getSecretFileContents($fileName, $default),true);
 	}
 }
