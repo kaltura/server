@@ -1,5 +1,5 @@
 # Scorpius-19.10.0
-## Add permission to block new direct login users ##
+## Add permission to allow setting SSO per user ##
 - Issue Type: Story
 - Issue ID: PLAT-24238
 
