@@ -1417,8 +1417,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setCategories($newCats)
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
-			return;
-			
+        {
+            KalturaLog::log('Partner has permission FEATURE_DISABLE_CATEGORY_LIMIT enabled. Entry cannot be assigned to categories ad-hoc, must use categoryEntry service.');
+            return;
+        }
+
 		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
 		
 		$this->trimCategories($newCats);
