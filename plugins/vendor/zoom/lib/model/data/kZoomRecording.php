@@ -65,37 +65,35 @@ class kZoomRecording implements iZoomObject
 
 			$this->recordingFiles[$kZoomRecordingFile->recordingStart][$kZoomRecordingFile->recordingFileType][] = $kZoomRecordingFile;
 		}
-		$this->sortRecordingFilesByRecordingType();
+		$this->sortZoomRecordingFilesByRecordingTypes();
 	}
 
-	public function sortRecordingFilesByRecordingType()
+	public function sortZoomRecordingFilesByRecordingTypes()
 	{
 		foreach ($this->recordingFiles as $recordingStart => $FileTypeRecordingFilesArray)
 		{
 			if(isset($this->recordingFiles[$recordingStart][kRecordingFileType::VIDEO]))
 			{
-				$this->sortZoomRecordingFilesByRecordingTypesArray($this->recordingFiles[$recordingStart][kRecordingFileType::VIDEO], ZoomHelper::ORDER_RECORDING_TYPE);
+				$this->sortZoomRecordingFilesByValuesArray($this->recordingFiles[$recordingStart][kRecordingFileType::VIDEO], ZoomHelper::ORDER_RECORDING_TYPE);
 			}
 		}
 	}
 
-	public static function sortZoomRecordingFilesByRecordingTypesArray(&$zoomRecordingFiles, array $recordingTypesArray)
+	public static function sortZoomRecordingFilesByValuesArray(&$zoomRecordingFiles, array $valuesArray)
 	{
 		$orderedRecordingFiles = array();
-		foreach ($recordingTypesArray as $recordingType)
+		foreach ($valuesArray as $value)
 		{
 			foreach ($zoomRecordingFiles as $zoomRecordingFile)
 			{
-				if ($zoomRecordingFile->recordingType == $recordingType)
+				if ($zoomRecordingFile->recordingType == $value)
 				{
 					$orderedRecordingFiles[] = $zoomRecordingFile;
-					KalturaLog::debug($zoomRecordingFile->recordingType);
 				}
 			}
 		}
 		$zoomRecordingFiles = $orderedRecordingFiles;
 	}
-
 
 	public function parseType($recordingType)
 	{
