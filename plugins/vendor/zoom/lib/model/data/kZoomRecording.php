@@ -65,7 +65,37 @@ class kZoomRecording implements iZoomObject
 
 			$this->recordingFiles[$kZoomRecordingFile->recordingStart][$kZoomRecordingFile->recordingFileType][] = $kZoomRecordingFile;
 		}
+		$this->sortRecordingFilesByRecordingType();
 	}
+
+	public function sortRecordingFilesByRecordingType()
+	{
+		foreach ($this->recordingFiles as $recordingStart => $FileTypeRecordingFilesArray)
+		{
+			if(isset($this->recordingFiles[$recordingStart][kRecordingFileType::VIDEO]))
+			{
+				$this->sortZoomRecordingFilesByRecordingTypesArray($this->recordingFiles[$recordingStart][kRecordingFileType::VIDEO], ZoomHelper::ORDER_RECORDING_TYPE);
+			}
+		}
+	}
+
+	public static function sortZoomRecordingFilesByRecordingTypesArray(&$zoomRecordingFiles, array $recordingTypesArray)
+	{
+		$orderedRecordingFiles = array();
+		foreach ($recordingTypesArray as $recordingType)
+		{
+			foreach ($zoomRecordingFiles as $zoomRecordingFile)
+			{
+				if ($zoomRecordingFile->recordingType == $recordingType)
+				{
+					$orderedRecordingFiles[] = $zoomRecordingFile;
+					KalturaLog::debug($zoomRecordingFile->recordingType);
+				}
+			}
+		}
+		$zoomRecordingFiles = $orderedRecordingFiles;
+	}
+
 
 	public function parseType($recordingType)
 	{
