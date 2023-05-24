@@ -19,10 +19,10 @@ class kZoomOauth extends kOAuth
 	 */
 	public static function refreshTokens($vendorIntegration)
 	{
-		list($zoomBaseURL, , $header, $userPwd) = self::getHeaderData();
 		switch ($vendorIntegration->getZoomAuthType())
 		{
 			case kZoomAuthTypes::SERVER_TO_SERVER:
+				list($zoomBaseURL, $userPwd) = self::getHeaderDataByPartnerId($vendorIntegration->getPartnerId());
 				KalturaLog::debug("Generate server-to-server access token");
 				$postFields = "grant_type=account_credentials&account_id=" . $vendorIntegration->getAccountId();
 				$header = array(self::AUTHORIZATION_HEADER . ":Basic " . base64_encode($userPwd));
@@ -32,6 +32,7 @@ class kZoomOauth extends kOAuth
 				return $tokensData;
 
 			case kZoomAuthTypes::OAUTH:
+				list($zoomBaseURL, , $header, $userPwd) = self::getHeaderData();
 				KalturaLog::info('Refreshing tokens');
 				$oldRefreshToken = $vendorIntegration->getRefreshToken();
 				$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
@@ -106,6 +107,21 @@ class kZoomOauth extends kOAuth
 		$header = array('Content-Type:application/x-www-form-urlencoded');
 		$userPwd = "$clientId:$clientSecret";
 		return array($zoomBaseURL, $redirectUrl, $header, $userPwd);
+	}
+
+	protected static function getHeaderDataByPartnerId($partnerId)
+	{
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM . "_$partnerId", ZoomHelper::VENDOR_MAP);
+		$clientId = $zoomConfiguration['clientId'];
+		$clientSecret = $zoomConfiguration['clientSecret'];
+		$userPwd = "$clientId:$clientSecret";
+		return array(self::getZoomUrl(), $userPwd);
+	}
+
+	public static function getZoomUrl()
+	{
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
+		return $zoomConfiguration['ZoomBaseUrl'];
 	}
 
 	/**
