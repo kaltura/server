@@ -70,7 +70,7 @@ class kZoomRecording implements iZoomObject
 
 	public function sortZoomRecordingFilesByRecordingTypes()
 	{
-		foreach ($this->recordingFiles as $recordingStart => $FileTypeRecordingFilesArray)
+		foreach ($this->recordingFiles as $recordingStart => $fileTypeRecordingFilesArray)
 		{
 			if(isset($this->recordingFiles[$recordingStart][kRecordingFileType::VIDEO]))
 			{
