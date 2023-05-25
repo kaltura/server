@@ -109,4 +109,39 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		return self::doSelectOne($c);
 	}
 
+	/**
+	 * @param $partnerId
+	 * @param $accountID
+	 * @param $vendorType
+	 * @return VendorIntegration
+	 * @throws PropelException
+	 */
+	public static function retrieveSingleVendorByAccountAndPartner($partnerId, $accountID, $vendorType)
+	{
+		$c = new Criteria();
+		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
+		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
+		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		return self::doSelectOne($c);
+	}
+
+	/**
+	 * @param $partnerId
+	 * @param $accountID
+	 * @param $vendorType
+	 * @return VendorIntegration
+	 * @throws PropelException
+	 */
+	public static function retrieveSingleVendorByAccountAndPartnerNoFilter($partnerId, $accountID, $vendorType)
+	{
+		$c = new Criteria();
+		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
+		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
+		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		self::setUseCriteriaFilter(false);
+		$result = self::doSelectOne($c);
+		self::setUseCriteriaFilter(true);
+		return $result;
+	}
+
 } // VendorIntegrationPeer

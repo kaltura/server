@@ -57,6 +57,27 @@ class ZoomHelper
 	}
 
 	/**
+	 * @param $partnerId
+	 * @param $accountId
+	 * @param bool $includeDeleted
+	 * @return null|zoomVendorIntegration
+	 * @throws PropelException
+	 */
+	public static function getZoomIntegrationByPartnerId($partnerId, $accountId, $includeDeleted = false)
+	{
+		if($includeDeleted)
+		{
+			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorByAccountAndPartnerNoFilter($partnerId, $accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+		}
+		else
+		{
+			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorByAccountAndPartner($partnerId, $accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+		}
+
+		return self::$zoomIntegration;
+	}
+
+	/**
 	 * @return zoomVendorIntegration
 	 */
 	public static function getZoomIntegration()
