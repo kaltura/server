@@ -111,7 +111,11 @@ class kZoomOauth extends kOAuth
 
 	protected static function getHeaderDataByPartnerId($partnerId)
 	{
-		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM . "_$partnerId", ZoomHelper::VENDOR_MAP);
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM . "_$partnerId", ZoomHelper::VENDOR_MAP, null);
+		if(!$zoomConfiguration)
+		{
+			$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
+		}
 		$clientId = $zoomConfiguration['clientId'];
 		$clientSecret = $zoomConfiguration['clientSecret'];
 		$userPwd = "$clientId:$clientSecret";
