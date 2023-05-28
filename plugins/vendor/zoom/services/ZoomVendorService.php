@@ -199,7 +199,7 @@ class ZoomVendorService extends KalturaBaseService
 	public function localRegistrationPageAction($zoomAccountId)
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByPartnerId($partnerId, $zoomAccountId);
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($zoomAccountId, false, $partnerId);
 		if(!$zoomIntegration)
 		{
 			$zoomIntegration = new ZoomVendorIntegration();
@@ -260,13 +260,15 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$queryPartnerId = null;
 		
 		/** @var ZoomVendorIntegration $zoomIntegration */
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
 		if($zoomIntegration->getZoomAuthType() == kZoomAuthTypes::SERVER_TO_SERVER)
 		{
-			$zoomIntegration = ZoomHelper::getZoomIntegrationByPartnerId($partnerId, $accountId, true);
+			$queryPartnerId = $partnerId;
 		}
+
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true, $queryPartnerId);
 
 		if(!$zoomIntegration || $zoomIntegration->getPartnerId() != $partnerId)
 		{

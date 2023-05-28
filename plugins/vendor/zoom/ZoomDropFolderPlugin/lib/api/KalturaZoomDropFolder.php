@@ -89,13 +89,13 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		{
 			if ($vendorIntegration)
 			{
-				$this->baseURL = kZoomOauth::getZoomUrl();
 				$this->accountId = $vendorIntegration->getAccountId();
 				$this->refreshToken = $vendorIntegration->getRefreshToken();
 				$this->accessToken = $vendorIntegration->getAccessToken();
 				$this->description = $vendorIntegration->getZoomAccountDescription();
 				$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
 				$this->zoomAuthType = $vendorIntegration->getZoomAuthType();
+				list($this->baseURL, ) = kZoomOauth::getHeaderDataByPartnerId($this->accountId, $vendorIntegration->getPartnerId());
 
 				if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kZoomTokens::isTokenExpired($vendorIntegration->getExpiresIn()))
 				{

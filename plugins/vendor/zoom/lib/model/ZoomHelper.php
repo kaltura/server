@@ -36,42 +36,22 @@ class ZoomHelper
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
 
-    /**
-     * @param $accountId
-     * @param bool $includeDeleted
-     * @return null|zoomVendorIntegration
-     * @throws PropelException
-     */
-	public static function getZoomIntegrationByAccountId($accountId, $includeDeleted = false)
-	{
-		if($includeDeleted)
-		{
-			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartnerNoFilter($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
-		}
-		else
-		{
-			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
-		}
-
-		return self::$zoomIntegration;
-	}
-
 	/**
-	 * @param $partnerId
 	 * @param $accountId
 	 * @param bool $includeDeleted
+	 * @param $partnerId
 	 * @return null|zoomVendorIntegration
 	 * @throws PropelException
 	 */
-	public static function getZoomIntegrationByPartnerId($partnerId, $accountId, $includeDeleted = false)
+	public static function getZoomIntegrationByAccountId($accountId, $includeDeleted = false, $partnerId = null)
 	{
 		if($includeDeleted)
 		{
-			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorByAccountAndPartnerNoFilter($partnerId, $accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartnerNoFilter($accountId, VendorTypeEnum::ZOOM_ACCOUNT, $partnerId);
 		}
 		else
 		{
-			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorByAccountAndPartner($partnerId, $accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT, $partnerId);
 		}
 
 		return self::$zoomIntegration;

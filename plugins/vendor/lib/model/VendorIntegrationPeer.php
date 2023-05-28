@@ -67,28 +67,38 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 	/**
 	 * @param $accountID
 	 * @param $vendorType
+	 * @param $partnerId
 	 * @return VendorIntegration
 	 * @throws PropelException
 	 */
-	public static function retrieveSingleVendorPerPartner($accountID, $vendorType)
+	public static function retrieveSingleVendorPerPartner($accountID, $vendorType, $partnerId = null)
 	{
 		$c = new Criteria();
 		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		if($partnerId)
+		{
+			$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
+		}
 		return self::doSelectOne($c);
 	}
 
 	/**
 	 * @param $accountID
 	 * @param $vendorType
+	 * @param $partnerId
 	 * @return VendorIntegration
 	 * @throws PropelException
 	 */
-	public static function retrieveSingleVendorPerPartnerNoFilter($accountID, $vendorType)
+	public static function retrieveSingleVendorPerPartnerNoFiqlter($accountID, $vendorType, $partnerId = null)
 	{
 		$c = new Criteria();
 		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
+		if($partnerId)
+		{
+			$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
+		}
 		self::setUseCriteriaFilter(false);
 		$result = self::doSelectOne($c);
 		self::setUseCriteriaFilter(true);
@@ -107,41 +117,6 @@ class VendorIntegrationPeer extends BaseVendorIntegrationPeer {
 		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
 		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
 		return self::doSelectOne($c);
-	}
-
-	/**
-	 * @param $partnerId
-	 * @param $accountID
-	 * @param $vendorType
-	 * @return VendorIntegration
-	 * @throws PropelException
-	 */
-	public static function retrieveSingleVendorByAccountAndPartner($partnerId, $accountID, $vendorType)
-	{
-		$c = new Criteria();
-		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
-		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
-		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
-		return self::doSelectOne($c);
-	}
-
-	/**
-	 * @param $partnerId
-	 * @param $accountID
-	 * @param $vendorType
-	 * @return VendorIntegration
-	 * @throws PropelException
-	 */
-	public static function retrieveSingleVendorByAccountAndPartnerNoFilter($partnerId, $accountID, $vendorType)
-	{
-		$c = new Criteria();
-		$c->add(VendorIntegrationPeer::PARTNER_ID, $partnerId);
-		$c->add(VendorIntegrationPeer::ACCOUNT_ID, $accountID);
-		$c->add(VendorIntegrationPeer::VENDOR_TYPE, $vendorType);
-		self::setUseCriteriaFilter(false);
-		$result = self::doSelectOne($c);
-		self::setUseCriteriaFilter(true);
-		return $result;
 	}
 
 } // VendorIntegrationPeer
