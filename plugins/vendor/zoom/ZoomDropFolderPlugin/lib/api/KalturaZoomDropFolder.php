@@ -89,14 +89,13 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		{
 			if ($vendorIntegration)
 			{
-				$headerData = self::getZoomHeaderData();
-				$this->baseURL = $headerData[2];
 				$this->accountId = $vendorIntegration->getAccountId();
 				$this->refreshToken = $vendorIntegration->getRefreshToken();
 				$this->accessToken = $vendorIntegration->getAccessToken();
 				$this->description = $vendorIntegration->getZoomAccountDescription();
 				$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
 				$this->zoomAuthType = $vendorIntegration->getZoomAuthType();
+				list($this->baseURL, ) = kZoomOauth::getHeaderDataByPartnerId($this->accountId, $vendorIntegration->getPartnerId());
 
 				if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kZoomTokens::isTokenExpired($vendorIntegration->getExpiresIn()))
 				{
@@ -109,8 +108,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 						$this->accessExpiresIn = kZoomOauth::getTokenExpiryRelativeTime($freshTokens[kZoomTokens::EXPIRES_IN]);
 					}
 				}
-				
-				
+
 				$zoomIntegrationObject = new KalturaZoomIntegrationSetting();
 				$zoomIntegrationObject->fromObject($vendorIntegration);
 				$this->zoomVendorIntegration = $zoomIntegrationObject;
@@ -149,13 +147,5 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
 		return parent::toObject($dbObject, $skip);
 	}
-	
-	protected static function getZoomHeaderData()
-	{
-		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
-		$clientId = $zoomConfiguration['clientId'];
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$clientSecret = $zoomConfiguration['clientSecret'];
-		return array($clientId, $clientSecret, $zoomBaseURL);
-	}
+
 }

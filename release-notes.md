@@ -1,4 +1,17 @@
 # Scorpius-19.10.0
+## Add Zoom server-to-server app type support
+- Issue Type: Task
+- Issue ID: PLAT-24271
+
+### Configuration ###
+Add the following to vendor.ini
+```
+[ZoomAccount_@ZoomAccountId@_@partnerId@]
+clientId = @ZoomClientID@
+clientSecret = @ZoomClientSecret@
+ZoomBaseUrl = https://zoom.us
+```
+
 ## Add permission to allow setting SSO per user ##
 - Issue Type: Story
 - Issue ID: PLAT-24238

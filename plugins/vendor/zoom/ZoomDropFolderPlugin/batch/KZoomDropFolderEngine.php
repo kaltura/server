@@ -238,6 +238,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
 				continue;
 			}
+			if(kZoomTokens::isTokenExpired($this->zoomClient->getAccessExpiresIn()) && !$this->refreshZoomClientTokens())
+			{
+				return;
+			}
 			$partnerId = $this->dropFolder->partnerId;
 			$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFile, $this->dropFolder->zoomVendorIntegration);
 			if ($groupParticipationType != KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
@@ -450,12 +454,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
-		if($this->zoomClient->getAccessExpiresIn() && $this->zoomClient->getAccessExpiresIn() <= time() + self::ONE_MINUTE)
+		if(kZoomTokens::isTokenExpired($this->zoomClient->getAccessExpiresIn()) && !$this->refreshZoomClientTokens())
 		{
-			if(!$this->refreshZoomClientTokens())
-			{
-				return;
-			}
+			return;
 		}
 		
 		$fileSize = $this->zoomClient->getFileSize($dropFolderFile->meetingMetadata->uuid, $dropFolderFile->recordingFile->id);
