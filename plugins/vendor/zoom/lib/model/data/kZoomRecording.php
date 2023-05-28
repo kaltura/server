@@ -72,9 +72,9 @@ class kZoomRecording implements iZoomObject
 	 * $this->recordingFiles has the following structure:
 	 * [start_time][file_type][recording_files]
 	 * example:
-	 * [1685260915] => [video] => [file1, file2]
-	 * [1685260915] => [audio] => [file1, file2]
-	 * [1685261000] => [video] => [file1, file2, file3]
+	 * 1685260915 => video => [file1, file2]
+	 * 1685260915 => audio => [file1, file2]
+	 * 1685261000 => video => [file1, file2, file3]
 	 * note: order is important only for video file types since it affects parent-child entry assignment
 	*/
 	public function sortZoomRecordingFilesByRecordingTypes()
