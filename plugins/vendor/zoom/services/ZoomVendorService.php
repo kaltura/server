@@ -260,15 +260,15 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		$queryPartnerId = null;
-		
-		/** @var ZoomVendorIntegration $zoomIntegration */
-		if($zoomIntegration->getZoomAuthType() == kZoomAuthTypes::SERVER_TO_SERVER)
-		{
-			$queryPartnerId = $partnerId;
-		}
 
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true, $queryPartnerId);
+		/** @var ZoomVendorIntegration $zoomIntegration */
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
+
+		// If a zoom account has server-to-server zoom integration, then all zoom integrations for that account should be server to server
+		if($zoomIntegration && $zoomIntegration->getZoomAuthType() == kZoomAuthTypes::SERVER_TO_SERVER)
+		{
+			$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true, $partnerId);
+		}
 
 		if(!$zoomIntegration || $zoomIntegration->getPartnerId() != $partnerId)
 		{
