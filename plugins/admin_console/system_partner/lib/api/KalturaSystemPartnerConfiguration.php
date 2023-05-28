@@ -404,7 +404,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $blockDirectLogin;
-
+	
 	/**
 	 * @var bool
 	 */
