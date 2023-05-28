@@ -75,7 +75,7 @@ class kZoomRecording implements iZoomObject
 	 * [1685260915] => [video] => [file1, file2]
 	 * [1685260915] => [audio] => [file1, file2]
 	 * [1685261000] => [video] => [file1, file2, file3]
-	 * note: order is important only for video file types
+	 * note: order is important only for video file types since it affects parent-child entry assignment
 	*/
 	public function sortZoomRecordingFilesByRecordingTypes()
 	{
