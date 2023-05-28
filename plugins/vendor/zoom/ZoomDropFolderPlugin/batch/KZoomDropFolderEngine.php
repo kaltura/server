@@ -598,7 +598,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	function shouldDisableExpiredDropFolder($dropFolder)
 	{
 		$accessExpiresIn = isset($dropFolder->accessExpiresIn) ? $dropFolder->accessExpiresIn : null;
-		return $accessExpiresIn && $dropFolder->id && $accessExpiresIn <= time() - self::ONE_DAY*3;
+		if($accessExpiresIn && $accessExpiresIn <= time() - self::ONE_DAY*5)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	function disableExpiredDropFolder($dropFolder)
