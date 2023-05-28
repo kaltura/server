@@ -1,3 +1,17 @@
+# Scorpius-19.10.0
+## Add onPrem server-to-server authentication method for zoom integration
+* Issue Type: Task
+* Issue ID: PLAT-24271
+
+### Configuration ###
+Add the following to vendor.ini
+```
+[ZoomAccount_@ZoomAccountId@_@partnerId@]
+clientId = @ZoomClientID@
+clientSecret = @ZoomClientSecret@
+ZoomBaseUrl = https://zoom.us
+```
+
 # Scorpius-19.9.0
 ## Add Recycle Bin batch for auto deletion
 * Issue Type: Task
