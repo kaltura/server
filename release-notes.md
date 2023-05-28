@@ -1,5 +1,5 @@
 # Scorpius-19.10.0
-## Add onPrem server-to-server authentication method for zoom integration
+## Add Zoom server-to-server app type support
 * Issue Type: Task
 * Issue ID: PLAT-24271
 
