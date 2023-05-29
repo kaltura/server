@@ -5,11 +5,11 @@
 ### Deployment ###
 Add the following to admin.ini
 ```
-moduls.allowThemeEditor.enabled = true
-moduls.allowThemeEditor.permissionType = 2
-moduls.allowThemeEditor.label = "Theme Editor"
-moduls.allowThemeEditor.permissionName = FEATURE_THEME_EDITOR_PERMISSION
-moduls.allowThemeEditor.group = GROUP_ENABLE_DISABLE_FEATURES
+moduls.themeEditor.enabled = true
+moduls.themeEditor.permissionType = 2
+moduls.themeEditor.label = "Enable Theme Editor"
+moduls.themeEditor.permissionName = FEATURE_THEME_EDITOR_PERMISSION
+moduls.themeEditor.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 ## Supporting the Reset Password dynamic Email workflow for EP
 * Issue Type: Task
