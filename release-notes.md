@@ -4,10 +4,10 @@
 * Issue ID: PLAT-24095
 
 ### Configuration
-* Add to map `dynamic_email_contents` the following: (replace APP_NUM with the number of the supported app`s enum - not as a string)
+* Add to map `dynamic_email_contents` the following: (replace APP with the value of the supported app`s enum in resetPassLinkType.php)
 
 ```
-dynamic_email_supported_apps = APP_NUM
+dynamic_email_supported_apps = APP
 ```
 ## Add permission to allow setting SSO per user ##
 - Issue Type: Story
