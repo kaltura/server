@@ -11,7 +11,38 @@ Enable plugin:
 
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_sessionCuePoint_permission.php
+  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_sessionCuePoint_permission.php
+
+## Supporting the Reset Password dynamic Email workflow for EP
+* Issue Type: Task
+* Issue ID: PLAT-24095
+
+### Configuration
+* Add to map `dynamic_email_contents` the following: (replace APP with the value of the supported app`s enum in resetPassLinkType.php)
+
+```
+dynamic_email_supported_apps = APP
+```
+
+## Add permission to EP analytics role ##
+* Issue Type: Task
+* Issue ID: PLAT-24276
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_permission_to_ep_analytics_user_role.php
+
+## Add Zoom server-to-server app type support
+- Issue Type: Task
+- Issue ID: PLAT-24271
+
+### Configuration ###
+Add the following to vendor.ini
+```
+[ZoomAccount_@ZoomAccountId@_@partnerId@]
+clientId = @ZoomClientID@
+clientSecret = @ZoomClientSecret@
+ZoomBaseUrl = https://zoom.us
+```
 
 ## Add permission to allow setting SSO per user ##
 - Issue Type: Story

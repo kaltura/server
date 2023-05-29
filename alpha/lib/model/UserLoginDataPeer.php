@@ -305,7 +305,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$roleNames = ($user) ? $user->getUserRoleNames() : null;
 		}
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$dynamicTemplateUserRoleName = kEmails::getDynamicEmailUserRoleName($roleNames);
+		$dynamicTemplateUserRoleName = kEmails::getDynamicEmailUserRoleName($roleNames, $linkType);
 		// If on the partner it's set not to reset the password - skip the email sending
 		if($partner->getEnabledService(PermissionName::FEATURE_DISABLE_RESET_PASSWORD_EMAIL)) {
 			KalturaLog::log("Skipping reset-password email sending according to partner configuration.");
