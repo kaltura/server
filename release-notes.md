@@ -1,4 +1,18 @@
 # Scorpius-19.10.0
+## Session Cue Point plugin ##
+- Issue Type: Task
+- Issue ID: PLAT-24275
+
+### Configuration ###
+Enable plugin:
+
+	To enable this plugin add the following to your plugins.ini file:
+	- SessionCuePoint
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_sessionCuePoint_permission.php
+
 ## Add permission to allow setting SSO per user ##
 - Issue Type: Story
 - Issue ID: PLAT-24238
