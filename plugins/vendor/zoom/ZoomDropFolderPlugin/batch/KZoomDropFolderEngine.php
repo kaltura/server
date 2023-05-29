@@ -120,6 +120,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
+		if($this->shouldDisableExpiredDropFolder($dropFolder))
+		{
+			$this->disableExpiredDropFolder($dropFolder);
+		}
+
 		$this->zoomClient = $this->initZoomClient($dropFolder);
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
@@ -232,6 +237,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			{
 				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
 				continue;
+			}
+			if(kZoomTokens::isTokenExpired($this->zoomClient->getAccessExpiresIn()) && !$this->refreshZoomClientTokens())
+			{
+				return;
 			}
 			$partnerId = $this->dropFolder->partnerId;
 			$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFile, $this->dropFolder->zoomVendorIntegration);
@@ -445,12 +454,9 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
-		if($this->zoomClient->getAccessExpiresIn() && $this->zoomClient->getAccessExpiresIn() <= time() + self::ONE_MINUTE)
+		if(kZoomTokens::isTokenExpired($this->zoomClient->getAccessExpiresIn()) && !$this->refreshZoomClientTokens())
 		{
-			if(!$this->refreshZoomClientTokens())
-			{
-				return;
-			}
+			return;
 		}
 		
 		$fileSize = $this->zoomClient->getFileSize($dropFolderFile->meetingMetadata->uuid, $dropFolderFile->recordingFile->id);
@@ -589,4 +595,24 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolderFileService->update($dropFolderFile->id, $kZoomDropFolderFile);
 		$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::HANDLED);
 	}
+
+	function shouldDisableExpiredDropFolder($dropFolder)
+	{
+		$accessExpiresIn = isset($dropFolder->accessExpiresIn) ? $dropFolder->accessExpiresIn : null;
+		if($accessExpiresIn && $accessExpiresIn <= time() - self::ONE_DAY*5)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	function disableExpiredDropFolder($dropFolder)
+	{
+		$updateDropFolder = new KalturaDropFolder();
+		$updateDropFolder->status = DropFolderStatus::DISABLED;
+		$this->dropFolderPlugin->dropFolder->update($dropFolder->id, $updateDropFolder);
+		$expiredTimeInGmt = kTimeZoneUtils::timezoneDate('Y-m-d', $dropFolder->accessExpiresIn, 'GMT');
+		throw new Exception("Failed to refresh tokens, last successful refresh was on $expiredTimeInGmt GMT");
+	}
+
 }

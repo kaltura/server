@@ -198,12 +198,13 @@ class ZoomVendorService extends KalturaBaseService
 	 */
 	public function localRegistrationPageAction($zoomAccountId)
 	{
-		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($zoomAccountId);
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($zoomAccountId, false, $partnerId);
 		if(!$zoomIntegration)
 		{
 			$zoomIntegration = new ZoomVendorIntegration();
 			$zoomIntegration->setAccountId($zoomAccountId);
-			$zoomIntegration->setPartnerId(kCurrentContext::getCurrentPartnerId());
+			$zoomIntegration->setPartnerId($partnerId);
 			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 			$zoomIntegration->setZoomAuthType(kZoomAuthTypes::SERVER_TO_SERVER);
 			$zoomIntegration->save();
@@ -259,9 +260,16 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		KalturaResponseCacher::disableCache();
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		
+
 		/** @var ZoomVendorIntegration $zoomIntegration */
 		$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
+
+		// If a zoom account has server-to-server zoom integration, then all zoom integrations for that account should be server to server
+		if($zoomIntegration && $zoomIntegration->getZoomAuthType() == kZoomAuthTypes::SERVER_TO_SERVER)
+		{
+			$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true, $partnerId);
+		}
+
 		if(!$zoomIntegration || $zoomIntegration->getPartnerId() != $partnerId)
 		{
 			throw new KalturaAPIException(KalturaZoomErrors::NO_INTEGRATION_DATA);

@@ -9,6 +9,27 @@
 ```
 dynamic_email_supported_apps = APP
 ```
+
+## Add permission to EP analytics role ##
+* Issue Type: Task
+* Issue ID: PLAT-24276
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_permission_to_ep_analytics_user_role.php
+
+## Add Zoom server-to-server app type support
+- Issue Type: Task
+- Issue ID: PLAT-24271
+
+### Configuration ###
+Add the following to vendor.ini
+```
+[ZoomAccount_@ZoomAccountId@_@partnerId@]
+clientId = @ZoomClientID@
+clientSecret = @ZoomClientSecret@
+ZoomBaseUrl = https://zoom.us
+```
+
 ## Add permission to allow setting SSO per user ##
 - Issue Type: Story
 - Issue ID: PLAT-24238
