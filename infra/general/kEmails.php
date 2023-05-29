@@ -55,7 +55,7 @@ class kEmails
 		}
 	}
 	
-	public static function getDynamicEmailUserRoleName($userRoleNames = null)
+	public static function getDynamicEmailUserRoleName($userRoleNames = null, $appInfo = null)
 	{
 		if (is_null($userRoleNames))
 		{
@@ -67,6 +67,10 @@ class kEmails
 		if($intersectingRoles)
 		{
 			return $intersectingRoles[0];
+		}
+		elseif ($appInfo['type'] == $appInfo['requiredType'])
+		{
+			return $rolesArrayFromDynamicMap[0];
 		}
 		return null;
 	}
