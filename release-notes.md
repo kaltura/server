@@ -1,4 +1,15 @@
 # Scorpius-19.10.0
+## Supporting the Reset Password dynamic Email workflow for EP
+* Issue Type: Task
+* Issue ID: PLAT-24095
+
+### Configuration
+* Add to map `dynamic_email_contents` the following: (replace APP with the value of the supported app`s enum in resetPassLinkType.php)
+
+```
+dynamic_email_supported_apps = APP
+```
+
 ## Add permission to EP analytics role ##
 * Issue Type: Task
 * Issue ID: PLAT-24276
