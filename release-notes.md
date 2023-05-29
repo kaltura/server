@@ -1,4 +1,11 @@
 # Scorpius-19.10.0
+## Add permission to EP analytics role ##
+* Issue Type: Task
+* Issue ID: PLAT-24276
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_permission_to_ep_analytics_user_role.php
+
 ## Add Zoom server-to-server app type support
 - Issue Type: Task
 - Issue ID: PLAT-24271
