@@ -3,7 +3,6 @@
 * Issue Type: Task
 * Issue ID: PLAT-24276
 
-Add permission to EP analytics role
 ### Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_permission_to_ep_analytics_user_role.php
 
