@@ -1,4 +1,14 @@
 # Scorpius-19.10.0
+## Supporting the Reset Password dynamic Email workflow for EP
+* Issue Type: Task
+* Issue ID: PLAT-24095
+
+### Configuration
+* Add to map `dynamic_email_contents` the following: (replace APP_NUM with the number of the supported app`s enum - not as a string)
+
+```
+dynamic_email_supported_apps = APP_NUM
+```
 ## Add permission to allow setting SSO per user ##
 - Issue Type: Story
 - Issue ID: PLAT-24238
