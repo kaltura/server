@@ -11,7 +11,7 @@ Enable plugin:
 
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
-  php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_sessionCuePoint_permission.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_sessionCuePoint_permission.php
 
 ## Supporting the Reset Password dynamic Email workflow for EP
 * Issue Type: Task
