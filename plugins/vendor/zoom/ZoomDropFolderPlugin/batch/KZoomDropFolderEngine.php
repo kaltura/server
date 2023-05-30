@@ -551,6 +551,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			throw new kExternalException(KalturaDropFolderErrorCode::MISSING_CONFIG, DropFolderPlugin::MISSING_CONFIG_MESSAGE);
 		}
 
+		//If the token will be expired during the processing (in $expiryExtraGraceTime seconds), sleep $expiryExtraGraceTime and refresh token
+		$expiryExtraGraceTime = 3;
+		if(kZoomTokens::isTokenExpired($dropFolder->accessExpiresIn, $expiryExtraGraceTime))
+		{
+			sleep($expiryExtraGraceTime);
+			$dropFolder = $this->dropFolderPlugin->dropFolder->get($data->dropFolderId);
+		}
+
 		$zoomBaseUrl = $dropFolder->baseURL;
 		$entry = KBatchBase::$kClient->baseEntry->get($dropFolderFile->parentEntryId);
 		switch ($data->contentMatchPolicy)

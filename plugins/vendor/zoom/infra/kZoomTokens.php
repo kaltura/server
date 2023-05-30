@@ -20,9 +20,9 @@ class kZoomTokens
 		$this->zoomAuthType = $zoomAuthType;
 	}
 
-	public static function isTokenExpired($expiresIn)
+	public static function isTokenExpired($expiresIn, $expiryExtraGraceTime = 0)
 	{
-		if ($expiresIn <= time() +
+		if ($expiresIn <= time() + $expiryExtraGraceTime +
 			kconf::getArrayValue('tokenExpiryGrace', ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP, 600))
 		{
 			return true;
