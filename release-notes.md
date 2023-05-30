@@ -1,4 +1,18 @@
 # Scorpius-19.10.0
+## Session Cue Point plugin ##
+- Issue Type: Task
+- Issue ID: PLAT-24275
+
+### Configuration ###
+Enable plugin:
+
+	To enable this plugin add the following to your plugins.ini file:
+	- SessionCuePoint
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_sessionCuePoint_permission.php
+
 ## Allow Theme Editor
 * Issue Type: Task
 * Issue ID: PLAT-24277
@@ -11,6 +25,7 @@ moduls.themeEditor.label = "Enable Theme Editor"
 moduls.themeEditor.permissionName = FEATURE_THEME_EDITOR_PERMISSION
 moduls.themeEditor.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
+
 ## Supporting the Reset Password dynamic Email workflow for EP
 * Issue Type: Task
 * Issue ID: PLAT-24095
