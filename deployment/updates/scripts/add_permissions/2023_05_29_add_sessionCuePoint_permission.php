@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * Add permissions to add sessionCuePoint
+ * @subpackage scorpius.roles_and_permissions
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
