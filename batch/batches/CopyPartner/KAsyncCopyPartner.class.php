@@ -12,8 +12,8 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	
 	protected $fromPartnerId;
 	protected $toPartnerId;
-	protected $entryIdsMap = array();
-	protected $staticPlaylistToEntriesMap = array();
+	protected $entryIdsMap;
+	protected $staticPlaylistToEntriesMap;
 	
 	const DUPLICATE_CATEGORY = 'DUPLICATE_CATEGORY';
 	
@@ -52,6 +52,9 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 
 		$this->fromPartnerId = $jobData->fromPartnerId;
 		$this->toPartnerId = $jobData->toPartnerId;
+		
+		$this->entryIdsMap = array();
+		$this->staticPlaylistToEntriesMap = array();
 		
 		$this->copyCategories();
 		$this->copyUiConfs();
@@ -251,7 +254,9 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			
 			$staticPlaylist = new KalturaPlaylist();
 			$staticPlaylist->playlistContent = (implode(',', $toEntryIds));
+			self::impersonate($this->toPartnerId);
 			$this->getClient()->playlist->update($staticPlaylistId, $staticPlaylist);
+			self::unimpersonate();
 		}
 	}
 	
