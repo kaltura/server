@@ -1108,6 +1108,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		elseif ($permission->getStatus() == PermissionStatus::BLOCKED)
 		{
 			self::disableRecycleBinScheduledTaskProfile($permission->getPartnerId());
+			self::emptyRecycleBin($permission->getPartnerId());
 		}
 	}
 	
@@ -1163,6 +1164,13 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$c->addAnd(ScheduledTaskProfilePeer::SYSTEM_NAME, self::RECYCLE_BIN_CLEANUP, Criteria::EQUAL);
 		$c->addAnd(ScheduledTaskProfilePeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 		return $c;
+	}
+	
+	protected static function emptyRecycleBin($partnerId)
+	{
+		$filter = new entryFilter();
+		$filter->setDisplayInSearchEquel(EntryDisplayInSearchType::RECYCLED);
+		kJobsManager::addDeleteJob($partnerId, DeleteObjectType::ENTRY, $filter);
 	}
 	
 	private static function markPartnerRoleCacheDirty($partnerId)
