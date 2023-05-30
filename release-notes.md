@@ -1,4 +1,11 @@
 # Scorpius-19.10.0
+## Static playlist missing entries after partner cloning ##
+- Issue Type: Bug
+- Issue ID: PLAT-24232
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_05_29_playlist_get_and_update.php
+
 ## Session Cue Point plugin ##
 - Issue Type: Task
 - Issue ID: PLAT-24275
