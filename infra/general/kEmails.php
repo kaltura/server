@@ -62,11 +62,22 @@ class kEmails
 		{
 			return null;
 		}
-		$rolesArrayFromDynamicMap = explode(',', kConf::get(self::DYNAMIC_EMAIL_ROLE_NAMES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null));
-		$appSupportingDynamicEmailContents = explode(',', kConf::get(self::DYNAMIC_EMAIL_SUPPORTED_APPS, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null));
+		$dynamicEmailRoleNames = kConf::get(self::DYNAMIC_EMAIL_ROLE_NAMES, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+		if (!$dynamicEmailRoleNames)
+		{
+			return null;
+		}
+		$rolesArrayFromDynamicMap = explode(',', $dynamicEmailRoleNames);
+		
+		$appSupportingDynamicEmailContents = array();
+		$dynamicEmailSupportedApps = kConf::get(self::DYNAMIC_EMAIL_SUPPORTED_APPS, kConfMapNames::DYNAMIC_EMAIL_CONTENTS, null);
+		if ($dynamicEmailSupportedApps)
+		{
+			$appSupportingDynamicEmailContents = explode(',', $dynamicEmailSupportedApps);
+		}
 		$rolesArrayFromUser = explode(',', $userRoleNames);
 		$intersectingRoles = array_intersect($rolesArrayFromDynamicMap, $rolesArrayFromUser);
-		if($intersectingRoles)
+		if ($intersectingRoles)
 		{
 			return $intersectingRoles[0];
 		}
