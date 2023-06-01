@@ -10,6 +10,8 @@
 require_once(dirname(__FILE__) . '/../../../vendor/aws/aws-autoloader.php');
 require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
 require_once(dirname(__FILE__) . '/../RefreshableRole.class.php');
+require_once(dirname(__FILE__) . '/../RefreshableWebIdentityRole.class.php');
+
 
 use Aws\S3\S3Client;
 use Aws\Sts\StsClient;
@@ -38,6 +40,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
 	const DEFAULT_S3_APP_NAME = "Kaltura-Server";
+	const WEB_IDENTITY_TOKEN_FILE_ENV_NAME = "AWS_WEB_IDENTITY_TOKEN_FILE";
+	const IRSA_ROLE_ARN_ENV_NAME = "AWS_ROLE_ARN";
+
 	
 	protected $filesAcl;
 	protected $s3Region;
@@ -58,6 +63,10 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $retriesNum;
 	
 	protected $s3Arn;
+
+	protected $irsaRoleArn;
+
+	protected $webIdentityTokenFile;
 	
 	// instances of this class should be created usign the 'getInstance' of the 'kLocalFileSystemManger' class
 	public function __construct(array $options = null)
@@ -65,6 +74,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		parent::__construct($options);
 		
 		$arnRole = getenv(self::S3_ARN_ROLE_ENV_NAME);
+		$envWebIdentityTokenFile = getenv(self::WEB_IDENTITY_TOKEN_FILE_ENV_NAME);
+		$envIrsaRoleArn = getenv(self::IRSA_ROLE_ARN_ENV_NAME);
+
 		if(!$options || (is_array($options) && !count($options)))
 		{
 			$options = kConf::get('storage_options', 'cloud_storage', null);
@@ -84,6 +96,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
 			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 			$this->userAgentRegex = isset($options['userAgentRegex']) ? $options['userAgentRegex'] : null;
+			$this->webIdentityTokenFile = isset($options['webIdentityTokenFile']) ? $options['webIdentityTokenFile'] : $envWebIdentityTokenFile;
+			$this->irsaRoleArn = isset($options['irsaRoleArn']) ? $options['irsaRoleArn'] : $envIrsaRoleArn;
+
 		}
 		
 		$this->userAgentPartner = isset($options['userAgentPartner']) ? $options['userAgentPartner'] : "Kaltura";
@@ -153,7 +168,24 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	{
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
 		
-		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
+		$roleRefresh = null;
+
+		if($this->webIdentityTokenFile) {
+				$roleRefresh = new RefreshableWebIdentityRole(new Credentials('', '', '', 1));
+				$webIdentityToken = file_get_contents($this->webIdentityTokenFile, false);
+				if(!$webIdentityToken)
+				{
+						self::safeLog('Failed to read AWS Web Identity Token file!');
+						return false;
+				}
+
+				$roleRefresh->setWebIdentityToken($webIdentityToken);
+				$roleRefresh->setIRSARoleArn($this->irsaRoleArn);
+		}
+		else {
+				$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
+		}
+
 		$roleRefresh->setRoleArn($this->s3Arn);
 		$roleRefresh->setS3Region($this->s3Region);
 		
