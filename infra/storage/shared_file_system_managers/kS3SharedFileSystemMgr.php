@@ -171,7 +171,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$roleRefresh = null;
 
 		if($this->webIdentityTokenFile) {
-				self::safeLog('READING STS TOKEN FILE');
 				$roleRefresh = new RefreshableWebIdentityRole(new Credentials('', '', '', 1));
 				$webIdentityToken = file_get_contents($this->webIdentityTokenFile, false);
 				if(!$webIdentityToken)
