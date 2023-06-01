@@ -112,6 +112,7 @@ class RefreshableWebIdentityRole extends AbstractRefreshableCredentials
         {
                 $this->irsaRoleArn = $irsaRoleArn;
         }
+        
         public function setWebIdentityToken($webIdentityToken)
         {
                 $this->webIdentityToken = $webIdentityToken;
