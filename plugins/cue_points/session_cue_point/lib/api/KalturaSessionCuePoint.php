@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package plugins.sessionCuePoint
  * @subpackage api.objects
@@ -8,17 +9,15 @@ class KalturaSessionCuePoint extends KalturaCuePoint
 	/**
 	 * @var string
 	 * @filter like,mlikeor,mlikeand
-	 * @requiresPermission insert,update
 	 */
 	public $name;
 	
 	/**
-	 * @var int 
+	 * @var int
 	 * @filter gte,lte,order
-	 * @requiresPermission insert,update
 	 */
 	public $endTime;
-
+	
 	public function __construct()
 	{
 		$this->cuePointType = SessionCuePointPlugin::getApiValue(SessionCuePointType::SESSION);
@@ -67,7 +66,7 @@ class KalturaSessionCuePoint extends KalturaCuePoint
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validateEndTime($sourceObject);
-			
+		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
