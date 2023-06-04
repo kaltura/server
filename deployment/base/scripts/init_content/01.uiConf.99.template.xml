@@ -30,4 +30,19 @@
 			<config path="ui_conf/html5Player.json" />
 		</uiConf>
 	</request>
+	<request service="uiConf" action="add">
+		<uiConf objectType="KalturaUiConf">
+			<objType>1</objType>
+			<name>V7 Player</name>
+			<width>528</width>
+			<height>327</height>
+			<swfUrl>/</swfUrl>
+			<html5Url></html5Url>
+			<useCdn>1</useCdn>
+			<tags>autodeploy,kalturaPlayerJs,player,ovp</tags>
+			<confvars>{"kaltura-ovp-player":"{latest}", "playkit-flash":"{latest}"}</confvars>
+			<creationMode>2</creationMode>
+			<config path="ui_conf/V7Player.json" />
+		</uiConf>
+	</request>
 </xml>
