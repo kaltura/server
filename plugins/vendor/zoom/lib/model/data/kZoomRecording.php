@@ -65,6 +65,43 @@ class kZoomRecording implements iZoomObject
 
 			$this->recordingFiles[$kZoomRecordingFile->recordingStart][$kZoomRecordingFile->recordingFileType][] = $kZoomRecordingFile;
 		}
+		$this->sortZoomRecordingFilesByRecordingTypes();
+	}
+
+	/**
+	 * $this->recordingFiles has the following structure:
+	 * [start_time][file_type][recording_files]
+	 * example:
+	 * 1685260915 => video => [file1, file2]
+	 *            => audio => [file1, file2]
+	 * 1685261000 => video => [file1, file2, file3]
+	 * note: order is important only for video file types since it affects parent-child entry assignment
+	*/
+	public function sortZoomRecordingFilesByRecordingTypes()
+	{
+		foreach ($this->recordingFiles as $recordingStart => $fileTypeRecordingFilesArray)
+		{
+			if(isset($this->recordingFiles[$recordingStart][kRecordingFileType::VIDEO]))
+			{
+				$this->sortZoomRecordingFilesByValuesArray($this->recordingFiles[$recordingStart][kRecordingFileType::VIDEO], ZoomHelper::ORDER_RECORDING_TYPE);
+			}
+		}
+	}
+
+	public static function sortZoomRecordingFilesByValuesArray(&$zoomRecordingFiles, array $valuesArray)
+	{
+		$orderedRecordingFiles = array();
+		foreach ($valuesArray as $value)
+		{
+			foreach ($zoomRecordingFiles as $zoomRecordingFile)
+			{
+				if ($zoomRecordingFile->recordingType == $value)
+				{
+					$orderedRecordingFiles[] = $zoomRecordingFile;
+				}
+			}
+		}
+		$zoomRecordingFiles = $orderedRecordingFiles;
 	}
 
 	public function parseType($recordingType)

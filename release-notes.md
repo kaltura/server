@@ -1,3 +1,84 @@
+# Scorpius-19.10.0
+## Static playlist missing entries after partner cloning ##
+- Issue Type: Bug
+- Issue ID: PLAT-24232
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_05_29_playlist_get_and_update.php
+
+## Session Cue Point plugin ##
+- Issue Type: Task
+- Issue ID: PLAT-24275
+
+### Configuration ###
+Enable plugin:
+
+	To enable this plugin add the following to your plugins.ini file:
+	- SessionCuePoint
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_sessionCuePoint_permission.php
+
+## Allow Theme Editor
+* Issue Type: Task
+* Issue ID: PLAT-24277
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.themeEditor.enabled = true
+moduls.themeEditor.permissionType = 2
+moduls.themeEditor.label = "Enable Theme Editor"
+moduls.themeEditor.permissionName = FEATURE_THEME_EDITOR_PERMISSION
+moduls.themeEditor.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Supporting the Reset Password dynamic Email workflow for EP
+* Issue Type: Task
+* Issue ID: PLAT-24095
+
+### Configuration
+* Add to map `dynamic_email_contents` the following: (replace APP with the value of the supported app`s enum in resetPassLinkType.php)
+
+```
+dynamic_email_supported_apps = APP
+```
+
+## Add permission to EP analytics role ##
+* Issue Type: Task
+* Issue ID: PLAT-24276
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_permission_to_ep_analytics_user_role.php
+
+## Add Zoom server-to-server app type support
+- Issue Type: Task
+- Issue ID: PLAT-24271
+
+### Configuration ###
+Add the following to vendor.ini
+```
+[ZoomAccount_@ZoomAccountId@_@partnerId@]
+clientId = @ZoomClientID@
+clientSecret = @ZoomClientSecret@
+ZoomBaseUrl = https://zoom.us
+```
+
+## Add permission to allow setting SSO per user ##
+- Issue Type: Story
+- Issue ID: PLAT-24238
+
+### Configuration ###
+Add the following to admin.ini
+```
+moduls.loginSSO.enabled = true
+moduls.loginSSO.permissionType = 2
+moduls.loginSSO.label = "Allow setting SSO per user"
+moduls.loginSSO.permissionName = ALLOW_SSO_PER_USER
+moduls.loginSSO.group = GROUP_LOGIN_SSO_OPTIONS
+moduls.loginSSO.skip = true
+```
+
 # Scorpius-19.9.0
 ## Add Recycle Bin batch for auto deletion
 * Issue Type: Task

@@ -28,6 +28,7 @@ class kBroadcastUrlManager
 
 	const LIVE_ENCRYPTION_KEY_PARAM = 'live_security_key';
 	const LIVE_SRT_IV_PARAM = 'stream_id_security_key';
+	const LIVE_BACKEND_ID_PARAM = 'backend_id';
 
 	
 	protected $partnerId;
@@ -96,7 +97,9 @@ class kBroadcastUrlManager
 	protected static function getLiveIdForHost($entry)
 	{
 		$entryId = str_replace('1_', '', $entry->getId());
-		return str_replace('_', '-', $entryId); // dns resolve don't handle well underscore in host
+		$liveId = str_replace('_', '-', $entryId); // dns resolve don't handle well underscore in host
+
+		return self::addLiveBackendId($liveId);
 	}
 	
 	protected function getHostname ($dc, $primary, $entry, $protocol)
@@ -271,10 +274,19 @@ class kBroadcastUrlManager
 		return kDeliveryUtils::urlsafeB64Encode($encryptedToken);
 	}
 
+	protected static function addLiveBackendId($id)
+	{
+		$backendId = kConf::get(self::LIVE_BACKEND_ID_PARAM, kConfMapNames::LIVE_SETTINGS, null);
+
+		return !is_null($backendId) ? "$backendId-$id" : $id;
+	}
+
 	public function createSrtStreamId(LiveStreamEntry $entry, $sessionType)
 	{
 		$streamId = '#:::';
-		$streamId .= 'e=' . $entry->getId() . ',st=' . $sessionType;
+
+		$liveId = self::addLiveBackendId($entry->getId());
+		$streamId .= 'e=' . $liveId . ',st=' . $sessionType;
 
 		$pass = $entry->getSrtPass();
 		if ($pass)

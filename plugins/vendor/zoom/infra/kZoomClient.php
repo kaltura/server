@@ -206,7 +206,7 @@ class kZoomClient extends kVendorClient
 		$curlWrapper->setOpts($options);
 		
 		$url = $this->generateContextualUrl($apiPath);
-		$token = $this->getValidAccessToken();
+		$token = $this->accessToken;
 
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
 			"authorization: Bearer {$token}",
@@ -229,27 +229,6 @@ class kZoomClient extends kVendorClient
 	protected function generateContextualUrl($apiPath)
 	{
 		return $this->baseURL . $apiPath . '?';
-	}
-
-	public function getValidAccessToken()
-	{
-		switch ($this->zoomAuthType)
-		{
-			case kZoomAuthTypes::SERVER_TO_SERVER:
-				if (kZoomTokens::isTokenExpired($this->accessExpiresIn))
-				{
-					$tokens = $this->zoomTokensHelper->generateServerToServerToken();
-					$this->accessToken = $tokens[kZoomTokens::ACCESS_TOKEN];
-					$this->accessExpiresIn = time() + $tokens[kZoomTokens::EXPIRES_IN] - kTimeConversion::MINUTE * 2;
-				}
-				break;
-
-			case kZoomAuthTypes::OAUTH:
-				// do not renew access token without saving the refresh token on the integration
-			default:
-		}
-
-		return $this->accessToken;
 	}
 	
 	public function getRefreshToken()

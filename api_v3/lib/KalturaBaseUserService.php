@@ -522,6 +522,10 @@ class KalturaBaseUserService extends KalturaBaseService
 					$invalidPasswordStructureMessage = $partner->getInvalidPasswordStructureMessage();
 				throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID,$invalidPasswordStructureMessage);
 			}
+			else if ($code == kUserException::SETTING_SSO_PER_USER_NOT_ALLOWED)
+			{
+				throw new KalturaAPIException(KalturaErrors::SETTING_SSO_PER_USER_NOT_ALLOWED);
+			}
 			throw $e;
 		}
 		catch (kPermissionException $e)

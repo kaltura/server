@@ -44,6 +44,7 @@ class ScheduledTaskProfileFilter extends baseObjectFilter
 			"_gte_last_execution_started_at",
 			"_lte_last_execution_started_at",
 			"_lteornull_last_execution_started_at",
+			"_in_object_filter_engine_type",
 		), NULL);
 		
 		$this->allowed_order_fields = array("created_at", "updated_at", "id");
