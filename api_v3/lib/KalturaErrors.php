@@ -806,6 +806,7 @@ class KalturaErrors extends APIErrors
 	 */
 
 	const CANNOT_CREATE_CLIP_FLAVOR_JOB = "CANNOT_CREATE_CLIP_FLAVOR_JOB;;cannot create clip, flavor convert batch job returned as null";
+	const CANNOT_COMPLETE_CLIP_CONCAT_JOB = "CANNOT_COMPLETE_CLIP_CONCAT_JOB;;cannot complete clip & concat batch job, since one of the children jobs failed or was aborted";
 
 	/*
 	 * Conf Control
