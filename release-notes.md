@@ -1,3 +1,11 @@
+# Scorpius-19.11.0
+## update Game Services partner permissions##
+- Issue Type: Story
+- Issue ID: PLAT-24279
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_06_06_update_game_services_partner_permissions.php
+
 # Scorpius-19.10.0
 ## Static playlist missing entries after partner cloning ##
 - Issue Type: Bug
