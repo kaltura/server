@@ -1,5 +1,5 @@
 # Scorpius-19.11.0
-## update Gamine-Services partner permissions##
+## update Game Services partner permissions##
 - Issue Type: Story
 - Issue ID: PLAT-24279
 
