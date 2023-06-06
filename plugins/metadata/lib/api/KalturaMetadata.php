@@ -8,7 +8,7 @@ class KalturaMetadata extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * 
-	 * @var int
+	 * @var bigint
 	 * @readonly
 	 */
 	public $id;
