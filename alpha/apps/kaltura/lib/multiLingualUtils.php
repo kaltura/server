@@ -138,7 +138,7 @@ class multiLingualUtils
 					$multiLingualMapping[$field][$languageKey] = $languageValue;
 				}
 			}
-			$missingLanguages = array_diff_key($multiLingualMapping[$field], $valueToAdd);
+			$missingLanguages = (!empty($multiLingualMapping[$field])) ? array_diff_key($multiLingualMapping[$field], $valueToAdd) : null;
 			if ($missingLanguages)
 			{
 				foreach ($missingLanguages as $languageKey => $languageValue)
@@ -261,7 +261,7 @@ class multiLingualUtils
 			}
 		}
 		
-		return array_unique($mappedLanguages)[0];
+		return empty($mappedLanguages) ? null : array_unique($mappedLanguages, SORT_REGULAR)[0];
 	}
 	
 	protected static function setRequestedLanguageStringInField(&$responseObject, $dbObject, $newMultiLingualMapping, $requestLanguage = null, KalturaDetachedResponseProfile $responseProfile = null)
