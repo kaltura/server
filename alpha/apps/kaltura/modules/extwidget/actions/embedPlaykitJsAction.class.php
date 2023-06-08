@@ -571,14 +571,24 @@ class embedPlaykitJsAction extends sfAction
 		return array($last_uiconf_config, $productVersion);
 	}
 
-	private function getConfigByVersion($version){
+	private function getConfigByVersion($version)
+	{
 		$config = array();
 		$corePackages = array();
 		$productVersion = null;
-		foreach ($this->uiConfTags as $tag) {
-			$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
-			list($versionLastUiConf,$tagVersionNumber) = $this->getLastConfig($versionUiConfs);
-			$versionConfig = json_decode($versionLastUiConf, true);
+		$loadPlayConfigFromIni = kConf::get("loadFromIni", kConfMapNames::EMBED_PLAYKIT, false);
+		foreach ($this->uiConfTags as $tag)
+		{
+			if($loadPlayConfigFromIni)
+			{
+				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);	
+			}
+			else
+			{
+				$versionUiConfs = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
+				list($versionLastUiConf,$tagVersionNumber) = $this->getLastConfig($versionUiConfs);
+				$versionConfig = json_decode($versionLastUiConf, true);
+			}
 			if (is_array($versionConfig)) {
 				$config = array_merge($config, $versionConfig);
 			}
@@ -588,6 +598,13 @@ class embedPlaykitJsAction extends sfAction
 			}
 		}
 		return array($config,$productVersion,$corePackages);
+	}
+
+	private function getVersionMap($tag, $version)
+	{
+		$versionLastUiConf = kConf::get($tag."_".$version, kConfMapNames::EMBED_PLAYKIT, array());
+		$tagVersionNumber = kConf::get($tag."_".$version."_tagVersionNumber", kConfMapNames::EMBED_PLAYKIT, "default");
+		return array($versionLastUiConf, $tagVersionNumber);
 	}
 
 	private function maybeAddAnalyticsPlugins()
