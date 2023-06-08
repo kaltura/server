@@ -18,6 +18,19 @@ class KalturaSessionCuePoint extends KalturaCuePoint
 	 */
 	public $endTime;
 	
+	/**
+	 * Duration in milliseconds
+	 * @var int
+	 * @filter gte,lte,order
+	 * @readonly
+	 */
+	public $duration;
+	
+	/**
+	 * @var string
+	 */
+	public $sessionOwner;
+	
 	public function __construct()
 	{
 		$this->cuePointType = SessionCuePointPlugin::getApiValue(SessionCuePointType::SESSION);
@@ -27,6 +40,8 @@ class KalturaSessionCuePoint extends KalturaCuePoint
 	(
 		"name",
 		"endTime",
+		"duration",
+		"sessionOwner",
 	);
 	
 	/* (non-PHPdoc)
@@ -57,7 +72,7 @@ class KalturaSessionCuePoint extends KalturaCuePoint
 	{
 		parent::validateForInsert($propertiesToSkip);
 		
-		$this->validateEndTime();
+		$this->validateEndTimeAndDuration($this->endTime, $this->duration);
 	}
 	
 	/* (non-PHPdoc)
@@ -65,8 +80,20 @@ class KalturaSessionCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validateEndTime($sourceObject);
+		$this->validateEndTimeAndDuration($this->endTime, $this->duration, $sourceObject);
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	public function updateEndTimeAndDuration($cuePoint)
+	{
+		if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
+		{
+			$this->endTime = $this->startTime;
+		}
+		if ($this->triggeredAt && $this->isNull('duration') && (!$cuePoint || is_null($cuePoint->getDuration())))
+		{
+			$this->duration = 0;
+		}
 	}
 }

@@ -205,52 +205,70 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	
 
 	
-	/*
-	 * @param CuePoint $cuePoint
-	 * @throw KalturaAPIException
+	/**
+	 * @param int $endTime
+	 * @param int $duration
+	 * @param CuePoint|null $cuePoint
+	 * @throws KalturaAPIException
 	 */
-	public function validateEndTime(CuePoint $cuePoint = null)
+	public function validateEndTimeAndDuration($endTime, $duration, CuePoint $cuePoint = null)
 	{
-		//setting params or default if null
-		if(is_null($this->startTime) && $cuePoint && $cuePoint->getStartTime())
+		KalturaLog::info("validate validateEndTimeAndDuration");
+		if (is_null($this->startTime) && $cuePoint && $cuePoint->getStartTime())
+		{
 			$this->startTime = $cuePoint->getStartTime();
-
-		if(is_null($this->triggeredAt) && $cuePoint && $cuePoint->getTriggeredAt())
+		}
+		if (is_null($this->triggeredAt) && $cuePoint && $cuePoint->getTriggeredAt())
+		{
 			$this->triggeredAt = $cuePoint->getTriggeredAt();
-
-		if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
-			$this->endTime = $this->startTime;
-
-		if ($this->triggeredAt && $this->isNull('duration') && (!$cuePoint || is_null($cuePoint->getDuration())))
-			$this->duration = 0;
-
-        //validate end time
-		if(!is_null($this->endTime) && $this->endTime < $this->startTime)
-			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
-
-		if($this->duration && $this->duration < 0)
-			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME, $this->parentId);
+		}
+		if ($endTime === null && $cuePoint && $cuePoint->getEndTime())
+		{
+			$endTime = $cuePoint->getEndTime();
+		}
 		
-		if($cuePoint)
+		if ($endTime && $endTime < $this->startTime)
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_CANNOT_BE_LESS_THAN_START_TIME);
+		}
+		
+		if ($duration && $duration < 0)
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::DURATION_CANNOT_BE_LESS_THAN_START_TIME);
+		}
+		
+		if ($cuePoint)
 		{
 			$dbEntry = entryPeer::retrieveByPK($cuePoint->getEntryId());
 		}
-		else //add
-		{ 
+		else
+		{
 			$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		}
 		if (!$dbEntry)
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
-		
-		if($dbEntry->getType() != entryType::LIVE_STREAM
-			&& $dbEntry->getLengthInMsecs())
 		{
-			if($this->endTime && $dbEntry->getLengthInMsecs() < $this->endTime)
-				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->endTime, $dbEntry->getLengthInMsecs());
-				
-			if($this->duration && $dbEntry->getLengthInMsecs() < $this->duration)
-				throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $this->duration, $dbEntry->getLengthInMsecs());
-		}	
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+		}
+		
+		if ($dbEntry->getType() == entryType::LIVE_STREAM || !$dbEntry->getLengthInMsecs())
+		{
+			return;
+		}
+		
+		if ($endTime && $dbEntry->getLengthInMsecs() < $endTime)
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::END_TIME_IS_BIGGER_THAN_ENTRY_END_TIME, $endTime, $dbEntry->getLengthInMsecs());
+		}
+		if ($duration && $dbEntry->getLengthInMsecs() < $duration)
+		{
+			throw new KalturaAPIException(KalturaCuePointErrors::DURATION_IS_BIGGER_THAN_ENTRY_DURATION, $duration, $dbEntry->getLengthInMsecs());
+		}
+		
+		$this->updateEndTimeAndDuration($cuePoint);
+	}
+	
+	public function updateEndTimeAndDuration($cuePoint)
+	{
 	}
 	
 	/*
