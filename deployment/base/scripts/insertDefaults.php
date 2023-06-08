@@ -70,7 +70,6 @@ function handleDirectory($dirName)
 	}
 }
 
-
 function handleFile($filePath)
 {
 	$con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
@@ -165,6 +164,11 @@ function handleFile($filePath)
 				$evaluator->setCode($evalString);
 				$value = $evaluator->getValue();
 				KalturaLog::info("Evaluated property value: $value");
+			}
+
+			if (preg_match('/(adminSecret|secret)/', $attributeName, $matches))
+			{
+				$value = md5(KCryptoWrapper::random_pseudo_bytes(16));
 			}
 
 			$setter = "set{$attributeName}";
