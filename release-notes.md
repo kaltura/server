@@ -1,5 +1,19 @@
 # Scorpius-19.11.0
-## update Game Services partner permissions##
+## Align database schema for bigint usage and index definition ##
+* Issue Type: Task
+* Issue ID: VCP-13172
+
+Note: This is a non mandatory performance update.
+
+### Deployment Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_bigint_id_metadata.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_bigint_id_user_entry.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_bigint_int_id_cue_point.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_bigint_int_id_upload_token.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_index_kvote_entry_rank_index.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_index_scheduler_worker_configured_id.sql
+
+## update Game Services partner permissions ##
 - Issue Type: Story
 - Issue ID: PLAT-24279
 
