@@ -2232,7 +2232,7 @@ CREATE TABLE IF NOT EXISTS `scheduler_worker` (
   `statuses` varchar(255) NOT NULL,
   `last_status` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `configured_id` (`configured_id`)
+  KEY `configured_id` (`configured_id`,`scheduler_configured_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `server_node` (
