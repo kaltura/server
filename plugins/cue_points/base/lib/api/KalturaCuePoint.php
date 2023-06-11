@@ -252,6 +252,7 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 		
 		if ($dbEntry->getType() == entryType::LIVE_STREAM || !$dbEntry->getLengthInMsecs())
 		{
+			$this->updateEndTimeAndDuration($cuePoint);
 			return;
 		}
 		
