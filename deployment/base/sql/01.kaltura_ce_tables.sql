@@ -581,7 +581,7 @@ CREATE TABLE IF NOT EXISTS `conversion_profile_2` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `cue_point` (
-  `int_id` int(11) NOT NULL AUTO_INCREMENT,
+  `int_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id` varchar(20) NOT NULL DEFAULT '',
   `parent_id` varchar(255) DEFAULT NULL,
   `entry_id` varchar(31) NOT NULL,
