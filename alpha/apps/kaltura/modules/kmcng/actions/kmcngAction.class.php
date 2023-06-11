@@ -120,7 +120,7 @@ class kmcngAction extends kalturaAction
 			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
 
 
-		$loadPlayConfigFromIni = kConf::get("loadFromIni", kConfMapNames::EMBED_PLAYKIT, false);
+		$loadPlayConfigFromIni = kConf::get("loadFromIni", kConfMapNames::EMBED_PLAYKIT, null);
 
 		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_VERSIONS_TAG, "latest");
 		list($playerBetaVersionsMapVersionConfig, $playerBetaConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_VERSIONS_TAG, "beta");
@@ -275,7 +275,8 @@ class kmcngAction extends kalturaAction
 		if($loadPlayConfigFromIni)
 		{
 			$versionConfig = json_encode(kConf::get($tag."_".$version, kConfMapNames::EMBED_PLAYKIT, array()), true);
-			$confVars = json_encode(kConf::get($tag."_".$version."_tagVersionNumber", array("version" => kConfMapNames::EMBED_PLAYKIT, "")), array("version" => ""));
+			$versionTag = kConf::get($tag."_".$version."_tagVersionNumber", kConfMapNames::EMBED_PLAYKIT, "");
+			$confVars = json_encode(array("version" => $versionTag));
 		}
 		else
 		{

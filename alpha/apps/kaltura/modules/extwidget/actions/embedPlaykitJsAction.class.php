@@ -576,7 +576,7 @@ class embedPlaykitJsAction extends sfAction
 		$config = array();
 		$corePackages = array();
 		$productVersion = null;
-		$loadPlayConfigFromIni = kConf::get("loadFromIni", kConfMapNames::EMBED_PLAYKIT, false);
+		$loadPlayConfigFromIni = kConf::get("loadFromIni", kConfMapNames::EMBED_PLAYKIT, null);
 		foreach ($this->uiConfTags as $tag)
 		{
 			if($loadPlayConfigFromIni)
@@ -589,6 +589,7 @@ class embedPlaykitJsAction extends sfAction
 				list($versionLastUiConf,$tagVersionNumber) = $this->getLastConfig($versionUiConfs);
 				$versionConfig = json_decode($versionLastUiConf, true);
 			}
+
 			if (is_array($versionConfig)) {
 				$config = array_merge($config, $versionConfig);
 			}
