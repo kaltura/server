@@ -604,7 +604,7 @@ class embedPlaykitJsAction extends sfAction
 	private function getVersionMap($tag, $version)
 	{
 		$versionLastUiConf = kConf::get($tag."_".$version, kConfMapNames::EMBED_PLAYKIT, array());
-		$tagVersionNumber = kConf::get($tag."_".$version."_tagVersionNumber", kConfMapNames::EMBED_PLAYKIT, "default");
+		$tagVersionNumber = kConf::get($tag."_".$version."_productVersion", kConfMapNames::EMBED_PLAYKIT, "");
 		return array($versionLastUiConf, $tagVersionNumber);
 	}
 

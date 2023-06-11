@@ -275,7 +275,7 @@ class kmcngAction extends kalturaAction
 		if($loadPlayConfigFromIni)
 		{
 			$versionConfig = json_encode(kConf::get($tag."_".$version, kConfMapNames::EMBED_PLAYKIT, array()), true);
-			$versionTag = kConf::get($tag."_".$version."_tagVersionNumber", kConfMapNames::EMBED_PLAYKIT, "");
+			$versionTag = kConf::get($tag."_".$version."_productVersion", kConfMapNames::EMBED_PLAYKIT, "");
 			$confVars = json_encode(array("version" => $versionTag));
 		}
 		else
@@ -285,8 +285,8 @@ class kmcngAction extends kalturaAction
 			$uiConfVersion = (is_array($uiConfVersions) && reset($uiConfVersions)) ? reset($uiConfVersions) : null;
 			if($uiConfVersion)
 			{
-				$versionConfig = isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '';
-				$confVars = isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : '';
+				$versionConfig = isset($uiConfVersion) ? $uiConfVersion->getConfig() : '';
+				$confVars = isset($uiConfVersion) ? $uiConfVersion->getConfVars() : '';
 			}
 		}
 

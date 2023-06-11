@@ -177,9 +177,8 @@ class kmc4Action extends kalturaAction
 			$this->content_uiconf_studio_v3 = (is_array($this->content_uiconfs_studio_v3) && reset($this->content_uiconfs_studio_v3)) ? reset($this->content_uiconfs_studio_v3) : null;
 		}
 
-		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
-		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
-		$this->content_uiconf_player_v3_versions = (is_array($this->content_uiconfs_player_v3_versions) && reset($this->content_uiconfs_player_v3_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
+		$loadPlayConfigFromIni = kConf::get("loadFromIni", kConfMapNames::EMBED_PLAYKIT, null);
+		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_VERSIONS_TAG, "latest");
 
 		$this->liveAUiConf = uiConfPeer::getUiconfByTagAndVersion(self::LIVE_ANALYTICS_UICONF_TAG, kConf::get("liveanalytics_version"));
 		$this->content_uiconfs_livea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
@@ -242,7 +241,7 @@ class kmc4Action extends kalturaAction
                 'version'				=> $studio_v3_version,
                 'uiConfID'				=> isset($this->content_uiconf_studio_v3) ? $this->content_uiconf_studio_v3->getId() : '',
                 'config'				=> isset($this->content_uiconf_studio_v3) ? $this->content_uiconf_studio_v3->getConfig() : '',
-                'playerVersionsMap'		=> isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
+                'playerVersionsMap'		=> $playerVersionsMapVersionConfig,
                 'showFlashStudio'		=> $showFlashStudio,
                 'showHTMLStudio'		=> $showHTMLStudio,
                 'showStudioV3'		    => $showStudioV3,
@@ -285,6 +284,32 @@ class kmc4Action extends kalturaAction
 		} else {
 			return $url;
 		}
+	}
+
+	private function getConfigByTagAndVersion($loadPlayConfigFromIni, $tag, $version)
+	{
+		$versionConfig = json_encode(array());
+		$confVars = json_encode(array());
+
+		if($loadPlayConfigFromIni)
+		{
+			$versionConfig = json_encode(kConf::get($tag."_".$version, kConfMapNames::EMBED_PLAYKIT, array()), true);
+			$versionTag = kConf::get($tag."_".$version."_tagVersionNumber", kConfMapNames::EMBED_PLAYKIT, "");
+			$confVars = json_encode(array("version" => $versionTag));
+		}
+		else
+		{
+			$uiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
+			$uiConfVersions = isset($uiConf) ? array_values($uiConf) : null;
+			$uiConfVersion = (is_array($uiConfVersions) && reset($uiConfVersions)) ? reset($uiConfVersions) : null;
+			if($uiConfVersion)
+			{
+				$versionConfig = isset($uiConfVersion) ? $uiConfVersion->getConfig() : '';
+				$confVars = isset($uiConfVersion) ? $uiConfVersion->getConfVars() : '';
+			}
+		}
+
+		return array($versionConfig, $confVars);
 	}
 
 }
