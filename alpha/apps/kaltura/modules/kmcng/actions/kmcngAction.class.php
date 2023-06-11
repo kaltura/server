@@ -120,13 +120,13 @@ class kmcngAction extends kalturaAction
 			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
 
 
-		$loadPlayConfigFromIni = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
+		$loadVersionMapFromKConf = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
 
-		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_VERSIONS_TAG, "latest");
-		list($playerBetaVersionsMapVersionConfig, $playerBetaConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_VERSIONS_TAG, "beta");
+		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_VERSIONS_TAG, "latest");
+		list($playerBetaVersionsMapVersionConfig, $playerBetaConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_VERSIONS_TAG, "beta");
 
-		list($playerOvpVersionsMapVersionConfig, $playerOvpConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_OVP_VERSIONS_TAG, "latest");
-		list($playerBetaOvpVersionsMapVersionConfig, $playerBetaOvpConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_OVP_VERSIONS_TAG, "beta");
+		list($playerOvpVersionsMapVersionConfig, $playerOvpConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_OVP_VERSIONS_TAG, "latest");
+		list($playerBetaOvpVersionsMapVersionConfig, $playerBetaOvpConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_OVP_VERSIONS_TAG, "beta");
 
 		$studio = null;
 		$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
@@ -267,12 +267,12 @@ class kmcngAction extends kalturaAction
 		return $config;
 	}
 
-	private function getConfigByTagAndVersion($loadPlayConfigFromIni, $tag, $version)
+	private function getConfigByTagAndVersion($loadVersionMapFromKConf, $tag, $version)
 	{
 		$versionConfig = json_encode(array());
 		$confVars = json_encode(array());
 
-		if($loadPlayConfigFromIni)
+		if($loadVersionMapFromKConf)
 		{
 			$versionConfig = json_encode(kConf::get($tag."_".$version, kConfMapNames::EMBED_PLAYKIT, array()), true);
 			$versionTag = kConf::get($tag."_".$version."_productVersion", kConfMapNames::EMBED_PLAYKIT, "");

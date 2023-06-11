@@ -177,8 +177,8 @@ class kmc4Action extends kalturaAction
 			$this->content_uiconf_studio_v3 = (is_array($this->content_uiconfs_studio_v3) && reset($this->content_uiconfs_studio_v3)) ? reset($this->content_uiconfs_studio_v3) : null;
 		}
 
-		$loadPlayConfigFromIni = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
-		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_VERSIONS_TAG, "latest");
+		$loadVersionMapFromKConf = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
+		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_VERSIONS_TAG, "latest");
 
 		$this->liveAUiConf = uiConfPeer::getUiconfByTagAndVersion(self::LIVE_ANALYTICS_UICONF_TAG, kConf::get("liveanalytics_version"));
 		$this->content_uiconfs_livea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
@@ -286,12 +286,12 @@ class kmc4Action extends kalturaAction
 		}
 	}
 
-	private function getConfigByTagAndVersion($loadPlayConfigFromIni, $tag, $version)
+	private function getConfigByTagAndVersion($loadVersionMapFromKConf, $tag, $version)
 	{
 		$versionConfig = json_encode(array());
 		$confVars = json_encode(array());
 
-		if($loadPlayConfigFromIni)
+		if($loadVersionMapFromKConf)
 		{
 			$versionConfig = json_encode(kConf::get($tag."_".$version, kConfMapNames::EMBED_PLAYKIT, array()), true);
 			$versionTag = kConf::get($tag."_".$version."_tagVersionNumber", kConfMapNames::EMBED_PLAYKIT, "");
