@@ -120,7 +120,7 @@ class kmcngAction extends kalturaAction
 			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
 
 
-		$loadPlayConfigFromIni = kConf::get("loadFromIni", kConfMapNames::EMBED_PLAYKIT, null);
+		$loadPlayConfigFromIni = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
 
 		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_VERSIONS_TAG, "latest");
 		list($playerBetaVersionsMapVersionConfig, $playerBetaConfVars) = $this->getConfigByTagAndVersion($loadPlayConfigFromIni, self::PLAYER_V3_VERSIONS_TAG, "beta");
