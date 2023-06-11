@@ -442,6 +442,11 @@ class EntryVendorTaskService extends KalturaBaseService
 		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 		}
+
+		if($dbEntryVendorTask->getVendorPartnerId() != kCurrentContext::getCurrentPartnerId())
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		}
 		
 		if($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::PROCESSING)
 		{
