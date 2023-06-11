@@ -2539,7 +2539,7 @@ CREATE TABLE IF NOT EXISTS `upload_token` (
 
 
 CREATE TABLE IF NOT EXISTS `user_entry` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `entry_id` varchar(20) DEFAULT NULL,
   `kuser_id` int(11) NOT NULL,
   `partner_id` int(11) DEFAULT NULL,
