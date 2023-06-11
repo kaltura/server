@@ -1,4 +1,12 @@
 # Scorpius-19.11.0
+
+## Expose scheduler de-register action in batch service ##
+Issue Type: Task
+Issue ID : No-Plat
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2023_06_11_batch_service_de_register_permission.php:10
+
 ## Align database schema for bigint usage and index definition ##
 * Issue Type: Task
 * Issue ID: VCP-13172
