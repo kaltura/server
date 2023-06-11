@@ -85,6 +85,11 @@ class KGenericScheduler
 		KalturaLog::debug("Got signal [$signal] from batchMgr, setting spawnNewTasks to false");
 		$this->spawnNewTasks = false;
 	}
+
+	public function deRegisterHost()
+	{
+		$this->schedulerConfig->deRegisterScheduler();
+	}
 	
 	/**
 	 * Loads the configuration file and initializes the scheduler accordingly.
