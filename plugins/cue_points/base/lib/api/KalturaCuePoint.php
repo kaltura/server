@@ -213,7 +213,6 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	 */
 	public function validateEndTimeAndDuration($endTime, $duration, CuePoint $cuePoint = null)
 	{
-		KalturaLog::info("validate validateEndTimeAndDuration");
 		if (is_null($this->startTime) && $cuePoint && $cuePoint->getStartTime())
 		{
 			$this->startTime = $cuePoint->getStartTime();
@@ -221,10 +220,6 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 		if (is_null($this->triggeredAt) && $cuePoint && $cuePoint->getTriggeredAt())
 		{
 			$this->triggeredAt = $cuePoint->getTriggeredAt();
-		}
-		if ($endTime === null && $cuePoint && $cuePoint->getEndTime())
-		{
-			$endTime = $cuePoint->getEndTime();
 		}
 		
 		if ($endTime && $endTime < $this->startTime)

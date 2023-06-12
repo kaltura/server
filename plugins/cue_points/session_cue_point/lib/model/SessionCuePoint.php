@@ -39,7 +39,7 @@ class SessionCuePoint extends CuePoint
 		$kuser = kuserPeer::retrieveByPKNoFilter($kuserId);
 		if (!$kuser)
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			return null;
 		}
 		return $kuser->getPuserId();
 	}
