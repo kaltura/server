@@ -1222,7 +1222,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::getAndFilter(array(
 				self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR)),
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$non_engaged))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$non_engagement))),
 			self::getLongSumAggregator(self::METRIC_LIVE_NO_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_PLAY_TIME_SUM));
 
 		self::$aggregations_def[self::METRIC_LIVE_ENGAGED_USERS_COUNT] = self::getFilteredAggregator(
@@ -6416,6 +6416,8 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($result[1] as $row)
 		{
 			$curr_minute = $row[0];
+			$eng = $row[1];
+			$row[1] = self::getLiveEngLevel($eng);
 			if (!isset($existing_minutes[$curr_minute]))
 			{
 				$existing_minutes[$curr_minute] = array();
@@ -6438,7 +6440,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			else
 			{
-				$data[] = array_pad(array($minute, 'Offline'), $values_count, 0);
+				$data[] = array_pad(array($minute, 'offline'), $values_count, 0);
 				++$total_count;
 			}
 		}
@@ -6447,6 +6449,22 @@ class kKavaReportsMgr extends kKavaBase
 		$result[2] = $total_count;
 		unset($result[3]);
 	}
+
+	protected static function getLiveEngLevel($liveEng)
+	{
+		$levels = array("high", "good", "fair", "low", "non");
+		foreach ($levels as $level)
+		{
+			$engLevel = $level . "_engagement";
+			$currEngValues = array_fill_keys(self::${$engLevel}, 1);
+			if (isset($currEngValues[$liveEng]))
+			{
+				return $level;
+			}
+		}
+		return "offline";
+	}
+
 
 	protected static function getFlavorParamsHeadersArray($headers)
 	{
