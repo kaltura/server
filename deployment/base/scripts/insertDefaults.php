@@ -166,10 +166,8 @@ function handleFile($filePath)
 				KalturaLog::info("Evaluated property value: $value");
 			}
 
-			if (preg_match('/(adminSecret|secret)/', $attributeName, $matches))
-			{
-				$value = md5(KCryptoWrapper::random_pseudo_bytes(16));
-			}
+			//If needed translate token into actual values
+			translateValue($attributeName, $value);
 
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
@@ -227,6 +225,44 @@ function handleFile($filePath)
 		kMemoryManager::clearMemory();
 	}
 }
+
+/**
+ * @param $key
+ * @param $value
+ * @return void
+ */
+function translateValue($key, &$value)
+{
+	global $tokensKeysArray;
+	if(!isset($tokensKeysArray[$key]) || !preg_match($tokensKeysArray[$key][0], $value, $matches))
+	{
+		return;
+	}
+
+	$value = $tokensKeysArray[$key][1]();
+}
+
+function getRandomPseudoBytes()
+{
+	return md5(KCryptoWrapper::random_pseudo_bytes(16));
+}
+
+function getLivePackagerUrl()
+{
+	return kConf::get('live_packager_url');
+}
+
+function getVodPackagerUrl()
+{
+	return kConf::get('cdn_host_https');
+}
+
+$tokensKeysArray = array(
+	'adminSecret' => array('@.*@','getRandomPseudoBytes'),
+	'secret' => array('@.*@','getRandomPseudoBytes'),
+	'url' => array('@LIVE_PACKAGER_URL@','getLivePackagerUrl'),
+	'url' => array('@VOD_PACKAGER_URL@','getVodPackagerUrl')
+);
 
 KalturaLog::log('Done.');
 exit(0);
