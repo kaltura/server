@@ -83,7 +83,7 @@ class KRecycleBinProcessor extends KGenericProcessor
 			return array();
 		}
 		$entriesToDelete = array($entriesList->objects);
-		while (count($entriesList->objects) >= self::ENTRIES_PAGE_SIZE && self::ENTRIES_NUMBER_OF_PAGES >= $pageIndex)
+		while (count($entriesList->objects) >= self::ENTRIES_PAGE_SIZE && self::ENTRIES_NUMBER_OF_PAGES > $pageIndex)
 		{
 			$pageIndex++;
 			$entriesList = $this->getOverdueRecycledEntries($pageIndex, $recycleBinRetentionPeriod);
