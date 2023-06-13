@@ -146,6 +146,8 @@ class kZoomOauth extends kOAuth
 	{
 		$headers = getallheaders();
 
+		KalturaLog::debug("Zoom headers: " . print_r($headers, true));
+
 		if (isset($headers[self::AUTHORIZATION_HEADER]))
 		{
 			KalturaLog::debug("Zoom authorization header [" . $headers[self::AUTHORIZATION_HEADER] . "]");
