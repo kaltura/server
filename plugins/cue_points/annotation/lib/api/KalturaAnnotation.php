@@ -143,7 +143,7 @@ class KalturaAnnotation extends KalturaCuePoint
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
 		$this->validateParentId();
 		if($this->parentId)
-			$this->validateEndTime();
+			$this->validateEndTimeAndDuration($this->endTime, $this->duration);
 
 		if(!isset($this->isPublic) || is_null($this->isPublic))
 		    $this->isPublic = false;
@@ -165,9 +165,21 @@ class KalturaAnnotation extends KalturaCuePoint
 			$this->validateParentId($sourceObject->getId());
 			
 		if($this->parentId || $sourceObject->getParentId())
-			$this->validateEndTime($sourceObject);
+			$this->validateEndTimeAndDuration($this->endTime, $this->duration, $sourceObject);
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	public function updateEndTimeAndDuration($cuePoint)
+	{
+		if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
+		{
+			$this->endTime = $this->startTime;
+		}
+		if ($this->triggeredAt && $this->isNull('duration') && (!$cuePoint || is_null($cuePoint->getDuration())))
+		{
+			$this->duration = 0;
+		}
 	}
 
 	/*
