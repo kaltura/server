@@ -121,16 +121,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if( in_array($job->getJobType(), array(BatchJobType::CONVERT,BatchJobType::CONCAT,BatchJobType::POSTCONVERT)))
 			{
 				/** @var BatchJob $job */
-				KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']' . '] type ['.$job->getJobType() .']' );
 				$childrenJobsStatuses[$job->getId()] = $job->getStatus();
-//				array_push($childrenJobsStatuses, $job->getStatus());
-//				if($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-//				{
-//					return false;
-//				}
 			}
 		}
-//		return true;
 		return $childrenJobsStatuses;
 	}
 	
@@ -656,21 +649,23 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		/** @var kClipConcatJobData $clipConcatJobData */
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
-		kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
 		$childrenJobsStatuses = $this->getStatusOfAllChildrenJobs($batchJob);
 		$problematicStatuses = array(BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_ABORTED, BatchJob::BATCHJOB_STATUS_FATAL);
 		if (array_intersect($childrenJobsStatuses, $problematicStatuses))
 		{
-			//TODO figure out how to bubble the failure
 			foreach ($childrenJobsStatuses as $jobId => $jobStatus)
 			{
-				KalturaLog::err('Child job [' . $jobId . '] is in status [' . $jobStatus . ']');
+				if (in_array($jobStatus, $problematicStatuses))
+				{
+					KalturaLog::err('Child job [' . $jobId . '] is in status [' . $jobStatus . ']');
+				}
 			}
+			kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FAILED);
 			throw new APIException(KalturaErrors::CANNOT_COMPLETE_CLIP_CONCAT_JOB, $batchJob->getJobType(), $batchJob->getId());
 		}
 		elseif ($this->isConcatOfAllChildrenDone($childrenJobsStatuses))
-//		if ($this->isConcatOfAllChildrenDone($batchJob))
 		{
+			kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
 			$destinationEntry = $clipConcatJobData->getDestEntryId();
 			$listOfFlavorAssets = $this->getAllConcatJobsFlavors($batchJob);
 			//collect all assets from temp entry and add them to the dest entry
