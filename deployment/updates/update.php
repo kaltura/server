@@ -61,13 +61,14 @@ if(isset($options['port']))
 $updateRunner = new ScriptsRunner();
 $updateRunner->init($ignoreErrors, $params);
 
+$appDir = realpath(__DIR__ . '/../../');
 if($replaceXmlTokens)
 {
 	$updateRunner->runXmlTokenReplacement("$appDir/deployment/updates/scripts/xml/");
 }
 
 // create version_management table
-$updateRunner->runSqlScript(dirname(__FILE__) . DIRECTORY_SEPARATOR . "create_version_mng_table.sql");
+$updateRunner->createVersionMngTableIfnotExists();
 
 if(!$skipDB)
 {
@@ -143,6 +144,32 @@ class ScriptsRunner
 		}
 
 		return $serverVersion;
+	}
+
+	public function createVersionMngTableIfnotExists()
+	{
+		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['dbname'], $this->dbParams['port']);
+		$tableExists = mysqli_query($link, "SHOW TABLES LIKE 'version_management';");
+		if($tableExists->num_rows)
+		{
+			KalturaLog::debug("version_management Already exist, no need to re-create");
+			return;
+		}
+
+		$mysqlExists = shell_exec(sprintf("which %s", escapeshellarg('mysql')));
+		if($mysqlExists)
+		{
+			$this->runSqlScript(dirname(__FILE__) . DIRECTORY_SEPARATOR . "create_version_mng_table.sql");
+			return;
+		}
+
+		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['dbname'], $this->dbParams['port']);
+
+		$result = mysqli_query($link, "CREATE TABLE IF NOT EXISTS version_management ( `id` int(11) NOT NULL AUTO_INCREMENT, `filename` varchar(250) NOT NULL, `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, `status` int(11) DEFAULT '1', `server_version` varchar(20) DEFAULT NULL, PRIMARY KEY (`id`));");
+		KalturaLog::debug("Result for table creation [" . print_r($result, true) . "]");
+
+		$result = mysqli_query($link, "INSERT IGNORE INTO version_management(filename) VALUES('create_version_mng_table.sql');");
+		KalturaLog::debug("Result for ignore add [" . print_r($result, true) . "]");
 	}
 
 	private function getAdminConsoleSecret()
@@ -355,18 +382,18 @@ class ScriptsRunner
 		}
 	}
 
-	private function handleXmlTemplatesDir($xmlTemplatesDir, $tokens, $values)
+	private function handleXmlTemplatesDir($dir, $tokens, $values)
 	{
-		$xmlTemplatesFiles = $this->getDirContnet($xmlTemplatesDir);
+		$xmlTemplatesFiles = $this->getDirContnet($dir);
 		foreach($xmlTemplatesFiles as $xmlTemplatesFile)
 		{
-			if(is_dir($dir . DIRECTORY_SEPARATOR . $file))
+			if(is_dir($dir . DIRECTORY_SEPARATOR . $xmlTemplatesFile))
 			{
-				$this->handlXmlTemplateFile($dir . DIRECTORY_SEPARATOR . $xmlTemplatesFile, $tokens, $values);
+				$this->runXmlTokenReplacement($dir . DIRECTORY_SEPARATOR . $xmlTemplatesFile, $tokens, $values);
 			}
 			else
 			{
-				$this->runXmlTokenReplacement($dir . DIRECTORY_SEPARATOR . $xmlTemplatesFile, $tokens, $values);
+				$this->handlXmlTemplateFile($dir . DIRECTORY_SEPARATOR . $xmlTemplatesFile, $tokens, $values);
 			}
 		}
 	}
