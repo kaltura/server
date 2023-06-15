@@ -333,13 +333,13 @@ class kKavaBase extends kDruidBase
 		self::USER_SOUND_OFF_TAB_NOT_FOCUSED_FULL_SCREEN,
 	);
 
-	protected static $kme_high_engagement = array(
+	protected static $meeting_high_engagement = array(
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON,
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON_ON_STAGE,
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON_OFF_STAGE,
 	);
 
-	protected static $kme_good_engagement = array(
+	protected static $meeting_good_engagement = array(
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON,
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON_ON_STAGE,
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON_OFF_STAGE,
@@ -351,7 +351,7 @@ class kKavaBase extends kDruidBase
 		self::USER_TAB_FOCUSED_MIC_MUTED_FULL_SCREEN_CAMERA_ON_SOUND_ON_OFF_STAGE,
 	);
 
-	protected static $kme_fair_engagement = array(
+	protected static $meeting_fair_engagement = array(
 		self::USER_TAB_FOCUSED_MIC_MUTED_FULL_SCREEN_CAMERA_OFF_SOUND_ON,
 		self::USER_TAB_FOCUSED_MIC_MUTED_FULL_SCREEN_CAMERA_OFF_SOUND_ON_ON_STAGE,
 		self::USER_TAB_FOCUSED_MIC_MUTED_FULL_SCREEN_CAMERA_OFF_SOUND_ON_OFF_STAGE,
@@ -390,7 +390,7 @@ class kKavaBase extends kDruidBase
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_OFF_OFF_STAGE,
 	);
 
-	protected static $kme_low_engagement = array(
+	protected static $meeting_low_engagement = array(
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF,
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF_ON_STAGE,
 		self::USER_TAB_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF_OFF_STAGE,
@@ -429,7 +429,7 @@ class kKavaBase extends kDruidBase
 		self::USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_OFF_OFF_STAGE,
 	);
 
-	protected static $kme_non_engagement = array(
+	protected static $meeting_non_engagement = array(
 		self::USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF,
 		self::USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF_ON_STAGE,
 		self::USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF_OFF_STAGE,
