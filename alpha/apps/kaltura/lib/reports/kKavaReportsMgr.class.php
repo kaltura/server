@@ -6416,8 +6416,6 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($result[1] as $row)
 		{
 			$curr_minute = $row[0];
-			$eng = $row[1];
-			$row[1] = self::getLiveEngLevel($eng);
 			if (!isset($existing_minutes[$curr_minute]))
 			{
 				$existing_minutes[$curr_minute] = array();
@@ -6440,7 +6438,7 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			else
 			{
-				$data[] = array_pad(array($minute, 'offline'), $values_count, 0);
+				$data[] = array_pad(array($minute, 'Offline'), $values_count, 0);
 				++$total_count;
 			}
 		}
