@@ -15,10 +15,16 @@ class ThumbAssetService extends KalturaAssetService
 	protected function getEnabledMediaTypes()
 	{
 		$liveStreamTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, KalturaEntryType::LIVE_STREAM);
-		
 		$mediaTypes = array_merge($liveStreamTypes, parent::getEnabledMediaTypes());
+
+		$roomPlugin = KalturaPluginManager::getPluginInstance(RoomPlugin::getPluginName());
+		if ($roomPlugin)
+		{
+			$mediaTypes[] = RoomPlugin::getEntryTypeCoreValue(RoomEntryType::ROOM);
+		}
+
 		$mediaTypes[] = KalturaEntryType::AUTOMATIC;
-		
+
 		$mediaTypes = array_unique($mediaTypes);
 		return $mediaTypes;
 	}

@@ -46,6 +46,13 @@ class SchedulerPeer extends BaseSchedulerPeer
 		$c->add(SchedulerPeer::CONFIGURED_ID, $schedulerId);
 		return SchedulerPeer::doSelectOne($c);
 	}
+
+	public static function getScheudlerByHostName($hostname)
+	{
+		$c = new Criteria();
+		$c->add(SchedulerPeer::HOST, $hostname);
+		return SchedulerPeer::doSelectOne($c);
+	}
 	
 	public static function getCacheInvalidationKeys()
 	{

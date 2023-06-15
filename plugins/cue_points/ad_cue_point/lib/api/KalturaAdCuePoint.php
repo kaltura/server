@@ -87,7 +87,7 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	{
 		parent::validateForInsert($propertiesToSkip);
 		
-		$this->validateEndTime();
+		$this->validateEndTimeAndDuration($this->endTime, $this->duration);
 	}
 	
 	/* (non-PHPdoc)
@@ -95,8 +95,20 @@ class KalturaAdCuePoint extends KalturaCuePoint
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		$this->validateEndTime($sourceObject);
+		$this->validateEndTimeAndDuration($this->endTime, $this->duration, $sourceObject);
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	public function updateEndTimeAndDuration($cuePoint)
+	{
+		if ($this->isNull('endTime') && (!$cuePoint || is_null($cuePoint->getEndTime())))
+		{
+			$this->endTime = $this->startTime;
+		}
+		if ($this->triggeredAt && $this->isNull('duration') && (!$cuePoint || is_null($cuePoint->getDuration())))
+		{
+			$this->duration = 0;
+		}
 	}
 }

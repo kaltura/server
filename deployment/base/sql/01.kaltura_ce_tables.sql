@@ -581,7 +581,7 @@ CREATE TABLE IF NOT EXISTS `conversion_profile_2` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `cue_point` (
-  `int_id` int(11) NOT NULL AUTO_INCREMENT,
+  `int_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `id` varchar(20) NOT NULL DEFAULT '',
   `parent_id` varchar(255) DEFAULT NULL,
   `entry_id` varchar(31) NOT NULL,
@@ -1472,7 +1472,7 @@ CREATE TABLE IF NOT EXISTS `kvote` (
   KEY `kvote_FI_3` (`kuser_id`),
   KEY `entry_user_status_index` (`entry_id`,`kuser_id`,`status`),
   KEY `partner_created_at` (`partner_id`,`created_at`),
-  KEY `entry_rank_index` (`entry_id`,`status`)
+  KEY `entry_rank_index` (`entry_id`,`rank`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 
@@ -1616,7 +1616,7 @@ CREATE TABLE IF NOT EXISTS `media_server` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `metadata` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `version` int(11) DEFAULT NULL,
@@ -2232,7 +2232,7 @@ CREATE TABLE IF NOT EXISTS `scheduler_worker` (
   `statuses` varchar(255) NOT NULL,
   `last_status` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `configured_id` (`configured_id`)
+  KEY `configured_id` (`configured_id`,`scheduler_configured_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `server_node` (
@@ -2514,7 +2514,7 @@ CREATE TABLE IF NOT EXISTS `ui_conf` (
 
 CREATE TABLE IF NOT EXISTS `upload_token` (
   `id` varchar(35) NOT NULL,
-  `int_id` int(11) NOT NULL AUTO_INCREMENT,
+  `int_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `partner_id` int(11) DEFAULT '0',
   `kuser_id` int(11) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
@@ -2523,13 +2523,13 @@ CREATE TABLE IF NOT EXISTS `upload_token` (
   `uploaded_file_size` bigint(20) DEFAULT NULL,
   `upload_temp_path` varchar(256) DEFAULT NULL,
   `user_ip` varchar(39) NOT NULL,
-  `created_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_at` datetime DEFAULT NULL,
   `dc` int(11) DEFAULT NULL,
   `object_type` varchar(127) DEFAULT NULL,
   `object_id` varchar(31) DEFAULT NULL,
   `custom_data` text,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`,`created_at`),
   KEY `int_id` (`int_id`),
   KEY `partner_id_status` (`partner_id`,`status`),
   KEY `status_created_at` (`status`,`created_at`),
@@ -2539,7 +2539,7 @@ CREATE TABLE IF NOT EXISTS `upload_token` (
 
 
 CREATE TABLE IF NOT EXISTS `user_entry` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `entry_id` varchar(20) DEFAULT NULL,
   `kuser_id` int(11) NOT NULL,
   `partner_id` int(11) DEFAULT NULL,
