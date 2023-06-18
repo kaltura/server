@@ -111,20 +111,29 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$batchJob->getParentJob()->getJobType() == BatchJobType::CONCAT;
 	}
 	
-	protected function isConcatOfAllChildrenDone(BatchJob $batchJob)
+	protected function getStatusOfAllChildrenJobs(BatchJob $batchJob)
 	{
 		$root = $batchJob->getRootJob();
 		$allChildrenJobs = $root->getChildJobs();
-		foreach ($root->getChildJobs() as $job)
+		$childrenJobsStatuses = array();
+		foreach ($allChildrenJobs as $job)
 		{
 			if( in_array($job->getJobType(), array(BatchJobType::CONVERT,BatchJobType::CONCAT,BatchJobType::POSTCONVERT)))
 			{
 				/** @var BatchJob $job */
-				KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']' . '] type ['.$job->getJobType() .']' );
-				if($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-				{
-					return false;
-				}
+				$childrenJobsStatuses[$job->getId()] = $job->getStatus();
+			}
+		}
+		return $childrenJobsStatuses;
+	}
+	
+	protected function isConcatOfAllChildrenDone($childrenJobsStatuses)
+	{
+		foreach ($childrenJobsStatuses as $childJobStatus)
+		{
+			if($childJobStatus != BatchJob::BATCHJOB_STATUS_FINISHED)
+			{
+				return false;
 			}
 		}
 		return true;
@@ -640,9 +649,23 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		/** @var kClipConcatJobData $clipConcatJobData */
 		$clipConcatJobData = $batchJob->getRootJob()->getData();
-		kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
-		if ($this->isConcatOfAllChildrenDone($batchJob))
+		$childrenJobsStatuses = $this->getStatusOfAllChildrenJobs($batchJob);
+		$problematicStatuses = array(BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_ABORTED, BatchJob::BATCHJOB_STATUS_FATAL);
+		if (array_intersect($childrenJobsStatuses, $problematicStatuses))
 		{
+			foreach ($childrenJobsStatuses as $jobId => $jobStatus)
+			{
+				if (in_array($jobStatus, $problematicStatuses))
+				{
+					KalturaLog::err('Child job [' . $jobId . '] is in status [' . $jobStatus . ']');
+				}
+			}
+			kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FAILED);
+			throw new APIException(KalturaErrors::CANNOT_COMPLETE_CLIP_CONCAT_JOB, $batchJob->getJobType(), $batchJob->getId());
+		}
+		elseif ($this->isConcatOfAllChildrenDone($childrenJobsStatuses))
+		{
+			kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
 			$destinationEntry = $clipConcatJobData->getDestEntryId();
 			$listOfFlavorAssets = $this->getAllConcatJobsFlavors($batchJob);
 			//collect all assets from temp entry and add them to the dest entry

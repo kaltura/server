@@ -12,19 +12,19 @@ $objectConfigurations = parse_ini_file($filePath, true);
 
 foreach($objectConfigurations as $ini_item)
 {
-    $id = $ini_item['id'];
-
-    $c = new Criteria();
-    $c->addAnd(assetParamsPeer::ID, $id);
-    $assetParams = assetParamsPeer::doSelect($c);
-
-    foreach ($assetParams as $assetParam)
-    {
-        if(isset($ini_item['conversionEnginesExtraParams']))
-        {
-            KalturaLog::info("Updating id [{$assetParam->getId()}] of partenr [{$assetParam->getPartnerId()}]");
-            $assetParam->setConversionEnginesExtraParams($ini_item['conversionEnginesExtraParams']);
-            $assetParam->save();
-        }
-    }
+	$id = $ini_item['id'];
+	
+	$c = new Criteria();
+	$c->addAnd(assetParamsPeer::ID, $id);
+	$assetParams = assetParamsPeer::doSelect($c);
+	
+	foreach ($assetParams as $assetParam)
+	{
+		if(isset($ini_item['conversionEnginesExtraParams']))
+		{
+			KalturaLog::info("Updating id [{$assetParam->getId()}] of partenr [{$assetParam->getPartnerId()}]");
+			$assetParam->setConversionEnginesExtraParams($ini_item['conversionEnginesExtraParams']);
+			$assetParam->save();
+		}
+	}
 }
