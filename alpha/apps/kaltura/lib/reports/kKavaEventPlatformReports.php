@@ -231,7 +231,17 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'count_raise_hand_clicked' => self::EVENT_TYPE_MEETING_RAISE_HAND,
 				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO
 			),
-		)
+		),
+
+		ReportType::EP_WEBCAST_LIVE_USER_ENGAGEMENT_LEVEL => array(
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_DIMENSION_MAP => array(
+				'position' => self::DIMENSION_POSITION,
+				'user_engagement' => self::DIMENSION_USER_ENGAGEMENT,
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addOfflineMinutes'
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter)

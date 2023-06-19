@@ -672,4 +672,26 @@ class BatchService extends KalturaBatchService
 		$ret = kFile::moveFile($data['tmp_name'], $destPath);
 		return $ret;
 	}
+
+	/**
+	 * batch deRegisterScheduler action allows to de-register batch server from kaltura scheduler tables
+	 *
+	 * @action deRegisterScheduler
+	 * @param string $host
+	 * @return bool
+	 */
+	public function deRegisterSchedulerAction($host)
+	{
+		KalturaLog::debug("Purging scheduler data for [$host]");
+		$scheduler = SchedulerPeer::getScheudlerByHostName($host);
+		if(!$scheduler)
+		{
+			KalturaLog::debug("Scheduler not found for host, [$host]");
+			return false;
+		}
+
+		KalturaLog::debug("Deleting scheduler data for scheduler id {$scheduler->getId()} with configuredId {$scheduler->getConfiguredId()}");
+		SchedulerPeer::deleteBySchedulerConfigId($scheduler->getConfiguredId());
+		return true;
+	}
 }

@@ -1,0 +1,11 @@
+{
+  "disableUserCache": true,
+  "plugins": {},
+  "playback": {
+    "muted": true,
+    "pictureInPicture": false
+  },
+  "provider": {
+    "env": {}
+  }
+}

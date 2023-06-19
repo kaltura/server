@@ -119,22 +119,14 @@ class kmcngAction extends kalturaAction
 		if (isset($kmcngParams["kmcng_custom_uri"]))
 			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
 
-		$this->playerV3VersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
-		$this->content_uiconfs_player_v3_versions = isset($this->playerV3VersionsUiConf) ? array_values($this->playerV3VersionsUiConf) : null;
-		$this->content_uiconf_player_v3_versions = (is_array($this->content_uiconfs_player_v3_versions) && reset($this->content_uiconfs_player_v3_versions)) ? reset($this->content_uiconfs_player_v3_versions) : null;
 
-		$this->playerV3BetaVersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "beta");
-		$this->content_uiconfs_player_v3_beta_versions = isset($this->playerV3BetaVersionsUiConf) ? array_values($this->playerV3BetaVersionsUiConf) : null;
-		$this->content_uiconf_player_v3_beta_versions = (is_array($this->content_uiconfs_player_v3_beta_versions) && reset($this->content_uiconfs_player_v3_beta_versions)) ? reset($this->content_uiconfs_player_v3_beta_versions) : null;
+		$loadVersionMapFromKConf = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
 
-		$this->playerV3OvpVersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_OVP_VERSIONS_TAG, "latest");
-		$this->content_uiconfs_player_v3_ovp_versions = isset($this->playerV3OvpVersionsUiConf) ? array_values($this->playerV3OvpVersionsUiConf) : null;
-		$this->content_uiconf_player_v3_ovp_versions = (is_array($this->content_uiconfs_player_v3_ovp_versions) && reset($this->content_uiconfs_player_v3_ovp_versions)) ? reset($this->content_uiconfs_player_v3_ovp_versions) : null;
+		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_VERSIONS_TAG, "latest");
+		list($playerBetaVersionsMapVersionConfig, $playerBetaConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_VERSIONS_TAG, "beta");
 
-		$this->playerV3BetaOvpVersionsUiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_OVP_VERSIONS_TAG, "beta");
-		$this->content_uiconfs_player_v3_beta_ovp_versions = isset($this->playerV3BetaOvpVersionsUiConf) ? array_values($this->playerV3BetaOvpVersionsUiConf) : null;
-		$this->content_uiconf_player_v3_beta_ovp_versions = (is_array($this->content_uiconfs_player_v3_beta_ovp_versions) && reset($this->content_uiconfs_player_v3_beta_ovp_versions)) ? reset($this->content_uiconfs_player_v3_beta_ovp_versions) : null;
-
+		list($playerOvpVersionsMapVersionConfig, $playerOvpConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_OVP_VERSIONS_TAG, "latest");
+		list($playerBetaOvpVersionsMapVersionConfig, $playerBetaOvpConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_OVP_VERSIONS_TAG, "beta");
 
 		$studio = null;
 		$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
@@ -163,14 +155,14 @@ class kmcngAction extends kalturaAction
 				"uri" => '/apps/studioV3/' . $studio_v3_version . "/index.html",
 				"html5_version" => $html5_version,
 				"html5lib" => $secureCDNServerUri . "/html5/html5lib/" . $html5_version . "/mwEmbedLoader.php",
-				"playerVersionsMap" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfig() : '',
-				"playerBetaVersionsMap" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfig() : '',
-				"playerConfVars" => isset($this->content_uiconf_player_v3_versions) ? $this->content_uiconf_player_v3_versions->getConfVars() : '',
-				"playerBetaConfVars" => isset($this->content_uiconf_player_v3_beta_versions) ? $this->content_uiconf_player_v3_beta_versions->getConfVars() : '',
-				"playerOvpVersionsMap" => isset($this->content_uiconf_player_v3_ovp_versions) ? $this->content_uiconf_player_v3_ovp_versions->getConfig() : '',
-				"playerBetaOvpVersionsMap" => isset($this->content_uiconf_player_v3_beta_ovp_versions) ? $this->content_uiconf_player_v3_beta_ovp_versions->getConfig() : '',
-				"playerOvpConfVars" => isset($this->content_uiconf_player_v3_ovp_versions) ? $this->content_uiconf_player_v3_ovp_versions->getConfVars() : '',
-				"playerBetaOvpConfVars" => isset($this->content_uiconf_player_v3_beta_ovp_versions) ? $this->content_uiconf_player_v3_beta_ovp_versions->getConfVars() : ''
+				"playerVersionsMap" => $playerVersionsMapVersionConfig,
+				"playerBetaVersionsMap" => $playerBetaVersionsMapVersionConfig,
+				"playerConfVars" => $playerVersionsMapConfVars,
+				"playerBetaConfVars" => $playerBetaConfVars,
+				"playerOvpVersionsMap" => $playerOvpVersionsMapVersionConfig,
+				"playerBetaOvpVersionsMap" => $playerBetaOvpVersionsMapVersionConfig,
+				"playerOvpConfVars" => $playerOvpConfVars,
+				"playerBetaOvpConfVars" => $playerBetaOvpConfVars
 			);
 		}
 
@@ -273,5 +265,31 @@ class kmcngAction extends kalturaAction
 		);
 
 		return $config;
+	}
+
+	private function getConfigByTagAndVersion($loadVersionMapFromKConf, $tag, $version)
+	{
+		$versionConfig = json_encode(array());
+		$confVars = json_encode(array());
+
+		if($loadVersionMapFromKConf)
+		{
+			$versionConfig = json_encode(kConf::get($tag."_".$version, kConfMapNames::EMBED_PLAYKIT, array()), true);
+			$versionTag = kConf::get($tag."_".$version."_productVersion", kConfMapNames::EMBED_PLAYKIT, "");
+			$confVars = json_encode(array("version" => $versionTag));
+		}
+		else
+		{
+			$uiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
+			$uiConfVersions = isset($uiConf) ? array_values($uiConf) : null;
+			$uiConfVersion = (is_array($uiConfVersions) && reset($uiConfVersions)) ? reset($uiConfVersions) : null;
+			if($uiConfVersion)
+			{
+				$versionConfig = isset($uiConfVersion) ? $uiConfVersion->getConfig() : '';
+				$confVars = isset($uiConfVersion) ? $uiConfVersion->getConfVars() : '';
+			}
+		}
+
+		return array($versionConfig, $confVars);
 	}
 }
