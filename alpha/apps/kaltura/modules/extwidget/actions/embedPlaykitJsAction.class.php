@@ -579,7 +579,8 @@ class embedPlaykitJsAction extends sfAction
 		$loadVersionMapFromKConf = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
 		foreach ($this->uiConfTags as $tag)
 		{
-			if($loadVersionMapFromKConf)
+			$loadVersionTagMapFromKConf = kConf::get("loadFromKConf_".$tag, kConfMapNames::EMBED_PLAYKIT, null);
+			if($loadVersionMapFromKConf || $loadVersionTagMapFromKConf)
 			{
 				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);	
 			}
