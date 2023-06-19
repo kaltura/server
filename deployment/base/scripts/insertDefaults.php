@@ -70,7 +70,6 @@ function handleDirectory($dirName)
 	}
 }
 
-
 function handleFile($filePath)
 {
 	$con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
@@ -167,6 +166,9 @@ function handleFile($filePath)
 				KalturaLog::info("Evaluated property value: $value");
 			}
 
+			//If needed translate token into actual values
+			translateValue($attributeName, $value);
+
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
 				throw new Exception("Attribute [$attributeName] not defined on object type [$objectType]");
@@ -223,6 +225,44 @@ function handleFile($filePath)
 		kMemoryManager::clearMemory();
 	}
 }
+
+/**
+ * @param $key
+ * @param $value
+ * @return void
+ */
+function translateValue($key, &$value)
+{
+	global $tokensKeysArray;
+	if(!isset($tokensKeysArray[$key]) || !preg_match($tokensKeysArray[$key][0], $value, $matches))
+	{
+		return;
+	}
+
+	$value = $tokensKeysArray[$key][1]();
+}
+
+function getRandomPseudoBytes()
+{
+	return md5(KCryptoWrapper::random_pseudo_bytes(16));
+}
+
+function getLivePackagerUrl()
+{
+	return kConf::get('live_packager_url');
+}
+
+function getVodPackagerUrl()
+{
+	return kConf::get('cdn_host_https');
+}
+
+$tokensKeysArray = array(
+	'adminSecret' => array('@.*@','getRandomPseudoBytes'),
+	'secret' => array('@.*@','getRandomPseudoBytes'),
+	'url' => array('@LIVE_PACKAGER_URL@','getLivePackagerUrl'),
+	'url' => array('@VOD_PACKAGER_URL@','getVodPackagerUrl')
+);
 
 KalturaLog::log('Done.');
 exit(0);
