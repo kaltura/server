@@ -1,3 +1,12 @@
+# Scorpius-19.12.0
+
+## update Game Services partner permissions ##
+- Issue Type: Story
+- Issue ID: PLAT-24279
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_06_20_update_game_services_partner_permissions.php
+
 # Scorpius-19.11.0
 
 ## Expose scheduler de-register action in batch service ##
