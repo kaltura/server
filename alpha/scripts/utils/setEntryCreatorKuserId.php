@@ -1,6 +1,6 @@
 <?php
 
-if($argc < 3)
+if($argc < 2)
 {
 	echo "Arguments missing.\n\n";
 	echo "Usage: php " . __FILE__ . " {mapping} <realrun / dryrun> \n";
