@@ -54,7 +54,7 @@ class Infra_AuthHelper
         {
             if(!is_dir($settings->sessionSavePath));
             {
-        	    mkdir($settings->sessionSavePath, 0777, true);
+        	    @mkdir($settings->sessionSavePath, 0777, true);
             }
             session_save_path($settings->sessionSavePath);
         }
