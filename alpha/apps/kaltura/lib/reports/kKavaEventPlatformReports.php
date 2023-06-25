@@ -119,16 +119,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
 				),
 			),
-			self::REPORT_JOIN_REPORTS => array(
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS),
-				),
-				array(
-					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
-				),
-			)
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 		),
 
 		ReportType::EP_WEBCAST_MAP_OVERLAY_REGION => array(
@@ -149,16 +141,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
 				),
 			),
-			self::REPORT_JOIN_REPORTS => array(
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS),
-				),
-				array(
-					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
-				),
-			)
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 		),
 
 		ReportType::EP_WEBCAST_MAP_OVERLAY_CITY => array(
@@ -180,16 +164,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
 				),
 			),
-			self::REPORT_JOIN_REPORTS => array(
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS),
-				),
-				array(
-					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
-				),
-			)
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 		),
 
 		ReportType::EP_WEBCAST_LIVE_USER_ENGAGEMENT => array(
