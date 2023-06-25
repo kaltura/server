@@ -1,5 +1,18 @@
-# Scorpius-19.11.0
+# Scorpius-19.12.0
+## Enable Event Platform
+* Issue Type: Task
+* Issue ID: PLAT-24300
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.virtualEvent.enabled = true
+moduls.virtualEvent.permissionType = 2
+moduls.virtualEvent.label = "Enable Event Platform (EP)"
+moduls.virtualEvent.permissionName = FEATURE_EVENT_PLATFORM_PERMISSION
+moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 
+# Scorpius-19.11.0
 ## Expose scheduler de-register action in batch service ##
 Issue Type: Task
 Issue ID : No-Plat
