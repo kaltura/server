@@ -188,6 +188,9 @@ class infraRequestUtils
 				case "html":
 					$content_type = "text/html";
 					break;
+				case "pdf":
+					$content_type = "application/pdf";
+					break;
 				default:
 					$content_type ="image/$ext";
 					break;
