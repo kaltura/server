@@ -191,6 +191,33 @@ class infraRequestUtils
 				case "pdf":
 					$content_type = "application/pdf";
 					break;
+				case "csv":
+					$content_type = "text/csv";
+					break;
+				case "odt":
+					$content_type = "application/vnd.oasis.opendocument.text";
+					break;
+				case "doc":
+					$content_type = "application/msword";
+					break;
+				case "docx":
+					$content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+					break;
+				case "ppt":
+					$content_type = "application/vnd.ms-powerpoint";
+					break;
+				case "pptx":
+					$content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+					break;
+				case "txt":
+					$content_type = "text/plain";
+					break;
+				case "xls":
+					$content_type = "application/vnd.ms-excel";
+					break;
+				case "xlsx":
+					$content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+					break;
 				default:
 					$content_type ="image/$ext";
 					break;
