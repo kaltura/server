@@ -207,7 +207,7 @@ class infraRequestUtils
 					$content_type = "application/vnd.ms-powerpoint";
 					break;
 				case "pptx":
-					$content_type = "applicatiapplication/vnd.openxmlformats-officedocument.presentationml.presentation";
+					$content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
 					break;
 				case "txt":
 					$content_type = "text/plain";
