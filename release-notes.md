@@ -5,10 +5,19 @@
 ### Deployment ###
 Add the following to admin.ini
 ```
+moduls.eventPlatform.enabled = true
+moduls.eventPlatform.permissionType = 2
+moduls.eventPlatform.label = "Enable Event Platform (EP)"
+moduls.eventPlatform.permissionName = FEATURE_EVENT_PLATFORM_PERMISSION
+moduls.eventPlatform.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+Add or edit (if already exists) the following on admin.ini
+```
 moduls.virtualEvent.enabled = true
 moduls.virtualEvent.permissionType = 2
-moduls.virtualEvent.label = "Enable Event Platform (EP)"
-moduls.virtualEvent.permissionName = FEATURE_EVENT_PLATFORM_PERMISSION
+moduls.virtualEvent.label = "Enable Virtual Events API Service"
+moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
 moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
