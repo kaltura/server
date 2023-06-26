@@ -386,7 +386,7 @@ class BaseEntryService extends KalturaEntryService
 	 * @param KalturaEntryReplacementOptions $advancedOptions Additional update content options
 	 * @return KalturaBaseEntry The updated entry
 	 *
-	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUNDF
 	 * @validateUser entry entryId edit
 	 */
 	function updateContentAction($entryId, KalturaResource $resource, $conversionProfileId = null, $advancedOptions = null)

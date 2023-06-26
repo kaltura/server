@@ -15,6 +15,11 @@ class KalturaLiveRestreamFeature extends KalturaLiveFeature
 	 */
 	public $secondaryUrl;
 
+    /**
+     * @var string
+     */
+    public $playbackUrl;
+
 	/**
 	 * @var string
 	 */
@@ -23,6 +28,7 @@ class KalturaLiveRestreamFeature extends KalturaLiveFeature
 	private static $map_between_objects = array(
 		'primaryUrl',
 		'secondaryUrl',
+        'playbackUrl',
 		'streamKey'
 	);
 
