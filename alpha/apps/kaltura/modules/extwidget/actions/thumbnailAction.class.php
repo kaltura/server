@@ -337,6 +337,15 @@ class thumbnailAction extends sfAction
 				// The required width and height will serve as the final crop values
 				$src_w = $width;
 				$src_h = $height;
+				
+				$exif = exif_read_data($imageFilePath);
+				$orientationsToHandle = array(5, 6, 7, 8);
+				if (isset($exif["Orientation"]) && in_array($exif["Orientation"], $orientationsToHandle))
+				{
+					$tmpWidth = $thumbWidth;
+					$thumbWidth = $thumbHeight;
+					$thumbHeight = $tmpWidth;
+				}
 
 				// Base on the thumbnail's dimensions
 				kThumbnailUtils::scaleDimensions( $thumbWidth, $thumbHeight, $width, $height, kThumbnailUtils::SCALE_UNIFORM_SMALLER_DIM, $width, $height );
