@@ -18,11 +18,11 @@ class LiveRestreamFeature extends LiveFeature
 	 */
 	protected $secondaryUrl;
 
-    /**
-     * Playback URL to play content from
-     * @var string
-     */
-    protected $playbackUrl;
+	/**
+	 * Playback URL to play content from
+	 * @var string
+	 */
+	protected $playbackUrl;
 
 	/**
 	 * stream

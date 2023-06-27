@@ -15,10 +15,10 @@ class KalturaLiveRestreamFeature extends KalturaLiveFeature
 	 */
 	public $secondaryUrl;
 
-    /**
-     * @var string
-     */
-    public $playbackUrl;
+	/**
+	 * @var string
+	 */
+	public $playbackUrl;
 
 	/**
 	 * @var string
