@@ -28,7 +28,7 @@ class KalturaLiveRestreamFeature extends KalturaLiveFeature
 	private static $map_between_objects = array(
 		'primaryUrl',
 		'secondaryUrl',
-        'playbackUrl',
+		'playbackUrl',
 		'streamKey'
 	);
 

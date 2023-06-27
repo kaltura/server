@@ -51,18 +51,22 @@ class LiveRestreamFeature extends LiveFeature
 		$this->secondaryUrl = $v;
 	}
 
-    public function getPlaybackUrl()
-    {
-        return $this->playbackUrl;
-    }
-    public function setPlaybackUrl($v)
-    {
-        $this->playbackUrl = $v;
-    }
-
 	public function getSecondaryUrl()
 	{
 		return $this->secondaryUrl;
+	}
+
+	/**
+	 * @param string $v
+	 */
+	public function setPlaybackUrl($v)
+	{
+		$this->playbackUrl = $v;
+	}
+
+	public function getPlaybackUrl()
+	{
+		return $this->playbackUrl;
 	}
 
 	/**
