@@ -3,7 +3,7 @@
 * Issue Type: Task
 * Issue ID: PLAT-24300
 ### Deployment ###
-Add the following to admin.ini
+Add the following to admin.ini:
 ```
 moduls.eventPlatform.enabled = true
 moduls.eventPlatform.permissionType = 2
