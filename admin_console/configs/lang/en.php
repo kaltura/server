@@ -1520,4 +1520,7 @@ return array(
 	'Kaltura_Client_Sso_Enum_SsoStatus::ACTIVE' => 'Enabled',
 	'Kaltura_Client_Sso_Enum_SsoStatus::DELETED' => 'Deleted',
 
+	'Kaltura_Client_Enum_RecycleBinRetentionPeriod::DAYS_5' => '5 Days',
+	'Kaltura_Client_Enum_RecycleBinRetentionPeriod::DAYS_15' => '15 Days',
+	'Kaltura_Client_Enum_RecycleBinRetentionPeriod::DAYS_30' => '30 Days',
 );

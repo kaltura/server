@@ -610,5 +610,11 @@ class KSchedulerConfig extends Zend_Config_Ini
 		$this->schedulerId = $scheulder->configuredId;
 		return true;
 	}
+
+	public function deRegisterScheduler()
+	{
+		$this->initClient();
+		return $this->kClient->batch->deRegisterScheduler($this->hostName);
+	}
 }
 

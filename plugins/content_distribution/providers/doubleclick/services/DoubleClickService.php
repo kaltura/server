@@ -78,7 +78,8 @@ class DoubleClickService extends ContentDistributionServiceBase
 		
 		// Dummy query to get the total count
 		$baseCriteria = KalturaCriteria::create(entryPeer::OM_CLASS);
-		$baseCriteria->add(entryPeer::DISPLAY_IN_SEARCH, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM, Criteria::NOT_EQUAL);
+		$displayInSearchStatusNotIn = array(mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
+		$baseCriteria->addAnd(entryPeer::DISPLAY_IN_SEARCH, $displayInSearchStatusNotIn, Criteria::NOT_IN);
 		$baseCriteria->setLimit(1);
 		$entryFilter->attachToCriteria($baseCriteria);
 		$entries = entryPeer::doSelect($baseCriteria);

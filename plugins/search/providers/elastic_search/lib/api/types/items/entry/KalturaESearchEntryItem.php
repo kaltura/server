@@ -66,6 +66,7 @@ class KalturaESearchEntryItem extends KalturaESearchAbstractEntryItem
 		KalturaESearchEntryFieldName::VOTES => ESearchEntryFieldName::VOTES,
 		KalturaESearchEntryFieldName::DISPLAY_IN_SEARCH => ESearchEntryFieldName::DISPLAY_IN_SEARCH,
 		KalturaESearchEntryFieldName::RECYCLED_AT => ESearchEntryFieldName::RECYCLED_AT,
+		KalturaESearchEntryFieldName::ROOM_TYPE => ESearchEntryFieldName::ROOM_TYPE,
 	);
 
 	protected function getMapBetweenObjects()

@@ -124,6 +124,10 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 
 	private function loadNewCaptionAssetFile($captionAssetId, $contentResource)
 	{
+		if (!kXml::isXMLValidContent($contentResource->content))
+		{
+			$contentResource->content = kXml::stripXMLInvalidChars($contentResource->content);
+		}
 		try
 		{
 			$updatedCaption = $this->captionClientPlugin->captionAsset->setContent($captionAssetId, $contentResource);

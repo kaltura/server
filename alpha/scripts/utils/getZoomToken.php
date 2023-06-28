@@ -13,5 +13,5 @@ require_once(__DIR__ . '/../bootstrap.php');
 
 $zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($vendorAccountId);
 ZoomHelper::verifyZoomIntegration($zoomIntegration);
-$accessToken = kZoomOauth::getValidAccessToken($zoomIntegration);
+$accessToken = kZoomOauth::getValidAccessTokenAndSave($zoomIntegration);
 echo $accessToken;

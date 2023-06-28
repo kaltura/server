@@ -6,6 +6,8 @@
  */
 class ZoomHelper
 {
+	const VENDOR_MAP = 'vendor';
+	const ZOOM_ACCOUNT_PARAM = 'ZoomAccount';
 	/** payload data */
 	const ACCOUNT_ID = "account_id";
 	const PAYLOAD = 'payload';
@@ -34,21 +36,22 @@ class ZoomHelper
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
 
-    /**
-     * @param $accountId
-     * @param bool $includeDeleted
-     * @return null|zoomVendorIntegration
-     * @throws PropelException
-     */
-	public static function getZoomIntegrationByAccountId($accountId, $includeDeleted = false)
+	/**
+	 * @param $accountId
+	 * @param bool $includeDeleted
+	 * @param $partnerId
+	 * @return null|zoomVendorIntegration
+	 * @throws PropelException
+	 */
+	public static function getZoomIntegrationByAccountId($accountId, $includeDeleted = false, $partnerId = null)
 	{
 		if($includeDeleted)
 		{
-			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartnerNoFilter($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartnerNoFilter($accountId, VendorTypeEnum::ZOOM_ACCOUNT, $partnerId);
 		}
 		else
 		{
-			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT, $partnerId);
 		}
 
 		return self::$zoomIntegration;

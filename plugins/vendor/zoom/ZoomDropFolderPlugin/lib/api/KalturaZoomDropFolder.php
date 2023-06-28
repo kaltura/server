@@ -6,8 +6,7 @@
  */
 class KalturaZoomDropFolder extends KalturaDropFolder
 {
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-	const MAP_NAME = 'vendor';
+
 	const ZOOM_BASE_URL = 'ZoomBaseUrl';
 	
 	/**
@@ -43,8 +42,13 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	/**
 	 * @readonly
 	 */
-	public $jwtToken;
-	
+	public $accountId;
+
+	/**
+	 * @readonly
+	 */
+	public $zoomAuthType;
+
 	/**
 	 * @var int
 	 * @readonly
@@ -80,42 +84,34 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		parent::doFromObject($sourceObject, $responseProfile);
 		
 		/* @var ZoomVendorIntegration $vendorIntegration */
-		$vendorIntegration = VendorIntegrationPeer ::retrieveByPK($this->zoomVendorIntegrationId);
+		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($this->zoomVendorIntegrationId);
 		try
 		{
 			if ($vendorIntegration)
 			{
-				$headerData = self ::getZoomHeaderData();
-				$this -> clientId = $headerData[0];
-				$this -> clientSecret = $headerData[1];
-				$this -> baseURL = $headerData[2];
-				$this -> jwtToken = $vendorIntegration -> getJwtToken();
-				$this -> refreshToken = $vendorIntegration -> getRefreshToken();
-				$this -> accessToken = $vendorIntegration -> getAccessToken();
-				$this -> description = $vendorIntegration->getZoomAccountDescription();
-				$this -> accessExpiresIn = $vendorIntegration->getExpiresIn();
-				$zoomClient = new kZoomClient($this -> baseURL, $this -> jwtToken, $this -> refreshToken, $this -> clientId,
-				                              $this -> clientSecret, $this -> accessToken);
-				
-				if ($this -> accessToken && $this -> refreshToken && kCurrentContext ::$ks_partner_id == Partner::BATCH_PARTNER_ID &&
-					$vendorIntegration -> getExpiresIn() <= time() +
-					kconf ::getArrayValue('tokenExpiryGrace', 'ZoomAccount', 'vendor', 600))
+				$this->accountId = $vendorIntegration->getAccountId();
+				$this->refreshToken = $vendorIntegration->getRefreshToken();
+				$this->accessToken = $vendorIntegration->getAccessToken();
+				$this->description = $vendorIntegration->getZoomAccountDescription();
+				$this->accessExpiresIn = $vendorIntegration->getExpiresIn();
+				$this->zoomAuthType = $vendorIntegration->getZoomAuthType();
+				list($this->baseURL, ) = kZoomOauth::getHeaderDataByPartnerId($this->accountId, $vendorIntegration->getPartnerId());
+
+				if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID && kZoomTokens::isTokenExpired($vendorIntegration->getExpiresIn()))
 				{
-					KalturaLog ::debug('Token expired for account id: ' . $vendorIntegration -> getAccountId() . ' renewing with the new tokens');
-					$freshTokens = $zoomClient -> refreshTokens();
+					KalturaLog::debug('Token expired for account id: ' . $vendorIntegration->getAccountId() . ' renewing with the new tokens');
+					$freshTokens = kZoomOauth::refreshTokens($vendorIntegration);
 					if ($freshTokens)
 					{
-						$this -> accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
-						$this -> refreshToken = $freshTokens[kZoomTokens::REFRESH_TOKEN];
-						$this -> accessExpiresIn = $freshTokens[kZoomTokens::EXPIRES_IN];
-						$vendorIntegration -> saveTokensData($freshTokens);
+						$this->accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
+						$this->refreshToken = isset($freshTokens[kZoomTokens::REFRESH_TOKEN]) ? $freshTokens[kZoomTokens::REFRESH_TOKEN] : null;
+						$this->accessExpiresIn = kZoomOauth::getTokenExpiryRelativeTime($freshTokens[kZoomTokens::EXPIRES_IN]);
 					}
 				}
-				
-				
+
 				$zoomIntegrationObject = new KalturaZoomIntegrationSetting();
-				$zoomIntegrationObject -> fromObject($vendorIntegration);
-				$this -> zoomVendorIntegration = $zoomIntegrationObject;
+				$zoomIntegrationObject->fromObject($vendorIntegration);
+				$this->zoomVendorIntegration = $zoomIntegrationObject;
 			}
 			else
 			{
@@ -151,13 +147,5 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
 		return parent::toObject($dbObject, $skip);
 	}
-	
-	protected static function getZoomHeaderData()
-	{
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-		$clientId = $zoomConfiguration['clientId'];
-		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$clientSecret = $zoomConfiguration['clientSecret'];
-		return array($clientId, $clientSecret, $zoomBaseURL);
-	}
+
 }

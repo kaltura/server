@@ -20,15 +20,15 @@ abstract class kZoomProcessor
 	/**
 	 * kZoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
-	 * @param string $jwtToken
+	 * @param string $accountId
 	 * @param string $refreshToken
-	 * @param string $clientId
-	 * @param string $clientSecret
 	 * @param string $accessToken
+	 * @param string $accessExpiresIn
+	 * @param int $zoomAuthType kZoomAuthTypes enum
 	 */
-	public function __construct($zoomBaseUrl,$jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken)
+	public function __construct($zoomBaseUrl, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
+		$this->zoomClient = new kZoomClient($zoomBaseUrl, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType);
 	}
 
 	/**

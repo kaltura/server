@@ -1,3 +1,136 @@
+# Scorpius-19.12.0
+## Enable Event Platform
+* Issue Type: Task
+* Issue ID: PLAT-24300
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.eventPlatform.enabled = true
+moduls.eventPlatform.permissionType = 2
+moduls.eventPlatform.label = "Enable Event Platform (EP)"
+moduls.eventPlatform.permissionName = FEATURE_EVENT_PLATFORM_PERMISSION
+moduls.eventPlatform.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+Add or edit (if already exists) the following on admin.ini
+```
+moduls.virtualEvent.enabled = true
+moduls.virtualEvent.permissionType = 2
+moduls.virtualEvent.label = "Enable Virtual Events API Service"
+moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
+moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Scorpius-19.11.0
+## Expose scheduler de-register action in batch service ##
+Issue Type: Task
+Issue ID : No-Plat
+
+#### Deployment Scripts ####
+run: php deployment/updates/scripts/add_permissions/2023_06_11_batch_service_de_register_permission.php
+
+## Align database schema for bigint usage and index definition ##
+* Issue Type: Task
+* Issue ID: VCP-13172
+
+Note: This is a non mandatory performance update.
+
+### Deployment Scripts ###
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_bigint_id_metadata.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_bigint_id_user_entry.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_bigint_int_id_cue_point.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_bigint_int_id_upload_token.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_index_kvote_entry_rank_index.sql
+    mysql -u{USER} -p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2023_06_11_index_scheduler_worker_configured_id.sql
+
+## update Game Services partner permissions ##
+- Issue Type: Story
+- Issue ID: PLAT-24279
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_06_06_update_game_services_partner_permissions.php
+
+# Scorpius-19.10.0
+## Static playlist missing entries after partner cloning ##
+- Issue Type: Bug
+- Issue ID: PLAT-24232
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_05_29_playlist_get_and_update.php
+
+## Session Cue Point plugin ##
+- Issue Type: Task
+- Issue ID: PLAT-24275
+
+### Configuration ###
+Enable plugin:
+
+	To enable this plugin add the following to your plugins.ini file:
+	- SessionCuePoint
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_sessionCuePoint_permission.php
+
+## Allow Theme Editor
+* Issue Type: Task
+* Issue ID: PLAT-24277
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.themeEditor.enabled = true
+moduls.themeEditor.permissionType = 2
+moduls.themeEditor.label = "Enable Theme Editor"
+moduls.themeEditor.permissionName = FEATURE_THEME_EDITOR_PERMISSION
+moduls.themeEditor.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Supporting the Reset Password dynamic Email workflow for EP
+* Issue Type: Task
+* Issue ID: PLAT-24095
+
+### Configuration
+* Add to map `dynamic_email_contents` the following: (replace APP with the value of the supported app`s enum in resetPassLinkType.php)
+
+```
+dynamic_email_supported_apps = APP
+```
+
+## Add permission to EP analytics role ##
+* Issue Type: Task
+* Issue ID: PLAT-24276
+
+### Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_05_29_add_permission_to_ep_analytics_user_role.php
+
+## Add Zoom server-to-server app type support
+- Issue Type: Task
+- Issue ID: PLAT-24271
+
+### Configuration ###
+Add the following to vendor.ini
+```
+[ZoomAccount_@ZoomAccountId@_@partnerId@]
+clientId = @ZoomClientID@
+clientSecret = @ZoomClientSecret@
+ZoomBaseUrl = https://zoom.us
+```
+
+## Add permission to allow setting SSO per user ##
+- Issue Type: Story
+- Issue ID: PLAT-24238
+
+### Configuration ###
+Add the following to admin.ini
+```
+moduls.loginSSO.enabled = true
+moduls.loginSSO.permissionType = 2
+moduls.loginSSO.label = "Allow setting SSO per user"
+moduls.loginSSO.permissionName = ALLOW_SSO_PER_USER
+moduls.loginSSO.group = GROUP_LOGIN_SSO_OPTIONS
+moduls.loginSSO.skip = true
+```
+
 # Scorpius-19.9.0
 
 ## Schedule event new filtering options ##
@@ -36,6 +169,17 @@ id                                                  = 611
 params.runnerTypes                                  = 3
 ```
 
+## Add 'RoomType' to ESearch for entry ##
+- Issue Type: Task
+- Issue ID: PLAT-24248
+
+### Deployment Scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port', 'entry_index_name' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"room_type" : {"type" : "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
+
 # Scorpius-19.8.0
 ## Add search term aggregation to SearchHistory plugin
 * Issue Type: Story
@@ -65,10 +209,12 @@ php deployment/updates/scripts/add_permissions/2023_04_10_add_ssrv_edit_admin_pe
 - Issue Type: Task
 - Issue ID: PLAT-24227
 
-### Deployment ###
+### Deployment Scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
 Replace 'esearch_host', 'esearch_port', 'entry_index_name' and execute the curl command
 
-    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping/entry" -H 'Content-Type: application/json' -d'{"properties": {"recycled_at" : {"type" : "date", "format": "epoch_second"}}}'
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@ENTRY_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"recycled_at" : {"type" : "date", "format": "epoch_second"}}}'
 
 # Scorpius-19.6.0
 ## Increase ActionsLimit For Analytics ##

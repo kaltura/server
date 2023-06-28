@@ -24,11 +24,19 @@ function shutDown($signal)
 	exit(0);
 }
 
+function deRegisterHost($signal)
+{
+	global $kscheduler;
+	echo "Got signal [$signal] from terminal";
+	$kscheduler->deRegisterHost($signal);
+}
+
 //Windows machines by default do not have the pcntl installed, so check if function exists before calling it
 if(function_exists("pcntl_signal"))
 {
 	pcntl_signal(SIGINT, 'gracefulShutDown');
 	pcntl_signal(SIGTERM, 'shutDown');
+	pcntl_signal(SIGUSR1, 'deRegisterHost');
 }
 
 $phpPath = 'php';

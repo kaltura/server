@@ -27,9 +27,8 @@ class zoomChatFilesProcessor extends zoomProcessor
 	/**
 	 * @param kalturaMediaEntry $entry
 	 * @param KalturaZoomDropFolderFile $recording
-	 * @param string $chatDownloadUrl
 	 */
-	public function handleChatRecord($entry, $recording, $chatDownloadUrl)
+	public function handleChatRecord($entry, $recording)
 	{
 		if(!$entry)
 		{

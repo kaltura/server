@@ -12,6 +12,8 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 	
 	protected $fromPartnerId;
 	protected $toPartnerId;
+	protected $entryIdsMap;
+	protected $staticPlaylistToEntriesMap;
 	
 	const DUPLICATE_CATEGORY = 'DUPLICATE_CATEGORY';
 	
@@ -51,10 +53,14 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$this->fromPartnerId = $jobData->fromPartnerId;
 		$this->toPartnerId = $jobData->toPartnerId;
 		
+		$this->entryIdsMap = array();
+		$this->staticPlaylistToEntriesMap = array();
+		
 		$this->copyCategories();
 		$this->copyUiConfs();
 		// copy permssions before trying to copy additional objects such as distribution profiles which are not enabled yet for the partner
 		$this->copyAllEntries();
+		$this->copyStaticPlaylistsContents();
 		
 		return $this->closeJob($job, null, null, "doCopyPartner finished", KalturaBatchJobStatus::FINISHED);
 	}
@@ -77,22 +83,35 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 			// Get the source partner's entries list
 			self::impersonate($this->fromPartnerId);
 			$entriesList = $this->getClient()->baseEntry->listAction($entryFilter, $pageFilter);
+			self::unimpersonate();
 
 			$receivedObjectsCount = $entriesList->objects ? count($entriesList->objects) : 0;
 			$pageFilter->pageIndex++;
 			
-			if ($receivedObjectsCount > 0)
+			if ($receivedObjectsCount <= 0)
 			{
-				// Write the source partner's entries to the destination partner 
-				self::impersonate( $this->toPartnerId);
-				foreach ($entriesList->objects as $entry)
+				break;
+			}
+			
+			// Write the source partner's entries to the destination partner
+			foreach ($entriesList->objects as $entry)
+			{
+				self::impersonate($this->toPartnerId);
+				$newEntry = $this->getClient()->baseEntry->cloneAction($entry->id);
+				self::unimpersonate();
+				$this->setOriginalToNewEntryId($entry->id, $newEntry->id);
+				if ($entry->type == KalturaEntryType::PLAYLIST)
 				{
-					$newEntry = $this->getClient()->baseEntry->cloneAction($entry->id);
+					self::impersonate($this->fromPartnerId);
+					$originalPlaylist = $this->getClient()->playlist->get($entry->id);
+					self::unimpersonate();
+					if ($originalPlaylist->playlistType == KalturaPlaylistType::STATIC_LIST)
+					{
+						$this->setStaticPlaylistToEntries($newEntry->id, $originalPlaylist->playlistContent);
+					}
 				}
-			}			
+			}
 		} while ($receivedObjectsCount);
-	
-		self::unimpersonate();
 	}
 	
 	protected function copyCategories()
@@ -218,5 +237,46 @@ class KAsyncCopyPartner extends KJobHandlerWorker
 		$newUiConf->createdAt = null;
 		$newUiConf->updatedAt = null;
 		return $newUiConf;
+	}
+	
+	protected function copyStaticPlaylistsContents()
+	{
+		$this->log("Copying static playlists contents from partner [" . $this->fromPartnerId . "] to partner [" . $this->toPartnerId . "]");
+		$staticPlaylistList = $this->getStaticPlaylistToEntriesMap();
+		foreach ($staticPlaylistList as $staticPlaylistId => $entryIdsList)
+		{
+			$fromEntryIds = explode(",", $entryIdsList);
+			$toEntryIds = array();
+			foreach ($fromEntryIds as $fromEntryId)
+			{
+				$toEntryIds[] = $this->getNewEntryId($fromEntryId);
+			}
+			
+			$staticPlaylist = new KalturaPlaylist();
+			$staticPlaylist->playlistContent = (implode(',', $toEntryIds));
+			self::impersonate($this->toPartnerId);
+			$this->getClient()->playlist->update($staticPlaylistId, $staticPlaylist);
+			self::unimpersonate();
+		}
+	}
+	
+	public function getNewEntryId($originalEntryId)
+	{
+		return $this->entryIdsMap[$originalEntryId];
+	}
+	
+	public function setOriginalToNewEntryId($originalEntryId, $newEntryId)
+	{
+		$this->entryIdsMap[$originalEntryId] = $newEntryId;
+	}
+	
+	public function getStaticPlaylistToEntriesMap()
+	{
+		return $this->staticPlaylistToEntriesMap;
+	}
+	
+	public function setStaticPlaylistToEntries($playlistId, $entryIdsList)
+	{
+		$this->staticPlaylistToEntriesMap[$playlistId] = $entryIdsList;
 	}
 }

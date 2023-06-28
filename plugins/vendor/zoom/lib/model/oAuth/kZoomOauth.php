@@ -9,26 +9,44 @@ class kZoomOauth extends kOAuth
 	const AUTHORIZATION_HEADER = 'Authorization';
 	const TOKEN_TYPE = 'token_type';
 	const SCOPE = 'scope';
-	const MAP_NAME = 'vendor';
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
 	const X_ZM_SIGNATURE = 'x-zm-signature';
 	const X_ZM_REQUEST_TIMESTAMP = 'x-zm-request-timestamp';
 
 	/**
 	 * @param ZoomVendorIntegration $vendorIntegration
-	 * @return array
+	 * @return array|null
 	 * @throws Exception
 	 */
 	public static function refreshTokens($vendorIntegration)
 	{
-		KalturaLog::info('Refreshing tokens');
-		list($zoomBaseURL, , $header, $userPwd) = self::getHeaderData();
-		$oldRefreshToken = $vendorIntegration->getRefreshToken();
-		$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
-		$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
-		$tokensData = self::retrieveTokensDataFromResponse($response);
-		$vendorIntegration->saveTokensData($tokensData);
-		return $tokensData;
+		switch ($vendorIntegration->getZoomAuthType())
+		{
+			case kZoomAuthTypes::SERVER_TO_SERVER:
+				list($zoomBaseURL, $userPwd) = self::getHeaderDataByPartnerId($vendorIntegration->getAccountId(), $vendorIntegration->getPartnerId());
+				KalturaLog::debug("Generate server-to-server access token");
+				$postFields = "grant_type=account_credentials&account_id=" . $vendorIntegration->getAccountId();
+				$header = array(self::AUTHORIZATION_HEADER . ":Basic " . base64_encode($userPwd));
+				$response = self::curlRetrieveTokensData($zoomBaseURL, null, $header, $postFields);
+				$tokensData = self::retrieveAccessTokenDataFromResponse($response);
+				$vendorIntegration->saveAccessTokenData($tokensData);
+				return $tokensData;
+
+			case kZoomAuthTypes::OAUTH:
+				list($zoomBaseURL, , $header, $userPwd) = self::getHeaderData();
+				KalturaLog::info('Refreshing tokens');
+				$oldRefreshToken = $vendorIntegration->getRefreshToken();
+				$postFields = "grant_type=refresh_token&refresh_token=$oldRefreshToken";
+				$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
+				$tokensData = self::retrieveTokensDataFromResponse($response);
+				$vendorIntegration->saveTokensData($tokensData);
+				return $tokensData;
+
+			default:
+				KalturaLog::err("Unknown Zoom authentication type, will not authenticate");
+
+		}
+
+		return null;
 	}
 	
 
@@ -55,7 +73,10 @@ class kZoomOauth extends kOAuth
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
 		$curlWrapper->setOpt(CURLOPT_HEADER, true);
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $header);
-		$curlWrapper->setOpt(CURLOPT_USERPWD, $userPwd);
+		if($userPwd)
+		{
+			$curlWrapper->setOpt(CURLOPT_USERPWD, $userPwd);
+		}
 		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
 		return $curlWrapper->exec($url . self::OAUTH_TOKEN_PATH);
 	}
@@ -78,7 +99,7 @@ class kZoomOauth extends kOAuth
 	 */
 	protected static function getHeaderData()
 	{
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
 		$clientId = $zoomConfiguration['clientId'];
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
 		$redirectUrl = $zoomConfiguration['redirectUrl'];
@@ -88,18 +109,31 @@ class kZoomOauth extends kOAuth
 		return array($zoomBaseURL, $redirectUrl, $header, $userPwd);
 	}
 
+	public static function getHeaderDataByPartnerId($accountId, $partnerId)
+	{
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM . "_$accountId" . "_$partnerId", ZoomHelper::VENDOR_MAP, null);
+		if(!$zoomConfiguration)
+		{
+			$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
+		}
+		$clientId = $zoomConfiguration['clientId'];
+		$clientSecret = $zoomConfiguration['clientSecret'];
+		$url = $zoomConfiguration['ZoomBaseUrl'];
+		$userPwd = "$clientId:$clientSecret";
+		return array($url, $userPwd);
+	}
+
 	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @return string
 	 * @throws kZoomErrorMessages
 	 */
-	public static function getValidAccessToken($zoomIntegration)
+	public static function getValidAccessTokenAndSave($zoomIntegration)
 	{
 		if (time() >= $zoomIntegration->getExpiresIn()) // token have expired -> refresh
 		{
 			self::refreshTokens($zoomIntegration);
 		}
-
 		return $zoomIntegration->getAccessToken();
 	}
 
@@ -111,6 +145,8 @@ class kZoomOauth extends kOAuth
 	public static function verifyHeaderToken($zoomConfiguration)
 	{
 		$headers = getallheaders();
+
+		KalturaLog::debug("Zoom headers: " . print_r($headers, true));
 
 		if (isset($headers[self::AUTHORIZATION_HEADER]))
 		{
