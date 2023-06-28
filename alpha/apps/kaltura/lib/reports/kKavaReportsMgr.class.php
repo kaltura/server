@@ -1661,11 +1661,11 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT));
 
 		self::$metrics_def[self::METRIC_REACTION_CLICKED_USER_RATIO] = array(
-			self::DRUID_AGGR => array(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_UNIQUE_VIEWERS),
+			self::DRUID_AGGR => array(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_REACTION_CLICKED_USER_RATIO, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_REACTION_CLICKED_UNIQUE_USERS),
-				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_VIEWERS))));
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS))));
 
 		self::$metrics_def[self::METRIC_VOD_AVG_PLAY_TIME] = array(
 			self::DRUID_AGGR => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_UNIQUE_VOD_VIEWERS),
