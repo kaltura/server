@@ -1,4 +1,23 @@
 # Scorpius-19.12.0
+
+## Schedule event new filtering options ##
+- Issue Type: Story
+- Issue ID: FOUN-1131
+
+### Configuration ###
+update sphinx kaltura.conf:
+
+  	Add the following to kaltura_schedule_event index:
+  	- rt_field = source_entry_id
+
+#### Deployment Scripts ####
+
+    - Need to re-build & re-index the schedule event sphinx table.
+
+#### Known Issues & Limitations ####
+
+None.
+
 ## Enable Event Platform
 * Issue Type: Task
 * Issue ID: PLAT-24300
@@ -132,6 +151,7 @@ moduls.loginSSO.skip = true
 ```
 
 # Scorpius-19.9.0
+
 ## Add Recycle Bin batch for auto deletion
 * Issue Type: Task
 * Issue ID: PLAT-24229

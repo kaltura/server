@@ -350,6 +350,11 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		return null;
 	}
 
+	public function getSourceEntryId()
+	{
+		return null;
+	}
+
 	public function getCategoryIdsForIndex()
 	{
 		return '';
