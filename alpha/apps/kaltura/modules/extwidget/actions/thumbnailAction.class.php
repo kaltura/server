@@ -338,6 +338,7 @@ class thumbnailAction extends sfAction
 				$src_w = $width;
 				$src_h = $height;
 				
+				// Images with portrait orientation (5, 6, 7, 8) require a switch between height and width
 				$exif = exif_read_data($imageFilePath);
 				$orientationsToHandle = array(5, 6, 7, 8);
 				if (isset($exif["Orientation"]) && in_array($exif["Orientation"], $orientationsToHandle))
