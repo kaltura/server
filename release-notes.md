@@ -11,8 +11,13 @@ update sphinx kaltura.conf:
   	- rt_field = source_entry_id
 
 #### Deployment Scripts ####
+    Need to re-build & re-index the schedule event sphinx table
+    Please note this requires deleteing the index fules under the search dir directory.
 
-    - Need to re-build & re-index the schedule event sphinx table.
+    For example:
+    rm -rf /opt/kaltura/sphinx/kaltura_schedule_event_rt.*
+
+
 
 #### Known Issues & Limitations ####
 
