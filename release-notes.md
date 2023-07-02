@@ -1,5 +1,51 @@
-# Scorpius-19.11.0
+# Scorpius-19.12.0
 
+## Schedule event new filtering options ##
+- Issue Type: Story
+- Issue ID: FOUN-1131
+
+### Configuration ###
+update sphinx kaltura.conf:
+
+  	Add the following to kaltura_schedule_event index:
+  	- rt_field = source_entry_id
+
+#### Deployment Scripts ####
+    Need to re-build & re-index the schedule event sphinx table
+    Please note this requires deleteing the index fules under the search dir directory.
+
+    For example:
+    rm -rf /opt/kaltura/sphinx/kaltura_schedule_event_rt.*
+
+
+
+#### Known Issues & Limitations ####
+
+None.
+
+## Enable Event Platform
+* Issue Type: Task
+* Issue ID: PLAT-24300
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.eventPlatform.enabled = true
+moduls.eventPlatform.permissionType = 2
+moduls.eventPlatform.label = "Enable Event Platform (EP)"
+moduls.eventPlatform.permissionName = FEATURE_EVENT_PLATFORM_PERMISSION
+moduls.eventPlatform.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+Add or edit (if already exists) the following on admin.ini
+```
+moduls.virtualEvent.enabled = true
+moduls.virtualEvent.permissionType = 2
+moduls.virtualEvent.label = "Enable Virtual Events API Service"
+moduls.virtualEvent.permissionName = VIRTUALEVENT_PLUGIN_PERMISSION
+moduls.virtualEvent.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Scorpius-19.11.0
 ## Expose scheduler de-register action in batch service ##
 Issue Type: Task
 Issue ID : No-Plat
@@ -110,6 +156,7 @@ moduls.loginSSO.skip = true
 ```
 
 # Scorpius-19.9.0
+
 ## Add Recycle Bin batch for auto deletion
 * Issue Type: Task
 * Issue ID: PLAT-24229

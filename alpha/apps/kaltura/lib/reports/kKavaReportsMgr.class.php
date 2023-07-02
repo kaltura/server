@@ -403,7 +403,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_VE_CREATED,
 		self::EVENT_TYPE_PAUSE,
 		self::EVENT_TYPE_RESUME,
-		self::EVENT_TYPE_MEETING_RAISE_HAND
+		self::EVENT_TYPE_MEETING_RAISE_HAND,
+		self::EVENT_TYPE_POLL_ANSWERED
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -463,7 +464,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_REACTION_CLICKED => 'count_reaction_clicked',
 		self::EVENT_TYPE_PAUSE => 'count_pause_clicked',
 		self::EVENT_TYPE_RESUME => 'count_resume_clicked',
-		self::EVENT_TYPE_MEETING_RAISE_HAND => 'count_raise_hand_clicked'
+		self::EVENT_TYPE_MEETING_RAISE_HAND => 'count_raise_hand_clicked',
+		self::EVENT_TYPE_POLL_ANSWERED => 'count_poll_answered'
 	);
 
 	//global transform
@@ -1659,11 +1661,11 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT));
 
 		self::$metrics_def[self::METRIC_REACTION_CLICKED_USER_RATIO] = array(
-			self::DRUID_AGGR => array(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_UNIQUE_VIEWERS),
+			self::DRUID_AGGR => array(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_REACTION_CLICKED_USER_RATIO, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_REACTION_CLICKED_UNIQUE_USERS),
-				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_VIEWERS))));
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS))));
 
 		self::$metrics_def[self::METRIC_VOD_AVG_PLAY_TIME] = array(
 			self::DRUID_AGGR => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_UNIQUE_VOD_VIEWERS),
@@ -4783,19 +4785,26 @@ class kKavaReportsMgr extends kKavaBase
 			$puser_id = $user_profile->userId;
 			$output = array();
 			foreach ($enriched_info_fields as $enriched_info_field) {
-				$field_path = explode(".", $enriched_info_field);
-				$curr_obj = $user_profile;
-				$value = '';
-				foreach ($field_path as $key)
+				if (!empty($user_profile->$enriched_info_field) && is_object($user_profile->$enriched_info_field)) 
 				{
-					$value = $curr_obj->$key ?? '';
-					if (is_object($value))
+					$value = json_encode($user_profile->$enriched_info_field);
+				} 
+				else 
+				{
+					$field_path = explode(".", $enriched_info_field);
+					$curr_obj = $user_profile;
+					$value = '';
+					foreach ($field_path as $key)
 					{
-						$curr_obj = $curr_obj->$key;
-					}
-					else
-					{
-						break;
+						$value = $curr_obj->$key ?? '';
+						if (is_object($value))
+						{
+							$curr_obj = $curr_obj->$key;
+						}
+						else
+						{
+							break;
+						}
 					}
 				}
 				$output[] = $value;

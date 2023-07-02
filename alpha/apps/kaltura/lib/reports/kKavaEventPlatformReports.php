@@ -39,20 +39,10 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 		),
 
 		ReportType::EP_WEBCAST_ENGAGEMENT => array(
-			self::REPORT_JOIN_REPORTS => array(
-				array(
-					self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
-					self::REPORT_TOTAL_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO)
-				),
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_METRICS => array(self::METRIC_REACTION_CLICKED_USER_RATIO),
-					self::REPORT_GRAPH_METRICS => array(self::METRIC_REACTION_CLICKED_USER_RATIO),
-					self::REPORT_TOTAL_METRICS => array(self::METRIC_REACTION_CLICKED_USER_RATIO)
-				),
-			)
+			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::METRIC_REACTION_CLICKED_USER_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::METRIC_REACTION_CLICKED_USER_RATIO),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::METRIC_REACTION_CLICKED_USER_RATIO)
 		),
 
 		ReportType::EP_WEBCAST_ENGAGEMENT_TIMELINE => array(
@@ -119,16 +109,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
 				),
 			),
-			self::REPORT_JOIN_REPORTS => array(
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS),
-				),
-				array(
-					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
-				),
-			)
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 		),
 
 		ReportType::EP_WEBCAST_MAP_OVERLAY_REGION => array(
@@ -149,16 +131,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
 				),
 			),
-			self::REPORT_JOIN_REPORTS => array(
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS),
-				),
-				array(
-					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
-				),
-			)
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 		),
 
 		ReportType::EP_WEBCAST_MAP_OVERLAY_CITY => array(
@@ -180,16 +154,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
 				),
 			),
-			self::REPORT_JOIN_REPORTS => array(
-				array(
-					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS),
-				),
-				array(
-					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
-				),
-			)
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_METRICS => array(self::METRIC_UNIQUE_VOD_VIEWERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEWERS),
 		),
 
 		ReportType::EP_WEBCAST_LIVE_USER_ENGAGEMENT => array(
@@ -242,6 +208,26 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD),
 			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addOfflineMinutes'
 		),
+
+		ReportType::EP_WEBCAST_VOD_USER_TOP_CONTENT => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+			self::REPORT_DIMENSION_MAP => array(
+				'name' => self::DIMENSION_KUSER_ID,
+				'full_name' => self::DIMENSION_KUSER_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => array('name', 'full_name'),
+				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'columns' => array('PUSER_ID', 'TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME))'),
+				)
+			),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_VOD_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_VOD_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
+			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_VOD_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)
