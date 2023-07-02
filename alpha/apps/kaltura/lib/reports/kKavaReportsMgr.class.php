@@ -404,7 +404,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PAUSE,
 		self::EVENT_TYPE_RESUME,
 		self::EVENT_TYPE_MEETING_RAISE_HAND,
-		self::EVENT_TYPE_POLL_ANSWERED
+		self::EVENT_TYPE_POLL_ANSWERED,
+		self::EVENT_TYPE_MEETING_JOIN_SESSION
 	);
 
 	protected static $media_type_count_aggrs = array(
