@@ -466,7 +466,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PAUSE => 'count_pause_clicked',
 		self::EVENT_TYPE_RESUME => 'count_resume_clicked',
 		self::EVENT_TYPE_MEETING_RAISE_HAND => 'count_raise_hand_clicked',
-		self::EVENT_TYPE_POLL_ANSWERED => 'count_poll_answered'
+		self::EVENT_TYPE_POLL_ANSWERED => 'count_poll_answered',
+		self::EVENT_TYPE_MEETING_JOIN_SESSION => 'count_meeting_join_session'
 	);
 
 	//global transform
