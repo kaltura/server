@@ -19,6 +19,12 @@ class LiveRestreamFeature extends LiveFeature
 	protected $secondaryUrl;
 
 	/**
+	 * Playback URL to play content from
+	 * @var string
+	 */
+	protected $playbackUrl;
+
+	/**
 	 * stream
 	 * @var string
 	 */
@@ -48,6 +54,19 @@ class LiveRestreamFeature extends LiveFeature
 	public function getSecondaryUrl()
 	{
 		return $this->secondaryUrl;
+	}
+
+	/**
+	 * @param string $v
+	 */
+	public function setPlaybackUrl($v)
+	{
+		$this->playbackUrl = $v;
+	}
+
+	public function getPlaybackUrl()
+	{
+		return $this->playbackUrl;
 	}
 
 	/**
