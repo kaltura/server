@@ -234,12 +234,17 @@ function handleFile($filePath)
 function translateValue($key, &$value)
 {
 	global $tokensKeysArray;
-	if(!isset($tokensKeysArray[$key]) || !preg_match($tokensKeysArray[$key][0], $value, $matches))
-	{
-		return;
-	}
+	$searchPhrase = "$key=$value";
 
-	$value = $tokensKeysArray[$key][1]();
+	foreach($tokensKeysArray as $token => $valueFunctioniInfo)
+	{
+		echo "Curr token [$token]\n";
+		if(preg_match("/$token/", $searchPhrase, $matches))
+		{
+			$value = preg_replace($valueFunctioniInfo[0], $valueFunctioniInfo[1](), $value, -1);
+			return;
+		}
+	}
 }
 
 function getRandomPseudoBytes()
@@ -258,10 +263,10 @@ function getVodPackagerUrl()
 }
 
 $tokensKeysArray = array(
-	'adminSecret' => array('@.*@','getRandomPseudoBytes'),
-	'secret' => array('@.*@','getRandomPseudoBytes'),
-	'url' => array('@LIVE_PACKAGER_URL@','getLivePackagerUrl'),
-	'url' => array('@VOD_PACKAGER_URL@','getVodPackagerUrl')
+	'adminSecret=(@.*@)' => array('/(@.*@)/', 'getRandomPseudoBytes'),
+	'secret=(@.*@)' =>  array('/(@.*@)/', 'getRandomPseudoBytes'),
+	'url="(@LIVE_PACKAGER_URL@).*"' => array('/@LIVE_PACKAGER_URL@/', 'getLivePackagerUrl'),
+	'url="(@VOD_PACKAGER_URL@).*"' => array('/@VOD_PACKAGER_URL@/', 'getVodPackagerUrl')
 );
 
 KalturaLog::log('Done.');
