@@ -13,6 +13,13 @@ if(!file_exists($dirName))
 }
 $dirName = realpath($dirName);
 
+$tokensKeysArray = array(
+	'adminSecret=(@.*@)' => array('/(@.*@)/', 'getRandomPseudoBytes'),
+	'secret=(@.*@)' =>  array('/(@.*@)/', 'getRandomPseudoBytes'),
+	'url=(@LIVE_PACKAGER_URL@).*' => array('/@LIVE_PACKAGER_URL@/', 'getLivePackagerUrl'),
+	'url=(@VOD_PACKAGER_URL@).*' => array('/@VOD_PACKAGER_URL@/', 'getVodPackagerUrl')
+);
+
 chdir(__DIR__);
 require_once(__DIR__ . '/../../bootstrap.php');
 
@@ -72,6 +79,7 @@ function handleDirectory($dirName)
 
 function handleFile($filePath)
 {
+	global $tokensKeysArray;
 	$con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 	
 	$fileName = basename($filePath);
@@ -167,7 +175,7 @@ function handleFile($filePath)
 			}
 
 			//If needed translate token into actual values
-			translateValue($attributeName, $value);
+			translateValue($tokensKeysArray, $attributeName, $value);
 
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
@@ -231,14 +239,12 @@ function handleFile($filePath)
  * @param $value
  * @return void
  */
-function translateValue($key, &$value)
+function translateValue($tokensKeysArray, $key, &$value)
 {
-	global $tokensKeysArray;
 	$searchPhrase = "$key=$value";
 
 	foreach($tokensKeysArray as $token => $valueFunctioniInfo)
 	{
-		echo "Curr token [$token]\n";
 		if(preg_match("/$token/", $searchPhrase, $matches))
 		{
 			$value = preg_replace($valueFunctioniInfo[0], $valueFunctioniInfo[1](), $value, -1);
@@ -261,13 +267,6 @@ function getVodPackagerUrl()
 {
 	return kConf::get('cdn_host_https');
 }
-
-$tokensKeysArray = array(
-	'adminSecret=(@.*@)' => array('/(@.*@)/', 'getRandomPseudoBytes'),
-	'secret=(@.*@)' =>  array('/(@.*@)/', 'getRandomPseudoBytes'),
-	'url="(@LIVE_PACKAGER_URL@).*"' => array('/@LIVE_PACKAGER_URL@/', 'getLivePackagerUrl'),
-	'url="(@VOD_PACKAGER_URL@).*"' => array('/@VOD_PACKAGER_URL@/', 'getVodPackagerUrl')
-);
 
 KalturaLog::log('Done.');
 exit(0);
