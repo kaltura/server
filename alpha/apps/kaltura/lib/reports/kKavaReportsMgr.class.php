@@ -4751,12 +4751,21 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function getUserProfileData($partner_id, $app_guid, $puser_ids)
 	{
-		$filter = array('appGuidIn' => $app_guid,
-						'userIdIn' => $puser_ids);
+		$filter = array(
+			'appGuidIn' => $app_guid,
+			'userIdIn' => $puser_ids
+		);
+
+		$pager = array(
+			'offset' => 0,
+			'limit' => count($puser_ids)
+		);
+
 		$service = new MicroServiceUserProfile();
-		$result = $service->list($partner_id, $filter);
+		$result = $service->list($partner_id, $filter, $pager);
 		return $result->objects;
 	}
+
 	protected static function getUsersInfoFromUserProfile($ids, $partner_id, $context)
 	{
 		$enriched_info_fields = $context['info_fields'];
