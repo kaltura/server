@@ -228,6 +228,28 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_VOD_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 		),
 
+		ReportType::EP_WEBCAST_VOD_LIVE_USERS_ENGAGEMENT => array(
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_DIMENSION_MAP => array(
+				'first_name' => self::DIMENSION_KUSER_ID,
+				'last_name' => self::DIMENSION_KUSER_ID,
+				'company' => self::DIMENSION_KUSER_ID,
+				'email' => self::DIMENSION_KUSER_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => array('first_name', 'last_name', 'company', 'email'),
+				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'columns' => array('FIRST_NAME', 'LAST_NAME', 'CUSTOM_DATA.company', 'EMAIL'),
+				),
+			),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
+			self::REPORT_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_MEETING_VIEW_TIME, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
+			self::REPORT_TOTAL_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_MEETING_VIEW_TIME, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
+			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedLiveVodColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addTotalCombinedLiveVodColumn',
+		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)
