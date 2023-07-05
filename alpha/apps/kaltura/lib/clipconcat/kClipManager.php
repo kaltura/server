@@ -123,11 +123,28 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']' . '] type ['.$job->getJobType() .']' );
 				if($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 				{
-					return false;
+					return $this->hasGrandChildFinished($job);
 				}
 			}
 		}
 		return true;
+	}
+	
+	protected function hasGrandChildFinished(BatchJob $job)
+	{
+		$children = $job->getChildJobs();
+		if(is_array($children) && count($children) > 0)
+		{
+			/** @var BatchJob $jobChild */
+			foreach ($children as $jobChild)
+			{
+				if (($jobChild->getJobType() == $job->getJobType()) && ($jobChild->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	protected function getAllConcatJobsFlavors(BatchJob  $batchJob)
