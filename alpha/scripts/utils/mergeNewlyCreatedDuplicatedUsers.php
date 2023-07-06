@@ -156,10 +156,35 @@ function getNewDuplicatedUsersCreated($startId, $lastId, $currentTime)
 function getStartId($lastRunFilePath)
 {
 	$startFromId = trim(file_get_contents($lastRunFilePath));
+	if($startFromId)
+	{
+		return $startFromId;
+	}
+
+	$c = new Criteria ();
+	$c->addDescendingOrderByColumn(kuserPeer::ID);
+	$lastKuser = kuserPeer::doSelectOne($c);
+	if(!$lastKuser)
+	{
+		throw new Exception ("Missing last run kuser id file and Failed To find last kuser");
+	}
+
+	$startFromId = $lastKuser->getId();
 	if(!$startFromId)
 	{
-		throw new Exception ("Missing file with last synced kuser id");
+		throw new Exception ("Missing last run kuser id file and found record has not id");
 	}
+
+	if(!file_exists(dirname($lastRunFilePath)))
+	{
+		@mkdir(dirname($lastRunFilePath));
+	}
+	
+	if(file_put_contents($lastRunFilePath, trim($lastRunFilePath)) == false)
+	{
+		throw new Exception ("Failed to write last run kuser id [$lastRunFilePath]");
+	}
+
 	return $startFromId;
 }
 
