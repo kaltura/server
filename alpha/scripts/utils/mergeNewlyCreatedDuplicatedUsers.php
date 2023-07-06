@@ -175,6 +175,11 @@ function getStartId($lastRunFilePath)
 		throw new Exception ("Missing last run kuser id file and found record has not id");
 	}
 
+	if(!file_exists(dirname($lastRunFilePath)))
+	{
+		@mkdir(dirname($lastRunFilePath));
+	}
+	
 	if(file_put_contents($lastRunFilePath, trim($lastRunFilePath)) == false)
 	{
 		throw new Exception ("Failed to write last run kuser id [$lastRunFilePath]");
