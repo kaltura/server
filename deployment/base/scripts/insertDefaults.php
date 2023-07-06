@@ -13,6 +13,13 @@ if(!file_exists($dirName))
 }
 $dirName = realpath($dirName);
 
+$tokensKeysArray = array(
+	'adminSecret=(@.*@)' => array('/(@.*@)/', 'getRandomPseudoBytes'),
+	'secret=(@.*@)' =>  array('/(@.*@)/', 'getRandomPseudoBytes'),
+	'url=(@LIVE_PACKAGER_URL@).*' => array('/@LIVE_PACKAGER_URL@/', 'getLivePackagerUrl'),
+	'url=(@VOD_PACKAGER_URL@).*' => array('/@VOD_PACKAGER_URL@/', 'getVodPackagerUrl')
+);
+
 chdir(__DIR__);
 require_once(__DIR__ . '/../../bootstrap.php');
 
@@ -72,6 +79,7 @@ function handleDirectory($dirName)
 
 function handleFile($filePath)
 {
+	global $tokensKeysArray;
 	$con = Propel::getConnection(PartnerPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 	
 	$fileName = basename($filePath);
@@ -167,7 +175,7 @@ function handleFile($filePath)
 			}
 
 			//If needed translate token into actual values
-			translateValue($attributeName, $value);
+			translateValue($tokensKeysArray, $attributeName, $value);
 
 			$setter = "set{$attributeName}";
 			if(!is_callable(array($object, $setter)))
@@ -181,10 +189,10 @@ function handleFile($filePath)
 
 				$value = file_get_contents($valueFilePath);
 			}
-			
+
 			if(preg_match('/^#[^#]+$/', $value))
 			{
-			    $value = kPluginableEnumsManager::genericApiToCore(substr($value, 1));
+				$value = kPluginableEnumsManager::genericApiToCore(substr($value, 1));
 			}
 
 			$setters[$setter] = $value;
@@ -197,7 +205,7 @@ function handleFile($filePath)
 			$pkCriteria = new Criteria();
 			$pkCriteria->add(constant(get_class($peer) . '::ID'), $pk);
 			$existingObject = $peer->doSelectOne($pkCriteria, $con);
-			
+
 		}
 		elseif (!is_null($identifierParam))
 		{
@@ -207,7 +215,7 @@ function handleFile($filePath)
 			$c->add ($identifierColumn, $objectConfiguration[$identifierParam]);
 			$existingObject = $peer->doSelectOne($c, $con);
 		}
-		
+
 		if($existingObject)
 		{
 			KalturaLog::info ('existing objects will not be re-written');
@@ -221,7 +229,7 @@ function handleFile($filePath)
 
 		if(!is_null($pkCriteria))
 			BasePeer::doUpdate($object->buildPkeyCriteria(), $pkCriteria, $con);
-			
+
 		kMemoryManager::clearMemory();
 	}
 }
@@ -231,15 +239,18 @@ function handleFile($filePath)
  * @param $value
  * @return void
  */
-function translateValue($key, &$value)
+function translateValue($tokensKeysArray, $key, &$value)
 {
-	global $tokensKeysArray;
-	if(!isset($tokensKeysArray[$key]) || !preg_match($tokensKeysArray[$key][0], $value, $matches))
-	{
-		return;
-	}
+	$searchPhrase = "$key=$value";
 
-	$value = $tokensKeysArray[$key][1]();
+	foreach($tokensKeysArray as $token => $valueFunctioniInfo)
+	{
+		if(preg_match("/$token/", $searchPhrase, $matches))
+		{
+			$value = preg_replace($valueFunctioniInfo[0], $valueFunctioniInfo[1](), $value, -1);
+			return;
+		}
+	}
 }
 
 function getRandomPseudoBytes()
@@ -256,13 +267,6 @@ function getVodPackagerUrl()
 {
 	return kConf::get('cdn_host_https');
 }
-
-$tokensKeysArray = array(
-	'adminSecret' => array('@.*@','getRandomPseudoBytes'),
-	'secret' => array('@.*@','getRandomPseudoBytes'),
-	'url' => array('@LIVE_PACKAGER_URL@','getLivePackagerUrl'),
-	'url' => array('@VOD_PACKAGER_URL@','getVodPackagerUrl')
-);
 
 KalturaLog::log('Done.');
 exit(0);
