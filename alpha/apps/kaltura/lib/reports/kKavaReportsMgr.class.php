@@ -4407,7 +4407,7 @@ class kKavaReportsMgr extends kKavaBase
 			else
 			{
 				$exploded_column = explode('.', $column);
-				$c->addSelectColumn('kuser' . '.' . $exploded_column[0]);
+				$c->addSelectColumn('kuser.' . $exploded_column[0]);
 			}
 		}
 
