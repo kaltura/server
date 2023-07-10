@@ -22,6 +22,12 @@ class ThumbAssetService extends KalturaAssetService
 		{
 			$mediaTypes[] = RoomPlugin::getEntryTypeCoreValue(RoomEntryType::ROOM);
 		}
+		
+		$documentPlugin = KalturaPluginManager::getPluginInstance(DocumentPlugin::getPluginName());
+		if ($documentPlugin)
+		{
+			$mediaTypes[] = KalturaEntryType::DOCUMENT;
+		}
 
 		$mediaTypes[] = KalturaEntryType::AUTOMATIC;
 
