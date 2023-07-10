@@ -41,21 +41,21 @@ while (count($partners))
 	foreach ($partners as $partner)
 	{
 		/* @var $partner Partner */
-		$eventPlatformPermission = PermissionPeer::getByNameAndPartner(VIRTUALEVENT_PLUGIN_PERMISSION, $partner->getId());
-		if (!$eventPlatformPermission)
+		$virtualEventPermission = PermissionPeer::getByNameAndPartner(VIRTUALEVENT_PLUGIN_PERMISSION, $partner->getId());
+		if (!$virtualEventPermission)
 		{
-			$eventPlatformPermission = new Permission();
-			$eventPlatformPermission->setType(PermissionType::SPECIAL_FEATURE);
-			$eventPlatformPermission->setPartnerId($partner->getId());
-			$eventPlatformPermission->setName(VIRTUALEVENT_PLUGIN_PERMISSION);
+			$virtualEventPermission = new Permission();
+			$virtualEventPermission->setType(PermissionType::SPECIAL_FEATURE);
+			$virtualEventPermission->setPartnerId($partner->getId());
+			$virtualEventPermission->setName(VIRTUALEVENT_PLUGIN_PERMISSION);
 		}
-		elseif ($eventPlatformPermission->getStatus() == PermissionStatus::ACTIVE)
+		elseif ($virtualEventPermission->getStatus() == PermissionStatus::ACTIVE)
 		{
 			continue;
 		}
 		KalturaLog::debug("Set permission [" . VIRTUALEVENT_PLUGIN_PERMISSION . "] for partner id [". $partner->getId() ."]");
-		$eventPlatformPermission->setStatus(PermissionStatus::ACTIVE);
-		$eventPlatformPermission->save();
+		$virtualEventPermission->setStatus(PermissionStatus::ACTIVE);
+		$virtualEventPermission->save();
 	}
 	
 	kMemoryManager::clearMemory();
