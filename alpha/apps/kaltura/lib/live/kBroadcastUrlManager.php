@@ -180,7 +180,7 @@ class kBroadcastUrlManager
 					break;
 		
 				case "{e}":
-					$extraQueryPrams['e'] = $entry->getId();
+					$extraQueryPrams['e'] = self::addLiveBackendId($entry->getId());
 					break;
 			}
 		}
@@ -192,10 +192,10 @@ class kBroadcastUrlManager
 	{
 		$queryParams = array('t' => $entry->getStreamPassword());
 		
-		//Support eCDN partner using old mediaServers that must recieve additional info to operate
+		// Support eCDN partner using old mediaServers that must receive additional info to operate
 		if($this->useOldUrlPattern)
 		{
-			$queryParams = array_merge(array('p' => $this->partnerId, 'e' => $entry->getId(), 'i' => $mediaServerIndex), $queryParams);
+			$queryParams = array_merge(array('p' => $this->partnerId, 'e' => self::addLiveBackendId($entry->getId()), 'i' => $mediaServerIndex), $queryParams);
 			return http_build_query($queryParams);
 		}
 		
