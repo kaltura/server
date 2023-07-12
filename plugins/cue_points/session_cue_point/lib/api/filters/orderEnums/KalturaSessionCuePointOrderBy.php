@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package plugins.sessionCuePoint
  * @subpackage api.filters.enum
