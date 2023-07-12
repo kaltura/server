@@ -81,6 +81,7 @@ class kDruidBase
 	const DRUID_EXTRACTION = 'extraction';
 	const DRUID_EXTRACTION_FUNC = 'extractionFn';
 	const DRUID_TIME_FORMAT = 'timeFormat';
+	const DRUID_ORIGIN = 'origin';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
