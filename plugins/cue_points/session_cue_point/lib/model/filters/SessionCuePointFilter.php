@@ -6,17 +6,5 @@
  */
 class SessionCuePointFilter extends CuePointFilter
 {
-	public function init()
-	{
-		parent::init();
-		
-		$extendedFields = kArray::makeAssociativeDefaultValue(array(
-			"_gte_end_time",
-			"_lte_end_time",
-			"_gte_duration",
-			"_lte_duration",
-		), null);
-		
-		$this->fields = array_merge($this->fields, $extendedFields);
-	}
+
 }
