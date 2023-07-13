@@ -14,6 +14,14 @@ class KalturaSessionCuePointFilter extends KalturaSessionCuePointBaseFilter
 		return new SessionCuePointFilter();
 	}
 	
+	/* (non-PHPdoc)
+	 * @see KalturaRelatedFilter::validateForResponseProfile()
+	 */
+	public function validateForResponseProfile()
+	{
+	
+	}
+	
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
 		return parent::getTypeListResponse($pager, $responseProfile, SessionCuePointPlugin::getCuePointTypeCoreValue(SessionCuePointType::SESSION));
