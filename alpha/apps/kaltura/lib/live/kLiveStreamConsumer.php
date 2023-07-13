@@ -1,7 +1,7 @@
 <?php
 
 
-class kLiveStreamConsumer implements kObjectChangedEventConsumer
+class kLiveStreamConsumer implements kObjectChangedEventConsumer,  kObjectCreatedEventConsumer
 {
 	/**
 	* @inheritDoc
@@ -122,19 +122,52 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer
 		
 		if ($object instanceof categoryEntry)
 		{
-			$partnerId = $object->getPartnerId();
-			
-			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partnerId) &&
-				PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_SYNC_RECORDED_VOD_CATEGORY, $partnerId))
-			{
-				$entry = entryPeer::retrieveByPK($object->getEntryId());
-				if ($entry && $entry->getType() == entryType::LIVE_STREAM)
-				{
-					return true;
-				}
-			}
+			return $this->shouldConsumeEventForCategoryEntry($object);
 		}
 		
+		return false;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function objectCreated(BaseObject $object)
+	{
+		if ($object instanceof categoryEntry)
+		{
+			$entry = entryPeer::retrieveByPK($object->getEntryId());
+			if ($entry && $entry->getType() == entryType::LIVE_STREAM && $entry->getRecordedEntryId())
+			{
+				$this->handleLiveEntryCategoryChanged($entry);
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function shouldConsumeCreatedEvent(BaseObject $object)
+	{
+		if ($object instanceof categoryEntry)
+		{
+			return $this->shouldConsumeEventForCategoryEntry($object);
+		}
+		return false;
+	}
+
+	private function shouldConsumeEventForCategoryEntry(categoryEntry $categoryEntry)
+	{
+		$partnerId = $categoryEntry->getPartnerId();
+
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partnerId) &&
+			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_SYNC_RECORDED_VOD_CATEGORY, $partnerId)) {
+			$entry = entryPeer::retrieveByPK($categoryEntry->getEntryId());
+			if ($entry && $entry->getType() == entryType::LIVE_STREAM) {
+				return true;
+			}
+		}
 		return false;
 	}
 }
