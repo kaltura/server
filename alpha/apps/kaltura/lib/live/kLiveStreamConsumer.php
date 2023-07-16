@@ -157,7 +157,7 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer,  kObjectCreate
 		return false;
 	}
 
-	private function shouldConsumeEventForCategoryEntry(categoryEntry $categoryEntry)
+	protected function shouldConsumeEventForCategoryEntry(categoryEntry $categoryEntry)
 	{
 		$partnerId = $categoryEntry->getPartnerId();
 
