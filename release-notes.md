@@ -1,3 +1,11 @@
+# Scorpius-19.13.0
+## Add permission to EP_USER_ANALYTICS Role ##
+- Issue Type: Task
+- Issue ID: PLAT-24331
+
+### Script ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_13_update_ep_analytics_user_role.php
+
 # Scorpius-19.12.0
 
 ## Schedule event new filtering options ##
