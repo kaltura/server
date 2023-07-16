@@ -4,7 +4,7 @@
 - Issue ID: PLAT-24331
 
 ### Script ###
-	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2022_07_13_update_ep_analytics_user_role.php
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_07_13_update_ep_analytics_user_role.php
 
 # Scorpius-19.12.0
 
