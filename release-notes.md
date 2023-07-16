@@ -1,5 +1,5 @@
 # Scorpius-19.13.0
-## Add missing permission to EP_USER_ANALYTICS Role ##
+## Add permission to EP_USER_ANALYTICS Role ##
 - Issue Type: Task
 - Issue ID: PLAT-24331
 
