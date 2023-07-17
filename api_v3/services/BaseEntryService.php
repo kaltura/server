@@ -406,32 +406,35 @@ class BaseEntryService extends KalturaEntryService
 		$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
 		
 		switch($dbEntry->getType())
-    	{
+		{
 			case entryType::MEDIA_CLIP:
 				$service = new MediaService();
-    			$service->initService('media', 'media', $this->actionName);
-				try
-				{
-					$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
-					$this->validateContent($dbEntry);
-				}
-				catch (kCoreException $e)
-				{
-					if ($e->getCode()==kCoreException::SOURCE_FILE_NOT_FOUND)
-						throw new KalturaAPIException(APIErrors::SOURCE_FILE_NOT_FOUND);
-				}
-		    	$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
-    			return $baseEntry;
+				$service->initService('media', 'media', $this->actionName);
+				break;
+			case entryType::DOCUMENT:
+				$service = new DocumentsService();
+				$service->initService('document_documents', 'document_documents', $this->actionName);
+				break;
 			case entryType::MIX:
 			case entryType::PLAYLIST:
 			case entryType::DATA:
 			case entryType::LIVE_STREAM:
-    		default:
-    			// TODO load from plugin manager other entry services such as document
-    			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
-    	}
-    	
-    	return $baseEntry;
+			default:
+				// TODO load from plugin manager other entry services such as document
+				throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $baseEntry->type);
+		}
+		try
+		{
+			$service->replaceResource($resource, $dbEntry, $conversionProfileId, $advancedOptions);
+			$this->validateContent($dbEntry);
+		}
+		catch (kCoreException $e)
+		{
+			if ($e->getCode()==kCoreException::SOURCE_FILE_NOT_FOUND)
+				throw new KalturaAPIException(APIErrors::SOURCE_FILE_NOT_FOUND);
+		}
+		$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
+		return $baseEntry;
 	}
 	
 	/**
