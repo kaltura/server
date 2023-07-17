@@ -201,7 +201,12 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
 		}
-
+		
+		if ($this->isColumnModified(kuserPeer::IS_ADMIN))
+		{
+			kuserPeer::sendNewUserMail($this, true);
+		}
+		
 		if($this->isColumnModified(kuserPeer::PUSER_ID) &&
 			categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
 		{
