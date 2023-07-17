@@ -2574,6 +2574,10 @@ class kKavaReportsMgr extends kKavaBase
 		
 		$input_filter->addReportsDruidFilters($partner_id, $report_def, $druid_filter);
 		$data_source = self::getDataSource($report_def);
+		if (isset($data_source[self::DRUID_TYPE]) && $data_source[self::DRUID_TYPE] === self::DRUID_UNION)
+		{
+			$data_source = reset($data_source[self::DRUID_DATASOURCES]);
+		}
 		//Calculating druid filter userIds uses core logic which we don't want to move to the filter
 		if ($input_filter instanceof endUserReportsInputFilter && $input_filter->userIds != null)
 		{
@@ -2791,7 +2795,6 @@ class kKavaReportsMgr extends kKavaBase
 			$druid_filter[] = $partner_filter;
 		}
 
-		$data_source = self::getDataSource($report_def);
 		if ($input_filter->owners != null)
 		{
 			$dimension = self::getEntryKuserDimension($data_source);
@@ -4403,7 +4406,8 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			else
 			{
-				$c->addSelectColumn("kuser.$column");
+				$exploded_column = explode('.', $column);
+				$c->addSelectColumn('kuser.' . $exploded_column[0]);
 			}
 		}
 
@@ -4439,7 +4443,17 @@ class kKavaReportsMgr extends kKavaBase
 			{
 				foreach ($columns as $column)
 				{
-					$output[] = $row[$column];
+					$exploded_column = explode('.', $column);
+					if (count($exploded_column) > 1)
+					{
+						list($column, $field) = $exploded_column;
+						$value = @unserialize($row[$column]);
+						$output[] = isset($value[$field]) ? $value[$field] : '';
+					}
+					else
+					{
+						$output[] = $row[$column];
+					}
 				}
 			}
 			else
@@ -4929,6 +4943,12 @@ class kKavaReportsMgr extends kKavaBase
 				break;
 			}
 		}
+
+		if (isset($data_source[self::DRUID_TYPE]) && $data_source[self::DRUID_TYPE] === self::DRUID_UNION)
+		{
+			$data_source = reset($data_source[self::DRUID_DATASOURCES]);
+		}
+
 		$dim_mapping = $report_def[self::REPORT_DIMENSION_MAP];
 
 		foreach ($enrich_defs as $enrich_def)
