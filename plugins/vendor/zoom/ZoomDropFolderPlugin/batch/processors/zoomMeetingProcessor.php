@@ -7,7 +7,12 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 {
 	protected function getAdditionalUsersFromZoom($recordingId)
 	{
-		return $this->zoomClient->retrieveMeetingParticipant($recordingId);
+		return $this->zoomClient->retrieveReportMeetingParticipant($recordingId);
+	}
+
+	protected function getAlternativeHostsData($recordingId)
+	{
+		return $this->zoomClient->retrieveMeeting($recordingId);
 	}
 
 	/**
@@ -35,24 +40,6 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 		$participants = new kZoomParticipants();
 		$participants->parseData($additionalUsersZoomResponse);
 		$participantsEmails = $participants->getParticipantsEmails();
-		if($participantsEmails)
-		{
-			$participantsEmails = array_filter(array_unique($participantsEmails), 'trim');
-			KalturaLog::debug('Found the following participants: ' . implode(", ", $participantsEmails));
-			$result = array();
-			foreach ($participantsEmails as $participantEmail)
-			{
-				$zoomUser = new kZoomUser();
-				$zoomUser->setOriginalName($participantEmail);
-				$zoomUser->setProcessedName(ZoomBatchUtils::processZoomUserName($participantEmail, $this->dropFolder->zoomVendorIntegration, $this->zoomClient));
-				$result[] = $zoomUser;
-			}
-		}
-		else
-		{
-			$result = null;
-		}
-
-		return $result;
+		return parent::parseZoomEmails($participantsEmails);
 	}
 }

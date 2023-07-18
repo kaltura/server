@@ -10,26 +10,18 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 	{
 		return $this->zoomClient->retrieveWebinarPanelists($recordingId);
 	}
+
+	protected function getAlternativeHostsData($recordingId)
+	{
+		return $this->zoomClient->retrieveWebinar($recordingId);
+	}
 	
 	protected function parseAdditionalUsers($additionalUsersZoomResponse)
 	{
 		$panelists = new kZoomPanelists();
 		$panelists->parseData($additionalUsersZoomResponse);
 		$panelistsEmails = $panelists->getPanelistsEmails();
-		$result = array();
-		if($panelistsEmails)
-		{
-			KalturaLog::debug('Found the following panelists: ' . implode(", ", $panelistsEmails));
-			foreach ($panelistsEmails as $panelistEmail)
-			{
-				$zoomUser = new kZoomUser();
-				$zoomUser->setOriginalName($panelistEmail);
-				$zoomUser->setProcessedName(ZoomBatchUtils::processZoomUserName($panelistEmail, $this->dropFolder->zoomVendorIntegration, $this->zoomClient));
-				$result[] = $zoomUser;
-			}
-		}
-		
-		return $result;
+		return parent::parseZoomEmails($panelistsEmails);
 	}
 	
 	/**
