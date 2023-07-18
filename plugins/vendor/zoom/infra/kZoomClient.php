@@ -69,15 +69,17 @@ class kZoomClient extends kVendorClient
 		return $this->callZoom($apiPath);
 	}
 
-	public function retrieveMetricsMeetingParticipant($meetingId)
+	public function retrieveMetricsMeetingParticipant($meetingId, $pageSize, $nextPageToken)
 	{
 		$apiPath = str_replace('@meetingId@', $meetingId, self::API_METRICS_MEETINGS_PARTICIPANT);
+		$apiPath .= '?page_size=' . $pageSize . '&next_page_token=' . $nextPageToken;
 		return $this->callZoom($apiPath);
 	}
 
-	public function retrieveMetricsWebinarParticipant($meetingId)
+	public function retrieveMetricsWebinarParticipant($meetingId, $pageSize, $nextPageToken)
 	{
 		$apiPath = str_replace('@webinarId@', $meetingId, self::API_METRICS_WEBINARS_PARTICIPANT);
+		$apiPath .= '?page_size=' . $pageSize . '&next_page_token=' . $nextPageToken;
 		return $this->callZoom($apiPath);
 	}
 	

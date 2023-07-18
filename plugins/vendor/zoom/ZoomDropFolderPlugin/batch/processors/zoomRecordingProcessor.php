@@ -13,6 +13,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	const SETTINGS = 'settings';
 	const ALTERNATIVE_HOSTS = 'alternative_hosts';
 	const COHOST_ROLE = 'cohost';
+	const NEXT_PAGE_TOKEN = 'next_page_token';
 
 	/**
 	 * @var KalturaMediaEntry
@@ -196,9 +197,13 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	 */
 	protected function handleParticipants($entry, $validatedUsers, $validatedHosts)
 	{
-		$entitledUsersPublish = $validatedHosts;
-		$entry->entitledUsersPublish = implode(',', array_unique($entitledUsersPublish));
-		$entry->entitledUsersEdit = implode(',', array_unique($validatedHosts));
+		$entitledUsersPublish = array();
+		if($validatedHosts)
+		{
+			$entitledUsersPublish = $validatedHosts;
+			$entry->entitledUsersPublish = implode(',', array_unique($validatedHosts));
+			$entry->entitledUsersEdit = implode(',', array_unique($validatedHosts));
+		}
 
 		$handleParticipantMode = $this->dropFolder->zoomVendorIntegration->handleParticipantsMode;
 		if ($validatedUsers && $handleParticipantMode != kHandleParticipantsMode::IGNORE)
@@ -344,7 +349,8 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$userToExclude = strtolower($userToExclude);
 		$zoomCoHosts = $this->getCoHostsEmails($recordingId);
 		$zoomAlternativeHosts = $this->getAlternativeHostsEmails($recordingId);
-		$zoomHosts = array_merge($zoomCoHosts, $zoomAlternativeHosts);
+		$zoomHosts = $zoomCoHosts ? array_merge($zoomCoHosts, $zoomAlternativeHosts) : $zoomAlternativeHosts;
+		$zoomHosts = $zoomHosts ? $zoomHosts : null;
 		return $this->getValidatedUsers($zoomHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
 										$userToExclude);
 	}
@@ -357,15 +363,28 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			$alternativeHostsEmails = explode(";", $data[self::SETTINGS][self::ALTERNATIVE_HOSTS]);
 			return $this->parseZoomEmails($alternativeHostsEmails);
 		}
-		return null;
+		return array();
 	}
 
 	protected function getCoHostsEmails($recordingId)
 	{
-		$metricsParticipants = $this->getCoHostsData($recordingId);
-		$participants = new kZoomParticipants();
-		$participants->parseData($metricsParticipants, self::COHOST_ROLE);
-		$coHostsEmails = $participants->getParticipantsEmails();
+		$coHostsEmails = array();
+		$pageIndex = 0;
+		$maxPages = 10;
+		$maxPageSize = 300;
+		$nextPageToken = '';
+		do
+		{
+			$metricsParticipants = $this->getCoHostsData($recordingId, $maxPageSize, $nextPageToken);
+			$participants = new kZoomParticipants();
+			$participants->parseData($metricsParticipants, self::COHOST_ROLE);
+			$coHostsEmails = array_merge($coHostsEmails, $participants->getParticipantsEmails());
+			$pageIndex++;
+			$nextPageToken = $metricsParticipants && $metricsParticipants[self::NEXT_PAGE_TOKEN] ?
+				$metricsParticipants[self::NEXT_PAGE_TOKEN] : '';
+
+		} while ($nextPageToken !== '' && $pageIndex < $maxPages);
+
 		return $this->parseZoomEmails($coHostsEmails);
 	}
 
