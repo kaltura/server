@@ -15,6 +15,11 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 	{
 		return $this->zoomClient->retrieveWebinar($recordingId);
 	}
+
+	protected function getCoHostsData($recordingId)
+	{
+		return $this->zoomClient->retrieveMetricsWebinarParticipant($recordingId);
+	}
 	
 	protected function parseAdditionalUsers($additionalUsersZoomResponse)
 	{

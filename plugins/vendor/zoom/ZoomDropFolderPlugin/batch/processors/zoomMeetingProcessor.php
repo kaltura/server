@@ -15,6 +15,11 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 		return $this->zoomClient->retrieveMeeting($recordingId);
 	}
 
+	protected function getCoHostsData($recordingId)
+	{
+		return $this->zoomClient->retrieveMetricsMeetingParticipant($recordingId);
+	}
+
 	/**
 	 * @param KalturaMediaEntry $entry
 	 * @param string $meetingId

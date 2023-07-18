@@ -11,7 +11,8 @@ class kZoomClient extends kVendorClient
 	const API_USERS_ME          = 'me';
 	const API_USERS             = '/v2/users/@userId@';
 	const API_REPORT_PARTICIPANT       = '/v2/report/meetings/@meetingId@/participants';
-	const API_METRICS_PARTICIPANT       = '/v2/metrics/meetings/@meetingId@/participants';
+	const API_METRICS_MEETINGS_PARTICIPANT       = '/v2/metrics/meetings/@meetingId@/participants';
+	const API_METRICS_WEBINARS_PARTICIPANT       = '/v2/metrics/webinars/@webinarId@/participants';
 	const API_PANELISTS         = '/v2/webinars/@webinarId@/panelists';
 	const API_WEBINAR         = '/v2/webinars/@webinarId@';
 	const API_USERS_PERMISSIONS = '/v2/users/@userId@/permissions';
@@ -70,7 +71,13 @@ class kZoomClient extends kVendorClient
 
 	public function retrieveMetricsMeetingParticipant($meetingId)
 	{
-		$apiPath = str_replace('@meetingId@', $meetingId, self::API_METRICS_PARTICIPANT);
+		$apiPath = str_replace('@meetingId@', $meetingId, self::API_METRICS_MEETINGS_PARTICIPANT);
+		return $this->callZoom($apiPath);
+	}
+
+	public function retrieveMetricsWebinarParticipant($meetingId)
+	{
+		$apiPath = str_replace('@webinarId@', $meetingId, self::API_METRICS_WEBINARS_PARTICIPANT);
 		return $this->callZoom($apiPath);
 	}
 	

@@ -362,7 +362,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 
 	protected function getCoHostsEmails($recordingId)
 	{
-		$metricsParticipants = $this->zoomClient->retrieveMetricsMeetingParticipant($recordingId);
+		$metricsParticipants = $this->getCoHostsData($recordingId);
 		$participants = new kZoomParticipants();
 		$participants->parseData($metricsParticipants, self::COHOST_ROLE);
 		$coHostsEmails = $participants->getParticipantsEmails();
@@ -396,7 +396,9 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse);
 
 	protected abstract function getAlternativeHostsData($recordingId);
-	
+
+	protected abstract function getCoHostsData($recordingId);
+
 	protected function approveEntryIfNeeded($parentEntryId)
 	{
 		$parentEntry =  KBatchBase::$kClient->baseEntry->get($parentEntryId);
