@@ -153,6 +153,10 @@ class BaseEntryService extends KalturaEntryService
 				$service = new LiveStreamService();
     			$service->initService('liveStream', 'liveStream', $this->actionName);
     			break;
+		    case entryType::DOCUMENT:
+			    $service = new DocumentsService();
+			    $service->initService('document_documents', 'document_documents', $this->actionName);
+			    break;
     			
     		default:
     			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
