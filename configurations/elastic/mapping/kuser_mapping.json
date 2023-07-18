@@ -220,6 +220,10 @@
 				"login_enabled": {
 					"type": "boolean"
 				},
+				"capabilities": {
+					"type" : "keyword",
+					"normalizer" : "kaltura_keyword_normalizer"
+				},
 				"tags" : {
 					"type" : "text",
 					"analyzer" : "kaltura_text",

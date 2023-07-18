@@ -16,10 +16,20 @@ class KalturaGroup extends KalturaBaseUser
 	 * @var KalturaGroupProcessStatus
 	 */
 	public $processStatus;
+	
+	/**
+	 * @var KalturaUserCapabilityArray
+	 */
+	public $capabilities;
 
 	private static $names = array('fullName' => 'getFullName', 'screenName' => 'getScreenName');
 
-	private static $map_between_objects = array('membersCount', 'processStatus');
+	private static $map_between_objects = array
+	(
+		'membersCount',
+		'processStatus',
+		'capabilities',
+	);
 
 	public function getMapBetweenObjects ( )
 	{
