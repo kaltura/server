@@ -416,7 +416,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 
 	protected abstract function getAlternativeHostsData($recordingId);
 
-	protected abstract function getCoHostsData($recordingId);
+	protected abstract function getCoHostsData($recordingId, $pageSize, $nextPageToken);
 
 	protected function approveEntryIfNeeded($parentEntryId)
 	{
