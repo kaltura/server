@@ -1449,8 +1449,10 @@ CREATE TABLE IF NOT EXISTS `kuser_to_user_role` (
   `user_role_id` int(11) NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `app_guid` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `kuser_to_user_role_FI_1` (`kuser_id`)
+  KEY `kuser_to_user_role_FI_1` (`kuser_id`),
+  KEY `app_guid` (`app_guid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 

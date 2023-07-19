@@ -26,7 +26,7 @@ abstract class BaseKuserToUserRolePeer {
 	const TM_CLASS = 'KuserToUserRoleTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 5;
+	const NUM_COLUMNS = 6;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -46,6 +46,9 @@ abstract class BaseKuserToUserRolePeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'kuser_to_user_role.UPDATED_AT';
 
+	/** the column name for the APP_GUID field */
+	const APP_GUID = 'kuser_to_user_role.APP_GUID';
+
 	/**
 	 * An identiy map to hold any loaded instances of KuserToUserRole objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -62,11 +65,11 @@ abstract class BaseKuserToUserRolePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'KuserId', 'UserRoleId', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kuserId', 'userRoleId', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::KUSER_ID, self::USER_ROLE_ID, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'kuser_id', 'user_role_id', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'KuserId', 'UserRoleId', 'CreatedAt', 'UpdatedAt', 'AppGuid', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kuserId', 'userRoleId', 'createdAt', 'updatedAt', 'appGuid', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::KUSER_ID, self::USER_ROLE_ID, self::CREATED_AT, self::UPDATED_AT, self::APP_GUID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'kuser_id', 'user_role_id', 'created_at', 'updated_at', 'app_guid', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
 
 	/**
@@ -76,11 +79,11 @@ abstract class BaseKuserToUserRolePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KuserId' => 1, 'UserRoleId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kuserId' => 1, 'userRoleId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KUSER_ID => 1, self::USER_ROLE_ID => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kuser_id' => 1, 'user_role_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KuserId' => 1, 'UserRoleId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'AppGuid' => 5, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kuserId' => 1, 'userRoleId' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'appGuid' => 5, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KUSER_ID => 1, self::USER_ROLE_ID => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::APP_GUID => 5, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kuser_id' => 1, 'user_role_id' => 2, 'created_at' => 3, 'updated_at' => 4, 'app_guid' => 5, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
 
 	/**
@@ -155,6 +158,7 @@ abstract class BaseKuserToUserRolePeer {
 		$criteria->addSelectColumn(KuserToUserRolePeer::USER_ROLE_ID);
 		$criteria->addSelectColumn(KuserToUserRolePeer::CREATED_AT);
 		$criteria->addSelectColumn(KuserToUserRolePeer::UPDATED_AT);
+		$criteria->addSelectColumn(KuserToUserRolePeer::APP_GUID);
 	}
 
 	/**
@@ -1398,6 +1402,15 @@ abstract class BaseKuserToUserRolePeer {
 	 * @return array
 	 */
 	public static function getAtomicColumns()
+	{
+		return array();
+	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
 	{
 		return array();
 	}
