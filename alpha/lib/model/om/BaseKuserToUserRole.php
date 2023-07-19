@@ -50,6 +50,12 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 	protected $updated_at;
 
 	/**
+	 * The value for the app_guid field.
+	 * @var        string
+	 */
+	protected $app_guid;
+
+	/**
 	 * @var        kuser
 	 */
 	protected $akuser;
@@ -212,6 +218,16 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [app_guid] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getAppGuid()
+	{
+		return $this->app_guid;
 	}
 
 	/**
@@ -390,6 +406,29 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
+	 * Set the value of [app_guid] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     KuserToUserRole The current object (for fluent API support)
+	 */
+	public function setAppGuid($v)
+	{
+		if(!isset($this->oldColumnsValues[KuserToUserRolePeer::APP_GUID]))
+			$this->oldColumnsValues[KuserToUserRolePeer::APP_GUID] = $this->app_guid;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->app_guid !== $v) {
+			$this->app_guid = $v;
+			$this->modifiedColumns[] = KuserToUserRolePeer::APP_GUID;
+		}
+
+		return $this;
+	} // setAppGuid()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -420,7 +459,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
 		$this->last_hydrate_time = time();
-
+		
 		try {
 
 			$this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
@@ -428,6 +467,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 			$this->user_role_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
 			$this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
 			$this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+			$this->app_guid = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -437,7 +477,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 5; // 5 = KuserToUserRolePeer::NUM_COLUMNS - KuserToUserRolePeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 6; // 6 = KuserToUserRolePeer::NUM_COLUMNS - KuserToUserRolePeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating KuserToUserRole object", $e);
@@ -496,7 +536,9 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 		// already in the pool.
 
 		KuserToUserRolePeer::setUseCriteriaFilter(false);
-		$stmt = KuserToUserRolePeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+		$criteria = $this->buildPkeyCriteria();
+		KuserToUserRolePeer::addSelectColumns($criteria);
+		$stmt = BasePeer::doSelect($criteria, $con);
 		KuserToUserRolePeer::setUseCriteriaFilter(true);
 		$row = $stmt->fetch(PDO::FETCH_NUM);
 		$stmt->closeCursor();
@@ -692,7 +734,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 	/**
 	 * Code to be run before persisting the object
 	 * @param PropelPDO $con
-	 * @return bloolean
+	 * @return boolean
 	 */
 	public function preSave(PropelPDO $con = null)
 	{
@@ -717,8 +759,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 	 */
 	public function preInsert(PropelPDO $con = null)
 	{
-    	$this->setCreatedAt(time());
-    	
+		$this->setCreatedAt(time());
 		$this->setUpdatedAt(time());
 		return parent::preInsert($con);
 	}
@@ -753,7 +794,8 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 		if($this->isModified())
 		{
 			kQueryCache::invalidateQueryCache($this);
-			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $this->tempModifiedColumns));
+			$modifiedColumns = $this->tempModifiedColumns;
+			kEventsManager::raiseEvent(new kObjectChangedEvent($this, $modifiedColumns));
 		}
 			
 		$this->tempModifiedColumns = array();
@@ -944,6 +986,9 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 			case 4:
 				return $this->getUpdatedAt();
 				break;
+			case 5:
+				return $this->getAppGuid();
+				break;
 			default:
 				return null;
 				break;
@@ -970,6 +1015,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 			$keys[2] => $this->getUserRoleId(),
 			$keys[3] => $this->getCreatedAt(),
 			$keys[4] => $this->getUpdatedAt(),
+			$keys[5] => $this->getAppGuid(),
 		);
 		return $result;
 	}
@@ -1016,6 +1062,9 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 			case 4:
 				$this->setUpdatedAt($value);
 				break;
+			case 5:
+				$this->setAppGuid($value);
+				break;
 		} // switch()
 	}
 
@@ -1045,6 +1094,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[2], $arr)) $this->setUserRoleId($arr[$keys[2]]);
 		if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+		if (array_key_exists($keys[5], $arr)) $this->setAppGuid($arr[$keys[5]]);
 	}
 
 	/**
@@ -1061,6 +1111,7 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(KuserToUserRolePeer::USER_ROLE_ID)) $criteria->add(KuserToUserRolePeer::USER_ROLE_ID, $this->user_role_id);
 		if ($this->isColumnModified(KuserToUserRolePeer::CREATED_AT)) $criteria->add(KuserToUserRolePeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(KuserToUserRolePeer::UPDATED_AT)) $criteria->add(KuserToUserRolePeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(KuserToUserRolePeer::APP_GUID)) $criteria->add(KuserToUserRolePeer::APP_GUID, $this->app_guid);
 
 		return $criteria;
 	}
@@ -1079,17 +1130,20 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 
 		$criteria->add(KuserToUserRolePeer::ID, $this->id);
 		
-		if($this->alreadyInSave && count($this->modifiedColumns) == 2 && $this->isColumnModified(KuserToUserRolePeer::UPDATED_AT))
+		if($this->alreadyInSave)
 		{
-			$theModifiedColumn = null;
-			foreach($this->modifiedColumns as $modifiedColumn)
-				if($modifiedColumn != KuserToUserRolePeer::UPDATED_AT)
-					$theModifiedColumn = $modifiedColumn;
-					
-			$atomicColumns = KuserToUserRolePeer::getAtomicColumns();
-			if(in_array($theModifiedColumn, $atomicColumns))
-				$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
-		}
+			if (count($this->modifiedColumns) == 2 && $this->isColumnModified(KuserToUserRolePeer::UPDATED_AT))
+			{
+				$theModifiedColumn = null;
+				foreach($this->modifiedColumns as $modifiedColumn)
+					if($modifiedColumn != KuserToUserRolePeer::UPDATED_AT)
+						$theModifiedColumn = $modifiedColumn;
+						
+				$atomicColumns = KuserToUserRolePeer::getAtomicColumns();
+				if(in_array($theModifiedColumn, $atomicColumns))
+					$criteria->add($theModifiedColumn, $this->getByName($theModifiedColumn, BasePeer::TYPE_COLNAME), Criteria::NOT_EQUAL);
+			}
+		}		
 
 		return $criteria;
 	}
@@ -1134,6 +1188,8 @@ abstract class BaseKuserToUserRole extends BaseObject  implements Persistent {
 		$copyObj->setCreatedAt($this->created_at);
 
 		$copyObj->setUpdatedAt($this->updated_at);
+
+		$copyObj->setAppGuid($this->app_guid);
 
 
 		$copyObj->setNew(true);

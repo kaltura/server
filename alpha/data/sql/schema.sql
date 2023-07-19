@@ -2193,6 +2193,7 @@ CREATE TABLE `kuser_to_user_role`
 	`user_role_id` INTEGER  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
+	`app_guid` VARCHAR(255),
 	PRIMARY KEY (`id`),
 	INDEX `kuser_to_user_role_FI_1` (`kuser_id`),
 	CONSTRAINT `kuser_to_user_role_FK_1`
@@ -2492,7 +2493,7 @@ CREATE TABLE `conf_maps`
 	`status` INTEGER  NOT NULL,
 	`created_at` DATETIME  NOT NULL,
 	`remarks` VARCHAR(255),
-	`content` MEDIUMTEXT,
+	`content` TEXT,
 	`version` INTEGER,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
@@ -2522,6 +2523,30 @@ CREATE TABLE `sso`
 	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `domain_status_index`(`domain`, `status`),
 	KEY `redirect_url_status_index`(`redirect_url`, `status`)
+)Type=InnoDB;
+
+#-----------------------------------------------------------------------------
+#-- virtual_event
+#-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `virtual_event`;
+
+
+CREATE TABLE `virtual_event`
+(
+	`id` BIGINT  NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(256),
+	`description` VARCHAR(1024),
+	`partner_id` BIGINT,
+	`status` TINYINT,
+	`tags` TEXT,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`custom_data` TEXT,
+	PRIMARY KEY (`id`),
+	KEY `partner_id_index`(`partner_id`),
+	KEY `status_partner_id_index`(`status`, `partner_id`),
+	KEY `updated_at_index`(`updated_at`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

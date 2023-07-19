@@ -1,0 +1,1 @@
+ALTER TABLE kuser_to_user_role ADD app_guid VARCHAR(255) DEFAULT NULL, ADD INDEX app_guid(`app_guid`);
