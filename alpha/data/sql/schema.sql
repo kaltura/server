@@ -2493,7 +2493,7 @@ CREATE TABLE `conf_maps`
 	`status` INTEGER  NOT NULL,
 	`created_at` DATETIME  NOT NULL,
 	`remarks` VARCHAR(255),
-	`content` TEXT,
+	`content` MEDIUMTEXT,
 	`version` INTEGER,
 	`custom_data` TEXT,
 	PRIMARY KEY (`id`),
@@ -2523,30 +2523,6 @@ CREATE TABLE `sso`
 	KEY `partner_id_status_index`(`partner_id`, `status`),
 	KEY `domain_status_index`(`domain`, `status`),
 	KEY `redirect_url_status_index`(`redirect_url`, `status`)
-)Type=InnoDB;
-
-#-----------------------------------------------------------------------------
-#-- virtual_event
-#-----------------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `virtual_event`;
-
-
-CREATE TABLE `virtual_event`
-(
-	`id` BIGINT  NOT NULL AUTO_INCREMENT,
-	`name` VARCHAR(256),
-	`description` VARCHAR(1024),
-	`partner_id` BIGINT,
-	`status` TINYINT,
-	`tags` TEXT,
-	`created_at` DATETIME,
-	`updated_at` DATETIME,
-	`custom_data` TEXT,
-	PRIMARY KEY (`id`),
-	KEY `partner_id_index`(`partner_id`),
-	KEY `status_partner_id_index`(`status`, `partner_id`),
-	KEY `updated_at_index`(`updated_at`)
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier
