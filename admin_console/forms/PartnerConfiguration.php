@@ -217,6 +217,13 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$maxWordsForNgram = $this->getElement('max_word_for_ngram');
 		$maxWordsForNgram->addValidator($intValidator) ;
+
+		$this->addElement('text', 'search_max_metadata_index_length', array(
+			'label'	  => 'Max metadata index length',
+		));
+
+		$maxWordsForNgram = $this->getElement('search_max_metadata_index_length');
+		$maxWordsForNgram->addValidator($intValidator) ;
 		
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
@@ -1071,8 +1078,10 @@ class Form_PartnerConfiguration extends Infra_Form
 		                                   array('crossLine')), 'security', array('legend' => 'Security'));
 		$this->addDisplayGroup(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'ALLOW_SSO_PER_USER',
 		                                   'two_factor_authentication_mode', 'crossLine'), 'authenticationSettings', array('legend' => 'Authentication Settings'));
-		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram'),
+
+		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram', 'search_max_metadata_index_length'),
 		                                   array('crossLine'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
+
 		$this->addDisplayGroup(array_merge($permissionNames[self::RECYCLE_BIN_OPTIONS], array('recycle_bin_retention_period')),'recycleBin', array('legend' => 'Recycle Bin Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
