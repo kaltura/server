@@ -94,7 +94,7 @@ class KAsyncReachQueueHandler extends KPeriodicWorker
                 }
             }
 
-        } while ($handledTasksCounter < KBatchBase::$taskConfig->params->taskHandleLimit);
+        } while ($handledTasksCounter < KBatchBase::$taskConfig->params->taskHandleLimit && !parent::checkStopFile());
 
         KBatchBase::unimpersonate();
     }

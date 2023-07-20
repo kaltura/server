@@ -855,4 +855,9 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		return $defaultValue;
 	}
+
+	public static function checkStopFile()
+	{
+		return file_exists('/opt/kaltura/maintenance');
+	}
 }

@@ -35,7 +35,7 @@ class KAsyncFileSyncImport extends KPeriodicWorker
 		
 		$timeLimit = time() + self::MAX_EXECUTION_TIME; 
 		
-		while (time() < $timeLimit)
+		while (time() < $timeLimit && !parent::checkStopFile())
 		{
 			self::$kClient->setResponseProfile($responseProfile);
 			

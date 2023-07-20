@@ -94,7 +94,7 @@ class KAsyncReachJobCleaner extends KPeriodicWorker
 			$totalCount = $totalCount - $pager->pageSize;
 			$pager->pageSize = min(self::MAX_PAGE_SIZE, $totalCount);
 
-		} while ($totalCount > 0 && $pager->pageIndex <= 20);
+		} while ($totalCount > 0 && $pager->pageIndex <= 20 && !parent::checkStopFile());
 
 		KalturaLog::debug('Done');
 	}
