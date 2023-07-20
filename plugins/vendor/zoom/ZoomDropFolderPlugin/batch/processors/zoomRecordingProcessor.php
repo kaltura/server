@@ -203,6 +203,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			$entitledUsersPublish = $validatedHosts;
 			$entry->entitledUsersPublish = implode(',', array_unique($validatedHosts));
 			$entry->entitledUsersEdit = implode(',', array_unique($validatedHosts));
+			KalturaLog::debug("Adding co-hosts and alternative hosts as entitled user publisher and editor, users: " . print_r($validatedHosts, true));
 		}
 
 		$handleParticipantMode = $this->dropFolder->zoomVendorIntegration->handleParticipantsMode;
@@ -360,6 +361,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$data = $this->getAlternativeHostsData($recordingId);
 		if(!isset($data[self::SETTINGS]) || !isset($data[self::SETTINGS][self::ALTERNATIVE_HOSTS]))
 		{
+			KalturaLog::debug("Found the following alternative hosts [" . $data[self::SETTINGS][self::ALTERNATIVE_HOSTS] . "]");
 			$alternativeHostsEmails = explode(";", $data[self::SETTINGS][self::ALTERNATIVE_HOSTS]);
 			return $this->parseZoomEmails($alternativeHostsEmails);
 		}
@@ -385,6 +387,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 
 		} while ($nextPageToken !== '' && $pageIndex < $maxPages);
 
+		KalturaLog::debug("Found the following co-hosts " . print_r($coHostsEmails, true));
 		return $this->parseZoomEmails($coHostsEmails);
 	}
 
