@@ -2863,7 +2863,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function setUpdatedAt($v)
 	{
-		KalturaLog::debug("Yossi: setting updateAt to [$v]");
 		parent::setUpdatedAt($v);
 		if(!in_array(entryPeer::UPDATED_AT, $this->modifiedColumns, false))
 			$this->modifiedColumns[] = entryPeer::UPDATED_AT;
