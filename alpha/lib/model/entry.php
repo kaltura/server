@@ -192,7 +192,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		self::ENTRY_MEDIA_TYPE_LIVE_STREAM_REAL_MEDIA => 'LIVE_STREAM_REAL_MEDIA',
 		self::ENTRY_MEDIA_TYPE_LIVE_STREAM_QUICKTIME => 'LIVE_STREAM_QUICKTIME',
 	);
-	
+
+	private static $allow_override_read_only_fields = false;
 	
 	/**
 	 * Applies default values to this object.
@@ -2862,6 +2863,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function setUpdatedAt($v)
 	{
+		KalturaLog::debug("Yossi: setting updateAt to [$v]");
 		parent::setUpdatedAt($v);
 		if(!in_array(entryPeer::UPDATED_AT, $this->modifiedColumns, false))
 			$this->modifiedColumns[] = entryPeer::UPDATED_AT;
@@ -2989,6 +2991,23 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	}
 	
 // ----------- Extra object connections ----------------
+	/**
+	 * Code to be run before updating the object in database
+	 * @param PropelPDO $con
+	 * @return boolean
+	 */
+	public function preUpdate(PropelPDO $con = null)
+	{
+		if(!self::$allow_override_read_only_fields || !in_array(entryPeer::UPDATED_AT, $this->modifiedColumns, false))
+		{
+			return parent::preUpdate($con);
+		}
+
+		$currUpdatedAt = $this->getUpdatedAt(null);
+		$ret = parent::preUpdate($con);
+		$this->setUpdatedAt($currUpdatedAt);
+		return $ret;
+	}
 
 	/**
 	 * Code to be run before updating the object in database
@@ -4623,6 +4642,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 
 		return false;
+	}
+
+	public static function setAllowSetReadOnlyFields($v)
+	{
+		self::$allow_override_read_only_fields = $v;
 	}
 
 }
