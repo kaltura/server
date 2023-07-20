@@ -359,7 +359,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	protected function getAlternativeHostsEmails($recordingId)
 	{
 		$data = $this->getAlternativeHostsData($recordingId);
-		if(!isset($data[self::SETTINGS]) || !isset($data[self::SETTINGS][self::ALTERNATIVE_HOSTS]))
+		if(isset($data[self::SETTINGS]) && isset($data[self::SETTINGS][self::ALTERNATIVE_HOSTS]))
 		{
 			KalturaLog::debug("Found the following alternative hosts [" . $data[self::SETTINGS][self::ALTERNATIVE_HOSTS] . "]");
 			$alternativeHostsEmails = explode(";", $data[self::SETTINGS][self::ALTERNATIVE_HOSTS]);

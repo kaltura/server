@@ -83,7 +83,7 @@ class kZoomClient extends kVendorClient
 	public function retrieveMetricsWebinarParticipant($meetingId, $pageSize, $nextPageToken)
 	{
 		$apiPath = str_replace('@webinarId@', $meetingId, self::API_METRICS_WEBINARS_PARTICIPANT);
-		$apiPath .= '?page_size=' . $pageSize;
+		$apiPath .= "?type=past" . '&page_size=' . $pageSize;
 		if($nextPageToken != '')
 		{
 			$apiPath .= '&next_page_token=' . $nextPageToken;
