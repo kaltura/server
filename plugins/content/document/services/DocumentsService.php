@@ -558,10 +558,14 @@ class DocumentsService extends KalturaEntryService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DOCUMENT)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
 		
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
+		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
+		}
 		
 		if ($resource)
 		{

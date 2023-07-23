@@ -1,5 +1,5 @@
 # Scorpius-19.13.0
-## Add action addContent to Documents service ##
+## Add addContent action to Documents service ##
 - Issue Type: Task
 - Issue ID: PLAT-24332
 
