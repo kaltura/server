@@ -123,7 +123,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				KalturaLog::info('Child job id [' . $job->getId() . '] status [' . $job->getStatus() . ']' . '] type ['.$job->getJobType() .']' );
 				if($job->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 				{
-					return $this->hasGrandChildFinished($job);
+					if (!$this->hasGrandChildFinished($job))
+					{
+						return false;
+					}
 				}
 			}
 		}
