@@ -222,8 +222,8 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Max metadata index length',
 		));
 
-		$maxWordsForNgram = $this->getElement('search_max_metadata_index_length');
-		$maxWordsForNgram->addValidator($intValidator) ;
+		$searchMaxMetadataIndexLength = $this->getElement('search_max_metadata_index_length');
+		$searchMaxMetadataIndexLength->addValidator($intValidator) ;
 		
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
