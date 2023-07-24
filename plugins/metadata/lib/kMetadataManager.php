@@ -819,7 +819,6 @@ class kMetadataManager
 		{
 			$maxMetadataLength = $partner->getSearchMaxMetadataIndexLength();
 		}
-		KalturaLog::debug("TTT: maxMetadataLength [$maxMetadataLength]");
 
 		foreach($profileFields as $profileField)
 		{
