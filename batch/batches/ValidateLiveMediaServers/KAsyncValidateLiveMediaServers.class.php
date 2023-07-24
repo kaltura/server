@@ -85,7 +85,7 @@ class KAsyncValidateLiveMediaServers extends KPeriodicWorker
 		
 		$entryServerNodes = self::$kClient->entryServerNode->listAction($entryServerNodeFilter, $entryServerNodePager);
 		
-		while($entryServerNodes->objects && count($entryServerNodes->objects))
+		while($entryServerNodes->objects && count($entryServerNodes->objects) && !parent::checkStopFile())
 		{
 			foreach($entryServerNodes->objects as $entryServerNode)
 			{

@@ -90,7 +90,7 @@ class KAsyncStorageUpdate extends KPeriodicWorker
 			{
 				gc_collect_cycles();
 			}
-		} while ($countPartners && !$maxPartnerReached);
+		} while ($countPartners && !$maxPartnerReached && !parent::checkStopFile());
 
 		if (!$maxPartnerReached)
 		{
