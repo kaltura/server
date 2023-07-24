@@ -1620,41 +1620,19 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this->getFromCustomData(self::CUSTOM_DATA_IS_HASHED);
 	}
 	
-	public function setCapabilities(array $v)
+	public function setCapabilities(array $capabilities)
 	{
+		$v = null;
+		if ($capabilities)
+		{
+			$v = implode(',', $capabilities);
+		}
 		$this->putInCustomData(self::CAPABILITIES, $v);
 	}
 	
 	public function getCapabilities()
 	{
-		return $this->getFromCustomData(self::CAPABILITIES, null, array());
-	}
-	
-	public function hasCapability($capability)
-	{
-		$capabilitiesArr = $this->getFromCustomData(self::CAPABILITIES, null, array());
-		return array_key_exists($capability, $capabilitiesArr);
-	}
-	
-	public function addCapability($capability)
-	{
 		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
-		$capabilities[$capability] = $capability;
-		$this->putInCustomData(self::CAPABILITIES, $capabilities);
-	}
-	
-	public function removeCapability($capabilityToRemove)
-	{
-		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
-		$newCapabilities = array();
-		foreach ($capabilities as $capability)
-		{
-			if ($capability !== $capabilityToRemove)
-			{
-				$newCapabilities[$capability] = $capability;
-			}
-		}
-		
-		$this->putInCustomData(self::CAPABILITIES, $newCapabilities);
+		return explode(',', $capabilities);
 	}
 }

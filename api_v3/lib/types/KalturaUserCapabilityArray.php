@@ -16,16 +16,30 @@ class KalturaUserCapabilityArray extends KalturaTypedArray
 		
 		foreach ($arr as $obj)
 		{
-			//$nObj = new KalturaUserCapability();
-			//$nObj->fromObject($obj, $responseProfile);
-			$newArr[] = $obj;
+			$nObj = new KalturaUserCapability();
+			$nObj->capability = $obj;
+			$newArr[] = $nObj;
 		}
 		
 		return $newArr;
 	}
 	
-//	public function __construct()
-//	{
-//		parent::__construct("KalturaUserCapability");
-//	}
+	/**
+	 * @return array
+	 */
+	public function toObjectsArray()
+	{
+		$ret = array();
+		foreach($this as $item)
+		{
+			$ret[] = $item->capability;
+		}
+		$ret = array_unique($ret);
+		return $ret;
+	}
+	
+	public function __construct()
+	{
+		parent::__construct("KalturaUserCapability");
+	}
 }

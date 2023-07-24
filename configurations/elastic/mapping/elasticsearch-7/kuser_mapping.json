@@ -215,8 +215,18 @@
 				"type": "boolean"
 			},
 			"capabilities": {
-				"type" : "keyword",
-				"normalizer" : "kaltura_keyword_normalizer"
+				"type" : "text",
+				"analyzer" : "kaltura_text",
+				"fields": {
+					"ngrams" : {
+						"type" : "text",
+						"analyzer" : "kaltura_ngrams"
+					},
+					"raw" : {
+						"type" : "keyword",
+						"normalizer" : "kaltura_keyword_normalizer"
+					}
+				}
 			},
 			"tags": {
 				"type": "text",

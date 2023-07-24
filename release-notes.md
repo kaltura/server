@@ -8,7 +8,7 @@
 ##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
 Replace 'esearch_host', 'esearch_port', 'kuser_index_name' and execute the curl command
 
-    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"capabilities" : {"type" : "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"capabilities" : {"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
 
 
 ## Add permission to EP_USER_ANALYTICS Role ##

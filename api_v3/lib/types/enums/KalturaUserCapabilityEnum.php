@@ -4,13 +4,13 @@
  * @package api
  * @subpackage enum
  */
-class KalturaUserCapability extends KalturaDynamicEnum implements UserCapability
+class KalturaUserCapabilityEnum extends KalturaDynamicEnum implements UserCapabilityEnum
 {
 	/**
 	 * @return string
 	 */
 	public static function getEnumClass()
 	{
-		return 'UserCapability';
+		return 'UserCapabilityEnum';
 	}
 }
