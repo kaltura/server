@@ -10,7 +10,7 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 		return $this->zoomClient->retrieveReportMeetingParticipant($recordingId);
 	}
 
-	protected function getAlternativeHostsData($recordingId)
+	protected function getRecordingParentObject($recordingId)
 	{
 		return $this->zoomClient->retrieveMeeting($recordingId);
 	}

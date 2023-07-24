@@ -11,7 +11,7 @@ class zoomWebinarProcessor extends zoomRecordingProcessor
 		return $this->zoomClient->retrieveWebinarPanelists($recordingId);
 	}
 
-	protected function getAlternativeHostsData($recordingId)
+	protected function getRecordingParentObject($recordingId)
 	{
 		return $this->zoomClient->retrieveWebinar($recordingId);
 	}

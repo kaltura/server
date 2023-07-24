@@ -351,14 +351,14 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$zoomCoHosts = $this->getCoHostsEmails($recordingId);
 		$zoomAlternativeHosts = $this->getAlternativeHostsEmails($recordingId);
 		$zoomHosts = $zoomCoHosts ? array_merge($zoomCoHosts, $zoomAlternativeHosts) : $zoomAlternativeHosts;
-		$zoomHosts = $zoomHosts ? $zoomHosts : null;
+		$zoomHosts = empty($zoomHosts) ? null : $zoomHosts;
 		return $this->getValidatedUsers($zoomHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
 										$userToExclude);
 	}
 
 	protected function getAlternativeHostsEmails($recordingId)
 	{
-		$data = $this->getAlternativeHostsData($recordingId);
+		$data = $this->getRecordingParentObject($recordingId);
 		if(isset($data[self::SETTINGS]) && isset($data[self::SETTINGS][self::ALTERNATIVE_HOSTS]))
 		{
 			KalturaLog::debug("Found the following alternative hosts [" . $data[self::SETTINGS][self::ALTERNATIVE_HOSTS] . "]");
@@ -417,7 +417,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	protected abstract function parseAdditionalUsers($additionalUsersZoomResponse);
 
-	protected abstract function getAlternativeHostsData($recordingId);
+	protected abstract function getRecordingParentObject($recordingId);
 
 	protected abstract function getCoHostsData($recordingId, $pageSize, $nextPageToken);
 
