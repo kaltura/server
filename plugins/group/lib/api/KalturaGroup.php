@@ -19,7 +19,11 @@ class KalturaGroup extends KalturaBaseUser
 
 	private static $names = array('fullName' => 'getFullName', 'screenName' => 'getScreenName');
 
-	private static $map_between_objects = array('membersCount', 'processStatus');
+	private static $map_between_objects = array
+	(
+		'membersCount',
+		'processStatus',
+	);
 
 	public function getMapBetweenObjects ( )
 	{
