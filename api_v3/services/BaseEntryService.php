@@ -153,7 +153,8 @@ class BaseEntryService extends KalturaEntryService
 				$service = new LiveStreamService();
     			$service->initService('liveStream', 'liveStream', $this->actionName);
     			break;
-		    case entryType::DOCUMENT:
+				
+			case entryType::DOCUMENT:
 				if(KalturaPluginManager::getPluginInstance('document'))
 				{
 					$service = new DocumentsService();
