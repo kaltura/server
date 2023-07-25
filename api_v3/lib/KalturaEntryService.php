@@ -500,6 +500,23 @@ class KalturaEntryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}
 		$ext = pathinfo($entryFullPath, PATHINFO_EXTENSION);
+		
+		if($dbEntry->getType() == entryType::DOCUMENT)
+		{
+			switch($ext)
+			{
+				case ('pdf'):
+					$dbEntry->setDocumentType(KalturaDocumentType::PDF);
+					break;
+				case('swf'):
+					$dbEntry->setDocumentType(KalturaDocumentType::SWF);
+					break;
+					
+				default:
+					$dbEntry->setDocumentType(KalturaDocumentType::DOCUMENT);
+					break;
+			}
+		}
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
@@ -1991,6 +2008,25 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->save();
 			throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 		}
+	}
+	
+	protected function handleErrorDuringSetResource($entryId, Exception $e)
+	{
+		if ($e->getCode() == APIErrors::getCode(APIErrors::ENTRY_ID_NOT_FOUND))
+		{
+			throw $e; //if no entry found then no need to do anything
+		}
+		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
+		$this->cancelReplaceAction($entryId);
+		
+		$errorCodeArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, APIErrors::getCode(APIErrors::SOURCE_FILE_NOT_FOUND));
+		if ((in_array($e->getCode(), $errorCodeArr)) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
+		{
+			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
+			KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [$remoteDc]");
+			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
+		}
+		throw $e;
 	}
 
 }

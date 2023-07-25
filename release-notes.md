@@ -1,4 +1,11 @@
 # Scorpius-19.13.0
+## Add addContent action to Documents service ##
+- Issue Type: Task
+- Issue ID: PLAT-24332
+
+### Script ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_07_18_addContent_to_document.php
+
 ## Add permission to EP_USER_ANALYTICS Role ##
 - Issue Type: Task
 - Issue ID: PLAT-24331
