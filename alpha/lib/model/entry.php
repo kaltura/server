@@ -4643,7 +4643,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return false;
 	}
 
-	public static function setAllowSetReadOnlyFields($v)
+	public static function setAllowOverrideReadOnlyFields($v)
 	{
 		self::$allow_override_read_only_fields = $v;
 	}
