@@ -6,6 +6,19 @@
 ### Script ###
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_07_13_update_ep_analytics_user_role.php
 
+## Enable AI in Event Platform
+* Issue Type: Task
+* Issue ID: PLAT-24374
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.eventPlatformAI.enabled = true
+moduls.eventPlatformAI.permissionType = 2
+moduls.eventPlatformAI.label = "Enable AI in EP"
+moduls.eventPlatformAI.permissionName = FEATURE_EP_AI_PERMISSION
+moduls.eventPlatformAI.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Scorpius-19.12.0
 
 ## Schedule event new filtering options ##
