@@ -4,7 +4,7 @@
  * @package Core
  * @subpackage model.enum
  */
-interface UserCapabilityEnum extends BaseEnum
+interface UserCapabilityType extends BaseEnum
 {
 	const SYNCED_GROUP = 0;
 }

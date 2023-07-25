@@ -7,7 +7,7 @@
 class KalturaUserCapability extends KalturaObject
 {
 	/**
-	 * @var KalturaUserCapabilityEnum
+	 * @var KalturaUserCapabilityType
 	 */
 	public $capability;
 	

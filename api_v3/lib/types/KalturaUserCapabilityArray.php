@@ -32,7 +32,10 @@ class KalturaUserCapabilityArray extends KalturaTypedArray
 		$ret = array();
 		foreach($this as $item)
 		{
-			$ret[] = $item->capability;
+			if (isset($item->capability))
+			{
+				$ret[] = $item->capability;
+			}
 		}
 		$ret = array_unique($ret);
 		return $ret;
