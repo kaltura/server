@@ -20,9 +20,9 @@ $counter = 0;
 foreach ($entryMappings as $entryMapping)
 {
 	list ($entryId, $updatedAt) = explode(",", $entryMapping);
-    $updatedAt = $isDateString ? strtotime($updatedAt) : $updatedAt;
+	$updatedAt = $isDateString ? strtotime($updatedAt) : $updatedAt;
 
-    entry::setAllowOverrideReadOnlyFields(true);
+	entry::setAllowOverrideReadOnlyFields(true);
 	$entry = entryPeer::retrieveByPK($entryId);
 	if(!$entry)
 	{
