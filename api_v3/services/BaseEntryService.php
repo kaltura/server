@@ -155,7 +155,7 @@ class BaseEntryService extends KalturaEntryService
     			break;
 				
 			case entryType::DOCUMENT:
-				if(KalturaPluginManager::getPluginInstance('document'))
+				if(KalturaPluginManager::getPluginInstance(DocumentPlugin::getPluginName()))
 				{
 					$service = new DocumentsService();
 					$service->initService('document_documents', 'document_documents', $this->actionName);
@@ -421,9 +421,12 @@ class BaseEntryService extends KalturaEntryService
 				$service->initService('media', 'media', $this->actionName);
 				break;
 			case entryType::DOCUMENT:
-				$service = new DocumentsService();
-				$service->initService('document_documents', 'document_documents', $this->actionName);
-				break;
+				if(KalturaPluginManager::getPluginInstance(DocumentPlugin::getPluginName()))
+				{
+					$service = new DocumentsService();
+					$service->initService('document_documents', 'document_documents', $this->actionName);
+					break;
+				}
 			case entryType::MIX:
 			case entryType::PLAYLIST:
 			case entryType::DATA:
