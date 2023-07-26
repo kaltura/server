@@ -202,8 +202,9 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	protected function validateStreamNotAlreadyExist($entryId, $hostname, $mediaServerIndex)
 	{
+		$streamAlreadyExsit = false;
 		try
-        {
+		{
 			$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
 			if (!$entryServerNode || !in_array($entryServerNode->getStatus(), array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)))
 			{
@@ -216,13 +217,20 @@ class LiveStreamService extends KalturaLiveEntryService
 			}
 			$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
 			KalturaLog::debug('registeredServerNodeId: [' . $registeredServerNode->getId() . ']  currentServerNodeId: [' . $mediaServerNode->getId() . ']');
+
+			//currently verifying only if already streaming in another environment
+			if ($mediaServerNode && $mediaServerNode->getEnvironment() != $registeredServerNode->getEnvironment()) {
+				$streamAlreadyExsits = true;
+			}
+
 		}
-		catch(Exception $e){
+		catch(Exception $e)
+		{
 			return;
 		}
 
-		//currently verifying only if already streaming in another environment
-		if ($mediaServerNode && $mediaServerNode->getEnvironment() != $registeredServerNode->getEnvironment()) {
+		if ($streamAlreadyExsits)
+		{
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $registeredServerNode->getHostName());
 		}
 
