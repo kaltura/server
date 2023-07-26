@@ -182,6 +182,8 @@ class LiveStreamService extends KalturaLiveEntryService
 		if($dbEntry->isStreamAlreadyBroadcasting())
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
 		*/
+
+		$this->validateStreamNotAlreadyExist($entryId, $hostname, $mediaServerIndex);
 		
 		if($hostname && isset($mediaServerIndex))
 			$this->setMediaServerWrapper($dbEntry, $mediaServerIndex, $hostname, KalturaEntryServerNodeStatus::AUTHENTICATED, $applicationName);
@@ -191,6 +193,39 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
+	}
+
+	/**
+	 * @param $entryId
+	 * @param $hostname
+	 * @param $mediaServerIndex
+	 */
+	protected function validateStreamNotAlreadyExist($entryId, $hostname, $mediaServerIndex)
+	{
+		try
+        {
+			$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
+			if (!$entryServerNode || !in_array($entryServerNode->getStatus(), array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)))
+			{
+				return;
+			}
+			$registeredServerNode = ServerNodePeer::retrieveRegisteredServerNodeByPk($entryServerNode->getServerNodeId());
+			if (!$registeredServerNode || $registeredServerNode->getHostName() == $hostname)
+			{
+				return;
+			}
+			$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
+			KalturaLog::debug('registeredServerNodeId: [' . $registeredServerNode->getId() . ']  currentServerNodeId: [' . $mediaServerNode->getId() . ']');
+		}
+		catch(Exception $e){
+			return;
+		}
+
+		//currently verifying only if already streaming in another environment
+		if ($mediaServerNode && $mediaServerNode->getEnvironment() != $registeredServerNode->getEnvironment()) {
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $registeredServerNode->getHostName());
+		}
+
 	}
 	
 	private function validateMaxStreamsNotReached(LiveEntry $liveEntry)
