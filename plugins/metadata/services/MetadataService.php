@@ -232,7 +232,7 @@ class MetadataService extends KalturaBaseService
 	 * Retrieve a metadata object by id
 	 * 
 	 * @action get
-	 * @param int $id 
+	 * @param bigint $id
 	 * @return KalturaMetadata
 	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 */		
@@ -253,7 +253,7 @@ class MetadataService extends KalturaBaseService
 	 * Update an existing metadata object with new XML content
 	 * 
 	 * @action update
-	 * @param int $id 
+	 * @param bigint $id
 	 * @param string $xmlData XML metadata
 	 * @param int $version Enable update only if the metadata object version did not change by other process
 	 * @return KalturaMetadata
@@ -334,7 +334,7 @@ class MetadataService extends KalturaBaseService
 	 * Update an existing metadata object with new XML file
 	 * 
 	 * @action updateFromFile
-	 * @param int $id 
+	 * @param bigint $id
 	 * @param file $xmlFile XML metadata
 	 * @return KalturaMetadata
 	 * @throws MetadataErrors::METADATA_NOT_FOUND
@@ -419,7 +419,7 @@ class MetadataService extends KalturaBaseService
 	 * Delete an existing metadata
 	 * 
 	 * @action delete
-	 * @param int $id
+	 * @param bigint $id
 	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 */		
 	function deleteAction($id)
@@ -441,7 +441,7 @@ class MetadataService extends KalturaBaseService
 	 * Used by batch metadata transform
 	 * 
 	 * @action invalidate
-	 * @param int $id
+	 * @param bigint $id
 	 * @param int $version Enable update only if the metadata object version did not change by other process
 	 * @throws MetadataErrors::METADATA_NOT_FOUND
 	 * @throws MetadataErrors::INVALID_METADATA_VERSION
@@ -489,7 +489,7 @@ class MetadataService extends KalturaBaseService
 	 * Serves metadata XML file
 	 *  
 	 * @action serve
-	 * @param int $id
+	 * @param bigint $id
 	 * @return file
 	 *  
 	 * @throws MetadataErrors::METADATA_NOT_FOUND
@@ -548,8 +548,8 @@ class MetadataService extends KalturaBaseService
 	/**
 	 * Action transforms current metadata object XML using a provided XSL.
 	 * @action updateFromXSL
-	 * 
-	 * @param int $id
+	 *
+	 * @param bigint $id
 	 * @param file $xslFile
 	 * @return KalturaMetadata
 	 * @throws MetadataErrors::XSLT_VALIDATION_ERROR
