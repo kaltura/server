@@ -42,7 +42,7 @@ class KAsyncClearCuePoints extends KPeriodicWorker
 		
 		$entries = self::$kClient->liveStream->listAction($entryFilter, $pager);
 		
-		while(count($entries->objects))
+		while(count($entries->objects) && !parent::checkStopFile())
 		{
 			foreach($entries->objects as $entry)
 			{

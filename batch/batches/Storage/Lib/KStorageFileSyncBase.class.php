@@ -33,7 +33,7 @@ abstract class KStorageFileSyncsBase extends KPeriodicWorker
 
 		$timeLimit = time() + $this->getAdditionalParams(self::MAX_EXECUTION_TIME);
 
-		while (time() < $timeLimit)
+		while (time() < $timeLimit && !parent::checkStopFile())
 		{
 			//Get File Syncs
 			$this->setPendingFileSyncResponseProfile();

@@ -36,7 +36,7 @@ class KAsyncDropFolderWatcher extends KPeriodicWorker
 
 		$numberOfFoldersEachRun = self::$taskConfig->numberOfFoldersEachRun;
 		KalturaLog::log("Start running to watch $numberOfFoldersEachRun folders");
-		for ($i = 0; $i < $numberOfFoldersEachRun; $i++)
+		for ($i = 0; $i < $numberOfFoldersEachRun && !parent::checkStopFile(); $i++)
 		{
 			try 
 			{

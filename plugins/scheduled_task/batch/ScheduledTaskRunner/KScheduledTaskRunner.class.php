@@ -38,7 +38,7 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$profiles = $this->getSortedScheduledTaskProfiles($maxProfiles);
 		/** @var KalturaScheduledTaskProfile $profile */
 		$profile = $this->getNextProfile($profiles);
-		while( $profile )
+		while( $profile && !parent::checkStopFile() )
 		{
 			//make sure a profile for the same partner runs in a minimum of 2 seconds diff
 			if (isset($lastRuntimePerPartner[$profile->partnerId]) && time() - $lastRuntimePerPartner[$profile->partnerId] <= 2 )

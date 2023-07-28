@@ -34,7 +34,7 @@ class KAsyncStoragePeriodicDeleteLocal extends KPeriodicWorker
 		$lockExpiryTimeout = $this->getAdditionalParams(self::LOCK_EXPIRY_TIMEOUT);
 
 		$timeLimit = time() + $this->getAdditionalParams(self::MAX_EXECUTION_TIME);
-		while (time() < $timeLimit)
+		while (time() < $timeLimit && !parent::checkStopFile())
 		{
 			$this->setDeleteLocalFileSyncsResponseProfile();
 			self::$kClient->fileSync->deleteLocalFileSyncs($filter, $this->getId(), $relativeTimeDeletionLimit, $relativeTimeRange, $lockExpiryTimeout);
