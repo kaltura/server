@@ -25,6 +25,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	const ATTENDANCE_INFO = "attendance_info";
 	const TITLE = 'title';
 	const COMPANY = 'company';
+	const CAPABILITIES = 'capabilities';
 
 	const CUSTOM_DATA_KS_PRIVILEGES = 'ks_privileges';
 	const CUSTOM_DATA_IS_SSO_EXCLUDED = 'is_sso_excluded';
@@ -201,7 +202,12 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
 		}
-
+		
+		if ($this->isColumnModified(kuserPeer::IS_ADMIN) && $this->getIsAdmin())
+		{
+			kuserPeer::sendNewUserMail($this, true);
+		}
+		
 		if($this->isColumnModified(kuserPeer::PUSER_ID) &&
 			categoryKuserPeer::isCategroyKuserExistsForKuser($this->getId()))
 		{
@@ -1441,6 +1447,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'is_hashed' => $this->getIsHashed(),
 			'is_admin' => $this->getIsAdmin(),
 			'login_enabled' => ($this->getLoginDataId() ? true : false),
+			'capabilities' => $this->getCapabilities(),
 		);
 		$this->addGroupUserDataToObjectParams($body);
 		elasticSearchUtils::cleanEmptyValues($body);
@@ -1613,4 +1620,19 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		return $this->getFromCustomData(self::CUSTOM_DATA_IS_HASHED);
 	}
 	
+	public function setCapabilities(array $capabilities)
+	{
+		$v = null;
+		if ($capabilities)
+		{
+			$v = implode(',', $capabilities);
+		}
+		$this->putInCustomData(self::CAPABILITIES, $v);
+	}
+	
+	public function getCapabilities()
+	{
+		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		return explode(',', $capabilities);
+	}
 }

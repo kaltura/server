@@ -280,7 +280,7 @@ class kmcngAction extends kalturaAction
 		}
 		else
 		{
-			$uiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
+			$uiConf = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
 			$uiConfVersions = isset($uiConf) ? array_values($uiConf) : null;
 			$uiConfVersion = (is_array($uiConfVersions) && reset($uiConfVersions)) ? reset($uiConfVersions) : null;
 			if($uiConfVersion)

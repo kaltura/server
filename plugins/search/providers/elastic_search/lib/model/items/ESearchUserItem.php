@@ -44,6 +44,7 @@ class ESearchUserItem extends ESearchItem
 		ESearchUserFieldName::IS_HASHED => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		ESearchUserFieldName::IS_ADMIN => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 		ESearchUserFieldName::LOGIN_ENABLED => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
+		ESearchUserFieldName::CAPABILITIES => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
 	);
 	
 	protected static $booleanFields = array(

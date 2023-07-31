@@ -258,7 +258,17 @@ class kKavaVpaasReports extends kKavaReports
 			{
 				foreach ($columns as $column)
 				{
-					$output[] = $row[$column];
+					$exploded_column = explode('.', $column);
+					if (count($exploded_column) > 1)
+					{
+						list($column, $field) = $exploded_column;
+						$value = @unserialize($row[$column]);
+						$output[] = isset($value[$field]) ? $value[$field] : '';
+					}
+					else
+					{
+						$output[] = $row[$column];
+					}
 				}
 			}
 			else
