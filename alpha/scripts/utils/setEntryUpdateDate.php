@@ -15,6 +15,7 @@ require_once(__DIR__ . '/../bootstrap.php');
 KalturaStatement::setDryRun($dryRun);
 
 $entryMappings = file($mapping, FILE_IGNORE_NEW_LINES);
+entry::setAllowOverrideReadOnlyFields(true);
 
 $counter = 0;
 foreach ($entryMappings as $entryMapping)
@@ -22,7 +23,6 @@ foreach ($entryMappings as $entryMapping)
 	list ($entryId, $updatedAt) = explode(",", $entryMapping);
 	$updatedAt = $isDateString ? strtotime($updatedAt) : $updatedAt;
 
-	entry::setAllowOverrideReadOnlyFields(true);
 	$entry = entryPeer::retrieveByPK($entryId);
 	if(!$entry)
 	{
