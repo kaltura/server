@@ -5,7 +5,7 @@
  */
 class KScheduledTaskRunner extends KPeriodicWorker
 {
-	const runnerTypes = 'runnerTypes';
+	const runnerType = 'runnerType';
 	
 	/**
 	 * @var array
@@ -34,13 +34,30 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	public function run($jobs = null)
 	{
 		$maxProfiles = $this->getParams('maxProfiles');
-		$lastRuntimePerPartner = array();
-		$profiles = $this->getSortedScheduledTaskProfiles($maxProfiles);
-		/** @var KalturaScheduledTaskProfile $profile */
-		$profile = $this->getNextProfile($profiles);
-		while( $profile )
+		if (!$maxProfiles)
 		{
-			//make sure a profile for the same partner runs in a minimum of 2 seconds diff
+			$maxProfiles = 10;
+		}
+		$lastRuntimePerPartner = array();
+		$runnerType = $this->getAdditionalParams(KScheduledTaskRunner::runnerType);
+		if (!isset($runnerType))
+		{
+			$runnerType = 0;
+		}
+		$scheduledTaskClient = $this->getScheduledTaskClient();
+		$profile = $scheduledTaskClient->scheduledTaskProfile->getExclusiveTask($runnerType);
+		if (!$profile)
+		{
+			KalturaLog::info('No scheduled task profiles available for this runner');
+			return;
+		}
+		
+		/** @var KalturaScheduledTaskProfile $profile */
+		$handledProfiles = 1;
+		while ($profile && $handledProfiles <= $maxProfiles)
+		{
+			KalturaLog::info("Processing scheduled task profile [$profile->id]");
+			// Make sure a profile for the same partner runs in a minimum of 2 seconds diff
 			if (isset($lastRuntimePerPartner[$profile->partnerId]) && time() - $lastRuntimePerPartner[$profile->partnerId] <= 2 )
 			{
 				sleep(2);
@@ -50,12 +67,18 @@ class KScheduledTaskRunner extends KPeriodicWorker
 				$processor = $this->getProcessor($profile);
 				$processor->processProfile($profile);
 			}
-			catch(Exception $ex)
+			catch (Exception $ex)
 			{
 				KalturaLog::err($ex);
 			}
+			$scheduledTaskClient->scheduledTaskProfile->freeExclusiveTask($profile->id);
 			$lastRuntimePerPartner[$profile->partnerId] = time();
-			$profile = $this->getNextProfile($profiles);
+			$profile = $scheduledTaskClient->scheduledTaskProfile->getExclusiveTask($runnerType);
+			$handledProfiles++;
+		}
+		if ($handledProfiles > $maxProfiles)
+		{
+			$scheduledTaskClient->scheduledTaskProfile->freeExclusiveTask($profile->id);
 		}
 	}
 
@@ -159,10 +182,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = $maxProfiles;
 		
-		$runnerTypes = $this->getAdditionalParams(KScheduledTaskRunner::runnerTypes);
-		if ($runnerTypes)
+		$runnerType = $this->getAdditionalParams(KScheduledTaskRunner::runnerType);
+		if ($runnerType)
 		{
-			$filter->objectFilterEngineTypeIn = $runnerTypes;
+			$filter->objectFilterEngineTypeIn = $runnerType;
 		}
 
 		$result = $scheduledTaskClient->scheduledTaskProfile->listAction($filter, $pager);
