@@ -296,6 +296,10 @@ class SessionService extends KalturaBaseService
 		// according to the partner's policy and the widget's policy - define the privileges of the ks
 		// TODO - decide !! - for now only view - any kshow
 		$privileges = "view:*,widget:1";
+		if ($widget->getPrivileges())
+		{
+			$privileges = $widget->getPrivileges() . ',widget:1';
+		}
 
 		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENTITLEMENT, $partnerId) &&
 			!$widget->getEnforceEntitlement() && $widget->getEntryId())
