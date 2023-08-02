@@ -367,7 +367,6 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 				$usersToAddList[] = $group;
 				if (isset($group->capabilities))
 				{
-					//$capabilitiesMap = array_merge($capabilitiesMap, array($group->group => $group->capabilities));
 					$capabilitiesMap[$group->group] = $group->capabilities;
 				}
 			}
