@@ -1,3 +1,12 @@
+# Scorpius-19.14.0
+## Add new permission to EP_USER_ANALYTICS Role ##
+- Issue Type: Story
+- Issue ID: PLAT-24381
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_03_add_ep_base_permission.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_03_add_permission_to_ep_analytics_role.php
+
 # Scorpius-19.13.0
 ## Add 'Capabilities' to ESearch for kuser ##
 - Issue Type: Task
