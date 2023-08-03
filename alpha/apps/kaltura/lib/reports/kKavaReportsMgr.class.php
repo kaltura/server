@@ -349,6 +349,7 @@ class kKavaReportsMgr extends kKavaBase
 	const ENRICH_FOREACH_KEYS_FUNC = 'self::forEachKeys';
 	const CLIENT_TAG_PRIORITY = 5;
 	const FLAVOR_PARAM_VIEW_COUNT_PREFIX = 'flavor_param_view_count_';
+	const MICRO_SERVICE_CHUNK_SIZE = 500;
 
 	const GET_TABLE_FLAG_IS_CSV = 0x01;
 	const GET_TABLE_FLAG_IDS_ONLY = 0x02;
@@ -4804,43 +4805,47 @@ class kKavaReportsMgr extends kKavaBase
 			$pusers_to_kusers[$puser] = $id;
 		}
 
-		$user_profiles = self::getUserProfileData($partner_id, $app_guid, array_keys($pusers_to_kusers));
-		foreach ($user_profiles as $user_profile)
+		$pusers_kusers_chunks = array_chunk(array_keys($pusers_to_kusers), self::MICRO_SERVICE_CHUNK_SIZE);
+		foreach ($pusers_kusers_chunks as $pusers_kusers_chunk)
 		{
-			$puser_id = $user_profile->userId;
-			$output = array();
-			foreach ($enriched_info_fields as $enriched_info_field) {
-				if (!empty($user_profile->$enriched_info_field) && is_object($user_profile->$enriched_info_field)) 
+			$user_profiles = self::getUserProfileData($partner_id, $app_guid, $pusers_kusers_chunk);
+			foreach ($user_profiles as $user_profile)
+			{
+				$puser_id = $user_profile->userId;
+				$output = array();
+				foreach ($enriched_info_fields as $enriched_info_field)
 				{
-					$value = json_encode($user_profile->$enriched_info_field);
-				} 
-				else 
-				{
-					$field_path = explode(".", $enriched_info_field);
-					$curr_obj = $user_profile;
-					$value = '';
-					foreach ($field_path as $key)
+					if (!empty($user_profile->$enriched_info_field) && is_object($user_profile->$enriched_info_field))
 					{
-						$value = $curr_obj->$key ?? '';
-						if (is_object($value))
+						$value = json_encode($user_profile->$enriched_info_field);
+					}
+					else
+					{
+						$field_path = explode(".", $enriched_info_field);
+						$curr_obj = $user_profile;
+						$value = '';
+						foreach ($field_path as $key)
 						{
-							$curr_obj = $curr_obj->$key;
-						}
-						else
-						{
-							break;
+							$value = $curr_obj->$key ?? '';
+							if (is_object($value))
+							{
+								$curr_obj = $curr_obj->$key;
+							}
+							else
+							{
+								break;
+							}
 						}
 					}
+					$output[] = $value;
 				}
-				$output[] = $value;
-			}
-			$kuser_id = $pusers_to_kusers[$puser_id];
-			if (isset($kuser_id))
-			{
-				$result[$kuser_id] = $output;
+				$kuser_id = $pusers_to_kusers[$puser_id];
+				if (isset($kuser_id))
+				{
+					$result[$kuser_id] = $output;
+				}
 			}
 		}
-
 		return $result;
 	}
 
