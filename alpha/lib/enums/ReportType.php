@@ -92,6 +92,7 @@ interface ReportType extends BaseEnum
    const DISCOVERY_VIEW_REALTIME = 10013;
    const TOP_ENDED_BROADCAST_ENTRIES = 10014;
    const TOP_LIVE_NOW_ENTRIES = 10015;
+   const LIVE_MEETING_USERS_OVERVIEW_REALTIME = 10016;
 
    //vpaas
    const CONTENT_DROPOFF_VPAAS = 20001;
