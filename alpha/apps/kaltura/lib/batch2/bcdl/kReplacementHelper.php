@@ -359,7 +359,7 @@ class kReplacementHelper
 	}
 
 	/**
-	 * sync the basic info fields and status of the ole replaced entry flavor with the ones on the new replacing entry matching asset
+	 * sync the basic info fields and status of the old replaced entry flavor with the ones on the new replacing entry matching asset
 	 *
 	 * @param $oldAsset
 	 * @param $newAsset
@@ -372,6 +372,7 @@ class kReplacementHelper
 		$oldAsset->setWidth($newAsset->getWidth());
 		$oldAsset->setHeight($newAsset->getHeight());
 		$oldAsset->setSize($newAsset->getSize());
+		$oldAsset->setSizeInBytes($newAsset->getSizeInBytes());
 		$oldAsset->setVideoCodecId($newAsset->getVideoCodecId());
 		$oldAsset->setContainerFormat($newAsset->getContainerFormat());
 		$oldAsset->setFileExt($newAsset->getFileExt());
