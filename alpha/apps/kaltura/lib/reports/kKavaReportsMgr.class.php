@@ -4815,29 +4815,22 @@ class kKavaReportsMgr extends kKavaBase
 				$output = array();
 				foreach ($enriched_info_fields as $enriched_info_field)
 				{
-					if (!empty($user_profile->$enriched_info_field) && is_object($user_profile->$enriched_info_field))
+					$field_path = explode(".", $enriched_info_field);
+					$curr_obj = $user_profile;
+					$value = '';
+					foreach ($field_path as $key)
 					{
-						$value = json_encode($user_profile->$enriched_info_field);
-					}
-					else
-					{
-						$field_path = explode(".", $enriched_info_field);
-						$curr_obj = $user_profile;
-						$value = '';
-						foreach ($field_path as $key)
+						$value = $curr_obj->$key ?? '';
+						if (is_object($value))
 						{
-							$value = $curr_obj->$key ?? '';
-							if (is_object($value))
-							{
-								$curr_obj = $curr_obj->$key;
-							}
-							else
-							{
-								break;
-							}
+							$curr_obj = $curr_obj->$key;
+						}
+						else
+						{
+							break;
 						}
 					}
-					$output[] = $value;
+					$output[] = is_object($value) ? json_encode($value) : $value;
 				}
 				$kuser_id = $pusers_to_kusers[$puser_id];
 				if (isset($kuser_id))
