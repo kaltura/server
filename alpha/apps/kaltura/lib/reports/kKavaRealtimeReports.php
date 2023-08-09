@@ -370,6 +370,16 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				'avg_view_downstream_bandwidth' => self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH,
 			)
 		),
+
+		ReportType::LIVE_MEETING_USERS_OVERVIEW_REALTIME => array(
+			self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_REALTIME, self::DATASOURCE_MEETING_REALTIME),
+			self::REPORT_GRAPH_METRICS => array(
+				self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE,
+				self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS,
+				self::METRIC_VIEW_EVENT_COMBINED_LIVE,
+				self::METRIC_AVG_COMBINED_LIVE_VIEW_ENGAGEMENT
+			),
+		),
 	);
 
 	protected static function initTransformTimeDimensions()
@@ -402,13 +412,13 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 		self::initQueryCache();
 
 		//default datasource
-		if (!isset($report_def[self::REPORT_JOIN_GRAPHS]) && !isset($report_def[self::REPORT_DATA_SOURCE]))
+		if (!isset($report_def[self::REPORT_JOIN_GRAPHS]) && !isset($report_def[self::REPORT_DATA_SOURCE]) && !isset($report_def[self::REPORT_UNION_DATA_SOURCES]))
 		{
 			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_REALTIME;
 		}
 
 		//filter on playback types
-		if (!isset($report_def[self::REPORT_PLAYBACK_TYPES]))
+		if (!isset($report_def[self::REPORT_PLAYBACK_TYPES]) && !isset($report_def[self::REPORT_UNION_DATA_SOURCES]))
 		{
 			$report_def[self::REPORT_PLAYBACK_TYPES] = array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR);
 		}

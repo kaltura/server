@@ -219,6 +219,13 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVG_VIEW_SEGMENT_DOWNLOAD_TIME_SEC = 'avg_view_segment_download_time_sec';
 	const METRIC_AVG_VIEW_MANIFEST_DOWNLOAD_TIME_SEC = 'avg_view_manifest_download_time_sec';
 
+	// realtime (player + meeting) metric
+	const METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE = 'view_unique_combined_live_audience';
+	const METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS = 'view_unique_combined_live_engaged_users';
+	const METRIC_VIEW_EVENT_COMBINED_LIVE = 'view_event_combined';
+	const METRIC_VIEW_ENGAGED_COMBINED_LIVE_COUNT = 'view_engaged_combined_live_count';
+	const METRIC_AVG_COMBINED_LIVE_VIEW_ENGAGEMENT = 'combined_live_avg_view_engagement';
+
 	const METRIC_DYNAMIC_VIEWERS = 'viewers';
 	const METRIC_DYNAMIC_VIEWERS_BUFFERING = 'viewers_buffering';
 	const METRIC_DYNAMIC_VIEWERS_DVR = 'viewers_dvr';
@@ -494,6 +501,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_VOD_VIEWERS => 'floor',
 		self::METRIC_UNIQUE_VOD_LIVE_VIEWERS => 'floor',
 		self::METRIC_REACTION_CLICKED_UNIQUE_USERS => 'floor',
+		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => 'floor',
+		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -549,6 +558,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_REACTION_CLICKED_UNIQUE_USERS => true,
 		self::METRIC_VOD_AVG_PLAY_TIME => true,
 		self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME => true,
+		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => true,
+		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1031,6 +1042,32 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
 				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$realtime_engagement))),
 			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_ENGAGED_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getNotFilter(self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_OFFLINE))))),
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getNotFilter(self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_OFFLINE))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, array_merge(self::$realtime_engagement, self::$meeting_engagement)))),
+			self::getHyperUniqueAggregator(self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_VIEW_EVENT_COMBINED_LIVE] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getNotFilter(self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_OFFLINE))))),
+			self::getLongSumAggregator(self::METRIC_VIEW_EVENT_COMBINED_LIVE, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_VIEW_ENGAGED_COMBINED_LIVE_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW),
+				self::getNotFilter(self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_OFFLINE))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, array_merge(self::$meeting_engagement, self::$realtime_engagement)))),
+			self::getLongSumAggregator(self::METRIC_VIEW_ENGAGED_COMBINED_LIVE_COUNT, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_VIEW_UNIQUE_BUFFERING_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -1555,6 +1592,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME_SEC,
 				self::METRIC_VIEW_PERIOD_PLAY_TIME_SEC,
 				self::EVENT_TYPE_PLAY));
+
+		self::$metrics_def[self::METRIC_AVG_COMBINED_LIVE_VIEW_ENGAGEMENT] = array(
+			self::DRUID_AGGR => array(self::METRIC_VIEW_EVENT_COMBINED_LIVE, self::METRIC_VIEW_ENGAGED_COMBINED_LIVE_COUNT),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_COMBINED_LIVE_VIEW_ENGAGEMENT,
+				self::METRIC_VIEW_ENGAGED_COMBINED_LIVE_COUNT,
+				self::METRIC_VIEW_EVENT_COMBINED_LIVE));
 
 		// complex metrics
 		self::$metrics_def[self::METRIC_AVG_PLAY_TIME] = array(
