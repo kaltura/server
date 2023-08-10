@@ -7,6 +7,22 @@
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_03_add_ep_base_permission.php
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_03_add_permission_to_ep_analytics_role.php
 
+
+## Add locks on scheduled task profile runners ##
+- Issue Type: Story
+- Issue ID: PLAT-24336
+
+### Configuration ###
+Add to local.ini:
+```
+scheduled_task_profiles_ttl = 300
+scheduled_task_profiles_limit = 100
+```
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_07_add_getExclusive_scheduledTask_permission.php
+
+
 # Scorpius-19.13.0
 ## Add 'Capabilities' to ESearch for kuser ##
 - Issue Type: Task
@@ -214,13 +230,18 @@ Add the following to batch.ini under KScheduledTaskRunner worker
 ```
 [KScheduledTaskRunner : PeriodicWorker]
 id                                                  = 610
-params.runnerTypes                                  = 1,2
+params.runnerType                                  = 1
+```
+```
+[KVendorTaskRunner : PeriodicWorker]
+id                                                  = 610
+params.runnerType                                  = 2
 ```
 Add the following to batch.ini
 ```
 [KAsyncRecycleBin : KScheduledTaskRunner]
 id                                                  = 611
-params.runnerTypes                                  = 3
+params.runnerType                                  = 3
 ```
 
 ## Add 'RoomType' to ESearch for entry ##

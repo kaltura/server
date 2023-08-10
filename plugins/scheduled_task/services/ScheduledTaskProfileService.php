@@ -290,4 +290,57 @@ class ScheduledTaskProfileService extends KalturaBaseService
 
 		return $batchJob;
 	}
+	
+	/**
+	 * @action getExclusiveTask
+	 * @param int $runnerType
+	 * @param int $maxTime
+	 * @return KalturaScheduledTaskProfile
+	 */
+	public function getExclusiveTaskAction($runnerType, $maxTime)
+	{
+		if ($runnerType)
+		{
+			$profile = kScheduledProfileTaskAllocator::allocateObjectByTag(kScheduledProfileTaskAllocator::OBJECT_NAME, $runnerType, $maxTime);
+		}
+		else
+		{
+			$profile = kScheduledProfileTaskAllocator::allocateObjectByTag(kScheduledProfileTaskAllocator::OBJECT_NAME,'*', $maxTime);
+		}
+		
+		if ($profile)
+		{
+			
+			$kalturaProfile = new KalturaScheduledTaskProfile();
+			$kalturaProfile->fromObject($profile, $this->getResponseProfile());
+			return $kalturaProfile;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/**
+	 * freeExclusive scheduledTaskProfile object
+	 *
+	 * @action freeExclusiveTask
+	 * @param int $scheduledTaskProfileId
+	 * @return KalturaScheduledTaskProfile
+	 *@throws KalturaAPIException
+	 */
+	public function freeExclusiveTaskAction($scheduledTaskProfileId)
+	{
+		kScheduledProfileTaskAllocator::unlockAllocatedObject(kScheduledProfileTaskAllocator::OBJECT_NAME, $scheduledTaskProfileId);
+		
+		$dbScheduledTaskProfile = ScheduledTaskProfilePeer::retrieveByPK($scheduledTaskProfileId);
+		if (!$dbScheduledTaskProfile)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduledTaskProfileId);
+		}
+		
+		$kalturaProfile = new KalturaScheduledTaskProfile();
+		$kalturaProfile->fromObject($dbScheduledTaskProfile, $this->getResponseProfile());
+		return $kalturaProfile;
+	}
 }
