@@ -9,6 +9,7 @@ abstract class kAllocator
 	const TIME_IN_CACHE_FOR_LOCK = 5;
 	
 	/**
+	 * @param string $objectName
 	 * @param string $tag
 	 * @param int $maxTimeForWatch
 	 */
@@ -50,9 +51,10 @@ abstract class kAllocator
 	
 	/**
 	 * Free object lock
+	 * @param string $objectName
 	 * @param string $objectId
 	 */
-	public static function unlockObject($objectName, $objectId)
+	public static function unlockAllocatedObject($objectName, $objectId)
 	{
 		$lock = kLock::create(self::getLockKeyForObject($objectName, $objectId));
 		$lock->unlock();
@@ -60,6 +62,7 @@ abstract class kAllocator
 	
 	/**
 	 * Try to lock the given object
+	 * @param string $objectName
 	 * @param string $objectId
 	 * @param int $maxTimeForWatch
 	 *
@@ -74,6 +77,7 @@ abstract class kAllocator
 	
 	/**
 	 * Return cache-key for tag
+	 * @param string $objectName
 	 * @param string $tag
 	 * @return string
 	 */
@@ -84,6 +88,7 @@ abstract class kAllocator
 	
 	/**
 	 * Return cache-key for index by tag
+	 * @param string $objectName
 	 * @param string $tag
 	 * @return string
 	 */
@@ -94,6 +99,7 @@ abstract class kAllocator
 	
 	/**
 	 * Return cache-key for lock by tag
+	 * @param string $objectName
 	 * @param string $tag
 	 * @return string
 	 */
@@ -104,6 +110,7 @@ abstract class kAllocator
 	
 	/**
 	 * Return cache-key for lock by object id
+	 * @param string $objectName
 	 * @param int $objectId
 	 * @return string
 	 */
@@ -114,9 +121,10 @@ abstract class kAllocator
 	
 	/**
 	 * Insert bulk of objects to the cache from DB
+	 * @param string $objectName
 	 * @param kBaseCacheWrapper $cache
 	 * @param string $tag
-	 * @return array of DropFolder or null
+	 * @return array
 	 */
 	protected static function refreshObjectListFromDB($objectName, $cache, $tag)
 	{
@@ -124,17 +132,20 @@ abstract class kAllocator
 		{
 			return kScheduledProfileTaskAllocator::refreshObjectListFromDB($objectName, $cache, $tag);
 		}
+		elseif ($objectName == kDropFolderAllocator::OBJECT_NAME)
+		{
+			return kDropFolderAllocator::refreshObjectListFromDB($objectName, $cache, $tag);
+		}
 		return array();
 	}
 	
 	/**
 	 * Return the object from cache if exist
+	 * @param string $objectName
 	 * @param kBaseCacheWrapper $cache
 	 * @param array $objectsList
 	 * @param string $indexKey
 	 * @param int $maxTimeForWatch
-	 *
-	 * @return DropFolder
 	 */
 	protected static function allocateObjectFromList($objectName, $cache, $objectsList, $indexKey, $maxTimeForWatch)
 	{
@@ -158,7 +169,7 @@ abstract class kAllocator
 				return $objectToAllocate;
 			}
 		}
-		KalturaLog::debug("Could not allocate any $objectName after [$numOfObjects] attempts");
+		KalturaLog::debug("Could not allocate any [$objectName] after [$numOfObjects] attempts");
 		return null;
 	}
 	
@@ -171,14 +182,14 @@ abstract class kAllocator
 		return true;
 	}
 	
-	protected static function refreshObjectsListInCache($cache, $objectName, $tag, $scheduledProfileTasksFromDB, $ttlForList)
+	protected static function refreshObjectsListInCache($cache, $objectName, $tag, $objectsFromDB, $ttlForList)
 	{
 		$tagKey = self::getCacheKeyForObjectTag($objectName, $tag);
 		$indexKey = self::getCacheKeyForIndex($objectName, $tag);
-		$indexKeyTtl = kTimeConversion::DAYS * 14; // day in seconds * 14 days
-		$numOfScheduledProfileTasksFromDB = count($scheduledProfileTasksFromDB);
-		KalturaLog::info("Inserted $numOfScheduledProfileTasksFromDB scheduled task profiles to cache with tag [$tag] for [$ttlForList] seconds");
+		$indexKeyTtl = kTimeConversion::DAYS * 14;
+		$numOfObjectsFromDB = count($objectsFromDB);
+		KalturaLog::info("Inserted $numOfObjectsFromDB [$objectName] to cache with tag [$tag] for [$ttlForList] seconds");
 		$cache->add($indexKey, 0, $indexKeyTtl);
-		$cache->set($tagKey, $scheduledProfileTasksFromDB, $ttlForList);
+		$cache->set($tagKey, $objectsFromDB, $ttlForList);
 	}
 }

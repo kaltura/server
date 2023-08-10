@@ -240,7 +240,7 @@ class DropFolderService extends KalturaBaseService
 	 */
 	public function getExclusiveDropFolderAction($tag, $maxTime)
 	{
-		$allocateDropFolder = kDropFolderAllocator::getDropFolder($tag, $maxTime);
+		$allocateDropFolder = kDropFolderAllocator::allocateObjectByTag(kDropFolderAllocator::OBJECT_NAME, $tag, $maxTime);
 		if ($allocateDropFolder && self::isValidForWatch($allocateDropFolder))
 		{
 			$dropFolder = KalturaDropFolder::getInstanceByType($allocateDropFolder->getType());
@@ -261,7 +261,7 @@ class DropFolderService extends KalturaBaseService
 	 */
 	public function freeExclusiveDropFolderAction($dropFolderId, $errorCode = null, $errorDescription = null)
 	{
-		kDropFolderAllocator::freeDropFolder($dropFolderId);
+		kScheduledProfileTaskAllocator::unlockAllocatedObject(kDropFolderAllocator::OBJECT_NAME, $dropFolderId);
 
 		$dbDropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
 		if (!$dbDropFolder)

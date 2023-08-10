@@ -294,17 +294,18 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	/**
 	 * @action getExclusiveTask
 	 * @param int $runnerType
+	 * @param int $maxTime
 	 * @return KalturaScheduledTaskProfile
 	 */
-	public function getExclusiveTaskAction($runnerType)
+	public function getExclusiveTaskAction($runnerType, $maxTime)
 	{
 		if ($runnerType)
 		{
-			$profile = kScheduledProfileTaskAllocator::allocateObjectByTag(kScheduledProfileTaskAllocator::OBJECT_NAME, $runnerType);
+			$profile = kScheduledProfileTaskAllocator::allocateObjectByTag(kScheduledProfileTaskAllocator::OBJECT_NAME, $runnerType, $maxTime);
 		}
 		else
 		{
-			$profile = kScheduledProfileTaskAllocator::allocateObjectByTag(kScheduledProfileTaskAllocator::OBJECT_NAME,'*');
+			$profile = kScheduledProfileTaskAllocator::allocateObjectByTag(kScheduledProfileTaskAllocator::OBJECT_NAME,'*', $maxTime);
 		}
 		
 		if ($profile)
@@ -325,14 +326,12 @@ class ScheduledTaskProfileService extends KalturaBaseService
 	 *
 	 * @action freeExclusiveTask
 	 * @param int $scheduledTaskProfileId
-	 * @param string $errorCode
-	 * @param string $errorDescription
 	 * @return KalturaScheduledTaskProfile
 	 *@throws KalturaAPIException
 	 */
-	public function freeExclusiveTaskAction($scheduledTaskProfileId, $errorCode = null, $errorDescription = null)
+	public function freeExclusiveTaskAction($scheduledTaskProfileId)
 	{
-		kScheduledProfileTaskAllocator::unlockObject(kScheduledProfileTaskAllocator::OBJECT_NAME, $scheduledTaskProfileId);
+		kScheduledProfileTaskAllocator::unlockAllocatedObject(kScheduledProfileTaskAllocator::OBJECT_NAME, $scheduledTaskProfileId);
 		
 		$dbScheduledTaskProfile = ScheduledTaskProfilePeer::retrieveByPK($scheduledTaskProfileId);
 		if (!$dbScheduledTaskProfile)

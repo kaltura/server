@@ -12,9 +12,11 @@ class kScheduledProfileTaskAllocator extends kAllocator
 	
 	/**
 	 * Insert bulk of scheduled profile tasks to the cache from DB
+	 * @param string $objectName
 	 * @param kBaseCacheWrapper $cache
 	 * @param string $tag
 	 * @return array
+	 * @throws Exception
 	 */
 	public static function refreshObjectListFromDB($objectName, $cache, $tag)
 	{
@@ -24,13 +26,8 @@ class kScheduledProfileTaskAllocator extends kAllocator
 			return array();
 		}
 		
-		$scheduledProfileTasksFromDB = self::retrieveScheduledTaskProfilesToHandle($tag);
-		if (!$scheduledProfileTasksFromDB)
-		{
-			return array();
-		}
-		
 		$ttlForList = kConf::get(self::KCONF_TIME_TO_LAST);
+		$scheduledProfileTasksFromDB = self::retrieveScheduledTaskProfilesToHandle($tag);
 		self::refreshObjectsListInCache($cache, $objectName, $tag, $scheduledProfileTasksFromDB, $ttlForList);
 		
 		$cache->delete($tagLockKey);
@@ -38,6 +35,11 @@ class kScheduledProfileTaskAllocator extends kAllocator
 		return $scheduledProfileTasksFromDB;
 	}
 	
+	/**
+	 * @param string $tag
+	 * @return array
+	 * @throws PropelException
+	 */
 	protected static function retrieveScheduledTaskProfilesToHandle($tag)
 	{
 		$criteria = new Criteria();
@@ -58,13 +60,15 @@ class kScheduledProfileTaskAllocator extends kAllocator
 		$scheduledProfileTasksFromDB = ScheduledTaskProfilePeer::doSelect($criteria);
 		ScheduledTaskProfilePeer::setDefaultCriteriaFilter(true);
 		
-		if (!$scheduledProfileTasksFromDB)
-		{
-			return array();
-		}
 		return $scheduledProfileTasksFromDB;
 	}
 	
+	/**
+	 * @param string $objectName
+	 * @param $objectToAllocate
+	 * @return bool
+	 * @throws PropelException
+	 */
 	protected static function verifyAllocatedObject($objectName, $objectToAllocate)
 	{
 		/** @var $objectToAllocate ScheduledTaskProfile */

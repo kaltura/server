@@ -230,13 +230,18 @@ Add the following to batch.ini under KScheduledTaskRunner worker
 ```
 [KScheduledTaskRunner : PeriodicWorker]
 id                                                  = 610
-params.runnerTypes                                  = 1,2
+params.runnerType                                  = 1
+```
+```
+[KVendorTaskRunner : PeriodicWorker]
+id                                                  = 610
+params.runnerType                                  = 2
 ```
 Add the following to batch.ini
 ```
 [KAsyncRecycleBin : KScheduledTaskRunner]
 id                                                  = 611
-params.runnerTypes                                  = 3
+params.runnerType                                  = 3
 ```
 
 ## Add 'RoomType' to ESearch for entry ##
