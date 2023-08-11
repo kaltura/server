@@ -13,8 +13,12 @@
  * @package Core
  * @subpackage model
  */
-class UserLoginData extends BaseUserLoginData{
-	
+class UserLoginData extends BaseUserLoginData
+{
+	const SHA1 = 'sha1';
+	const PASSWORD_ARGON2ID = 'argon2id';
+	const PASSWORD_ARGON2I = 'argon2i';
+
 	public function getFullName()
 	{
 		return trim($this->getFirstName() . ' ' . $this->getLastName());
@@ -50,24 +54,60 @@ class UserLoginData extends BaseUserLoginData{
 	}
 	
 	public function setPassword($password) 
-	{ 
-		$salt = md5(rand(100000, 999999).$this->getLoginEmail()); 
-		$this->setSalt($salt); 
-		$this->setSha1Password(sha1($salt.$password)); 
+	{
+		KalturaLog::debug("TTT: Setting password");
+		$passwordHashingAlgo = $whiteListedInternalPatterns = kConf::get('password_hash_algo', 'security', self::SHA1);
+		KalturaLog::debug("TTT: passwordHashingAlgo [$passwordHashingAlgo]");
+		switch ($passwordHashingAlgo)
+		{
+			case self::PASSWORD_ARGON2I:
+				$hashedPassword = password_hash($password, PASSWORD_ARGON2I);
+				$this->setUserPassword($hashedPassword);
+				break;
+			case self::PASSWORD_ARGON2ID:
+				$hashedPassword = password_hash($password, PASSWORD_ARGON2ID);
+				$this->setUserPassword($hashedPassword);
+				break;
+
+			case self::SHA1:
+			default:
+				$salt = md5(rand(100000, 999999).$this->getLoginEmail());
+				$this->setSalt($salt);
+				$this->setSha1Password(sha1($salt.$password));
+				break;
+
+		}
+
+		$this->setUserPasswordHashAlgo($passwordHashingAlgo);
 		$this->setPasswordUpdatedAt(time());
 	} 
-	
-	
+
 	public function isPasswordValid($password_to_match)
 	{
-		return sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password() ;
+		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
+
+		switch ($passwordHashingAlgo)
+		{
+			case self::PASSWORD_ARGON2ID:
+			case self::PASSWORD_ARGON2I:
+				return password_verify($password_to_match, $this->getUserPassword());
+			case self::SHA1:
+			default:
+				return sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password();
+		}
 	}
 	
 	
 	public function resetPassword ($newPassword)
 	{
 		$this->setPassword( $newPassword );
-		$this->addToPreviousPasswords($this->getSha1Password(), $this->getSalt());
+
+		$oldPassword = $this->getCurrentHashedPassword();
+		$salt = $this->getUserPasswordHashAlgo() == self::SHA1
+			? $this->getSalt() : null;
+
+		KalturaLog::debug("TTT: In Reset Pass Flow");
+		$this->addToPreviousPasswords($oldPassword, $salt, $this->getUserPasswordHashAlgo());
 		$this->setPasswordHashKey(null);
 		$this->setLoginAttempts(0);
 		$this->setLoginBlockedUntil(null);
@@ -204,14 +244,15 @@ class UserLoginData extends BaseUserLoginData{
 	}
 	
 	
-	public function addToPreviousPasswords($sha1, $salt)
+	public function addToPreviousPasswords($sha1, $salt, $hashMethod)
 	{
 		$passwords = $this->getPreviousPasswords();
 		if (!$passwords) {
 			$passwords = array();
 		}
-		array_unshift($passwords, array ('sha1' => $sha1, 'salt' => $salt));
+		array_unshift($passwords, array ('sha1' => $sha1, 'salt' => $salt, 'hashMethod' => $hashMethod));
 		$passToKeep = $this->getNumPrevPassToKeep();
+		KalturaLog::debug("TTT: pass to keep [$passToKeep]");
 		while (count($passwords) > $passToKeep) {
 			array_pop($passwords);
 		}
@@ -246,21 +287,50 @@ class UserLoginData extends BaseUserLoginData{
 		$previousPass = $this->getPreviousPasswords();
 		if ($passToKeep > 0 && count($previousPass) == 0)
 		{
-			$encryptedPassword = sha1($this->salt . $pass);
-			if ($encryptedPassword === $this->sha1_password)
-			{
-				return true;
-			}
+			return $this->isSamePassword($pass, $this->salt, $this->getCurrentHashedPassword());
 		}
 		
 		$i = 0;
 		while ($i < count($previousPass) && $i < $passToKeep) {
-			if ($previousPass[$i]['sha1'] === sha1($previousPass[$i]['salt'] . $pass)) {
+			if($this->isSamePassword($pass, $previousPass[$i]['salt'], $previousPass[$i]['sha1']))
+			{
 				return true;
 			}
 			$i++;
 		}
+
 		return false;
+	}
+
+	private function isSamePassword($newPass, $salt, $oldPass)
+	{
+		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
+
+		switch ($passwordHashingAlgo)
+		{
+			case self::PASSWORD_ARGON2I:
+			case self::PASSWORD_ARGON2ID:
+				return password_verify($newPass, $oldPass);
+
+			case self::SHA1:
+			default:
+				return sha1($salt . $pass) === $oldPass;
+		}
+
+		return false;
+	}
+
+	private function getCurrentHashedPassword()
+	{
+		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
+
+		$currentHashedPass = $this->getSha1Password();
+		if(in_array($passwordHashingAlgo, array(self::PASSWORD_ARGON2ID, self::PASSWORD_ARGON2I)))
+		{
+			$currentHashedPass = $this->getUserPassword();
+		}
+
+		return $currentHashedPass;
 	}
 	
 	public function getMaxLoginAttempts()
@@ -386,4 +456,37 @@ class UserLoginData extends BaseUserLoginData{
 		}
 		return false;
 	}
+
+	/*
+	* @return int
+	*/
+	public function getUserPassword()
+	{
+		return $this->getFromCustomData('password', null, null);
+	}
+
+	/**
+	 * @param int $attempts
+	 */
+	public function setUserPassword($password)
+	{
+		$this->putInCustomData('password', $password, null);
+	}
+
+	/*
+	* @return int
+	*/
+	public function getUserPasswordHashAlgo()
+	{
+		return $this->getFromCustomData('hash_algo', null, null);
+	}
+
+	/**
+	 * @param int $attempts
+	 */
+	public function setUserPasswordHashAlgo($hasAlgo)
+	{
+		$this->putInCustomData('hash_algo', $hasAlgo, null);
+	}
+
 } // UserLoginData
