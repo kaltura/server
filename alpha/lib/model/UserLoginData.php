@@ -55,9 +55,7 @@ class UserLoginData extends BaseUserLoginData
 	
 	public function setPassword($password) 
 	{
-		KalturaLog::debug("TTT: Setting password");
-		$passwordHashingAlgo = $whiteListedInternalPatterns = kConf::get('password_hash_algo', 'security', self::SHA1);
-		KalturaLog::debug("TTT: passwordHashingAlgo [$passwordHashingAlgo]");
+		$passwordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
 		switch ($passwordHashingAlgo)
 		{
 			case self::PASSWORD_ARGON2I:
@@ -106,7 +104,6 @@ class UserLoginData extends BaseUserLoginData
 		$salt = $this->getUserPasswordHashAlgo() == self::SHA1
 			? $this->getSalt() : null;
 
-		KalturaLog::debug("TTT: In Reset Pass Flow");
 		$this->addToPreviousPasswords($oldPassword, $salt, $this->getUserPasswordHashAlgo());
 		$this->setPasswordHashKey(null);
 		$this->setLoginAttempts(0);
@@ -252,7 +249,6 @@ class UserLoginData extends BaseUserLoginData
 		}
 		array_unshift($passwords, array ('sha1' => $sha1, 'salt' => $salt, 'hashMethod' => $hashMethod));
 		$passToKeep = $this->getNumPrevPassToKeep();
-		KalturaLog::debug("TTT: pass to keep [$passToKeep]");
 		while (count($passwords) > $passToKeep) {
 			array_pop($passwords);
 		}
