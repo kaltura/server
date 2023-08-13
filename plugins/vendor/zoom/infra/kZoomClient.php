@@ -4,7 +4,7 @@
  * @package plugins.vendor
  * @subpackage zoom.model
  */
-class kZoomClient
+class kZoomClient extends kVendorClient
 {
 	const ZOOM_BASE_URL = 'ZoomBaseUrl';
 	const PARTICIPANTS  = 'participants';
@@ -19,78 +19,71 @@ class kZoomClient
 	const API_LIST_RECORDING = '/v2/accounts/@accountId@/recordings';
 	const API_GET_MEETING_RECORDING = '/v2/meetings/@meetingId@/recordings';
 	const API_GET_MEETING = '/v2/meetings/@meetingId@';
-	
-	protected $zoomBaseURL;
-	protected $refreshToken;
-	protected $accessToken;
-	protected $jwtToken;
-	protected $clientId;
-	protected $clientSecret;
+
+	protected $accountId;
+	protected $zoomAuthType;
 	protected $zoomTokensHelper;
-	protected $accessExpiresIn;
 	
 	/**
 	 * kZoomClient constructor.
 	 * @param $zoomBaseURL
-	 * @param null $jwtToken
+	 * @param null $accountId
 	 * @param null $refreshToken
-	 * @param null $clientId
-	 * @param null $clientSecret
 	 * @param null $accessToken
 	 * @param null $accessExpiresIn
+	 * @param null $zoomAuthType
 	 * @throws KalturaAPIException
 	 */
-	public function __construct($zoomBaseURL, $jwtToken = null, $refreshToken = null, $clientId = null,
-	                            $clientSecret= null, $accessToken = null, $accessExpiresIn = null)
+	public function __construct($zoomBaseURL, $accountId = null, $refreshToken = null,
+								$accessToken = null, $accessExpiresIn = null, $zoomAuthType = null)
 	{
-		$this -> zoomBaseURL = $zoomBaseURL;
+		$this->baseURL = $zoomBaseURL;
 		// check if at least one is available, otherwise throw exception
-		if ($refreshToken == null && $jwtToken == null && $accessToken == null)
+		if ($zoomAuthType == kZoomAuthTypes::OAUTH && $refreshToken == null && $accessToken == null)
 		{
-			throw new KalturaAPIException (KalturaZoomErrors::UNABLE_TO_AUTHENTICATE);
+			throw new KalturaAPIException (KalturaZoomErrors::UNABLE_TO_AUTHENTICATE_OAUTH);
 		}
-		$this -> refreshToken = $refreshToken;
-		$this -> jwtToken = $jwtToken;
-		$this->clientId = $clientId;
-		$this->clientSecret = $clientSecret;
+		$this->accountId = $accountId;
+		$this->refreshToken = $refreshToken;
 		$this->accessToken = $accessToken;
 		$this->accessExpiresIn = $accessExpiresIn;
-		$this->zoomTokensHelper = new kZoomTokens($zoomBaseURL, $clientId, $clientSecret);
+		$this->zoomAuthType = $zoomAuthType;
+		$this->zoomTokensHelper = new kZoomTokens($zoomBaseURL, $accountId, $zoomAuthType);
 	}
 	
 	
 	public function retrieveTokenZoomUserPermissions()
 	{
-		return $this -> retrieveZoomUserPermissions(self::API_USERS_ME);
+		return $this->retrieveZoomUserPermissions(self::API_USERS_ME);
 	}
 	
 	public function retrieveTokenZoomUser()
 	{
-		return $this -> retrieveZoomUser(self::API_USERS_ME);
+		return $this->retrieveZoomUser(self::API_USERS_ME);
 	}
 	
 	public function retrieveMeetingParticipant($meetingId)
 	{
 		$apiPath = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
-		return $this -> callZoom($apiPath);
+		return $this->callZoom($apiPath);
 	}
 	
 	public function retrieveWebinarPanelists($webinarId)
 	{
 		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
-		return $this -> callZoom($apiPath);
+		return $this->callZoom($apiPath);
 	}
 	
 	public function retrieveZoomUser($userName)
 	{
 		$apiPath = str_replace('@userId@', $userName, self::API_USERS);
-		return $this -> callZoom($apiPath);
+		return $this->callZoom($apiPath);
 	}
 	
 	public function retrieveZoomUserPermissions($userName)
 	{
 		$apiPath = str_replace('@userId@', $userName, self::API_USERS_PERMISSIONS);
-		return $this -> callZoom($apiPath);
+		return $this->callZoom($apiPath);
 	}
 	
 	protected function resolveMeetingUUId($meetingUUid)
@@ -186,18 +179,12 @@ class kZoomClient
 	 * @param $response
 	 * @param int $httpCode
 	 * @param KCurlWrapper $curlWrapper
-	 * @param $apiPath
 	 */
-	protected function handleCurlResponse(&$response, $httpCode, $curlWrapper, $apiPath)
+	protected function handleCurlResponse(&$response, $httpCode, $curlWrapper)
 	{
-		$JWTResponse = $this->checkJWTResponse($response);
-		if ($JWTResponse != $response)
+		if (!$response || KCurlHeaderResponse::isError($httpCode) || $curlWrapper->getError())
 		{
-			return 'JWT error: ' . $JWTResponse;
-		}
-		if (!$response || KCurlHeaderResponse::isError($httpCode) || $curlWrapper -> getError())
-		{
-			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()} ";
+			$errMsg = "Zoom Curl returned error, Error code : $httpCode, Error: {$curlWrapper->getError()}";
 			KalturaLog ::debug($errMsg);
 			if($response)
 			{
@@ -219,21 +206,15 @@ class kZoomClient
 		$curlWrapper->setOpts($options);
 		
 		$url = $this->generateContextualUrl($apiPath);
-		if ($this->jwtToken != null) // if we have a jwt we need to use it to make the call
-		{
-			$token = $this->jwtToken;
-		}
-		else
-		{
-			$token = $this->accessToken;
-		}
+		$token = $this->accessToken;
+
 		$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
 			"authorization: Bearer {$token}",
 			"content-type: application/json"
 		));
-		$response = $curlWrapper -> exec($url);
-		$httpCode = $curlWrapper -> getHttpCode();
-		$this -> handleCurlResponse($response, $httpCode, $curlWrapper, $apiPath);
+		$response = $curlWrapper->exec($url);
+		$httpCode = $curlWrapper->getHttpCode();
+		$this->handleCurlResponse($response, $httpCode, $curlWrapper);
 		if (!$response)
 		{
 			$data = $curlWrapper->getErrorMsg();
@@ -244,47 +225,10 @@ class kZoomClient
 		}
 		return $data;
 	}
-	
-	protected function checkJWTResponse($response)
-	{
-		if ($this->jwtToken != null)
-		{
-			$decodedResponse = json_decode($response, true);
-			if (isset($decodedResponse['code']))
-			{
-				KalturaLog::ERR('Error calling Zoom - Code: ' . $decodedResponse['code'] . ' Reason: ' .
-				                $decodedResponse['message']);
-				return $decodedResponse['message'];
-			}
-		}
-		return $response;
-	}
-	
+
 	protected function generateContextualUrl($apiPath)
 	{
-		$url = $this -> zoomBaseURL . $apiPath . '?';
-		if ($this->refreshToken)
-		{
-			if (!$this->accessToken)
-			{
-				$this->refreshTokens();
-			}
-		}
-		return $url;
-	}
-	
-	public function refreshTokens()
-	{
-		$tokens = null;
-		if (!$this->jwtToken)
-		{
-			$tokens = $this -> zoomTokensHelper -> refreshTokens($this -> refreshToken);
-			$this -> accessToken = $tokens[kZoomTokens::ACCESS_TOKEN];
-			$this -> refreshToken = $tokens[kZoomTokens::REFRESH_TOKEN];
-			$this -> accessExpiresIn = $tokens[kZoomTokens::EXPIRES_IN];
-		}
-		return $tokens;
-		
+		return $this->baseURL . $apiPath . '?';
 	}
 	
 	public function getRefreshToken()

@@ -34,11 +34,6 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	 * @var KalturaNullableBoolean
 	 */
 	public $enableWebinarUploads;
-
-	/**
-	 * @var string
-	 */
-	public $jwtToken;
 	
 	/**
 	 * @var KalturaNullableBoolean
@@ -49,11 +44,6 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	 * @var string
 	 */
 	public $zoomAccountDescription;
-	
-	/**
-	 * @var KalturaNullableBoolean
-	 */
-	public $enableMeetingUpload;
 	
 	/**
 	 * @var string
@@ -82,10 +72,8 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'zoomWebinarCategory',
 		'enableWebinarUploads',
 		'enableRecordingUpload' => 'status',
-		'jwtToken',
 		'enableZoomTranscription',
 		'zoomAccountDescription',
-		'enableMeetingUpload',
 		'groupParticipationType',
 		'optInGroupNames',
 		'optOutGroupNames',

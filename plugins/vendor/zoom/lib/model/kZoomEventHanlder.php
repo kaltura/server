@@ -6,10 +6,7 @@
 
 class kZoomEventHanlder
 {
-	const PHP_INPUT = 'php://input';
 	protected $zoomConfiguration;
-	const CONFIGURATION_PARAM_NAME = 'ZoomAccount';
-	const MAP_NAME = 'vendor';
 	const EMAIL = 'email';
 	const CMS_USER_FIELD = 'cms_user_id';
 	const KALTURA_ZOOM_DEFAULT_USER = 'KalturaZoomDefault';
@@ -25,16 +22,27 @@ class kZoomEventHanlder
 	
 	/**
 	 * @return kZoomEvent
+	 * @param array $data
 	 * @throws Exception
 	 */
-	public function parseEvent()
+	public function parseEvent($data)
 	{
 		kZoomOauth::verifyHeaderToken($this->zoomConfiguration);
-		$data = $this->getRequestData();
 		KalturaLog::debug('Zoom event data is ' . print_r($data, true));
 		$event = new kZoomEvent();
 		$event->parseData($data);
 		return $event;
+	}
+
+	public function processUrlValidationEvent($data)
+	{
+		$response = new KalturaEndpointValidationResponse();
+		$payload = $data[kZoomEvent::PAYLOAD];
+		KalturaLog::debug("Zoom endpoint validation payload: " . print_r($payload, true));
+		$response->plainToken = $payload[kZoomEvent::PLAIN_TOKEN];
+		$secretToken = $this->zoomConfiguration[kOAuth::SECRET_TOKEN];
+		$response->encryptedToken = hash_hmac("sha256", $response->plainToken, $secretToken);
+		return $response;
 	}
 
 	/**
@@ -64,7 +72,7 @@ class kZoomEventHanlder
 				if ($zoomDropFolderId)
 				{
 					self::createZoomDropFolderFile($event, $zoomDropFolderId, $zoomVendorIntegration->getPartnerId(), $zoomVendorIntegration,
-					                               $zoomDropFolder->getConversionProfileId(), $zoomClient, $zoomDropFolder->getFileDeletePolicy());
+					                               $zoomDropFolder->getConversionProfileId(), $zoomDropFolder->getFileDeletePolicy());
 				}
 				else
 				{
@@ -90,10 +98,9 @@ class kZoomEventHanlder
 				}
 				else
 				{
-					$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL],
-					                                                    $zoomVendorIntegration->getJwtToken(),
-					                                                    $zoomVendorIntegration->getRefreshToken(),
-					                                                    null, null, $zoomVendorIntegration->getAccessToken());
+					$transcriptProcessor = new kZoomTranscriptProcessor($this->zoomConfiguration[kZoomClient::ZOOM_BASE_URL], $zoomVendorIntegration->getAccountId(),
+												$zoomVendorIntegration->getRefreshToken(), $zoomVendorIntegration->getAccessToken(),
+												$zoomVendorIntegration->getExpiresIn(), $zoomVendorIntegration->getZoomAuthType());
 					$transcriptProcessor->handleRecordingTranscriptComplete($event);
 				}
 				break;
@@ -190,14 +197,14 @@ class kZoomEventHanlder
 	
 	protected function initZoomClient(ZoomVendorIntegration $zoomVendorIntegration)
 	{
-		$jwtToken = $zoomVendorIntegration->getJwtToken();
+		$accountId = $zoomVendorIntegration->getAccountId();
 		$refreshToken = $zoomVendorIntegration->getRefreshToken();
 		$accessToken = $zoomVendorIntegration->getAccessToken();
-		$zoomConfiguration = kConf::get(self::CONFIGURATION_PARAM_NAME, self::MAP_NAME);
-		$clientId = $zoomConfiguration['clientId'];
+		$accessExpiresIn = $zoomVendorIntegration->getExpiresIn();
+		$zoomAuthType = $zoomVendorIntegration->getZoomAuthType();
+		$zoomConfiguration = kConf::get(ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP);
 		$zoomBaseURL = $zoomConfiguration['ZoomBaseUrl'];
-		$clientSecret = $zoomConfiguration['clientSecret'];
-		return new kZoomClient($zoomBaseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
+		return new kZoomClient($zoomBaseURL, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType);
 	}
 	
 	
@@ -216,7 +223,7 @@ class kZoomEventHanlder
 	}
 	
 	protected static function createZoomDropFolderFile(kZoomEvent $event, $dropFolderId, $partnerId, ZoomVendorIntegration $zoomVendorIntegration,
-	                                                   $conversionProfileId, kZoomClient $zoomClient = null, $fileDeletionPolicy = null)
+	                                                   $conversionProfileId, $fileDeletionPolicy = null)
 	{
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
@@ -233,7 +240,7 @@ class kZoomEventHanlder
 		foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 		{
 			$parentEntry = null;
-			self::handleAudioFiles($recordingFilesPerTimeSlot, $kMeetingMetaData->getUuid(), $zoomClient ,$fileDeletionPolicy);
+			self::handleAudioFiles($recordingFilesPerTimeSlot);
 			/* @var kZoomRecordingFile $recordingFile*/
 			foreach ($recordingFilesPerTimeSlot as $recordingFile)
 			{
@@ -243,7 +250,7 @@ class kZoomEventHanlder
 				{
 					KalturaLog::debug('No recording named: ' . $fileName);
 					if(!ZoomHelper::shouldHandleFileTypeEnum($recordingFile->recordingFileType) ||
-						($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT && $zoomVendorIntegration->getEnableZoomTranscription() === 0))
+						($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT && $zoomVendorIntegration->getEnableZoomTranscription() == 0))
 					{
 						continue;
 					}
@@ -283,7 +290,7 @@ class kZoomEventHanlder
 		}
 	}
 
-	protected static function handleAudioFiles(&$recordingFilesPerTimeSlot, $meetingFileUuid, kZoomClient $zoomClient, $fileDeletionPolicy)
+	protected static function handleAudioFiles(&$recordingFilesPerTimeSlot)
 	{
 		$foundMP4 = false;
 		$audioKeys = array();
@@ -412,13 +419,4 @@ class kZoomEventHanlder
 		return $dropFolderFiles;
 	}
 
-	/**
-	 * @return mixed
-	 * @throws Exception
-	 */
-	protected function getRequestData()
-	{
-		$request_body = file_get_contents(self::PHP_INPUT);
-		return json_decode($request_body, true);
-	}
 }

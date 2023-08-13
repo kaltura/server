@@ -9,7 +9,6 @@ abstract class kZoomProcessor
 	const ONE_DAY_IN_SECONDS = 86400;
 	const ZOOM_PREFIX = 'Zoom_';
 	const ZOOM_LOCK_TTL = 120;
-	const URL_ACCESS_TOKEN = '?access_token=';
 	const REFERENCE_FILTER = '_eq_reference_id';
 	const CMS_USER_FIELD = 'cms_user_id';
 
@@ -21,15 +20,15 @@ abstract class kZoomProcessor
 	/**
 	 * kZoomRecordingProcessor constructor.
 	 * @param string $zoomBaseUrl
-	 * @param string $jwtToken
+	 * @param string $accountId
 	 * @param string $refreshToken
-	 * @param string $clientId
-	 * @param string $clientSecret
 	 * @param string $accessToken
+	 * @param string $accessExpiresIn
+	 * @param int $zoomAuthType kZoomAuthTypes enum
 	 */
-	public function __construct($zoomBaseUrl,$jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken)
+	public function __construct($zoomBaseUrl, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType)
 	{
-		$this->zoomClient = new kZoomClient($zoomBaseUrl, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken);
+		$this->zoomClient = new kZoomClient($zoomBaseUrl, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType);
 	}
 
 	/**
