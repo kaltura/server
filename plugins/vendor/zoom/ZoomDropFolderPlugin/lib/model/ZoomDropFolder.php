@@ -60,7 +60,7 @@ class ZoomDropFolder extends RemoteDropFolder
 	public function getFolderUrl()
 	{
 		return kConf ::getArrayValue(
-			KalturaZoomDropFolder::ZOOM_BASE_URL, KalturaZoomDropFolder::CONFIGURATION_PARAM_NAME, KalturaZoomDropFolder::MAP_NAME
+			KalturaZoomDropFolder::ZOOM_BASE_URL, ZoomHelper::ZOOM_ACCOUNT_PARAM, ZoomHelper::VENDOR_MAP
 		);
 	}
 	

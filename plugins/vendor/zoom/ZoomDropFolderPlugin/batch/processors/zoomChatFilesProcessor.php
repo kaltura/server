@@ -27,9 +27,8 @@ class zoomChatFilesProcessor extends zoomProcessor
 	/**
 	 * @param kalturaMediaEntry $entry
 	 * @param KalturaZoomDropFolderFile $recording
-	 * @param string $chatDownloadUrl
 	 */
-	public function handleChatRecord($entry, $recording, $chatDownloadUrl)
+	public function handleChatRecord($entry, $recording)
 	{
 		if(!$entry)
 		{
@@ -40,7 +39,9 @@ class zoomChatFilesProcessor extends zoomProcessor
 		KBatchBase::impersonate($entry->partnerId);
 		$attachmentAsset = $this->createAttachmentAssetForChatFile($recording->meetingMetadata->meetingId, $entry, $attachmentPlugin);
 		$attachmentAssetResource = new KalturaUrlResource();
-		$attachmentAssetResource->url = $this->getZoomRedirectUrlFromFile($recording);
+		list($redirectUrl, $urlHeaders) = $this->getZoomRedirectUrlFromFile($recording);
+		$attachmentAssetResource->url = $redirectUrl;
+		$attachmentAssetResource->urlHeaders = $urlHeaders;
 		$attachmentPlugin->attachmentAsset->setContent($attachmentAsset->id, $attachmentAssetResource);
 		KBatchBase::unimpersonate();
 	}
