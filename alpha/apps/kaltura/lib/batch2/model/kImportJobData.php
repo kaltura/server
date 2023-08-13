@@ -36,6 +36,11 @@ class kImportJobData extends kJobData
 	private $destFileSharedPath;
 	
 	/**
+	 * @var array
+	 */
+	private $urlHeaders;
+	
+	/**
 	 * @return the $srcFileUrl
 	 */
 	public function getSrcFileUrl()
@@ -127,5 +132,21 @@ class kImportJobData extends kJobData
 	public function setDestFileSharedPath($destFileSharedPath)
 	{
 		$this->destFileSharedPath = $destFileSharedPath;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getUrlHeaders()
+	{
+		return $this->urlHeaders;
+	}
+	
+	/**
+	 * @param array $urlHeaders
+	 */
+	public function setUrlHeaders($urlHeaders)
+	{
+		$this->urlHeaders = $urlHeaders;
 	}
 }

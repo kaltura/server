@@ -20,6 +20,11 @@ class kUrlResource extends kContentResource
 	private $forceAsyncDownload = false;
 	
 	/**
+	 * @var array
+	 */
+	private $urlHeaders;
+	
+	/**
 	 * @return string
 	 */
 	public function getUrl()
@@ -41,7 +46,9 @@ class kUrlResource extends kContentResource
 	 */
 	public function getImportJobData()
 	{
-	    return null;
+		$importJobData = new kImportJobData();
+		$importJobData->setUrlHeaders($this->getUrlHeaders());
+		return $importJobData;
 	}
 	
 	/**
@@ -55,5 +62,21 @@ class kUrlResource extends kContentResource
 	public function setForceAsyncDownload($force)
 	{
 	    $this->forceAsyncDownload = $force;
+	}
+	
+	/**
+	 * @return array
+	 */
+	public function getUrlHeaders()
+	{
+		return $this->urlHeaders;
+	}
+	
+	/**
+	 * @param array $urlHeaders
+	 */
+	public function setUrlHeaders($urlHeaders)
+	{
+		$this->urlHeaders = $urlHeaders;
 	}
 }

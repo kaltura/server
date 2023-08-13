@@ -19,7 +19,16 @@ class KalturaUrlResource extends KalturaContentResource
 	 */
 	public $forceAsyncDownload;
 	
-	private static $map_between_objects = array('url', 'forceAsyncDownload');
+	/**
+	 * @var KalturaStringArray
+	 */
+	public $urlHeaders;
+	
+	private static $map_between_objects = array(
+		'url',
+		'forceAsyncDownload',
+		'urlHeaders',
+		);
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
