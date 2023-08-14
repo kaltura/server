@@ -8,41 +8,57 @@
 abstract class KalturaUserAppRoleBaseFilter extends KalturaRelatedFilter
 {
 	/**
-	 * @var string the app-registry id to search for
+	 * The app-registry id to search for
+	 *
+	 * @var string
 	 */
 	public $appGuidEqual;
 	
 	/**
-	 * @var string apps-registries ids csv list
+	 * Apps-registries ids csv list
+	 *
+	 * @var string
 	 */
 	public $appGuidIn;
 	
 	/**
-	 * @var string the user-role id to search for
+	 * The user-role id to search for
+	 *
+	 * @var string
 	 */
 	public $userRoleIdEqual;
 	
 	/**
-	 * @var string users-roles ids csv list
+	 * Users-roles ids csv list
+	 *
+	 * @var string
 	 */
 	public $userRoleIdIn;
 	
 	/**
+	 * Unix timestamp
+	 *
 	 * @var time
 	 */
 	public $createdAtLessThanOrEqual;
 	
 	/**
+	 * Unix timestamp
+	 *
 	 * @var time
 	 */
 	public $createdAtGreaterThanOrEqual;
 	
 	/**
+	 * Unix timestamp
+	 *
 	 * @var time
 	 */
 	public $updatedAtLessThanOrEqual;
 	
 	/**
+	 * Unix timestamp
+	 *
 	 * @var time
 	 */
 	public $updatedAtGreaterThanOrEqual;

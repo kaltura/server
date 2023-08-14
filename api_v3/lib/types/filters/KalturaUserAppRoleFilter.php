@@ -6,12 +6,16 @@
 class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 {
 	/**
-	 * @var string the user id to search for
+	 * The User Id to search for
+	 *
+	 * @var string
 	 */
 	public $userIdEqual;
 	
 	/**
-	 * @var string users ids csv list
+	 * Users Ids csv list
+	 *
+	 * @var string
 	 */
 	public $userIdIn;
 	
@@ -57,7 +61,6 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		
 		KuserToUserRolePeer::setUseCriteriaFilter(false);
 		$list = KuserToUserRolePeer::doSelect($c);
-		KuserToUserRolePeer::setUseCriteriaFilter(true);
 		
 		$resultCount = count($list);
 		if ($resultCount && ($resultCount < $pager->pageSize))
@@ -69,6 +72,8 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 			KalturaFilterPager::detachFromCriteria($c);
 			$totalCount = KuserToUserRolePeer::doCount($c);
 		}
+		
+		KuserToUserRolePeer::setUseCriteriaFilter(true);
 		
 		$response->totalCount = $totalCount;
 		$response->objects = KalturaUserAppRoleArray::fromDbArray($list, $responseProfile);
