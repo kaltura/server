@@ -59,6 +59,7 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		$userAppRoleFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
 		
+		// disable default criteria (which only retrieve results that 'app_guid === null'
 		KuserToUserRolePeer::setUseCriteriaFilter(false);
 		$list = KuserToUserRolePeer::doSelect($c);
 		
@@ -82,9 +83,23 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 	
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
-		// TODO: think I need to verify the mongo Ids are correct and KS permissions here
+		// TODO: KS permissions here
+		$isAdminSession = kCurrentContext::getCurrentSessionType() === kSessionBase::SESSION_TYPE_ADMIN;
 		
-		if (!empty($this->userIdEqual))
+		// user ks can only retrieve results for himself
+		if (!$isAdminSession)
+		{
+			$kuser = kCurrentContext::getCurrentKsKuser();
+			if (!$kuser)
+			{
+				throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, kCurrentContext::$ks_uid);
+			}
+			
+			$this->userIdEqual = $kuser->getId();
+			$this->userIdIn = null;
+		}
+		
+		if ($isAdminSession && !empty($this->userIdEqual))
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
 			if ($kuser)
@@ -97,7 +112,7 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 			}
 		}
 		
-		if (!empty($this->userIdIn))
+		if ($isAdminSession && !empty($this->userIdIn))
 		{
 			$this->userIdIn = myKuserUtils::preparePusersToKusersFilter($this->userIdIn);
 		}

@@ -25,6 +25,7 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
 
+		// to keep backward compatibility, do not retrieve results where app_guid !== null
 		$c =  KalturaCriteria::create(KuserToUserRolePeer::OM_CLASS);
 		$c->addAnd(KuserToUserRolePeer::APP_GUID, null, Criteria::ISNULL);
 
