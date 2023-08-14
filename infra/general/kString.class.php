@@ -535,4 +535,10 @@ class kString
 		
 		return $trailingEscapesCount % 2 == 0;
 	}
+	
+	public static function isValidMongoId($string)
+	{
+		return preg_match('/^[0-9a-fA-F]{24}$/', $string) === 1;
+	}
+	
 }
