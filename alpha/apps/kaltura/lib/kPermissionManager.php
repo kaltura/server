@@ -728,7 +728,8 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 					break;
 									
 				case ks::INVALID_PARTNER:
-					KalturaLog::err('Wrong partner ['.self::$ksPartnerId.'] actual partner ['.$ksObj->partner_id.']');
+					$pid = kCurrentContext::getCurrentPartnerId()
+					KalturaLog::err('Wrong partner [''] actual partner ['.$ksObj->partner_id.']');
 					break;
 									
 				case ks::INVALID_USER:

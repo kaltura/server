@@ -17,6 +17,21 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 {
 	
 	/**
+	 * Creates default criteria filter
+	 * To keep backward compatibility, do not fetch roles where app_guid is null
+	 */
+	public static function setDefaultCriteriaFilter()
+	{
+		if(self::$s_criteria_filter == null)
+			self::$s_criteria_filter = new criteriaFilter();
+
+		$c =  KalturaCriteria::create(KuserToUserRolePeer::OM_CLASS);
+		$c->addAnd(KuserToUserRolePeer::APP_GUID, null, Criteria::ISNULL);
+
+		self::$s_criteria_filter->setFilter($c);
+	}
+	
+	/**
 	 * Get objects by kuser and user role IDs
 	 * @param int $kuserId
 	 * @param int $userRoleId
@@ -30,6 +45,7 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		return self::doSelect($c);
 	}
 	
+	// TODO: need to add cache key for 'kuserId_appGuid' ?
 	public static function getCacheInvalidationKeys()
 	{
 		return array(array("kuserToUserRole:kuserId=%s", self::KUSER_ID));		
@@ -54,4 +70,119 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 	{
 		return false;
 	}
+	
+	// TODO: probably can be removed
+	public static function addAppRole($kuserId, $appGuid, $userRoleId)
+	{
+		$kuserToUserRole = new KuserToUserRole();
+		$kuserToUserRole->setKuserId($kuserId);
+		$kuserToUserRole->setAppGuid($appGuid);
+		$kuserToUserRole->setUserRoleId($userRoleId);
+		$kuserToUserRole->save();
+		
+		return $kuserToUserRole;
+	}
+	
+	/**
+	 * Get object by kuser and appGuid
+	 *
+	 * @param $kuserId
+	 * @param $appGuid
+	 *
+	 * @return KuserToUserRole|null
+	 * @throws PropelException
+	 */
+	public static function getByKuserIdAndAppGuid($kuserId, $appGuid)
+	{
+		$c = new Criteria();
+		$c->addAnd(self::KUSER_ID, $kuserId, Criteria::EQUAL);
+		$c->addAnd(self::APP_GUID, $appGuid, Criteria::EQUAL);
+		
+		self::setUseCriteriaFilter(false);
+		$res = self::doSelectOne($c);
+		self::setUseCriteriaFilter(true);
+		
+		return $res;
+	}
+	
+	/**
+	 * @param $puserId
+	 * @param $appGuid
+	 * @return KuserToUserRole
+	 *
+	 * @throws kCoreException
+	 * @throws PropelException
+	 */
+	public static function getByPuserIdAndAppGuid($puserId, $appGuid)
+	{
+		$puserId = trim($puserId);
+		$appGuid = trim($appGuid);
+		
+		if (!kCurrentContext::$is_admin_session && kCurrentContext::$ks_uid != $puserId)
+		{
+			throw new kCoreException('[Cannot Retrieve Another User Using Non Admin Session]', kCoreException::CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION, $puserId);
+		}
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $puserId);
+		
+		if (!$kuser)
+		{
+			throw new kCoreException('[User ID Not Found]', kCoreException::INVALID_USER_ID, $puserId);
+		}
+		
+		if (!kString::isValidMongoId($appGuid))
+		{
+			throw new kCoreException('[Invalid App Guid]', kCoreException::INVALID_APP_GUID, $appGuid);
+		}
+		
+		$dbUserAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($kuser->getId(), $appGuid);
+		
+		if (!$dbUserAppRole)
+		{
+			throw new kCoreException('[User App Role Not Found]', kCoreException::USER_APP_ROLE_NOT_FOUND, "$puserId,$appGuid");
+		}
+		
+		return $dbUserAppRole;
+	}
+	
+	/**
+	 * @param kuser $kuser
+	 * @param string $appGuid
+	 * @param int $userRoleId
+	 * @return void
+	 *
+	 * @throws kCoreException
+	 * @throws PropelException
+	 */
+	public static function isValidForInsert(kuser $kuser, $appGuid, $userRoleId)
+	{
+		// groups are not supported
+		if ($kuser->getType() === KuserType::GROUP)
+		{
+			throw new kCoreException('[User App Role Not Allowed For Group]', kCoreException::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP);
+		}
+		
+		// validate userRoleId exist
+		$userRole = UserRolePeer::retrieveByPK($userRoleId);
+		
+		if (!$userRole)
+		{
+			throw new kCoreException('[User Role Not Found]', kCoreException::USER_ROLE_NOT_FOUND);
+		}
+		
+		// validate appGuid string
+		if (!kString::isValidMongoId($appGuid))
+		{
+			throw new kCoreException('[Invalid App Guid]', kCoreException::INVALID_APP_GUID, $appGuid);
+		}
+		
+		// validate user does not have a role for the requested appGuid
+		$userAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($kuser->getId(), $appGuid);
+		if ($userAppRole)
+		{
+			$puserId = $kuser->getPuserId();
+			throw new kCoreException('[User App Role Already Exists]', kCoreException::USER_APP_ROLE_ALREADY_EXISTS, "$puserId,$appGuid");
+		}
+	}
+	
 } // KuserToUserRolePeer

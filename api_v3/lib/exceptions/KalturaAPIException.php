@@ -15,6 +15,7 @@ class KalturaAPIException extends Exception
 	{
 		$errorArgs = func_get_args();
 		array_shift( $errorArgs );
+		KalturaLog::debug("AAAAA args = " . print_r($errorArgs, 1));
 		$errorData = APIErrors::getErrorData( $errorString, $errorArgs );
 		
 		$this->message = $errorData['message'];
