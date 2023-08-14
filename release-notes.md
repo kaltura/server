@@ -1,9 +1,18 @@
 # Rigel-18.18.0
-## Add partners for auth-broker/user-profile/kms ##
+## Backport Zoom Server-To-Server OAuth from version Scorpius-19.13.0
+As Zoom deprecates JWT app on Sep 1st 2023 a late update to the version was added to allow users running on this old version to keep zoom drop folders active while not using the Kaltura main OAuth application.
 
 * Issue Type: Task
-* Issue ID: - Issue Type: Feature
-- Issue ID: FOUN-819
+* Issue ID: VCP-13681
+
+### Deployment scripts ###  
+	php /opt/kaltura/app/deployment/base/scripts/installPlugins.php  
+Client generation required.
+
+## Add partners for auth-broker/user-profile/kms ##
+
+* Issue Type: Feature
+* Issue ID: FOUN-819
 
 ### Configuration ###
     Replace all tokens from the ini file (under auth-broker/user-profile/kms sections) and remove".template" from the file name: 
