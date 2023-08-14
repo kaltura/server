@@ -18,6 +18,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_API_USAGE = 'api-usage';
 	const DATASOURCE_VE_REGISTRATION = 'virtual-events-registration';
 	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
+	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -661,6 +662,23 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 		),
+		self::DATASOURCE_MEETING_REALTIME => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_USER_ENGAGEMENT => 1,
+		),
 	);
 
 	protected static $datasources_hash_dimensions = array(
@@ -673,7 +691,11 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_MEETING_HISTORICAL => array(
 			self::DIMENSION_KUSER_ID => 1,
 		),
+		self::DATASOURCE_MEETING_REALTIME => array(
+			self::DIMENSION_KUSER_ID => 1,
+		),
 	);
+
 	protected static $sourceFromAdminTag = array(
 		'kalturaclassroom' => 'Classroom Capture',
 		'kalturacapture' => 'Kaltura Capture',

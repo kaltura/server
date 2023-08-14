@@ -22,6 +22,7 @@ class BulkUploadResultKuser extends BulkUploadResult
     const TAGS = "tags";
 	const GROUP = "group";
 	const EXTERNAL_ID = "external_id";
+	const CAPABILITIES = "capabilities";
     
     /* (non-PHPdoc)
      * @see BulkUploadResult::handleRelatedObjects()
@@ -89,4 +90,14 @@ class BulkUploadResultKuser extends BulkUploadResult
 	
 	public function getExternalId()	{return $this->getFromCustomData(self::EXTERNAL_ID);}
 	public function setExternalId($v)	{$this->putInCustomData(self::EXTERNAL_ID, $v);}
+	
+	public function getCapabilities()
+	{
+		return $this->getFromCustomData(self::CAPABILITIES);
+	}
+	
+	public function setCapabilities($v)
+	{
+		$this->putInCustomData(self::CAPABILITIES, $v);
+	}
 }
