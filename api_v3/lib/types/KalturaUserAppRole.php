@@ -39,30 +39,7 @@ class KalturaUserAppRole extends KalturaAppRole
 			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $puserId);
 		}
 		
-		try
-		{
-			KuserToUserRolePeer::isValidForInsert($kuser, $appGuid, $userRoleId);
-		}
-		catch (kCoreException $ex)
-		{
-			switch ($ex->getCode())
-			{
-				case kCoreException::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP:
-					throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP);
-				
-				case kCoreException::USER_ROLE_NOT_FOUND:
-					throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
-				
-				case kCoreException::INVALID_APP_GUID:
-					throw new KalturaAPIException(KalturaErrors::INVALID_APP_GUID, $appGuid);
-				
-				case kCoreException::USER_APP_ROLE_ALREADY_EXISTS:
-					throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_ALREADY_EXISTS, $kuser->getPuserId(), $appGuid);
-				
-				default:
-					throw $ex;
-			}
-		}
+		KuserToUserRolePeer::isValidForInsert($kuser, $appGuid, $userRoleId);
 		
 		if (is_null($kuserToUserRole))
 		{

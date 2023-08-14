@@ -71,18 +71,6 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		return false;
 	}
 	
-	// TODO: probably can be removed
-	public static function addAppRole($kuserId, $appGuid, $userRoleId)
-	{
-		$kuserToUserRole = new KuserToUserRole();
-		$kuserToUserRole->setKuserId($kuserId);
-		$kuserToUserRole->setAppGuid($appGuid);
-		$kuserToUserRole->setUserRoleId($userRoleId);
-		$kuserToUserRole->save();
-		
-		return $kuserToUserRole;
-	}
-	
 	/**
 	 * Get object by kuser and appGuid
 	 *
