@@ -112,9 +112,8 @@ abstract class kZoomProcessor
 		$dbUser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $kZoomUser->getProcessedName());
 		if (!$dbUser)
 		{
-			$dbUser = kuserPeer::getActiveKuserByEmail($kZoomUser->getOriginalName(), $partnerId);
+			$dbUser = kuserPeer::getKuserByEmail($kZoomUser->getOriginalName(), $partnerId, KuserStatus::ACTIVE);
 		}
-
 		return $dbUser;
 	}
 }

@@ -376,35 +376,22 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 * @param int|null $partnerId
 	 * @return kuser
 	 */
-	public static function getKuserByEmail($email, $partnerId = null)
+	public static function getKuserByEmail($email, $partnerId = null, $status = null)
 	{
 		$c = new Criteria();
-		$c->add (kuserPeer::EMAIL, $email);
-		
-		if(!is_null($partnerId))
-			$c->add (kuserPeer::PARTNER_ID, $partnerId);
-			
-		$kuser = kuserPeer::doSelectOne( $c );
-		
+		$c->add(kuserPeer::EMAIL, $email);
+		if($partnerId)
+		{
+			$c->add(kuserPeer::PARTNER_ID, $partnerId);
+		}
+		if($status)
+		{
+			$c->add(self::STATUS, $status);
+		}
+		$kuser = kuserPeer::doSelectOne($c);
 		return $kuser;
-		
 	}
 
-    public static function getActiveKuserByEmail($email, $partnerId = null)
-    {
-        $c = new Criteria();
-        $c->add (kuserPeer::EMAIL, $email);
-        $c->add(self::STATUS, KuserStatus::ACTIVE);
-
-        if(!is_null($partnerId))
-            $c->add (kuserPeer::PARTNER_ID, $partnerId);
-
-        $kuser = kuserPeer::doSelectOne( $c );
-
-        return $kuser;
-
-    }
-	
 	/**
 	 * @param int $id
 	 * @return string
