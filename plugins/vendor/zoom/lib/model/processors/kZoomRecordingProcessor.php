@@ -171,7 +171,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		foreach ($zoomUsers as $zoomUser)
 		{
 			/* @var $zoomUser kZoomUser */
-			$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
+			$dbUser = $this->getKalturaUser($partnerId, $zoomUser,kuserStatus::ACTIVE);
 			if($dbUser)
 			{
 				if (strtolower($dbUser->getPuserId()) !== $userToExclude)

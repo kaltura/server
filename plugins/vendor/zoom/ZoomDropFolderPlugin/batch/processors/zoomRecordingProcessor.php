@@ -220,7 +220,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		{
 			/* @var $zoomUser kZoomUser */
 			/* @var $kUser KalturaUser */
-			$kUser = ZoomBatchUtils::getKalturaUser($partnerId, $zoomUser);
+			$kUser = ZoomBatchUtils::getKalturaUser($partnerId, $zoomUser, kuserStatus::ACTIVE);
 			if($kUser)
 			{
 				if (strtolower($kUser->id) !== $userToExclude)
