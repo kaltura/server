@@ -109,10 +109,10 @@ abstract class kZoomProcessor
 	 */
 	protected function getKalturaUser($partnerId, $kZoomUser)
 	{
-		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $kZoomUser->getProcessedName(), true);
+		$dbUser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $kZoomUser->getProcessedName());
 		if (!$dbUser)
 		{
-			$dbUser = kuserPeer::getKuserByEmail($kZoomUser->getOriginalName(), $partnerId);
+			$dbUser = kuserPeer::getActiveKuserByEmail($kZoomUser->getOriginalName(), $partnerId);
 		}
 
 		return $dbUser;
