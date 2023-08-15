@@ -602,11 +602,17 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		}
 		$dbObject = parent::toObject($dbObject);
 		
-		if(!is_null($this->passwordStructureValidations))
+		if (!is_null($this->passwordStructureValidations))
 		{
-			$dbObject->setPasswordStructureValidations(
-				array(array(trim($this->passwordStructureValidations),
-					trim($this->passwordStructureValidationsDescription))));
+			$regexArr = array();
+			foreach ($this->passwordStructureValidations as $regexItem)
+			{
+				if ($regexItem->regex)
+				{
+					$regexArr[] = array(trim($regexItem->regex), $regexItem->description);
+				}
+			}
+			$dbObject->setPasswordStructureValidations($regexArr);
 		}
 		
 		return $dbObject;
@@ -638,13 +644,35 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	protected function updatePasswordStructureFromPartner(Partner $partner)
 	{
-		$regexArr = $partner->getPasswordStructureRegex();
-		if (!$regexArr)
+		if ($partner->getPasswordStructureValidations())
 		{
-			$regexArr = kConf::get('user_login_password_structure');
+			$regexArray = $partner->getPasswordStructureValidations();
+			$this->passwordStructureValidationsDescription = '';
+			$newDescription = '';
+			foreach ($regexArray as $regexItem)
+			{
+				if (isset($regexItem[1]))
+				{
+					$newDescription .= $regexItem[1] . '\n';
+				}
+			}
+			if ($newDescription)
+			{
+				$this->passwordStructureValidationsDescription = substr($newDescription, 0, -2);
+			}
 		}
-		$this->passwordStructureValidations = KalturaRegexArray::fromDbArray($regexArr);
-		
-		$this->passwordStructureValidationsDescription = $partner->getInvalidPasswordStructureMessage();
+		else
+		{
+			$regexArray = kConf::get('user_login_password_structure');
+			$newArr = array();
+			foreach ($regexArray as $regex)
+			{
+				$regexItem = new KalturaRegexItem();
+				$regexItem->regex = $regex;
+				$newArr[] = $regexItem;
+			}
+			$this->passwordStructureValidations = $newArr;
+			$this->passwordStructureValidationsDescription = kConf::get('invalid_password_structure_message');
+		}
 	}
 }
