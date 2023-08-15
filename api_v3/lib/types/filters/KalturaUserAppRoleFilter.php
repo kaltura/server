@@ -83,6 +83,8 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 	
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
+		$this->fixCsvFilterProperties();
+		
 		// TODO: KS permissions here
 		$isAdminSession = kCurrentContext::getCurrentSessionType() === kSessionBase::SESSION_TYPE_ADMIN;
 		
@@ -134,5 +136,12 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		{
 			$this->userIdIn = $this->prepareKusersToPusersFilter($srcObj->get('_in_user_id'));
 		}
+	}
+	
+	protected function fixCsvFilterProperties()
+	{
+		$this->userIdIn = !empty($this->userIdIn) ? kString::csvFixWhitespace($this->userIdIn) : null;
+		$this->appGuidIn = !empty($this->appGuidIn) ? kString::csvFixWhitespace($this->appGuidIn) : null;
+		$this->userRoleIdIn = !empty($this->userRoleIdIn) ? kString::csvFixWhitespace($this->userRoleIdIn) : null;
 	}
 }

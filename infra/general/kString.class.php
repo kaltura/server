@@ -541,4 +541,8 @@ class kString
 		return preg_match('/^[0-9a-fA-F]{24}$/', $string) === 1;
 	}
 	
+	public static function csvFixWhitespace($csv)
+	{
+		return str_replace(' ', '', $csv);
+	}
 }
