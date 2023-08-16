@@ -67,6 +67,16 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 	 */
 	public $partnerId;
 
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $enableMeetingUpload;
+	
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $enableMeetingChat;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -80,6 +90,8 @@ abstract class KalturaIntegrationSetting extends KalturaObject
 		'createdAt',
 		'updatedAt',
 		'partnerId',
+		'enableMeetingUpload',
+		'enableMeetingChat',
 	);
 
 	public function getMapBetweenObjects()

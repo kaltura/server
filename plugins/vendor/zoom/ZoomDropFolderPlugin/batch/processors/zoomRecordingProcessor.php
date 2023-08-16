@@ -32,23 +32,6 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	}
 	
 	/**
-	 * @param kalturaZoomDropFolderFile $recording
-	 * @return bool
-	 * @throws PropelException
-	 * @throws kCoreException
-	 */
-	protected function wasEventHandled($recording)
-	{
-		if($this->getZoomEntryByRecordingId($recording->meetingMetadata->uuid, $recording->partnerId))
-		{
-			KalturaLog::debug("Recording {$recording->meetingMetadata->uuid} already processed");
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
 	 * @param KalturaZoomDropFolderFile $recording
 	 * @return KalturaMediaEntry
 	 * @throws kCoreException
@@ -74,7 +57,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		else if($recording->recordingFile->fileType == KalturaRecordingFileType::CHAT)
 		{
 			$chatFilesProcessor = new zoomChatFilesProcessor($this->zoomBaseUrl, $this->dropFolder);
-			$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording, $recording->recordingFile->downloadUrl);
+			$chatFilesProcessor->handleChatRecord($this->mainEntry, $recording);
 			$entry = $this->mainEntry;
 		}
 		return $entry;
@@ -125,9 +108,10 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$flavorAsset = KBatchBase::$kClient->flavorAsset->add($entry->id, $kFlavorAsset);
 		
 		$resource = new KalturaUrlResource();
-		$redirectUrl = $this->getZoomRedirectUrlFromFile($recording);
+		list($redirectUrl, $urlHeaders) = $this->getZoomRedirectUrlFromFile($recording);
 		$resource->url = $redirectUrl;
 		$resource->forceAsyncDownload = true;
+		$resource->urlHeaders = $urlHeaders;
 		
 		$assetParamsResourceContainer =  new KalturaAssetParamsResourceContainer();
 		$assetParamsResourceContainer->resource = $resource;
@@ -138,7 +122,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		return $entry;
 	}
 	
-	protected function addEntryToCategory($categoryName, $entryId)
+	public function addEntryToCategory($categoryName, $entryId)
 	{
 		$categoryId = $this->findCategoryIdByName($categoryName);
 		if ($categoryId)
@@ -147,9 +131,9 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		}
 	}
 	
-	protected function findCategoryIdByName($categoryName)
+	public function findCategoryIdByName($categoryName)
 	{
-		$isFullPath = self::isFullPath($categoryName);
+		$isFullPath = $this->isFullPath($categoryName);
 		
 		$categoryFilter = new KalturaCategoryFilter();
 		if ($isFullPath)
@@ -185,13 +169,13 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		return $categoryId;
 	}
 	
-	protected function isFullPath($categoryName)
+	public function isFullPath($categoryName)
 	{
 		$numCategories = count(explode('>', $categoryName));
 		return ($numCategories > 1);
 	}
 	
-	protected function addCategoryEntry($categoryId, $entryId)
+	public static function addCategoryEntry($categoryId, $entryId)
 	{
 		$categoryEntry = new KalturaCategoryEntry();
 		$categoryEntry->categoryId = $categoryId;

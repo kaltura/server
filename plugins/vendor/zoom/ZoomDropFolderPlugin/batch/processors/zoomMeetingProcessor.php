@@ -37,6 +37,7 @@ class zoomMeetingProcessor extends zoomRecordingProcessor
 		$participantsEmails = $participants->getParticipantsEmails();
 		if($participantsEmails)
 		{
+			$participantsEmails = array_filter(array_unique($participantsEmails), 'trim');
 			KalturaLog::debug('Found the following participants: ' . implode(", ", $participantsEmails));
 			$result = array();
 			foreach ($participantsEmails as $participantEmail)

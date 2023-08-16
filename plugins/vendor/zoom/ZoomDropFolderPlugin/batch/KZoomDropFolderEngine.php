@@ -120,6 +120,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
+		if($this->shouldDisableExpiredDropFolder($dropFolder))
+		{
+			$this->disableExpiredDropFolder($dropFolder);
+		}
+
 		$this->zoomClient = $this->initZoomClient($dropFolder);
 		$this->dropFolder = $dropFolder;
 		KalturaLog::info('Watching folder [' . $this->dropFolder->id . ']');
@@ -161,25 +166,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return true;
 	}
 
-	protected function getLastHandledMeetingTime($meetingFilesOrdered)
-	{
-		$lastMeeting = end($meetingFilesOrdered);
-		$lastHandledMeetingTime = kTimeZoneUtils::strToZuluTime($lastMeeting[self::START_TIME]);
-		KalturaLog::info('Last meeting is: '. print_r($lastMeeting, true));
-		KalturaLog::info('Last handled meeting time from DF is: '. $this->dropFolder->lastHandledMeetingTime);
-		KalturaLog::info('Last meeting time'. $lastHandledMeetingTime);
-		return $lastHandledMeetingTime;
-	}
-
 	protected function initZoomClient(KalturaDropFolder $dropFolder)
 	{
-		$jwtToken = isset($dropFolder->jwtToken) ? $dropFolder->jwtToken : null;
+		$accountId = isset($dropFolder->accountId) ? $dropFolder->accountId : null;
 		$refreshToken = isset($dropFolder->refreshToken) ? $dropFolder->refreshToken : null;
-		$clientId = isset($dropFolder->clientId) ? $dropFolder->clientId : null;
-		$clientSecret = isset($dropFolder->clientSecret) ? $dropFolder->clientSecret : null;
 		$accessToken = isset($dropFolder->accessToken) ? $dropFolder->accessToken : null;
 		$accessExpiresIn = isset($dropFolder->accessExpiresIn) ? $dropFolder->accessExpiresIn : null;
-		return new kZoomClient($dropFolder->baseURL, $jwtToken, $refreshToken, $clientId, $clientSecret, $accessToken, $accessExpiresIn);
+		$zoomAuthType = isset($dropFolder->zoomAuthType) ? $dropFolder->zoomAuthType : 0;
+		return new kZoomClient($dropFolder->baseURL, $accountId, $refreshToken, $accessToken, $accessExpiresIn, $zoomAuthType);
 	}
 	
 	protected function getMeetingsFromZoom()
@@ -244,6 +238,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				KalturaLog::debug('found entry with old reference id - continue to the next meeting');
 				continue;
 			}
+			if(kZoomTokens::isTokenExpired($this->zoomClient->getAccessExpiresIn()) && !$this->refreshZoomClientTokens())
+			{
+				return;
+			}
 			$partnerId = $this->dropFolder->partnerId;
 			$userId = ZoomBatchUtils::getUserId($this->zoomClient, $partnerId, $meetingFile, $this->dropFolder->zoomVendorIntegration);
 			if ($groupParticipationType != KalturaZoomGroupParticipationType::NO_CLASSIFICATION)
@@ -277,7 +275,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			foreach ($recordingFilesOrdered as $recordingFilesPerTimeSlot)
 			{
 				$parentEntry = null;
-				$this->handleAudioFiles($recordingFilesPerTimeSlot, $meetingFile[self::UUID]);
+				$this->handleAudioFiles($recordingFilesPerTimeSlot);
 				foreach ($recordingFilesPerTimeSlot as $recordingFile)
 				{
 					$recordingFileName = $meetingFile[self::UUID] . '_' . $recordingFile[self::ID] . ZoomHelper::SUFFIX_ZOOM;
@@ -366,7 +364,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		KalturaLog::debug('Last handled meetings time is: '. $lastHandledMeetingTime);
 	}
 
-	protected function handleAudioFiles(&$recordingFilesPerTimeSlot, $meetingFileUuid)
+	protected function handleAudioFiles(&$recordingFilesPerTimeSlot)
 	{
 		$foundMP4 = false;
 		$audioKeys = array();
@@ -456,13 +454,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function handleExistingDropFolderFile (KalturaDropFolderFile $dropFolderFile)
 	{
-		if($this->zoomClient->getAccessExpiresIn() && $this->zoomClient->getAccessExpiresIn() <= time() + self::ONE_MINUTE)
-		{
-			if(!$this->refreshZoomClientTokens())
+		if(kZoomTokens::isTokenExpired($this->zoomClient->getAccessExpiresIn()) && !$this->refreshZoomClientTokens())
 			{
 				return;
 			}
-		}
 		
 		$fileSize = $this->zoomClient->getFileSize($dropFolderFile->meetingMetadata->uuid, $dropFolderFile->recordingFile->id);
 		if (!$fileSize)
@@ -556,6 +551,14 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			throw new kExternalException(KalturaDropFolderErrorCode::MISSING_CONFIG, DropFolderPlugin::MISSING_CONFIG_MESSAGE);
 		}
 
+		//If the token will be expired during the processing (in $expiryExtraGraceTime seconds), sleep $expiryExtraGraceTime and refresh token
+		$expiryExtraGraceTime = 3;
+		if(kZoomTokens::isTokenExpired($dropFolder->accessExpiresIn, $expiryExtraGraceTime))
+		{
+			sleep($expiryExtraGraceTime);
+			$dropFolder = $this->dropFolderPlugin->dropFolder->get($data->dropFolderId);
+		}
+
 		$zoomBaseUrl = $dropFolder->baseURL;
 		$entry = KBatchBase::$kClient->baseEntry->get($dropFolderFile->parentEntryId);
 		switch ($data->contentMatchPolicy)
@@ -600,4 +603,24 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$this->dropFolderFileService->update($dropFolderFile->id, $kZoomDropFolderFile);
 		$this->dropFolderFileService->updateStatus($dropFolderFile->id, KalturaDropFolderFileStatus::HANDLED);
 	}
+
+	function shouldDisableExpiredDropFolder($dropFolder)
+	{
+		$accessExpiresIn = isset($dropFolder->accessExpiresIn) ? $dropFolder->accessExpiresIn : null;
+		if($accessExpiresIn && $accessExpiresIn <= time() - self::ONE_DAY*5)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	function disableExpiredDropFolder($dropFolder)
+	{
+		$updateDropFolder = new KalturaDropFolder();
+		$updateDropFolder->status = DropFolderStatus::DISABLED;
+		$this->dropFolderPlugin->dropFolder->update($dropFolder->id, $updateDropFolder);
+		$expiredTimeInGmt = kTimeZoneUtils::timezoneDate('Y-m-d', $dropFolder->accessExpiresIn, 'GMT');
+		throw new Exception("Failed to refresh tokens, last successful refresh was on $expiredTimeInGmt GMT");
+	}
+
 }

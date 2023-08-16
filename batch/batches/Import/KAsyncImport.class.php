@@ -64,17 +64,23 @@ class KAsyncImport extends KJobHandlerWorker
 	}
 
 	/* Will download $sourceUrl to $localPath and will monitor progress with watchDog*/
-	private function curlExec($sourceUrl,$localPath,$resumeOffset=0)
+	private function curlExec($sourceUrl, $localPath, $resumeOffset = 0, $urlHeaders = null)
 	{
 		self::$startTime			= time();
 		self::$downloadedSoFar		= 0;
 		$progressCallBack			= null;
 		$curlWrapper				= new KCurlWrapper(self::$taskConfig->params);
 		self::$currentResource  	= $curlWrapper->ch;
-		if($resumeOffset)
+		if ($resumeOffset)
+		{
 			$curlWrapper->setResumeOffset($resumeOffset);
+		}
 		$protocol					= $curlWrapper->getSourceUrlProtocol($sourceUrl);
-		if($protocol				== KCurlWrapper::HTTP_PROTOCOL_HTTP)
+		if ($urlHeaders)
+		{
+			$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $urlHeaders);
+		}
+		if ($protocol == KCurlWrapper::HTTP_PROTOCOL_HTTP)
 		{
 			$curlWrapper->setTimeout(self::IMPORT_TIMEOUT);
 			$progressCallBack 		= array('KAsyncImport', 'progressWatchDog');
@@ -194,7 +200,7 @@ class KAsyncImport extends KJobHandlerWorker
 				$this->updateJob($job, "Downloading file, size: $fileSize", KalturaBatchJobStatus::PROCESSING, $data);
 			}
 
-			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->curlExec($sourceUrl, $data->destFileLocalPath,$resumeOffset);
+			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->curlExec($sourceUrl, $data->destFileLocalPath, $resumeOffset, $data->urlHeaders);
 
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
 			{

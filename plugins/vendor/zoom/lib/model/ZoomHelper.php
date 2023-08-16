@@ -6,6 +6,8 @@
  */
 class ZoomHelper
 {
+	const VENDOR_MAP = 'vendor';
+	const ZOOM_ACCOUNT_PARAM = 'ZoomAccount';
 	/** payload data */
 	const ACCOUNT_ID = "account_id";
 	const PAYLOAD = 'payload';
@@ -34,21 +36,22 @@ class ZoomHelper
 	/* @var zoomVendorIntegration $zoomIntegration */
 	protected static $zoomIntegration;
 
-    /**
-     * @param $accountId
-     * @param bool $includeDeleted
-     * @return null|zoomVendorIntegration
-     * @throws PropelException
-     */
-	public static function getZoomIntegrationByAccountId($accountId, $includeDeleted = false)
+	/**
+	 * @param $accountId
+	 * @param bool $includeDeleted
+	 * @param $partnerId
+	 * @return null|zoomVendorIntegration
+	 * @throws PropelException
+	 */
+	public static function getZoomIntegrationByAccountId($accountId, $includeDeleted = false, $partnerId = null)
 	{
 		if($includeDeleted)
 		{
-			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartnerNoFilter($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartnerNoFilter($accountId, VendorTypeEnum::ZOOM_ACCOUNT, $partnerId);
 		}
 		else
 		{
-			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+			self::$zoomIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($accountId, VendorTypeEnum::ZOOM_ACCOUNT, $partnerId);
 		}
 
 		return self::$zoomIntegration;
@@ -89,17 +92,6 @@ class ZoomHelper
         return in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions);
     }
 
-	/**
-	 * redirects to new URL
-	 * @param $url
-	 */
-	public static function redirect($url)
-	{
-		$redirect  = new kRendererRedirect($url);
-		$redirect->output();
-		KExternalErrors::dieGracefully();
-	}
-
     /**
      * @param array $tokens
      * @param array $zoomConfiguration
@@ -112,8 +104,8 @@ class ZoomHelper
 		{
 			$page = file_get_contents($file_path);
 			$tokensString = json_encode($tokens);
-			$verificationToken = $zoomConfiguration[kZoomOauth::VERIFICATION_TOKEN];
-			list($enc, $iv) = AESEncrypt::encrypt($verificationToken, $tokensString);
+			$secretToken = kZoomOauth::getTokenForEncryption($zoomConfiguration);
+			list($enc, $iv) = AESEncrypt::encrypt($secretToken, $tokensString);
 			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
 			$page = str_replace('@encryptData@', base64_encode($enc), $page);
 			$page = str_replace('@iv@', base64_encode($iv), $page);
@@ -140,30 +132,6 @@ class ZoomHelper
 		
 		throw new KalturaAPIException('unable to find regional redirect page, please contact support');
 	}
-	
-	/**
-	 * @param ZoomVendorIntegration $zoomIntegration
-	 * @param $accountId
-	 * @param $ks
-	 * @throws Exception
-	 */
-	public static function loadSubmitPage($zoomIntegration, $accountId, $ks)
-	{
-		$file_path = dirname(__FILE__) . '/../api/webPage/KalturaZoomRegistrationPage.html';
-		if (file_exists($file_path))
-		{
-			$page = file_get_contents($file_path);
-			$page = str_replace('@ks@', $ks->getOriginalString(), $page);
-			$page = str_replace('@BaseServiceUrl@', requestUtils::getHost(), $page);
-			$page = str_replace( '@partnerId@',$zoomIntegration->getPartnerId(),$page);
-			$page = str_replace('@accountId@', $accountId , $page);
-
-			echo $page;
-			die();
-		}
-
-		throw new KalturaAPIException('unable to find submit page, please contact support');
-	}
 
 	/**
 	 * @param $data
@@ -179,58 +147,14 @@ class ZoomHelper
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public static function getPayloadData()
+	public static function getPayloadData($plain=false)
 	{
 		$request_body = file_get_contents(self::PHP_INPUT);
-        return json_decode($request_body, true);
-	}
-
-	/**
-	 * @param int $partnerId
-	 * @param string $categoryFullName
-	 * @param bool $createIfNotExist
-	 * @return int id;
-	 * @throws PropelException
-	 * @throws Exception
-	 */
-	public static function createCategoryForZoom($partnerId, $categoryFullName, $createIfNotExist = true)
-	{
-		$category = categoryPeer::getByFullNameExactMatch($categoryFullName, null, $partnerId);
-		if($category)
+		if($plain)
 		{
-			KalturaLog::debug('Category: ' . $categoryFullName . ' already exist for partner: ' . $partnerId);
-			return $category->getId();
+			return $request_body;
 		}
-
-		if(!$createIfNotExist)
-		{
-			return null;
-		}
-
-		$categoryDb = new category();
-
-		//Check if this is a root category or child , if child get its parent ID
-		$categoryNameArray = explode(categoryPeer::CATEGORY_SEPARATOR, $categoryFullName);
-		$categoryName = end($categoryNameArray);
-		if(count($categoryNameArray) > 1)
-		{
-			$parentCategoryFullNameArray = array_slice ($categoryNameArray,0,-1);
-			$parentCategoryFullName = implode(categoryPeer::CATEGORY_SEPARATOR, $parentCategoryFullNameArray );
-			$parentCategory = categoryPeer::getByFullNameExactMatch($parentCategoryFullName, null, $partnerId);
-			if(!$parentCategory)
-			{
-				self::exitWithError(kZoomErrorMessages::PARENT_CATEGORY_NOT_FOUND . $parentCategoryFullName);
-			}
-
-			$parentCategoryId = $parentCategory->getId();
-			$categoryDb->setParentId($parentCategoryId);
-		}
-
-		$categoryDb->setName($categoryName);
-		$categoryDb->setFullName($categoryFullName);
-		$categoryDb->setPartnerId($partnerId);
-		$categoryDb->save();
-		return $categoryDb->getId();
+		return json_decode($request_body, true);
 	}
 
 	/**
@@ -350,14 +274,15 @@ class ZoomHelper
 		return $filesByRecordingType;
 	}
 
-	public static function getRedirectUrl($url)
+	public static function getRedirectUrl($url, $headers)
 	{
 		$redirectUrl = $url;
 		$curl = curl_init($url);
-		curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt ($curl, CURLOPT_HEADER, true);
-		curl_setopt ($curl, CURLOPT_NOBODY, true);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($curl, CURLOPT_HEADER, true);
+		curl_setopt($curl, CURLOPT_NOBODY, true);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 		$result = curl_exec($curl);
 		if ($result !== false)
 		{
