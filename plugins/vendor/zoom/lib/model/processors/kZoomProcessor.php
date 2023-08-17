@@ -107,7 +107,7 @@ abstract class kZoomProcessor
 	 * @param kZoomUser $kZoomUser
 	 * @return kuser
 	 */
-	protected function getKalturaUser($partnerId, $kZoomUser,$status)
+	protected function getKalturaUser($partnerId, $kZoomUser, $status=null)
 	{
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $kZoomUser->getProcessedName(),true, $status);
 		if (!$dbUser)
