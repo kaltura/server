@@ -13,7 +13,14 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 
 	protected function getItemList($filter, $pager)
 	{
-		return KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
+		$clientTag = KBatchBase::$kClient->getClientTag();
+		if(is_object($filter->advancedSearch))
+		{
+			KBatchBase::$kClient->setClientTag($clientTag ." useESearch");
+		}
+		$items = KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
+		KBatchBase::$kClient->setClientTag($clientTag);
+		return $items;
 	}
 
 	protected function getDefaultHeaderRowToCsv()
