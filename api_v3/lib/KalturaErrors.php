@@ -827,5 +827,7 @@ class KalturaErrors extends APIErrors
 	const USER_APP_ROLE_ALREADY_EXISTS = "USER_APP_ROLE_ALREADY_EXISTS;PUSER_ID,APP_GUID;User ID [\"@PUSER_ID@\"] already have a role for App Guid [\"@APP_GUID@\"]";
 	const USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP = "USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP;;Cannot assign an app role for a user of type 'group'";
 	const INVALID_APP_GUID = "INVALID_APP_GUID;APP_GUID;App GUID [\"@APP_GUID@\"] is not a valid Mongo DB Object ID";
+	const MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE = "MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE;;Must filter on at least 'users' or 'appGuid' or 'userRole'";
+	const MUST_FILTER_USERS_OR_USER_ROLE = "MUST_FILTER_USERS_OR_USER_ROLE;;Must filter on at least 'users' or 'userRole'";
 }
 

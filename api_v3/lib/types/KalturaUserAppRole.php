@@ -65,11 +65,11 @@ class KalturaUserAppRole extends KalturaAppRole
 	{
 		/* @var KuserToUserRole $kuserToUserRoleObject*/
 		if(!$kuserToUserRoleObject)
-			return;
-		
-		parent::doFromObject($kuserToUserRoleObject, $responseProfile);
+			return false;
 		
 		$this->userId = kuserPeer::retrieveByPK($kuserToUserRoleObject->getKuserId())->getPuserId();
+		
+		parent::doFromObject($kuserToUserRoleObject, $responseProfile);
 	}
 	
 	private function verifyMandatoryParams($puserId, $appGuid ,$userRoleId)
