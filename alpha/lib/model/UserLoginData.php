@@ -466,7 +466,7 @@ class UserLoginData extends BaseUserLoginData
 	}
 
 	/*
-	* @return int
+	* @return string
 	*/
 	public function getUserPassword()
 	{
@@ -474,7 +474,7 @@ class UserLoginData extends BaseUserLoginData
 	}
 
 	/**
-	 * @param int $attempts
+	 * @param string $password
 	 */
 	public function setUserPassword($password)
 	{
@@ -482,7 +482,7 @@ class UserLoginData extends BaseUserLoginData
 	}
 
 	/*
-	* @return int
+	* @return string
 	*/
 	public function getUserPasswordHashAlgo()
 	{
@@ -490,7 +490,7 @@ class UserLoginData extends BaseUserLoginData
 	}
 
 	/**
-	 * @param int $attempts
+	 * @param string $hasAlgo
 	 */
 	public function setUserPasswordHashAlgo($hasAlgo)
 	{
