@@ -53,7 +53,7 @@ class UserLoginData extends BaseUserLoginData
 		return !is_null($this->getFromCustomData('last_login_partner_id'));
 	}
 	
-	public function setPassword($password) 
+	public function setPassword($password, $setUpdatedAt = true)
 	{
 		$passwordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
 		switch ($passwordHashingAlgo)
@@ -77,22 +77,34 @@ class UserLoginData extends BaseUserLoginData
 		}
 
 		$this->setUserPasswordHashAlgo($passwordHashingAlgo);
-		$this->setPasswordUpdatedAt(time());
+		if($setUpdatedAt)
+		{
+			$this->setPasswordUpdatedAt(time());
+		}
 	} 
 
 	public function isPasswordValid($password_to_match)
 	{
+		$result = false;
 		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
+		$defaultPasswordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
 
 		switch ($passwordHashingAlgo)
 		{
 			case self::PASSWORD_ARGON2ID:
 			case self::PASSWORD_ARGON2I:
-				return password_verify($password_to_match, $this->getUserPassword());
+				$result = password_verify($password_to_match, $this->getUserPassword());
 			case self::SHA1:
 			default:
-				return sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password();
+				$result = sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password();
 		}
+
+		if($result && $defaultPasswordHashingAlgo != self::SHA1 && $passwordHashingAlgo == self::SHA1)
+		{
+			$this->setPassword($password_to_match, false);
+		}
+
+		return $result;
 	}
 	
 	
@@ -474,7 +486,7 @@ class UserLoginData extends BaseUserLoginData
 	*/
 	public function getUserPasswordHashAlgo()
 	{
-		return $this->getFromCustomData('hash_algo', null, null);
+		return $this->getFromCustomData('hash_algo', null, self::SHA1);
 	}
 
 	/**
