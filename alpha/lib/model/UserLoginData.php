@@ -13,8 +13,12 @@
  * @package Core
  * @subpackage model
  */
-class UserLoginData extends BaseUserLoginData{
-	
+class UserLoginData extends BaseUserLoginData
+{
+	const SHA1 = 'sha1';
+	const PASSWORD_ARGON2ID = 'argon2id';
+	const PASSWORD_ARGON2I = 'argon2i';
+
 	public function getFullName()
 	{
 		return trim($this->getFirstName() . ' ' . $this->getLastName());
@@ -49,25 +53,70 @@ class UserLoginData extends BaseUserLoginData{
 		return !is_null($this->getFromCustomData('last_login_partner_id'));
 	}
 	
-	public function setPassword($password) 
-	{ 
-		$salt = md5(rand(100000, 999999).$this->getLoginEmail()); 
-		$this->setSalt($salt); 
-		$this->setSha1Password(sha1($salt.$password)); 
-		$this->setPasswordUpdatedAt(time());
+	public function setPassword($password, $setUpdatedAt = true)
+	{
+		$passwordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
+		switch ($passwordHashingAlgo)
+		{
+			case self::PASSWORD_ARGON2I:
+				$hashedPassword = password_hash($password, PASSWORD_ARGON2I);
+				$this->setUserPassword($hashedPassword);
+				break;
+			case self::PASSWORD_ARGON2ID:
+				$hashedPassword = password_hash($password, PASSWORD_ARGON2ID);
+				$this->setUserPassword($hashedPassword);
+				break;
+
+			case self::SHA1:
+			default:
+				$salt = md5(rand(100000, 999999).$this->getLoginEmail());
+				$this->setSalt($salt);
+				$this->setSha1Password(sha1($salt.$password));
+				break;
+
+		}
+
+		$this->setUserPasswordHashAlgo($passwordHashingAlgo);
+		if($setUpdatedAt)
+		{
+			$this->setPasswordUpdatedAt(time());
+		}
 	} 
-	
-	
+
 	public function isPasswordValid($password_to_match)
 	{
-		return sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password() ;
+		$result = false;
+		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
+		$defaultPasswordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
+
+		switch ($passwordHashingAlgo)
+		{
+			case self::PASSWORD_ARGON2ID:
+			case self::PASSWORD_ARGON2I:
+				$result = password_verify($password_to_match, $this->getUserPassword());
+			case self::SHA1:
+			default:
+				$result = sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password();
+		}
+
+		if($result && $defaultPasswordHashingAlgo != self::SHA1 && $passwordHashingAlgo == self::SHA1)
+		{
+			$this->setPassword($password_to_match, false);
+		}
+
+		return $result;
 	}
 	
 	
 	public function resetPassword ($newPassword)
 	{
 		$this->setPassword( $newPassword );
-		$this->addToPreviousPasswords($this->getSha1Password(), $this->getSalt());
+
+		$oldPassword = $this->getCurrentHashedPassword();
+		$salt = $this->getUserPasswordHashAlgo() == self::SHA1
+			? $this->getSalt() : null;
+
+		$this->addToPreviousPasswords($oldPassword, $salt, $this->getUserPasswordHashAlgo());
 		$this->setPasswordHashKey(null);
 		$this->setLoginAttempts(0);
 		$this->setLoginBlockedUntil(null);
@@ -204,13 +253,13 @@ class UserLoginData extends BaseUserLoginData{
 	}
 	
 	
-	public function addToPreviousPasswords($sha1, $salt)
+	public function addToPreviousPasswords($sha1, $salt, $hashMethod)
 	{
 		$passwords = $this->getPreviousPasswords();
 		if (!$passwords) {
 			$passwords = array();
 		}
-		array_unshift($passwords, array ('sha1' => $sha1, 'salt' => $salt));
+		array_unshift($passwords, array ('sha1' => $sha1, 'salt' => $salt, 'hashMethod' => $hashMethod));
 		$passToKeep = $this->getNumPrevPassToKeep();
 		while (count($passwords) > $passToKeep) {
 			array_pop($passwords);
@@ -246,21 +295,50 @@ class UserLoginData extends BaseUserLoginData{
 		$previousPass = $this->getPreviousPasswords();
 		if ($passToKeep > 0 && count($previousPass) == 0)
 		{
-			$encryptedPassword = sha1($this->salt . $pass);
-			if ($encryptedPassword === $this->sha1_password)
-			{
-				return true;
-			}
+			return $this->isSamePassword($pass, $this->salt, $this->getCurrentHashedPassword());
 		}
 		
 		$i = 0;
 		while ($i < count($previousPass) && $i < $passToKeep) {
-			if ($previousPass[$i]['sha1'] === sha1($previousPass[$i]['salt'] . $pass)) {
+			if($this->isSamePassword($pass, $previousPass[$i]['salt'], $previousPass[$i]['sha1']))
+			{
 				return true;
 			}
 			$i++;
 		}
+
 		return false;
+	}
+
+	private function isSamePassword($newPass, $salt, $oldPass)
+	{
+		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
+
+		switch ($passwordHashingAlgo)
+		{
+			case self::PASSWORD_ARGON2I:
+			case self::PASSWORD_ARGON2ID:
+				return password_verify($newPass, $oldPass);
+
+			case self::SHA1:
+			default:
+				return sha1($salt . $pass) === $oldPass;
+		}
+
+		return false;
+	}
+
+	private function getCurrentHashedPassword()
+	{
+		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
+
+		$currentHashedPass = $this->getSha1Password();
+		if(in_array($passwordHashingAlgo, array(self::PASSWORD_ARGON2ID, self::PASSWORD_ARGON2I)))
+		{
+			$currentHashedPass = $this->getUserPassword();
+		}
+
+		return $currentHashedPass;
 	}
 	
 	public function getMaxLoginAttempts()
@@ -386,4 +464,37 @@ class UserLoginData extends BaseUserLoginData{
 		}
 		return false;
 	}
+
+	/*
+	* @return string
+	*/
+	public function getUserPassword()
+	{
+		return $this->getFromCustomData('password', null, null);
+	}
+
+	/**
+	 * @param string $password
+	 */
+	public function setUserPassword($password)
+	{
+		$this->putInCustomData('password', $password, null);
+	}
+
+	/*
+	* @return string
+	*/
+	public function getUserPasswordHashAlgo()
+	{
+		return $this->getFromCustomData('hash_algo', null, self::SHA1);
+	}
+
+	/**
+	 * @param string $hasAlgo
+	 */
+	public function setUserPasswordHashAlgo($hasAlgo)
+	{
+		$this->putInCustomData('hash_algo', $hasAlgo, null);
+	}
+
 } // UserLoginData
