@@ -18,6 +18,7 @@ class UserLoginData extends BaseUserLoginData
 	const SHA1 = 'sha1';
 	const PASSWORD_ARGON2ID = 'argon2id';
 	const PASSWORD_ARGON2I = 'argon2i';
+	const K_CONF_PAS_HASH_ALGO_PARAM = 'password_hash_algo';
 
 	public function getFullName()
 	{
@@ -55,7 +56,7 @@ class UserLoginData extends BaseUserLoginData
 	
 	public function setPassword($password, $setUpdatedAt = true)
 	{
-		$passwordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
+		$passwordHashingAlgo = $this->getDefaultPasswordHashAlgo();
 		switch ($passwordHashingAlgo)
 		{
 			case self::PASSWORD_ARGON2I:
@@ -87,7 +88,7 @@ class UserLoginData extends BaseUserLoginData
 	{
 		$result = false;
 		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
-		$defaultPasswordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
+		$defaultPasswordHashingAlgo = $this->getDefaultPasswordHashAlgo();
 
 		switch ($passwordHashingAlgo)
 		{
@@ -106,7 +107,21 @@ class UserLoginData extends BaseUserLoginData
 
 		return $result;
 	}
-	
+
+	private function getDefaultPasswordHashAlgo()
+	{
+		$defaultHashingAlgo = self::SHA1;
+		if(defined('PASSWORD_ARGON2I'))
+		{
+			$defaultHashingAlgo = self::PASSWORD_ARGON2I;
+		}
+		if(defined('PASSWORD_ARGON2ID'))
+		{
+			$defaultHashingAlgo = self::PASSWORD_ARGON2ID;
+		}
+
+		return kConf::get(self::K_CONF_PAS_HASH_ALGO_PARAM, kConfMapNames::SECURITY, $defaultHashingAlgo);
+	}
 	
 	public function resetPassword ($newPassword)
 	{
