@@ -1,3 +1,22 @@
+# Scorpius-19.15.0
+
+## Change default hashing algorithms ##
+- Issue Type: Task
+- Issue ID: N/A
+
+The default password hashing algorithm is now set to argon2id.
+In case the PHP distribution used does is not compiled to support this hashing algorithm you can override this in you security.ini configuration file.
+Supported hashing algorithms are:
+1. argon2id
+2. argon2i
+3. sha1
+
+### Configuration ###
+In case you want to override the default argon2id add the following to security.ini (with your preferred hashing algo):
+    password_hash_algo = argon2i
+    OR
+    password_hash_algo = sha1
+
 # Scorpius-19.14.0
 ## Add new permission to EP_USER_ANALYTICS Role ##
 - Issue Type: Story

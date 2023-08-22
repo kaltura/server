@@ -55,7 +55,7 @@ class UserLoginData extends BaseUserLoginData
 	
 	public function setPassword($password, $setUpdatedAt = true)
 	{
-		$passwordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
+		$passwordHashingAlgo = $this->getDefaultPasswordHashAlgo();
 		switch ($passwordHashingAlgo)
 		{
 			case self::PASSWORD_ARGON2I:
@@ -87,7 +87,7 @@ class UserLoginData extends BaseUserLoginData
 	{
 		$result = false;
 		$passwordHashingAlgo = $this->getUserPasswordHashAlgo();
-		$defaultPasswordHashingAlgo = kConf::get('password_hash_algo', 'security', self::SHA1);
+		$defaultPasswordHashingAlgo = $this->getDefaultPasswordHashAlgo();
 
 		switch ($passwordHashingAlgo)
 		{
@@ -106,7 +106,11 @@ class UserLoginData extends BaseUserLoginData
 
 		return $result;
 	}
-	
+
+	private function getDefaultPasswordHashAlgo()
+	{
+		return kConf::get('password_hash_algo', 'security', self::PASSWORD_ARGON2ID);
+	}
 	
 	public function resetPassword ($newPassword)
 	{
