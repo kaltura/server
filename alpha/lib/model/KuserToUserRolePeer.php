@@ -125,7 +125,6 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		}
 		
 		// validate appGuid belong to ks partner
-		// might be redundant, if appGuid does not belong to partner, it will not be found on getByKuserIdAndAppGuid
 		$appRegistry = KuserToUserRolePeer::getAppGuidById($appGuid);
 		if (!$appRegistry)
 		{
