@@ -4,8 +4,8 @@
 - Issue Type: Task
 - Issue ID: N/A
 
-If the php distribution used supports argon2id|argon2i it will now be used by default if not it will fallback to sha1.
-You can always override by manually setting you preferred hashing algorithm in the security.ini config file.  
+If the php distribution used supports argon2id|argon2i it will now be used by default, if not it will fallback to sha1.
+You can always override this by manually setting your preferred hashing algorithm in the security.ini config file.  
 Supported hashing algorithms are:
 1. argon2id
 2. argon2i
