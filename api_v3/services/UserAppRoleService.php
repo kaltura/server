@@ -121,24 +121,9 @@ class UserAppRoleService extends KalturaBaseService
 	 */
 	public function listAction(KalturaUserAppRoleFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		// temporary solution to only allow -11 pid to filter by appGuid only, until mongoWrapper exist then can move to
-		// api_v3/lib/types/filters/KalturaUserAppRoleFilter.php:85 - to verify if appGuid belongs to ks_partner_id
-		
-		// only -11 impersonated session is allowed to filter by appGuid only, all others must filter by either userId or userRole (since they have partner on db object)
-		if (!$filter || (!($filter->userIdEqual || $filter->userIdIn || $filter->userRoleIdEqual || $filter->userRoleIdIn)))
+		if (!$filter || (!($filter->userIdEqual || $filter->userIdIn || $filter->userRoleIdEqual || $filter->userRoleIdIn || $filter->appGuidEqual || $filter->appGuidIn)))
 		{
-			// if removing intval condition is true (seems like kCurrentContext::$master_partner_id is not int as stated)
-			if (intval(kCurrentContext::$master_partner_id) !== self::EP_PARTNER_ID)
-			{
-				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_USERS_OR_USER_ROLE);
-			}
-			
-			if (!$filter || !($filter->appGuidEqual || $filter->appGuidIn))
-			{
 				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE);
-			}
-			
-			KalturaUserAppRoleFilter::$EP_FILTER_RESULTS_ON_APP_GUID_ONLY_LIST = true;
 		}
 		
 		if (!$pager)
@@ -223,6 +208,9 @@ class UserAppRoleService extends KalturaBaseService
 			
 			case kCoreException::INVALID_APP_GUID:
 				throw new KalturaAPIException(KalturaErrors::INVALID_APP_GUID, $ex->getData());
+				
+			case kCoreException::APP_GUID_NOT_FOUND:
+				throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $ex->getData());
 			
 			case kCoreException::USER_APP_ROLE_NOT_FOUND:
 				$args = explode(',', $ex->getData());

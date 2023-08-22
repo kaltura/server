@@ -124,6 +124,14 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 			throw new kCoreException('[Invalid App Guid]', kCoreException::INVALID_APP_GUID, $appGuid);
 		}
 		
+		// validate appGuid belong to ks partner
+		// might be redundant, if appGuid does not belong to partner, it will not be found on getByKuserIdAndAppGuid
+		$appRegistry = KuserToUserRolePeer::getAppGuidById($appGuid);
+		if (!$appRegistry)
+		{
+			throw new kCoreException('[App Guid Not Found]', kCoreException::APP_GUID_NOT_FOUND, $appGuid);
+		}
+		
 		$dbUserAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($kuser->getId(), $appGuid);
 		
 		if (!$dbUserAppRole)
@@ -165,6 +173,13 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 			throw new kCoreException('[Invalid App Guid]', kCoreException::INVALID_APP_GUID, $appGuid);
 		}
 		
+		// validate appGuid belong to ks partner
+		$appRegistry = KuserToUserRolePeer::getAppGuidById($appGuid);
+		if (!$appRegistry)
+		{
+			throw new kCoreException('[App Guid Not Found]', kCoreException::APP_GUID_NOT_FOUND, $appGuid);
+		}
+		
 		// validate user does not have a role for the requested appGuid
 		$userAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($kuser->getId(), $appGuid);
 		if ($userAppRole)
@@ -172,6 +187,47 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 			$puserId = $kuser->getPuserId();
 			throw new kCoreException('[User App Role Already Exists]', kCoreException::USER_APP_ROLE_ALREADY_EXISTS, "$puserId,$appGuid");
 		}
+	}
+	
+	public static function getAppGuidById($appGuid)
+	{
+		$appRegistryClient = new MicroServiceAppRegistry();
+		$appRegistry = $appRegistryClient->get(kCurrentContext::getCurrentPartnerId(), $appGuid);
+		
+		if (isset($appRegistry->code) && $appRegistry->code == 'OBJECT_NOT_FOUND')
+		{
+			return false;
+		}
+		
+		return $appRegistry;
+	}
+	
+	public static function getKsPartnerAppGuidsFromCsv($appGuidsCsv)
+	{
+		$appGuidsResult = array();
+		$appGuidsArray = explode(',', $appGuidsCsv);
+		
+		$filter = array(
+			'idIn' => $appGuidsArray
+		);
+		
+		$pager = array(
+			'offset' => 0,
+			'limit' => count($appGuidsArray)
+		);
+		
+		$appRegistryClient = new MicroServiceAppRegistry();
+		$appRegistries = $appRegistryClient->list(kCurrentContext::getCurrentPartnerId(), $filter, $pager);
+		
+		foreach ($appRegistries->objects as $appRegistry)
+		{
+			if (isset($appRegistry->id))
+			{
+				$appGuidsResult[] = $appRegistry->id;
+			}
+		}
+		
+		return implode(',', $appGuidsResult);
 	}
 	
 } // KuserToUserRolePeer

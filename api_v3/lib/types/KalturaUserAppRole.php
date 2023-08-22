@@ -65,7 +65,9 @@ class KalturaUserAppRole extends KalturaAppRole
 	{
 		/* @var KuserToUserRole $kuserToUserRoleObject*/
 		if(!$kuserToUserRoleObject)
+		{
 			return false;
+		}
 		
 		$this->userId = kuserPeer::retrieveByPK($kuserToUserRoleObject->getKuserId())->getPuserId();
 		

@@ -9,8 +9,6 @@
  */
 class kString
 {
-	const CSV_SEPARATOR = ',';
-	
 	/**
 	 * return true if $str starts with $desired_prefix, false otherwise
 	 *
