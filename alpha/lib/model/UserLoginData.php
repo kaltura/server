@@ -109,7 +109,17 @@ class UserLoginData extends BaseUserLoginData
 
 	private function getDefaultPasswordHashAlgo()
 	{
-		return kConf::get('password_hash_algo', 'security', self::PASSWORD_ARGON2ID);
+		$defaultHashingAlgo = self::SHA1;
+		if(defined('PASSWORD_ARGON2I'))
+		{
+			$defaultHashingAlgo = self::PASSWORD_ARGON2I;
+		}
+		if(defined('PASSWORD_ARGON2ID'))
+		{
+			$defaultHashingAlgo = self::PASSWORD_ARGON2ID;
+		}
+
+		return kConf::get('password_hash_algo', 'security', $defaultHashingAlgo);
 	}
 	
 	public function resetPassword ($newPassword)
