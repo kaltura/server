@@ -322,7 +322,7 @@ class UserLoginData extends BaseUserLoginData
 
 			case self::SHA1:
 			default:
-				return sha1($salt . $pass) === $oldPass;
+				return sha1($salt . $newPass) === $oldPass;
 		}
 
 		return false;
