@@ -1136,7 +1136,7 @@ CREATE TABLE IF NOT EXISTS `flavor_params` (
   KEY `updated_at_index` (`updated_at`),
   KEY `partner_id` (`partner_id`,`deleted_at`,`is_default`,`type`),
   KEY `system_deleted_at` (`system_name`,`deleted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1001 DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `flavor_params_conversion_profile` (
   `conversion_profile_id` int(11) NOT NULL,
