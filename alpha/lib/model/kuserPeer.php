@@ -49,7 +49,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 * @param bool $ignorePuserKuser
 	 * @return kuser
 	 */
-	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false, $status=null)
+	public static function getKuserByPartnerAndUid($partnerId, $puserId, $ignorePuserKuser = false)
 	{
 		$puserId = self::getValidPuserStr($puserId);
 
@@ -63,11 +63,6 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$c = new Criteria();
 		$c->add(self::PARTNER_ID, $partnerId);
 		$c->add(self::PUSER_ID, $puserId);
-
-		if($status)
-		{
-			$c->add(self::STATUS, $status);
-		}
 
 		// in case of more than one deleted kusers - get the last one
 		$c->addDescendingOrderByColumn(kuserPeer::UPDATED_AT);
@@ -381,17 +376,13 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 * @param int|null $partnerId
 	 * @return kuser
 	 */
-	public static function getKuserByEmail($email, $partnerId = null, $status = null)
+	public static function getKuserByEmail($email, $partnerId = null)
 	{
 		$c = new Criteria();
 		$c->add(kuserPeer::EMAIL, $email);
 		if($partnerId)
 		{
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
-		}
-		if($status)
-		{
-			$c->add(self::STATUS, $status);
 		}
 		$kuser = kuserPeer::doSelectOne($c);
 		return $kuser;

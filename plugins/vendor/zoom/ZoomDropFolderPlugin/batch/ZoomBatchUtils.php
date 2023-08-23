@@ -91,7 +91,7 @@ class ZoomBatchUtils
 		return $userId;
 	}
 
-	public static function getKalturaUser($partnerId, $kZoomUser, $status=null)
+	public static function getKalturaUser($partnerId, $kZoomUser)
 	{
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 1;
@@ -100,10 +100,6 @@ class ZoomBatchUtils
 		$filter = new KalturaUserFilter();
 		$filter->partnerIdEqual = $partnerId;
 		$filter->idEqual = $kZoomUser->getProcessedName();
-		if($status)
-		{
-			$filter->statusEqual = $status;
-		}
 		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
 		if (!$kalturaUser->objects)
 		{
