@@ -226,7 +226,7 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 			}
 		}
 		
-		return implode(',', $appGuidsResult);
+		return count($appGuidsResult) ? implode(',', $appGuidsResult) : 'null'; // set to 'null' will not return results (if set to '' 'attachToCriteria' will remove it from mysql query)
 	}
 	
 } // KuserToUserRolePeer

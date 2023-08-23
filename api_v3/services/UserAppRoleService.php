@@ -121,7 +121,7 @@ class UserAppRoleService extends KalturaBaseService
 	 */
 	public function listAction(KalturaUserAppRoleFilter $filter = null, KalturaFilterPager $pager = null)
 	{
-		if (!$filter || (!($filter->userIdEqual || $filter->userIdIn || $filter->userRoleIdEqual || $filter->userRoleIdIn || $filter->appGuidEqual || $filter->appGuidIn)))
+		if (!$filter || !($filter->userIdEqual || $filter->userIdIn || $filter->userRoleIdEqual || $filter->userRoleIdIn || $filter->appGuidEqual || $filter->appGuidIn))
 		{
 				throw new KalturaAPIException(KalturaErrors::MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE);
 		}
