@@ -888,6 +888,67 @@ class PartnerController extends Zend_Controller_Action
 		$this->getResponse()->setRedirect($url);
 	}
 
-	
-	
+	public function passwordValidationRulesAction()
+	{
+//		$partnerId = $this->_getParam('partner_id');
+//		$assetDistributionRulesSubForm = new Zend_Form_SubForm(array('DisableLoadDefaultDecorators' => true));
+//		$assetDistributionRulesSubForm->addDecorator('ViewScript', array(
+//			'viewScript' => 'password-validation-rules.phtml',
+//		));
+		
+		
+		$this->_helper->layout->disableLayout();
+		$partnerId = $this->_getParam('partner_id');
+		$client = Infra_ClientHelper::getClient();
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		$form = new Form_PasswordValidationRules();
+		
+		$this->view->errMessage = false;
+		
+		//$client->startMultiRequest();
+		$partnerRegexArray = array();
+		
+		try {
+			Infra_ClientHelper::impersonate($partnerId);
+			$partner = $systemPartnerPlugin->systemPartner->get($partnerId);
+			Infra_ClientHelper::unimpersonate();
+			if ($partner)
+			{
+				/** @var $partner KalturaPartner */
+				if ($partner->passwordStructureValidations)
+				{
+					$partnerRegexArray = $partner->passwordStructureValidations;
+				}
+			}
+//			$result = $client->doMultiRequest();
+//			if (isset($result[0])) {
+//				foreach($result[0]->objects as $audit) {
+//					$isExtendedFreeTrailHistory = false;
+//					foreach($audit->data->changedItems as $changedItem){
+//						if ($changedItem->descriptor == 'extendedFreeTrailExpiryDate'
+//							|| $changedItem->descriptor == 'extendedFreeTrailExpiryReason'
+//							|| $changedItem->descriptor == 'partner.STATUS'
+//							|| $changedItem->descriptor == 'statusChangeReason'
+//						)
+//						{
+//							$isExtendedFreeTrailHistory = true;
+//							break;
+//						}
+//					}
+//					if ($isExtendedFreeTrailHistory) {
+//						$extendedFreeTrailHistoryObjects[] = $audit;
+//					}
+//				}
+//			}
+//			$this->view->auditList = $extendedFreeTrailHistoryObjects;
+		}
+		catch (Exception $e){
+			$this->view->errMessage = $e->getMessage();
+		}
+		
+		$this->view->regexList = $partnerRegexArray;
+		$this->view->form = $form;
+		$this->view->partnerId = $partnerId;
+		
+	}
 }

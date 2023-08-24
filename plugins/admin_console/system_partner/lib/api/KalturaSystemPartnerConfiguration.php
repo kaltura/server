@@ -646,10 +646,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$passwordValidation = $source_object->getPasswordStructureValidations();
-		if(isset($passwordValidation[0]))
+		if (!isset($passwordValidation[0]))
 		{
-			$this->passwordStructureValidations = $passwordValidation[0][0];
-			$this->passwordStructureValidationsDescription = $passwordValidation[0][1];
+			$this->passwordStructureValidations = array();
+			$this->passwordStructureValidationsDescription = null;
 		}
 
 	}
@@ -824,11 +824,21 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
-		if(!is_null($this->passwordStructureValidations))
+		KalturaLog::info("dror debug");
+		if ($this->passwordStructureValidations)
 		{
-			$object_to_fill->setPasswordStructureValidations(
-				array(array(trim($this->passwordStructureValidations),
-				            $this->passwordStructureValidationsDescription)));
+			KalturaLog::info(print_r($this->passwordStructureValidations, true));
+			$passwordValidationJson = json_decode($this->passwordStructureValidations);
+			KalturaLog::info(print_r($passwordValidationJson, true));
+//			$object_to_fill->setPasswordStructureValidations(
+//				array(array(trim($this->passwordStructureValidations),
+//				            $this->passwordStructureValidationsDescription)));
+			$passwordToFill = array();
+			foreach ($passwordValidationJson as $regex => $description)
+			{
+				$passwordToFill[] = array(trim($regex),$description);
+				$object_to_fill->setPasswordStructureValidations($passwordToFill);
+			}
 		}
 		else
 		{
