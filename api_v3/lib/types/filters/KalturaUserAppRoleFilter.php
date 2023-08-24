@@ -77,11 +77,16 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		
 		KuserToUserRolePeer::setUseCriteriaFilter(true);
 		
-		$response->totalCount = $totalCount;
 		$response->objects = KalturaUserAppRoleArray::fromDbArray($list, $responseProfile);
+		$response->totalCount = $totalCount;
+		
 		return $response;
 	}
 	
+	/**
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$this->fixCsvFilterProperties();
@@ -120,9 +125,7 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		
 		if (!empty($this->userRoleIdIn))
 		{
-			$userRoleIdsList = explode(',', $this->userRoleIdIn);
-			$userRoleIds = UserRolePeer::retrieveByPKs($userRoleIdsList);
-			$this->userRoleIdIn = $userRoleIds ? implode(',', $userRoleIds) : -1;
+			$this->userRoleIdIn = UserRolePeer::retrieveExistingUserRolesCsvByCsv($this->userRoleIdIn);
 		}
 		
 		if (!empty($this->appGuidEqual))

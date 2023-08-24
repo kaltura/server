@@ -117,6 +117,26 @@ class UserRolePeer extends BaseUserRolePeer
 		UserRolePeer::setUseCriteriaFilter(true);
 		return $userRole;
 	}
+	
+	/**
+	 * Will return existing UserRoleIds as csv
+	 * @param $userRolesCsv
+	 * @return int|string
+	 * @throws PropelException
+	 */
+	public static function retrieveExistingUserRolesCsvByCsv($userRolesCsv)
+	{
+		$userRoleIds = array();
+		
+		$userRoleIdsList = explode(',', $userRolesCsv);
+		$userRoles = UserRolePeer::retrieveByPKs($userRoleIdsList);
+		
+		foreach ($userRoles as $userRole)
+		{
+			$userRoleIds[] = $userRole->getId();
+		}
+		return count($userRoleIds) ? implode(',', $userRoleIds) : -1;
+	}
 		
 	public static function getCacheInvalidationKeys()
 	{
