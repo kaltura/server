@@ -367,9 +367,9 @@ function openPasswordValidationRules()
         resizable: false,
         width: 750,
         title: '<?php echo $this->translate('Password Validation Rules'); ?>',
-        height: 400,
+        height: 600,
         buttons: {
-            '<?php echo $this->translate('Oh my god, save us'); ?>': function() {
+            '<?php echo $this->translate('Save'); ?>': function() {
                 passwordValidationRulesSaveButtonPressed();
                 jQuery(this).dialog('close').remove();
             },
@@ -379,9 +379,7 @@ function openPasswordValidationRules()
         },
         close: function() {}
     });
-    dialogDiv.load(
-        url
-    );
+    dialogDiv.load(url);
 }
 
 jQuery(document).ready(function() {

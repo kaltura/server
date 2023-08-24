@@ -824,26 +824,19 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
-		KalturaLog::info("dror debug");
+		$passwordToFill = array();
 		if ($this->passwordStructureValidations)
 		{
-			KalturaLog::info(print_r($this->passwordStructureValidations, true));
 			$passwordValidationJson = json_decode($this->passwordStructureValidations);
-			KalturaLog::info(print_r($passwordValidationJson, true));
-//			$object_to_fill->setPasswordStructureValidations(
-//				array(array(trim($this->passwordStructureValidations),
-//				            $this->passwordStructureValidationsDescription)));
-			$passwordToFill = array();
 			foreach ($passwordValidationJson as $regex => $description)
 			{
-				$passwordToFill[] = array(trim($regex),$description);
-				$object_to_fill->setPasswordStructureValidations($passwordToFill);
+				if ($regex)
+				{
+					$passwordToFill[] = array(trim($regex),$description);
+				}
 			}
 		}
-		else
-		{
-			$object_to_fill->setPasswordStructureValidations(array());
-		}
+		$object_to_fill->setPasswordStructureValidations($passwordToFill);
 		
 		if(!is_null($this->secondarySecretRoleId))
 		{
