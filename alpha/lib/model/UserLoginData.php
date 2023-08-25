@@ -95,9 +95,11 @@ class UserLoginData extends BaseUserLoginData
 			case self::PASSWORD_ARGON2ID:
 			case self::PASSWORD_ARGON2I:
 				$result = password_verify($password_to_match, $this->getUserPassword());
+				break;
 			case self::SHA1:
 			default:
 				$result = sha1( $this->getSalt().$password_to_match ) === $this->getSha1Password();
+				break;
 		}
 
 		if($result && $defaultPasswordHashingAlgo != self::SHA1 && $passwordHashingAlgo == self::SHA1)
