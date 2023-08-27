@@ -1,3 +1,29 @@
+# Scorpius-19.15.0
+
+## Change default hashing algorithms ##
+- Issue Type: Task
+- Issue ID: N/A
+
+If the php distribution used supports argon2id|argon2i it will now be used by default, if not it will fallback to sha1.
+You can always override this by manually setting your preferred hashing algorithm in the security.ini config file.  
+Supported hashing algorithms are:
+1. argon2id
+2. argon2i
+3. sha1
+
+### Configuration ###
+In case you want to override the default argon2id add the following to security.ini (with your preferred hashing algo):
+    password_hash_algo = ONE_OF_THE_SUPPORTED_VALUES
+
+# Scorpius-19.14.0
+## Add new permission to EP_USER_ANALYTICS Role ##
+- Issue Type: Story
+- Issue ID: PLAT-24381
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_03_add_ep_base_permission.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_03_add_permission_to_ep_analytics_role.php
+
 # Scorpius-19.13.0
 ## Add 'Capabilities' to ESearch for kuser ##
 - Issue Type: Task

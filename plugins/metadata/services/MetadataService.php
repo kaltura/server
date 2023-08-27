@@ -548,7 +548,6 @@ class MetadataService extends KalturaBaseService
 	/**
 	 * Action transforms current metadata object XML using a provided XSL.
 	 * @action updateFromXSL
-	 *
 	 * @param bigint $id
 	 * @param file $xslFile
 	 * @return KalturaMetadata
