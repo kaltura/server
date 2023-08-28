@@ -20,4 +20,10 @@ class KuserToUserRole extends BaseKuserToUserRole {
 		return array("kuserToUserRole:kuserId=".strtolower($this->getKuserId()));
 	}
 	
+	public function postDelete(PropelPDO $con = null)
+	{
+		kQueryCache::invalidateQueryCache($this);
+		parent::postDelete($con);
+	}
+
 } // KuserToUserRole
