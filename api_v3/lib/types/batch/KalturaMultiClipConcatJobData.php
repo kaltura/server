@@ -4,9 +4,8 @@
  * @subpackage objects
  */
 
-class KalturaClipConcatJobData extends KalturaJobData
+class KalturaMultiClipConcatJobData extends KalturaJobData
 {
-
 	/**
 	 * @var string
 	 */
@@ -15,17 +14,7 @@ class KalturaClipConcatJobData extends KalturaJobData
 	/**
 	 * @var string
 	 */
-	public $tempEntryId;
-
-	/**
-	 * @var string
-	 */
-	public $sourceEntryId;
-
-	/**
-	 * @var string
-	 */
-	public $importUrl;
+	public $multiTempEntryId;
 
 	/**
 	 * @var int
@@ -38,31 +27,23 @@ class KalturaClipConcatJobData extends KalturaJobData
 	public $priority;
 
 	/**
-	 * @var KalturaOperationAttributesArray $operationAttributes
+	 * @var KalturaOperationResourceArray
 	 */
-	public $operationAttributes;
-
-	/**
-	 * @var string
-	 */
-	public $resourceOrder;
+	public $operationResources;
 
 
 	private static $map_between_objects = array
 	(
 		'destEntryId',
-		'tempEntryId',
+		'multiTempEntryId',
 		'partnerId',
 		'priority',
-		'operationAttributes',
-		'sourceEntryId',
-		'importUrl',
-		'resourceOrder'
+		'operationResources'
 	);
 
 	/* (non-PHPdoc)
- * @see KalturaObject::getMapBetweenObjects()
- */
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
 	public function getMapBetweenObjects ( )
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
@@ -74,7 +55,9 @@ class KalturaClipConcatJobData extends KalturaJobData
 	public function toObject($dbData = null, $props_to_skip = array())
 	{
 		if(is_null($dbData))
-			$dbData = new kClipConcatJobData();
+		{
+			$dbData = new kMultiClipConcatJobData();
+		}
 
 		return parent::toObject($dbData, $props_to_skip);
 	}

@@ -6,46 +6,50 @@
 
 class kClipConcatJobData extends kJobData
 {
-	/**$destEntryId
+	/**
 	 * @var string
 	 */
 	private $destEntryId;
 
-	/**$tempEntryId
+	/**
 	 * @var string
 	 */
 	private $tempEntryId;
 
-	/**sourceEntryId
+	/**
 	 * @var string
 	 */
 	private $sourceEntryId;
 
-	/**importUrl
+	/**
 	 * @var string
 	 */
 	private $importUrl;
 
-	/** $partnerId
+	/**
 	 * @var int
 	 */
 	private $partnerId;
 
-	/** $priority
+	/**
 	 * @var int
 	 */
 	private $priority;
 
-	/** clip operations
+	/**
 	 * @var array $operationAttributes
 	 */
 	private $operationAttributes;
 
 	/**
-	 * @bool clipManagerState
+	 * @var bool
 	 */
 	private $importNeeded;
 
+	/**
+	 * @var int
+	 */
+	private $resourceOrder;
 
 	public function __construct($importUrl = null)
 	{
@@ -61,7 +65,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string $entryId
+	 * @return string
 	 */
 	public function getDestEntryId()
 	{
@@ -77,7 +81,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string $entryId
+	 * @return string
 	 */
 	public function getTempEntryId()
 	{
@@ -93,7 +97,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string $sourceEntryId
+	 * @return string
 	 */
 	public function getSourceEntryId()
 	{
@@ -109,7 +113,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string $importUrl
+	 * @return string
 	 */
 	public function getImportUrl()
 	{
@@ -125,7 +129,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string $partnerId
+	 * @return string
 	 */
 	public function getPartnerId()
 	{
@@ -140,9 +144,8 @@ class kClipConcatJobData extends kJobData
 		$this->partnerId = $partnerId;
 	}
 
-
 	/**
-	 * @return string $priority
+	 * @return string
 	 */
 	public function getPriority()
 	{
@@ -158,7 +161,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return kOperationAttributes[] $operationAttributes
+	 * @return kOperationAttributes[]
 	 */
 	public function getOperationAttributes()
 	{
@@ -183,6 +186,20 @@ class kClipConcatJobData extends kJobData
 		return $this->importNeeded;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getResourceOrder()
+	{
+		return $this->resourceOrder;
+	}
 
+	/**
+	 * @param int $resourceOrder
+	 */
+	public function setResourceOrder($resourceOrder)
+	{
+		$this->resourceOrder = $resourceOrder;
+	}
 
 }

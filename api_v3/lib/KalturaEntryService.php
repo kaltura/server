@@ -704,11 +704,11 @@ class KalturaEntryService extends KalturaBaseService
 	
 	/**
 	 * @param kOperationResource $resource
-	 * @param entry $dbEntry
+	 * @param entry $destEntry
 	 * @param asset $dbAsset
 	 * @return asset
 	 */
-	protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
+	protected function attachOperationResource(kOperationResource $resource, entry $destEntry, asset $dbAsset = null)
 	{
 		$operationAttributes = $resource->getOperationAttributes();
 		$internalResource = $resource->getResource();
@@ -716,18 +716,29 @@ class KalturaEntryService extends KalturaBaseService
 		$isLiveClippingFlow = $srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry);
 		if ($isLiveClippingFlow)
 		{
-			$this->handleLiveClippingFlow($srcEntry, $dbEntry, $operationAttributes);
+			$this->handleLiveClippingFlow($srcEntry, $destEntry, $operationAttributes);
 		}
 		elseif($internalResource instanceof kLiveEntryResource)
 		{
-			$dbAsset = $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
+			$dbAsset = $this->attachLiveEntryResource($internalResource, $destEntry, $dbAsset, $operationAttributes);
 		}
 		else
 		{
 			$clipManager = new kClipManager();
-			$this->handleMultiClipRequest($resource, $dbEntry, $clipManager, $operationAttributes);
+			$this->handleMultiClipRequest($resource, $destEntry, $clipManager);
 		}
 		return $dbAsset;
+	}
+
+	/**
+	 * @param kOperationResources $resources
+	 * @param entry $destEntry
+	 * @throws KalturaAPIException
+	 */
+	protected function attachOperationResources(kOperationResources $resources, entry $destEntry)
+	{
+		$clipManager = new kClipManager();
+		$this->handleMultiResourceMultiClipRequest($resources, $destEntry, $clipManager);
 	}
 
 	protected function handleLiveClippingFlow($recordedEntry, $clippedEntry, $operationAttributes)
@@ -1869,17 +1880,22 @@ class KalturaEntryService extends KalturaBaseService
 	}
 
 	/**
-	 * @param $resource
-	 * @param entry $dbEntry
-	 * @param $clipManager
-	 * @param $operationAttributes
-	 * @return asset
+	 * @param kOperationResource $resource
+	 * @param entry $destEntry
+	 * @param kClipManager $clipManager
+	 * @param entry $clipEntry
+	 * @param int $rootJobId
+	 * @param int $order
+	 * @param bool $fillDest
 	 * @throws KalturaAPIException
 	 */
-	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes)
+	protected function handleMultiClipRequest($resource, $destEntry, $clipManager, $clipEntry = null, $rootJobId = null, $order = null, $fillDest = true)
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
-		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
+		if(!$clipEntry)
+		{
+			$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
+		}
 		$url = null;
 		if ($resource->getResource() instanceof kFileSyncResource && $resource->getResource()->getOriginEntryId())
 		{
@@ -1890,8 +1906,48 @@ class KalturaEntryService extends KalturaBaseService
 			$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 			$this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
 		}
-		$clipManager->startBatchJob($resource, $dbEntry, $operationAttributes, $clipEntry , $url);
+		$clipManager->startClipConcatBatchJob($resource, $destEntry, $clipEntry , $url, $rootJobId, $order, $fillDest);
 	}
+
+
+	/**
+	 * @param $resources
+	 * @param entry $destEntry
+	 * @param kClipManager $clipManager
+	 * @throws KalturaAPIException
+	 * @throws Exception
+	 */
+	protected function handleMultiResourceMultiClipRequest($resources, entry $destEntry, $clipManager)
+	{
+		KalturaLog::info("Multi resource clipping service detected, start to create multi template entry and sub template entries");
+
+		$tempEntries = array();
+		$tempEntriesIds = array();
+		$sourceEntryIds = array();
+
+		//for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip
+		foreach ($resources->getResources() as $resource)
+		{
+			/** @var kOperationResource $resource **/
+			$sourceEntryId = $resource->getResource()->getOriginEntryId();
+			$sourceEntryIds[] = $sourceEntryId;
+			$resource->setSourceEntryId($sourceEntryId);
+			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
+			$tempEntriesIds[] = $tempEntry->getId();
+			$tempEntries[] = $tempEntry;
+		}
+
+		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
+		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $multiTempEntry->getId(), $tempEntriesIds, $destEntry->getId());
+
+		$rootJob = $clipManager->startMultiClipConcatBatchJob($resources, $destEntry, $multiTempEntry);
+		foreach ($resources->getResources() as $key => $resource)
+		{
+			$this->handleMultiClipRequest($resource, $destEntry, $clipManager, $tempEntries[$key], $rootJob->getId(), $key, false);
+		}
+		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
+	}
+
 
 	/***
 	 * @param null $entryId
