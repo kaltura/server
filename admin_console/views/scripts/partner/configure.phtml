@@ -359,8 +359,8 @@ function useDefaultStreamersChanged() {
 
 function openPasswordValidationRules()
 {
-    var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'password-validation-rules')); ?>';
-    var dialogDiv = jQuery('<div id="rules-div"></div>').appendTo('body');
+    let url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'password-validation-rules')); ?>';
+    let dialogDiv = jQuery('<div id="rules-div"></div>').appendTo('body');
     dialogDiv.dialog({
         bgiframe: true,
         modal: true,

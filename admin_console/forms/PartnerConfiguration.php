@@ -366,7 +366,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->getElement('password_structure_validations_edit')->setAttrib('onClick', 'openPasswordValidationRules()');
 		
 		$this->addElement('hidden', 'password_structure_validations', array(
-			'label'		=> 'e_search_languages',
+			'label'		=> 'password_structure_validations',
 			'decorators'	=> array('ViewHelper'),
 		));
 		

@@ -4,7 +4,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_PasswordValidationRules extends Infra_Form
+class Form_PasswordValidationRule extends Infra_Form
 {
 	public function init()
 	{

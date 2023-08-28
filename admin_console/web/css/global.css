@@ -2649,3 +2649,8 @@ form#frmCreateSsoProfile dd,form#frmCreateSsoProfile dt {
 fieldset fieldset.add-rule-fieldset {
 	clear: both;
 }
+
+fieldset fieldset.regex-rule {
+	border: solid 1px #B7BABC;
+	background: #d6dcf4;
+}
