@@ -17,7 +17,7 @@ class KuserToUserRole extends BaseKuserToUserRole {
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("kuserToUserRole:kuserId=".strtolower($this->getKuserId()));
+		return array("kuserToUserRole:kuserId=".strtolower($this->getKuserId()), "kuserToUserRole:id=".strtolower($this->getId()));
 	}
 	
 	public function postDelete(PropelPDO $con = null)

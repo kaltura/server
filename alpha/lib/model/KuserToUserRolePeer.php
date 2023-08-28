@@ -46,10 +46,9 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		return self::doSelect($c);
 	}
 	
-	// TODO: need to add cache key for 'kuserId_appGuid' ?
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("kuserToUserRole:kuserId=%s", self::KUSER_ID));		
+		return array(array("kuserToUserRole:kuserId=%s", self::KUSER_ID), array("kuserToUserRole:id=%s", self::ID));		
 	}
 	
 	/* (non-PHPdoc)
