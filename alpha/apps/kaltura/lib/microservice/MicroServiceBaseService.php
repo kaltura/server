@@ -91,6 +91,13 @@ class MicroServiceBaseService
 		$response = curl_exec($ch);
 		$timeTook = microtime(true) - $startTime;
 
+		$requestInfo = array(
+			'requestUrl' => $requestUrl,
+			'requestHeaders' => $requestHeaders,
+			'requestBody' => $requestParams
+		);
+		
+		KalturaLog::debug('Microservice request data: ' . print_r($requestInfo, 1));
 		KalturaLog::debug('Microservice request took - ' . $timeTook. ' seconds');
 
 		$curlError = curl_error($ch);
