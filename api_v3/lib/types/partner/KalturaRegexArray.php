@@ -1,30 +1,38 @@
 <?php
+
 /**
  * @package api
  * @subpackage objects
  */
-
 class KalturaRegexArray extends KalturaTypedArray
 {
 	public function __construct()
 	{
 		return parent::__construct("KalturaRegexItem");
 	}
-
+	
 	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaRegexArray();
-		if($arr && is_array($arr))
+		if (!$arr || !is_array($arr))
 		{
-			foreach($arr as $item)
+			return $newArr;
+		}
+		
+		foreach ($arr as $item)
+		{
+			if (!isset($item[0]))
 			{
-				$arrayObject = new KalturaRegexItem();
-				$arrayObject->regex = $item;
-				$newArr[] = $arrayObject;
+				continue;
 			}
+			$regexItem = new KalturaRegexItem();
+			$regexItem->regex = $item[0];
+			if (isset($item[1]))
+			{
+				$regexItem->description = $item[1];
+			}
+			$newArr[] = $regexItem;
 		}
 		return $newArr;
 	}
 }
-
-

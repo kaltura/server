@@ -359,18 +359,6 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'password_structure_validations', array(
-			'label'			=> 'Password structure validations (regex):',
-			'filters'		=> array('StringTrim'),
-		));
-		
-		$this->addElement('text', 'password_structure_validations_description',
-		                  array(
-			'label'			=> 'Password structure validations description:',
-			'filters'		=> array('StringTrim'),
-		));
-
-
 
 //--------------------------- Single Sign On ---------------------------
 		
@@ -1060,9 +1048,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',
 									 'num_prev_pass_to_keep',
-									 'pass_replace_freq',
-									 'password_structure_validations',
-									 'password_structure_validations_description'),
+									 'pass_replace_freq'),
 									 $permissionNames[self::SECURITY_OPTIONS],
 									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));

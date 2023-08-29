@@ -206,9 +206,10 @@ class ZoomVendorService extends KalturaBaseService
 			$zoomIntegration->setAccountId($zoomAccountId);
 			$zoomIntegration->setPartnerId($partnerId);
 			$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
-			$zoomIntegration->setZoomAuthType(kZoomAuthTypes::SERVER_TO_SERVER);
-			$zoomIntegration->save();
 		}
+
+		$zoomIntegration->setZoomAuthType(kZoomAuthTypes::SERVER_TO_SERVER);
+		$zoomIntegration->save();
 
 		$filePath = dirname(__FILE__) . self::REGISTRATION_PAGE_PATH;
 		VendorHelper::loadSubmitPage($zoomIntegration->getPartnerId(), $zoomAccountId, $this->getKs(), $filePath);
