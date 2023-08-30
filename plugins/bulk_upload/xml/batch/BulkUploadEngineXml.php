@@ -2183,6 +2183,11 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			$entry->entitledUsersPublish = $this->parseAndAddToExistingValues('entitledUsersPublish', $item, $existingItem);
 		}
+
+        if(isset($item->entitledUsersView))
+        {
+            $entry->entitledUsersView = $this->parseAndAddToExistingValues('entitledUsersView', $item, $existingItem);
+        }
 		
 		if(isset($item->referenceId))
 			$entry->referenceId = (string)$item->referenceId;
