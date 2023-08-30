@@ -213,7 +213,7 @@ class mySearchUtils
 			
 			$obj->setDisplayInSearch ( $res );
 		}
-		if( $obj instanceof entry && $obj->getParentEntryId())
+		if( $obj instanceof entry && $obj->getParentEntryId() && $obj->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED)
 		{
 			$obj->setDisplayInSearch( mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		}
