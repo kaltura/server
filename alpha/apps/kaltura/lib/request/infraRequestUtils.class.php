@@ -17,6 +17,7 @@ class infraRequestUtils
 	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
 	const CLIENT_TAG = 'clientTag';
 	const ORIGIN_HEADER = 'HTTP_ORIGIN';
+	const KCONF_KEY_API_MASK_PARAMS = 'api_mask_params';
 	
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = array();
@@ -639,7 +640,7 @@ class infraRequestUtils
 
 		if(is_null(self::$apiMaskParamsPattern))
 		{
-			self::$apiMaskParamsPattern = implode("|", kConf::get('api_mask_params', 'runtime_config', array()));
+			self::$apiMaskParamsPattern = implode("|", kConf::get(self::KCONF_KEY_API_MASK_PARAMS, kConfMapNames::RUNTIME_CONFIG, array()));
 		}
 
 		if(!self::$apiMaskParamsPattern)
