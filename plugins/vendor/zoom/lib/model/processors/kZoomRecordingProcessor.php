@@ -174,6 +174,10 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 			$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
 			if($dbUser)
 			{
+                if ($dbUser->getStatus() == KuserStatus::BLOCKED)
+                {
+                    continue;
+                }
 				if (strtolower($dbUser->getPuserId()) !== $userToExclude)
 				{
 					$validatedUsers[] = $dbUser->getPuserId();
