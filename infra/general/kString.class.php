@@ -9,6 +9,8 @@
  */
 class kString
 {
+	const KCONF_CONFIG_KEY_ENABLE_API_MASK_PARAMS = 'enable_api_mask_params';
+
 	/**
 	 * return true if $str starts with $desired_prefix, false otherwise
 	 *
@@ -538,10 +540,10 @@ class kString
 
 	public static function maskString($str, $maskChar = '*', $maxLength = null)
 	{
-		$enableParamsMasking = kConf::get('enable_api_mask_params', 'runtime_config', true);
+		$enableParamsMasking = kConf::get(self::KCONF_CONFIG_KEY_ENABLE_API_MASK_PARAMS, kConfMapNames::RUNTIME_CONFIG, true);
 		if(!$enableParamsMasking)
 			return $str;
-		
+
 		return str_repeat($maskChar, $maxLength ? min(strlen($str), $maxLength) : strlen($str));
 	}
 }
