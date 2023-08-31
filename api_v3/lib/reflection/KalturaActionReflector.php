@@ -144,6 +144,7 @@ class KalturaActionReflector extends KalturaReflector
 				
 				$paramInfo = new KalturaParamInfo($type, $name);
 				$paramInfo->setDescription($parsedDocComment->paramDescription);
+				$paramInfo->setMasked(in_array($name, $parsedDocComment->maskedActrionParams));
 				
 				if ($reflectionParam->isOptional()) // for normal parameters
 				{

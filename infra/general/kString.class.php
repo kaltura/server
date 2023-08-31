@@ -535,4 +535,9 @@ class kString
 		
 		return $trailingEscapesCount % 2 == 0;
 	}
+
+	public static function maskString($str, $maskChar = '*', $maxLength = null)
+	{
+		return str_repeat($maskChar, $maxLength ? min(strlen($str), $maxLength) : strlen($str));
+	}
 }

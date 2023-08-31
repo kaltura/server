@@ -24,6 +24,8 @@ class infraRequestUtils
 	protected static $hostname = null;
 	public static $jsonData = null;
 
+	protected static $apiMaskParamsPattern = null;
+
 	//
 	// the function check the http range header and sets http response headers accordingly
 	// an array of the start, end and length of the requested range is returned.
@@ -629,5 +631,36 @@ class infraRequestUtils
             }
         }
 		return array_replace_recursive($_GET, $params);
+	}
+
+	public static function maskSensitiveParams($params)
+	{
+		$result = $params;
+
+		if(is_null(self::$apiMaskParamsPattern))
+		{
+			self::$apiMaskParamsPattern = implode("|", kConf::get('api_mask_params', 'runtime_config', array()));
+		}
+
+		if(!self::$apiMaskParamsPattern)
+		{
+			return $result;
+		}
+
+		foreach ($params as $key => $value)
+		{
+			$result[$key] = $value;
+
+			if (is_array($value))
+			{
+				$result[$key] = self::maskSensitiveParams($value);
+			}
+			elseif (preg_match("/" . self::$apiMaskParamsPattern . "/i", $key, $output_array))
+			{
+				$result[$key] = kString::maskString($value);
+			}
+		}
+
+		return $result;
 	}
 }
