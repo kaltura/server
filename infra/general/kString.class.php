@@ -538,6 +538,10 @@ class kString
 
 	public static function maskString($str, $maskChar = '*', $maxLength = null)
 	{
+		$enableParamsMasking = kConf::get('enable_api_mask_params', 'runtime_config', true);
+		if(!$enableParamsMasking)
+			return $str;
+		
 		return str_repeat($maskChar, $maxLength ? min(strlen($str), $maxLength) : strlen($str));
 	}
 }
