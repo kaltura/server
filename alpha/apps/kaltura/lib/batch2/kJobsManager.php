@@ -1027,7 +1027,15 @@ class kJobsManager
 		if (!$jobData) {
  		    $jobData = new kImportJobData();
 		}
- 		$jobData->setSrcFileUrl($entryUrl);
+ 		if ($jobData->getShouldRedirect())
+        {
+            $redirectUrl = ZoomHelper::getRedirectUrl($entryUrl, $jobData->getUrlHeaders());
+            $jobData->setSrcFileUrl($redirectUrl);
+        }
+        else
+        {
+            $jobData->setSrcFileUrl($entryUrl);
+        }
  		
  		if($asset)
  		{

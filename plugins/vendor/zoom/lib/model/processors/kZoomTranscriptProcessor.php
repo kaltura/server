@@ -48,13 +48,12 @@ class kZoomTranscriptProcessor extends kZoomProcessor
 
 			try
 			{
-				$url = $recordingFile->download_url;
 				$headers = array("Authorization: Bearer {$event->downloadToken}");
-				$redirectUrl = ZoomHelper::getRedirectUrl($url, $headers);
 				$captionAsset = $this->createAssetForTranscription($entry);
 				$captionAssetResource = new KalturaUrlResource();
-				$captionAssetResource->url = $redirectUrl;
+				$captionAssetResource->url = $recordingFile->download_url;
 				$captionAssetResource->urlHeaders = $headers;
+                $captionAssetResource->shouldRedirect = true;
 				$captionAssetService->setContentAction($captionAsset->getId(), $captionAssetResource);
 			}
 			catch (Exception $e)
