@@ -927,4 +927,26 @@ abstract class KalturaObject implements IApiObject
 		else
 			$this->purifyHtml = true;
 	}
+
+	public function __debugInfo()
+	{
+		$className = get_class($this);
+		$reflector = KalturaTypeReflectorCacher::get($className);
+		$properties = $reflector->getProperties();
+
+		$result = array();
+
+		foreach($properties as $property)
+		{
+			$propertyName = $property->getName();
+
+			$result[$propertyName] = $this->$propertyName;
+			if ($property->isMasked())
+			{
+				$result[$propertyName] = kString::maskString($this->$propertyName, '*', $property->getMaskingMaxLength());
+			}
+		}
+
+		return $result;
+	}
 }

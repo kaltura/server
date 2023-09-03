@@ -649,7 +649,7 @@ class Propel
 				KalturaMonitorClient::monitorConnTook($dsn, $timeTook, 'PDO_' . $e->getCode());
 
 				if ($i == $count || $timeTook < 1)
-					throw new PropelException("Unable to open PDO connection dsn[$dsn] user[$user] password[$password]", $e);
+					throw new PropelException("Unable to open PDO connection dsn[$dsn] user[".kString::maskString($user)."] password[".kString::maskString($password) . "]", $e);
 			}
 		}
 		

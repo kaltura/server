@@ -16,6 +16,7 @@ class KalturaUser extends KalturaBaseUser
 
 	/**
 	 * @var int
+	 * @masked
 	 */
 	public $dateOfBirth;
 
@@ -58,18 +59,21 @@ class KalturaUser extends KalturaBaseUser
 	 * @var string
 	 * @insertonly
 	 * @writeonly
+	 * @masked
 	 */
 	public $password;
 
 	/**
 	 * @var string
 	 * @filter likex
+	 * @masked
 	 */
 	public $firstName;
 
 	/**
 	 * @var string
 	 * @filter likex
+	 * @masked
 	 */
 	public $lastName;
 
@@ -81,21 +85,26 @@ class KalturaUser extends KalturaBaseUser
 
 	/**
 	 * @var string
+	 * @masked
+	 * @maskingMaxLnegth 256
 	 */
 	public $registrationInfo;
 
 	/**
 	 * @var string
+	 * @maskingMaxLnegth 256
 	 */
 	public $attendanceInfo;
 
 	/**
 	 * @var string
+	 * @masked
 	 */
 	public $title;
 
 	/**
 	 * @var string
+	 * @masked
 	 */
 	public $company;
 
@@ -119,6 +128,7 @@ class KalturaUser extends KalturaBaseUser
 	 * This field should be sent instead of the id field whenever you want to work with hashed user ids
 	 * @var string
 	 * @insertonly
+	 * @masked
 	 */
 	public $externalId;
 	

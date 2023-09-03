@@ -54,9 +54,8 @@ class KalturaRequestDeserializer
 	    return $key ? $this->set_element($path, array($key=>$data)) : $data;
 	}
 
-	public function buildActionArguments(&$actionParams)
+	public function buildActionArguments(&$actionParams, $maskArguments = false)
 	{
-		
 		$serviceArguments = array();
 		foreach($actionParams as &$actionParam)
 		{
@@ -75,6 +74,10 @@ class KalturaRequestDeserializer
 						throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_CHAR, $name);
 						
 					$this->validateParameter($name, $value, $actionParam);
+					if($maskArguments && $actionParam->isMasked())
+					{
+						$value = kString::maskString($value);
+					}
 					$serviceArguments[] = $value;
 					continue;
 				}

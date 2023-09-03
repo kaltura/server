@@ -75,6 +75,8 @@ class KalturaTypeReflector
 	private $_permissions = array();
 	
 	private $_comments = null;
+
+	private $_maskedActionParsms = array();
 	
 	/**
 	 * Contructs new type reflector instance
@@ -104,6 +106,8 @@ class KalturaTypeReflector
 			$this->_serverOnly = $commentsParser->serverOnly;
 			$this->_package = $commentsParser->package;
 			$this->_subpackage = $commentsParser->subpackage;
+			$this->_maskedActionParsms = $commentsParser->maskedActrionParams;
+
 			$permissions = array();
 			$parentType = get_parent_class($this->_type);
 			if ($parentType !== false)
@@ -191,6 +195,10 @@ class KalturaTypeReflector
 								$prop = new KalturaPropertyInfo($parsedDocComment->varType, $name);
 								
 								$prop->setReadOnly($parsedDocComment->readOnly);
+								$masked = $parsedDocComment->masked || in_array($name, $parsedDocComment->maskedActrionParams);
+								$prop->setMasked($masked);
+								$prop->setMaskingMaxLength($parsedDocComment->maskingMaxLength);
+								$prop->setMaskingMaxLength($parsedDocComment->maskingMaxLength);
 								$prop->setInsertOnly($parsedDocComment->insertOnly);
 								$prop->setWriteOnly($parsedDocComment->writeOnly);
 								$prop->setMultiLingual($parsedDocComment->multiLingual);
