@@ -640,7 +640,7 @@ class infraRequestUtils
 
 		if(is_null(self::$apiMaskParamsPattern))
 		{
-			self::$apiMaskParamsPattern = implode("|", kConf::get(self::KCONF_KEY_API_MASK_PARAMS, kConfMapNames::RUNTIME_CONFIG, array()));
+			self::$apiMaskParamsPattern = implode("|", kConf::get(self::KCONF_KEY_API_MASK_PARAMS, kConfMapNames::SECURITY, array()));
 		}
 
 		if(!self::$apiMaskParamsPattern)

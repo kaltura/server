@@ -540,7 +540,7 @@ class kString
 
 	public static function maskString($str, $maskChar = '*', $maxLength = null)
 	{
-		$enableParamsMasking = kConf::get(self::KCONF_CONFIG_KEY_ENABLE_API_MASK_PARAMS, kConfMapNames::RUNTIME_CONFIG, true);
+		$enableParamsMasking = kConf::get(self::KCONF_CONFIG_KEY_ENABLE_API_MASK_PARAMS, kConfMapNames::SECURITY, true);
 		if(!$enableParamsMasking)
 			return $str;
 
