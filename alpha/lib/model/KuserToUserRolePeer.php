@@ -15,6 +15,8 @@
  */
 class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObjectPeer
 {
+	const APP_GUID_CACHE_KEY_PREFIX = 'appGuid_';
+	const APP_GUID_CACHE_TTL = 86400; // cached for 1 day
 	
 	/**
 	 * Creates default criteria filter
@@ -187,8 +189,18 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		}
 	}
 	
+	/**
+	 * @throws kCoreException
+	 */
 	public static function getAppGuidById($appGuid)
 	{
+		
+		$appGuidExists = KuserToUserRolePeer::getAppGuidFromCache($appGuid);
+		if ($appGuidExists)
+		{
+			return $appGuidExists;
+		}
+		
 		$appRegistryClient = new MicroServiceAppRegistry();
 		$appRegistry = $appRegistryClient->get(kCurrentContext::getCurrentPartnerId(), $appGuid);
 		
@@ -197,21 +209,56 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 			return false;
 		}
 		
-		return $appRegistry;
+		if (!isset($appRegistry->id))
+		{
+			return false;
+		}
+		
+		KuserToUserRolePeer::addAppGuidToCache($appRegistry->id);
+		return $appRegistry->id;
 	}
 	
+	/**
+	 * @throws kCoreException
+	 */
 	public static function getKsPartnerAppGuidsFromCsv($appGuidsCsv)
 	{
-		$appGuidsResult = array();
-		$appGuidsArray = explode(',', $appGuidsCsv);
+		$appGuidsResponse = array();
+		$appGuidsCached = array();
+		$appGuidsToQuery = explode(',', $appGuidsCsv);
+		
+		// remove duplicate appGuids, if exists
+		$appGuidsToQuery = array_unique($appGuidsToQuery);
+		
+		// filter appGuids that already stored in cache
+		foreach ($appGuidsToQuery as $key => $appGuid)
+		{
+			$appGuidExist = KuserToUserRolePeer::getAppGuidFromCache($appGuid);
+			
+			// remove appGuids that already stored in cache before querying app-registry ms
+			if ($appGuidExist)
+			{
+				$appGuidsCached[] = $appGuid;
+				unset($appGuidsToQuery[$key]);
+			}
+		}
+		
+		// reset array keys or else 'json_encode' will encode the non-consecutive as the key-value resulting in bad mongo query
+		$appGuidsToQuery = array_values($appGuidsToQuery);
+		
+		// if all appGuids were found in cache, return original csv
+		if (!count($appGuidsToQuery))
+		{
+			return $appGuidsCsv;
+		}
 		
 		$filter = array(
-			'idIn' => $appGuidsArray
+			'idIn' => $appGuidsToQuery
 		);
 		
 		$pager = array(
 			'offset' => 0,
-			'limit' => count($appGuidsArray)
+			'limit' => count($appGuidsToQuery)
 		);
 		
 		$appRegistryClient = new MicroServiceAppRegistry();
@@ -221,11 +268,58 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		{
 			if (isset($appRegistry->id))
 			{
-				$appGuidsResult[] = $appRegistry->id;
+				$appGuidsResponse[] = $appRegistry->id;
+				KuserToUserRolePeer::addAppGuidToCache($appRegistry->id);
 			}
 		}
 		
-		return count($appGuidsResult) ? implode(',', $appGuidsResult) : 'null'; // set to 'null' will not return results (if set to '' 'attachToCriteria' will remove it from mysql query)
+		$appGuidsFinal = array_merge($appGuidsCached, $appGuidsResponse);
+		return count($appGuidsFinal) ? implode(',', $appGuidsFinal) : 'null'; // set to 'null' will not return results (if set to '' 'attachToCriteria' will remove it from mysql query)
+	}
+	
+	/**
+	 * @throws kCoreException
+	 */
+	private static function getAppGuidFromCache($appGuid)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_MICROSERVICES);
+		if (!$cache)
+		{
+			throw new kCoreException('[Failed to instantiate cache]', kCoreException::FAILED_TO_INSTANTIATE_MICROSERVICE_CACHE);
+		}
+		
+		$cacheKey = self::APP_GUID_CACHE_KEY_PREFIX . $appGuid;
+		$cacheValue = $cache->get($cacheKey);
+		if (!$cacheValue)
+		{
+			KalturaLog::debug("Cache value for key [$cacheKey] not found");
+			return false;
+		}
+		
+		KalturaLog::debug("Cache value for key [$cacheKey] found, value [$cacheValue]");
+		return $cacheValue;
+	}
+	
+	/**
+	 * @throws kCoreException
+	 */
+	private static function addAppGuidToCache($appGuid)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_MICROSERVICES);
+		if (!$cache)
+		{
+			throw new kCoreException('[Failed to instantiate cache]', kCoreException::FAILED_TO_INSTANTIATE_MICROSERVICE_CACHE);
+		}
+		
+		$cacheKey = self::APP_GUID_CACHE_KEY_PREFIX . $appGuid;
+		$res = $cache->add($cacheKey, true, self::APP_GUID_CACHE_TTL);
+		
+		if (!$res)
+		{
+			KalturaLog::debug("Failed to save key [$cacheKey] to cache - already stored?");
+		}
+		
+		KalturaLog::debug("Saved key [$cacheKey] to cache");
 	}
 	
 } // KuserToUserRolePeer

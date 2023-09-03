@@ -215,6 +215,10 @@ class UserAppRoleService extends KalturaBaseService
 			case kCoreException::USER_APP_ROLE_NOT_FOUND:
 				$args = explode(',', $ex->getData());
 				throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_FOUND, $args[0], $args[1]);
+				
+			case kCoreException::FAILED_TO_INSTANTIATE_MICROSERVICE_CACHE:
+				// todo - do I want to throw API exception for cache? probably not
+				// currently throws 'INTERNAL_SERVER_ERROR'
 			
 			default:
 				throw $ex;
