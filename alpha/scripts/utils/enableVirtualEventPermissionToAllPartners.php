@@ -4,8 +4,8 @@
  *
  *
  * Examples:
- * php 2023_06_26_enable_virtual_event_permission_to_all_partners.php
- * php 2023_06_26_enable_virtual_event_permission_to_all_partners.php realrun
+ * php enableVirtualEventPermissionToAllPartners.php
+ * php enableVirtualEventPermissionToAllPartners.php realrun
  *
  * @package Deployment
  * @subpackage updates
@@ -23,7 +23,7 @@ const VIRTUALEVENT_PLUGIN_PERMISSION = 'VIRTUALEVENT_PLUGIN_PERMISSION';
 //------------------------------------------------------
 
 
-require_once (__DIR__ . '/../../bootstrap.php');
+require_once(__DIR__ . '/../../bootstrap.php');
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 KalturaStatement::setDryRun($dryRun);
@@ -53,7 +53,7 @@ while (count($partners))
 		{
 			continue;
 		}
-		KalturaLog::debug("Set permission [" . VIRTUALEVENT_PLUGIN_PERMISSION . "] for partner id [". $partner->getId() ."]");
+		print("Set permission [" . VIRTUALEVENT_PLUGIN_PERMISSION . "] for partner id [". $partner->getId() ."]");
 		$virtualEventPermission->setStatus(PermissionStatus::ACTIVE);
 		$virtualEventPermission->save();
 	}
@@ -70,4 +70,4 @@ while (count($partners))
 	$offset +=  $countLimitEachLoop;
 }
 
-KalturaLog::debug("Done");
+print("Done");
