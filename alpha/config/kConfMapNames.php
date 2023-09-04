@@ -18,4 +18,5 @@ class kConfMapNames
 	const LIVE_SETTINGS = 'live';
 	const AVRO_SCHEMA_REGISTRY = 'schema_registry';
 	const KAFKA = 'kafka';
+	const SECURITY = 'security';
 }
