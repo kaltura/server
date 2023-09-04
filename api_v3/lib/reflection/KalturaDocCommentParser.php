@@ -7,7 +7,7 @@ class KalturaDocCommentParser
 {
     const DOCCOMMENT_READONLY = "/\\@readonly/i";
     const DOCCOMMENT_MASKED = "/\\@masked/i";
-    const DOCCOMMENT_MASKING_MAX_LENGTH = "/\\@maskingMaxLnegth (\d*)/i";
+    const DOCCOMMENT_MASKING_MAX_LENGTH = "/\\@maskingMaxLength (\d*)/i";
     const DOCCOMMENT_MASKED_ACTION_PARAMS = "/\\@maskedParams ([a-z,A-Z]+)/i";
     const DOCCOMMENT_INSERTONLY = "/\\@insertonly/i";
     const DOCCOMMENT_WRITEONLY = "/\\@writeonly/i";
@@ -91,7 +91,7 @@ class KalturaDocCommentParser
     /**
      * @var array
      */
-    public $maskedActrionParams;
+    public $maskedActionParams;
 
     /**
      * @var bool
@@ -336,10 +336,10 @@ class KalturaDocCommentParser
         if (preg_match( self::DOCCOMMENT_MASKING_MAX_LENGTH, $comment, $result ))
             $this->maskingMaxLength = $result[1];
 
-        $this->maskedActrionParams = array();
+        $this->maskedActionParams = array();
         if (preg_match( self::DOCCOMMENT_MASKED_ACTION_PARAMS, $comment, $result ))
         {
-	        $this->maskedActrionParams = explode(",", $result[1]);
+	        $this->maskedActionParams = explode(",", $result[1]);
         }
 
         $result = null;
