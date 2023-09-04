@@ -133,6 +133,7 @@ class SearchService extends KalturaBaseService
 	 * @param KalturaSearchProviderType $searchSource
 	 * @param string $userName
 	 * @param string $password
+	 * @maskedParams userName,password
 	 * @return KalturaSearchAuthData 
 	 * @ksOptional
 	 */

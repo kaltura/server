@@ -38,6 +38,16 @@ class KalturaPropertyInfo
 	/**
 	 * @var bool
 	 */
+	private $_masked = false;
+
+	/**
+	 * @var int
+	 */
+	private $_maskedMaxLength = false;
+	
+	/**
+	 * @var bool
+	 */
 	private $_insertOnly = false;
 	
 	/**
@@ -367,6 +377,38 @@ class KalturaPropertyInfo
 	/**
 	 * @param bool $value
 	 */
+	public function setMasked($value)
+	{
+		$this->_masked = $value;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isMasked()
+	{
+		return $this->_masked;
+	}
+
+	/**
+	 * @param int $value
+	 */
+	public function setMaskingMaxLength($value)
+	{
+		$this->_maskedMaxLength = $value;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMaskingMaxLength()
+	{
+		return $this->_maskedMaxLength;
+	}
+	
+	/**
+	 * @param bool $value
+	 */
 	public function setInsertOnly($value)
 	{
 		$this->_insertOnly = $value;
@@ -602,6 +644,8 @@ class KalturaPropertyInfo
 		$array["isStringEnum"] 	= $this->isStringEnum();
 		$array["isArray"] 		= $this->isArray();
 		$array["isAbstract"] 		= $this->isAbstract();
+		$array["isMasked"]          = $this->isMasked();
+		$array["maskingMaxLength"]  = $this->getMaskingMaxLength();
 		
 		if ($this->isArray())
 		{
