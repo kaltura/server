@@ -86,13 +86,13 @@ class KalturaUser extends KalturaBaseUser
 	/**
 	 * @var string
 	 * @masked
-	 * @maskingMaxLnegth 256
+	 * @maskingMaxLength 256
 	 */
 	public $registrationInfo;
 
 	/**
 	 * @var string
-	 * @maskingMaxLnegth 256
+	 * @maskingMaxLength 256
 	 */
 	public $attendanceInfo;
 
