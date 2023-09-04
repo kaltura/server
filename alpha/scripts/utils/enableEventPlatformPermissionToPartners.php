@@ -4,8 +4,8 @@
  *
  *
  * Examples:
- * php 2023_06_26_enable_event_platform_permission_to_partners.php
- * php 2023_06_26_enable_event_platform_permission_to_partners.php realrun
+ * php enableEventPlatformPermissionToPartners.php
+ * php enableEventPlatformPermissionToPartners.php realrun
  *
  * @package Deployment
  * @subpackage updates
@@ -24,7 +24,7 @@ const FEATURE_EVENT_PLATFORM_PERMISSION = 'FEATURE_EVENT_PLATFORM_PERMISSION';
 //------------------------------------------------------
 
 
-require_once (__DIR__ . '/../../bootstrap.php');
+require_once(__DIR__ . '/../../bootstrap.php');
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 KalturaStatement::setDryRun($dryRun);
@@ -41,6 +41,12 @@ while (count($partners))
 {
 	foreach ($partners as $partner)
 	{
+		$existingEventPermission = PermissionPeer::getByNameAndPartner(FEATURE_EVENT_PLATFORM_PERMISSION, $partner->getId());
+		if($existingEventPermission)
+		{
+			print("Existing Event Platform permission on partner: [" . $partner->getId(). "] \n");
+		}
+		
 		/* @var $partner Partner */
 		$virtualEventPermission = PermissionPeer::getByNameAndPartner(VIRTUALEVENT_PLUGIN_PERMISSION, $partner->getId());
 		if (!$virtualEventPermission || $virtualEventPermission->getStatus() != PermissionStatus::ACTIVE)
@@ -48,7 +54,7 @@ while (count($partners))
 			continue;
 		}
 		
-		KalturaLog::debug("Set permission [" . FEATURE_EVENT_PLATFORM_PERMISSION . "] for partner id [". $partner->getId() ."]");
+		print("Set permission [" . FEATURE_EVENT_PLATFORM_PERMISSION . "] for partner id [". $partner->getId() ."]\n");
 		$eventPlatformPermission = PermissionPeer::getByNameAndPartner(FEATURE_EVENT_PLATFORM_PERMISSION, $partner->getId());
 		if (!$eventPlatformPermission)
 		{
@@ -74,4 +80,4 @@ while (count($partners))
 	$offset +=  $countLimitEachLoop;
 }
 
-KalturaLog::debug("Done");
+print("Done\n");
