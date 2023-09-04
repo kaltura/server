@@ -357,6 +357,31 @@ function useDefaultStreamersChanged() {
 	}
 }
 
+function openPasswordValidationRules()
+{
+    let url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'password-validation-rules')); ?>';
+    let dialogDiv = jQuery('<div id="rules-div"></div>').appendTo('body');
+    dialogDiv.dialog({
+        bgiframe: true,
+        modal: true,
+        resizable: false,
+        width: 750,
+        title: '<?php echo $this->translate('Password Validation Rules'); ?>',
+        height: 600,
+        buttons: {
+            '<?php echo $this->translate('Save'); ?>': function() {
+                passwordValidationRulesSaveButtonPressed();
+                jQuery(this).dialog('close').remove();
+            },
+            '<?php echo $this->translate('Close'); ?>': function() {
+                jQuery(this).dialog('close').remove();
+            }
+        },
+        close: function() {}
+    });
+    dialogDiv.load(url);
+}
+
 jQuery(document).ready(function() {
 	<?php if ($this->formValid): ?>
 		jQuery('#partner-configure-dialog').dialog('close');
