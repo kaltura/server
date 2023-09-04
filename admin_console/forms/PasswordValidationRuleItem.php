@@ -4,7 +4,7 @@
  * @package Admin
  * @subpackage Partners
  */
-class Form_PasswordValidationRule extends Infra_Form
+class Form_PasswordValidationRuleItem extends Infra_Form
 {
 	public function init()
 	{
@@ -19,10 +19,6 @@ class Form_PasswordValidationRule extends Infra_Form
 		
 		$this->addElement('text', 'description', array(
 			'filters' 		=> array('StringTrim'),
-			'decorators'	=> array('ViewHelper'),
-		));
-		
-		$this->addElement('hidden', 'belongs', array(
 			'decorators'	=> array('ViewHelper'),
 		));
 	}

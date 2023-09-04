@@ -918,6 +918,6 @@ class PartnerController extends Zend_Controller_Action
 		}
 		
 		$this->view->regexList = $partnerRegexArray;
-		$this->view->form = new Form_PasswordValidationRule();
+		$this->view->form = new Infra_Form();
 	}
 }
