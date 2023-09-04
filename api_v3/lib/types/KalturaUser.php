@@ -16,6 +16,7 @@ class KalturaUser extends KalturaBaseUser
 
 	/**
 	 * @var int
+	 * @masked
 	 */
 	public $dateOfBirth;
 
@@ -58,18 +59,21 @@ class KalturaUser extends KalturaBaseUser
 	 * @var string
 	 * @insertonly
 	 * @writeonly
+	 * @masked
 	 */
 	public $password;
 
 	/**
 	 * @var string
 	 * @filter likex
+	 * @masked
 	 */
 	public $firstName;
 
 	/**
 	 * @var string
 	 * @filter likex
+	 * @masked
 	 */
 	public $lastName;
 
@@ -81,21 +85,26 @@ class KalturaUser extends KalturaBaseUser
 
 	/**
 	 * @var string
+	 * @masked
+	 * @maskingMaxLength 256
 	 */
 	public $registrationInfo;
 
 	/**
 	 * @var string
+	 * @maskingMaxLength 256
 	 */
 	public $attendanceInfo;
 
 	/**
 	 * @var string
+	 * @masked
 	 */
 	public $title;
 
 	/**
 	 * @var string
+	 * @masked
 	 */
 	public $company;
 

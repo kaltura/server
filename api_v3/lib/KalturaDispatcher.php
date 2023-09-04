@@ -95,7 +95,7 @@ class KalturaDispatcher
 		$deserializer = new KalturaRequestDeserializer($params);
 		$this->arguments = $deserializer->buildActionArguments($actionParams);
 		KalturaLog::debug("Dispatching service [".$service."], action [".$action."], reqIndex [".
-			kCurrentContext::$multiRequest_index."] with params " . print_r($this->arguments, true));
+			kCurrentContext::$multiRequest_index."] with params " . print_r($deserializer->buildActionArguments($actionParams, true), true));
 
 		$responseProfile = $deserializer->getResponseProfile();
 		if($responseProfile)

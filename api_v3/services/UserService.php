@@ -274,6 +274,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $privileges Special privileges
 	 * @return string A session KS for the user
 	 * @ksIgnored
+	 * @maskedParams userId,password
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::USER_WRONG_PASSWORD
@@ -302,6 +303,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $otp the user's one-time password
 	 * @return string A session KS for the user
 	 * @ksIgnored
+	 * @maskedParams loginId,password
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::USER_WRONG_PASSWORD
@@ -348,6 +350,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $newLastName Optional, The user's new last name
 	 * @param string $otp the user's one-time password
 	 * @ksIgnored
+	 * @maskedParams oldLoginId,password,newLoginId,newPassword,newFirstName,newLastName
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
@@ -532,6 +535,7 @@ class UserService extends KalturaBaseUserService
 	 * @param string $loginId The user's email address that identifies the user for login
 	 * @param string $password The user's password
 	 * @return KalturaUser The user object represented by the user and login IDs
+	 * @maskedParams userId,loginId,password
 	 * 
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_ENABLED
 	 * @throws KalturaErrors::USER_NOT_FOUND

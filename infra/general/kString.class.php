@@ -9,6 +9,8 @@
  */
 class kString
 {
+	const KCONF_CONFIG_KEY_ENABLE_API_MASK_PARAMS = 'enable_api_mask_params';
+
 	/**
 	 * return true if $str starts with $desired_prefix, false otherwise
 	 *
@@ -534,5 +536,14 @@ class kString
 		$trailingEscapesCount = strlen($str) - strlen(rtrim($str, '\\'));
 		
 		return $trailingEscapesCount % 2 == 0;
+	}
+
+	public static function maskString($str, $maskChar = '*', $maxLength = null)
+	{
+		$enableParamsMasking = kConf::get(self::KCONF_CONFIG_KEY_ENABLE_API_MASK_PARAMS, kConfMapNames::SECURITY, true);
+		if(!$enableParamsMasking)
+			return $str;
+
+		return str_repeat($maskChar, $maxLength ? min(strlen($str), $maxLength) : strlen($str));
 	}
 }
