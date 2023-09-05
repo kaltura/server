@@ -8,7 +8,13 @@
 class KalturaAppRole extends KalturaObject implements IRelatedFilterable
 {
 	/**
+	 * @var int
+	 */
+	protected $kuserId;
+	
+	/**
 	 * @var string
+	 * @insertonly
 	 */
 	public $appGuid;
 	

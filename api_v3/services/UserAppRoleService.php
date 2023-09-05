@@ -76,8 +76,16 @@ class UserAppRoleService extends KalturaBaseService
 	public function updateAction($userId, $appGuid, KalturaUserAppRole $userAppRole)
 	{
 		$dbUserAppRole = $this->getByUserAndAppGuid($userId, $appGuid);
-		$dbUserAppRole = $userAppRole->toUpdatableObject($dbUserAppRole);
-		$dbUserAppRole->save();
+		
+		try
+		{
+			$dbUserAppRole = $userAppRole->toUpdatableObject($dbUserAppRole);
+			$dbUserAppRole->save();
+		}
+		catch (kCoreException $ex)
+		{
+			$this->handleCoreException($ex);
+		}
 		
 		$userAppRole = new KalturaUserAppRole();
 		$userAppRole->fromObject($dbUserAppRole, $this->getResponseProfile());

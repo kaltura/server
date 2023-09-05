@@ -34,6 +34,11 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
+	public static function getCacheInvalidationKeys()
+	{
+		return array(array("kuserToUserRole:kuserId=%s", self::KUSER_ID), array("kuserToUserRole:id=%s", self::ID));
+	}
+	
 	/**
 	 * Get objects by kuser and user role IDs
 	 * @param int $kuserId
@@ -46,11 +51,6 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		$c->addAnd(self::KUSER_ID, $kuserId, Criteria::EQUAL);
 		$c->addAnd(self::USER_ROLE_ID, $userRoleId, Criteria::EQUAL);
 		return self::doSelect($c);
-	}
-	
-	public static function getCacheInvalidationKeys()
-	{
-		return array(array("kuserToUserRole:kuserId=%s", self::KUSER_ID), array("kuserToUserRole:id=%s", self::ID));		
 	}
 	
 	/* (non-PHPdoc)
@@ -186,6 +186,17 @@ class KuserToUserRolePeer extends BaseKuserToUserRolePeer implements IRelatedObj
 		{
 			$puserId = $kuser->getPuserId();
 			throw new kCoreException('[User App Role Already Exists]', kCoreException::USER_APP_ROLE_ALREADY_EXISTS, "$puserId,$appGuid");
+		}
+	}
+	
+	public static function isValidForUpdate($userRoleId)
+	{
+		// validate userRoleId exist
+		$userRole = UserRolePeer::retrieveByPK($userRoleId);
+		
+		if (!$userRole)
+		{
+			throw new kCoreException('[User Role Not Found]', kCoreException::USER_ROLE_NOT_FOUND);
 		}
 	}
 	
