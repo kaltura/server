@@ -1,3 +1,11 @@
+# Scorpius-19.16.0
+## Deploy new Flavor params and conversion profile for PPT conversion ##
+- Issue Type: Task
+- Issue ID: NR2-7791
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_06_28_deploy_kaltura_meetings_documents_conversion_data.php
+
 # Scorpius-19.15.0
 
 ## Change default hashing algorithms ##
