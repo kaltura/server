@@ -228,7 +228,7 @@ class GroupUserService extends KalturaBaseService
 
 	protected static function handleGroupUserInBatch(kBulkGroupUserSyncCsv $bulkGroupUserSyncCsv, $removeFromExistingGroups, $createNewGroups)
 	{
-		$fileData = $bulkGroupUserSyncCsv->getSyncGroupUsersCsvFile($removeFromExistingGroups, $createNewGroups);
+		$fileData = $bulkGroupUserSyncCsv->getSyncGroupUsersCsvFile($removeFromExistingGroups, $createNewGroups, KalturaUserCapabilityType::SYNCED_GROUP);
 		if (!$fileData)
 		{
 			return null;

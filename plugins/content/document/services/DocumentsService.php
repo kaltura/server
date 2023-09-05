@@ -544,6 +544,49 @@ class DocumentsService extends KalturaEntryService
 	}
 	
 	/**
+	 * Add content to document entry which is not yet associated with content (therefore is in status NO_CONTENT).
+	 * If the requirement is to replace the entry's associated content, use action updateContent.
+	 *
+	 * @action addContent
+	 * @param string $entryId
+	 * @param KalturaResource $resource
+	 * @return KalturaDocumentEntry
+	 * @validateUser entry entryId edit
+	 */
+	function addContentAction($entryId, KalturaResource $resource = null)
+	{
+		$dbEntry = entryPeer::retrieveByPK($entryId);
+		
+		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::DOCUMENT)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+		
+		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
+		}
+		
+		if ($resource)
+		{
+			try
+			{
+				$validateLocalExist = myEntryUtils::shouldValidateLocal();
+				$resource->validateEntry($dbEntry, $validateLocalExist);
+				$kResource = $resource->toObject();
+				$this->attachResource($kResource, $dbEntry);
+			}
+			catch (Exception $e)
+			{
+				$this->handleErrorDuringSetResource($entryId, $e);
+			}
+			$this->validateContent($dbEntry);
+			$resource->entryHandled($dbEntry);
+		}
+		return $this->getEntry($entryId);
+	}
+	
+	/**
 	 * Replace content associated with the given document entry.
 	 *
 	 * @action updateContent

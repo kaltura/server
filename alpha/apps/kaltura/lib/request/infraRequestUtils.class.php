@@ -17,12 +17,15 @@ class infraRequestUtils
 	const DEFAULT_HTTP_TIME = 'Sun, 19 Nov 2000 08:52:00 GMT';
 	const CLIENT_TAG = 'clientTag';
 	const ORIGIN_HEADER = 'HTTP_ORIGIN';
+	const KCONF_KEY_API_MASK_PARAMS = 'api_mask_params';
 	
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = array();
 	protected static $requestParams = null;
 	protected static $hostname = null;
 	public static $jsonData = null;
+
+	protected static $apiMaskParamsPattern = null;
 
 	//
 	// the function check the http range header and sets http response headers accordingly
@@ -629,5 +632,36 @@ class infraRequestUtils
             }
         }
 		return array_replace_recursive($_GET, $params);
+	}
+
+	public static function maskSensitiveParams($params)
+	{
+		$result = $params;
+
+		if(is_null(self::$apiMaskParamsPattern))
+		{
+			self::$apiMaskParamsPattern = implode("|", kConf::get(self::KCONF_KEY_API_MASK_PARAMS, kConfMapNames::SECURITY, array()));
+		}
+
+		if(!self::$apiMaskParamsPattern)
+		{
+			return $result;
+		}
+
+		foreach ($params as $key => $value)
+		{
+			$result[$key] = $value;
+
+			if (is_array($value))
+			{
+				$result[$key] = self::maskSensitiveParams($value);
+			}
+			elseif (preg_match("/" . self::$apiMaskParamsPattern . "/i", $key, $output_array))
+			{
+				$result[$key] = kString::maskString($value);
+			}
+		}
+
+		return $result;
 	}
 }

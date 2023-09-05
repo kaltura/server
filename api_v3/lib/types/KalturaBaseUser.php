@@ -9,6 +9,7 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	/**
 	 * @var string
 	 * @filter order
+	 * @masked
 	 */
 	public $id;
 
@@ -23,6 +24,7 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	 * @var string
 	 * @filter like,likex
 	 * @utf8truncate 127
+	 * @masked
 	 */
 	public $screenName;
 
@@ -30,35 +32,41 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	 * @var string
 	 * @utf8truncate 40
 	 * @deprecated
+	 * @masked
 	 */
 	public $fullName;
 
 	/**
 	 * @var string
 	 * @filter like,likex
+	 * @masked
 	 */
 	public $email;
 
 	/**
 	 * @var string
+	 * @masked
 	 */
 	public $country;
 
 	/**
 	 * @var string
 	 * @utf8truncate 16
+	 * @masked
 	 */
 	public $state;
 
 	/**
 	 * @var string
 	 * @utf8truncate 30
+	 * @masked
 	 */
 	public $city;
 
 	/**
 	 * @var string
 	 * @utf8truncate 10
+	 * @masked
 	 */
 	public $zip;
 
@@ -170,6 +178,11 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	 * @var KalturaUserMode
 	 */
 	public $userMode;
+	
+	/**
+	 * @var KalturaUserCapabilityArray
+	 */
+	public $capabilities;
 
 	private static $map_between_objects = array
 	(
@@ -196,6 +209,7 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 		"allowedPartnerPackages",
 		"statusUpdatedAt",
 		"userMode",
+		"capabilities",
 	);
 
 	public function getMapBetweenObjects ( )

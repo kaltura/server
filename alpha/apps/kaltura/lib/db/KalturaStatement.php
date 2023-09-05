@@ -58,7 +58,7 @@ class KalturaStatement extends PDOStatement
 			
 		$sql = str_replace($search, $replace, $this->queryString);
 		
-		KalturaLog::debug($sql);
+		KalturaLog::securedDebug($sql);
 		
 		$sqlStart = microtime(true);
 		if(self::$dryRun && !preg_match('/^(\/\*.+\*\/ )?SELECT/i', $sql))

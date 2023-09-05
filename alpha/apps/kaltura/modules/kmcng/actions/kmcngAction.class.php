@@ -229,7 +229,7 @@ class kmcngAction extends kalturaAction
                 );
 
 		$config = array(
-			'ks' =>  ($this->getRequest()->getMethod() == sfRequest::POST && $this->getRequest()->getParameter('ks')) ? $this->getRequest()->getParameter('ks') : null,
+			'ks' =>  ($this->getRequest()->getMethod() == sfRequest::POST && $this->getRequest()->getParameter('ks')) ? $this->getKs() : null,
 			'kalturaServer' => array(
 				'uri' => $serverAPIUri,
 				'deployUrl' => $deployUrl,
@@ -280,7 +280,7 @@ class kmcngAction extends kalturaAction
 		}
 		else
 		{
-			$uiConf = uiConfPeer::getUiconfByTagAndVersion(self::PLAYER_V3_VERSIONS_TAG, "latest");
+			$uiConf = uiConfPeer::getUiconfByTagAndVersion($tag, $version);
 			$uiConfVersions = isset($uiConf) ? array_values($uiConf) : null;
 			$uiConfVersion = (is_array($uiConfVersions) && reset($uiConfVersions)) ? reset($uiConfVersions) : null;
 			if($uiConfVersion)
@@ -291,5 +291,35 @@ class kmcngAction extends kalturaAction
 		}
 
 		return array($versionConfig, $confVars);
+	}
+
+
+	private function getKs()
+	{
+		$ks = $this->getRequest()->getParameter('ks');
+		$ksObj = kSessionUtils::crackKs($ks);
+		$action = $this->getRequest()->getParameter('actions');
+		// set login fields for persist-login-by-ks action
+		if($ksObj && $action == 'persist-login-by-ks') {
+			$ksUserId = $ksObj->user;
+			$ksPartnerId = $ksObj->partner_id;
+			$partner = PartnerPeer::retrieveByPK($ksPartnerId);
+			$kuser = null;
+			if($partner)
+			{
+				$kuser = kuserPeer::getKuserByPartnerAndUid($ksPartnerId, $ksUserId, true);
+			}
+			$loginData = null;
+			if($kuser)
+			{
+				$loginData = $kuser->getLoginData();
+			}
+			if($loginData)
+			{
+				UserLoginDataPeer::setLastLoginFields($loginData, $kuser);
+			}
+		}
+
+		return $ks;
 	}
 }

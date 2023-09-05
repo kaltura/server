@@ -13,6 +13,7 @@ class kBulkGroupUserSyncCsv
 	const ACTION = '*action';
 	const USER_ID = 'userId';
 	const GROUP_ID = 'group';
+	const CAPABILITIES = 'capabilities';
 
 	protected $userMap;
 	protected $kuser;
@@ -25,14 +26,14 @@ class kBulkGroupUserSyncCsv
 		$this->userMap = array();
 	}
 
-	public function getSyncGroupUsersCsvFile($removeFromExistingGroups, $createNewGroups)
+	public function getSyncGroupUsersCsvFile($removeFromExistingGroups, $createNewGroups, $capabilities = null)
 	{
 		list($groupIdsToRemove, $groupIdsToAdd) = $this->getSyncGroupUsers($removeFromExistingGroups, $createNewGroups);
 		//if no groups to add/remove don't add the job
 		if(empty($groupIdsToRemove) && empty($groupIdsToAdd))
 			return null;
 
-		$csvFile = $this->buildUsersCsv($groupIdsToRemove, $groupIdsToAdd);
+		$csvFile = $this->buildUsersCsv($groupIdsToRemove, $groupIdsToAdd, $capabilities);
 		$fileData = array(
 			self::NAME => basename($csvFile),
 			self::TMP_NAME => $csvFile
@@ -117,7 +118,7 @@ class kBulkGroupUserSyncCsv
 		return false;
 	}
 
-	protected function buildUsersCsv($groupsToRemove, $groupIdsToAdd)
+	protected function buildUsersCsv($groupsToRemove, $groupIdsToAdd, $capabilities = null)
 	{
 		$userId = $this->kuser->getPuserId();
 		$csvPath = tempnam(sys_get_temp_dir(), 'csv');
@@ -135,11 +136,12 @@ class kBulkGroupUserSyncCsv
 			$csvData[] = array(
 				self::ACTION => BulkUploadAction::UPDATE,
 				self::USER_ID => trim($userId),
-				self::GROUP_ID => $addGroupId
+				self::GROUP_ID => $addGroupId,
+				self::CAPABILITIES => $capabilities
 			);
 		}
 		$f = fopen($csvPath, 'w');
-		fputcsv($f, array(self::ACTION, self::USER_ID, self::GROUP_ID));
+		fputcsv($f, array(self::ACTION, self::USER_ID, self::GROUP_ID, self::CAPABILITIES));
 		foreach ($csvData as $csvLine)
 		{
 			fputcsv($f, $csvLine);

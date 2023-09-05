@@ -223,6 +223,10 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			$kUser = ZoomBatchUtils::getKalturaUser($partnerId, $zoomUser);
 			if($kUser)
 			{
+			    	if ($kUser->status == KalturaUserStatus::BLOCKED)
+                		{
+                    			continue;
+                		}
 				if (strtolower($kUser->id) !== $userToExclude)
 				{
 					$validatedUsers[] = $kUser->id;

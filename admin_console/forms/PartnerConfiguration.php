@@ -68,12 +68,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'required' 		=> true,
 		));
-				
+		
 		$this->addElement('text', 'description', array(
 			'label'			=> 'partner-configure Description',
 			'filters'		=> array('StringTrim'),
 		));
-			
+		
 		// change to read only
 		$this->addElement('text', 'admin_name', array(
 			'label'			=> 'partner-configure Administrator Name',
@@ -128,7 +128,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Enforce HTTPS API',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
-						
+		
 //--------------------------- Publisher specific Delivery Settings ---------------------------
 
 		$this->addElement('checkbox', 'enforce_delivery', array(
@@ -268,7 +268,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Default Delivery Type'] = 'default_delivery_type';
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Default Embed Code Type'] = 'default_embed_code_type';
 		$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS]['Enable system streamer types'] = 'use_default_streamers';
-				
+		
 		foreach($this->playerDeliveryTypes as $playerDeliveryType)
 		{
 			/* @var $playerDeliveryType Kaltura_Client_Type_PlayerDeliveryType */
@@ -297,7 +297,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Delete exported storage from Kaltura',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
-				
+		
 		$this->addElement('checkbox', 'import_remote_source_for_convert', array(
 			'label'	  => 'Import remote source for convert',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
@@ -313,7 +313,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Allowed From Email WhiteList Notifications:',
 			'filters'		=> array('StringTrim'),
 		));
-			
+		
 		$this->addElement('checkbox', 'allow_multi_notification', array(
 			'label'	  => 'Allow multi-notifications',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
@@ -359,18 +359,16 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('text', 'password_structure_validations', array(
-			'label'			=> 'Password structure validations (regex):',
-			'filters'		=> array('StringTrim'),
+		$this->addElement('button', 'password_structure_validations_edit', array(
+			'label'		=> 'Edit Rules',
+			'decorators'	=> array('ViewHelper'),
+		));
+		$this->getElement('password_structure_validations_edit')->setAttrib('onClick', 'openPasswordValidationRules()');
+		
+		$this->addElement('hidden', 'password_structure_validations', array(
+			'decorators'	=> array('ViewHelper'),
 		));
 		
-		$this->addElement('text', 'password_structure_validations_description',
-		                  array(
-			'label'			=> 'Password structure validations description:',
-			'filters'		=> array('StringTrim'),
-		));
-
-
 
 //--------------------------- Single Sign On ---------------------------
 		
@@ -439,7 +437,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 //--------------------------- New Account Options ---------------------------
-												
+		
 		$this->addElement('button', 'monitor_usage_history', array(
 			'label'	  => 'View History',
 		));
@@ -462,7 +460,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Force First Login Message in KMC',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('class' => 'partner_configuration_checkbox_field_only')))
 		));
-				
+		
 
 //--------------------------- Included Usage ---------------------------
 		$element = new Zend_Form_Element_Hidden('includedUsageLabel');
@@ -526,8 +524,8 @@ class Form_PartnerConfiguration extends Infra_Form
 		$htmlPurifierOptions = array(
 			Kaltura_Client_Enum_HTMLPurifierBehaviourType::IGNORE => 'Ignore',
 			Kaltura_Client_Enum_HTMLPurifierBehaviourType::NOTIFY => 'Notify',
-			Kaltura_Client_Enum_HTMLPurifierBehaviourType::SANITIZE => 'Sanitize',						
-			Kaltura_Client_Enum_HTMLPurifierBehaviourType::BLOCK => 'Block',						
+			Kaltura_Client_Enum_HTMLPurifierBehaviourType::SANITIZE => 'Sanitize',
+			Kaltura_Client_Enum_HTMLPurifierBehaviourType::BLOCK => 'Block',
 		);
 		$this->addElement('select', 'html_purifier_behaviour', array(
 			'label' => 'HTML Purifier Behaviour',
@@ -704,7 +702,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array('checkbox_audio_thumb_entry_id','audio_thumb_entry_id','checkbox_live_thumb_entry_id','live_thumb_entry_id','crossLine'),'thumbnailConfiguration',array('legend' => 'Thumbnail Configuration:'));
 		$this->addDisplayGroup($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES], 'enableDisableFeatures',array('legend' => 'Enable/Disable Features:'));
-			
+		
 		//removing decorators from display groups
 		$displayGroups = $this->getDisplayGroups();
 		foreach ($displayGroups as $displayGroup)
@@ -715,7 +713,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		//creating divs for left right dividing
 		$this->setDisplayColumn('generalInformation',  'recycleBin', true);
 		$this->setDisplayColumn('accountPackagesService', 'enableDisableFeatures', false);
-				
+		
 		//---------------- Display DisplayGroups according to Permissions ---------------
 		$this->handlePermissions();
 	}
@@ -928,7 +926,7 @@ class Form_PartnerConfiguration extends Infra_Form
 						$basePermission->name = trim($basePermissionName);
 						$basePermission->type = trim($basePermissionType);
 						$basePermission->status = $permission->status;
-											
+						
 						$permissionSet = false;
 						foreach ($systemPartnerConfiguration->permissions as $permission)
 						{
@@ -949,7 +947,7 @@ class Form_PartnerConfiguration extends Infra_Form
 				}
 			}
 		}
-			
+		
 		foreach ($this->limitSubForms as $subForm)
 		{
 			if ($subForm instanceof Form_PartnerConfigurationLimitSubForm)
@@ -984,7 +982,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		return $systemPartnerConfiguration;
 	}
-		
+	
 	protected function addLimitsElements()
 	{
 		$userLoginAttempsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS, 'Maximum login attemps:');
@@ -1061,8 +1059,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									 'login_block_period',
 									 'num_prev_pass_to_keep',
 									 'pass_replace_freq',
-									 'password_structure_validations',
-									 'password_structure_validations_description'),
+									 'password_structure_validations_edit'),
 									 $permissionNames[self::SECURITY_OPTIONS],
 									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));

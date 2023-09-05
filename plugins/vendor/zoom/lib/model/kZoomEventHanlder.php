@@ -250,7 +250,7 @@ class kZoomEventHanlder
 				{
 					KalturaLog::debug('No recording named: ' . $fileName);
 					if(!ZoomHelper::shouldHandleFileTypeEnum($recordingFile->recordingFileType) ||
-						($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT && $zoomVendorIntegration->getEnableZoomTranscription() === 0))
+						($recordingFile->recordingFileType == kRecordingFileType::TRANSCRIPT && $zoomVendorIntegration->getEnableZoomTranscription() == 0))
 					{
 						continue;
 					}
