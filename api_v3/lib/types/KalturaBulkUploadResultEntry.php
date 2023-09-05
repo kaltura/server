@@ -109,6 +109,11 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 	/**
 	 * @var string
 	 */
+	public $entitledUsersView;
+
+	/**
+	 * @var string
+	 */
 	public $ownerId;
 	
 	/**
@@ -145,6 +150,7 @@ class KalturaBulkUploadResultEntry extends KalturaBulkUploadResult
 		"creatorId",
 		"entitledUsersEdit",
 		"entitledUsersPublish",
+		"entitledUsersView",
 		"ownerId",
 		"referenceId",
 		"templateEntryId",
