@@ -136,6 +136,11 @@
 					<xs:documentation>Comma-separated list of entry's co-publishers</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element maxOccurs="1" minOccurs="0" ref="entitledUsersView">
+				<xs:annotation>
+					<xs:documentation>Comma-separated list of entry's co-viewers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element maxOccurs="1" minOccurs="0" name="name">
 				<xs:annotation>
 					<xs:documentation>The title of the entry</xs:documentation>
@@ -1515,6 +1520,25 @@ tK1yWx3LOnxokoJUtNRSdEi</privateKey>
 							<user>user1</user>
 							<user>user2</user>
 						</entitledUsersEdit>
+						<media>...</media>
+						<contentAssets>...</contentAssets>
+					</item>
+				</example>
+			</xs:appinfo>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name="entitledUsersView" type="T_entitledUsers">
+		<xs:annotation>
+			<xs:documentation>Co-viewers</xs:documentation>
+			<xs:appinfo>
+				<example title="XML Example: Entry tags">
+					<item>
+						<action>add</action>
+						<entitledUsersView>
+							<user>user1</user>
+							<user>user2</user>
+						</entitledUsersView>
 						<media>...</media>
 						<contentAssets>...</contentAssets>
 					</item>
