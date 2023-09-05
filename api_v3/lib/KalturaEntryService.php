@@ -1930,7 +1930,8 @@ class KalturaEntryService extends KalturaBaseService
 		foreach ($resources->getResources() as $resource)
 		{
 			/** @var kOperationResource $resource **/
-			$sourceEntryId = $resource->getResource()->getOriginEntryId();
+			$resourceObj = $resource->getResource();
+			$sourceEntryId = $resourceObj->getOriginEntryId();
 			$sourceEntryIds[] = $sourceEntryId;
 			$resource->setSourceEntryId($sourceEntryId);
 
@@ -1938,7 +1939,7 @@ class KalturaEntryService extends KalturaBaseService
 			$tempEntriesIds[] = $tempEntry->getId();
 			$tempEntries[] = $tempEntry;
 
-			$flavorAssetId = $resource->getResource()->getObjectId();
+			$flavorAssetId = $resourceObj->getObjectId();
 			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId);
 			if(!$mediaInfoObj)
 			{
