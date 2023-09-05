@@ -15,17 +15,17 @@ class corpActions extends sfActions
    */
   public function executeIndex()
   {
-	$this->redirect(kConf::get('corp_action_schema') . kConf::get('corp_action_redirect'), 301);
+	$this->redirect(kConf::get('corp_action_schema', 'local', 'http://') . kConf::get('corp_action_redirect'), 301);
   }
 
   public function executeError404()
   {
-	$this->redirect(kConf::get('corp_action_schema') . kConf::get('corp_action_redirect'), 301);
+	$this->redirect(kConf::get('corp_action_schema', 'local', 'http://') . kConf::get('corp_action_redirect'), 301);
   }
   
   public function executeTandc()
   {
-	$this->redirect(kConf::get('corp_action_schema') . kConf::get('corp_action_redirect')."/tandc", 301);
+	$this->redirect(kConf::get('corp_action_schema', 'local', 'http://') . kConf::get('corp_action_redirect')."/tandc", 301);
   }
 }
 
