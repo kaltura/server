@@ -285,7 +285,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 		myPartnerUtils::setPartnerIdForObj($this);
 		
-		if($this->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM)
+		if($this->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM && $this->getDisplayInSearch() != mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED)
 		{
 			mySearchUtils::setDisplayInSearch($this);
 		}
