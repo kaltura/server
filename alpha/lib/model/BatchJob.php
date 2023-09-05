@@ -456,6 +456,13 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		return array_merge($result1, $result2);
 	}
 
+	public function getChildJobsByTypes(array $types)
+	{
+		$c = new Criteria();
+		$c->addAnd($c->getNewCriterion(BatchJobPeer::JOB_TYPE, $types, Criteria::IN));
+		return $this->getChildJobs($c);
+	}
+
 	public function getOpenStatusChildJobs(Criteria $c = null)
 	{
 		$c = $c ? $c : new Criteria();

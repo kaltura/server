@@ -68,7 +68,7 @@ class kMultiClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string
+	 * @return int
 	 */
 	public function getPartnerId()
 	{
@@ -76,7 +76,7 @@ class kMultiClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @param string $partnerId
+	 * @param int $partnerId
 	 */
 	public function setPartnerId($partnerId)
 	{
@@ -84,7 +84,7 @@ class kMultiClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string
+	 * @return int
 	 */
 	public function getPriority()
 	{
@@ -92,7 +92,7 @@ class kMultiClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @param string $priority
+	 * @param int $priority
 	 */
 	public function setPriority($priority)
 	{

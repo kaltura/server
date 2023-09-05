@@ -37,7 +37,7 @@ class kClipConcatJobData extends kJobData
 	private $priority;
 
 	/**
-	 * @var array $operationAttributes
+	 * @var array
 	 */
 	private $operationAttributes;
 
@@ -50,6 +50,11 @@ class kClipConcatJobData extends kJobData
 	 * @var int
 	 */
 	private $resourceOrder;
+
+	/**
+	 * @var string
+	 */
+	private $conversionParams;
 
 	public function __construct($importUrl = null)
 	{
@@ -129,7 +134,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string
+	 * @return int
 	 */
 	public function getPartnerId()
 	{
@@ -137,7 +142,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @param string $partnerId
+	 * @param int $partnerId
 	 */
 	public function setPartnerId($partnerId)
 	{
@@ -145,7 +150,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @return string
+	 * @return int
 	 */
 	public function getPriority()
 	{
@@ -153,7 +158,7 @@ class kClipConcatJobData extends kJobData
 	}
 
 	/**
-	 * @param string $priority
+	 * @param int $priority
 	 */
 	public function setPriority($priority)
 	{
@@ -176,11 +181,17 @@ class kClipConcatJobData extends kJobData
 		$this->operationAttributes = $operationAttributes;
 	}
 
+	/**
+	 * @param bool $isNeeded
+	 */
 	public function setImportNeeded($isNeeded)
 	{
 		$this->importNeeded = $isNeeded;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function getImportNeeded()
 	{
 		return $this->importNeeded;
@@ -200,6 +211,22 @@ class kClipConcatJobData extends kJobData
 	public function setResourceOrder($resourceOrder)
 	{
 		$this->resourceOrder = $resourceOrder;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getConversionParams()
+	{
+		return $this->conversionParams;
+	}
+
+	/**
+	 * @param string $conversionParams
+	 */
+	public function setConversionParams($conversionParams)
+	{
+		$this->conversionParams = $conversionParams;
 	}
 
 }

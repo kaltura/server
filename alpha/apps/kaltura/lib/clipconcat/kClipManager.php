@@ -7,6 +7,9 @@
 class kClipManager implements kBatchJobStatusEventConsumer
 {
 	const CLIP_NUMBER = 'clipNumber';
+	const HEIGHT = 'height';
+	const WIDTH = 'width';
+	const FRAME_RATE = 'frameRate';
 	const LOCK_EXPIRY = 10;
 
 	/**
@@ -16,9 +19,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param string $importUrl
 	 * @param int $rootJobId
 	 * @param int $resourceOrder
-	 * @param bool $fillDest
+	 * @param string $conversionParams
 	 */
-	public function createClipConcatJobFromResource($resource, $destEntry, $clipEntry, $importUrl = null, $rootJobId = null, $resourceOrder = null, $fillDest = true)
+	public function createClipConcatJobFromResource($resource, $destEntry, $clipEntry, $importUrl = null,
+													$rootJobId = null, $resourceOrder = null, $conversionParams = null)
 	{
 		$partnerId = $clipEntry->getPartnerId();
 		$clipEntryId = $clipEntry->getId();
@@ -51,7 +55,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData->setDestEntryId($destEntry->getId());
 		$jobData->setTempEntryId($clipEntryId);
 
-		if($fillDest)
+		if(!$rootJobId)
 		{
 			//if it is replace(Trim flow) active the copy to destination consumers
 			$this->fillDestEntry($destEntry, $sourceEntryId, $operationAttributes);
@@ -61,6 +65,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData->setPartnerId($partnerId);
 		$jobData->setPriority(0);
 		$jobData->setOperationAttributes($operationAttributes);
+		$jobData->setConversionParams($conversionParams);
 		kJobsManager::addJob($parentJob, $jobData, BatchJobType::CLIP_CONCAT);
 	}
 
@@ -101,28 +106,34 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$rootJob = $this->getAncestorJob($batchJob);
 			if ($batchJob->getJobType() == BatchJobType::CLIP_CONCAT)
 			{
-				$this->handleClipConcatParentJob($batchJob);
+				$this->handleClipConcatParentJob($batchJob, $rootJob);
+			}
+			elseif($batchJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT)
+			{
+				$this->handleMultiClipConcatJob($batchJob);
 			}
 			elseif ($this->isImportFinished($batchJob))
 			{
-				$this->handleImportFinished($batchJob->getParentJob());
+				$this->handleImportFinished($batchJob->getParentJob(), $rootJob);
 			}
 			elseif ($this->isImportFailed($batchJob))
 			{
-				//When import fails the concat job would have been stuck in queue, in this case we need to fail the concat job as well
-				$this->handleImportFailed($batchJob);
+				//When import fails the concat job would have been stuck in queue,
+				// in this case we need to fail the concat job
+				// and fail the multi clip job in case of multi clip flow
+				$this->handleImportFailed($batchJob, $rootJob);
 			}
-			elseif($this->shouldStartMultiResourceConcat($batchJob))
+			elseif($this->shouldStartMultiResourceConcat($batchJob, $rootJob))
 			{
 				$this->startMultiResourceConcat($rootJob);
 			}
-			elseif ($this->shouldStartSingleResourceConcat($batchJob))
+			elseif ($this->shouldStartSingleResourceConcat($batchJob, $rootJob))
 			{
 				$this->startSingleResourceConcat($rootJob);
 			}
-			elseif($this->isConcatFinished($batchJob))
+			elseif($this->isConcatFinished($batchJob, $rootJob))
 			{
-				$this->concatDone($batchJob);
+				$this->concatDone($rootJob);
 			}
 		}
 		catch (Exception $ex)
@@ -152,43 +163,47 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return 	$batchJob->getJobType() == BatchJobType::IMPORT && in_array($batchJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL, BatchJob::BATCHJOB_STATUS_ABORTED));
 	}
 	
-	protected function shouldStartSingleResourceConcat(BatchJob $batchJob)
+	protected function shouldStartSingleResourceConcat(BatchJob $batchJob, $rootJob)
 	{
-		$root = $this->getAncestorJob($batchJob);
-		if($root && $root->getJobType() != BatchJobType::CLIP_CONCAT)
+		if($rootJob && $rootJob->getJobType() != BatchJobType::CLIP_CONCAT)
 		{
 			return false;
 		}
 		if($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT)
 		{
-			return !$this->concatJobExist($root);
+			return !$this->concatJobExist($rootJob);
 		}
 		return false;
 	}
 	
-	protected function isConcatFinished(BatchJob $batchJob)
+	protected function isConcatFinished(BatchJob $batchJob, $rootJob)
 	{
-		return 	$batchJob->getParentJob() &&
-				$batchJob->getParentJob()->getJobType() == BatchJobType::CONCAT;
+		if(!$batchJob->getParentJob() || $batchJob->getParentJob()->getJobType() != BatchJobType::CONCAT)
+		{
+			return false;
+		}
+		if($rootJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT && !$this->isClipConcatChildrenFinished($rootJob))
+		{
+			return false;
+		}
+		return true;
 	}
 	
 	protected function isConcatOfAllChildrenDone(BatchJob $batchJob)
 	{
-		foreach ($batchJob->getChildJobs() as $job)
+		$childJobs = $batchJob->getChildJobsByTypes(array(BatchJobType::CONVERT, BatchJobType::CONCAT, BatchJobType::POSTCONVERT));
+		foreach ($childJobs as $job)
 		{
-			if(in_array($job->getJobType(), array(BatchJobType::CONVERT, BatchJobType::CONCAT, BatchJobType::POSTCONVERT)))
+			/** @var BatchJob $job */
+			$jobId = $job->getId();
+			$jobStatus = $job->getStatus();
+			$jobType = $job->getJobType();
+			KalturaLog::info("Child job id [$jobId] status [$jobStatus] type [$jobType]");
+			if($jobStatus != BatchJob::BATCHJOB_STATUS_FINISHED)
 			{
-				/** @var BatchJob $job */
-				$jobId = $job->getId();
-				$jobStatus = $job->getStatus();
-				$jobType = $job->getJobType();
-				KalturaLog::info("Child job id [$jobId] status [$jobStatus] type [$jobType]");
-				if($jobStatus != BatchJob::BATCHJOB_STATUS_FINISHED)
+				if (!$this->hasGrandChildFinished($job))
 				{
-					if (!$this->hasGrandChildFinished($job))
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 		}
@@ -224,40 +239,44 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return false;
 	}
 	
-	protected function getAllConcatJobsFlavors(BatchJob  $batchJob)
+	protected function getAllConcatJobsFlavors(BatchJob $rootJob)
 	{
-		$root = $batchJob->getRootJob();
 		$flavors = array();
-		foreach ($root->getChildJobs() as $job)
+		$concatJobs = $rootJob->getChildJobsByTypes(array(BatchJobType::CONCAT));
+		foreach ($concatJobs as $concatJob)
 		{
-			/** @var BatchJob $job */
-			if ($job->getJobType() == BatchJobType::CONCAT)
-			{
-				$flavors[] = assetPeer::retrieveById($job->getData()->getFlavorAssetId());
-			}
+			$flavors[] = assetPeer::retrieveById($concatJob->getData()->getFlavorAssetId());
 		}
 		return $flavors;
 	}
 
-	protected function handleImportFinished($batchJob)
+	protected function handleImportFinished($batchJob, $rootJob)
 	{
 		/**@var kClipConcatJobData $jobData */
 		$jobData = $batchJob->getData();
 		$jobData->setImportNeeded(false);
 		$batchJob->setData($jobData);
-		kEventsManager::raiseEventDeferred(new kBatchJobStatusEvent($batchJob));
+		$batchJob->save(); //TODO check if needed
+		if($rootJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT)
+		{
+			kEventsManager::raiseEventDeferred(new kBatchJobStatusEvent($rootJob));
+		}
+		else
+		{
+			kEventsManager::raiseEventDeferred(new kBatchJobStatusEvent($batchJob));
+		}
 	}
 	
-	protected function handleImportFailed(BatchJob $batchJob)
+	protected function handleImportFailed(BatchJob $batchJob, $rootJob)
 	{
 		$parentJob = $batchJob->getParentJob();
 		$parentJob->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
 		$parentJob->setMessage("Failed to import source file for clipping ");
 		$parentJob->save();
 
-		$rootJob = $batchJob->getRootJob();
-		if($rootJob->getId() != $parentJob->getId())
+		if($rootJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT)
 		{
+			// TODO handle rest of clip concat jobs
 			$rootJob->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
 			$rootJob->setMessage("Failed to import source file for clipping for entry Id [" . $batchJob->getEntryId() ."]");
 			$rootJob->save();
@@ -270,12 +289,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	public function shouldConsumeJobStatusEvent(BatchJob $batchJob)
 	{
-		if($batchJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT)
-		{
-			return false;
-		}
-
-		if ($batchJob->getJobType() == BatchJobType::CLIP_CONCAT)
+		if (in_array($batchJob->getJobType(), array(BatchJobType::CLIP_CONCAT, BatchJobType::MULTI_CLIP_CONCAT)))
 		{
 			return true;
 		}
@@ -309,12 +323,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param entry $destEntry
 	 * @param entry $clipEntry
 	 * @param string $importUrl
-	 * @param string $rootJobId
-	 * @param bool $fillDest
+	 * @param int $rootJobId
+	 * @param int $order
+	 * @param string $conversionParams
 	 */
-	public function startClipConcatBatchJob($resource, $destEntry, $clipEntry, $importUrl = null, $rootJobId = null, $order = null, $fillDest = false)
+	public function startClipConcatBatchJob($resource, $destEntry, $clipEntry, $importUrl, $rootJobId, $order, $conversionParams)
 	{
-		$this->createClipConcatJobFromResource($resource, $destEntry , $clipEntry, $importUrl, $rootJobId, $order, $fillDest);
+		$this->createClipConcatJobFromResource($resource, $destEntry , $clipEntry, $importUrl, $rootJobId, $order, $conversionParams);
 	}
 
 	/**
@@ -361,14 +376,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param string $originalConversionEnginesExtraParams
 	 * @param string $encryptionKey
 	 * @param bool $isAudio
+	 * @param array $conversionParams
 	 * @return int
 	 * @throws kCoreException
 	 */
-	private function cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey = null, $isAudio = false)
+	protected function cloneFlavorParamForAsset($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey = null, $isAudio = false, $conversionParams = null)
 	{
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
-		$this->fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams, $isAudio);
+		$this->fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams, $isAudio, $conversionParams);
 		if ($encryptionKey)
 		{
 			$flavorParamsObj->setIsEncrypted(true);
@@ -381,7 +397,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param string $entryId
 	 * @return flavorAsset
 	 */
-	private function setDummyOriginalFlavorAssetReady($entryId)
+	protected function setDummyOriginalFlavorAssetReady($entryId)
 	{
 		$flavorAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		//set Dummy Ready we will update it later
@@ -397,7 +413,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param int $order
 	 * @return flavorAsset
 	 */
-	private function createTempClipFlavorAsset($partnerId, $entryId, $flavorParamId, $order)
+	protected function createTempClipFlavorAsset($partnerId, $entryId, $flavorParamId, $order)
 	{
 		$entry = entryPeer::retrieveByPK($entryId);
 		if(!$entry)
@@ -424,7 +440,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param BatchJob $batchJob
 	 * @throws Exception
 	 */
-	private function startSingleResourceConcat($batchJob)
+	protected function startSingleResourceConcat($batchJob)
 	{
 		KalturaLog::info('Going To Start Concat Job');
 		if($batchJob->getJobType() != BatchJobType::CLIP_CONCAT)
@@ -451,7 +467,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$files = $this->getFilesPath($assets);
 		foreach ($files as $assetId => $relatedFiles)
 		{
-			$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $assetId);
+			$asset = assetPeer::retrieveById($assetId);
+			$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $asset->getFlavorParamsId());
 			
 			//calling addConcatJob only if lock succeeds
 			$store = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
@@ -468,7 +485,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $b flavorAsset
 	 * @return int
 	 */
-	private function cmpByClipOrder($a, $b)
+	protected function cmpByClipOrder($a, $b)
 	{
 		$aClipNumber = $a->getFromCustomData(self::CLIP_NUMBER);
 		$bClipNumber = $b->getFromCustomData(self::CLIP_NUMBER);
@@ -480,7 +497,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $b BatchJob
 	 * @return int
 	 */
-	private function cmpByResourceOrder($a, $b)
+	protected function cmpByResourceOrder($a, $b)
 	{
 		$aData = $a->getData();
 		$bData = $b->getData();
@@ -499,7 +516,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $b int
 	 * @return int
 	 */
-	private function cmpInt($a, $b)
+	protected function cmpInt($a, $b)
 	{
 		if (!$a)
 		{
@@ -518,7 +535,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws APIException
 	 * @throws kCoreException
 	 */
-	private function handleClipConcatParentJob($batchJob)
+	protected function handleClipConcatParentJob($batchJob, $rootJob)
 	{
 		switch ($batchJob->getStatus())
 		{
@@ -535,7 +552,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					KalturaLog::info("Adding import job in clip manager for temp entry " . $jobData->getTempEntryId() . " to url: " . $jobData->getImportUrl());
 					kJobsManager::addImportJob($batchJob, $jobData->getTempEntryId(), $jobData->getPartnerId(), $jobData->getImportUrl(), null, null, null, true);
 				}
-				else
+				elseif ($rootJob->getJobType() != BatchJobType::MULTI_CLIP_CONCAT)
 				{
 					$this->addClipJobsFromBatchJob($batchJob, $jobData);
 				}
@@ -544,7 +561,140 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				break;
 		}
 	}
-	
+
+	/***
+	 * @param BatchJob $batchJob
+	 */
+	protected function handleMultiClipConcatJob($batchJob)
+	{
+		switch ($batchJob->getStatus())
+		{
+			case BatchJob::BATCHJOB_STATUS_ALMOST_DONE:
+				$clipConcatJobs = $batchJob->getChildJobsByTypes(array(BatchJobType::CLIP_CONCAT));
+				if($this->shouldAddClipJobsForMultiClip($clipConcatJobs))
+				{
+					$this->addClipJobsForChildren($clipConcatJobs);
+				}
+				break;
+			default:
+				break;
+		}
+	}
+
+	protected function addClipJobsForChildren($batchJobs)
+	{
+		foreach ($batchJobs as $batchJob)
+		{
+			/** @var $jobData kClipConcatJobData */
+			$jobData = $batchJob->getData();
+			$this->addClipJobsFromBatchJob($batchJob, $jobData);
+		}
+	}
+
+	protected function clipJobsAdded($batchJob)
+	{
+		$convertChildJobs = $batchJob->getChildJobsByTypes(array(BatchJobType::CONVERT));
+		return count($convertChildJobs) > 0;
+	}
+
+	protected function shouldAddClipJobsForMultiClip($batchJobs)
+	{
+		foreach ($batchJobs as $batchJob)
+		{
+			$childJobData = $batchJob->getData();
+			if ($childJobData->getImportNeeded() || $this->clipJobsAdded($batchJob))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @throws APIException
+	 */
+	public function getCalculatedConversionParams($mediaInfoObjs)
+	{
+		$conversionParamsArray = array();
+		$frameRate = 0;
+		$height = 0;
+		$width = 0;
+		$aspectRatios = array();
+		foreach ($mediaInfoObjs as $mediaInfoObj)
+		{
+			/** @var $mediaInfoObj mediaInfo*/
+			$frameRate = max($frameRate, $mediaInfoObj->getVideoFrameRate());
+			$currentWidth = $mediaInfoObj->getVideoWidth();
+			$currentHeight = $mediaInfoObj->getVideoHeight();
+			if($height * $width == 0)
+			{
+				$width = $currentWidth;
+				$height = $currentHeight;
+			}
+			$width = min($currentWidth, $width);
+			$height = min($currentHeight, $height);
+			$aspectRatios[] = $currentWidth/$currentHeight;
+		}
+
+		$this->decideMultiClipResolution($aspectRatios, $width, $height);
+		$conversionParams = json_encode(array(
+			self::WIDTH => $width,
+			self::HEIGHT => $height,
+			self::FRAME_RATE => $frameRate
+		));
+
+		foreach ($mediaInfoObjs as $mediaInfoObj)
+		{
+			if($mediaInfoObj->getVideoWidth() == $width && $mediaInfoObj->getVideoHeight() == $height)
+			{
+				$conversionParamsArray[] = json_encode(array(self::FRAME_RATE => $frameRate));
+			}
+			else
+			{
+				$conversionParamsArray[] = $conversionParams;
+			}
+		}
+
+		return $conversionParamsArray;
+	}
+
+	/**
+	 * @throws APIException
+	 */
+	protected function decideMultiClipResolution($aspectRatios, &$width, &$height)
+	{
+		$aspectRatio = $this->decideAspectRatio($aspectRatios);
+
+		if($height * $aspectRatio >= $width)
+		{
+			$width = $height * $aspectRatio;
+		}
+		else
+		{
+			$height = $width * (1/$aspectRatio);
+		}
+	}
+
+	/**
+	 * @throws APIException
+	 */
+	protected function decideAspectRatio($inputARs)
+	{
+		$maxARDiff = 0.2;
+		$avgAR = array_sum($inputARs)/count($inputARs);
+		foreach ($inputARs as $inputAR)
+		{
+			if(abs($inputAR - $avgAR) > $maxARDiff)
+			{
+				throw new APIException(KalturaErrors::INCOMPATIBLE_RESOURCES_DIMENSIONS);
+			}
+		}
+		$standardARs = array(4/3,5/4,5/3,16/9,16/8,16/10,2.4,2.39,2.35,1.85);
+		$standardARDiff = array_map(function ($standardAR) use ($avgAR) {return abs($standardAR - $avgAR);}, $standardARs);
+		$minDiffInd = array_keys($standardARDiff, min($standardARDiff))[0];
+		return $standardARs[$minDiffInd];
+	}
+
 	/**
 	 * @param $batchJob
 	 * @param $jobData
@@ -558,27 +708,21 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$rootJob = $batchJob->getRootJob();
 		$flavorAssetsToBeProcessed = array();
 		$audioAssets = array();
-
-		// audio clipping is not supported for multi clip flow
 		if(!$rootJob || $rootJob->getJobType() != BatchJobType::MULTI_CLIP_CONCAT)
 		{
+			// audio clipping is not supported for multi clip concat flow
 			$audioAssets = assetPeer::retrieveAudioFlavorsByEntryID($jobData->getSourceEntryId(), array(asset::ASSET_STATUS_READY));
 			$flavorAssetsToBeProcessed = $audioAssets;
 		}
-
 		$flavorAssetsToBeProcessed[] = assetPeer::retrieveOriginalByEntryId($jobData->getTempEntryId());
 		foreach($flavorAssetsToBeProcessed as $asset)
 		{
 			/** @var flavorAsset $asset */
 			//start child clip jobs
-			$isAudio = false;
-			if (in_array($asset, $audioAssets))
-			{
-				$isAudio = true;
-			}
+			$isAudio = in_array($asset, $audioAssets);
 			$errDesc = '';
 			$this->addClipJobs($batchJob, $jobData->getTempEntryId(), $errDesc, $jobData->getPartnerId(),
-								 $jobData->getOperationAttributes(), $asset->getId(), kConvertJobData::TRIMMING_FLAVOR_PRIORITY, $isAudio);
+								 $jobData->getOperationAttributes(), $asset, $isAudio);
 		}
 		kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 	}
@@ -589,44 +733,46 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $errDescription
 	 * @param $partnerId
 	 * @param array $operationAttributes
-	 * @param string $assetId
-	 * @param int $priority
+	 * @param flavorAsset $asset
 	 * @param bool $isAudio
 	 * @return BatchJob[]
 	 * @throws APIException
 	 * @throws kCoreException
 	 */
-	private function addClipJobs($parentJob , $entryId, &$errDescription, $partnerId,
-								 array $operationAttributes, $assetId, $priority = 0, $isAudio = false)
+	protected function addClipJobs($parentJob , $entryId, &$errDescription, $partnerId, array $operationAttributes, $asset, $isAudio = false)
 	{
 		$batchArray = array();
 		$order = 0;
 		$originalConversionEnginesExtraParams =
 			assetParamsPeer::retrieveByPK(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID)->getConversionEnginesExtraParams();
 		
-		$injectedFlavorAsset = assetPeer::retrieveById($assetId);
 		$encryptionKey = null;
-		if ($injectedFlavorAsset)
+		if ($asset)
 		{
-			$encryptionKey = $injectedFlavorAsset->getEncryptionKey();
+			$encryptionKey = $asset->getEncryptionKey();
 		}
+
+		$conversionParams = $parentJob->getData()->getConversionParams();
+		$conversionParams = $conversionParams ? json_decode($conversionParams, true) : null;
 
 		/* @var $singleAttribute kClipAttributes */
 		foreach($operationAttributes as $singleAttribute)
 		{
-			KalturaLog::info("Going To create Flavor for clip: " . print_r($singleAttribute, true));
-			if($singleAttribute->getDuration()<=0)
+			KalturaLog::info("Going To create Flavor for entry Id [$entryId] for clip: " . print_r($singleAttribute, true));
+			if($singleAttribute->getDuration() <= 0)
 			{
 				KalturaLog::info("Ignoring clip attribute with non-positive duration");
 				continue;
 			}
 
-			$clonedID =	$this->cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey, $isAudio);
-			$flavorAsst = $this->createTempClipFlavorAsset($partnerId,$entryId,$clonedID,$order);
-			$flavorAsst->setActualSourceAssetParamsIds($assetId);
+			$clonedID = $this->cloneFlavorParamForAsset($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey, $isAudio, $conversionParams);
+			$flavorAsset = $this->createTempClipFlavorAsset($partnerId, $entryId, $clonedID, $order);
+			$flavorAsset->setActualSourceAssetParamsIds($asset->getId());
+
 			$batchJob =	kBusinessPreConvertDL::decideAddEntryFlavor($parentJob, $entryId,
-					$clonedID, $errDescription,$flavorAsst->getId()
-					, array($singleAttribute) , $priority, $injectedFlavorAsset);
+					$clonedID, $errDescription, $flavorAsset->getId(),
+					array($singleAttribute), kConvertJobData::TRIMMING_FLAVOR_PRIORITY, $asset);
+
 			if(!$batchJob)
 			{
 				throw new APIException(KalturaErrors::CANNOT_CREATE_CLIP_FLAVOR_JOB, $parentJob->getJobType(), $parentJob->getId());
@@ -642,7 +788,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param BatchJob $batchJob
 	 * @return bool are all clip batch done
 	 */
-	private function areAllClipJobsDone($batchJob)
+	protected function areAllClipJobsDone($batchJob)
 	{
 		$c = new Criteria();
 		$c->add(BatchJobPeer::JOB_TYPE,array(BatchJobType::CONVERT,BatchJobType::CONCAT),Criteria::IN);
@@ -672,7 +818,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 * @throws Exception
 	 */
-	private function getFilesPath($assets)
+	protected function getFilesPath($assets)
 	{
 		$files = array();
 		foreach ($assets as $asset) {
@@ -703,10 +849,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	/**
 	 * @param entry $tempEntry
+	 * @param int $flavorParamsId
 	 * @return flavorAsset
 	 * @throws kCoreException
 	 */
-	private function addNewAssetToTargetEntry($tempEntry, $assetId)
+	protected function addNewAssetToTargetEntry($tempEntry, $flavorParamsId)
 	{
 
 		/** @var flavorAsset $flavorAsset */
@@ -715,15 +862,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorAsset->setPartnerId($tempEntry->getPartnerId());
 		$flavorAsset->setEntryId($tempEntry->getId());
 		$flavorAsset->setStatus(asset::ASSET_STATUS_QUEUED);
-		$asset = assetPeer::retrieveById($assetId);
-		if ($asset->getFlavorParamsId() != kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID)
-		{
-			$flavorAsset->setFlavorParamsId($asset->getFlavorParamsId());
-		}
-		else
-		{
-			$flavorAsset->setFlavorParamsId(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
-		}
+		$flavorAsset->setFlavorParamsId($flavorParamsId);
 		$flavorAsset->setIsOriginal(false);
 		/*
 		 * TODO - AWS - Handle shared concat flow
@@ -765,7 +904,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 */
-	private function addDestinationEntryAsset($entryId, $concatAsset)
+	protected function addDestinationEntryAsset($entryId, $concatAsset)
 	{
 		$concatSyncKey = $concatAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		$dbAsset = assetPeer::retrieveOriginalByEntryId($entryId);
@@ -800,24 +939,17 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 */
-	private function concatDone(BatchJob $batchJob)
+	protected function concatDone(BatchJob $rootJob)
 	{
-		$rootJob = $batchJob->getRootJob();
-
 		/** @var $clipConcatJobData kMultiClipConcatJobData|kClipConcatJobData */
 		$clipConcatJobData = $rootJob->getData();
 
 		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 
-		if($rootJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT && !$this->isClipConcatChildrenFinished($rootJob))
-		{
-			return;
-		}
-
 		if ($this->isConcatOfAllChildrenDone($rootJob))
 		{
 			$destinationEntry = $clipConcatJobData->getDestEntryId();
-			$listOfFlavorAssets = $this->getAllConcatJobsFlavors($batchJob);
+			$listOfFlavorAssets = $this->getAllConcatJobsFlavors($rootJob);
 			//collect all assets from temp entry and add them to the dest entry
 			foreach ($listOfFlavorAssets as $flavorAsset)
 			{
@@ -837,12 +969,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	/**
 	 * @param BatchJob $batchJob
+	 * @param BatchJob $rootJob
 	 * @return bool
 	 */
-	private function shouldStartMultiResourceConcat($batchJob)
+	protected function shouldStartMultiResourceConcat($batchJob, $rootJob)
 	{
-		$rootJob = $this->getAncestorJob($batchJob);
-		if($rootJob->getJobType() != BatchJobType::MULTI_CLIP_CONCAT)
+		if($rootJob && $rootJob->getJobType() != BatchJobType::MULTI_CLIP_CONCAT)
 		{
 			return false;
 		}
@@ -856,26 +988,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	/**
 	 * @param BatchJob $batchJob
 	 * @throws kCoreException
+	 * @throws KalturaAPIException
 	 */
-	private function startMultiResourceConcat(BatchJob $batchJob)
+	protected function startMultiResourceConcat(BatchJob $batchJob)
 	{
-		if($batchJob->getJobType() != BatchJobType::MULTI_CLIP_CONCAT)
-		{
-			return;
-		}
-
-//		$assetId = null; //TODO: add one asset for concatenated output
-		$tempEntry = entryPeer::retrieveByPK($batchJob->getData()->getMultiTempEntryId());
-//		$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $assetId);
-		$outAssetId = null;
-
-		$batchJobs = array_filter($batchJob->getChildJobs(), function ($job) {return $job->getJobType() == BatchJobType::CLIP_CONCAT;});
+		$batchJobs = $batchJob->getChildJobsByTypes(array(BatchJobType::CLIP_CONCAT));
 		usort($batchJobs, array("kClipManager", "cmpByResourceOrder"));
 
+		$lastAssetId = null;
 		$allRelatedFiles = array();
 		foreach ($batchJobs as $childJob)
 		{
-			KalturaLog::debug('Going To Start Multi Concat Job');
+			KalturaLog::debug('Going To Start Concat Job for Multi Clip Concat');
 			kJobsManager::updateBatchJob($childJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 
 			/** @var kClipConcatJobData $jobData */
@@ -888,17 +1012,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			foreach ($files as $assetId => $relatedFiles)
 			{
 				/** @var array $relatedFiles */
-				KalturaLog::debug("Related file : " . print_r($relatedFiles, true));
-				//TODO remove from here
-				$outAssetId = $assetId;
 				$allRelatedFiles = array_merge($allRelatedFiles, $relatedFiles);
+				KalturaLog::debug("Asset Id: [$assetId], Related file : " . print_r($relatedFiles, true));
+				// assume concatenated assets have the same actualFlavorParamsId and take the last
+				$lastAssetId = $assetId;
 			}
 			$this->deleteEntry($jobData->getTempEntryId());
 		}
-		$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $outAssetId);
+		// use no filter because we delete the entry
+		$asset = assetPeer::retrieveByIdNoFilter($lastAssetId);
+		$tempEntry = entryPeer::retrieveByPK($batchJob->getData()->getMultiTempEntryId());
+		$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $asset->getFlavorParamsId());
 
-		// TODO check if needed to set version
-//		$flavorAsset->setVersion(0);
 		//calling addConcatJob only if lock succeeds
 		$store = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		$lockKey = 'kclipManager_add_concat_job' . $batchJob->getId() . $flavorAsset->getId();
@@ -914,7 +1039,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws Exception
 	 * @throws KalturaAPIException
 	 */
-	private function deleteEntry($entryId, $entryType = null)
+	protected function deleteEntry($entryId, $entryType = null)
 	{
 		$entryToDelete = entryPeer::retrieveByPK($entryId);
 
@@ -928,7 +1053,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param asset $dbAsset
 	 * @throws PropelException
 	 */
-	private function updateMediaFlowOnAsset($dbAsset)
+	protected function updateMediaFlowOnAsset($dbAsset)
 	{
 		$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($dbAsset->getId());
 		if ($mediaInfo) {
@@ -942,7 +1067,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param asset $dbAsset
 	 * @param entry $dbEntry
 	 */
-	private function syncFlavorParamToAsset($dbAsset, $dbEntry)
+	protected function syncFlavorParamToAsset($dbAsset, $dbEntry)
 	{
 		if ($dbAsset->getStatus() == asset::ASSET_STATUS_READY) {
 			$dbEntry->syncFlavorParamsIds();
@@ -954,7 +1079,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param string $entryId
 	 * @param entry $dbEntry
 	 */
-	private function updateAssetFailedToConvert($entryId, $dbEntry)
+	protected function updateAssetFailedToConvert($entryId, $dbEntry)
 	{
 		KalturaLog::err("Flavor asset not created for entry [" . $entryId . "]");
 
@@ -971,7 +1096,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $dbEntry
 	 * @throws PropelException
 	 */
-	private function updateAssetState($concatSyncKey, $dbAsset, $isNewAsset, $dbEntry)
+	protected function updateAssetState($concatSyncKey, $dbAsset, $isNewAsset, $dbEntry)
 	{
 		$newSyncKey = $dbAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::createSyncFileLinkForKey($newSyncKey, $concatSyncKey);
@@ -990,7 +1115,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param $sourceEntryId
 	 * @param array $operationAttributes
 	 */
-	private function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes)
+	protected function fillDestEntry($destEntry, $sourceEntryId, array $operationAttributes)
 	{
 		if ($destEntry->getIsTemporary())
 			$destEntry->setFlowType(EntryFlowType::TRIM_CONCAT);
@@ -1009,7 +1134,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param bool $isAudio
 	 * @return string
 	 */
-	private function editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParamsArray = array(), $isAudio = false)
+	protected function editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParamsArray = array(), $isAudio = false)
 	{
 		$newConversionExtraParams = array();
 		for ($i = 0; $i < count($conversionEngines) ; $i++)
@@ -1029,25 +1154,40 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param kClipAttributes $singleAttribute
 	 * @param string $originalConversionEnginesExtraParams
 	 * @param bool $isAudio
+	 * @param array $conversionParams
 	 */
-	private function fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams, $isAudio)
+	protected function fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams, $isAudio, $conversionParams = null)
 	{
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
 		if (is_null($originalConversionEnginesExtraParams))
+		{
 			$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, null, $isAudio);
-		else {
+		}
+		else
+		{
 			$conversionExtraParams = explode('|', $originalConversionEnginesExtraParams);
 			$newExtraConversionParams =
 				$this->editConversionEngineExtraParam($conversionEngines, $singleAttribute,$conversionExtraParams,$isAudio);
 		}
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
+		if($conversionParams && $flavorParamsObj instanceof flavorParams)
+		{
+			$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
+			if(isset($conversionParams[self::WIDTH]) && isset($conversionParams[self::HEIGHT]))
+			{
+				$flavorParamsObj->setWidth($conversionParams[self::WIDTH]);
+				$flavorParamsObj->setHeight($conversionParams[self::HEIGHT]);
+				$flavorParamsObj->setAspectRatioProcessingMode(2);
+				$flavorParamsObj->setIsAvoidVideoShrinkFramesizeToSource(1);
+			}
+		}
 	}
 
 	/**
 	 * @param kClipAttributes $singleAttribute
 	 * @return string
 	 */
-	private function addEffects($singleAttribute)
+	protected function addEffects($singleAttribute)
 	{
 		$effects = new kEffectsManager();
 		return $effects->getFFMPEGEffects($singleAttribute);
@@ -1057,18 +1197,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param BatchJob $rootJob
 	 * @return bool
 	 */
-	private function concatJobExist($rootJob)
+	protected function concatJobExist($rootJob)
 	{
 		if (!$rootJob)
-			return false;
-
-		/** @var BatchJob $job */
-		foreach ($rootJob->getChildJobs() as $job)
 		{
-			if ($job->getJobType() == BatchJobType::CONCAT)
-				return true;
+			return false;
 		}
-		return false;
+		$concatJobs = $rootJob->getChildJobsByTypes(array(BatchJobType::CONCAT));
+		return count($concatJobs) > 0;
 	}
 	
 }

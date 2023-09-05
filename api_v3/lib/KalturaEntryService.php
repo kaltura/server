@@ -1886,10 +1886,10 @@ class KalturaEntryService extends KalturaBaseService
 	 * @param entry $clipEntry
 	 * @param int $rootJobId
 	 * @param int $order
-	 * @param bool $fillDest
+	 * @param string $conversionParams
 	 * @throws KalturaAPIException
 	 */
-	protected function handleMultiClipRequest($resource, $destEntry, $clipManager, $clipEntry = null, $rootJobId = null, $order = null, $fillDest = true)
+	protected function handleMultiClipRequest($resource, $destEntry, $clipManager, $clipEntry = null, $rootJobId = null, $order = null, $conversionParams = null)
 	{
 		KalturaLog::info("clipping service detected start to create sub flavors;");
 		if(!$clipEntry)
@@ -1906,7 +1906,7 @@ class KalturaEntryService extends KalturaBaseService
 			$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 			$this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
 		}
-		$clipManager->startClipConcatBatchJob($resource, $destEntry, $clipEntry , $url, $rootJobId, $order, $fillDest);
+		$clipManager->startClipConcatBatchJob($resource, $destEntry, $clipEntry, $url, $rootJobId, $order, $conversionParams);
 	}
 
 
@@ -1924,26 +1924,37 @@ class KalturaEntryService extends KalturaBaseService
 		$tempEntries = array();
 		$tempEntriesIds = array();
 		$sourceEntryIds = array();
+		$mediaInfoObjs = array();
 
-		//for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip
+		// for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip
 		foreach ($resources->getResources() as $resource)
 		{
 			/** @var kOperationResource $resource **/
 			$sourceEntryId = $resource->getResource()->getOriginEntryId();
 			$sourceEntryIds[] = $sourceEntryId;
 			$resource->setSourceEntryId($sourceEntryId);
+
 			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
 			$tempEntriesIds[] = $tempEntry->getId();
 			$tempEntries[] = $tempEntry;
+
+			$flavorAssetId = $resource->getResource()->getObjectId();
+			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId);
+			if(!$mediaInfoObj)
+			{
+				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $flavorAssetId);
+			}
+			$mediaInfoObjs[] = $mediaInfoObj;
 		}
 
+		$conversionParamsArray = $clipManager->getCalculatedConversionParams($mediaInfoObjs);
 		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
 		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $multiTempEntry->getId(), $tempEntriesIds, $destEntry->getId());
 
 		$rootJob = $clipManager->startMultiClipConcatBatchJob($resources, $destEntry, $multiTempEntry);
 		foreach ($resources->getResources() as $key => $resource)
 		{
-			$this->handleMultiClipRequest($resource, $destEntry, $clipManager, $tempEntries[$key], $rootJob->getId(), $key, false);
+			$this->handleMultiClipRequest($resource, $destEntry, $clipManager, $tempEntries[$key], $rootJob->getId(), $key, $conversionParamsArray[$key]);
 		}
 		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 	}
