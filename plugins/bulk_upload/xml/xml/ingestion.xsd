@@ -1494,7 +1494,7 @@ tK1yWx3LOnxokoJUtNRSdEi</privateKey>
 		<xs:annotation>
 			<xs:documentation>Co-editors</xs:documentation>
 			<xs:appinfo>
-				<example title="XML Example: Entry tags">
+				<example title="XML Example: Entry Co-editors">
 					<item>
 						<action>add</action>
 						<entitledUsersEdit>
@@ -1511,15 +1511,15 @@ tK1yWx3LOnxokoJUtNRSdEi</privateKey>
 
 	<xs:element name="entitledUsersPublish" type="T_entitledUsers">
 		<xs:annotation>
-			<xs:documentation>Co-editors</xs:documentation>
+			<xs:documentation>Co-publishors</xs:documentation>
 			<xs:appinfo>
-				<example title="XML Example: Entry tags">
+				<example title="XML Example: Entry Co-publishors">
 					<item>
 						<action>add</action>
-						<entitledUsersEdit>
+						<entitledUsersPublish>
 							<user>user1</user>
 							<user>user2</user>
-						</entitledUsersEdit>
+						</entitledUsersPublish>
 						<media>...</media>
 						<contentAssets>...</contentAssets>
 					</item>
@@ -1532,7 +1532,7 @@ tK1yWx3LOnxokoJUtNRSdEi</privateKey>
 		<xs:annotation>
 			<xs:documentation>Co-viewers</xs:documentation>
 			<xs:appinfo>
-				<example title="XML Example: Entry tags">
+				<example title="XML Example: Entry Co-viewers">
 					<item>
 						<action>add</action>
 						<entitledUsersView>
