@@ -1891,7 +1891,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function handleMultiClipRequest($resource, $destEntry, $clipManager, $clipEntry = null, $rootJobId = null, $order = null, $conversionParams = null)
 	{
-		KalturaLog::info("clipping service detected start to create sub flavors;");
+		KalturaLog::info("Clipping action detected start to create sub flavors;");
 		if(!$clipEntry)
 		{
 			$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
@@ -1919,7 +1919,7 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function handleMultiResourceMultiClipRequest($resources, entry $destEntry, $clipManager)
 	{
-		KalturaLog::info("Multi resource clipping service detected, start to create multi template entry and sub template entries");
+		KalturaLog::info("Multi resource clipping action detected, start to create multi template entry and sub template entries");
 
 		$tempEntries = array();
 		$tempEntriesIds = array();
