@@ -514,7 +514,14 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		foreach ($cue_point_plugin_map as $dynamic_enum_id => $plugin_name)
 		{
 			$plugin = kPluginableEnumsManager::getPlugin($plugin_name);
-			if($plugin::shouldCloneByProperty($entry)==true) {
+			if(!$plugin)
+			{
+				KalturaLog::debug("Plugin [$plugin_name] not found, skipping!");
+				continue;
+			}
+
+			if($plugin::shouldCloneByProperty($entry)==true)
+			{
 				$listOfEnumIds[] = $dynamic_enum_id;
 			}
 		}
