@@ -819,5 +819,15 @@ class KalturaErrors extends APIErrors
 	const HOST_NAME_CONTAINS_ASTRIX = "HOST_NAME_CONTAINS_ASTRIX;HOST_NAME;Host name contains *, use # instead {@HOST_NAME@}";
 	const CHANGE_DESCRIPTION_CANNOT_BE_EMPTY = "CHANGE_DESCRIPTION_CANNOT_BE_EMPTY;;Param changeDescription cannot be empty";
 	const SEARCH_ITEM_TYPE_NOT_FOUND = 'SEARCH_ITEM_TYPE_NOT_FOUND;SEARCH_ITEM_TYPE,ELASTIC_FIELD_NAME; Search item type [@SEARCH_ITEM_TYPE@] not found for field: [@ELASTIC_FIELD_NAME@]';
+	
+	/**
+	 * UserAppRole service
+	 */
+	const USER_APP_ROLE_NOT_FOUND = "USER_APP_ROLE_NOT_FOUND;PUSER_ID,APP_GUID;App Role for User ID [\"@PUSER_ID@\"] and App GUID [\"@APP_GUID@\"] not found";
+	const USER_APP_ROLE_ALREADY_EXISTS = "USER_APP_ROLE_ALREADY_EXISTS;PUSER_ID,APP_GUID;User ID [\"@PUSER_ID@\"] already have a role for App Guid [\"@APP_GUID@\"]";
+	const USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP = "USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP;;Cannot assign an app role for a user of type 'group'";
+	const INVALID_APP_GUID = "INVALID_APP_GUID;APP_GUID;App GUID [\"@APP_GUID@\"] is not a valid Mongo DB Object ID";
+	const APP_GUID_NOT_FOUND = "APP_GUID_NOT_FOUND;APP_GUID;App GUID [\"@APP_GUID@\"] not found";
+	const MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE = "MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE;;Must filter on at least 'users' or 'appGuid' or 'userRole'";
 }
 

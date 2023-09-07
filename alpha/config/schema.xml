@@ -1915,6 +1915,7 @@
 		<column primaryKey="false" required="true" autoIncrement="false" lazyLoad="false" name="user_role_id" type="integer" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="app_guid" type="varchar" default="null" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="kuser">
 			<reference local="kuser_id" foreign="id" />
 		</foreign-key>
