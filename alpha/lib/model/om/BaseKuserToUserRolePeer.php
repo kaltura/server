@@ -3,49 +3,52 @@
 /**
  * Base static class for performing query and update operations on the 'kuser_to_user_role' table.
  *
- * 
+ *
  *
  * @package Core
  * @subpackage model.om
  */
 abstract class BaseKuserToUserRolePeer {
-
+	
 	/** the default database name for this class */
 	const DATABASE_NAME = 'propel';
-
+	
 	/** the table name for this class */
 	const TABLE_NAME = 'kuser_to_user_role';
-
+	
 	/** the related Propel class for this table */
 	const OM_CLASS = 'KuserToUserRole';
-
+	
 	/** A class that can be returned by this peer. */
 	const CLASS_DEFAULT = 'Core.KuserToUserRole';
-
+	
 	/** the related TableMap class for this table */
 	const TM_CLASS = 'KuserToUserRoleTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 5;
-
+	const NUM_COLUMNS = 6;
+	
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
-
+	
 	/** the column name for the ID field */
 	const ID = 'kuser_to_user_role.ID';
-
+	
 	/** the column name for the KUSER_ID field */
 	const KUSER_ID = 'kuser_to_user_role.KUSER_ID';
-
+	
 	/** the column name for the USER_ROLE_ID field */
 	const USER_ROLE_ID = 'kuser_to_user_role.USER_ROLE_ID';
-
+	
 	/** the column name for the CREATED_AT field */
 	const CREATED_AT = 'kuser_to_user_role.CREATED_AT';
-
+	
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'kuser_to_user_role.UPDATED_AT';
-
+	
+	/** the column name for the APP_GUID field */
+	const APP_GUID = 'kuser_to_user_role.APP_GUID';
+	
 	/**
 	 * An identiy map to hold any loaded instances of KuserToUserRole objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -53,8 +56,8 @@ abstract class BaseKuserToUserRolePeer {
 	 * @var        array KuserToUserRole[]
 	 */
 	public static $instances = array();
-
-
+	
+	
 	/**
 	 * holds an array of fieldnames
 	 *
@@ -62,13 +65,13 @@ abstract class BaseKuserToUserRolePeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'KuserId', 'UserRoleId', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kuserId', 'userRoleId', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::KUSER_ID, self::USER_ROLE_ID, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'kuser_id', 'user_role_id', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'KuserId', 'UserRoleId', 'CreatedAt', 'UpdatedAt', 'AppGuid', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'kuserId', 'userRoleId', 'createdAt', 'updatedAt', 'appGuid', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::KUSER_ID, self::USER_ROLE_ID, self::CREATED_AT, self::UPDATED_AT, self::APP_GUID, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'kuser_id', 'user_role_id', 'created_at', 'updated_at', 'app_guid', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
-
+	
 	/**
 	 * holds an array of keys for quick access to the fieldnames array
 	 *
@@ -76,13 +79,13 @@ abstract class BaseKuserToUserRolePeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KuserId' => 1, 'UserRoleId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kuserId' => 1, 'userRoleId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KUSER_ID => 1, self::USER_ROLE_ID => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kuser_id' => 1, 'user_role_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'KuserId' => 1, 'UserRoleId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, 'AppGuid' => 5, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'kuserId' => 1, 'userRoleId' => 2, 'createdAt' => 3, 'updatedAt' => 4, 'appGuid' => 5, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::KUSER_ID => 1, self::USER_ROLE_ID => 2, self::CREATED_AT => 3, self::UPDATED_AT => 4, self::APP_GUID => 5, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'kuser_id' => 1, 'user_role_id' => 2, 'created_at' => 3, 'updated_at' => 4, 'app_guid' => 5, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
 	);
-
+	
 	/**
 	 * Translates a fieldname to another type
 	 *
@@ -102,7 +105,7 @@ abstract class BaseKuserToUserRolePeer {
 		}
 		return $toNames[$key];
 	}
-
+	
 	/**
 	 * Returns an array of field names.
 	 *
@@ -111,7 +114,7 @@ abstract class BaseKuserToUserRolePeer {
 	 *                      BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM
 	 * @return     array A list of field names
 	 */
-
+	
 	static public function getFieldNames($type = BasePeer::TYPE_PHPNAME)
 	{
 		if (!array_key_exists($type, self::$fieldNames)) {
@@ -119,7 +122,7 @@ abstract class BaseKuserToUserRolePeer {
 		}
 		return self::$fieldNames[$type];
 	}
-
+	
 	/**
 	 * Convenience method which changes table.column to alias.column.
 	 *
@@ -136,7 +139,7 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		return str_replace(KuserToUserRolePeer::TABLE_NAME.'.', $alias.'.', $column);
 	}
-
+	
 	/**
 	 * Add all the columns needed to create a new object.
 	 *
@@ -155,8 +158,9 @@ abstract class BaseKuserToUserRolePeer {
 		$criteria->addSelectColumn(KuserToUserRolePeer::USER_ROLE_ID);
 		$criteria->addSelectColumn(KuserToUserRolePeer::CREATED_AT);
 		$criteria->addSelectColumn(KuserToUserRolePeer::UPDATED_AT);
+		$criteria->addSelectColumn(KuserToUserRolePeer::APP_GUID);
 	}
-
+	
 	/**
 	 * Returns the number of rows matching criteria.
 	 *
@@ -169,32 +173,32 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		// we may modify criteria, so copy it first
 		$criteria = clone $criteria;
-
+		
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
 		$criteria->setPrimaryTableName(KuserToUserRolePeer::TABLE_NAME);
-
+		
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
-
+		
 		if (!$criteria->hasSelectClause()) {
 			KuserToUserRolePeer::addSelectColumns($criteria);
 		}
-
+		
 		$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 		$criteria->setDbName(self::DATABASE_NAME); // Set the correct dbName
 		
 		KuserToUserRolePeer::attachCriteriaFilter($criteria);
-
+		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteria, 
+			$criteria,
 			kQueryCache::QUERY_TYPE_COUNT,
-			'KuserToUserRolePeer', 
-			$cacheKey, 
+			'KuserToUserRolePeer',
+			$cacheKey,
 			$queryDB);
 		if ($cachedResult !== null)
 		{
@@ -247,7 +251,7 @@ abstract class BaseKuserToUserRolePeer {
 	 * Before returning a query result from the cache, the time of the cached query
 	 * is compared to the time saved in the invalidation key.
 	 * A cached query will only be used if it's newer than the matching invalidation key.
-	 *  
+	 *
 	 * @return     array The invalidation keys that should be checked before returning a cached result for this criteria.
 	 *		 if an empty array is returned, the query cache won't be used - the query will be performed on the DB.
 	 */
@@ -255,10 +259,10 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		return array();
 	}
-
+	
 	/**
 	 * Override in order to filter objects returned from doSelect.
-	 *  
+	 *
 	 * @param      array $selectResults The array of objects to filter.
 	 * @param	   Criteria $criteria
 	 */
@@ -269,7 +273,7 @@ abstract class BaseKuserToUserRolePeer {
 	/**
 	 * Adds the supplied object array to the instance pool, objects already found in the pool
 	 * will be replaced with instance from the pool.
-	 *  
+	 *
 	 * @param      array $queryResult The array of objects to get / add to pool.
 	 */
 	public static function updateInstancePool(&$queryResult)
@@ -287,10 +291,10 @@ abstract class BaseKuserToUserRolePeer {
 			}
 		}
 	}
-						
+	
 	/**
 	 * Adds the supplied object array to the instance pool.
-	 *  
+	 *
 	 * @param      array $queryResult The array of objects to add to pool.
 	 */
 	public static function addInstancesToPool($queryResult)
@@ -298,7 +302,7 @@ abstract class BaseKuserToUserRolePeer {
 		if (Propel::isInstancePoolingEnabled())
 		{
 			if ( count( self::$instances ) + count( $queryResult ) <= kConf::get('max_num_instances_in_pool') )
-			{  
+			{
 				foreach ($queryResult as $curResult)
 				{
 					KuserToUserRolePeer::addInstanceToPool($curResult);
@@ -317,16 +321,16 @@ abstract class BaseKuserToUserRolePeer {
 	 *		 rethrown wrapped into a PropelException.
 	 */
 	public static function doSelect(Criteria $criteria, PropelPDO $con = null)
-	{		
+	{
 		$criteriaForSelect = KuserToUserRolePeer::prepareCriteriaForSelect($criteria);
 		
 		$queryDB = kQueryCache::QUERY_DB_UNDEFINED;
 		$cacheKey = null;
 		$cachedResult = kQueryCache::getCachedQueryResults(
-			$criteriaForSelect, 
+			$criteriaForSelect,
 			kQueryCache::QUERY_TYPE_SELECT,
-			'KuserToUserRolePeer', 
-			$cacheKey, 
+			'KuserToUserRolePeer',
+			$cacheKey,
 			$queryDB);
 		if ($cachedResult !== null)
 		{
@@ -354,32 +358,32 @@ abstract class BaseKuserToUserRolePeer {
 		KuserToUserRolePeer::addInstancesToPool($queryResult);
 		return $queryResult;
 	}
-
+	
 	public static function alternativeCon($con, $queryDB = kQueryCache::QUERY_DB_UNDEFINED)
 	{
 		if ($con === null)
 		{
 			switch ($queryDB)
 			{
-			case kQueryCache::QUERY_DB_MASTER:
-				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
-				break;
-
-			case kQueryCache::QUERY_DB_SLAVE:
-				$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
-				break;
+				case kQueryCache::QUERY_DB_MASTER:
+					$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_MASTER);
+					break;
+				
+				case kQueryCache::QUERY_DB_SLAVE:
+					$con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
+					break;
 			}
 		}
-	
+		
 		if($con === null)
 			$con = myDbHelper::alternativeCon($con);
-			
+		
 		if($con === null)
 			$con = Propel::getConnection(KuserToUserRolePeer::DATABASE_NAME, Propel::CONNECTION_READ);
 		
 		return $con;
 	}
-		
+	
 	/**
 	 * @var criteriaFilter The default criteria filter.
 	 */
@@ -389,7 +393,7 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		$criteria_filter = KuserToUserRolePeer::getCriteriaFilter();
 		
-		if ( $use )  $criteria_filter->enable(); 
+		if ( $use )  $criteria_filter->enable();
 		else $criteria_filter->disable();
 	}
 	
@@ -411,7 +415,7 @@ abstract class BaseKuserToUserRolePeer {
 		
 		return self::$s_criteria_filter;
 	}
-	 
+	
 	/**
 	 * Creates default criteria filter
 	 */
@@ -420,7 +424,7 @@ abstract class BaseKuserToUserRolePeer {
 		if(self::$s_criteria_filter == null)
 			self::$s_criteria_filter = new criteriaFilter();
 		
-		$c = new myCriteria(); 
+		$c = new myCriteria();
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
@@ -428,7 +432,7 @@ abstract class BaseKuserToUserRolePeer {
 	/**
 	 * the filterCriteria will filter out all the doSelect methods - ONLY if the filter is turned on.
 	 * IMPORTANT - the filter is turend on by default and when switched off - should be turned on again manually .
-	 * 
+	 *
 	 * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
 	 */
 	protected static function attachCriteriaFilter(Criteria $criteria)
@@ -467,7 +471,7 @@ abstract class BaseKuserToUserRolePeer {
 	
 	public static function prepareCriteriaForSelect(Criteria $criteria)
 	{
-		if ($criteria->hasSelectClause()) 
+		if ($criteria->hasSelectClause())
 		{
 			$asColumns = $criteria->getAsColumns();
 			if(count($asColumns) == 1 && isset($asColumns['_score']))
@@ -484,10 +488,10 @@ abstract class BaseKuserToUserRolePeer {
 		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
-
+		
 		// attach default criteria
 		KuserToUserRolePeer::attachCriteriaFilter($criteria);
-
+		
 		return $criteria;
 	}
 	
@@ -533,17 +537,17 @@ abstract class BaseKuserToUserRolePeer {
 			{
 				$key = (string) $obj->getId();
 			}
-				
+			
 			if ( isset( self::$instances[$key] )											// Instance is already mapped?
-					|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
-				)
+				|| count( self::$instances ) < kConf::get('max_num_instances_in_pool')	// Not mapped, but max. inst. not yet reached?
+			)
 			{
 				self::$instances[$key] = $obj;
 				kMemoryManager::registerPeer('KuserToUserRolePeer');
 			}
 		}
 	}
-
+	
 	/**
 	 * Removes an object from the instance pool.
 	 *
@@ -566,11 +570,11 @@ abstract class BaseKuserToUserRolePeer {
 				$e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or KuserToUserRole object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
 				throw $e;
 			}
-
+			
 			unset(self::$instances[$key]);
 		}
 	} // removeInstanceFromPool()
-
+	
 	/**
 	 * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
 	 *
@@ -612,7 +616,7 @@ abstract class BaseKuserToUserRolePeer {
 	public static function clearRelatedInstancePool()
 	{
 	}
-
+	
 	/**
 	 * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
 	 *
@@ -631,7 +635,7 @@ abstract class BaseKuserToUserRolePeer {
 		}
 		return (string) $row[$startcol];
 	}
-
+	
 	/**
 	 * The returned array will contain objects of the default type or
 	 * objects that inherit from the default.
@@ -642,7 +646,7 @@ abstract class BaseKuserToUserRolePeer {
 	public static function populateObjects(PDOStatement $stmt)
 	{
 		$results = array();
-	
+		
 		// set the class once to avoid overhead in the loop
 		$cls = KuserToUserRolePeer::getOMClass(false);
 		// populate the object(s)
@@ -662,7 +666,7 @@ abstract class BaseKuserToUserRolePeer {
 		$stmt->closeCursor();
 		return $results;
 	}
-
+	
 	/**
 	 * Returns the number of rows matching criteria, joining the related kuser table
 	 *
@@ -676,16 +680,16 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
-
+		
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
 		$criteria->setPrimaryTableName(KuserToUserRolePeer::TABLE_NAME);
-
+		
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
-
+		
 		if (!$criteria->hasSelectClause()) {
 			KuserToUserRolePeer::addSelectColumns($criteria);
 		}
@@ -697,9 +701,9 @@ abstract class BaseKuserToUserRolePeer {
 		
 		
 		$criteria->addJoin(KuserToUserRolePeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
+		
 		$stmt = KuserToUserRolePeer::doCountStmt($criteria, $con);
-
+		
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
@@ -708,8 +712,8 @@ abstract class BaseKuserToUserRolePeer {
 		$stmt->closeCursor();
 		return $count;
 	}
-
-
+	
+	
 	/**
 	 * Returns the number of rows matching criteria, joining the related UserRole table
 	 *
@@ -723,16 +727,16 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
-
+		
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
 		$criteria->setPrimaryTableName(KuserToUserRolePeer::TABLE_NAME);
-
+		
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
-
+		
 		if (!$criteria->hasSelectClause()) {
 			KuserToUserRolePeer::addSelectColumns($criteria);
 		}
@@ -744,9 +748,9 @@ abstract class BaseKuserToUserRolePeer {
 		
 		
 		$criteria->addJoin(KuserToUserRolePeer::USER_ROLE_ID, UserRolePeer::ID, $join_behavior);
-
+		
 		$stmt = KuserToUserRolePeer::doCountStmt($criteria, $con);
-
+		
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
@@ -755,8 +759,8 @@ abstract class BaseKuserToUserRolePeer {
 		$stmt->closeCursor();
 		return $count;
 	}
-
-
+	
+	
 	/**
 	 * Selects a collection of KuserToUserRole objects pre-filled with their kuser objects.
 	 * @param      Criteria  $criteria
@@ -769,21 +773,21 @@ abstract class BaseKuserToUserRolePeer {
 	public static function doSelectJoinkuser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
-
+		
 		// Set the correct dbName if it has not been overridden
 		if ($criteria->getDbName() == Propel::getDefaultDB()) {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
-
+		
 		KuserToUserRolePeer::addSelectColumns($criteria);
 		$startcol = (KuserToUserRolePeer::NUM_COLUMNS - KuserToUserRolePeer::NUM_LAZY_LOAD_COLUMNS);
 		kuserPeer::addSelectColumns($criteria);
-
+		
 		$criteria->addJoin(KuserToUserRolePeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
+		
 		$stmt = KuserToUserRolePeer::doSelectStmt($criteria, $con);
 		$results = array();
-
+		
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$key1 = KuserToUserRolePeer::getPrimaryKeyHashFromRow($row, 0);
 			if (null !== ($obj1 = KuserToUserRolePeer::getInstanceFromPool($key1))) {
@@ -791,21 +795,21 @@ abstract class BaseKuserToUserRolePeer {
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
-
+				
 				$cls = KuserToUserRolePeer::getOMClass(false);
-
+				
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
 				KuserToUserRolePeer::addInstanceToPool($obj1, $key1);
 			} // if $obj1 already loaded
-
+			
 			$key2 = kuserPeer::getPrimaryKeyHashFromRow($row, $startcol);
 			if ($key2 !== null) {
 				$obj2 = kuserPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
-
+					
 					$cls = kuserPeer::getOMClass(false);
-
+					
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol);
 					kuserPeer::addInstanceToPool($obj2, $key2);
@@ -813,9 +817,9 @@ abstract class BaseKuserToUserRolePeer {
 				
 				// Add the $obj1 (KuserToUserRole) to $obj2 (kuser)
 				$obj2->addKuserToUserRole($obj1);
-
+				
 			} // if joined row was not null
-
+			
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
@@ -825,8 +829,8 @@ abstract class BaseKuserToUserRolePeer {
 		
 		return $results;
 	}
-
-
+	
+	
 	/**
 	 * Selects a collection of KuserToUserRole objects pre-filled with their UserRole objects.
 	 * @param      Criteria  $criteria
@@ -839,21 +843,21 @@ abstract class BaseKuserToUserRolePeer {
 	public static function doSelectJoinUserRole(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
-
+		
 		// Set the correct dbName if it has not been overridden
 		if ($criteria->getDbName() == Propel::getDefaultDB()) {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
-
+		
 		KuserToUserRolePeer::addSelectColumns($criteria);
 		$startcol = (KuserToUserRolePeer::NUM_COLUMNS - KuserToUserRolePeer::NUM_LAZY_LOAD_COLUMNS);
 		UserRolePeer::addSelectColumns($criteria);
-
+		
 		$criteria->addJoin(KuserToUserRolePeer::USER_ROLE_ID, UserRolePeer::ID, $join_behavior);
-
+		
 		$stmt = KuserToUserRolePeer::doSelectStmt($criteria, $con);
 		$results = array();
-
+		
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$key1 = KuserToUserRolePeer::getPrimaryKeyHashFromRow($row, 0);
 			if (null !== ($obj1 = KuserToUserRolePeer::getInstanceFromPool($key1))) {
@@ -861,21 +865,21 @@ abstract class BaseKuserToUserRolePeer {
 				// See http://propel.phpdb.org/trac/ticket/509
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
-
+				
 				$cls = KuserToUserRolePeer::getOMClass(false);
-
+				
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
 				KuserToUserRolePeer::addInstanceToPool($obj1, $key1);
 			} // if $obj1 already loaded
-
+			
 			$key2 = UserRolePeer::getPrimaryKeyHashFromRow($row, $startcol);
 			if ($key2 !== null) {
 				$obj2 = UserRolePeer::getInstanceFromPool($key2);
 				if (!$obj2) {
-
+					
 					$cls = UserRolePeer::getOMClass(false);
-
+					
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol);
 					UserRolePeer::addInstanceToPool($obj2, $key2);
@@ -883,9 +887,9 @@ abstract class BaseKuserToUserRolePeer {
 				
 				// Add the $obj1 (KuserToUserRole) to $obj2 (UserRole)
 				$obj2->addKuserToUserRole($obj1);
-
+				
 			} // if joined row was not null
-
+			
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
@@ -895,8 +899,8 @@ abstract class BaseKuserToUserRolePeer {
 		
 		return $results;
 	}
-
-
+	
+	
 	/**
 	 * Returns the number of rows matching criteria, joining all related tables
 	 *
@@ -910,16 +914,16 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
-
+		
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
 		$criteria->setPrimaryTableName(KuserToUserRolePeer::TABLE_NAME);
-
+		
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
-
+		
 		if (!$criteria->hasSelectClause()) {
 			KuserToUserRolePeer::addSelectColumns($criteria);
 		}
@@ -931,11 +935,11 @@ abstract class BaseKuserToUserRolePeer {
 		
 		
 		$criteria->addJoin(KuserToUserRolePeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
+		
 		$criteria->addJoin(KuserToUserRolePeer::USER_ROLE_ID, UserRolePeer::ID, $join_behavior);
-
+		
 		$stmt = KuserToUserRolePeer::doCountStmt($criteria, $con);
-
+		
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
@@ -944,7 +948,7 @@ abstract class BaseKuserToUserRolePeer {
 		$stmt->closeCursor();
 		return $count;
 	}
-
+	
 	/**
 	 * Selects a collection of KuserToUserRole objects pre-filled with all related objects.
 	 *
@@ -958,28 +962,28 @@ abstract class BaseKuserToUserRolePeer {
 	public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
-
+		
 		// Set the correct dbName if it has not been overridden
 		if ($criteria->getDbName() == Propel::getDefaultDB()) {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
-
+		
 		KuserToUserRolePeer::addSelectColumns($criteria);
 		$startcol2 = (KuserToUserRolePeer::NUM_COLUMNS - KuserToUserRolePeer::NUM_LAZY_LOAD_COLUMNS);
-
+		
 		kuserPeer::addSelectColumns($criteria);
 		$startcol3 = $startcol2 + (kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS);
-
+		
 		UserRolePeer::addSelectColumns($criteria);
 		$startcol4 = $startcol3 + (UserRolePeer::NUM_COLUMNS - UserRolePeer::NUM_LAZY_LOAD_COLUMNS);
-
+		
 		$criteria->addJoin(KuserToUserRolePeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
+		
 		$criteria->addJoin(KuserToUserRolePeer::USER_ROLE_ID, UserRolePeer::ID, $join_behavior);
-
+		
 		$stmt = KuserToUserRolePeer::doSelectStmt($criteria, $con);
 		$results = array();
-
+		
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$key1 = KuserToUserRolePeer::getPrimaryKeyHashFromRow($row, 0);
 			if (null !== ($obj1 = KuserToUserRolePeer::getInstanceFromPool($key1))) {
@@ -988,55 +992,55 @@ abstract class BaseKuserToUserRolePeer {
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
 				$cls = KuserToUserRolePeer::getOMClass(false);
-
+				
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
 				KuserToUserRolePeer::addInstanceToPool($obj1, $key1);
 			} // if obj1 already loaded
-
+			
 			// Add objects for joined kuser rows
-
+			
 			$key2 = kuserPeer::getPrimaryKeyHashFromRow($row, $startcol2);
 			if ($key2 !== null) {
 				$obj2 = kuserPeer::getInstanceFromPool($key2);
 				if (!$obj2) {
-
+					
 					$cls = kuserPeer::getOMClass(false);
-
+					
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol2);
 					kuserPeer::addInstanceToPool($obj2, $key2);
 				} // if obj2 loaded
-
+				
 				// Add the $obj1 (KuserToUserRole) to the collection in $obj2 (kuser)
 				$obj2->addKuserToUserRole($obj1);
 			} // if joined row not null
-
+			
 			// Add objects for joined UserRole rows
-
+			
 			$key3 = UserRolePeer::getPrimaryKeyHashFromRow($row, $startcol3);
 			if ($key3 !== null) {
 				$obj3 = UserRolePeer::getInstanceFromPool($key3);
 				if (!$obj3) {
-
+					
 					$cls = UserRolePeer::getOMClass(false);
-
+					
 					$obj3 = new $cls();
 					$obj3->hydrate($row, $startcol3);
 					UserRolePeer::addInstanceToPool($obj3, $key3);
 				} // if obj3 loaded
-
+				
 				// Add the $obj1 (KuserToUserRole) to the collection in $obj3 (UserRole)
 				$obj3->addKuserToUserRole($obj1);
 			} // if joined row not null
-
+			
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
 		return $results;
 	}
-
-
+	
+	
 	/**
 	 * Returns the number of rows matching criteria, joining the related kuser table
 	 *
@@ -1050,7 +1054,7 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
-
+		
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
@@ -1059,7 +1063,7 @@ abstract class BaseKuserToUserRolePeer {
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
-
+		
 		if (!$criteria->hasSelectClause()) {
 			KuserToUserRolePeer::addSelectColumns($criteria);
 		}
@@ -1071,9 +1075,9 @@ abstract class BaseKuserToUserRolePeer {
 		
 		
 		$criteria->addJoin(KuserToUserRolePeer::USER_ROLE_ID, UserRolePeer::ID, $join_behavior);
-
+		
 		$stmt = KuserToUserRolePeer::doCountStmt($criteria, $con);
-
+		
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
@@ -1082,8 +1086,8 @@ abstract class BaseKuserToUserRolePeer {
 		$stmt->closeCursor();
 		return $count;
 	}
-
-
+	
+	
 	/**
 	 * Returns the number of rows matching criteria, joining the related UserRole table
 	 *
@@ -1097,7 +1101,7 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		// we're going to modify criteria, so copy it first
 		$criteria = clone $criteria;
-
+		
 		// We need to set the primary table name, since in the case that there are no WHERE columns
 		// it will be impossible for the BasePeer::createSelectSql() method to determine which
 		// tables go into the FROM clause.
@@ -1106,7 +1110,7 @@ abstract class BaseKuserToUserRolePeer {
 		if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
 			$criteria->setDistinct();
 		}
-
+		
 		if (!$criteria->hasSelectClause()) {
 			KuserToUserRolePeer::addSelectColumns($criteria);
 		}
@@ -1118,9 +1122,9 @@ abstract class BaseKuserToUserRolePeer {
 		
 		
 		$criteria->addJoin(KuserToUserRolePeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
+		
 		$stmt = KuserToUserRolePeer::doCountStmt($criteria, $con);
-
+		
 		if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$count = (int) $row[0];
 		} else {
@@ -1129,8 +1133,8 @@ abstract class BaseKuserToUserRolePeer {
 		$stmt->closeCursor();
 		return $count;
 	}
-
-
+	
+	
 	/**
 	 * Selects a collection of KuserToUserRole objects pre-filled with all related objects except kuser.
 	 *
@@ -1144,26 +1148,26 @@ abstract class BaseKuserToUserRolePeer {
 	public static function doSelectJoinAllExceptkuser(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
-
+		
 		// Set the correct dbName if it has not been overridden
 		// $criteria->getDbName() will return the same object if not set to another value
 		// so == check is okay and faster
 		if ($criteria->getDbName() == Propel::getDefaultDB()) {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
-
+		
 		KuserToUserRolePeer::addSelectColumns($criteria);
 		$startcol2 = (KuserToUserRolePeer::NUM_COLUMNS - KuserToUserRolePeer::NUM_LAZY_LOAD_COLUMNS);
-
+		
 		UserRolePeer::addSelectColumns($criteria);
 		$startcol3 = $startcol2 + (UserRolePeer::NUM_COLUMNS - UserRolePeer::NUM_LAZY_LOAD_COLUMNS);
-
+		
 		$criteria->addJoin(KuserToUserRolePeer::USER_ROLE_ID, UserRolePeer::ID, $join_behavior);
-
-
+		
+		
 		$stmt = BasePeer::doSelect($criteria, $con);
 		$results = array();
-
+		
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$key1 = KuserToUserRolePeer::getPrimaryKeyHashFromRow($row, 0);
 			if (null !== ($obj1 = KuserToUserRolePeer::getInstanceFromPool($key1))) {
@@ -1172,38 +1176,38 @@ abstract class BaseKuserToUserRolePeer {
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
 				$cls = KuserToUserRolePeer::getOMClass(false);
-
+				
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
 				KuserToUserRolePeer::addInstanceToPool($obj1, $key1);
 			} // if obj1 already loaded
-
-				// Add objects for joined UserRole rows
-
-				$key2 = UserRolePeer::getPrimaryKeyHashFromRow($row, $startcol2);
-				if ($key2 !== null) {
-					$obj2 = UserRolePeer::getInstanceFromPool($key2);
-					if (!$obj2) {
-	
-						$cls = UserRolePeer::getOMClass(false);
-
+			
+			// Add objects for joined UserRole rows
+			
+			$key2 = UserRolePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+			if ($key2 !== null) {
+				$obj2 = UserRolePeer::getInstanceFromPool($key2);
+				if (!$obj2) {
+					
+					$cls = UserRolePeer::getOMClass(false);
+					
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol2);
 					UserRolePeer::addInstanceToPool($obj2, $key2);
 				} // if $obj2 already loaded
-
+				
 				// Add the $obj1 (KuserToUserRole) to the collection in $obj2 (UserRole)
 				$obj2->addKuserToUserRole($obj1);
-
+				
 			} // if joined row is not null
-
+			
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
 		return $results;
 	}
-
-
+	
+	
 	/**
 	 * Selects a collection of KuserToUserRole objects pre-filled with all related objects except UserRole.
 	 *
@@ -1217,26 +1221,26 @@ abstract class BaseKuserToUserRolePeer {
 	public static function doSelectJoinAllExceptUserRole(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
 	{
 		$criteria = clone $criteria;
-
+		
 		// Set the correct dbName if it has not been overridden
 		// $criteria->getDbName() will return the same object if not set to another value
 		// so == check is okay and faster
 		if ($criteria->getDbName() == Propel::getDefaultDB()) {
 			$criteria->setDbName(self::DATABASE_NAME);
 		}
-
+		
 		KuserToUserRolePeer::addSelectColumns($criteria);
 		$startcol2 = (KuserToUserRolePeer::NUM_COLUMNS - KuserToUserRolePeer::NUM_LAZY_LOAD_COLUMNS);
-
+		
 		kuserPeer::addSelectColumns($criteria);
 		$startcol3 = $startcol2 + (kuserPeer::NUM_COLUMNS - kuserPeer::NUM_LAZY_LOAD_COLUMNS);
-
+		
 		$criteria->addJoin(KuserToUserRolePeer::KUSER_ID, kuserPeer::ID, $join_behavior);
-
-
+		
+		
 		$stmt = BasePeer::doSelect($criteria, $con);
 		$results = array();
-
+		
 		while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
 			$key1 = KuserToUserRolePeer::getPrimaryKeyHashFromRow($row, 0);
 			if (null !== ($obj1 = KuserToUserRolePeer::getInstanceFromPool($key1))) {
@@ -1245,37 +1249,37 @@ abstract class BaseKuserToUserRolePeer {
 				// $obj1->hydrate($row, 0, true); // rehydrate
 			} else {
 				$cls = KuserToUserRolePeer::getOMClass(false);
-
+				
 				$obj1 = new $cls();
 				$obj1->hydrate($row);
 				KuserToUserRolePeer::addInstanceToPool($obj1, $key1);
 			} // if obj1 already loaded
-
-				// Add objects for joined kuser rows
-
-				$key2 = kuserPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-				if ($key2 !== null) {
-					$obj2 = kuserPeer::getInstanceFromPool($key2);
-					if (!$obj2) {
-	
-						$cls = kuserPeer::getOMClass(false);
-
+			
+			// Add objects for joined kuser rows
+			
+			$key2 = kuserPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+			if ($key2 !== null) {
+				$obj2 = kuserPeer::getInstanceFromPool($key2);
+				if (!$obj2) {
+					
+					$cls = kuserPeer::getOMClass(false);
+					
 					$obj2 = new $cls();
 					$obj2->hydrate($row, $startcol2);
 					kuserPeer::addInstanceToPool($obj2, $key2);
 				} // if $obj2 already loaded
-
+				
 				// Add the $obj1 (KuserToUserRole) to the collection in $obj2 (kuser)
 				$obj2->addKuserToUserRole($obj1);
-
+				
 			} // if joined row is not null
-
+			
 			$results[] = $obj1;
 		}
 		$stmt->closeCursor();
 		return $results;
 	}
-
+	
 	/**
 	 * Returns the TableMap related to this peer.
 	 * This method is not needed for general use but a specific application could have a need.
@@ -1287,19 +1291,19 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		return Propel::getDatabaseMap(self::DATABASE_NAME)->getTable(self::TABLE_NAME);
 	}
-
+	
 	/**
 	 * Add a TableMap instance to the database for this peer class.
 	 */
 	public static function buildTableMap()
 	{
-	  $dbMap = Propel::getDatabaseMap(BaseKuserToUserRolePeer::DATABASE_NAME);
-	  if (!$dbMap->hasTable(BaseKuserToUserRolePeer::TABLE_NAME))
-	  {
-	    $dbMap->addTableObject(new KuserToUserRoleTableMap());
-	  }
+		$dbMap = Propel::getDatabaseMap(BaseKuserToUserRolePeer::DATABASE_NAME);
+		if (!$dbMap->hasTable(BaseKuserToUserRolePeer::TABLE_NAME))
+		{
+			$dbMap->addTableObject(new KuserToUserRoleTableMap());
+		}
 	}
-
+	
 	/**
 	 * The class that the Peer will make instances of.
 	 *
@@ -1308,14 +1312,14 @@ abstract class BaseKuserToUserRolePeer {
 	 * relative to a location on the PHP include_path.
 	 * (e.g. path.to.MyClass -> 'path/to/MyClass.php')
 	 *
-	 * @param      boolean  Whether or not to return the path wit hthe class name 
+	 * @param      boolean  Whether or not to return the path wit hthe class name
 	 * @return     string path.to.ClassName
 	 */
 	public static function getOMClass($withPrefix = true)
 	{
 		return $withPrefix ? KuserToUserRolePeer::CLASS_DEFAULT : KuserToUserRolePeer::OM_CLASS;
 	}
-
+	
 	/**
 	 * Method perform an INSERT on the database, given a KuserToUserRole or Criteria object.
 	 *
@@ -1330,21 +1334,21 @@ abstract class BaseKuserToUserRolePeer {
 		if ($con === null) {
 			$con = Propel::getConnection(KuserToUserRolePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-
+		
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
 		} else {
 			$criteria = $values->buildCriteria(); // build Criteria from KuserToUserRole object
 		}
-
+		
 		if ($criteria->containsKey(KuserToUserRolePeer::ID) && $criteria->keyContainsValue(KuserToUserRolePeer::ID) ) {
 			throw new PropelException('Cannot insert a value for auto-increment primary key ('.KuserToUserRolePeer::ID.')');
 		}
-
-
+		
+		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
-
+		
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table (I guess, conceivably)
@@ -1355,10 +1359,10 @@ abstract class BaseKuserToUserRolePeer {
 			$con->rollBack();
 			throw $e;
 		}
-
+		
 		return $pk;
 	}
-
+	
 	/**
 	 * Method perform an UPDATE on the database, given a KuserToUserRole or Criteria object.
 	 *
@@ -1373,23 +1377,23 @@ abstract class BaseKuserToUserRolePeer {
 		if ($con === null) {
 			$con = Propel::getConnection(KuserToUserRolePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-
+		
 		$selectCriteria = new Criteria(self::DATABASE_NAME);
-
+		
 		if ($values instanceof Criteria) {
 			$criteria = clone $values; // rename for clarity
-
+			
 			$comparison = $criteria->getComparison(KuserToUserRolePeer::ID);
 			$selectCriteria->add(KuserToUserRolePeer::ID, $criteria->remove(KuserToUserRolePeer::ID), $comparison);
-
+			
 		} else { // $values is KuserToUserRole object
 			$criteria = $values->buildCriteria(); // gets full criteria
 			$selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
 		}
-
+		
 		// set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
-
+		
 		return BasePeer::doUpdate($selectCriteria, $criteria, $con);
 	}
 	
@@ -1401,7 +1405,16 @@ abstract class BaseKuserToUserRolePeer {
 	{
 		return array();
 	}
-
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
+	{
+		return array();
+	}
+	
 	/**
 	 * Method to DELETE all rows from the kuser_to_user_role table.
 	 *
@@ -1430,7 +1443,7 @@ abstract class BaseKuserToUserRolePeer {
 			throw $e;
 		}
 	}
-
+	
 	/**
 	 * Method perform a DELETE on the database, given a KuserToUserRole or Criteria object OR a primary key value.
 	 *
@@ -1442,12 +1455,12 @@ abstract class BaseKuserToUserRolePeer {
 	 * @throws     PropelException Any exceptions caught during processing will be
 	 *		 rethrown wrapped into a PropelException.
 	 */
-	 public static function doDelete($values, PropelPDO $con = null)
-	 {
+	public static function doDelete($values, PropelPDO $con = null)
+	{
 		if ($con === null) {
 			$con = Propel::getConnection(KuserToUserRolePeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
 		}
-
+		
 		if ($values instanceof Criteria) {
 			// invalidate the cache for all objects of this type, since we have no
 			// way of knowing (without running a query) what objects should be invalidated
@@ -1468,12 +1481,12 @@ abstract class BaseKuserToUserRolePeer {
 				KuserToUserRolePeer::removeInstanceFromPool($singleval);
 			}
 		}
-
+		
 		// Set the correct dbName
 		$criteria->setDbName(self::DATABASE_NAME);
-
+		
 		$affectedRows = 0; // initialize var to track total num of affected rows
-
+		
 		try {
 			// use transaction because $criteria could contain info
 			// for more than one table or we could emulating ON DELETE CASCADE, etc.
@@ -1488,7 +1501,7 @@ abstract class BaseKuserToUserRolePeer {
 			throw $e;
 		}
 	}
-
+	
 	/**
 	 * Validates all modified columns of given KuserToUserRole object.
 	 * If parameter $columns is either a single column name or an array of column names
@@ -1504,15 +1517,15 @@ abstract class BaseKuserToUserRolePeer {
 	public static function doValidate(KuserToUserRole $obj, $cols = null)
 	{
 		$columns = array();
-
+		
 		if ($cols) {
 			$dbMap = Propel::getDatabaseMap(KuserToUserRolePeer::DATABASE_NAME);
 			$tableMap = $dbMap->getTable(KuserToUserRolePeer::TABLE_NAME);
-
+			
 			if (! is_array($cols)) {
 				$cols = array($cols);
 			}
-
+			
 			foreach ($cols as $colName) {
 				if ($tableMap->containsColumn($colName)) {
 					$get = 'get' . $tableMap->getColumn($colName)->getPhpName();
@@ -1520,12 +1533,12 @@ abstract class BaseKuserToUserRolePeer {
 				}
 			}
 		} else {
-
+		
 		}
-
+		
 		return BasePeer::doValidate(KuserToUserRolePeer::DATABASE_NAME, KuserToUserRolePeer::TABLE_NAME, $columns);
 	}
-
+	
 	/**
 	 * Retrieve a single object by pkey.
 	 *
@@ -1535,19 +1548,19 @@ abstract class BaseKuserToUserRolePeer {
 	 */
 	public static function retrieveByPK($pk, PropelPDO $con = null)
 	{
-
+		
 		if (null !== ($obj = KuserToUserRolePeer::getInstanceFromPool((string) $pk))) {
 			return $obj;
 		}
-
+		
 		$criteria = new Criteria(KuserToUserRolePeer::DATABASE_NAME);
 		$criteria->add(KuserToUserRolePeer::ID, $pk);
-
+		
 		$v = KuserToUserRolePeer::doSelect($criteria, $con);
-
+		
 		return !empty($v) > 0 ? $v[0] : null;
 	}
-
+	
 	/**
 	 * Retrieve multiple objects by pkey.
 	 *
@@ -1568,7 +1581,7 @@ abstract class BaseKuserToUserRolePeer {
 		}
 		return $objs;
 	}
-
+	
 } // BaseKuserToUserRolePeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
