@@ -1926,14 +1926,13 @@ class KalturaEntryService extends KalturaBaseService
 		$sourceEntryIds = array();
 		$mediaInfoObjs = array();
 
-		// for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip
+		// for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip 3. retrieve media info object
 		foreach ($resources->getResources() as $resource)
 		{
 			/** @var kOperationResource $resource **/
 			$resourceObj = $resource->getResource();
 			$sourceEntryId = $resourceObj->getOriginEntryId();
 			$sourceEntryIds[] = $sourceEntryId;
-			$resource->setSourceEntryId($sourceEntryId);
 
 			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
 			$tempEntriesIds[] = $tempEntry->getId();
@@ -1943,12 +1942,13 @@ class KalturaEntryService extends KalturaBaseService
 			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId);
 			if(!$mediaInfoObj)
 			{
+				KalturaLog::err("Could not retrieve media info object for flavor asset Id [$flavorAssetId] for source entry Id [$sourceEntryId]");
 				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $flavorAssetId);
 			}
 			$mediaInfoObjs[] = $mediaInfoObj;
 		}
 
-		$conversionParamsArray = $clipManager->getCalculatedConversionParams($mediaInfoObjs);
+		$conversionParamsArray = $clipManager->getCalculatedConversionParams($mediaInfoObjs, $destEntry->getConversionProfileId());
 		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
 		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $multiTempEntry->getId(), $tempEntriesIds, $destEntry->getId());
 

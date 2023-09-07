@@ -267,10 +267,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		if($rootJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT)
 		{
-			// TODO handle rest of clip concat jobs
+			$parentJobId = $parentJob->getId();
+			$entryId = $batchJob->getEntryId();
 			$rootJob->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
-			$rootJob->setMessage("Failed to import source file for clipping for entry Id [" . $batchJob->getEntryId() ."]");
+			$rootJob->setMessage("Failed to import source file for clipping for entryId [$entryId], batch job id [$parentJobId]");
 			$rootJob->save();
+
+			foreach ($rootJob->getChildJobs() as $childJob)
+			{
+				$childJob->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
+				$childJob->setMessage("Failed to import source file for clipping for entryId [$entryId], batch job id [$parentJobId]");
+				$childJob->save();
+			}
 		}
 	}
 	
@@ -561,58 +569,89 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	/**
 	 * @throws APIException
 	 */
-	public function getCalculatedConversionParams($mediaInfoObjs)
+	public function getCalculatedConversionParams($mediaInfoObjs, $conversionProfileId)
 	{
-		$conversionParamsArray = array();
-		$frameRate = self::MIN_FRAME_RATE;
+		// choose min height and min width of input dimensions and conversion profile max dimensions
+		// if input aspect ratios are different, choose standard aspect ratio that is closest to the average of the input aspect ratios
+		// scale chosen height and width by chosen aspect ratio
+		// choose max frame rate of all input frame rates, limit 10<=frameRate<=30
+
 		$height = 0;
 		$width = 0;
+		$frameRate = self::MIN_FRAME_RATE;
 		$aspectRatios = array();
+
 		foreach ($mediaInfoObjs as $mediaInfoObj)
 		{
 			/** @var $mediaInfoObj mediaInfo*/
 			$frameRate = max($frameRate, $mediaInfoObj->getVideoFrameRate());
 			$currentWidth = $mediaInfoObj->getVideoWidth();
 			$currentHeight = $mediaInfoObj->getVideoHeight();
-			if($height * $width == 0)
+			if($currentWidth * $currentHeight == 0)
 			{
-				$width = $currentWidth;
-				$height = $currentHeight;
+				throw new APIException(KalturaErrors::INCOMPATIBLE_RESOURCES_DIMENSIONS);
 			}
-			$width = min($currentWidth, $width);
-			$height = min($currentHeight, $height);
+			$width = $width == 0 ? $currentWidth : min($currentWidth, $width);
+			$height = $height == 0 ? $currentHeight : min($currentHeight, $height);
 			$aspectRatios[] = $currentWidth/$currentHeight;
 		}
 
-		$this->decideMultiClipResolution($aspectRatios, $width, $height);
+		$this->limitByMaxProfileResolution($conversionProfileId, $aspectRatios, $width, $height);
+		$this->adjustResolutionByAspectRatios($aspectRatios, $width, $height);
+		KalturaLog::debug("Multi Clip dimensions: width [$width], height [$height]");
+
 		$conversionParams = json_encode(array(
 			self::WIDTH => $width,
 			self::HEIGHT => $height,
 			self::FRAME_RATE => min($frameRate, self::MAX_FRAME_RATE)
-		));
+		), true);
 
+		$conversionParamsArray = array();
 		foreach ($mediaInfoObjs as $mediaInfoObj)
 		{
 			if($mediaInfoObj->getVideoWidth() == $width && $mediaInfoObj->getVideoHeight() == $height)
 			{
-				$conversionParamsArray[] = json_encode(array(self::FRAME_RATE => $frameRate));
+				$conversionParamsArray[] = json_encode(array(self::FRAME_RATE => $frameRate), true);
 			}
 			else
 			{
 				$conversionParamsArray[] = $conversionParams;
 			}
 		}
-
 		return $conversionParamsArray;
+	}
+
+	protected function limitByMaxProfileResolution($conversionProfileId, $aspectRatios, &$width, &$height)
+	{
+		$profileWidth = 0;
+		$profileHeight = 0;
+		$flavors = flavorParamsConversionProfilePeer::retrieveByConversionProfile($conversionProfileId);
+		foreach($flavors as $flavor)
+		{
+			/* @var $flavor flavorParamsConversionProfile */
+			$flavorParams = assetParamsPeer::retrieveByPK($flavor->getFlavorParamsId());
+			$profileHeight = max($profileHeight, $flavorParams->getHeight());
+			$profileWidth = max($profileWidth, $flavorParams->getWidth());
+		}
+
+		if($profileHeight == 0 && $profileWidth == 0)
+		{
+			return;
+		}
+
+		KalturaLog::debug("Conversion profile maximum dimensions: width [$profileWidth], height [$profileHeight]");
+		$this->adjustResolutionByAspectRatios($aspectRatios, $profileWidth, $profileHeight);
+		$width = min($width, $profileWidth);
+		$height = min($height, $profileHeight);
 	}
 
 	/**
 	 * @throws APIException
 	 */
-	protected function decideMultiClipResolution($aspectRatios, &$width, &$height)
+	protected function adjustResolutionByAspectRatios($aspectRatios, &$width, &$height)
 	{
 		$aspectRatio = $this->decideAspectRatio($aspectRatios);
-
+		// aspect ration is aw/ah, therefore, the goal is w/h = aw/ah where w=aw or h=ah
 		if($height * $aspectRatio >= $width)
 		{
 			$width = $height * $aspectRatio;
@@ -628,15 +667,22 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	protected function decideAspectRatio($inputARs)
 	{
+		if(count(array_unique($inputARs)) == 1)
+		{
+			return $inputARs[0];
+		}
+
 		$maxARDiff = 0.2;
 		$avgAR = array_sum($inputARs)/count($inputARs);
 		foreach ($inputARs as $inputAR)
 		{
+			// fail if one input aspect ratio is very different than the average aspect ratio of all inputs
 			if(abs($inputAR - $avgAR) > $maxARDiff)
 			{
 				throw new APIException(KalturaErrors::INCOMPATIBLE_RESOURCES_DIMENSIONS);
 			}
 		}
+		// return standard aspect ratio closest to the average of input ratios
 		$standardARs = array(4/3,5/4,5/3,16/9,16/8,16/10,2.4,2.39,2.35,1.85);
 		$standardARDiff = array_map(function ($standardAR) use ($avgAR) {return abs($standardAR - $avgAR);}, $standardARs);
 		$minDiffInd = array_keys($standardARDiff, min($standardARDiff))[0];
@@ -934,50 +980,52 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param BatchJob $batchJob
+	 * @param BatchJob $multiClipConcatJob
 	 * @throws kCoreException
 	 * @throws KalturaAPIException
 	 */
-	protected function startMultiResourceConcat(BatchJob $batchJob)
+	protected function startMultiResourceConcat(BatchJob $multiClipConcatJob)
 	{
-		$batchJobs = $batchJob->getChildJobsByTypes(array(BatchJobType::CLIP_CONCAT));
-		usort($batchJobs, array("kClipManager", "cmpByResourceOrder"));
+		$clipConcatJobs = $multiClipConcatJob->getChildJobsByTypes(array(BatchJobType::CLIP_CONCAT));
+		usort($clipConcatJobs, array("kClipManager", "cmpByResourceOrder"));
 
 		$lastAssetId = null;
 		$allRelatedFiles = array();
-		foreach ($batchJobs as $childJob)
+		foreach ($clipConcatJobs as $clipConcatJob)
 		{
 			KalturaLog::debug('Going To Start Concat Job for Multi Clip Concat');
-			kJobsManager::updateBatchJob($childJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+			kJobsManager::updateBatchJob($clipConcatJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 
 			/** @var kClipConcatJobData $jobData */
-			$jobData = $childJob->getData();
+			$jobData = $clipConcatJob->getData();
 
-			$assets = assetPeer::retrieveByEntryId($jobData->getTempEntryId(), array(assetType::FLAVOR));
-			usort($assets, array("kClipManager", "cmpByClipOrder"));
+			$flavorAssetsOnTempEntry = assetPeer::retrieveByEntryId($jobData->getTempEntryId(), array(assetType::FLAVOR));
+			usort($flavorAssetsOnTempEntry, array("kClipManager", "cmpByClipOrder"));
 
-			$files = $this->getFilesPath($assets);
-			foreach ($files as $assetId => $relatedFiles)
+			$files = $this->getFilesPath($flavorAssetsOnTempEntry);
+			foreach ($files as $flavorAssetId => $relatedFiles)
 			{
 				/** @var array $relatedFiles */
 				$allRelatedFiles = array_merge($allRelatedFiles, $relatedFiles);
-				KalturaLog::debug("Asset Id: [$assetId], Related file : " . print_r($relatedFiles, true));
+				KalturaLog::debug("Asset Id: [$flavorAssetId], Related file : " . print_r($relatedFiles, true));
 				// assume concatenated assets have the same actualFlavorParamsId and take the last
-				$lastAssetId = $assetId;
+				$lastAssetId = $flavorAssetId;
 			}
 			$this->deleteEntry($jobData->getTempEntryId());
 		}
 		// use no filter because we delete the entry
-		$asset = assetPeer::retrieveByIdNoFilter($lastAssetId);
-		$tempEntry = entryPeer::retrieveByPK($batchJob->getData()->getMultiTempEntryId());
-		$flavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $asset->getFlavorParamsId());
+		$flavorAsset = assetPeer::retrieveByIdNoFilter($lastAssetId);
+		$tempEntry = entryPeer::retrieveByPK($multiClipConcatJob->getData()->getMultiTempEntryId());
+
+		// create one target flavor asset for all clip concat jobs
+		$targetFlavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $flavorAsset->getFlavorParamsId());
 
 		//calling addConcatJob only if lock succeeds
 		$store = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
-		$lockKey = 'kclipManager_add_concat_job' . $batchJob->getId() . $flavorAsset->getId();
+		$lockKey = 'kclipManager_add_concat_job' . $multiClipConcatJob->getId() . $targetFlavorAsset->getId();
 		if (!$store || $store->add($lockKey, true, self::LOCK_EXPIRY))
 		{
-			kJobsManager::addConcatJob($batchJob, $flavorAsset, $allRelatedFiles, false);
+			kJobsManager::addConcatJob($multiClipConcatJob, $targetFlavorAsset, $allRelatedFiles, false);
 		}
 	}
 
@@ -1120,7 +1168,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
 		if($conversionParams && $flavorParamsObj instanceof flavorParams)
 		{
-			$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
+			if(isset($conversionParams[self::FRAME_RATE]))
+			{
+				$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
+			}
 			if(isset($conversionParams[self::WIDTH]) && isset($conversionParams[self::HEIGHT]))
 			{
 				$flavorParamsObj->setWidth($conversionParams[self::WIDTH]);

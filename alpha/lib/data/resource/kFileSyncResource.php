@@ -27,7 +27,7 @@ class kFileSyncResource extends kContentResource
 	
 	/**
 	 * The version of the file sync object 
-	 * @var string
+	 * @var int
 	 */
 	private $version;
 
@@ -69,7 +69,7 @@ class kFileSyncResource extends kContentResource
 	}
 	
 	/**
-	 * @return the $fileSyncObjectType
+	 * @return int
 	 */
 	public function getFileSyncObjectType()
 	{
@@ -77,7 +77,7 @@ class kFileSyncResource extends kContentResource
 	}
 
 	/**
-	 * @return the $objectSubType
+	 * @return int
 	 */
 	public function getObjectSubType()
 	{
@@ -85,7 +85,7 @@ class kFileSyncResource extends kContentResource
 	}
 
 	/**
-	 * @return the $objectId
+	 * @return string
 	 */
 	public function getObjectId()
 	{
@@ -93,7 +93,7 @@ class kFileSyncResource extends kContentResource
 	}
 
 	/**
-	 * @return the $version
+	 * @return int
 	 */
 	public function getVersion()
 	{
@@ -125,7 +125,7 @@ class kFileSyncResource extends kContentResource
 	}
 
 	/**
-	 * @param string $version
+	 * @param int $version
 	 */
 	public function setVersion($version)
 	{

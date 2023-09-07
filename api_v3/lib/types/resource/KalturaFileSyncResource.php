@@ -27,9 +27,15 @@ class KalturaFileSyncResource extends KalturaContentResource
 	
 	/**
 	 * The version of the file sync object 
-	 * @var string
+	 * @var int
 	 */
 	public $version;
+
+	/**
+	 * The original entry ID, if exists
+	 * @var string
+	 */
+	public $originEntryId;
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
@@ -43,7 +49,12 @@ class KalturaFileSyncResource extends KalturaContentResource
 		$this->validatePropertyNotNull('objectId');
 	}
 	
-	private static $map_between_objects = array('fileSyncObjectType', 'objectSubType', 'objectId', 'version');
+	private static $map_between_objects = array(
+		'fileSyncObjectType',
+		'objectSubType',
+		'objectId',
+		'originEntryId'
+	);
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()

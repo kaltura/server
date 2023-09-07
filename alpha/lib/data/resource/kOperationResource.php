@@ -13,11 +13,6 @@ class kOperationResource extends kContentResource
 	private $resource;
 
 	/**
-	 * @var string
-	 */
-	private $sourceEntryId;
-
-	/**
 	 * @var array<kOperationAttributes>
 	 */
 	private $operationAttributes;
@@ -102,19 +97,5 @@ class kOperationResource extends kContentResource
 	{
 		$this->assetParamsId = $assetParamsId;
 	}
-	/**
-	 * @return string
-	 */
-	public function getSourceEntryId()
-	{
-		return $this->sourceEntryId;
-	}
 
-	/**
-	 * @param string $sourceEntryId
-	 */
-	public function setSourceEntryId($sourceEntryId)
-	{
-		$this->sourceEntryId = $sourceEntryId;
-	}
 }

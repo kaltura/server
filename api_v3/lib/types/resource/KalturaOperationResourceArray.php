@@ -14,8 +14,13 @@ class KalturaOperationResourceArray extends KalturaTypedArray
 		$newArr = new KalturaOperationResourceArray();
 		foreach($arr as $obj)
 		{
+			/**@var kOperationResource $obj*/
+			$resourceObj = new KalturaFileSyncResource();
+			$resourceObj->fromObject($obj->getResource(), $responseProfile);
+
 			$nObj = new KalturaOperationResource();
 			$nObj->fromObject($obj, $responseProfile);
+			$nObj->resource = $resourceObj;
 			$newArr[] = $nObj;
 		}
 

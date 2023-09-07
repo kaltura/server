@@ -12,12 +12,6 @@ class KalturaOperationResource extends KalturaContentResource
 	 * @var KalturaContentResource
 	 */
 	public $resource;
-
-	/**
-	 * @readonly
-	 * @var string
-	 */
-	public $sourceEntryId;
 	
 	/**
 	 * @var KalturaOperationAttributesArray
@@ -63,7 +57,7 @@ class KalturaOperationResource extends KalturaContentResource
 	}
 	
 	private static $map_between_objects = array(
-		'sourceEntryId',
+		'resource',
 		'assetParamsId',
 		'operationAttributes'
 	);
