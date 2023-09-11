@@ -83,5 +83,7 @@ class flavorParamsOutput extends assetParamsOutput
 
 	public function setContentAwareness($v){ $this->putInCustomData('ContentAwareness', $v);}
 	public function getContentAwareness(){return $this->getFromCustomData('ContentAwareness', null, null);}
-	
+
+	public function setImageToVideo($v){ $this->putInCustomData('ImageToVideo', $v);}
+	public function getImageToVideo(){return $this->getFromCustomData('ImageToVideo', null, 0);}
 }

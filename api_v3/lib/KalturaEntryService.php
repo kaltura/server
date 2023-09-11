@@ -1942,9 +1942,17 @@ class KalturaEntryService extends KalturaBaseService
 			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId);
 			if(!$mediaInfoObj)
 			{
-				KalturaLog::err("Could not retrieve media info object for flavor asset Id [$flavorAssetId] for source entry Id [$sourceEntryId]");
-				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $flavorAssetId);
+				if($resourceObj instanceof kFileSyncResource && $resourceObj->getFileSyncObjectType() == FileSyncObjectType::ENTRY)
+				{
+					$sourceEntry = EntryPeer::retrieveByPK($flavorAssetId);
+					if($sourceEntry->getMediaType() != KalturaMediaType::IMAGE)
+					{
+						KalturaLog::err("Could not retrieve media info object for flavor asset Id [$flavorAssetId] for source entry Id [$sourceEntryId]");
+						throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $flavorAssetId);
+					}
+				}
 			}
+			// at this point, if $mediaInfoObj is null, then this is an image place holder
 			$mediaInfoObjs[] = $mediaInfoObj;
 		}
 
