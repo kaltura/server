@@ -56,7 +56,11 @@ class KalturaOperationResource extends KalturaContentResource
 		$this->resource->entryHandled($dbEntry);
 	}
 	
-	private static $map_between_objects = array('assetParamsId');
+	private static $map_between_objects = array(
+		'resource',
+		'assetParamsId',
+		'operationAttributes'
+	);
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()

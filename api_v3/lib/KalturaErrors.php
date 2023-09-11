@@ -149,6 +149,8 @@ class KalturaErrors extends APIErrors
 	const RESOURCE_TYPE_NOT_SUPPORTED = "RESOURCE_TYPE_NOT_SUPPORTED;RES_TYPE;Resource type \"@RES_TYPE@\" not supported";
 
 	const RESOURCES_MULTIPLE_DATA_CENTERS = "RESOURCES_MULTIPLE_DATA_CENTERS;;Resources created on different data centers";
+	const INCOMPATIBLE_RESOURCES_DIMENSIONS = "INCOMPATIBLE_RESOURCES_DIMENSIONS;;Resources has incompatible dimensions";
+	const MEDIA_INFO_NOT_FOUND = "MEDIA_INFO_NOT_FOUND;FLAVOR_ASSET_ID;Media info for flavor asset Id \"@FLAVOR_ASSET_ID@\" not found";
 
 	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED;MEDIA_TYPE;Entry media type \"@MEDIA_TYPE@\" not supported";
 
@@ -187,6 +189,9 @@ class KalturaErrors extends APIErrors
 	const RESOURCE_ENTRY_ID_MISSING= "RESOURCE_ENTRY_ID_MISSING;;Entry Id on resource object is missing";
 	
 	const CYCLE_IN_PARENTAGE = "CYCLE_IN_PARENTAGE;;Invalid cycle detected in the parent child connection of this entry";
+
+	const CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION = "CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION;MAX_DURATION;clips durations exceeded max allowed duration \"@MAX_DURATION@\" in seconds";
+	const RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;clips durations exceeded max allowed duration \"@MAX_COUNT@\" in seconds";
 
 
 	/**

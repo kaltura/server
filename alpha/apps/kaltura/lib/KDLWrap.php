@@ -180,6 +180,24 @@ class KDLWrap
 			}
 
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
+
+			// Handle image to video conversion in ffmpeg command in case we are handling a source with flavor_params -2 (clone of -1)
+			if($cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID && $cdlFlvrOut->getImageToVideo() === 1)
+			{
+				$cmdLines = $cdlFlvrOut->getCommandLines();
+				foreach ($cmdLines as $key => $cmdLine)
+				{
+					if($key == conversionEngineType::FFMPEG || $key == conversionEngineType::FFMPEG_AUX)
+					{
+						$cmdLineTemp = str_replace(" -i ", " -loop 1 -i ", $cmdLine);
+						$imageToVideoCmd = KDLCmdlinePlaceholders::InFileName . " -ar " . $cdlFlvrOut->getAudioSampleRate() . " -ac " . $cdlFlvrOut->getAudioChannels() . " -f s16le -i /dev/zero ";
+						$cmdLines[$key] = str_replace(KDLCmdlinePlaceholders::InFileName, $imageToVideoCmd, $cmdLineTemp);
+					}
+				}
+				$cdlFlvrOut->setCommandLines($cmdLines);
+				$this->_targetList[] = $cdlFlvrOut;
+			}
+
 			// Handle audio streams for ffmpeg command in case we are handling trimming a source with flavor_params -1
 			// in case we need to handle multiple audio streams we need to remove the "-map_metadata -1" command
 			// and replace it with the language mapping for the correct audio streams
@@ -335,6 +353,7 @@ class KDLWrap
 			$flavor->setRemoteStorageProfileIds($target->_cdlObject->getRemoteStorageProfileIds());
 			$flavor->setMediaParserType($target->_cdlObject->getMediaParserType());
 			$flavor->setSourceAssetParamsIds($target->_cdlObject->getSourceAssetParamsIds());
+			$flavor->setImageToVideo($target->_cdlObject->getImageToVideo());
 		}
 		
 		if($target->IsRedundant()) {

@@ -90,6 +90,7 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		BatchJobType::MOVE_CATEGORY_ENTRIES => 'Move Category Entries',
 		BatchJobType::LIVE_TO_VOD => "Live To Vod",
 		BatchJobType::CLIP_CONCAT => "Clip Concat",
+		BatchJobType::MULTI_CLIP_CONCAT => "Multi Clip Concat",
 	);
 	
 	private static $BATCHJOB_STATUS_NAMES = array(
@@ -453,6 +454,13 @@ class BatchJob extends BaseBatchJob implements ISyncableFile
 		// Unite
 		BatchJobPeer::setUseCriteriaFilter(true);
 		return array_merge($result1, $result2);
+	}
+
+	public function getChildJobsByTypes(array $types)
+	{
+		$c = new Criteria();
+		$c->addAnd($c->getNewCriterion(BatchJobPeer::JOB_TYPE, $types, Criteria::IN));
+		return $this->getChildJobs($c);
 	}
 
 	public function getOpenStatusChildJobs(Criteria $c = null)

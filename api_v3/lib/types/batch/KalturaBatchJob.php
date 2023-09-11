@@ -363,10 +363,6 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 			case 'kCaptureThumbJobData':
 				$this->data = new KalturaCaptureThumbJobData();
 				break;
-				
-			case 'kMoveCategoryEntriesJobData':
-			    $this->data = new KalturaMoveCategoryEntriesJobData();
-			    break;
 
 			case 'kIndexJobData':
 				$this->data = new KalturaIndexJobData();
@@ -430,6 +426,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 
 			case 'kClipConcatJobData':
 				$this->data = new KalturaClipConcatJobData();
+				break;
+
+			case 'kMultiClipConcatJobData':
+				$this->data = new KalturaMultiClipConcatJobData();
 				break;
 
 			case 'kCopyCuePointsJobData':
@@ -692,6 +692,14 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$dbData = new kClipConcatJobData();
 				if(is_null($this->data))
 					$this->data = new KalturaClipConcatJobData();
+				break;
+
+			case KalturaBatchJobType::MULTI_CLIP_CONCAT:
+				$dbData = new kMultiClipConcatJobData();
+				if(is_null($this->data))
+				{
+					$this->data = new KalturaMultiClipConcatJobData();
+				}
 				break;
 
 			case KalturaBatchJobType::COPY_CUE_POINTS:
