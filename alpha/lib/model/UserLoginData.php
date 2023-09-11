@@ -273,21 +273,20 @@ class UserLoginData extends BaseUserLoginData
 	public function addToPreviousPasswords($sha1, $salt, $hashMethod)
 	{
 		$passwords = $this->getPreviousPasswords();
-		if (!$passwords) {
-			$passwords = array();
-		}
 		array_unshift($passwords, array ('sha1' => $sha1, 'salt' => $salt, 'hashMethod' => $hashMethod));
 		$passToKeep = $this->getNumPrevPassToKeep();
+
 		while (count($passwords) > $passToKeep) {
 			array_pop($passwords);
 		}
+
 		$this->setPreviousPasswords($passwords);
 	}
 	
 	//TODO: should be set private after migration from admin_kuser to user_login_data
 	public function getPreviousPasswords()
 	{
-		return $this->getFromCustomData('previous_passwords', null, null);
+		return $this->getFromCustomData('previous_passwords', null, array());
 	}
 	
 	//TODO: should be set private after migration from admin_kuser to user_login_data
