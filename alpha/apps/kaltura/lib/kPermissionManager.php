@@ -99,7 +99,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				continue;
 				
 			$cacheRole = $cacheStore->get(self::getCacheKeyPrefix() . $key); // try to fetch from cache
-			if ( !$cacheRole || !isset($cacheRole['updatedAt']) || ( $cacheRole['updatedAt'] < $roleCacheDirtyAt ) )
+			if ( !$cacheRole || !isset($cacheRole['updatedAt']) || ( $cacheRole['updatedAt'] <= $roleCacheDirtyAt ) )
 			{
 				self::$cacheStores[] = $cacheStore;
 				continue;
