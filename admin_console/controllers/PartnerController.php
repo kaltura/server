@@ -888,6 +888,36 @@ class PartnerController extends Zend_Controller_Action
 		$this->getResponse()->setRedirect($url);
 	}
 
-	
-	
+	public function passwordValidationRulesAction()
+	{
+		$this->_helper->layout->disableLayout();
+		$partnerId = $this->_getParam('partner_id');
+		$client = Infra_ClientHelper::getClient();
+		$systemPartnerPlugin = Kaltura_Client_SystemPartner_Plugin::get($client);
+		
+		$this->view->errMessage = false;
+		$partnerRegexArray = array();
+		
+		try
+		{
+			Infra_ClientHelper::impersonate($partnerId);
+			$partner = $systemPartnerPlugin->systemPartner->get($partnerId);
+			Infra_ClientHelper::unimpersonate();
+			if ($partner)
+			{
+				/** @var $partner KalturaPartner */
+				if ($partner->passwordStructureValidations)
+				{
+					$partnerRegexArray = $partner->passwordStructureValidations;
+				}
+			}
+		}
+		catch (Exception $e)
+		{
+			$this->view->errMessage = $e->getMessage();
+		}
+		
+		$this->view->regexList = $partnerRegexArray;
+		$this->view->form = new Infra_Form();
+	}
 }

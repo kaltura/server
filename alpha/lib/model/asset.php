@@ -168,6 +168,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		$this->setHeight($fromAsset->getHeight());
 		$this->setContainerFormat($fromAsset->getContainerFormat());
 		$this->setSize($fromAsset->getSize());
+		$this->setSizeInBytes($fromAsset->getSizeInBytes());
 		$this->setFileExt($fromAsset->getFileExt());
 		$this->setTags($fromAsset->getTags());
 		$this->setDescription($fromAsset->getDescription());

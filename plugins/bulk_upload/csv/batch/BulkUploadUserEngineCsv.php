@@ -284,6 +284,17 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		
 		if ($bulkUploadUserResult->externalId)
 			$user->externalId = $bulkUploadUserResult->externalId;
+		
+		if (isset($bulkUploadUserResult->capabilities))
+		{
+			$capabilitiesArray = explode(',', $bulkUploadUserResult->capabilities);
+			foreach ($capabilitiesArray as $capability)
+			{
+				$userCapability = new KalturaUserCapability();
+				$userCapability->capability = $capability;
+				$user->capabilities[] = $userCapability;
+			}
+		}
 
 	    return $user;
 	}

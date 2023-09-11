@@ -30,7 +30,8 @@ class SessionService extends KalturaBaseService
 	 * @param KalturaSessionType $type Regular session or Admin session
 	 * @param int $partnerId
 	 * @param int $expiry KS expiry time in seconds
-	 * @param string $privileges 
+	 * @param string $privileges
+	 * @maskedParams secret,userId,privileges
 	 * @return string
 	 * @ksIgnored
 	 *

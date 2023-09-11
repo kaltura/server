@@ -152,6 +152,9 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 		    if($bulkUploadResult->entitledUsersPublish)
 		    	$mediaEntry->entitledUsersPublish = $bulkUploadResult->entitledUsersPublish;
 
+		    if($bulkUploadResult->entitledUsersView)
+		    	$mediaEntry->entitledUsersView = $bulkUploadResult->entitledUsersView;
+
 		    if($bulkUploadResult->referenceId)
 		    	$mediaEntry->referenceId = $bulkUploadResult->referenceId;
 		    	
@@ -389,6 +392,7 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 	    $ret[] = 'ownerId';
 	    $ret[] = 'entitledUsersEdit';
 	    $ret[] = 'entitledUsersPublish';
+	    $ret[] = 'entitledUsersView';
 	    $ret[] = 'referenceId';
 	    $ret[] = 'templateEntryId';
 

@@ -41,6 +41,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @param string $newFirstName Optional, provide only when you want to update the first name
 	 * @param string $newLastName Optional, provide only when you want to update the last name
 	 * @param string $otp the user's one-time password
+	 * @maskedParams email,password,newEmail,newPassword,newFirstName,newLastName
 	 *
 	 * @throws KalturaErrors::INVALID_FIELD_VALUE
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
@@ -187,7 +188,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * @param int $expiry
 	 * @param string $privileges
 	 * @param string $otp
-	 * 
+	 * @maskedParams puserId,loginEmail,password
 	 * @return string KS
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
@@ -287,6 +288,7 @@ class KalturaBaseUserService extends KalturaBaseService
 	 * 
 	 * @param string $hashKey
 	 * @param string $newPassword new password to set
+	 * @maskedParams newPassword
 	 *
 	 * @throws KalturaErrors::LOGIN_DATA_NOT_FOUND
 	 * @throws KalturaErrors::PASSWORD_STRUCTURE_INVALID
