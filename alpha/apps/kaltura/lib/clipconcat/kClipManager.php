@@ -20,6 +20,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const SOURCE_ENTRY = 'sourceEntry';
 	const MIN_FRAME_RATE = 10;
 	const MAX_FRAME_RATE = 30;
+	const DEFAULT_SAMPLE_RATE = 44100;
 	const LOCK_EXPIRY = 10;
 
 	/**
@@ -720,7 +721,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function decideAudioSamplingRate(array $allAudioSampleRates)
 	{
-		return 44100;
+		return self::DEFAULT_SAMPLE_RATE;
 	}
 
 	protected function decideAudioChannels(array $allAudioChannels)
