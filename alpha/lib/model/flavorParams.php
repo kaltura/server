@@ -177,6 +177,5 @@ class flavorParams extends assetParams
 
 	public function setChunkedEncodeMode($v){ $this->putInCustomData('ChunkedEncodeMode', $v);}
 	public function getChunkedEncodeMode(){return $this->getFromCustomData('ChunkedEncodeMode', null, 0);}
-	public function setImageToVideo($v){ $this->putInCustomData('ImageToVideo', $v);}
-	public function getImageToVideo(){return $this->getFromCustomData('ImageToVideo', null, 0);}
+
 }

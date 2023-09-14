@@ -154,6 +154,7 @@ class KalturaEntryResource extends KalturaContentResource
 			
     	if($srcEntry->getMediaType() == KalturaMediaType::IMAGE)
     	{
+			$object_to_fill->setOriginEntryId($srcEntry->getId());
 			$object_to_fill->setFileSyncObjectType(FileSyncObjectType::ENTRY);
 			$object_to_fill->setObjectSubType(kEntryFileSyncSubType::DATA);
 			$object_to_fill->setObjectId($srcEntry->getId());

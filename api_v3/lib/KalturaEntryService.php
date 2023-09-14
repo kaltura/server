@@ -1921,10 +1921,9 @@ class KalturaEntryService extends KalturaBaseService
 	{
 		KalturaLog::info("Multi resource clipping action detected, start to create multi template entry and sub template entries");
 
-		$tempEntries = array();
-		$tempEntriesIds = array();
 		$sourceEntryIds = array();
-		$mediaInfoObjs = array();
+		$tempEntryIds = array();
+		$resourcesData = array();
 
 		// for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip 3. retrieve media info object
 		foreach ($resources->getResources() as $resource)
@@ -1934,37 +1933,60 @@ class KalturaEntryService extends KalturaBaseService
 			$sourceEntryId = $resourceObj->getOriginEntryId();
 			$sourceEntryIds[] = $sourceEntryId;
 
+			$sourceEntry = EntryPeer::retrieveByPK($sourceEntryId);
 			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
-			$tempEntriesIds[] = $tempEntry->getId();
-			$tempEntries[] = $tempEntry;
+			$tempEntryIds[] = $tempEntry->getId();
 
-			$flavorAssetId = $resourceObj->getObjectId();
-			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($flavorAssetId);
+			$duration = 0;
+			foreach ($resource->getOperationAttributes() as $operationAttribute)
+			{
+				/* @var $operationAttribute kClipAttributes **/
+				$duration += $operationAttribute->getDuration();
+			}
+
+			if($sourceEntry->getMediaType() == KalturaMediaType::IMAGE)
+			{
+				$syncKey = $sourceEntry->getSyncKey(kEntryFileSyncSubType::DATA);
+				$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, 'mediainfo');
+				$mediaInfo = $mediaInfoParser->getMediaInfo();
+				$mediaInfoObj = $mediaInfo->toInsertableObject();
+				$imageToVideo = 1;
+			}
+			else
+			{
+				$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($resourceObj->getObjectId());
+				$imageToVideo = 0;
+			}
 			if(!$mediaInfoObj)
 			{
-				if($resourceObj instanceof kFileSyncResource && $resourceObj->getFileSyncObjectType() == FileSyncObjectType::ENTRY)
-				{
-					$sourceEntry = EntryPeer::retrieveByPK($flavorAssetId);
-					if($sourceEntry->getMediaType() != KalturaMediaType::IMAGE)
-					{
-						KalturaLog::err("Could not retrieve media info object for flavor asset Id [$flavorAssetId] for source entry Id [$sourceEntryId]");
-						throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $flavorAssetId);
-					}
-				}
+				$objectId = $resourceObj->getObjectId();
+				KalturaLog::err("Could not retrieve media info object for object Id [$objectId] for source entry Id [$sourceEntryId]");
+				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
 			}
-			// at this point, if $mediaInfoObj is null, then this is an image place holder
-			$mediaInfoObjs[] = $mediaInfoObj;
+
+			$resourcesData[] = array(
+				kClipManager::SOURCE_ENTRY => $sourceEntry,
+				kClipManager::TEMP_ENTRY => $tempEntry,
+				kClipManager::MEDIA_INFO_OBJECT => $mediaInfoObj,
+				kClipManager::DURATION => $duration,
+				kClipManager::IMAGE_TO_VIDEO => $imageToVideo
+			);
+
 		}
 
-		$conversionParamsArray = $clipManager->getCalculatedConversionParams($mediaInfoObjs, $destEntry->getConversionProfileId());
+		$clipManager->calculateAndEditConversionParams($resourcesData, $destEntry->getConversionProfileId());
 		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
-		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $multiTempEntry->getId(), $tempEntriesIds, $destEntry->getId());
-
+		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $tempEntryIds, $multiTempEntry->getId(), $destEntry->getId());
 		$rootJob = $clipManager->startMultiClipConcatBatchJob($resources, $destEntry, $multiTempEntry);
 		foreach ($resources->getResources() as $key => $resource)
 		{
-			$this->handleMultiClipRequest($resource, $destEntry, $clipManager, $tempEntries[$key], $rootJob->getId(), $key, $conversionParamsArray[$key]);
+			$tempEntry = $resourcesData[$key][kClipManager::TEMP_ENTRY];
+			$conversionParams = $resourcesData[$key][kClipManager::CONVERSION_PARAMS];
+			$this->handleMultiClipRequest($resource, $destEntry, $clipManager, $tempEntry, $rootJob->getId(), $key, $conversionParams);
 		}
+		$destEntry->setStatus(entryStatus::PENDING);
+		$destEntry->save();
 		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 	}
 

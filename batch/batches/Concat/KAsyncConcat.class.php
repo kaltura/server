@@ -108,6 +108,12 @@ class KAsyncConcat extends KJobHandlerWorker
 			$srcFiles[] = $srcFile->value;
 		}
 
+		$filePathsToRemove = array();
+		$srcFiles = $this->convertRequiredSrcFiles($data, $srcFiles, $ffmpegBin, $filePathsToRemove);
+		if(!$srcFiles)
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to pre-concat conversions", KalturaBatchJobStatus::FAILED);
+		}
 		$attemptNum = 1;
 		$totalAttempts = isset(KBatchBase::$taskConfig->params->totalAttempts) ? KBatchBase::$taskConfig->params->totalAttempts : 3;
 
@@ -119,8 +125,11 @@ class KAsyncConcat extends KJobHandlerWorker
 		}
 		while (!$result && $attemptNum <= $totalAttempts);
 
-		if(! $result)
+		$this->unlinkFilePaths($filePathsToRemove);
+		if(!$result)
+		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to concat files", KalturaBatchJobStatus::FAILED);
+		}
 
 		try
 		{
@@ -134,6 +143,33 @@ class KAsyncConcat extends KJobHandlerWorker
 		}
 
 		return $this->moveFile($job, $data, $localTempFilePath, $sharedTempFilePath);
+	}
+
+	protected function convertRequiredSrcFiles($data, &$srcFiles, $ffmpegBin, &$filePathsToRemove)
+	{
+		foreach ($data->conversionCommands as $key => $conversionCommand)
+		{
+			if($conversionCommand->value == "-")
+			{
+				continue;
+			}
+			$inFileName = $srcFiles[$key];
+			$resolvedInFilePath  = kFile::realPath($inFileName);
+			$outFilename = $this->localTempPath . DIRECTORY_SEPARATOR . basename($inFileName) . ".image_video.mpegts";
+			$conversionCmd = str_replace("__inFileName__", $resolvedInFilePath, $conversionCommand->value);
+			$conversionCmd = str_replace("__outFileName__", $outFilename, $conversionCmd);
+			$cmdStr = "$ffmpegBin $conversionCmd 2>&1";
+
+			KalturaLog::debug("Executing [$cmdStr]");
+			system($cmdStr, $rv);
+			if($rv != 0)
+			{
+				return null;
+			}
+			$srcFiles[$key] = $outFilename;
+			$filePathsToRemove[] = $outFilename;
+		}
+		return $srcFiles;
 	}
 
 	/**
@@ -158,6 +194,17 @@ class KAsyncConcat extends KJobHandlerWorker
 			
 		$data->destFilePath = $sharedTempFilePath;
 		return $this->closeJob($job, null, null, 'successfully moved file', KalturaBatchJobStatus::FINISHED, $data);
+	}
+
+	protected function unlinkFilePaths(array $filePaths)
+	{
+		foreach ($filePaths as $filePath)
+		{
+			if(kFile::checkFileExists($filePath))
+			{
+				kFile::unlink($filePath);
+			}
+		}
 	}
 
 	/**

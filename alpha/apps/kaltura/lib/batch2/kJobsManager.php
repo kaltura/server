@@ -1161,9 +1161,10 @@ class kJobsManager
 	 * @param bool $shouldSort
 	 * @param null $offset
 	 * @param null $duration
+	 * @param array $conversionCommands
 	 * @return BatchJob
 	 */
-	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $shouldSort = true , $offset = null, $duration = null)
+	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $shouldSort = true, $offset = null, $duration = null, $conversionCommands = null)
 	{
 		$jobData = new kConcatJobData();
  		$jobData->setSrcFiles($files);
@@ -1171,6 +1172,7 @@ class kJobsManager
 		$jobData->setOffset($offset);
 		$jobData->setDuration($duration);
 		$jobData->setShouldSort($shouldSort);
+		$jobData->setConversionCommands($conversionCommands);
 
  		$entry = $asset->getentry();
  		if($entry && $entry->getStatus() != entryStatus::READY)
