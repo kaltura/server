@@ -362,9 +362,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param array $tempEntriesIds
 	 * @param string $destEntryId
 	 */
-	public function addMultiClipTrackEntries($sourceEntryIds, $multiTempEntryId, $destEntryId)
+	public function addMultiClipTrackEntries($sourceEntryIds, $tempEntryIds, $multiTempEntryId, $destEntryId)
 	{
-		$description = "source entry ids: [" . implode(",", $sourceEntryIds) . "],  multi template entry id: [" . $multiTempEntryId . "].";
+		$description = "template entry ids: [" . implode(",",$tempEntryIds) . "]";
+		$this->addClipTrackEntry($multiTempEntryId, $description);
+		$description = "source entry ids: [" . implode(",", $sourceEntryIds) . "],  multi template entry id: [" . $multiTempEntryId . "]";
 		$this->addClipTrackEntry($destEntryId, $description);
 	}
 

@@ -1922,6 +1922,7 @@ class KalturaEntryService extends KalturaBaseService
 		KalturaLog::info("Multi resource clipping action detected, start to create multi template entry and sub template entries");
 
 		$sourceEntryIds = array();
+		$tempEntryIds = array();
 		$resourcesData = array();
 
 		// for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip 3. retrieve media info object
@@ -1934,6 +1935,7 @@ class KalturaEntryService extends KalturaBaseService
 
 			$sourceEntry = EntryPeer::retrieveByPK($sourceEntryId);
 			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
+			$tempEntryIds[] = $tempEntry->getId();
 
 			$duration = 0;
 			foreach ($resource->getOperationAttributes() as $operationAttribute)
@@ -1975,7 +1977,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		$clipManager->calculateAndEditConversionParams($resourcesData, $destEntry->getConversionProfileId());
 		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
-		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $multiTempEntry->getId(), $destEntry->getId());
+		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $tempEntryIds, $multiTempEntry->getId(), $destEntry->getId());
 		$rootJob = $clipManager->startMultiClipConcatBatchJob($resources, $destEntry, $multiTempEntry);
 		foreach ($resources->getResources() as $key => $resource)
 		{
