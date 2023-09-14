@@ -13,6 +13,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const AUDIO_CHANNELS = 'audioChannels';
 	const AUDIO_SAMPLE_RATE = 'audioSamplingRate';
 	const IMAGE_TO_VIDEO = 'imageToVideo';
+	const CONVERSION_PARAMS = 'conversionParams';
+	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
+	const DURATION = 'duration';
+	const TEMP_ENTRY = 'tempEntry';
+	const SOURCE_ENTRY = 'sourceEntry';
 	const MIN_FRAME_RATE = 10;
 	const MAX_FRAME_RATE = 30;
 	const LOCK_EXPIRY = 10;
@@ -112,7 +117,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$rootJob = $this->getAncestorJob($batchJob);
 			if ($batchJob->getJobType() == BatchJobType::CLIP_CONCAT)
 			{
-				$this->handleClipConcatParentJob($batchJob);
+				$this->handleClipConcatParentJob($batchJob, $rootJob);
 			}
 			elseif ($this->isImportFinished($batchJob))
 			{
@@ -356,11 +361,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param array $tempEntriesIds
 	 * @param string $destEntryId
 	 */
-	public function addMultiClipTrackEntries($sourceEntryIds, $multiTempEntryId, $tempEntriesIds, $destEntryId)
+	public function addMultiClipTrackEntries($sourceEntryIds, $multiTempEntryId, $destEntryId)
 	{
-		$description = "source entry Ids : [" . implode(",", $sourceEntryIds) . "] template entry ids: [" . implode(",",$tempEntriesIds) . "].";
-		$this->addClipTrackEntry($multiTempEntryId, $description);
-
 		$description = "source entry ids: [" . implode(",", $sourceEntryIds) . "],  multi template entry id: [" . $multiTempEntryId . "].";
 		$this->addClipTrackEntry($destEntryId, $description);
 	}
@@ -542,7 +544,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param BatchJob $batchJob
 	 * @throws kCoreException|PropelException|KalturaAPIException|APIException
 	 */
-	protected function handleClipConcatParentJob($batchJob)
+	protected function handleClipConcatParentJob($batchJob, $rootJob)
 	{
 		switch ($batchJob->getStatus())
 		{
@@ -561,21 +563,63 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				}
 				else
 				{
-					$this->addClipJobsFromBatchJob($batchJob, $jobData);
+					$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+					if($imageToVideo)
+					{
+						// processing of images (convert image to video) is done in concat job
+						kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+					}
+					else
+					{
+						$this->addClipJobsFromBatchJob($batchJob, $jobData);
+					}
 				}
 				break;
+
+			case BatchJob::BATCHJOB_STATUS_FINISHED:
+
+				if($this->allClipConcatJobsFinished($rootJob) && !$this->concatJobExist($rootJob))
+				{
+					$this->startMultiResourceConcat($rootJob);
+				}
+				break;
+
 			default:
 				break;
 		}
 	}
 
+	protected function allClipConcatJobsFinished($rootJob)
+	{
+		if($rootJob->getJobType() != BatchJobType::MULTI_CLIP_CONCAT)
+		{
+			return false;
+		}
+		/* @var $jobData kMultiClipConcatJobData**/
+		$jobData = $rootJob->getData();
+		$clipConcatJobs = $rootJob->getChildJobsByTypes(array(BatchJobType::CLIP_CONCAT));
+		if(count($clipConcatJobs) != count($jobData->getOperationResources()))
+		{
+			return false;
+		}
+		foreach ($clipConcatJobs as $clipConcatJob)
+		{
+			if($clipConcatJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/**
 	 * @throws KalturaAPIException
 	 */
-	public function getCalculatedConversionParams($mediaInfoObjs, $conversionProfileId)
+	public function getCalculatedConversionParams($resourcesData, $conversionProfileId)
 	{
 		// choose min height and min width of input dimensions and conversion profile max dimensions
-		// if input aspect ratios are different, choose standard aspect ratio that is closest to the average of the input aspect ratios
+		// choose the most common of aspect ratio and audio channels
+		// choose sampling rate of 44.1 kHz
 		// scale chosen height and width by chosen aspect ratio
 		// choose max frame rate of all input frame rates, limit 10<=frameRate<=30
 		$height = 0;
@@ -585,77 +629,114 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$allAudioChannels = array();
 		$allAudioSampleRates = array();
 
-		foreach ($mediaInfoObjs as $mediaInfoObj)
+		foreach ($resourcesData as $resourceData)
 		{
-			if(!$mediaInfoObj)
-			{
-				continue;
-			}
+			$entryId = $resourceData[self::SOURCE_ENTRY] ? $resourceData[self::SOURCE_ENTRY]->getId() : null;
+
 			/** @var $mediaInfoObj mediaInfo*/
-			$frameRate = max($frameRate, $mediaInfoObj->getVideoFrameRate());
+			$mediaInfoObj = $resourceData[self::MEDIA_INFO_OBJECT];
+			if(!($mediaInfoObj instanceof mediaInfo))
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $entryId);
+			}
 			$currentWidth = $mediaInfoObj->getVideoWidth();
 			$currentHeight = $mediaInfoObj->getVideoHeight();
 			if($currentWidth * $currentHeight == 0)
 			{
-				throw new KalturaAPIException(KalturaErrors::INCOMPATIBLE_RESOURCES_DIMENSIONS);
+				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $entryId);
 			}
 			$width = $width == 0 ? $currentWidth : min($currentWidth, $width);
 			$height = $height == 0 ? $currentHeight : min($currentHeight, $height);
-			$aspectRatios[] = $currentWidth/$currentHeight;
-			$allAudioChannels[] = $mediaInfoObj->getAudioChannels();
-			$allAudioSampleRates[] = $mediaInfoObj->getAudioSamplingRate();
+			$duration = $resourceData[self::DURATION];
+			$this->updateKeyFrequency($aspectRatios, $currentWidth/$currentHeight, $duration);
+			if(!$resourceData[self::IMAGE_TO_VIDEO])
+			{
+				$this->updateKeyFrequency($allAudioChannels, $mediaInfoObj->getAudioChannels(), $duration);
+				$this->updateKeyFrequency($allAudioSampleRates, $mediaInfoObj->getAudioSamplingRate(), $duration);
+				$frameRate = max($frameRate, $mediaInfoObj->getVideoFrameRate());
+			}
 		}
 
-		$audioChannel = $this->decideAudioChannels($allAudioChannels);
+		$audioChannels = $this->decideAudioChannels($allAudioChannels);
 		$audioSampleRate = $this->decideAudioSamplingRate($allAudioSampleRates);
-		$this->limitByMaxProfileResolution($conversionProfileId, $aspectRatios, $width, $height);
-		$this->adjustResolutionByAspectRatios($aspectRatios, $width, $height);
+		$aspectRatio = $this->decideAspectRatio($aspectRatios);
+		$this->decideResolution($conversionProfileId, $aspectRatio, $width, $height);
+
 		KalturaLog::debug("Multi Clip dimensions: width [$width], height [$height]");
 
 		$conversionParams = array(
 			self::WIDTH => $width,
 			self::HEIGHT => $height,
-			self::AUDIO_CHANNELS => $audioChannel,
+			self::AUDIO_CHANNELS => $audioChannels,
 			self::AUDIO_SAMPLE_RATE => $audioSampleRate,
 			self::FRAME_RATE => min($frameRate, self::MAX_FRAME_RATE)
 		);
 
-		$conversionParamsArray = array();
-		foreach ($mediaInfoObjs as $mediaInfoObj)
-		{
-			$currentConversionParams = $conversionParams;
-			if(!$mediaInfoObj)
-			{
-				$currentConversionParams[self::IMAGE_TO_VIDEO] = 1;
-			}
-			elseif($mediaInfoObj->getVideoWidth() == $width && $mediaInfoObj->getVideoHeight() == $height)
-			{
-				unset($currentConversionParams[self::WIDTH]);
-				unset($currentConversionParams[self::HEIGHT]);
-			}
-			$conversionParamsArray[] = json_encode($currentConversionParams, true);
-		}
+		$this->setConversionParamsForResources($resourcesData, $conversionParams);
+		return $resourcesData;
+	}
 
-		return $conversionParamsArray;
+	protected function setConversionParamsForResources(&$resourcesData, $conversionParams)
+	{
+		$width = $conversionParams[self::WIDTH];
+		$height = $conversionParams[self::HEIGHT];
+		$audioChannels = $conversionParams[self::AUDIO_CHANNELS];
+		$audioSampleRate = $conversionParams[self::AUDIO_SAMPLE_RATE];
+		foreach ($resourcesData as $key => $resourceData)
+		{
+			$imageToVideo = $resourceData[self::IMAGE_TO_VIDEO];
+			$currentConversionParams = array();
+			$mediaInfoObj = $resourceData[self::MEDIA_INFO_OBJECT];
+			if($mediaInfoObj->getVideoWidth() != $width || $mediaInfoObj->getVideoHeight() != $height)
+			{
+				$currentConversionParams[self::WIDTH] = $width;
+				$currentConversionParams[self::HEIGHT] = $height;
+			}
+			if($imageToVideo || $mediaInfoObj->getAudioChannels() != $audioChannels)
+			{
+				$currentConversionParams[self::AUDIO_CHANNELS] = $audioChannels;
+			}
+			if($imageToVideo || $mediaInfoObj->getAudioSamplingRate() != $audioSampleRate)
+			{
+				$currentConversionParams[self::AUDIO_SAMPLE_RATE] = $audioSampleRate;
+			}
+			if($imageToVideo)
+			{
+				$currentConversionParams[self::IMAGE_TO_VIDEO] = $imageToVideo;
+			}
+			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
+		}
+	}
+
+	protected function decideResolution($conversionProfileId, $aspectRatio, &$width, &$height)
+	{
+		$this->limitByMaxProfileResolution($conversionProfileId, $aspectRatio, $width, $height);
+		$this->adjustResolutionByAspectRatios($aspectRatio, $width, $height);
+	}
+
+	protected function updateKeyFrequency(&$array, $key, $frequency)
+	{
+		$array["$key"] = isset($array["$key"]) ? $array["$key"] + $frequency : $frequency;
 	}
 
 	protected function decideAudioSamplingRate(array $allAudioSampleRates)
 	{
-		return min($allAudioSampleRates);
+		return 44100;
 	}
 
 	protected function decideAudioChannels(array $allAudioChannels)
 	{
-		// if audio channels are only stereo or mixed (mono and stereo), return stereo, else return mono
-		$uniqAudioChannels = array_unique($allAudioChannels);
-		if((count($uniqAudioChannels) == 1 && $uniqAudioChannels[0] == 2) || count($uniqAudioChannels) > 1)
+		// 1 - mono, 2 - stereo
+		if(count($allAudioChannels) == 0)
 		{
-			return 2; // stereo
+			return 1;
 		}
-		return 1; //mono
+		$maxDurationAudioChannels = max($allAudioChannels);
+		$mostFrequentAudioChannels = array_search($maxDurationAudioChannels, $allAudioChannels);
+		return $mostFrequentAudioChannels > 1 ? 2 : 1;
 	}
 
-	protected function limitByMaxProfileResolution($conversionProfileId, $aspectRatios, &$width, &$height)
+	protected function limitByMaxProfileResolution($conversionProfileId, $aspectRatio, &$width, &$height)
 	{
 		$profileWidth = 0;
 		$profileHeight = 0;
@@ -674,37 +755,32 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 
 		KalturaLog::debug("Conversion profile maximum dimensions: width [$profileWidth], height [$profileHeight]");
-		$this->adjustResolutionByAspectRatios($aspectRatios, $profileWidth, $profileHeight);
+		$this->adjustResolutionByAspectRatios($aspectRatio, $profileWidth, $profileHeight);
 		$width = min($width, $profileWidth);
 		$height = min($height, $profileHeight);
 	}
 
-	protected function adjustResolutionByAspectRatios($aspectRatios, &$width, &$height)
+	protected function adjustResolutionByAspectRatios($aspectRatio, &$width, &$height)
 	{
-		$aspectRatio = $this->decideAspectRatio($aspectRatios);
 		// aspect ration is aw/ah, therefore, the goal is w/h = aw/ah where w=aw or h=ah
 		if($height * $aspectRatio >= $width)
 		{
-			$width = $height * $aspectRatio;
+			$width = round($height * $aspectRatio);
 		}
 		else
 		{
-			$height = $width * (1/$aspectRatio);
+			$height = round($width * (1/$aspectRatio));
 		}
 	}
 
 	protected function decideAspectRatio($inputARs)
 	{
-		if(count(array_unique($inputARs)) == 1)
+		if(count($inputARs) == 0)
 		{
-			return $inputARs[0];
+			throw new KalturaAPIException(KalturaErrors::INCOMPATIBLE_RESOURCES_DIMENSIONS);
 		}
-		$avgAR = array_sum($inputARs)/count($inputARs);
-		// return standard aspect ratio closest to the average of input ratios
-		$standardARs = array(4/3,5/4,5/3,16/9,16/8,16/10,2.4,2.39,2.35,1.85);
-		$standardARDiff = array_map(function ($standardAR) use ($avgAR) {return abs($standardAR - $avgAR);}, $standardARs);
-		$minDiffInd = array_keys($standardARDiff, min($standardARDiff))[0];
-		return $standardARs[$minDiffInd];
+		$maxDurationAspectRatio = max($inputARs);
+		return array_search($maxDurationAspectRatio, $inputARs);
 	}
 
 	/**
@@ -762,8 +838,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$encryptionKey = $asset->getEncryptionKey();
 		}
 
-		$conversionParams = $parentJob->getData()->getConversionParams();
-		$conversionParams = $conversionParams ? json_decode($conversionParams, true) : null;
+		$conversionParams = $this->getJobDataConversionParams($parentJob->getData());
 
 		/* @var $singleAttribute kClipAttributes */
 		foreach($operationAttributes as $singleAttribute)
@@ -828,14 +903,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 * @throws Exception
 	 */
-	protected function getFilesPath($assets)
+	protected function getFilesPath($assets, $allowIsOriginal = false)
 	{
 		$files = array();
-		foreach ($assets as $asset) {
+		foreach ($assets as $asset)
+		{
 			/**
-			 * Don't take source it is empty
+			 * Don't take source
 			 * @var flavorAsset $asset */
-			if ($asset->getIsOriginal()) {
+			if (!$allowIsOriginal && $asset->getIsOriginal())
+			{
 				continue;
 			}
 			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
@@ -1007,42 +1084,89 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$lastAssetId = null;
 		$allRelatedFiles = array();
+		$imageConvertCommands = array();
 		foreach ($clipConcatJobs as $clipConcatJob)
 		{
 			KalturaLog::debug('Going To Start Concat Job for Multi Clip Concat');
-			kJobsManager::updateBatchJob($clipConcatJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+
+			if($clipConcatJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+			{
+				kJobsManager::updateBatchJob($clipConcatJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+			}
 
 			/** @var kClipConcatJobData $jobData */
 			$jobData = $clipConcatJob->getData();
 
 			$flavorAssetsOnTempEntry = assetPeer::retrieveByEntryId($jobData->getTempEntryId(), array(assetType::FLAVOR));
 			usort($flavorAssetsOnTempEntry, array("kClipManager", "cmpByClipOrder"));
+			$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+			$files = $this->getFilesPath($flavorAssetsOnTempEntry, $imageToVideo);
 
-			$files = $this->getFilesPath($flavorAssetsOnTempEntry);
 			foreach ($files as $flavorAssetId => $relatedFiles)
 			{
 				/** @var array $relatedFiles */
-				$allRelatedFiles = array_merge($allRelatedFiles, $relatedFiles);
+				foreach ($relatedFiles as $relatedFile)
+				{
+					$allRelatedFiles[] = $relatedFile;
+					$imageConvertCommands[] = $imageToVideo ? $this->getConvertImageCommand($jobData) : "-";
+				}
 				KalturaLog::debug("Asset Id: [$flavorAssetId], Related file : " . print_r($relatedFiles, true));
 				// assume concatenated assets have the same actualFlavorParamsId and take the last
-				$lastAssetId = $flavorAssetId;
+				$lastAssetId = $flavorAssetId ? $flavorAssetId : $lastAssetId;
 			}
 			$this->deleteEntry($jobData->getTempEntryId());
 		}
+
 		// use no filter because we delete the entry
 		$flavorAsset = assetPeer::retrieveByIdNoFilter($lastAssetId);
+		$flavorParamsId = $flavorAsset ? $flavorAsset->getFlavorParamsId() : flavorParams::SOURCE_FLAVOR_ID;
 		$tempEntry = entryPeer::retrieveByPK($multiClipConcatJob->getData()->getMultiTempEntryId());
-
-		// create one target flavor asset for all clip concat jobs
-		$targetFlavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $flavorAsset->getFlavorParamsId());
 
 		//calling addConcatJob only if lock succeeds
 		$store = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
-		$lockKey = 'kclipManager_add_concat_job' . $multiClipConcatJob->getId() . $targetFlavorAsset->getId();
+		// create one concat job for multi temp entry
+		$lockKey = 'kclipManager_add_concat_job' . $multiClipConcatJob->getId() . $tempEntry->getId();
 		if (!$store || $store->add($lockKey, true, self::LOCK_EXPIRY))
 		{
-			kJobsManager::addConcatJob($multiClipConcatJob, $targetFlavorAsset, $allRelatedFiles, false);
+			// create one target flavor asset for all clip concat jobs
+			$targetFlavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $flavorParamsId);
+			kJobsManager::addConcatJob($multiClipConcatJob, $targetFlavorAsset, $allRelatedFiles, false, null, null, $imageConvertCommands);
 		}
+	}
+
+	protected function getConvertImageCommand($jobData)
+	{
+		$cmdStr = " -loop 1 -i __inFileName__";
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		if(isset($conversionParams[self::AUDIO_CHANNELS]))
+		{
+			$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
+		}
+		if(isset($conversionParams[self::AUDIO_SAMPLE_RATE]))
+		{
+			$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
+		}
+
+		// image should have only one clipAttribute
+		$operationAttribute = $jobData->getOperationAttributes()[0];
+		$cmdStr .= " -f s16le -i /dev/zero -c:v libx264 -t " . $operationAttribute->getDuration()/1000;
+		if(isset($conversionParams[self::FRAME_RATE]))
+		{
+			$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
+		}
+		if(isset($conversionParams[self::WIDTH]) && isset($conversionParams[self::HEIGHT]))
+		{
+			$width = $conversionParams[self::WIDTH];
+			$height = $conversionParams[self::HEIGHT];
+			$frameSize = "$width:$height";
+			$cmdStr .= " -s " . str_replace(':', 'x', $frameSize);
+			$cmdStr .= " -filter_complex '[0:v]scale=iw*min($width/iw\,$height/ih):ih*min($width/iw\,$height/ih)[vflt0];[vflt0]pad=$width:$height:(ow-iw)/2:(oh-ih)/2'";
+			$cmdStr .= " -aspect $frameSize";
+		}
+		$cmdStr .= " -c:a libfdk_aac -b:a 192k";
+		$cmdStr .= " -f mpegts -vsync 1";
+		$cmdStr .= " -y __outFileName__";
+		return $cmdStr;
 	}
 
 	/**
@@ -1198,11 +1322,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		if($conversionParams)
 		{
 			$flavorParamsObj->setForceFrameToMultiplication16(0);
-			if(isset($conversionParams[self::IMAGE_TO_VIDEO]))
-			{
-				$flavorParamsObj->setImageToVideo($conversionParams[self::IMAGE_TO_VIDEO]);
-				$flavorParamsObj->setIsCropIMX(0);
-			}
 			if(isset($conversionParams[self::FRAME_RATE]))
 			{
 				$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
@@ -1237,7 +1356,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err("Could not find flavor params Id " . kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 			throw new KalturaAPIException(KalturaErrors::INTERNAL_SERVERL_ERROR);
 		}
-		$flavorParamsObj->setImageToVideo(0);
 		$flavorParamsObj->setFrameRate($flavorParamsOriginalObj->getFrameRate());
 		$flavorParamsObj->setWidth($flavorParamsOriginalObj->getWidth());
 		$flavorParamsObj->setHeight($flavorParamsOriginalObj->getHeight());
@@ -1270,5 +1388,22 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$concatJobs = $rootJob->getChildJobsByTypes(array(BatchJobType::CONCAT));
 		return count($concatJobs) > 0;
 	}
-	
+
+	protected function getJobDataConversionParams($jobData, $field = null)
+	{
+		if($jobData instanceof kClipConcatJobData)
+		{
+			$conversionParamsJson = $jobData->getConversionParams();
+			if($conversionParamsJson)
+			{
+				$conversionParams = json_decode($conversionParamsJson, true);
+				if($field)
+				{
+					return isset($conversionParams[$field]) ? $conversionParams[$field] : null;
+				}
+				return $conversionParams;
+			}
+		}
+		return null;
+	}
 }

@@ -150,6 +150,7 @@ class KalturaErrors extends APIErrors
 
 	const RESOURCES_MULTIPLE_DATA_CENTERS = "RESOURCES_MULTIPLE_DATA_CENTERS;;Resources created on different data centers";
 	const INCOMPATIBLE_RESOURCES_DIMENSIONS = "INCOMPATIBLE_RESOURCES_DIMENSIONS;;Resources has incompatible dimensions";
+	const INVALID_MEDIA_INFO = "INVALID_MEDIA_INFO;ENTRY_ID;Entry Id \"@ENTRY_ID@\" has invalid media info";
 	const MEDIA_INFO_NOT_FOUND = "MEDIA_INFO_NOT_FOUND;FLAVOR_ASSET_ID;Media info for flavor asset Id \"@FLAVOR_ASSET_ID@\" not found";
 
 	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED;MEDIA_TYPE;Entry media type \"@MEDIA_TYPE@\" not supported";

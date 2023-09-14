@@ -27,7 +27,7 @@ class KalturaFileSyncResource extends KalturaContentResource
 	
 	/**
 	 * The version of the file sync object 
-	 * @var int
+	 * @var string
 	 */
 	public $version;
 
