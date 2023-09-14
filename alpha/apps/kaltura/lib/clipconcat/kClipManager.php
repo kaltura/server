@@ -615,7 +615,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	/**
 	 * @throws KalturaAPIException
 	 */
-	public function getCalculatedConversionParams($resourcesData, $conversionProfileId)
+	public function calculateAndEditConversionParams(&$resourcesData, $conversionProfileId)
 	{
 		// choose min height and min width of input dimensions and conversion profile max dimensions
 		// choose the most common of aspect ratio and audio channels
@@ -673,7 +673,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		);
 
 		$this->setConversionParamsForResources($resourcesData, $conversionParams);
-		return $resourcesData;
 	}
 
 	protected function setConversionParamsForResources(&$resourcesData, $conversionParams)

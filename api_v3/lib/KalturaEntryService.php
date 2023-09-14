@@ -1973,7 +1973,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		}
 
-		$resourcesData = $clipManager->getCalculatedConversionParams($resourcesData, $destEntry->getConversionProfileId());
+		$clipManager->calculateAndEditConversionParams($resourcesData, $destEntry->getConversionProfileId());
 		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
 		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $multiTempEntry->getId(), $destEntry->getId());
 		$rootJob = $clipManager->startMultiClipConcatBatchJob($resources, $destEntry, $multiTempEntry);

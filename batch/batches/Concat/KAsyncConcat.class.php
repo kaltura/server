@@ -160,7 +160,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			$conversionCmd = str_replace("__outFileName__", $outFilename, $conversionCmd);
 			$cmdStr = "$ffmpegBin $conversionCmd 2>&1";
 
-			KalturaLog::debug("Convert image to video, Executing [$cmdStr]");
+			KalturaLog::debug("Executing [$cmdStr]");
 			system($cmdStr, $rv);
 			if($rv != 0)
 			{
