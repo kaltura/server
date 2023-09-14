@@ -571,19 +571,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					{
 						// processing of images (convert image to video) is done in concat job
 						kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+						if($this->allClipConcatJobsFinished($rootJob) && !$this->concatJobExist($rootJob))
+						{
+							$this->startMultiResourceConcat($rootJob);
+						}
 					}
 					else
 					{
 						$this->addClipJobsFromBatchJob($batchJob, $jobData);
 					}
-				}
-				break;
-
-			case BatchJob::BATCHJOB_STATUS_FINISHED:
-
-				if($this->allClipConcatJobsFinished($rootJob) && !$this->concatJobExist($rootJob))
-				{
-					$this->startMultiResourceConcat($rootJob);
 				}
 				break;
 
