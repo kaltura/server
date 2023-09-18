@@ -2193,7 +2193,7 @@ CREATE TABLE `kuser_to_user_role`
 	`user_role_id` INTEGER  NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
-    `app_guid` VARCHAR(32),
+	`app_guid` VARCHAR(32),
 	PRIMARY KEY (`id`),
 	INDEX `kuser_to_user_role_FI_1` (`kuser_id`),
 	CONSTRAINT `kuser_to_user_role_FK_1`

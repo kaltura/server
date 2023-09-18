@@ -39,15 +39,7 @@ class KalturaUserAppRole extends KalturaAppRole
 			$kuserToUserRole = new KuserToUserRole();
 		}
 		
-		$kuserToUserRole = parent::toInsertableObject($kuserToUserRole, $skip);
-		
-		// todo remove after testing
-//		/* @var KuserToUserRole $kuserToUserRole */
-//		$kuserToUserRole->setKuserId($this->kuserId);
-//		$kuserToUserRole->setAppGuid($this->appGuid);
-//		$kuserToUserRole->setUserRoleId($this->userRoleId);
-		
-		return $kuserToUserRole;
+		return parent::toInsertableObject($kuserToUserRole, $skip);
 	}
 	
 	/**
