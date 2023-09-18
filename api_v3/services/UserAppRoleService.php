@@ -40,15 +40,15 @@ class UserAppRoleService extends KalturaBaseService
 		// todo: consider adding $master_partner_id = -11
 		// todo: if it's EP impersonated session, fetch user_role from 'global_partner' (0)
 		
-		try
-		{
+//		try
+//		{
 			$dbUserAppRole = $userAppRole->toInsertableObject();
 			$dbUserAppRole->save();
-		}
-		catch (kCoreException $ex)
-		{
-			$this->handleCoreException($ex);
-		}
+//		}
+//		catch (kCoreException $ex)
+//		{
+//			$this->handleCoreException($ex);
+//		}
 		
 		$userAppRole = new KalturaUserAppRole();
 		$userAppRole->fromObject($dbUserAppRole, $this->getResponseProfile());
@@ -74,15 +74,15 @@ class UserAppRoleService extends KalturaBaseService
 	{
 		$dbUserAppRole = $this->getByUserAndAppGuid($userId, $appGuid);
 		
-		try
-		{
+//		try
+//		{
 			$dbUserAppRole = $userAppRole->toUpdatableObject($dbUserAppRole);
 			$dbUserAppRole->save();
-		}
-		catch (kCoreException $ex)
-		{
-			$this->handleCoreException($ex);
-		}
+//		}
+//		catch (kCoreException $ex)
+//		{
+//			$this->handleCoreException($ex);
+//		}
 		
 		$userAppRole = new KalturaUserAppRole();
 		$userAppRole->fromObject($dbUserAppRole, $this->getResponseProfile());
@@ -122,6 +122,7 @@ class UserAppRoleService extends KalturaBaseService
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaUserAppRoleListResponse
 	 *
+	 * @throws KalturaAPIException
 	 * @throws PropelException
 	 */
 	public function listAction(KalturaUserAppRoleFilter $filter = null, KalturaFilterPager $pager = null)
@@ -171,17 +172,38 @@ class UserAppRoleService extends KalturaBaseService
 	 */
 	protected function getByUserAndAppGuid($userId, $appGuid)
 	{
-		try
+		$puserId = trim($userId);
+		$appGuid = trim($appGuid);
+		
+		if (!kCurrentContext::$is_admin_session && kCurrentContext::$ks_uid != $puserId)
 		{
-			$dbUserAppRole = KuserToUserRolePeer::getByPuserIdAndAppGuid($userId, $appGuid);
+			throw new KalturaAPIException(KalturaErrors::CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION, $puserId);
 		}
-		catch (kCoreException $ex)
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $puserId);
+		
+		if (!$kuser)
 		{
-			$this->handleCoreException($ex);
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $puserId);
 		}
-		catch (Exception $ex)
+		
+		if (!kString::isValidMongoId($appGuid))
 		{
-			throw $ex;
+			throw new KalturaAPIException(KalturaErrors::INVALID_APP_GUID, $appGuid);
+		}
+		
+		// validate appGuid belong to ks partner
+		$appGuidExist = MicroServiceAppRegistry::getExistingAppGuid(kCurrentContext::getCurrentPartnerId(), $appGuid);
+		if (!$appGuidExist)
+		{
+			throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $appGuid);
+		}
+		
+		$dbUserAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($kuser->getId(), $appGuid);
+		
+		if (!$dbUserAppRole)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_FOUND, $puserId, $appGuid);
 		}
 		
 		return $dbUserAppRole;
@@ -191,42 +213,42 @@ class UserAppRoleService extends KalturaBaseService
 	 * @throws KalturaAPIException
 	 * @throws kCoreException
 	 */
-	protected function handleCoreException(kCoreException $ex)
-	{
-		switch ($ex->getCode())
-		{
-			case kCoreException::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP:
-				throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP);
-			
-			case kCoreException::USER_ROLE_NOT_FOUND:
-				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
-			
-			case kCoreException::USER_APP_ROLE_ALREADY_EXISTS:
-				$args = explode(',', $ex->getData());
-				throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_ALREADY_EXISTS, $args[0], $args[1]);
-			
-			case kCoreException::CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION:
-				throw new KalturaAPIException(KalturaErrors::CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION, $ex->getData());
-			
-			case kCoreException::INVALID_USER_ID:
-				throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $ex->getData());
-			
-			case kCoreException::INVALID_APP_GUID:
-				throw new KalturaAPIException(KalturaErrors::INVALID_APP_GUID, $ex->getData());
-			
-			case kCoreException::APP_GUID_NOT_FOUND:
-				throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $ex->getData());
-			
-			case kCoreException::USER_APP_ROLE_NOT_FOUND:
-				$args = explode(',', $ex->getData());
-				throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_FOUND, $args[0], $args[1]);
-			
-			case kCoreException::FAILED_TO_INSTANTIATE_MICROSERVICE_CACHE:
-				// todo - do I want to throw API exception for cache? probably not
-				// currently throws 'INTERNAL_SERVER_ERROR'
-			
-			default:
-				throw $ex;
-		}
-	}
+//	protected function handleCoreException(kCoreException $ex)
+//	{
+//		switch ($ex->getCode())
+//		{
+//			case kCoreException::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP:
+//				throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP);
+//
+//			case kCoreException::USER_ROLE_NOT_FOUND:
+//				throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
+//
+//			case kCoreException::USER_APP_ROLE_ALREADY_EXISTS:
+//				$args = explode(',', $ex->getData());
+//				throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_ALREADY_EXISTS, $args[0], $args[1]);
+//
+//			case kCoreException::CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION:
+//				throw new KalturaAPIException(KalturaErrors::CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION, $ex->getData());
+//
+//			case kCoreException::INVALID_USER_ID:
+//				throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $ex->getData());
+//
+//			case kCoreException::INVALID_APP_GUID:
+//				throw new KalturaAPIException(KalturaErrors::INVALID_APP_GUID, $ex->getData());
+//
+//			case kCoreException::APP_GUID_NOT_FOUND:
+//				throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $ex->getData());
+//
+//			case kCoreException::USER_APP_ROLE_NOT_FOUND:
+//				$args = explode(',', $ex->getData());
+//				throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_FOUND, $args[0], $args[1]);
+//
+//			case kCoreException::FAILED_TO_INSTANTIATE_MICROSERVICE_CACHE:
+//				// todo - do I want to throw API exception for cache? probably not
+//				// currently throws 'INTERNAL_SERVER_ERROR'
+//
+//			default:
+//				throw $ex;
+//		}
+//	}
 }

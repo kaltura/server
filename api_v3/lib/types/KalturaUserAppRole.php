@@ -13,6 +13,16 @@ class KalturaUserAppRole extends KalturaAppRole
 	 */
 	public $userId;
 	
+	private static $map_between_objects = array
+	(
+		"userId" => "puserId"
+	);
+	
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+	
 	/**
 	 * @param $kuserToUserRole
 	 * @param $skip
@@ -31,10 +41,11 @@ class KalturaUserAppRole extends KalturaAppRole
 		
 		$kuserToUserRole = parent::toInsertableObject($kuserToUserRole, $skip);
 		
-		/* @var KuserToUserRole $kuserToUserRole */
-		$kuserToUserRole->setKuserId($this->kuserId);
-		$kuserToUserRole->setAppGuid($this->appGuid);
-		$kuserToUserRole->setUserRoleId($this->userRoleId);
+		// todo remove after testing
+//		/* @var KuserToUserRole $kuserToUserRole */
+//		$kuserToUserRole->setKuserId($this->kuserId);
+//		$kuserToUserRole->setAppGuid($this->appGuid);
+//		$kuserToUserRole->setUserRoleId($this->userRoleId);
 		
 		return $kuserToUserRole;
 	}
@@ -62,15 +73,9 @@ class KalturaUserAppRole extends KalturaAppRole
 			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $this->userId);
 		}
 		
-		$this->kuserId = $kuser->getId();
-		KuserToUserRolePeer::isValidForInsert($kuser, $this->appGuid, $this->userRoleId);
+		KalturaUserAppRole::isValidForInsert($kuser, $this->appGuid, $this->userRoleId);
 		
 		parent::validateForInsert($propertiesToSkip);
-	}
-	
-	public function toUpdatableObject($kuserToUserRole, $skip = array())
-	{
-		return parent::toUpdatableObject($kuserToUserRole, $skip);
 	}
 	
 	/**
@@ -79,21 +84,36 @@ class KalturaUserAppRole extends KalturaAppRole
 	 */
 	public function validateForUpdate($kuserToUserRole, $propertiesToSkip = array())
 	{
-		KuserToUserRolePeer::isValidForUpdate($this->userRoleId);
+		if (!$this->userRoleId)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'userRoleId');
+		}
+		
+		// validate userRoleId exist
+		$userRole = UserRolePeer::retrieveByPK($this->userRoleId);
+		
+		if (!$userRole)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
+		}
+		
 		return parent::validateForUpdate($kuserToUserRole, $propertiesToSkip);
 	}
 	
+	/**
+	 * @throws kCoreException
+	 */
 	public function doFromObject($kuserToUserRoleObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		/* @var KuserToUserRole $kuserToUserRoleObject*/
 		if(!$kuserToUserRoleObject)
 		{
-			return false;
+			return null;
 		}
 		
-		$this->userId = kuserPeer::retrieveByPK($kuserToUserRoleObject->getKuserId())->getPuserId();
-		
 		parent::doFromObject($kuserToUserRoleObject, $responseProfile);
+		
+		$this->userId = $kuserToUserRoleObject->getPuserId();
 	}
 	
 	private function verifyMandatoryParams($puserId, $appGuid ,$userRoleId)
@@ -116,6 +136,54 @@ class KalturaUserAppRole extends KalturaAppRole
 		if ($param)
 		{
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $param);
+		}
+	}
+	
+	
+	/**
+	 * @param kuser $kuser
+	 * @param string $appGuid
+	 * @param int $userRoleId
+	 * @return void
+	 *
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 * @throws PropelException
+	 */
+	private static function isValidForInsert(kuser $kuser, $appGuid, $userRoleId)
+	{
+		// groups are not supported
+		if ($kuser->getType() === KuserType::GROUP)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP);
+		}
+		
+		// validate appGuid string
+		if (!kString::isValidMongoId($appGuid))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_APP_GUID, $appGuid);
+		}
+		
+		// validate appGuid belong to ks partner
+		$appGuidExist = MicroServiceAppRegistry::getExistingAppGuid(kCurrentContext::getCurrentPartnerId(), $appGuid);
+		if (!$appGuidExist)
+		{
+			throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $appGuid);
+		}
+		
+		// validate userRoleId exist
+		$userRole = UserRolePeer::retrieveByPK($userRoleId);
+		
+		if (!$userRole)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
+		}
+		
+		// validate user does not have a role for the requested appGuid
+		$userAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($kuser->getId(), $appGuid);
+		if ($userAppRole)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_ALREADY_EXISTS, $kuser->getPuserId(), $appGuid);
 		}
 	}
 }

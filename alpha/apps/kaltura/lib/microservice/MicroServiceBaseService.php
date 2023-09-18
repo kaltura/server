@@ -97,7 +97,7 @@ class MicroServiceBaseService
 			'requestBody' => $requestParams
 		);
 		
-		KalturaLog::debug('Microservice request data: ' . print_r($requestInfo, 1));
+		KalturaLog::debug('Microservice request data: ' . print_r($requestInfo, true));
 		KalturaLog::debug('Microservice request took - ' . $timeTook. ' seconds');
 
 		$curlError = curl_error($ch);

@@ -554,6 +554,8 @@ class kString
 	
 	public static function csvFixWhitespace($csv)
 	{
-		return str_replace(' ', '', $csv);
+		// trim whitespace from beginning and end (leaving inner whitespace untouched)
+		$trimmedArray = array_map('trim', explode(',', $csv));
+		return implode(',', $trimmedArray);
 	}
 }
