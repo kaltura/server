@@ -46,13 +46,6 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 	{
 		$response = new KalturaUserAppRoleListResponse();
 		
-		if (in_array(kCurrentContext::getCurrentSessionType(), array(kSessionBase::SESSION_TYPE_NONE,kSessionBase::SESSION_TYPE_WIDGET)))
-		{
-			$response->objects = array();
-			$response->totalCount = 0;
-			return $response;
-		}
-		
 		$c = new Criteria();
 		$userAppRoleFilter = $this->toObject();
 		$c->addAnd(KuserToUserRolePeer::APP_GUID, null, Criteria::ISNOTNULL);
@@ -86,11 +79,13 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 	/**
 	 * @throws KalturaAPIException
 	 * @throws PropelException
+	 * @throws kCoreException
 	 */
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$this->fixCsvFilterProperties();
 		
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$isAdminSession = kCurrentContext::getCurrentSessionType() === kSessionBase::SESSION_TYPE_ADMIN;
 		
 		// user ks can only retrieve results for himself
@@ -108,7 +103,7 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		
 		if ($isAdminSession && !empty($this->userIdEqual))
 		{
-			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userIdEqual);
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $this->userIdEqual);
 			$this->userIdEqual = $kuser ? $kuser->getId() : -1; // set -1 = no result will be returned when the user is missing
 		}
 		
@@ -130,13 +125,13 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		
 		if (!empty($this->appGuidEqual))
 		{
-			$appRegistry = KuserToUserRolePeer::getAppGuidById($this->appGuidEqual);
-			$this->appGuidEqual = $appRegistry ? $appRegistry->id : 'null'; // set to 'null' will not return results (if set to '' 'attachToCriteria' will remove it from mysql query)
+			$appGuidExist =  MicroServiceAppRegistry::getExistingAppGuid($partnerId, $this->appGuidEqual);
+			$this->appGuidEqual = $appGuidExist ? $appGuidExist : 'null'; // set to 'null' will not return results (if set to '' 'attachToCriteria' will remove it from mysql query)
 		}
 		
 		if(!empty($this->appGuidIn))
 		{
-			$this->appGuidIn = KuserToUserRolePeer::getKsPartnerAppGuidsFromCsv($this->appGuidIn);
+			$this->appGuidIn = MicroServiceAppRegistry::getExistingAppGuidsFromCsv($partnerId, $this->appGuidIn);
 		}
 		
 		return parent::toObject($object_to_fill, $props_to_skip);

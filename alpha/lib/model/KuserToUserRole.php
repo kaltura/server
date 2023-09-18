@@ -20,6 +20,38 @@ class KuserToUserRole extends BaseKuserToUserRole {
 		return array("kuserToUserRole:kuserId=".strtolower($this->getKuserId()), "kuserToUserRole:id=".strtolower($this->getId()));
 	}
 	
+	public function setPuserId($puserId)
+	{
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $puserId);
+		
+		if (!$kuser)
+		{
+			throw new kCoreException('[User ID Not Found]', kCoreException::INVALID_USER_ID, $puserId);
+		}
+		
+		parent::setKuserId($kuser->getId());
+	}
+	
+	public function getPuserId()
+	{
+		$kuserId = $this->getKuserId();
+		
+		// todo consult Yossi - when 'validateForUpdate' executes it calls the getter functions before we call setter functions
+		if (!$this->getKuserId())
+		{
+			return false;
+		}
+		
+		$kuser = kuserPeer::retrieveByPK($this->getKuserId());
+		
+		if (!$kuser)
+		{
+			throw new kCoreException('[User ID Not Found]', kCoreException::INVALID_USER_ID);
+		}
+		
+		return $kuser->getPuserId();
+	}
+	
 	public function postDelete(PropelPDO $con = null)
 	{
 		kQueryCache::invalidateQueryCache($this);
