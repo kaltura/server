@@ -1714,7 +1714,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
 
-		if ( $entry->getStatus() != entryStatus::READY ) {
+		if ( $entry->getStatus() != entryStatus::READY && $entry->getStatus() != entryStatus::NO_CONTENT ) {
 			$entry->addClonePendingEntry($newEntry->getId());
 			$entry->save();
 		} else {
