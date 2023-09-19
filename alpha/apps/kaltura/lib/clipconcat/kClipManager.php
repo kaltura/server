@@ -131,9 +131,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				// and fail the multi clip job in case of multi clip flow
 				$this->handleImportFailed($batchJob, $rootJob);
 			}
-			elseif($this->shouldStartMultiResourceConcat($batchJob, $rootJob))
+			elseif($this->isClipConcatFinished($batchJob, $rootJob))
 			{
-				$this->startMultiResourceConcat($rootJob);
+				kJobsManager::updateBatchJob($batchJob->getRootJob(), BatchJob::BATCHJOB_STATUS_FINISHED);
 			}
 			elseif ($this->shouldStartSingleResourceConcat($batchJob, $rootJob))
 			{
@@ -149,6 +149,19 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			KalturaLog::err('Error During Concat Job [' . $ex->getMessage() . ']');
 		}
 		return true;
+	}
+
+	protected function isClipConcatFinished($batchJob, $rootJob)
+	{
+		if($rootJob && $rootJob->getJobType() != BatchJobType::MULTI_CLIP_CONCAT)
+		{
+			return false;
+		}
+		if($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT)
+		{
+			return $this->isClipConcatChildrenFinished($batchJob);
+		}
+		return false;
 	}
 
 	protected function getAncestorJob($batchJob)
@@ -1057,24 +1070,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	}
 
 	/**
-	 * @param BatchJob $batchJob
-	 * @param BatchJob $rootJob
-	 * @return bool
-	 */
-	protected function shouldStartMultiResourceConcat($batchJob, $rootJob)
-	{
-		if($rootJob && $rootJob->getJobType() != BatchJobType::MULTI_CLIP_CONCAT)
-		{
-			return false;
-		}
-		if($batchJob->getParentJob() && $batchJob->getParentJob()->getJobType() == BatchJobType::CONVERT)
-		{
-			return !$this->concatJobExist($rootJob) && $this->isClipConcatChildrenFinished($rootJob);
-		}
-		return false;
-	}
-
-	/**
 	 * @param BatchJob $multiClipConcatJob
 	 * @throws kCoreException
 	 * @throws KalturaAPIException
@@ -1083,45 +1078,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		$clipConcatJobs = $multiClipConcatJob->getChildJobsByTypes(array(BatchJobType::CLIP_CONCAT));
 		usort($clipConcatJobs, array("kClipManager", "cmpByResourceOrder"));
-
-		$lastAssetId = null;
-		$allRelatedFiles = array();
-		$imageConvertCommands = array();
-		foreach ($clipConcatJobs as $clipConcatJob)
-		{
-			KalturaLog::debug('Going To Start Concat Job for Multi Clip Concat');
-
-			if($clipConcatJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
-			{
-				kJobsManager::updateBatchJob($clipConcatJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-			}
-
-			/** @var kClipConcatJobData $jobData */
-			$jobData = $clipConcatJob->getData();
-
-			$flavorAssetsOnTempEntry = assetPeer::retrieveByEntryId($jobData->getTempEntryId(), array(assetType::FLAVOR));
-			usort($flavorAssetsOnTempEntry, array("kClipManager", "cmpByClipOrder"));
-			$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
-			$files = $this->getFilesPath($flavorAssetsOnTempEntry, $imageToVideo);
-
-			foreach ($files as $flavorAssetId => $relatedFiles)
-			{
-				/** @var array $relatedFiles */
-				foreach ($relatedFiles as $relatedFile)
-				{
-					$allRelatedFiles[] = $relatedFile;
-					$imageConvertCommands[] = $imageToVideo ? $this->getConvertImageCommand($jobData) : "-";
-				}
-				KalturaLog::debug("Asset Id: [$flavorAssetId], Related file : " . print_r($relatedFiles, true));
-				// assume concatenated assets have the same actualFlavorParamsId and take the last
-				$lastAssetId = $flavorAssetId ? $flavorAssetId : $lastAssetId;
-			}
-			$this->deleteEntry($jobData->getTempEntryId());
-		}
-
-		// use no filter because we delete the entry
-		$flavorAsset = assetPeer::retrieveByIdNoFilter($lastAssetId);
-		$flavorParamsId = $flavorAsset ? $flavorAsset->getFlavorParamsId() : flavorParams::SOURCE_FLAVOR_ID;
 		$tempEntry = entryPeer::retrieveByPK($multiClipConcatJob->getData()->getMultiTempEntryId());
 
 		//calling addConcatJob only if lock succeeds
@@ -1130,6 +1086,45 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$lockKey = 'kclipManager_add_concat_job' . $multiClipConcatJob->getId() . $tempEntry->getId();
 		if (!$store || $store->add($lockKey, true, self::LOCK_EXPIRY))
 		{
+			$lastAssetId = null;
+			$allRelatedFiles = array();
+			$imageConvertCommands = array();
+			foreach ($clipConcatJobs as $clipConcatJob)
+			{
+				KalturaLog::debug('Going To Start Concat Job for Multi Clip Concat');
+
+				if($clipConcatJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
+				{
+					kJobsManager::updateBatchJob($clipConcatJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+				}
+
+				/** @var kClipConcatJobData $jobData */
+				$jobData = $clipConcatJob->getData();
+
+				$flavorAssetsOnTempEntry = assetPeer::retrieveByEntryId($jobData->getTempEntryId(), array(assetType::FLAVOR));
+				usort($flavorAssetsOnTempEntry, array("kClipManager", "cmpByClipOrder"));
+				$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+				$files = $this->getFilesPath($flavorAssetsOnTempEntry, $imageToVideo);
+
+				foreach ($files as $flavorAssetId => $relatedFiles)
+				{
+					/** @var array $relatedFiles */
+					foreach ($relatedFiles as $relatedFile)
+					{
+						$allRelatedFiles[] = $relatedFile;
+						$imageConvertCommands[] = $imageToVideo ? $this->getConvertImageCommand($jobData) : "-";
+					}
+					KalturaLog::debug("Asset Id: [$flavorAssetId], Related file : " . print_r($relatedFiles, true));
+					// assume concatenated assets have the same actualFlavorParamsId and take the last
+					$lastAssetId = $flavorAssetId ? $flavorAssetId : $lastAssetId;
+				}
+				$this->deleteEntry($jobData->getTempEntryId());
+			}
+
+			// use no filter because we delete the entry
+			$flavorAsset = assetPeer::retrieveByIdNoFilter($lastAssetId);
+			$flavorParamsId = $flavorAsset ? $flavorAsset->getFlavorParamsId() : flavorParams::SOURCE_FLAVOR_ID;
+
 			// create one target flavor asset for all clip concat jobs
 			$targetFlavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $flavorParamsId);
 			kJobsManager::addConcatJob($multiClipConcatJob, $targetFlavorAsset, $allRelatedFiles, false, null, null, $imageConvertCommands);
