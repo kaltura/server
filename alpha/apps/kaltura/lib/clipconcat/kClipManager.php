@@ -732,7 +732,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function adjustResolutionDivisionByValue(&$width, &$height, $value = 2)
 	{
-		// h264 requires resolution division by two
+		// h264 requires height and width to be divided by two
 		$width -= $width % $value;
 		$height -= $height % $value;
 	}
