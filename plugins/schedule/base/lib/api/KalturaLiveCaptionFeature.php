@@ -30,12 +30,19 @@ class KalturaLiveCaptionFeature extends KalturaLiveFeature
 	 */
 	public $inputDelay;
 
+	/**
+	 * @var string
+	 * 3 letter code
+	 */
+	public $language;
+
 	private static $map_between_objects = array(
 		'mediaUrl',
 		'mediaKey',
 		'captionUrl',
 		'captionToken',
-		'inputDelay'
+		'inputDelay',
+		'language'
 	);
 
 	/* (non-PHPdoc)

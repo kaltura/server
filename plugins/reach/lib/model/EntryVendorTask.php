@@ -460,11 +460,15 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 				$taskData = $this->getTaskJobData();
 				/* @var $connectedEvent LiveStreamScheduleEvent */
 				$connectedEvent = $taskData->getScheduleEvent();
+				/* @var $vendorCatalogItem VendorCatalogItem */
+				$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
+				$language =  languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getSourceLanguage());
 
 				$feature = new LiveCaptionFeature();
 				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
 				$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
+				$feature->setLanguage($language);
 
 				$connectedEvent->addFeature($feature, true);
 				$connectedEvent->save();
