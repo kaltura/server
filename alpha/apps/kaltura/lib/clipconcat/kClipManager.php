@@ -727,6 +727,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		$this->limitByMaxProfileResolution($conversionProfileId, $aspectRatio, $width, $height);
 		$this->adjustResolutionByAspectRatios($aspectRatio, $width, $height);
+		$this->adjustResolutionDivisionByValue($width, $height);
+	}
+
+	protected function adjustResolutionDivisionByValue(&$width, &$height, $value = 2)
+	{
+		// h264 requires height and width to be divided by two
+		$width -= $width % $value;
+		$height -= $height % $value;
 	}
 
 	protected function updateKeyFrequency(&$array, $key, $frequency)
