@@ -1946,6 +1946,11 @@ class KalturaEntryService extends KalturaBaseService
 
 			if($sourceEntry->getMediaType() == KalturaMediaType::IMAGE)
 			{
+				foreach ($resource->getOperationAttributes() as $operationAttribute)
+				{
+					/* @var $operationAttribute kClipAttributes **/
+					$operationAttribute->setOffset(0);
+				}
 				$syncKey = $sourceEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 				$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 				$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, 'mediainfo');
