@@ -49,6 +49,7 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		$c = new Criteria();
 		$userAppRoleFilter = $this->toObject();
 		$c->addAnd(KuserToUserRolePeer::APP_GUID, null, Criteria::ISNOTNULL);
+		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		
 		$userAppRoleFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
@@ -56,7 +57,8 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		// disable default criteria (which only retrieve results that 'app_guid === null' for backward compatibility)
 		KuserToUserRolePeer::setUseCriteriaFilter(false);
 		
-		$list = KuserToUserRolePeer::doSelect($c);
+		// join with 'kuser' table to return active or blocked users (not deleted) which will fail on alpha/lib/model/KuserToUserRole.php:43
+		$list = KuserToUserRolePeer::doSelectJoinkuser($c);
 		$resultCount = count($list);
 		if ($resultCount && ($resultCount < $pager->pageSize))
 		{
