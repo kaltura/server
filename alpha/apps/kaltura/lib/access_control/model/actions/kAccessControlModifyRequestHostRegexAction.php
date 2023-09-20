@@ -64,13 +64,15 @@ class kAccessControlModifyRequestHostRegexAction extends kRuleAction
 			$serverNode = ServerNodePeer::retrieveByPK($this->replacmenServerNodeId);
 			if($serverNode)
 			{
+				$replacementHostname = $serverNode->getPlaybackHostName() ? $serverNode->getPlaybackHostName() : $serverNode->getHostName();
+
 				if(isset($this->replacement) && $hasTokenInReplacment >= 0)
 				{
-					$replacement = str_replace(self::REPLACMENT_HOST_NAME_TOKEN, $serverNode->getHostName(), $this->replacement);
+					$replacement = str_replace(self::REPLACMENT_HOST_NAME_TOKEN, $replacementHostname, $this->replacement);
 				}
 				else 
 				{
-					$replacement = $this->buildDefaultReplacmentString($serverNode->getHostName());
+					$replacement = $this->buildDefaultReplacmentString($replacementHostname);
 				}
 			}
 		}
