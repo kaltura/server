@@ -1,3 +1,17 @@
+# Scorpius-19.17.0
+## Enable viewing system entries flagged for moderation ##
+* Issue Type: Task
+* Issue ID: PLAT-24420
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.viewModeratedSystemEntries.enabled = true
+moduls.viewModeratedSystemEntries.permissionType = 2
+moduls.viewModeratedSystemEntries.label = "View System Entries Flagged For Moderation"
+moduls.viewModeratedSystemEntries.permissionName = VIEW_MODERATED_SYSTEM_ENTRIES
+moduls.viewModeratedSystemEntries.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Scorpius-19.16.0
 ## Deploy new Flavor params and conversion profile for PPT conversion ##
 - Issue Type: Task
