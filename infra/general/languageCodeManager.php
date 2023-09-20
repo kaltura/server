@@ -82,10 +82,8 @@ class languageCodeManager
         return self::getObjectFromTwoCode($val);
     }
 
-	public static function getThreeCodeFromKalturaName($kalturaName)
+    public static function getThreeCodeFromKalturaName($kalturaName)
     {
-        if(!self::isAlreadyLoaded())
-            self::loadLanguageCodeMap();
         $obj = self::getObjectFromKalturaName($kalturaName);
         return !is_null($obj) ? $obj[self::ISO639_T] : null;
     }
