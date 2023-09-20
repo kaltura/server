@@ -34,9 +34,6 @@ class KuserToUserRole extends BaseKuserToUserRole {
 	
 	public function getPuserId()
 	{
-		$kuserId = $this->getKuserId();
-		
-		// todo consult Yossi - when 'validateForUpdate' executes it calls the getter functions before we call setter functions
 		if (!$this->getKuserId())
 		{
 			return false;

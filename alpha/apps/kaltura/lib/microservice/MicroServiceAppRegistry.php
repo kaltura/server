@@ -33,7 +33,7 @@ class MicroServiceAppRegistry extends MicroServiceBaseService
 		$appGuidExists = MicroServiceAppRegistry::getAppGuidFromCache($appGuid);
 		if ($appGuidExists)
 		{
-			return $appGuidExists;
+			return $appGuid;
 		}
 		
 		$appRegistryClient = new MicroServiceAppRegistry();
