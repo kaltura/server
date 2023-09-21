@@ -21,6 +21,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const MIN_FRAME_RATE = 10;
 	const MAX_FRAME_RATE = 30;
 	const DEFAULT_SAMPLE_RATE = 44100;
+	const DEFAULT_AUDIO_CHANNELS = 1;
 	const LOCK_EXPIRY = 10;
 
 	/**
@@ -752,7 +753,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		// 1 - mono, 2 - stereo
 		if(count($allAudioChannels) == 0)
 		{
-			return 1;
+			return self::DEFAULT_AUDIO_CHANNELS;
 		}
 		$maxDurationAudioChannels = max($allAudioChannels);
 		$mostFrequentAudioChannels = array_search($maxDurationAudioChannels, $allAudioChannels);

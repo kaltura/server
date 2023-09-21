@@ -1174,7 +1174,10 @@ class kJobsManager
 		$jobData->setShouldSort($shouldSort);
 		$jobData->setConversionCommands($conversionCommands);
 
- 		$entry = $asset->getentry();
+		$isMultiSource = $parentJob->getJobType() == KalturaBatchJobType::MULTI_CLIP_CONCAT;
+		$jobData->setMultiSource($isMultiSource);
+
+		$entry = $asset->getentry();
  		if($entry && $entry->getStatus() != entryStatus::READY)
 		{
 			$entry->setStatus(entryStatus::PRECONVERT);
