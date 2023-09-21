@@ -11,7 +11,8 @@ class KAsyncConcat extends KJobHandlerWorker
 	const MaxChunkDelta 	= 150;		// msec
 	const CONCAT_METHOD_FILE 	= "raw";
 	const CONCAT_METHOD_FFMPEG 	= "ffmpeg";
-
+	const DEFAULT_SAMPLE_RATE = 44100;
+	const DEFAULT_AUDIO_CHANNELS = 1;
 	/**
 	 * @var string
 	 */
@@ -243,8 +244,8 @@ class KAsyncConcat extends KJobHandlerWorker
 		$mi = null;
 		$concatStr = '';
 		$concatFilter = '';
-		$audioSampleRate = 44100;
-		$audioChannels = 1;
+		$audioSampleRate = self::DEFAULT_SAMPLE_RATE;
+		$audioChannels = self::DEFAULT_AUDIO_CHANNELS;
 		foreach($filesArr as $index => $fileName)
 		{
 			$i++;
@@ -309,14 +310,14 @@ class KAsyncConcat extends KJobHandlerWorker
 			if($multiSource)
 			{
 				$concatStr .= " -i \"$fileName\"";
-
+				$concatFilter.="[$index:v]";
 				if(isset($mi->audioDuration))
 				{
-					$concatFilter.="[$index:v][$index:a]";
+					$concatFilter.="[$index:a]";
 				}
 				else
 				{
-					$concatFilter.="[$index:v][$filesArrCnt:a]";
+					$concatFilter.="[$filesArrCnt:a]";
 				}
 
 				$audioSampleRate = isset($mi->audioSamplingRate) ? $mi->audioSamplingRate : $audioSampleRate;
@@ -370,7 +371,8 @@ class KAsyncConcat extends KJobHandlerWorker
 			$concatFilter = $concatFilter . "concat=n=$filesArrCnt:v=1:a=1[v][a]";
 			$concatStr .= " -t 1 -f lavfi -i anullsrc=r=$audioSampleRate:cl=$audioLayout -filter_complex \"$concatFilter\"";
 			$videoParamStr = " -map \"[v]\" ";
-			$audioParamStr = " -map \"[a]\" ";
+			$audioParamStr = " -bsf:a aac_adtstoasc";
+			$audioParamStr .= " -map \"[a]\" ";
 		}
 
 		$probeSizeAndAnalyzeDurationStr = self::getProbeSizeAndAnalyzeDuration($attempt);
