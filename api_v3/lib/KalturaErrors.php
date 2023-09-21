@@ -154,6 +154,7 @@ class KalturaErrors extends APIErrors
 	const MEDIA_INFO_NOT_FOUND = "MEDIA_INFO_NOT_FOUND;FLAVOR_ASSET_ID;Media info for flavor asset Id \"@FLAVOR_ASSET_ID@\" not found";
 
 	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED;MEDIA_TYPE;Entry media type \"@MEDIA_TYPE@\" not supported";
+	const ENTRY_ID_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_ID_MEDIA_TYPE_NOT_SUPPORTED;ENTRY_ID,MEDIA_TYPE;Entry ID \"@ENTRY_ID@\" media type \"@MEDIA_TYPE@\" not supported";
 
 	const ENTRY_SOURCE_TYPE_NOT_SUPPORTED = "ENTRY_SOURCE_TYPE_NOT_SUPPORTED;SOURCE_TYPE;Entry source type \"@SOURCE_TYPE@\" not supported";
 
