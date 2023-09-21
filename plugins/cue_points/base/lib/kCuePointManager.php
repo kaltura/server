@@ -68,9 +68,16 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$partnerId = $data->getPartnerId();
 		foreach ($data->getOperationResources() as $operationResource)
 		{
-			/** @var $resource kFileSyncResource*/
 			$resource = $operationResource->getResource();
+			if(!($resource instanceof kFileSyncResource))
+			{
+				continue;
+			}
 			$sourceEntryId = $resource->getOriginEntryId();
+			if(!$sourceEntryId)
+			{
+				continue;
+			}
 			$operationAttributes = $operationResource->getOperationAttributes();
 			self::addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $pastClipsDuration);
 			$pastClipsDuration += self::getClipsDuration($operationAttributes);
@@ -92,7 +99,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$chapter->setSubType(ThumbCuePointSubType::CHAPTER);
 		$chapter->setThumbOffset($offset);
 		$chapter->setStartTime($offset);
-		$chapter->setText("$sourceEntryId");
+		$chapter->setName("$sourceEntryId");
 		$chapter->setStatus(KalturaCuePointStatus::READY);
 		$chapter->save();
 	}
