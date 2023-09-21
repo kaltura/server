@@ -49,8 +49,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		// creates a temp file path
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
-		$this->concatMethod = isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
-	
+
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
 		{
@@ -100,6 +99,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath.".mp4" : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$this->concatMethod = !$data->multiSource && isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
 
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
@@ -120,7 +120,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		do
 		{
 			KalturaLog::info('Concat attempt ' . $attemptNum . ' out of: ' . $totalAttempts);
-			$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration, $data->shouldSort, $attemptNum);
+			$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration, $data->shouldSort, $data->multiSource, $attemptNum);
 			$attemptNum++;
 		}
 		while (!$result && $attemptNum <= $totalAttempts);
@@ -220,7 +220,7 @@ class KAsyncConcat extends KJobHandlerWorker
 	 * @return boolean
 	 * @throws kApplicativeException
 	 */
-	protected function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $attempt = 1)
+	protected function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $multiSource = false, $attempt = 1)
 	{
 		$fixLargeDeltaFlag = null;
 		$chunkBr = null;
@@ -241,7 +241,12 @@ class KAsyncConcat extends KJobHandlerWorker
 		$filesArrCnt = count($filesArr);
 		$i=0;
 		$mi = null;
-		foreach($filesArr as $fileName) {
+		$concatStr = '';
+		$concatFilter = '';
+		$audioSampleRate = 44100;
+		$audioChannels = 1;
+		foreach($filesArr as $index => $fileName)
+		{
 			$i++;
 				/*
 				 * Get chunk file media-info
@@ -301,40 +306,71 @@ class KAsyncConcat extends KJobHandlerWorker
 				KalturaLog::log("Chunk duration($duration), Wowza chunk setting(".KAsyncConcat::LiveChunkDuration."),max-allowed-delta(".KAsyncConcat::MaxChunkDelta."),fixLargeDeltaFlag($fixLargeDeltaFlag) ");
 			}
 				*/
+			if($multiSource)
+			{
+				$concatStr .= " -i \"$fileName\"";
+
+				if(isset($mi->audioDuration))
+				{
+					$concatFilter.="[$index:v][$index:a]";
+				}
+				else
+				{
+					$concatFilter.="[$index:v][$filesArrCnt:a]";
+				}
+
+				$audioSampleRate = isset($mi->audioSamplingRate) ? $mi->audioSamplingRate : $audioSampleRate;
+				$audioChannels = isset($mi->audioChannels) ? $mi->audioChannels : $audioChannels;
+			}
 		}
-		
-		$concatStr = $this->concatFilesArr($filesArr, $outFilename);
+
+		$videoParamStr = null;
+		$audioParamStr = null;
+		if(!$multiSource)
+		{
+			$concatStr = $this->concatFilesArr($filesArr, $outFilename);
+			$concatStr = $concatStr ? " -i " . $concatStr : null;
 			/*
-			 * For clip flow - set converion to x264,
+			 * For clip flow - set conversion to x264,
 			 * otherwise - just copy video
 			 */
-		if(isset($clipStr))	{
-			$videoParamStr = "-c:v libx264";
-			if(isset($chunkBr) && $chunkBr>0 && $filesArrCnt>0) {
-				$chunkBr = round($chunkBr/$filesArrCnt);
-				$videoParamStr.= " -b:v $chunkBr" . "k";
+			if(isset($clipStr))	{
+				$videoParamStr = "-c:v libx264";
+				if(isset($chunkBr) && $chunkBr>0 && $filesArrCnt>0) {
+					$chunkBr = round($chunkBr/$filesArrCnt);
+					$videoParamStr.= " -b:v $chunkBr" . "k";
+				}
+				$videoParamStr.= " -subq 7 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
 			}
-			$videoParamStr.= " -subq 7 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
-		}
-		else
-			$videoParamStr = "-c:v copy";
-		
-		if (isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate))
-			$videoParamStr.= " -map v ";
+			else
+				$videoParamStr = "-c:v copy";
+
+			if (isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate))
+				$videoParamStr.= " -map v ";
 
 			/*
 			 * If no audio - skip.
 			 * For AAC source - copy audio,
 			 * otherwise - convert to AAC
 			 */
-		$audioParamStr = null;
-		if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate)) {
-			if(isset($mi->audioFormat) && $mi->audioFormat=="aac")
-				$audioParamStr = "-c:a copy";
-			else
-				$audioParamStr = "-c:a libfdk_aac";
-			$audioParamStr.= " -bsf:a aac_adtstoasc";
-			$audioParamStr.= " -map a ";
+			$audioParamStr = null;
+			if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate))
+			{
+				if(isset($mi->audioFormat) && $mi->audioFormat=="aac")
+					$audioParamStr = "-c:a copy";
+				else
+					$audioParamStr = "-c:a libfdk_aac";
+				$audioParamStr.= " -bsf:a aac_adtstoasc";
+				$audioParamStr.= " -map a ";
+			}
+		}
+		else
+		{
+			$audioLayout = $audioChannels == 1 ? "mono" : "stereo";
+			$concatFilter = $concatFilter . "concat=n=$filesArrCnt:v=1:a=1[v][a]";
+			$concatStr .= " -t 1 -f lavfi -i anullsrc=r=$audioSampleRate:cl=$audioLayout -filter_complex \"$concatFilter\"";
+			$videoParamStr = " -map \"[v]\" ";
+			$audioParamStr = " -map \"[a]\" ";
 		}
 
 		$probeSizeAndAnalyzeDurationStr = self::getProbeSizeAndAnalyzeDuration($attempt);
@@ -357,8 +393,8 @@ class KAsyncConcat extends KJobHandlerWorker
 			{
 				$cmdStr .= "-protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\" ";
 			}
-			
-			$cmdStr .= "$probeSizeAndAnalyzeDurationStr -i $concatStr $videoParamStr $audioParamStr";
+
+			$cmdStr .= "$probeSizeAndAnalyzeDurationStr $concatStr $videoParamStr $audioParamStr";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 	

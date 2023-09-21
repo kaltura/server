@@ -48,6 +48,11 @@ class kConcatJobData extends kJobData
 	private $conversionCommands;
 
 	/**
+	 * @var bool
+	 */
+	private $multiSource;
+
+	/**
 	 * @return array $srcFiles
 	 */
 	public function getSrcFiles()
@@ -173,5 +178,21 @@ class kConcatJobData extends kJobData
 	public function setConversionCommands($conversionCommands)
 	{
 		$this->conversionCommands = $conversionCommands;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getMultiSource()
+	{
+		return $this->multiSource;
+	}
+
+	/**
+	 * @param bool $multiSource
+	 */
+	public function setMultiSource($multiSource)
+	{
+		$this->multiSource = $multiSource;
 	}
 }
