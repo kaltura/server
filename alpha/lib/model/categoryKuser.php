@@ -431,7 +431,6 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 			$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $this->getPuserId());
 			if ($kuser->getType() == KuserType::GROUP)
 			{
-				KalturaLog::debug("Adding job for syncing category subscribers");
 				$filter = new categoryKuserFilter();
 				$filter->setCategoryIdEqual($this->getCategoryId());
 				$filter->setUserIdEqual($this->getPuserId());
