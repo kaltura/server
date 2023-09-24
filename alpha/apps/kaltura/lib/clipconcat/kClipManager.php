@@ -1056,8 +1056,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		/** @var $clipConcatJobData kMultiClipConcatJobData|kClipConcatJobData */
 		$clipConcatJobData = $rootJob->getData();
 
-		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_FINISHED);
-
 		if ($this->isConcatOfAllChildrenDone($rootJob))
 		{
 			$destinationEntry = $clipConcatJobData->getDestEntryId();
@@ -1067,6 +1065,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$this->addDestinationEntryAsset($destinationEntry, $flavorAsset);
 			}
+
+			kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+
 			if($rootJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT)
 			{
 				$deleteEntry = $clipConcatJobData->getMultiTempEntryId();
