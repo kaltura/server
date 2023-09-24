@@ -145,6 +145,7 @@ class KalturaErrors extends APIErrors
 	const ENTRY_REPLACEMENT_ALREADY_EXISTS = "ENTRY_REPLACEMENT_ALREADY_EXISTS;;Entry already in replacement";
 
 	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED;ENTRY_TYPE;Entry type \"@ENTRY_TYPE@\" not supported";
+	const ENTRY_ID_TYPE_NOT_SUPPORTED = "ENTRY_ID_TYPE_NOT_SUPPORTED;ENTRY_ID,ENTRY_TYPE;Entry Id \"@ENTRY_ID@\" type \"@ENTRY_TYPE@\" not supported";
 
 	const RESOURCE_TYPE_NOT_SUPPORTED = "RESOURCE_TYPE_NOT_SUPPORTED;RES_TYPE;Resource type \"@RES_TYPE@\" not supported";
 
