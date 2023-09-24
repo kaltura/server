@@ -2039,7 +2039,7 @@ class KalturaEntryService extends KalturaBaseService
 					if(myEntryUtils::shouldValidateLocal() && $fileSync->getDc() == $remoteDc)
 					{
 						KalturaLog::info("Source was not found locally, but was found in the remote dc [$remoteDc]");
-						throw new KalturaAPIException(KalturaErrors::ENTRY_ID_SOURCE_FILE_NOT_FOUND, $entryId);
+						throw new KalturaAPIException(KalturaErrors::ENTRY_SOURCE_FILE_NOT_FOUND, $entryId);
 					}
 
 					return $fileSync->getExternalUrl($entryId, null, true);

@@ -343,7 +343,7 @@ class APIErrors
 	
 	
 	const SOURCE_FILE_NOT_FOUND = "SOURCE_FILE_NOT_FOUND;;The flavor source file not found";
-	const ENTRY_ID_SOURCE_FILE_NOT_FOUND = "ENTRY_ID_SOURCE_FILE_NOT_FOUND;ENTRY_ID;The flavor source file not found for entry Id \"@ENTRY_ID@\"";
+	const ENTRY_SOURCE_FILE_NOT_FOUND = "ENTRY_SOURCE_FILE_NOT_FOUND;ENTRY_ID;The flavor source file not found for entry Id \"@ENTRY_ID@\"";
 
 	
 	const SOURCE_FILE_REMOTE = "SOURCE_FILE_REMOTE;;The source file is remote, no local file found";
