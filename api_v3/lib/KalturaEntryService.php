@@ -1934,6 +1934,8 @@ class KalturaEntryService extends KalturaBaseService
 			$sourceEntryIds[] = $sourceEntryId;
 
 			$sourceEntry = EntryPeer::retrieveByPK($sourceEntryId);
+			$this->validateEntrySupported($sourceEntry);
+
 			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
 			$tempEntryIds[] = $tempEntry->getId();
 
@@ -1995,6 +1997,22 @@ class KalturaEntryService extends KalturaBaseService
 		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 	}
 
+	/***
+	 * @param entry $sourceEntry
+	 * @throws APIException
+	 */
+	protected function validateEntrySupported($sourceEntry)
+	{
+		$sourceEntryId = $sourceEntry->getId();
+		if(!in_array($sourceEntry->getType(), array(KalturaEntryType::MEDIA_CLIP, KalturaEntryType::DATA)))
+		{
+			throw new APIException(KalturaErrors::ENTRY_ID_TYPE_NOT_SUPPORTED, $sourceEntryId, $sourceEntry->getType());
+		}
+		if(!in_array($sourceEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::IMAGE)))
+		{
+			throw new APIException(KalturaErrors::ENTRY_ID_MEDIA_TYPE_NOT_SUPPORTED, $sourceEntryId, $sourceEntry->getMediaType());
+		}
+	}
 
 	/***
 	 * @param null $entryId
@@ -2021,7 +2039,7 @@ class KalturaEntryService extends KalturaBaseService
 					if(myEntryUtils::shouldValidateLocal() && $fileSync->getDc() == $remoteDc)
 					{
 						KalturaLog::info("Source was not found locally, but was found in the remote dc [$remoteDc]");
-						throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
+						throw new KalturaAPIException(KalturaErrors::ENTRY_SOURCE_FILE_NOT_FOUND, $entryId);
 					}
 
 					return $fileSync->getExternalUrl($entryId, null, true);
