@@ -1930,11 +1930,9 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			/** @var kOperationResource $resource **/
 			$resourceObj = $resource->getResource();
-			$sourceEntryId = $resourceObj->getOriginEntryId();
+			$sourceEntry = $this->getValidatedEntryForResource($resourceObj);
+			$sourceEntryId = $sourceEntry->getId();
 			$sourceEntryIds[] = $sourceEntryId;
-
-			$sourceEntry = EntryPeer::retrieveByPK($sourceEntryId);
-			$this->validateEntrySupported($sourceEntry);
 
 			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
 			$tempEntryIds[] = $tempEntry->getId();
@@ -1998,11 +1996,24 @@ class KalturaEntryService extends KalturaBaseService
 	}
 
 	/***
-	 * @param entry $sourceEntry
+	 * @param kContentResource $resourceObj
 	 * @throws APIException
 	 */
-	protected function validateEntrySupported($sourceEntry)
+	protected function getValidatedEntryForResource($resourceObj)
 	{
+		$sourceEntry = $this->getEntryFromContentResource($resourceObj);
+		if(!$sourceEntry)
+		{
+			if($resourceObj instanceof kLiveEntryResource)
+			{
+				$sourceEntryId = $resourceObj->getEntry();
+				throw new APIException(KalturaErrors::ENTRY_ID_TYPE_NOT_SUPPORTED, $sourceEntryId->getId(), $sourceEntryId->getType());
+			}
+			elseif($resourceObj instanceof kFileSyncResource)
+			{
+				throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $resourceObj->getOriginEntryId());
+			}
+		}
 		$sourceEntryId = $sourceEntry->getId();
 		if(!in_array($sourceEntry->getType(), array(KalturaEntryType::MEDIA_CLIP, KalturaEntryType::DATA)))
 		{
@@ -2012,6 +2023,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			throw new APIException(KalturaErrors::ENTRY_ID_MEDIA_TYPE_NOT_SUPPORTED, $sourceEntryId, $sourceEntry->getMediaType());
 		}
+		return $sourceEntry;
 	}
 
 	/***
