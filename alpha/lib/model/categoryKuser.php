@@ -423,5 +423,21 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 	{
 		return PartnerPeer::retrieveByPK( $this->getPartnerId() );
 	}
-
+	
+	public function save(PropelPDO $con = null)
+	{
+		if ($this->old_status != $this->status && $this->status == CategoryKuserStatus::DELETED)
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $this->getPuserId());
+			if ($kuser->getType() == KuserType::GROUP)
+			{
+				$filter = new categoryKuserFilter();
+				$filter->setCategoryIdEqual($this->getCategoryId());
+				$filter->setUserIdEqual($this->getPuserId());
+				kJobsManager::addDeleteJob($this->getPartnerId(), DeleteObjectType::CATEGORY_USER_SUBSCRIBER, $filter);
+			}
+		}
+		
+		parent::save($con);
+	}
 } // categoryKuser
