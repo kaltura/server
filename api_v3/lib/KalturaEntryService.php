@@ -1925,8 +1925,9 @@ class KalturaEntryService extends KalturaBaseService
 		$tempEntryIds = array();
 		$resourcesData = array();
 
+		$resourcesCount = count($resources->getResources());
 		// for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip 3. retrieve media info object
-		foreach ($resources->getResources() as $resource)
+		foreach ($resources->getResources() as $ind => $resource)
 		{
 			/** @var kOperationResource $resource **/
 			$resourceObj = $resource->getResource();
@@ -1968,6 +1969,12 @@ class KalturaEntryService extends KalturaBaseService
 				$objectId = $resourceObj->getObjectId();
 				KalturaLog::err("Could not retrieve media info object for object Id [$objectId] for source entry Id [$sourceEntryId]");
 				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
+			}
+
+			// if difference between audio and video durations is more than 0.5s then block
+			if($ind != $resourcesCount - 1 && ($mediaInfoObj->getVideoDuration() - $mediaInfoObj->getAudioDuration()) / 1000 >= 0.5)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $sourceEntryId);
 			}
 
 			$resourcesData[] = array(
