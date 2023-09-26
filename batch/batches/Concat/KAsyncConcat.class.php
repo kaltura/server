@@ -242,11 +242,6 @@ class KAsyncConcat extends KJobHandlerWorker
 		$filesArrCnt = count($filesArr);
 		$i=0;
 		$mi = null;
-		$concatStr = '';
-		$concatFilter = '';
-		$audioSampleRate = self::DEFAULT_SAMPLE_RATE;
-		$audioChannels = self::DEFAULT_AUDIO_CHANNELS;
-		$shouldSyncAudio = false;
 		foreach($filesArr as $index => $fileName)
 		{
 			$i++;
@@ -308,81 +303,42 @@ class KAsyncConcat extends KJobHandlerWorker
 				KalturaLog::log("Chunk duration($duration), Wowza chunk setting(".KAsyncConcat::LiveChunkDuration."),max-allowed-delta(".KAsyncConcat::MaxChunkDelta."),fixLargeDeltaFlag($fixLargeDeltaFlag) ");
 			}
 				*/
-			if($multiSource)
-			{
-				if($mi->audioDuration < $mi->videoDuration)
-				{
-					$shouldSyncAudio = true;
-				}
-				$concatStr .= " -i \"" . kFile::realPath($fileName) . "\"";
-				$concatFilter.="[$index:v]";
-				if(isset($mi->audioDuration))
-				{
-					$concatFilter.="[$index:a]";
-				}
-				else
-				{
-					$concatFilter.="[$filesArrCnt:a]";
-				}
-
-				$audioSampleRate = isset($mi->audioSamplingRate) ? $mi->audioSamplingRate : $audioSampleRate;
-				$audioChannels = isset($mi->audioChannels) ? $mi->audioChannels : $audioChannels;
-			}
 		}
 
-		$videoParamStr = null;
-		$audioParamStr = null;
-		$extraParams = "";
-		if(!$shouldSyncAudio)
-		{
-			$concatStr = $this->concatFilesArr($filesArr, $outFilename);
-			$concatStr = $concatStr ? " -i " . $concatStr : null;
-			/*
-			 * For clip flow - set conversion to x264,
-			 * otherwise - just copy video
-			 */
-			if(isset($clipStr))	{
-				$videoParamStr = "-c:v libx264";
-				if(isset($chunkBr) && $chunkBr>0 && $filesArrCnt>0) {
-					$chunkBr = round($chunkBr/$filesArrCnt);
-					$videoParamStr.= " -b:v $chunkBr" . "k";
-				}
-				$videoParamStr.= " -subq 7 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
+		$concatStr = $this->concatFilesArr($filesArr, $outFilename);
+		$concatStr = $concatStr ? " -i " . $concatStr : null;
+		/*
+		 * For clip flow - set conversion to x264,
+		 * otherwise - just copy video
+		 */
+		if(isset($clipStr))	{
+			$videoParamStr = "-c:v libx264";
+			if(isset($chunkBr) && $chunkBr>0 && $filesArrCnt>0) {
+				$chunkBr = round($chunkBr/$filesArrCnt);
+				$videoParamStr.= " -b:v $chunkBr" . "k";
 			}
-			else
-				$videoParamStr = "-c:v copy";
-
-			if (isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate))
-				$videoParamStr.= " -map v ";
-
-			/*
-			 * If no audio - skip.
-			 * For AAC source - copy audio,
-			 * otherwise - convert to AAC
-			 */
-			$audioParamStr = null;
-			if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate))
-			{
-				if(isset($mi->audioFormat) && $mi->audioFormat=="aac")
-					$audioParamStr = "-c:a copy";
-				else
-					$audioParamStr = "-c:a libfdk_aac";
-				$audioParamStr.= " -bsf:a aac_adtstoasc";
-				$audioParamStr.= " -map a ";
-			}
+			$videoParamStr.= " -subq 7 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
 		}
 		else
+			$videoParamStr = "-c:v copy";
+
+		if (isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate))
+			$videoParamStr.= " -map v ";
+
+		/*
+		 * If no audio - skip.
+		 * For AAC source - copy audio,
+		 * otherwise - convert to AAC
+		 */
+		$audioParamStr = null;
+		if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate))
 		{
-			$audioLayout = $audioChannels == 1 ? "mono" : "stereo";
-			$concatFilter = $concatFilter . "concat=n=$filesArrCnt:v=1:a=1[v][a]";
-//			$concatStr = " -reconnect_on_status 5xx -reconnect_on_err 1 -reconnect 1 -cache_redirect 0 $concatStr";
-			$concatStr .= " -t 1 -f lavfi -i anullsrc=r=$audioSampleRate:cl=$audioLayout ";
-			$concatStr .= "-subq 5 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 1 -refs 2 -x264opts stitchable -vprofile main";
-			$concatStr .= " -filter_complex \"$concatFilter\"";
-			$videoParamStr = " -map \"[v]\" ";
-			$audioParamStr = " -bsf:a aac_adtstoasc";
-			$audioParamStr .= " -map \"[a]\" ";
-			$extraParams .= " -vsync 1";
+			if(isset($mi->audioFormat) && $mi->audioFormat=="aac")
+				$audioParamStr = "-c:a copy";
+			else
+				$audioParamStr = "-c:a libfdk_aac";
+			$audioParamStr.= " -bsf:a aac_adtstoasc";
+			$audioParamStr.= " -map a ";
 		}
 
 		$probeSizeAndAnalyzeDurationStr = self::getProbeSizeAndAnalyzeDuration($attempt);
@@ -406,7 +362,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				$cmdStr .= "-protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\" ";
 			}
 
-			$cmdStr .= "$probeSizeAndAnalyzeDurationStr $concatStr $videoParamStr $audioParamStr $extraParams";
+			$cmdStr .= "$probeSizeAndAnalyzeDurationStr $concatStr $videoParamStr $audioParamStr";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 	
