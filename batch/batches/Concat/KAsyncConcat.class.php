@@ -309,7 +309,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				*/
 			if($multiSource)
 			{
-				$concatStr .= " -i \"$fileName\"";
+				$concatStr .= " -i \"" . kFile::realPath($fileName) . "\"";
 				$concatFilter.="[$index:v]";
 				if(isset($mi->audioDuration))
 				{
