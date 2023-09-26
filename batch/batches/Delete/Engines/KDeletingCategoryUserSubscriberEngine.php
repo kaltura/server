@@ -180,7 +180,14 @@ class KDeletingCategoryUserSubscriberEngine extends KDeletingEngine
 					continue;
 				}
 				
-				$groupUsers = $this->retrieveGroupUsersFromFilter($groupUserFilter);
+				try
+				{
+					$groupUsers = $this->retrieveGroupUsersFromFilter($groupUserFilter);
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err("Failed to retrieve list of groupUsers for groupId [$groupId] and userId [$subscriberId]");
+				}
 				
 				if ($groupUsers && $groupUsers->objects && count($groupUsers->objects) > 0)
 				{
@@ -196,7 +203,14 @@ class KDeletingCategoryUserSubscriberEngine extends KDeletingEngine
 			
 			if ($countForList)
 			{
-				$groupUsers = $this->retrieveGroupUsersFromFilter($groupUserFilter);
+				try
+				{
+					$groupUsers = $this->retrieveGroupUsersFromFilter($groupUserFilter);
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err("Failed to retrieve list of groupUsers for groupId [$groupId] and userId [$subscriberId]");
+				}
 				
 				if ($groupUsers && $groupUsers->objects && count($groupUsers->objects) > 0)
 				{
@@ -206,7 +220,14 @@ class KDeletingCategoryUserSubscriberEngine extends KDeletingEngine
 			
 			if ($deleteSubscriber)
 			{
-				KBatchBase::$kClient->categoryUser->delete($categoryId, $subscriberId);
+				try
+				{
+					KBatchBase::$kClient->categoryUser->delete($categoryId, $subscriberId);
+				}
+				catch (Exception $e)
+				{
+					KalturaLog::err("Failed to delete categoryUser with categoryId [$categoryId] and userId [$subscriberId]");
+				}
 			}
 		}
 	}
@@ -216,15 +237,7 @@ class KDeletingCategoryUserSubscriberEngine extends KDeletingEngine
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = self::LIST_SIZE;
 		
-		try
-		{
-			$groupUsers = KBatchBase::$kClient->groupUser->listAction($groupUserFilter, $pager);
-		}
-		catch (Exception $e)
-		{
-			KalturaLog::err('Failed to retrieve list of groupUsers');
-			$groupUsers = array();
-		}
+		$groupUsers = KBatchBase::$kClient->groupUser->listAction($groupUserFilter, $pager);
 		
 		return $groupUsers;
 	}
