@@ -12,18 +12,19 @@ moduls.viewModeratedSystemEntries.permissionName = VIEW_MODERATED_SYSTEM_ENTRIES
 moduls.viewModeratedSystemEntries.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
-# Scorpius-19.16.0
 ## Add Azerbaijani and Urdu language options for live streams ##
 * Issue Type: Task
 * Issue ID: SUP-38837
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_09_24_add_live_languages_aze_urd.php
 
+# Scorpius-19.16.0
 ## Deploy new Flavor params and conversion profile for PPT conversion ##
 - Issue Type: Task
 - Issue ID: NR2-7791
 
 ### Deployment Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/2023_06_28_deploy_kaltura_meetings_documents_conversion_data.php
-    php /opt/kaltura/app/deployment/updates/scripts/2023_09_24_add_live_languages_aze_urd.php
 
 # Scorpius-19.15.0
 
