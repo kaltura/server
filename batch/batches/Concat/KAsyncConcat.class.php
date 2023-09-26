@@ -50,6 +50,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		// creates a temp file path
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
+		$this->concatMethod = isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
 
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
@@ -100,7 +101,6 @@ class KAsyncConcat extends KJobHandlerWorker
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath.".mp4" : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
-		$this->concatMethod = !$data->multiSource && isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
 
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
@@ -246,6 +246,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		$concatFilter = '';
 		$audioSampleRate = self::DEFAULT_SAMPLE_RATE;
 		$audioChannels = self::DEFAULT_AUDIO_CHANNELS;
+		$shouldSyncAudio = false;
 		foreach($filesArr as $index => $fileName)
 		{
 			$i++;
@@ -309,6 +310,10 @@ class KAsyncConcat extends KJobHandlerWorker
 				*/
 			if($multiSource)
 			{
+				if($mi->audioDuration < $mi->videoDuration)
+				{
+					$shouldSyncAudio = true;
+				}
 				$concatStr .= " -i \"" . kFile::realPath($fileName) . "\"";
 				$concatFilter.="[$index:v]";
 				if(isset($mi->audioDuration))
@@ -327,7 +332,8 @@ class KAsyncConcat extends KJobHandlerWorker
 
 		$videoParamStr = null;
 		$audioParamStr = null;
-		if(!$multiSource)
+		$extraParams = "";
+		if(!$shouldSyncAudio)
 		{
 			$concatStr = $this->concatFilesArr($filesArr, $outFilename);
 			$concatStr = $concatStr ? " -i " . $concatStr : null;
@@ -369,10 +375,14 @@ class KAsyncConcat extends KJobHandlerWorker
 		{
 			$audioLayout = $audioChannels == 1 ? "mono" : "stereo";
 			$concatFilter = $concatFilter . "concat=n=$filesArrCnt:v=1:a=1[v][a]";
-			$concatStr .= " -t 1 -f lavfi -i anullsrc=r=$audioSampleRate:cl=$audioLayout -filter_complex \"$concatFilter\"";
+//			$concatStr = " -reconnect_on_status 5xx -reconnect_on_err 1 -reconnect 1 -cache_redirect 0 $concatStr";
+			$concatStr .= " -t 1 -f lavfi -i anullsrc=r=$audioSampleRate:cl=$audioLayout ";
+			$concatStr .= "-subq 5 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -coder 1 -refs 2 -x264opts stitchable -vprofile main";
+			$concatStr .= " -filter_complex \"$concatFilter\"";
 			$videoParamStr = " -map \"[v]\" ";
 			$audioParamStr = " -bsf:a aac_adtstoasc";
 			$audioParamStr .= " -map \"[a]\" ";
+			$extraParams .= " -vsync 1";
 		}
 
 		$probeSizeAndAnalyzeDurationStr = self::getProbeSizeAndAnalyzeDuration($attempt);
@@ -396,7 +406,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				$cmdStr .= "-protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\" ";
 			}
 
-			$cmdStr .= "$probeSizeAndAnalyzeDurationStr $concatStr $videoParamStr $audioParamStr";
+			$cmdStr .= "$probeSizeAndAnalyzeDurationStr $concatStr $videoParamStr $audioParamStr $extraParams";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 	
