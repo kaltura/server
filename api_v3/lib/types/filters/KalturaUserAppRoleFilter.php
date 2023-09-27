@@ -67,7 +67,7 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($c);
-			$totalCount = KuserToUserRolePeer::doCount($c);
+			$totalCount = KuserToUserRolePeer::doCountJoinkuser($c);
 		}
 		
 		KuserToUserRolePeer::setUseCriteriaFilter(true);
