@@ -153,6 +153,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			// delete old roles
 			$c = new Criteria();
 			$c->addAnd(KuserToUserRolePeer::KUSER_ID, $this->getId(), Criteria::EQUAL);
+			$c->addAnd(KuserToUserRolePeer::APP_GUID, null, Criteria::ISNULL);
 			KuserToUserRolePeer::doDelete($c);
 			
 			// add new roles

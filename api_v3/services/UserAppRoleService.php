@@ -23,6 +23,17 @@ class UserAppRoleService extends KalturaBaseService
 		$this->applyPartnerFilterForClass('UserRole');
 	}
 	
+	protected function partnerGroup($peer = null)
+	{
+		// if the current KS is an impersonated KS from EP (-11) add EP PID to partner criteria
+		if (kCurrentContext::$is_admin_session && isset(kCurrentContext::$master_partner_id) && kCurrentContext::$master_partner_id < 0)
+		{
+			return $this->partnerGroup . ',' . kCurrentContext::$master_partner_id;
+		}
+		
+		return $this->partnerGroup;
+	}
+	
 	/**
 	 * Assign an application role for a user
 	 *
@@ -37,9 +48,6 @@ class UserAppRoleService extends KalturaBaseService
 	 */
 	public function addAction(KalturaUserAppRole $userAppRole)
 	{
-		// todo: consider adding $master_partner_id = -11
-		// todo: if it's EP impersonated session, fetch user_role from 'global_partner' (0)
-		
 		$dbUserAppRole = $userAppRole->toInsertableObject();
 		$dbUserAppRole->save();
 		

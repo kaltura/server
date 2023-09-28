@@ -49,6 +49,7 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		$c = new Criteria();
 		$userAppRoleFilter = $this->toObject();
 		$c->addAnd(KuserToUserRolePeer::APP_GUID, null, Criteria::ISNOTNULL);
+		$c->addAnd(kuserPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId(), Criteria::EQUAL);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 		
 		$userAppRoleFilter->attachToCriteria($c);
