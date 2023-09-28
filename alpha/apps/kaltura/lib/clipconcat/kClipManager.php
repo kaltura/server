@@ -669,7 +669,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if(!$resourceData[self::IMAGE_TO_VIDEO])
 			{
 				$this->updateKeyFrequency($allAudioChannels, $mediaInfoObj->getAudioChannels(), $duration);
-				$this->updateKeyFrequency($allAudioSampleRates, $mediaInfoObj->getAudioSamplingRate(), $duration);
+				$allAudioSampleRates[] = $mediaInfoObj->getAudioSamplingRate();
 				$frameRate = max($frameRate, $mediaInfoObj->getVideoFrameRate());
 			}
 		}
