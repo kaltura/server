@@ -750,14 +750,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function decideAudioChannels(array $allAudioChannels)
 	{
-		// 1 - mono, 2 - stereo
-		if(count($allAudioChannels) == 0)
-		{
-			return self::DEFAULT_AUDIO_CHANNELS;
-		}
-		$maxDurationAudioChannels = max($allAudioChannels);
-		$mostFrequentAudioChannels = array_search($maxDurationAudioChannels, $allAudioChannels);
-		return $mostFrequentAudioChannels > 1 ? 2 : 1;
+		return min($allAudioChannels);
 	}
 
 	protected function limitByMaxProfileResolution($conversionProfileId, $aspectRatio, &$width, &$height)
