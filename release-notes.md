@@ -1,3 +1,14 @@
+# Scorpius-19.18.0
+## Pass AuthBroker endpoints to kmcng ##
+* Issue Type: Task
+* Issue ID: PLAT-24425
+### Configuration ###
+Add the following to local.ini:
+```
+authBrokerBaseUrl = @AUTH_BROKER_BASE_URL@
+appRegistryBaseUrl = @APP_REGISTRY_BASE_URL@
+```
+
 # Scorpius-19.17.0
 ## Enable viewing system entries flagged for moderation ##
 * Issue Type: Task
