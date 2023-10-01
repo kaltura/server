@@ -241,8 +241,10 @@ class KAsyncConcat extends KJobHandlerWorker
 		}
 		$filesArrCnt = count($filesArr);
 		$i=0;
-		$mi = null;
-		foreach($filesArr as $index => $fileName)
+		$hasAudio = true;
+		$hasVideo = true;
+		$audioFormats = array();
+		foreach($filesArr as $fileName)
 		{
 			$i++;
 				/*
@@ -250,22 +252,53 @@ class KAsyncConcat extends KJobHandlerWorker
 				 */
 			$ffParser = new KFFMpegMediaParser($fileName, $ffmpegBin, $ffprobeBin);
 			$mi = null;
-			try {
+			try
+			{
 				$mi = $ffParser->getMediaInfo();
 			}
-			catch(Exception $ex) {
+			catch(Exception $ex)
+			{
 				KalturaLog::log(print_r($ex,1));
 			}
 				/*
 				 * Calculate chunk-br for the cliping flow
 				 */
-			if(isset($clipStr)) {
+			if(isset($clipStr))
+			{
 				if(isset($mi->containerBitRate) && $mi->containerBitRate>0)
+				{
 					$chunkBr+= $mi->containerBitRate;
+				}
 				else if(isset($mi->videoBitRate) && $mi->videoBitRate>0)
+				{
 					$chunkBr+= $mi->videoBitRate;
+				}
 				else if(isset($mi->audioBitRate) && $mi->audioBitRate>0)
+				{
 					$chunkBr+= $mi->audioBitRate;
+				}
+			}
+
+			$isAudioSet = isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate);
+			if(!$isAudioSet)
+			{
+				$hasAudio = false;
+			}
+			else
+			{
+				if (isset($mi->audioFormat))
+				{
+					$audioFormats[] = $mi->audioFormat;
+				}
+				else
+				{
+					$audioFormats[] = null;
+				}
+			}
+			$isVideoSet = isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate);
+			if(!$isVideoSet)
+			{
+				$hasVideo = false;
 			}
 			
 				/* 
@@ -311,19 +344,32 @@ class KAsyncConcat extends KJobHandlerWorker
 		 * For clip flow - set conversion to x264,
 		 * otherwise - just copy video
 		 */
-		if(isset($clipStr))	{
+		if(isset($clipStr))
+		{
 			$videoParamStr = "-c:v libx264";
-			if(isset($chunkBr) && $chunkBr>0 && $filesArrCnt>0) {
+			if(isset($chunkBr) && $chunkBr>0 && $filesArrCnt>0)
+			{
 				$chunkBr = round($chunkBr/$filesArrCnt);
-				$videoParamStr.= " -b:v $chunkBr" . "k";
+				$videoParamStr .= " -b:v $chunkBr" . "k";
 			}
-			$videoParamStr.= " -subq 7 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
+			$videoParamStr .= " -subq 7 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4 -bf 16 -coder 1 -refs 6 -x264opts b-pyramid:weightb:mixed-refs:8x8dct:no-fast-pskip=0 -vprofile high  -pix_fmt yuv420p -threads 4";
 		}
 		else
+		{
 			$videoParamStr = "-c:v copy";
+		}
 
-		if (isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate))
-			$videoParamStr.= " -map v ";
+		if ($hasVideo)
+		{
+			if($multiSource)
+			{
+				$videoParamStr .= " -map v:0 ";
+			}
+			else
+			{
+				$videoParamStr .= " -map v ";
+			}
+		}
 
 		/*
 		 * If no audio - skip.
@@ -331,14 +377,25 @@ class KAsyncConcat extends KJobHandlerWorker
 		 * otherwise - convert to AAC
 		 */
 		$audioParamStr = null;
-		if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate))
+		if($hasAudio)
 		{
-			if(isset($mi->audioFormat) && $mi->audioFormat=="aac")
+			if(count(array_unique($audioFormats)) == 1 && $audioFormats[0] =="aac")
+			{
 				$audioParamStr = "-c:a copy";
+			}
 			else
+			{
 				$audioParamStr = "-c:a libfdk_aac";
-			$audioParamStr.= " -bsf:a aac_adtstoasc";
-			$audioParamStr.= " -map a ";
+			}
+			$audioParamStr .= " -bsf:a aac_adtstoasc";
+			if($multiSource)
+			{
+				$audioParamStr .= " -map a:0 ";
+			}
+			else
+			{
+				$audioParamStr .= " -map a ";
+			}
 		}
 
 		$probeSizeAndAnalyzeDurationStr = self::getProbeSizeAndAnalyzeDuration($attempt);
