@@ -286,14 +286,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			}
 			else
 			{
-				if (isset($mi->audioFormat))
-				{
-					$audioFormats[] = $mi->audioFormat;
-				}
-				else
-				{
-					$audioFormats[] = null;
-				}
+				$audioFormats[] = isset($mi->audioFormat) ? $mi->audioFormat : null;
 			}
 			$isVideoSet = isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate);
 			if(!$isVideoSet)
@@ -361,14 +354,7 @@ class KAsyncConcat extends KJobHandlerWorker
 
 		if ($hasVideo)
 		{
-			if($multiSource)
-			{
-				$videoParamStr .= " -map v:0 ";
-			}
-			else
-			{
-				$videoParamStr .= " -map v ";
-			}
+			$videoParamStr .= $multiSource ? " -map v:0 " : " -map v ";
 		}
 
 		/*
@@ -388,14 +374,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				$audioParamStr = "-c:a libfdk_aac";
 			}
 			$audioParamStr .= " -bsf:a aac_adtstoasc";
-			if($multiSource)
-			{
-				$audioParamStr .= " -map a:0 ";
-			}
-			else
-			{
-				$audioParamStr .= " -map a ";
-			}
+			$audioParamStr .= $multiSource ? " -map a:0 " : " -map a ";
 		}
 
 		$probeSizeAndAnalyzeDurationStr = self::getProbeSizeAndAnalyzeDuration($attempt);
