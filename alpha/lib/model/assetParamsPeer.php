@@ -307,6 +307,14 @@ class assetParamsPeer extends BaseassetParamsPeer
 		return self::doSelectOne($c, $con);
 	}
 
+	public static function retrieveByPartnerIdAndSystemName ($partnerId, $systemName, $con = null)
+	{
+		$c = new Criteria();
+		$c->addAnd(assetParamsPeer::PARTNER_ID, $partnerId);
+		$c->addAnd(assetParamsPeer::SYSTEM_NAME, $systemName);
+		return self::doSelectOne($c, $con);
+	}
+
 	public static function retrieveAllFlavorParamsTypes(){
 		$flavorTypes = KalturaPluginManager::getExtendedTypes(self::OM_CLASS, assetType::FLAVOR);
 		$flavorTypes[] = assetType::LIVE;

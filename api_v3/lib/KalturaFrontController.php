@@ -92,8 +92,10 @@ class KalturaFrontController
 		error_reporting(E_STRICT | E_ALL);
 		
 		set_error_handler(array(&$this, "errorHandler"));
-		
-		KalturaLog::debug("Params [" . print_r($this->params, true) . "]");
+
+		$logParams = infraRequestUtils::maskSensitiveParams($this->params);
+		KalturaLog::debug("Params [" . print_r($logParams, true) . "]");
+
 		try {	
 			$this->setSerializerByFormat();
 		}

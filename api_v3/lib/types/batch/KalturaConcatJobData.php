@@ -47,6 +47,17 @@ class KalturaConcatJobData extends KalturaJobData
 	 */
 	public $shouldSort;
 
+	/**
+	 * conversion commands to be applied to source files
+	 * @var KalturaStringArray
+	 */
+	public $conversionCommands;
+
+	/**
+	 * @var bool
+	 */
+	public $multiSource;
+
 	private static $map_between_objects = array
 	(
 		'srcFiles',
@@ -56,6 +67,8 @@ class KalturaConcatJobData extends KalturaJobData
 		'duration',
 		'concatenatedDuration',
 		'shouldSort',
+		'conversionCommands',
+		'multiSource'
 	);
 
 	/* (non-PHPdoc)

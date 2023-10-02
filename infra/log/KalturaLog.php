@@ -20,6 +20,9 @@ class KalturaLog
     const DEBUG   = Zend_Log::DEBUG;
     
     const LOG_TYPE_ANALYTICS = 'LOG_TYPE_ANALYTICS';
+
+    const LOG_TYPE_SECURED = 'LOG_TYPE_SECURED';
+
     const STANDARD_ERROR = 'STANDARD_ERROR';
 
 	public static function isInitialized()
@@ -123,6 +126,24 @@ class KalturaLog
 		}
 		$message = substr($message, 0, -1);
 		self::logByType($message, self::LOG_TYPE_ANALYTICS, self::NOTICE);
+	}
+
+	static function securedDebug($message)
+	{
+		self::initLog();
+
+		preg_match("/partner.*([a-z0-9]{32}).*([a-z0-9]{32})/", $message, $matches);
+		if(count($matches))
+		{
+			$message = str_replace(array($matches[1], $matches[2]), array(str_repeat('*', 32), str_repeat('*', 32)), $message);
+		}
+
+		self::$_logger->log($message, self::DEBUG);
+	}
+
+	static function secured($message)
+	{
+		self::logByType($message, self::LOG_TYPE_SECURED, self::DEBUG);
 	}
 
 	static function stderr($message, $priority = self::ERR)

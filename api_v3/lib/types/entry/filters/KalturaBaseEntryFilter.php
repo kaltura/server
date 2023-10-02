@@ -189,7 +189,7 @@ class KalturaBaseEntryFilter extends KalturaBaseEntryBaseFilter
 		{
 			$this->setDefaultStatus();
 			$this->setDefaultModerationStatus($this);
-			if (($this->parentEntryIdEqual == null) && ($this->idIn == null) && ($this->displayInSearchEqual == null))
+			if (($this->parentEntryIdEqual == null) && ($this->idIn == null) && ($this->displayInSearchEqual == null) && ($this->displayInSearchIn == null))
 			{
 				$displayInSearchStatusNotIn = array(mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 				$c->add(entryPeer::DISPLAY_IN_SEARCH, $displayInSearchStatusNotIn, Criteria::NOT_IN);

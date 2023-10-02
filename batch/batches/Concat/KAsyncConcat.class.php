@@ -11,7 +11,8 @@ class KAsyncConcat extends KJobHandlerWorker
 	const MaxChunkDelta 	= 150;		// msec
 	const CONCAT_METHOD_FILE 	= "raw";
 	const CONCAT_METHOD_FFMPEG 	= "ffmpeg";
-
+	const DEFAULT_SAMPLE_RATE = 44100;
+	const DEFAULT_AUDIO_CHANNELS = 1;
 	/**
 	 * @var string
 	 */
@@ -50,7 +51,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
 		$this->concatMethod = isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
-	
+
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
 		{
@@ -108,19 +109,28 @@ class KAsyncConcat extends KJobHandlerWorker
 			$srcFiles[] = $srcFile->value;
 		}
 
+		$filePathsToRemove = array();
+		$srcFiles = $this->convertRequiredSrcFiles($data, $srcFiles, $ffmpegBin, $filePathsToRemove);
+		if(!$srcFiles)
+		{
+			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to pre-concat conversions", KalturaBatchJobStatus::FAILED);
+		}
 		$attemptNum = 1;
 		$totalAttempts = isset(KBatchBase::$taskConfig->params->totalAttempts) ? KBatchBase::$taskConfig->params->totalAttempts : 3;
 
 		do
 		{
 			KalturaLog::info('Concat attempt ' . $attemptNum . ' out of: ' . $totalAttempts);
-			$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration, $data->shouldSort, $attemptNum);
+			$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration, $data->shouldSort, $data->multiSource, $attemptNum);
 			$attemptNum++;
 		}
 		while (!$result && $attemptNum <= $totalAttempts);
 
-		if(! $result)
+		$this->unlinkFilePaths($filePathsToRemove);
+		if(!$result)
+		{
 			return $this->closeJob($job, KalturaBatchJobErrorTypes::RUNTIME, null, "Failed to concat files", KalturaBatchJobStatus::FAILED);
+		}
 
 		try
 		{
@@ -134,6 +144,33 @@ class KAsyncConcat extends KJobHandlerWorker
 		}
 
 		return $this->moveFile($job, $data, $localTempFilePath, $sharedTempFilePath);
+	}
+
+	protected function convertRequiredSrcFiles($data, &$srcFiles, $ffmpegBin, &$filePathsToRemove)
+	{
+		foreach ($data->conversionCommands as $key => $conversionCommand)
+		{
+			if($conversionCommand->value == "-")
+			{
+				continue;
+			}
+			$inFileName = $srcFiles[$key];
+			$resolvedInFilePath  = kFile::realPath($inFileName);
+			$outFilename = $this->localTempPath . DIRECTORY_SEPARATOR . basename($inFileName) . ".image_video.mpegts";
+			$conversionCmd = str_replace("__inFileName__", "\"$resolvedInFilePath\"", $conversionCommand->value);
+			$conversionCmd = str_replace("__outFileName__", $outFilename, $conversionCmd);
+			$cmdStr = "$ffmpegBin $conversionCmd 2>&1";
+
+			KalturaLog::debug("Executing [$cmdStr]");
+			system($cmdStr, $rv);
+			if($rv != 0)
+			{
+				return null;
+			}
+			$srcFiles[$key] = $outFilename;
+			$filePathsToRemove[] = $outFilename;
+		}
+		return $srcFiles;
 	}
 
 	/**
@@ -160,6 +197,17 @@ class KAsyncConcat extends KJobHandlerWorker
 		return $this->closeJob($job, null, null, 'successfully moved file', KalturaBatchJobStatus::FINISHED, $data);
 	}
 
+	protected function unlinkFilePaths(array $filePaths)
+	{
+		foreach ($filePaths as $filePath)
+		{
+			if(kFile::checkFileExists($filePath))
+			{
+				kFile::unlink($filePath);
+			}
+		}
+	}
+
 	/**
 	 *
 	 * @param unknown_type $ffmpegBin
@@ -173,7 +221,7 @@ class KAsyncConcat extends KJobHandlerWorker
 	 * @return boolean
 	 * @throws kApplicativeException
 	 */
-	protected function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $attempt = 1)
+	protected function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $multiSource = false, $attempt = 1)
 	{
 		$fixLargeDeltaFlag = null;
 		$chunkBr = null;
@@ -194,7 +242,8 @@ class KAsyncConcat extends KJobHandlerWorker
 		$filesArrCnt = count($filesArr);
 		$i=0;
 		$mi = null;
-		foreach($filesArr as $fileName) {
+		foreach($filesArr as $index => $fileName)
+		{
 			$i++;
 				/*
 				 * Get chunk file media-info
@@ -255,12 +304,13 @@ class KAsyncConcat extends KJobHandlerWorker
 			}
 				*/
 		}
-		
+
 		$concatStr = $this->concatFilesArr($filesArr, $outFilename);
-			/*
-			 * For clip flow - set converion to x264,
-			 * otherwise - just copy video
-			 */
+		$concatStr = $concatStr ? " -i " . $concatStr : null;
+		/*
+		 * For clip flow - set conversion to x264,
+		 * otherwise - just copy video
+		 */
 		if(isset($clipStr))	{
 			$videoParamStr = "-c:v libx264";
 			if(isset($chunkBr) && $chunkBr>0 && $filesArrCnt>0) {
@@ -271,17 +321,18 @@ class KAsyncConcat extends KJobHandlerWorker
 		}
 		else
 			$videoParamStr = "-c:v copy";
-		
+
 		if (isset($mi->videoFormat) || isset($mi->videoCodecId) || isset($mi->videoDuration) || isset($mi->videoBitRate))
 			$videoParamStr.= " -map v ";
 
-			/*
-			 * If no audio - skip.
-			 * For AAC source - copy audio,
-			 * otherwise - convert to AAC
-			 */
+		/*
+		 * If no audio - skip.
+		 * For AAC source - copy audio,
+		 * otherwise - convert to AAC
+		 */
 		$audioParamStr = null;
-		if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate)) {
+		if(isset($mi->audioFormat) || isset($mi->audioCodecId) || isset($mi->audioDuration) || isset($mi->audioBitRate))
+		{
 			if(isset($mi->audioFormat) && $mi->audioFormat=="aac")
 				$audioParamStr = "-c:a copy";
 			else
@@ -310,8 +361,8 @@ class KAsyncConcat extends KJobHandlerWorker
 			{
 				$cmdStr .= "-protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\" ";
 			}
-			
-			$cmdStr .= "$probeSizeAndAnalyzeDurationStr -i $concatStr $videoParamStr $audioParamStr";
+
+			$cmdStr .= "$probeSizeAndAnalyzeDurationStr $concatStr $videoParamStr $audioParamStr";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 	

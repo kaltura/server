@@ -36,6 +36,11 @@ class LiveCaptionFeature extends LiveFeature
 	protected $inputDelay;
 
 	/**
+	 * @var string
+	 */
+	protected $language;
+
+	/**
 	 * @param string $v
 	 */
 	public function setMediaUrl($v)
@@ -95,6 +100,19 @@ class LiveCaptionFeature extends LiveFeature
 	public function getInputDelay()
 	{
 		return $this->inputDelay;
+	}
+
+	/**
+	 * @param string $v
+	 */
+	public function setLanguage($v)
+	{
+		$this->language = $v;
+	}
+
+	public function getLanguage()
+	{
+		return $this->language;
 	}
 
 	public function getApiType()

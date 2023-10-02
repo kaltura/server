@@ -176,9 +176,25 @@ if (isPlaykit === '1') {
     if (data.embedType === 'iframe') {
         code = '<iframe id="kaltura_player" src="'+iframeURL+'" width="'+ width +'" height="'+height+'" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" allow="autoplay; fullscreen; encrypted-media" frameborder="0" style="width: '+width+'px; height: '+height+'px;" itemprop="video" itemscope="" itemtype="http://schema.org/VideoObject"></iframe>';
     }
+    else if (data.embedType === 'thumb') {
+        code = `<div id='kaltura_player_1' style='width: 560px;height: 395px'></div>
+                <scr`+`ipt type='text/javascript' src='${codeUrl}'></scr`+`ipt>
+                <scr`+`ipt src='https://static.kaltura.com/content/static/player-scripts/thumbnail-embed.js'></scr`+`ipt>
+                <scr`+`ipt>
+                        __thumbnailEmbed({
+                            config: {
+                                provider: {
+                                    partnerId: '${data.partnerId}',
+                                    uiConfId: '${data.uiConfId}'
+                                },
+                                targetId: 'kaltura_player_1'
+                            },
+                            mediaInfo: {entryId: '${data.entryId}' }
+                        });
+                </scr`+`ipt>`;
+    }
     document.getElementById('framePlayerContainer').style.height = height + 'px';
     document.getElementById('framePlayerContainer').style.width = width + 'px';
-
 }
 
 // IE9 and below has issue with document.write script tag

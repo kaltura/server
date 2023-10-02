@@ -145,12 +145,17 @@ class KalturaErrors extends APIErrors
 	const ENTRY_REPLACEMENT_ALREADY_EXISTS = "ENTRY_REPLACEMENT_ALREADY_EXISTS;;Entry already in replacement";
 
 	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED;ENTRY_TYPE;Entry type \"@ENTRY_TYPE@\" not supported";
+	const ENTRY_ID_TYPE_NOT_SUPPORTED = "ENTRY_ID_TYPE_NOT_SUPPORTED;ENTRY_ID,ENTRY_TYPE;Entry Id \"@ENTRY_ID@\" type \"@ENTRY_TYPE@\" not supported";
 
 	const RESOURCE_TYPE_NOT_SUPPORTED = "RESOURCE_TYPE_NOT_SUPPORTED;RES_TYPE;Resource type \"@RES_TYPE@\" not supported";
 
 	const RESOURCES_MULTIPLE_DATA_CENTERS = "RESOURCES_MULTIPLE_DATA_CENTERS;;Resources created on different data centers";
+	const INCOMPATIBLE_RESOURCES_DIMENSIONS = "INCOMPATIBLE_RESOURCES_DIMENSIONS;;Resources has incompatible dimensions";
+	const INVALID_MEDIA_INFO = "INVALID_MEDIA_INFO;ENTRY_ID;Entry Id \"@ENTRY_ID@\" has invalid media info";
+	const MEDIA_INFO_NOT_FOUND = "MEDIA_INFO_NOT_FOUND;FLAVOR_ASSET_ID;Media info for flavor asset Id \"@FLAVOR_ASSET_ID@\" not found";
 
 	const ENTRY_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_MEDIA_TYPE_NOT_SUPPORTED;MEDIA_TYPE;Entry media type \"@MEDIA_TYPE@\" not supported";
+	const ENTRY_ID_MEDIA_TYPE_NOT_SUPPORTED = "ENTRY_ID_MEDIA_TYPE_NOT_SUPPORTED;ENTRY_ID,MEDIA_TYPE;Entry ID \"@ENTRY_ID@\" media type \"@MEDIA_TYPE@\" not supported";
 
 	const ENTRY_SOURCE_TYPE_NOT_SUPPORTED = "ENTRY_SOURCE_TYPE_NOT_SUPPORTED;SOURCE_TYPE;Entry source type \"@SOURCE_TYPE@\" not supported";
 
@@ -187,6 +192,9 @@ class KalturaErrors extends APIErrors
 	const RESOURCE_ENTRY_ID_MISSING= "RESOURCE_ENTRY_ID_MISSING;;Entry Id on resource object is missing";
 	
 	const CYCLE_IN_PARENTAGE = "CYCLE_IN_PARENTAGE;;Invalid cycle detected in the parent child connection of this entry";
+
+	const CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION = "CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION;MAX_DURATION;clips durations exceeded max allowed duration \"@MAX_DURATION@\" in seconds";
+	const RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;clips durations exceeded max allowed duration \"@MAX_COUNT@\" in seconds";
 
 
 	/**

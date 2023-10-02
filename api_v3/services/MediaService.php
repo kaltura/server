@@ -245,6 +245,14 @@ class MediaService extends KalturaEntryService
 
 				return $this->attachOperationResource($resource, $dbEntry, $dbAsset);
 
+			case 'kOperationResources':
+				if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
+				{
+					throw new KalturaAPIException(KalturaErrors::RESOURCE_TYPE_NOT_SUPPORTED, get_class($resource));
+				}
+				$this->attachOperationResources($resource, $dbEntry);
+				return null;
+
 			default:
 				KalturaLog::err("Resource of type [" . get_class($resource) . "] is not supported");
 				$dbEntry->setStatus(entryStatus::ERROR_IMPORTING);
@@ -1255,24 +1263,5 @@ class MediaService extends KalturaEntryService
 
 		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
 		return $content;
-	}
-
-	private function handleErrorDuringSetResource($entryId, Exception $e)
-	{
-		if ($e->getCode() == APIErrors::getCode(APIErrors::ENTRY_ID_NOT_FOUND))
-		{
-			throw $e; //if no entry found then no need to do anything
-		}
-		KalturaLog::info("Exception was thrown during setContent on entry [$entryId] with error: " . $e->getMessage());
-		$this->cancelReplaceAction($entryId);
-
-		$errorCodeArr = array(kCoreException::SOURCE_FILE_NOT_FOUND, APIErrors::getCode(APIErrors::SOURCE_FILE_NOT_FOUND));
-		if ((in_array($e->getCode(), $errorCodeArr)) && (kDataCenterMgr::dcExists(1 - kDataCenterMgr::getCurrentDcId())))
-		{
-			$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
-			KalturaLog::info("Source file wasn't found on current DC. Dumping the request to DC ID [$remoteDc]");
-			kFileUtils::dumpApiRequest(kDataCenterMgr::getRemoteDcExternalUrlByDcId($remoteDc), true);
-		}
-		throw $e;
 	}
 }

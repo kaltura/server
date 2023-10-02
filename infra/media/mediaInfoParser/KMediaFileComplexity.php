@@ -37,8 +37,9 @@
 			$this->mediaInfoBin = isset($mediaInfoBin)? $mediaInfoBin: "mediaInfo";
 		}
 
+		const MINIMAL_SAMPLING_POINTS_NUM = 2;
 		const DEFAULT_SAMPLING_POINTS_NUM = 20;
-		const MINIMAL_SAMPLING_STEP_INTERVAL = 2; 	//secs, interval between sampling points
+		const DEFAULT_SAMPLING_STEP_INTERVAL = 20; 	//secs, interval between sampling points
 		const DEFAULT_SINGLE_SAMPLING_POINT_DUR = 1;//secs, sampling time on each sampling point
 
 		protected $ffmpegBin = null;
@@ -190,17 +191,37 @@
 				 * - test duration on each point (samplingPointDuration)
 				 */
 			{
-				if(isset($this->samplingPoints)) 
+				if(isset($this->samplingPoints)) {
 					$samplingPoints = $this->samplingPoints;
-				else 
-					$samplingPoints = self::DEFAULT_SAMPLING_POINTS_NUM; // 20
-				
-				$stepInterval = round($duration/$samplingPoints,3);
-				if($stepInterval<self::MINIMAL_SAMPLING_STEP_INTERVAL)
-					$stepInterval = self::MINIMAL_SAMPLING_STEP_INTERVAL;
-
+					$stepInterval = round($duration/$samplingPoints,3);
+				}
+				else {
+						// Avoid short contents oversampling
+					if($duration<self::DEFAULT_SAMPLING_STEP_INTERVAL*self::MINIMAL_SAMPLING_POINTS_NUM) {
+							// For very short contents (up to ~50 sec) 
+							//   set the samplingPoints to MINIMAL_SAMPLING_POINTS_NUM (2)
+							//   calc the stepInterval accordingly
+						$samplingPoints = self::MINIMAL_SAMPLING_POINTS_NUM;
+						$stepInterval = round($duration/$samplingPoints,3);
+					}
+					else if($duration<self::DEFAULT_SAMPLING_STEP_INTERVAL*self::DEFAULT_SAMPLING_POINTS_NUM) {
+							// For short contents (up to ~400 sec) 
+							//   set the stepInterval to DEFAULT_SAMPLING_STEP_INTERVAL (20)
+							//   calc samplingPoints accordingly
+						$stepInterval = self::DEFAULT_SAMPLING_STEP_INTERVAL;
+						$samplingPoints = round($duration/$stepInterval);
+					}
+					else {
+							// For the rest set the samplingPoints to DEFAULT_SAMPLING_POINTS_NUM (2)
+							//   calc the stepInterval accordingly
+						$samplingPoints = self::DEFAULT_SAMPLING_POINTS_NUM;
+						$stepInterval = round($duration/$samplingPoints,3);
+					}
+				}
 				if(isset($this->samplingPointDuration)) $samplingPointDuration = $this->samplingPointDuration;
 				else $samplingPointDuration = self::DEFAULT_SINGLE_SAMPLING_POINT_DUR;
+KalturaLog::log("dur:$duration, samplingPoints:$samplingPoints, stepInterval:$stepInterval, samplingPointDuration:$samplingPointDuration");
+//die;	
 			}
 			
 			$diff = 0;
@@ -318,16 +339,18 @@
 			$filterStr = null;
 			if(isset($scanType) && $scanType>0)
 				$filterStr = "yadif";
-			if(isset($width))
-				$scaleStr = $width;
-			if(isset($height))
-				$scaleStr = isset($scaleStr)? "$scaleStr:$width" : "-1:$height";
-			else if(isset($scaleStr))
-				$scaleStr.= ":-1";
+			$scaleStr=null;
+			if(isset($width) && isset($height))
+				$scaleStr = "$width:$height";
+			else if(isset($width))
+				$scaleStr = "$width:-1";
+			else if(isset($height))
+				$scaleStr = "-1:$height";
 			if(isset($scaleStr)) {
 				if(isset($filterStr)) $filterStr.= ",scale=$scaleStr";
 				else $filterStr.= "scale=$scaleStr";
 			}
+
 			if(isset($filterStr))
 				$cmdLine.= " -filter_complex '$filterStr'";
 			if(isset($fps)) $cmdLine.= " -r $fps";

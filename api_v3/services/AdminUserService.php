@@ -61,6 +61,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * @param string $newEmail Optional, provide only when you want to update the email
 	 * @param string $newPassword
 	 * @param string $otp the user's one-time password
+	 * @maskedParams email,password,newEmail,newPassword
 	 * @return KalturaAdminUser
 	 * @ksIgnored
 	 *
@@ -128,6 +129,7 @@ class AdminUserService extends KalturaBaseUserService
 	 * @param string $email
 	 * @param string $password
 	 * @param int $partnerId
+	 * @maskedParams email,password
 	 * @return string
 	 * @ksIgnored
 	 *

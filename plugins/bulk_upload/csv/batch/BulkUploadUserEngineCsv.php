@@ -284,6 +284,17 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		
 		if ($bulkUploadUserResult->externalId)
 			$user->externalId = $bulkUploadUserResult->externalId;
+		
+		if (isset($bulkUploadUserResult->capabilities))
+		{
+			$capabilitiesArray = explode(',', $bulkUploadUserResult->capabilities);
+			foreach ($capabilitiesArray as $capability)
+			{
+				$userCapability = new KalturaUserCapability();
+				$userCapability->capability = $capability;
+				$user->capabilities[] = $userCapability;
+			}
+		}
 
 	    return $user;
 	}
@@ -311,7 +322,8 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			"partnerData",
 			"group",
 			"userRole",
-			"externalId"
+			"externalId",
+			"capabilities",
 		);
 	}
 
@@ -356,13 +368,18 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$this->groupActionsList[]=$userResult;
 	}
 
-	private function getGroupActionList(&$usersToAddList,&$userGroupToDeleteMap)
+	private function getGroupActionList(&$usersToAddList, &$userGroupToDeleteMap, &$capabilitiesMap)
 	{
 		foreach ($this->groupActionsList as $group)
 		{
+			/* @var $group KalturaBulkUploadResultUser */
 			if (strpos($group->group, "-") !== 0)
 			{
 				$usersToAddList[] = $group;
+				if (isset($group->capabilities))
+				{
+					$capabilitiesMap[$group->group] = $group->capabilities;
+				}
 			}
 			else
 			{
@@ -403,19 +420,28 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		KBatchBase::impersonate($this->currentPartnerId);
 	}
 
-	private function addUserOfTypeGroup($actualGroupUsersList , $expectedGroupUsersList)
+	private function addUserOfTypeGroup($actualGroupUsersList , $expectedGroupUsersList, $capabilitiesMap)
 	{
-		$ret=array();
+		$ret = array();
 		foreach ($actualGroupUsersList as $index => $user)
 		{
 			//check if value does not exist
 			if( !($user instanceof KalturaUser)  ||  ($user->type != KalturaUserType::GROUP))
 			{
 				$this->handleMultiRequest($ret);
-				KalturaLog::debug("Adding User of type group" . $expectedGroupUsersList[$index]->group );
+				$groupId = $expectedGroupUsersList[$index]->group;
+				KalturaLog::debug("Adding User of type group: $groupId");
 				$groupUser = new KalturaUser();
-				$groupUser->id = $expectedGroupUsersList[$index]->group;
+				$groupUser->id = $groupId;
 				$groupUser->type = KalturaUserType::GROUP;
+				if (isset($capabilitiesMap[$groupId]))
+				{
+					$groupCapability = $capabilitiesMap[$groupId];
+					KalturaLog::debug("Adding capability $groupCapability to group $groupId");
+					$newObject = new KalturaUserCapability();
+					$newObject->capability = $groupCapability;
+					$groupUser->capabilities[] = $newObject;
+				}
 				KBatchBase::$kClient->user->add($groupUser);
 			}
 		}
@@ -469,14 +495,15 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		KalturaLog::info("Handling user/group association");
 		KBatchBase::impersonate($this->currentPartnerId);
 		$userGroupToDeleteMap = array();
-		$groupUsersToAddList= array();
+		$groupUsersToAddList = array();
+		$capabilitiesMap = array();
 		$this->multiRequestSize = 100;
-		$this->getGroupActionList($groupUsersToAddList,$userGroupToDeleteMap);
+		$this->getGroupActionList($groupUsersToAddList, $userGroupToDeleteMap, $capabilitiesMap);
 		$this->deleteUsers($userGroupToDeleteMap);
 		if(count($groupUsersToAddList))
 		{
 			$requestResults = $this->getUsers($groupUsersToAddList);
-			$this->addUserOfTypeGroup($requestResults, $groupUsersToAddList);
+			$this->addUserOfTypeGroup($requestResults, $groupUsersToAddList, $capabilitiesMap);
 
 			$ret = $this->addGroupUsers($groupUsersToAddList);
 			$this->multiUpdateResults($ret, $groupUsersToAddList);

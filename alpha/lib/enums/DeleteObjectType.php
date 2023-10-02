@@ -11,4 +11,5 @@ interface DeleteObjectType extends BaseEnum
 	const CATEGORY_ENTRY_AGGREGATION = 4;
 	const USER_ENTRY = 5;
 	const ENTRY = 6;
+	const CATEGORY_USER_SUBSCRIBER = 7;
 }

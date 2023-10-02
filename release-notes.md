@@ -1,10 +1,95 @@
+# Scorpius-19.17.0
+## Enable viewing system entries flagged for moderation ##
+* Issue Type: Task
+* Issue ID: PLAT-24420
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.viewModeratedSystemEntries.enabled = true
+moduls.viewModeratedSystemEntries.permissionType = 2
+moduls.viewModeratedSystemEntries.label = "View System Entries Flagged For Moderation"
+moduls.viewModeratedSystemEntries.permissionName = VIEW_MODERATED_SYSTEM_ENTRIES
+moduls.viewModeratedSystemEntries.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Add Azerbaijani and Urdu language options for live streams ##
+* Issue Type: Task
+* Issue ID: SUP-38837
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_09_24_add_live_languages_aze_urd.php
+
+# Scorpius-19.16.0
+## Deploy new Flavor params and conversion profile for PPT conversion ##
+- Issue Type: Task
+- Issue ID: NR2-7791
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_06_28_deploy_kaltura_meetings_documents_conversion_data.php
+
+# Scorpius-19.15.0
+
+## Change default hashing algorithms ##
+- Issue Type: Task
+- Issue ID: N/A
+
+If the php distribution used supports argon2id|argon2i it will now be used by default, if not it will fallback to sha1.
+You can always override this by manually setting your preferred hashing algorithm in the security.ini config file.  
+Supported hashing algorithms are:
+1. argon2id
+2. argon2i
+3. sha1
+
+### Configuration ###
+In case you want to override the default argon2id add the following to security.ini (with your preferred hashing algo):
+    password_hash_algo = ONE_OF_THE_SUPPORTED_VALUES
+
+# Scorpius-19.14.0
+## Add new permission to EP_USER_ANALYTICS Role ##
+- Issue Type: Story
+- Issue ID: PLAT-24381
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_03_add_ep_base_permission.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_08_03_add_permission_to_ep_analytics_role.php
+
 # Scorpius-19.13.0
+## Add 'Capabilities' to ESearch for kuser ##
+- Issue Type: Task
+- Issue ID: PLAT-24352
+
+### Deployment Scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port', 'kuser_index_name' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"capabilities" : {"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
+
+## Add addContent action to Documents service ##
+- Issue Type: Task
+- Issue ID: PLAT-24332
+
+### Script ###
+	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_07_18_addContent_to_document.php
+
 ## Add permission to EP_USER_ANALYTICS Role ##
 - Issue Type: Task
 - Issue ID: PLAT-24331
 
 ### Script ###
 	php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_07_13_update_ep_analytics_user_role.php
+
+## Enable AI in Event Platform
+* Issue Type: Task
+* Issue ID: PLAT-24374
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.eventPlatformAI.enabled = true
+moduls.eventPlatformAI.permissionType = 2
+moduls.eventPlatformAI.label = "Enable AI in EP"
+moduls.eventPlatformAI.permissionName = FEATURE_EP_AI_PERMISSION
+moduls.eventPlatformAI.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 
 # Scorpius-19.12.0
 

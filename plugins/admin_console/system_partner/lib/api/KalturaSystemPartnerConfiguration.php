@@ -652,10 +652,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$passwordValidation = $source_object->getPasswordStructureValidations();
-		if(isset($passwordValidation[0]))
+		if (!isset($passwordValidation[0]))
 		{
-			$this->passwordStructureValidations = $passwordValidation[0][0];
-			$this->passwordStructureValidationsDescription = $passwordValidation[0][1];
+			$this->passwordStructureValidations = array();
+			$this->passwordStructureValidationsDescription = null;
 		}
 
 	}
@@ -830,16 +830,19 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		
 		$object_to_fill->setShouldApplyAccessControlOnEntryMetadata($this->restrictEntryByMetadata);
-		if(!is_null($this->passwordStructureValidations))
+		$passwordToFill = array();
+		if ($this->passwordStructureValidations)
 		{
-			$object_to_fill->setPasswordStructureValidations(
-				array(array($this->passwordStructureValidations,
-				            $this->passwordStructureValidationsDescription)));
+			$passwordValidationJson = json_decode($this->passwordStructureValidations);
+			foreach ($passwordValidationJson as $regex => $description)
+			{
+				if ($regex)
+				{
+					$passwordToFill[] = array(trim($regex),$description);
+				}
+			}
 		}
-		else
-		{
-			$object_to_fill->setPasswordStructureValidations('');
-		}
+		$object_to_fill->setPasswordStructureValidations($passwordToFill);
 		
 		if(!is_null($this->secondarySecretRoleId))
 		{

@@ -18,6 +18,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_API_USAGE = 'api-usage';
 	const DATASOURCE_VE_REGISTRATION = 'virtual-events-registration';
 	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
+	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -265,9 +266,9 @@ class kKavaBase extends kDruidBase
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON = 'TabNotFocusedMicMutedFullScreenOffCameraOffSoundOn';
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_ON_STAGE = 'TabNotFocusedMicMutedFullScreenOffCameraOffSoundOnOnStage';
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_OFF_STAGE = 'TabNotFocusedMicMutedFullScreenOffCameraOffSoundOnOffStage';
-	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON = 'TabNotFocusedMicUnutedFullScreenOffCameraOffSoundOn';
-	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_ON_STAGE = 'TabNotFocusedMicUnutedFullScreenOffCameraOffSoundOnOnStage';
-	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_OFF_STAGE = 'TabNotFocusedMicUnutedFullScreenOffCameraOffSoundOnOffStage';
+	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON = 'TabNotFocusedMicUnmutedFullScreenOffCameraOffSoundOn';
+	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_ON_STAGE = 'TabNotFocusedMicUnmutedFullScreenOffCameraOffSoundOnOnStage';
+	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_OFF_STAGE = 'TabNotFocusedMicUnmutedFullScreenOffCameraOffSoundOnOffStage';
 	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF = 'TabNotFocusedMicUnmutedFullScreenCameraOffSoundOff';
 	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF_ON_STAGE = 'TabNotFocusedMicUnmutedFullScreenCameraOffSoundOffOnStage';
 	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_OFF_SOUND_OFF_OFF_STAGE = 'TabNotFocusedMicUnmutedFullScreenCameraOffSoundOffOffStage';
@@ -289,9 +290,9 @@ class kKavaBase extends kDruidBase
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON = 'TabNotFocusedMicMutedFullScreenOffCameraOnSoundOn';
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON_ON_STAGE = 'TabNotFocusedMicMutedFullScreenOffCameraOnSoundOnOnStage';
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON_OFF_STAGE = 'TabNotFocusedMicMutedFullScreenOffCameraOnSoundOnOffStage';
-	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON = 'TabNotFocusedMicUnutedFullScreenOffCameraOnSoundOn';
-	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON_ON_STAGE = 'TabNotFocusedMicUnutedFullScreenOffCameraOnSoundOnOnStage';
-	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON_OFF_STAGE = 'TabNotFocusedMicUnutedFullScreenOffCameraOnSoundOnOffStage';
+	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON = 'TabNotFocusedMicUnmutedFullScreenOffCameraOnSoundOn';
+	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON_ON_STAGE = 'TabNotFocusedMicUnmutedFullScreenOffCameraOnSoundOnOnStage';
+	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_ON_OFF_STAGE = 'TabNotFocusedMicUnmutedFullScreenOffCameraOnSoundOnOffStage';
 	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_OFF = 'TabNotFocusedMicUnmutedFullScreenCameraOnSoundOff';
 	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_OFF_ON_STAGE = 'TabNotFocusedMicUnmutedFullScreenCameraOnSoundOffOnStage';
 	const USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_CAMERA_ON_SOUND_OFF_OFF_STAGE = 'TabNotFocusedMicUnmutedFullScreenCameraOnSoundOffOffStage';
@@ -661,6 +662,23 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 		),
+		self::DATASOURCE_MEETING_REALTIME => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_USER_ENGAGEMENT => 1,
+		),
 	);
 
 	protected static $datasources_hash_dimensions = array(
@@ -673,7 +691,11 @@ class kKavaBase extends kDruidBase
 		self::DATASOURCE_MEETING_HISTORICAL => array(
 			self::DIMENSION_KUSER_ID => 1,
 		),
+		self::DATASOURCE_MEETING_REALTIME => array(
+			self::DIMENSION_KUSER_ID => 1,
+		),
 	);
+
 	protected static $sourceFromAdminTag = array(
 		'kalturaclassroom' => 'Classroom Capture',
 		'kalturacapture' => 'Kaltura Capture',

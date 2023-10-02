@@ -7,40 +7,50 @@
 class KalturaClipConcatJobData extends KalturaJobData
 {
 
-	/**$destEntryId
+	/**
 	 * @var string
 	 */
 	public $destEntryId;
 
-	/**$tempEntryId
+	/**
 	 * @var string
 	 */
 	public $tempEntryId;
 
-	/**$tempEntryId
+	/**
 	 * @var string
 	 */
 	public $sourceEntryId;
 
-	/**$importUrl
+	/**
 	 * @var string
 	 */
 	public $importUrl;
 
-	/** $partnerId
+	/**
 	 * @var int
 	 */
 	public $partnerId;
 
-	/** $priority
+	/**
 	 * @var int
 	 */
 	public $priority;
 
-	/** clip operations
-	 * @var KalturaOperationAttributesArray $operationAttributes
+	/**
+	 * @var KalturaOperationAttributesArray
 	 */
 	public $operationAttributes;
+
+	/**
+	 * @var int
+	 */
+	public $resourceOrder;
+
+	/**
+	 * @var string
+	 */
+	public $conversionParams;
 
 
 	private static $map_between_objects = array
@@ -51,7 +61,9 @@ class KalturaClipConcatJobData extends KalturaJobData
 		'priority',
 		'operationAttributes',
 		'sourceEntryId',
-		'importUrl'
+		'importUrl',
+		'resourceOrder',
+		'conversionParams'
 	);
 
 	/* (non-PHPdoc)

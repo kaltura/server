@@ -7,13 +7,14 @@
 class kZoomClient extends kVendorClient
 {
 	const ZOOM_BASE_URL = 'ZoomBaseUrl';
-	const PARTICIPANTS  = 'participants';
-	
 	/** API */
 	const API_USERS_ME          = 'me';
 	const API_USERS             = '/v2/users/@userId@';
-	const API_PARTICIPANT       = '/v2/report/meetings/@meetingId@/participants';
+	const API_REPORT_PARTICIPANT       = '/v2/report/meetings/@meetingId@/participants';
+	const API_METRICS_MEETINGS_PARTICIPANT       = '/v2/metrics/meetings/@meetingId@/participants';
+	const API_METRICS_WEBINARS_PARTICIPANT       = '/v2/metrics/webinars/@webinarId@/participants';
 	const API_PANELISTS         = '/v2/webinars/@webinarId@/panelists';
+	const API_WEBINAR         = '/v2/webinars/@webinarId@';
 	const API_USERS_PERMISSIONS = '/v2/users/@userId@/permissions';
 	const API_DELETE_RECORDING_FILE = '/v2/meetings/@meetingId@/recordings/@recordingId@';
 	const API_LIST_RECORDING = '/v2/accounts/@accountId@/recordings';
@@ -62,15 +63,43 @@ class kZoomClient extends kVendorClient
 		return $this->retrieveZoomUser(self::API_USERS_ME);
 	}
 	
-	public function retrieveMeetingParticipant($meetingId)
+	public function retrieveReportMeetingParticipant($meetingId)
 	{
-		$apiPath = str_replace('@meetingId@', $meetingId, self::API_PARTICIPANT);
+		$apiPath = str_replace('@meetingId@', $meetingId, self::API_REPORT_PARTICIPANT);
+		return $this->callZoom($apiPath);
+	}
+
+	public function retrieveMetricsMeetingParticipant($meetingId, $pageSize, $nextPageToken)
+	{
+		$apiPath = str_replace('@meetingId@', $meetingId, self::API_METRICS_MEETINGS_PARTICIPANT);
+		$apiPath .= "?type=past" . '&page_size=' . $pageSize;
+		if($nextPageToken != '')
+		{
+			$apiPath .= '&next_page_token=' . $nextPageToken;
+		}
+		return $this->callZoom($apiPath);
+	}
+
+	public function retrieveMetricsWebinarParticipant($meetingId, $pageSize, $nextPageToken)
+	{
+		$apiPath = str_replace('@webinarId@', $meetingId, self::API_METRICS_WEBINARS_PARTICIPANT);
+		$apiPath .= "?type=past" . '&page_size=' . $pageSize;
+		if($nextPageToken != '')
+		{
+			$apiPath .= '&next_page_token=' . $nextPageToken;
+		}
 		return $this->callZoom($apiPath);
 	}
 	
 	public function retrieveWebinarPanelists($webinarId)
 	{
 		$apiPath = str_replace('@webinarId@', $webinarId, self::API_PANELISTS);
+		return $this->callZoom($apiPath);
+	}
+
+	public function retrieveWebinar($webinarId)
+	{
+		$apiPath = str_replace('@webinarId@', $webinarId, self::API_WEBINAR);
 		return $this->callZoom($apiPath);
 	}
 	

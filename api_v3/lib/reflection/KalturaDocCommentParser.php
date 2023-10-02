@@ -6,6 +6,9 @@
 class KalturaDocCommentParser
 {
     const DOCCOMMENT_READONLY = "/\\@readonly/i";
+    const DOCCOMMENT_MASKED = "/\\@masked/i";
+    const DOCCOMMENT_MASKING_MAX_LENGTH = "/\\@maskingMaxLength (\d*)/i";
+    const DOCCOMMENT_MASKED_ACTION_PARAMS = "/\\@maskedParams ([a-z,A-Z]+)/i";
     const DOCCOMMENT_INSERTONLY = "/\\@insertonly/i";
     const DOCCOMMENT_WRITEONLY = "/\\@writeonly/i";
     const DOCCOMMENT_MULTILINGUAL = "/\\@multilingual/i";
@@ -74,6 +77,21 @@ class KalturaDocCommentParser
      * @var bool
      */
     public $readOnly;
+
+    /**
+     * @var bool
+     */
+    public $masked;
+
+    /**
+     * @var int
+     */
+    public $maskingMaxLength;
+
+    /**
+     * @var array
+     */
+    public $maskedActionParams;
 
     /**
      * @var bool
@@ -267,6 +285,7 @@ class KalturaDocCommentParser
         $this->deprecated = preg_match( self::DOCCOMMENT_DEPRECATED, $comment);
         $this->serverOnly = preg_match( self::DOCCOMMENT_SERVER_ONLY, $comment);
         $this->beta = preg_match( self::DOCCOMMENT_BETA, $comment);
+        $this->masked = preg_match( self::DOCCOMMENT_MASKED, $comment);
 
         if(preg_match( self::DOCCOMMENT_KS_IGNORED, $comment))
         {
@@ -312,6 +331,16 @@ class KalturaDocCommentParser
         $result = null;
         if (preg_match( self::DOCCOMMENT_LINK, $comment, $result ))
             $this->link = $result[1];
+
+        $this->maskingMaxLength = 0;
+        if (preg_match( self::DOCCOMMENT_MASKING_MAX_LENGTH, $comment, $result ))
+            $this->maskingMaxLength = $result[1];
+
+        $this->maskedActionParams = array();
+        if (preg_match( self::DOCCOMMENT_MASKED_ACTION_PARAMS, $comment, $result ))
+        {
+	        $this->maskedActionParams = explode(",", $result[1]);
+        }
 
         $result = null;
         if (preg_match(self::DOCCOMMENT_RETURN_TYPE, $comment, $result))

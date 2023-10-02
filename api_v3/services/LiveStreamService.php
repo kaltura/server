@@ -159,6 +159,9 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::LIVE_STREAM_INVALID_TOKEN
+	 * @throws KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU
+	 * @throws KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED
+	 * @throws KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING
 	 */
 	function authenticateAction($entryId, $token, $hostname = null, $mediaServerIndex = null, $applicationName = null)
 	{
@@ -182,6 +185,8 @@ class LiveStreamService extends KalturaLiveEntryService
 		if($dbEntry->isStreamAlreadyBroadcasting())
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $mediaServer->getHostname());
 		*/
+
+		$this->validateStreamNotAlreadyExist($entryId, $hostname, $mediaServerIndex);
 		
 		if($hostname && isset($mediaServerIndex))
 			$this->setMediaServerWrapper($dbEntry, $mediaServerIndex, $hostname, KalturaEntryServerNodeStatus::AUTHENTICATED, $applicationName);
@@ -191,6 +196,48 @@ class LiveStreamService extends KalturaLiveEntryService
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
+	}
+
+	/**
+	 * @param $entryId
+	 * @param $hostname
+	 * @param $mediaServerIndex
+	 */
+	protected function validateStreamNotAlreadyExist($entryId, $hostname, $mediaServerIndex)
+	{
+		$streamAlreadyExsit = false;
+		try
+		{
+			$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
+			if (!$entryServerNode || !in_array($entryServerNode->getStatus(), array(EntryServerNodeStatus::BROADCASTING, EntryServerNodeStatus::PLAYABLE)))
+			{
+				return;
+			}
+			$registeredServerNode = ServerNodePeer::retrieveRegisteredServerNodeByPk($entryServerNode->getServerNodeId());
+			if (!$registeredServerNode || $registeredServerNode->getHostName() == $hostname)
+			{
+				return;
+			}
+			$mediaServerNode = ServerNodePeer::retrieveActiveMediaServerNode($hostname);
+			KalturaLog::debug('registeredServerNodeId: [' . $registeredServerNode->getId() . ']  currentServerNodeId: [' . $mediaServerNode->getId() . ']');
+
+			//currently verifying only if already streaming in another environment
+			if ($mediaServerNode && $mediaServerNode->getEnvironment() != $registeredServerNode->getEnvironment()) {
+				$streamAlreadyExsits = true;
+			}
+
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err($e->getMessage());
+			return;
+		}
+
+		if ($streamAlreadyExsits)
+		{
+			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $registeredServerNode->getHostName());
+		}
+
 	}
 	
 	private function validateMaxStreamsNotReached(LiveEntry $liveEntry)
