@@ -91,7 +91,6 @@ class MicroServiceBaseService
 		$response = curl_exec($ch);
 		$timeTook = microtime(true) - $startTime;
 		
-		
 		$requestInfo = array(
 			'requestUrl' => $requestUrl,
 			'requestHeaders' => $requestHeaders,
