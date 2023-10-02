@@ -546,4 +546,16 @@ class kString
 
 		return str_repeat($maskChar, $maxLength ? min(strlen($str), $maxLength) : strlen($str));
 	}
+	
+	public static function isValidMongoId($string)
+	{
+		return preg_match('/^[0-9a-fA-F]{24}$/', $string) === 1;
+	}
+	
+	public static function csvFixWhitespace($csv)
+	{
+		// trim whitespace from beginning and end (leaving inner whitespace untouched)
+		$trimmedArray = array_map('trim', explode(',', $csv));
+		return implode(',', $trimmedArray);
+	}
 }
