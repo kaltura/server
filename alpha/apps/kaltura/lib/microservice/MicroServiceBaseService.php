@@ -91,6 +91,11 @@ class MicroServiceBaseService
 		$response = curl_exec($ch);
 		$timeTook = microtime(true) - $startTime;
 		
+		if (class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorCurl(parse_url($this->serviceUrl, PHP_URL_HOST), $timeTook, $ch);
+		}
+		
 		$requestInfo = array(
 			'requestUrl' => $requestUrl,
 			'requestHeaders' => $requestHeaders,
