@@ -238,7 +238,24 @@ class UserController extends Zend_Controller_Action
 			$ks = isset($_GET['ks']) ? $_GET['ks'] : null;
 			if(!$ks)
 			{
-				$this->getResponse()->setRedirect($redirectUrl);
+				$body = '<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit</title>
+</head>
+<body>
+<form class="login-form" action="' . $redirectUrl . '" method="post">
+    <input type="hidden" id="partnerId" name="partnerId" value="-2" />
+    <input type="hidden" id="user" name="user" value="sso.kaltura.com" />
+</form>
+</body>
+<script>
+document.querySelector(".login-form").submit();
+</script>
+</html>';
+				$this->getResponse()->setBody($body);
+				$this->getResponse()->sendResponse();
+				die();
 			}
 			else
 			{
