@@ -1,3 +1,30 @@
+# Scorpius-19.18.0
+___
+## UserAppRole Service  ##
+
+* Issue Type: Task
+* Issue ID: FOUN-1240
+
+### Deployment Scripts ###
+* Note: all the commands below should be executed from the 'server' directory (i.e. '/opt/kaltura/app/')
+* Alternatively, modify files path to be absulute instead of relative
+1. Alter 'kuser_to_user_role' DB table:
+````
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2023_07_20_alter_kuser_to_user_role_table.sql
+````
+2. Add Service's permissions to DB:
+````
+php deployment/updates/scripts/add_permissions/2023_07_24_add_userapprole_permissions.php
+````
+3. Generate Clients:
+````
+php generator/generate.php
+find cache/ -type f -delete
+service apache2 graceful
+````
+Done!
+___
+
 # Scorpius-19.17.0
 ## Enable viewing system entries flagged for moderation ##
 * Issue Type: Task
