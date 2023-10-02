@@ -98,7 +98,6 @@ class MicroServiceBaseService
 		);
 		
 		KalturaLog::debug('Microservice request data: ' . print_r($requestInfo, true));
-
 		KalturaLog::debug('Microservice request took - ' . $timeTook. ' seconds');
 
 		$curlError = curl_error($ch);
