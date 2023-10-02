@@ -149,11 +149,6 @@ class UserAppRoleService extends KalturaBaseService
 	public function deleteAction($userId, $appGuid)
 	{
 		$dbUserAppRole = $this->getByUserAndAppGuid($userId, $appGuid);
-		if (!$dbUserAppRole)
-		{
-			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_FOUND, $userId, $appGuid);
-		}
-		
 		$dbUserAppRole->delete();
 		
 		return true;

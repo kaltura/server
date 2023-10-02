@@ -89,7 +89,7 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		$this->fixCsvFilterProperties();
 		
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		$isAdminSession = kCurrentContext::getCurrentSessionType() === kSessionBase::SESSION_TYPE_ADMIN;
+		$isAdminSession = kCurrentContext::$is_admin_session;
 		
 		// user ks can only retrieve results for himself
 		if (!$isAdminSession)

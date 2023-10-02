@@ -5,7 +5,7 @@
  * @relatedService UserAppRoleService
  */
 
-class KalturaAppRole extends KalturaObject implements IRelatedFilterable
+abstract class KalturaAppRole extends KalturaObject implements IRelatedFilterable
 {
 	/**
 	 * @var int

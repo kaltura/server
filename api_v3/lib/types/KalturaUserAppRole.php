@@ -156,19 +156,19 @@ class KalturaUserAppRole extends KalturaAppRole
 			throw new KalturaAPIException(KalturaErrors::INVALID_APP_GUID, $appGuid);
 		}
 		
-		// validate appGuid belong to ks partner
-		$appGuidExist = MicroServiceAppRegistry::getExistingAppGuid(kCurrentContext::getCurrentPartnerId(), $appGuid);
-		if (!$appGuidExist)
-		{
-			throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $appGuid);
-		}
-		
 		// validate userRoleId exist
 		$userRole = UserRolePeer::retrieveByPK($userRoleId);
 		
 		if (!$userRole)
 		{
 			throw new KalturaAPIException(KalturaErrors::USER_ROLE_NOT_FOUND);
+		}
+		
+		// validate appGuid belong to ks partner
+		$appGuidExist = MicroServiceAppRegistry::getExistingAppGuid(kCurrentContext::getCurrentPartnerId(), $appGuid);
+		if (!$appGuidExist)
+		{
+			throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $appGuid);
 		}
 		
 		// validate user does not have a role for the requested appGuid
