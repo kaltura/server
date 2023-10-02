@@ -9,7 +9,7 @@ class kZoomParticipants implements iZoomObject
 
 	public $participants;
 
-	public function parseData($data)
+	public function parseData($data, $role = null)
 	{
 		$this->participants = array();
 		if(isset($data[self::PARTICIPANTS]))
@@ -17,7 +17,7 @@ class kZoomParticipants implements iZoomObject
 			foreach ($data[self::PARTICIPANTS] as $participantData)
 			{
 				$participant = new kZoomParticipant();
-				$participant->parseData($participantData);
+				$participant->parseData($participantData, $role);
 				$this->participants[] = $participant;
 			}
 		}

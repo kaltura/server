@@ -180,6 +180,8 @@ class KDLWrap
 			}
 
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
+
+
 			// Handle audio streams for ffmpeg command in case we are handling trimming a source with flavor_params -1
 			// in case we need to handle multiple audio streams we need to remove the "-map_metadata -1" command
 			// and replace it with the language mapping for the correct audio streams

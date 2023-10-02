@@ -42,6 +42,17 @@ class kConcatJobData extends kJobData
 	public $concatenatedDuration;
 
 	/**
+	 * conversion commands to be applied to source files
+	 * @var array
+	 */
+	private $conversionCommands;
+
+	/**
+	 * @var bool
+	 */
+	private $multiSource;
+
+	/**
 	 * @return array $srcFiles
 	 */
 	public function getSrcFiles()
@@ -151,5 +162,37 @@ class kConcatJobData extends kJobData
 	public function setShouldSort($shouldSort)
 	{
 		$this->shouldSort = $shouldSort;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getConversionCommands()
+	{
+		return $this->conversionCommands;
+	}
+
+	/**
+	 * @param array $conversionCommands
+	 */
+	public function setConversionCommands($conversionCommands)
+	{
+		$this->conversionCommands = $conversionCommands;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getMultiSource()
+	{
+		return $this->multiSource;
+	}
+
+	/**
+	 * @param bool $multiSource
+	 */
+	public function setMultiSource($multiSource)
+	{
+		$this->multiSource = $multiSource;
 	}
 }

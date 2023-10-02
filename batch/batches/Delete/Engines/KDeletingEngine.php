@@ -53,6 +53,9 @@ abstract class KDeletingEngine
 			case KalturaDeleteObjectType::ENTRY:
 				return new KDeletingEntryEngine();
 			
+			case KalturaDeleteObjectType::CATEGORY_USER_SUBSCRIBER:
+				return new KDeletingCategoryUserSubscriberEngine();
+			
 			default:
 				return KalturaPluginManager::loadObject('KDeletingEngine', $objectType);
 		}

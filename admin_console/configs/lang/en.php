@@ -69,6 +69,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::USERS_CSV' => 'Users Csv',
 	'Kaltura_Client_Enum_BatchJobType::COPY_CUE_POINTS' => 'Copy cue Points',
 	'Kaltura_Client_Enum_BatchJobType::CLIP_CONCAT' => 'Clip Concat',
+	'Kaltura_Client_Enum_BatchJobType::MULTI_CLIP_CONCAT' => 'Multi Clip Concat',
 	'Kaltura_Client_Enum_BatchJobType::CONVERT_CAPTION_ASSET' => 'Convert Caption Asset',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',

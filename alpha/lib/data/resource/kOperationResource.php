@@ -11,7 +11,7 @@ class kOperationResource extends kContentResource
 	 * @var kContentResource
 	 */
 	private $resource;
-	
+
 	/**
 	 * @var array<kOperationAttributes>
 	 */
@@ -97,4 +97,5 @@ class kOperationResource extends kContentResource
 	{
 		$this->assetParamsId = $assetParamsId;
 	}
+
 }

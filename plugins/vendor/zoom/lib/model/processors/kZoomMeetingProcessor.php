@@ -8,7 +8,7 @@ class kZoomMeetingProcessor extends kZoomRecordingProcessor
 {
 	protected function getAdditionalUsersFromZoom($recordingId)
 	{
-		return $this->zoomClient->retrieveMeetingParticipant($recordingId);
+		return $this->zoomClient->retrieveReportMeetingParticipant($recordingId);
 	}
 
 	/**

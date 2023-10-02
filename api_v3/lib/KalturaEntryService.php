@@ -704,11 +704,11 @@ class KalturaEntryService extends KalturaBaseService
 	
 	/**
 	 * @param kOperationResource $resource
-	 * @param entry $dbEntry
+	 * @param entry $destEntry
 	 * @param asset $dbAsset
 	 * @return asset
 	 */
-	protected function attachOperationResource(kOperationResource $resource, entry $dbEntry, asset $dbAsset = null)
+	protected function attachOperationResource(kOperationResource $resource, entry $destEntry, asset $dbAsset = null)
 	{
 		$operationAttributes = $resource->getOperationAttributes();
 		$internalResource = $resource->getResource();
@@ -716,18 +716,29 @@ class KalturaEntryService extends KalturaBaseService
 		$isLiveClippingFlow = $srcEntry && myEntryUtils::isLiveClippingEntry($srcEntry);
 		if ($isLiveClippingFlow)
 		{
-			$this->handleLiveClippingFlow($srcEntry, $dbEntry, $operationAttributes);
+			$this->handleLiveClippingFlow($srcEntry, $destEntry, $operationAttributes);
 		}
 		elseif($internalResource instanceof kLiveEntryResource)
 		{
-			$dbAsset = $this->attachLiveEntryResource($internalResource, $dbEntry, $dbAsset, $operationAttributes);
+			$dbAsset = $this->attachLiveEntryResource($internalResource, $destEntry, $dbAsset, $operationAttributes);
 		}
 		else
 		{
 			$clipManager = new kClipManager();
-			$this->handleMultiClipRequest($resource, $dbEntry, $clipManager, $operationAttributes);
+			$this->handleMultiClipRequest($resource, $destEntry, $clipManager);
 		}
 		return $dbAsset;
+	}
+
+	/**
+	 * @param kOperationResources $resources
+	 * @param entry $destEntry
+	 * @throws KalturaAPIException
+	 */
+	protected function attachOperationResources(kOperationResources $resources, entry $destEntry)
+	{
+		$clipManager = new kClipManager();
+		$this->handleMultiResourceMultiClipRequest($resources, $destEntry, $clipManager);
 	}
 
 	protected function handleLiveClippingFlow($recordedEntry, $clippedEntry, $operationAttributes)
@@ -1869,17 +1880,22 @@ class KalturaEntryService extends KalturaBaseService
 	}
 
 	/**
-	 * @param $resource
-	 * @param entry $dbEntry
-	 * @param $clipManager
-	 * @param $operationAttributes
-	 * @return asset
+	 * @param kOperationResource $resource
+	 * @param entry $destEntry
+	 * @param kClipManager $clipManager
+	 * @param entry $clipEntry
+	 * @param int $rootJobId
+	 * @param int $order
+	 * @param string $conversionParams
 	 * @throws KalturaAPIException
 	 */
-	protected function handleMultiClipRequest($resource, entry $dbEntry, $clipManager, $operationAttributes)
+	protected function handleMultiClipRequest($resource, $destEntry, $clipManager, $clipEntry = null, $rootJobId = null, $order = null, $conversionParams = null)
 	{
-		KalturaLog::info("clipping service detected start to create sub flavors;");
-		$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
+		KalturaLog::info("Clipping action detected start to create sub flavors;");
+		if(!$clipEntry)
+		{
+			$clipEntry = $clipManager->createTempEntryForClip($this->getPartnerId());
+		}
 		$url = null;
 		if ($resource->getResource() instanceof kFileSyncResource && $resource->getResource()->getOriginEntryId())
 		{
@@ -1890,7 +1906,130 @@ class KalturaEntryService extends KalturaBaseService
 			$clipDummySourceAsset = kFlowHelper::createOriginalFlavorAsset($this->getPartnerId(), $clipEntry->getId());
 			$this->attachResource($resource->getResource(), $clipEntry, $clipDummySourceAsset);
 		}
-		$clipManager->startBatchJob($resource, $dbEntry, $operationAttributes, $clipEntry , $url);
+		$clipManager->startClipConcatBatchJob($resource, $destEntry, $clipEntry, $url, $rootJobId, $order, $conversionParams);
+	}
+
+
+	/**
+	 * @param $resources
+	 * @param entry $destEntry
+	 * @param kClipManager $clipManager
+	 * @throws KalturaAPIException
+	 * @throws Exception
+	 */
+	protected function handleMultiResourceMultiClipRequest($resources, entry $destEntry, $clipManager)
+	{
+		KalturaLog::info("Multi resource clipping action detected, start to create multi template entry and sub template entries");
+
+		$sourceEntryIds = array();
+		$tempEntryIds = array();
+		$resourcesData = array();
+
+		// for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip 3. retrieve media info object
+		foreach ($resources->getResources() as $ind => $resource)
+		{
+			/** @var kOperationResource $resource **/
+			$resourceObj = $resource->getResource();
+			$sourceEntry = $this->getValidatedEntryForResource($resourceObj);
+			$sourceEntryId = $sourceEntry->getId();
+			$sourceEntryIds[] = $sourceEntryId;
+
+			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
+			$tempEntryIds[] = $tempEntry->getId();
+
+			$duration = 0;
+			foreach ($resource->getOperationAttributes() as $operationAttribute)
+			{
+				/* @var $operationAttribute kClipAttributes **/
+				$duration += $operationAttribute->getDuration();
+			}
+
+			if($sourceEntry->getMediaType() == KalturaMediaType::IMAGE)
+			{
+				foreach ($resource->getOperationAttributes() as $operationAttribute)
+				{
+					/* @var $operationAttribute kClipAttributes **/
+					$operationAttribute->setOffset(0);
+				}
+				$syncKey = $sourceEntry->getSyncKey(kEntryFileSyncSubType::DATA);
+				$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+				$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, 'mediainfo');
+				$mediaInfo = $mediaInfoParser->getMediaInfo();
+				$mediaInfoObj = $mediaInfo->toInsertableObject();
+				$imageToVideo = 1;
+			}
+			else
+			{
+				$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($resourceObj->getObjectId());
+				$imageToVideo = 0;
+			}
+			if(!$mediaInfoObj)
+			{
+				$objectId = $resourceObj->getObjectId();
+				KalturaLog::err("Could not retrieve media info object for object Id [$objectId] for source entry Id [$sourceEntryId]");
+				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
+			}
+
+			// if difference between audio and video durations is more than 0.5s then block
+			if(($mediaInfoObj->getVideoDuration() - $mediaInfoObj->getAudioDuration()) / 1000 >= 0.5)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $sourceEntryId);
+			}
+
+			$resourcesData[] = array(
+				kClipManager::SOURCE_ENTRY => $sourceEntry,
+				kClipManager::TEMP_ENTRY => $tempEntry,
+				kClipManager::MEDIA_INFO_OBJECT => $mediaInfoObj,
+				kClipManager::DURATION => $duration,
+				kClipManager::IMAGE_TO_VIDEO => $imageToVideo
+			);
+
+		}
+
+		$clipManager->calculateAndEditConversionParams($resourcesData, $destEntry->getConversionProfileId());
+		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
+		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $tempEntryIds, $multiTempEntry->getId(), $destEntry->getId());
+		$rootJob = $clipManager->startMultiClipConcatBatchJob($resources, $destEntry, $multiTempEntry);
+		foreach ($resources->getResources() as $key => $resource)
+		{
+			$tempEntry = $resourcesData[$key][kClipManager::TEMP_ENTRY];
+			$conversionParams = $resourcesData[$key][kClipManager::CONVERSION_PARAMS];
+			$this->handleMultiClipRequest($resource, $destEntry, $clipManager, $tempEntry, $rootJob->getId(), $key, $conversionParams);
+		}
+		$destEntry->setStatus(entryStatus::PENDING);
+		$destEntry->save();
+		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
+	}
+
+	/***
+	 * @param kContentResource $resourceObj
+	 * @throws APIException
+	 */
+	protected function getValidatedEntryForResource($resourceObj)
+	{
+		$sourceEntry = $this->getEntryFromContentResource($resourceObj);
+		if(!$sourceEntry)
+		{
+			if($resourceObj instanceof kLiveEntryResource)
+			{
+				$sourceEntryId = $resourceObj->getEntry();
+				throw new APIException(KalturaErrors::ENTRY_ID_TYPE_NOT_SUPPORTED, $sourceEntryId->getId(), $sourceEntryId->getType());
+			}
+			elseif($resourceObj instanceof kFileSyncResource)
+			{
+				throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $resourceObj->getOriginEntryId());
+			}
+		}
+		$sourceEntryId = $sourceEntry->getId();
+		if(!in_array($sourceEntry->getType(), array(KalturaEntryType::MEDIA_CLIP, KalturaEntryType::DATA)))
+		{
+			throw new APIException(KalturaErrors::ENTRY_ID_TYPE_NOT_SUPPORTED, $sourceEntryId, $sourceEntry->getType());
+		}
+		if(!in_array($sourceEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::IMAGE)))
+		{
+			throw new APIException(KalturaErrors::ENTRY_ID_MEDIA_TYPE_NOT_SUPPORTED, $sourceEntryId, $sourceEntry->getMediaType());
+		}
+		return $sourceEntry;
 	}
 
 	/***
@@ -1918,7 +2057,7 @@ class KalturaEntryService extends KalturaBaseService
 					if(myEntryUtils::shouldValidateLocal() && $fileSync->getDc() == $remoteDc)
 					{
 						KalturaLog::info("Source was not found locally, but was found in the remote dc [$remoteDc]");
-						throw new KalturaAPIException(KalturaErrors::SOURCE_FILE_NOT_FOUND);
+						throw new KalturaAPIException(KalturaErrors::ENTRY_SOURCE_FILE_NOT_FOUND, $entryId);
 					}
 
 					return $fileSync->getExternalUrl($entryId, null, true);

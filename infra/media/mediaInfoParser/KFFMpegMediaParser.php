@@ -139,23 +139,55 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		 * On missing stream durations (mostly for Webm/VP8), retrieve dur from last frame
 		 */
 		{
-$startFrom = ($mediaInfo->containerDuration-500)/1000;
-			if($startFrom<0) $startFrom = 0;
+				// if the conatiner duration is missing, instruct ffmpeg to reposition 
+				// beyond the EOF (assuming that thw file is <100K sec ...),
+				// in that case ffmpeg repositions to the last several frames
+			if(($mediaInfo->containerDuration-500)<0) 
+				$startFrom = 100000;
+			else
+				$startFrom = ($mediaInfo->containerDuration-500)/1000;
 			
-			if($this->isAudioSet($mediaInfo) and $mediaInfo->audioDuration==0){
-				$audDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBinCmd, $this->filePath, $startFrom, "audio");
-				$mediaInfo->audioDuration = round($audDur*1000);
+				// Select the streams that need duration data retrieval
+			$strms = array();
+			if($this->isAudioSet($mediaInfo) and $mediaInfo->audioDuration==0)
+				$strms[] = "audio";
+			if($this->isVideoSet($mediaInfo) and $mediaInfo->videoDuration==0)
+				$strms[] = "video";
+			
+			switch(count($strms)){
+				case 1:
+					$durs=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBinCmd, $this->filePath, $startFrom,$strms[0]);
+					break;
+				case 2:
+					$durs=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBinCmd, $this->filePath, $startFrom);
+					break;
 			}
-			if($this->isVideoSet($mediaInfo) and $mediaInfo->videoDuration==0){
-				$vidDur=self::retrieveDurationFromLastFrame($this->cmdPath, $this->ffprobeBinCmd, $this->filePath, $startFrom, "video");
-				$mediaInfo->videoDuration = round($vidDur*1000);
+			if(isset($durs)) {
+				$calcContDur=0;
+				foreach($durs as $strm=>$dur){
+					$dur = round($dur*1000);
+					switch($strm){
+						case 'audio':
+							$mediaInfo->audioDuration = $dur;
+							break;
+						case 'video':
+							$mediaInfo->videoDuration = $dur;
+							break;
+					}
+					$calcContDur = max($calcContDur, $dur);
+				}
+					// If needed, calculate container dur and br
+				if($mediaInfo->containerDuration==0)
+					$mediaInfo->containerDuration = $calcContDur;
+				if($mediaInfo->containerBitRate==0 && $mediaInfo->containerDuration>0)
+					$mediaInfo->containerBitRate=round(($mediaInfo->fileSize*8*1000)/$mediaInfo->containerDuration);
+				KalturaLog::log(print_r($mediaInfo,1));
 			}
 		}
-		KalturaLog::log(print_r($mediaInfo,1));
 		$mediaInfo->contentStreams = json_encode($mediaInfo->contentStreams);
-//if($this->newFlow!=0)
 		$mediaInfo = self::convertToMediaInfoNames($mediaInfo);
-
+//KalturaLog::log(print_r($mediaInfo,1));
+//die;
 		return $mediaInfo;
 	}
 	
@@ -275,7 +307,12 @@ $startFrom = ($mediaInfo->containerDuration-500)/1000;
 	protected function parseVideoStream($stream, KalturaMediaInfo $mediaInfo)
 	{
 		$mediaInfo->videoFormat = isset($stream->codec_name)? trim($stream->codec_name): null;
-		$mediaInfo->videoCodecId = isset($stream->codec_tag_string)? trim($stream->codec_tag_string): null;
+			// if 'codec_tag_string' empty or conatains crypthic '[0][0][0]..' (or like),
+			// in such cases use 'codec_name' field
+		if(!isset($stream->codec_tag_string) || strpos($stream->codec_tag_string, '][')==!null)
+			$mediaInfo->videoCodecId = $mediaInfo->videoFormat;
+		else $mediaInfo->videoCodecId = trim($stream->codec_tag_string);
+
 			// If stream duration is not set or zero'ed, 
 			// try to retrieve duration from stream/tag section 
 		$mediaInfo->videoDuration = self::retrieveDuration($stream);
@@ -301,7 +338,7 @@ $startFrom = ($mediaInfo->containerDuration-500)/1000;
 			}
 			if(isset($value) && $value!=false && $value<120) 
 				$mediaInfo->videoFrameRate = round($value,3);
-			else if(isset($stream->avg_frame_rate)) {
+			else if(isset($stream->avg_frame_rate) && $stream->avg_frame_rate>0) {
 				$avg_frame_rate = $stream->avg_frame_rate;
 				$value=eval("return ($avg_frame_rate);");
 				if(isset($value) && $value!=false && $value<120) 
@@ -343,7 +380,12 @@ $startFrom = ($mediaInfo->containerDuration-500)/1000;
 	protected function parseAudioStream($stream, $mediaInfo)
 	{
 		$mediaInfo->audioFormat = isset($stream->codec_name)? trim($stream->codec_name): null;
-		$mediaInfo->audioCodecId = isset($stream->codec_tag_string)? trim($stream->codec_tag_string): null;
+			// if 'codec_tag_string' empty or conatains crypthic '[0][0][0]..' (or like,
+			// in such cases use 'codec_name' field
+		if(!isset($stream->codec_tag_string) || strpos($stream->codec_tag_string, '][')==!null)
+			$mediaInfo->audioCodecId = $mediaInfo->audioFormat;
+		else $mediaInfo->audioCodecId = trim($stream->codec_tag_string);
+
 			// If stream duration is not set or zero'ed, 
 			// try to retrieve duration from stream/tag section 
 		$mediaInfo->audioDuration = self::retrieveDuration($stream);
@@ -384,7 +426,12 @@ $startFrom = ($mediaInfo->containerDuration-500)/1000;
 	protected function parseDataStream($stream, KalturaMediaInfo $mediaInfo)
 	{
 		$mediaInfo->dataFormat = isset($stream->codec_name)? $stream->codec_name: null;
-		$mediaInfo->dataCodecId = isset($stream->codec_tag_string)? $stream->codec_tag_string: null;
+			// if 'codec_tag_string' empty or conatains crypthic '[0][0][0]..' (or like,
+			// in such cases use 'codec_name' field
+		if(!isset($stream->codec_tag_string) || strpos($stream->codec_tag_string, '][')==!null)
+			$mediaInfo->dataCodecId = $mediaInfo->dataFormat;
+		else $mediaInfo->dataCodecId = trim($stream->codec_tag_string);
+
 		$mediaInfo->dataDuration = isset($stream->duration)? ($stream->duration*1000): null;
 		return $mediaInfo;
 	}
@@ -764,7 +811,9 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	private static function checkForScanType($ffmpegBin, $ffprobeBin, $srcFileName, $seconds=5)
 	{
 		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffmpegBin -t $seconds -i \"$srcFileName\" -c:v copy -an -f matroska -y -v quiet - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
+			// The cmdLine was fixed with '-map v' to copy to the pipe ONLY the video stream.
+		$cmdLine = "$ffmpegBin -i \"$srcFileName\" -c:v copy -map v -f matroska -y -v quiet -t $seconds - ";
+		$cmdLine.= "| $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
 
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
@@ -1030,31 +1079,41 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 	 * @param $srcFileName
 	 * $param $startFrom
 	 * $param $stream
-	 * @return number
+	 * @return streams dur array or null
 	 */
 	private static function retrieveDurationFromLastFrame($ffmpegBin, $ffprobeBin, $srcFileName, $startFrom, $stream=null)
 	{
 		KalturaLog::log("src:$srcFileName,start:$startFrom,stream:$stream");
-		if($stream=="video"){
-			$selectStreams = "-select_streams v"; $copyStreams=":v";
+		switch($stream){
+			case null:
+				$copyStreams = "-c:v copy -c:a copy";
+				$streams = array("video", "audio");
+				break;
+			case "video":
+			case "audio":
+				$strmCh = $stream[0];
+				$copyStreams = "-c:$strmCh copy";
+				$streams = array($stream);
+				break;
+			default:
+				KalturaLog::log("Invalid stream id ($stream)");
+				return null;
 		}
-		else if($stream=="audio"){
-			$selectStreams = "-select_streams a"; $copyStreams=":a";
-		}
-		else {$selectStreams=null; $copyStreams=null;}
-		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffmpegBin -ss $startFrom -i \"$srcFileName\" -copyts -c$copyStreams copy -f matroska -y -v quiet - | $ffprobeBin - $selectStreams -show_frames $selectStreams -of csv -show_entries frame=media_type,pkt_pts_time,pkt_duration_time   2>&1";
-		KalturaLog::log($cmdLine);
 
+		$srcFileName = kFile::realPath($srcFileName);
+		$cmdLine = "$ffmpegBin -ss $startFrom -i \"$srcFileName\" -copyts $copyStreams -f matroska -y -v quiet - | $ffprobeBin - -show_frames -of csv -show_entries frame=media_type,pkt_pts_time,pkt_duration_time   2>&1";
+		KalturaLog::log($cmdLine);
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
+
 		if($rv!=0) {
 			KalturaLog::err("Duration retrieval detection failed on ffmpeg/ffprobe call - rv($rv),lastLine($lastLine)");
-			return 0;
+			return null;
 		}
 		
+		$durs = array();
 		for (end($outputArr); key($outputArr)!==null; prev($outputArr)){
 			$line = current($outputArr);
-//KalturaLog::log($line);
+//KalturaLog::log("line:$line");
 			$stam=$pts=$strm=$dur=0;
 			$valsArr=explode(',', $line);
 			if(count($valsArr)<4)
@@ -1063,13 +1122,20 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 			if($stam!="frame")
 				continue;
 			if(isset($pts) && isset($dur)) {
+				$pts=(float)$pts; $dur=(float)$dur;
+				if(in_array($strm, $streams) && !key_exists($strm, $durs))
+					$durs[$strm] = $pts+$dur;
 				$duration = $pts+$dur;
-				KalturaLog::log("$stam,pts:$pts,stream:$strm,dur:$dur");
-				return $duration;
+				KalturaLog::log("$stam,pts:$pts,stream:$strm,dur:$dur,$duration");
 			}
+			if(count($streams)==count($durs)){
+				KalturaLog::log(print_r($durs,1));
+				return $durs;
+			}
+				
 		}
-		KalturaLog::log("Missing last frame duration for stream($stream)");
-		return 0;
+		KalturaLog::log("Missing last frame duration");
+		return null;
 	}
 	
 	/**

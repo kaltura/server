@@ -159,6 +159,9 @@ class LiveStreamService extends KalturaLiveEntryService
 	 * 
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaErrors::LIVE_STREAM_INVALID_TOKEN
+	 * @throws KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_PASSTHRU
+	 * @throws KalturaErrors::LIVE_STREAM_EXCEEDED_MAX_TRANSCODED
+	 * @throws KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING
 	 */
 	function authenticateAction($entryId, $token, $hostname = null, $mediaServerIndex = null, $applicationName = null)
 	{
