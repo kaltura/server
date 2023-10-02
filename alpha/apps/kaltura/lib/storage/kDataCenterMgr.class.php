@@ -79,32 +79,66 @@ class kDataCenterMgr
 		return self::getDcById( $dc_config["current"] );
 	}
 	
-	public static function getSharedStorageProfileIds($getFromLegacyConfig = false)
+	public static function getSharedStorageProfileIds($partnerId = null)
 	{
-		if($getFromLegacyConfig)
+		$sharedStorageProfileIds = kConf::get('shared_storage_profile_ids', 'cloud_storage', array());
+
+		if(!$partnerId)
 		{
-			$sharedStorageProfileIds = kConf::get('periodic_storage_ids', 'cloud_storage', array());
+			$partnerId = kCurrentContext::getCurrentPartnerId();
 		}
-		else
+
+		KalturaLog::debug("TTT: getSharedStorageProfileIds partner id [$partnerId]");
+		if($partnerId)
 		{
-			$sharedStorageProfileIds = kConf::get('shared_storage_profile_ids', 'cloud_storage', array());
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			$partnerDedicatedStorageId = $partner->getPartnerDedicatedStorageId();
+			if($partnerDedicatedStorageId)
+			{
+				$sharedStorageProfileIds[] = $partnerDedicatedStorageId;
+			}
 		}
-		
-		if(is_array($sharedStorageProfileIds))
-			return $sharedStorageProfileIds;
-		
-		return explode(",", $sharedStorageProfileIds);
+
+		return $sharedStorageProfileIds;
+	}
+
+	public static function getSharedStorageProfileIdsForPartner($partnerId = null)
+	{
+		if(!$partnerId)
+		{
+			return null;
+		}
+
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		$sharedStorageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$sharedStorageProfileIds[] = $partnerSharedStorageProfileId;
+		return $sharedStorageProfileIds;
 	}
 	
 	public static function isDcIdShared($dcId)
 	{
+		KalturaLog::debug("TTT: Checking isDcIdShared [$dcId]");
 		$sharedStorageProfileIds = self::getSharedStorageProfileIds();
-		return in_array($dcId, $sharedStorageProfileIds);
+		if(in_array($dcId, $sharedStorageProfileIds))
+		{
+			return true;
+		}
+
+		$storageProfile = StorageProfilePeer::retrieveByPK($dcId);
+		if(!$storageProfile)
+		{
+			return false;
+		}
+
+
+		return $storageProfile->getProtocol() == StorageProfileProtocol::KALTURA_DC && $storageProfile->getPartnerId() != PartnerPeer::GLOBAL_PARTNER;
 	}
 
 	// returns a tupple with the id and the DC's properties
 	public static function getDcById($dc_id, $partnerId = null)
 	{
+		KalturaLog::debug("TTT: getting dcId [$dc_id] partnerId [$partnerId]");
 		if (self::isDcIdShared($dc_id))
 		{
 			$dc_id = kDataCenterMgr::getCurrentDcId();
@@ -124,8 +158,8 @@ class kDataCenterMgr
 		}
 		elseif ($partnerId)
 		{
-			$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIds();
-			if (in_array($dc_id, $cloudStorageProfileIds))
+			$sharedStorageProfileIds = self::getSharedStorageProfileIdsForPartner($partnerId);
+			if (in_array($dc_id, $sharedStorageProfileIds))
 			{
 				$storageProfile = StorageProfilePeer::retrieveByPK($dc_id);
 				if ($storageProfile->getPackagerUrl())

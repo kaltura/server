@@ -793,7 +793,7 @@ class kFlowHelper
 					kFileSyncUtils::moveFromFile($fixedFileName, $syncKey);
 					$syncPath=kFileSyncUtils::getLocalFilePathForKey($syncKey);
 						/*
-						 * Finish the current extract medi job and start a new one
+						 * Finish the current extract media job and start a new one
 						 */
 					kJobsManager::updateBatchJob($dbBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 					kJobsManager::addExtractMediaJob($rootBatchJob, $syncPath, $data->getFlavorAssetId());

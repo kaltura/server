@@ -1074,11 +1074,11 @@ class kJobsManager
 		}
 		
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		$importToShared = kConf::get('enable_import_to_shared', 'runtime_config', null);
-		$excludePartnersImportToShared = kConf::get('exclude_partners_import_to_shared', 'runtime_config', array());
-		if($importToShared && $partner->getSharedStorageProfileId() && !in_array($partnerId, $excludePartnersImportToShared))
+		$sharedStorageProfileId = $partner->getSharedStorageProfileId();
+		KalturaLog::debug("TTT: sharedStorageProfileId found is [$sharedStorageProfileId]");
+		if($sharedStorageProfileId)
 		{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($sharedStorageProfileId);
 			$pathMgr = $sharedStorageProfile->getPathManager();
 			
 			$sharedPath = null;

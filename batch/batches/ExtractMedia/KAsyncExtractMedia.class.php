@@ -112,7 +112,9 @@ class KAsyncExtractMedia extends KJobHandlerWorker
 		try
 		{
 			$mediaFile = kFile::realPath($mediaFile);
+			KalturaLog::debug("TTT: file path is [$mediaFile]");
 			$engine = KBaseMediaParser::getParser($job->jobSubType, $mediaFile, self::$taskConfig, $job);
+			KalturaLog::debug("TTT: engine is [" . get_class($engine) . "]");
 			if($engine)
 			{
 				$mediaInfo = $engine->getMediaInfo();

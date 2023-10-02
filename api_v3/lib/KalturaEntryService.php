@@ -652,6 +652,14 @@ class KalturaEntryService extends KalturaBaseService
 		// TODO - move image handling to media service
 		if($dbEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
+                       //For entries with content we need to make sure the version is incremented
+                       //to avoid file sync violation exceptions
+                       if($dbEntry->getStatus() === entryStatus::READY)
+                       {
+                               $dbEntry->setData ( $dbEntry->getData() );
+                               $dbEntry->save();
+                       }
+
 			$syncKey = $dbEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 	   		kFileSyncUtils::createSyncFileLinkForKey($syncKey, $srcSyncKey);
 	   		

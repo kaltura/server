@@ -155,6 +155,10 @@ class KafkaProvider extends QueueProvider
 	 */
 	public function create($queueName)
 	{
+//		$conf = new RdKafka\TopicConf();
+//		$conf->set('acks', -1);
+//		$topic = $this->producer->newTopic($queueName, $conf);
+
 		$topic = $this->producer->newTopic($queueName);
 		$this->topic = $topic;
 	}
