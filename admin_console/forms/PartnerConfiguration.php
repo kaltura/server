@@ -218,12 +218,11 @@ class Form_PartnerConfiguration extends Infra_Form
 		$maxWordsForNgram = $this->getElement('max_word_for_ngram');
 		$maxWordsForNgram->addValidator($intValidator) ;
 
-		$this->addElement('text', 'search_max_metadata_index_length', array(
-			'label'	  => 'Max metadata index length',
+		$this->addElement('select', 'search_max_metadata_index_length', array(
+			'label'          => 'Max metadata index length',
+			'filters'        => array('StringTrim'),
+			'multiOptions'   => array(256 => '256', 1024 => '1024', 2048 => '2048', 4096 => '4096', 8192 => '8192'),
 		));
-
-		$searchMaxMetadataIndexLength = $this->getElement('search_max_metadata_index_length');
-		$searchMaxMetadataIndexLength->addValidator($intValidator) ;
 		
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
