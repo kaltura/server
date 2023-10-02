@@ -16,10 +16,15 @@ mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/
 ````
 php deployment/updates/scripts/add_permissions/2023_07_24_add_userapprole_permissions.php
 ````
-3. Generate Clients:
+3. Add 'microservices' under '[mapping]' in cache.ini
+````
+[mapping]
+microservices = memcacheGlobal
+````
+4. (On-Prem only) Generate Clients:
 ````
 php generator/generate.php
-find cache/ -type f -delete
+find /opt/kaltura/app/cache/ -type f -delete
 service apache2 graceful
 ````
 Done!
