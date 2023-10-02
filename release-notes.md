@@ -16,7 +16,8 @@ mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/
 ````
 php deployment/updates/scripts/add_permissions/2023_07_24_add_userapprole_permissions.php
 ````
-3. Add 'microservices' under '[mapping]' in cache.ini
+3. Add 'microservices' under '[mapping]' in cache.ini  
+* Below we use 'memcacheGlobal' - but you should use the one that suits your needs
 ````
 [mapping]
 microservices = memcacheGlobal
