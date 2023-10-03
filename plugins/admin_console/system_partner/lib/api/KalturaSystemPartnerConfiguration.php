@@ -40,12 +40,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $cdnHost;
-
+	
 	/**
 	 * @var string
 	 */
 	public $cdnHostWhiteList;
-
+	
 	/**
 	 * @var string
 	 */
@@ -77,7 +77,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $storageServePriority;
 	
 	/**
-	 * 
+	 *
 	 * @var int
 	 */
 	public $kmcVersion;
@@ -87,12 +87,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @deprecated
 	 */
 	public $restrictThumbnailByKs;
-
+	
 	/**
 	 * @var bool
 	 */
 	public $supportAnimatedThumbnails;
-		
+	
 	/**
 	 * @var int
 	 */
@@ -132,7 +132,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $notificationsConfig;
-
+	
 	/**
 	 * @var string
 	 */
@@ -142,11 +142,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $allowMultiNotification;
-		
+	
 	/**
 	 * @var int
 	 */
-	public $loginBlockPeriod; 
+	public $loginBlockPeriod;
 	
 	/**
 	 * @var int
@@ -191,15 +191,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $mediaProtocol;
 	
 	/**
-	 * @var string 
+	 * @var string
 	 */
 	public $extendedFreeTrailExpiryReason;
 	
 	/**
 	 *  Unix timestamp (In seconds)
-	 * 
+	 *
 	 * @var int
-	 * 
+	 *
 	 */
 	public $extendedFreeTrailExpiryDate;
 	
@@ -212,7 +212,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $crmId;
-
+	
 	/**
 	 * @var string
 	 */
@@ -234,13 +234,13 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $partnerPackageClassOfService;
 	
 	/**
-	 * 
+	 *
 	 * @var bool
 	 */
 	public $enableBulkUploadNotificationsEmails;
 	
 	/**
-	 * @var string 
+	 * @var string
 	 */
 	public $deliveryProfileIds;
 	
@@ -250,37 +250,37 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $liveDeliveryProfileIds;
 	
 	/**
-	 * @var bool 
+	 * @var bool
 	 */
 	public $enforceDelivery;
 	
 	/**
-	 * 
+	 *
 	 * @var string
 	 */
 	public $bulkUploadNotificationsEmail;
 	
 	/**
-	 * 
+	 *
 	 * @var bool
 	 */
 	public $internalUse;
 	
-
+	
 	/**
 	 * @var KalturaSourceType
 	 */
 	public $defaultLiveStreamEntrySourceType;
-
+	
 	
 	/**
 	 * @var string
 	 */
 	public $liveStreamProvisionParams;
 	
-
+	
 	/**
-	 * 
+	 *
 	 * @var KalturaBaseEntryFilter
 	 */
 	public $autoModerateEntryFilter;
@@ -299,7 +299,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 */
 	public $cacheFlavorVersion;
-
+	
 	/**
 	 * @var int
 	 */
@@ -334,7 +334,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $audioThumbEntryId;
-
+	
 	/**
 	 * @var string
 	 */
@@ -344,62 +344,62 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $timeAlignedRenditions;
-
+	
 	/**
 	 * @var int
 	 */
 	public $htmlPurifierBehaviour;
-
+	
 	/**
 	 * @var bool
 	 */
 	public $htmlPurifierBaseListUsage;
 	
 	/**
- * @var int
- */
+	 * @var int
+	 */
 	public $defaultLiveStreamSegmentDuration;
-
-    /**
-     * @var int
-     */
-    public $defaultRecordingConversionProfile;
-
+	
+	/**
+	 * @var int
+	 */
+	public $defaultRecordingConversionProfile;
+	
 	/**
 	 * @var string
 	 */
 	public $eSearchLanguages;
-
+	
 	/**
 	 * @var int
 	 */
 	public $publisherEnvironmentType;
-
+	
 	/**
 	 * @var string
 	 */
 	public $ovpEnvironmentUrl;
-
+	
 	/**
 	 * @var string
 	 */
 	public $ottEnvironmentUrl;
-
+	
 	/**
 	 * @var bool
 	 */
 	public $enableSelfServe;
-
+	
 	/**
 	 * @var bool
 	 */
 	public $useTwoFactorAuthentication;
-
+	
 	/**
 	 * @var bool
 	 */
 	public $useSso;
-
+	
 	/**
 	 * @var bool
 	 */
@@ -409,37 +409,37 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $ignoreSynonymEsearch;
-
+	
 	/**
 	 * @var bool
 	 */
 	public $avoidIndexingSearchHistory;
-
+	
 	/**
 	 * @var int
 	 */
 	public $usagePercent;
-
+	
 	/**
 	 * @var int
 	 */
 	public $eightyPercentWarning;
-
+	
 	/**
 	 * @var int
 	 */
 	public $usageLimitWarning;
-
+	
 	/**
 	 * @var int
 	 */
 	public $lastFreeTrialNotificationDay;
-
+	
 	/**
 	 * @var bool
 	 */
 	public $extendedFreeTrailEndsWarning;
-
+	
 	/**
 	 * @var bool
 	 */
@@ -480,7 +480,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 */
 	public $maxWordForNgram;
-	 
+	
+	/**
+	 * @var int
+	 */
+	public $searchMaxMetadataIndexLength;
+	
 	/**
 	 * @var KalturaTwoFactorAuthenticationMode
 	 */
@@ -490,7 +495,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var bool
 	 */
 	public $purifyImageContent;
-
+	
 	/**
 	 * @var bool
 	 */
@@ -517,7 +522,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"host",
 		"cdnHost",
 		"cdnHostWhiteList",
-	    "thumbnailHost",
+		"thumbnailHost",
 		//"maxBulkSize",
 		"partnerPackage",
 		"monitorUsage",
@@ -527,7 +532,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"kmcVersion",
 		"defThumbOffset",
 		"defThumbDensity",
-	//"adminLoginUsersQuota",
+		//"adminLoginUsersQuota",
 		"userSessionRoleId",
 		"adminSessionRoleId",
 		"alwaysAllowedPermissionNames",
@@ -561,7 +566,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"defaultLiveStreamEntrySourceType",
 		"liveStreamProvisionParams",
 		"logoutUrl",
-	    "defaultEntitlementEnforcement",
+		"defaultEntitlementEnforcement",
 		"cacheFlavorVersion",
 		"apiAccessControlId",
 		"defaultDeliveryType",
@@ -569,10 +574,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		"customDeliveryTypes",
 		"language",
 		"audioThumbEntryId",
-		"liveThumbEntryId",		
+		"liveThumbEntryId",
 		"deliveryProfileIds",
 		"liveDeliveryProfileIds",
-	    "timeAlignedRenditions",
+		"timeAlignedRenditions",
 		"htmlPurifierBehaviour",
 		"htmlPurifierBaseListUsage",
 		"defaultLiveStreamSegmentDuration",
@@ -598,18 +603,19 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'allowedDomains',
 		'trigramPercentage',
 		'maxWordForNgram',
+		'searchMaxMetadataIndexLength',
 		'twoFactorAuthenticationMode',
 		'purifyImageContent',
 		'isSelfServe',
 		'eventPlatformAllowedTemplates',
 		'recycleBinRetentionPeriod',
 	);
-
+	
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-
+	
 	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
@@ -630,7 +636,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->autoModerateEntryFilter = new KalturaBaseEntryFilter();
 			$this->autoModerateEntryFilter->fromObject($dbAutoModerationEntryFilter);
 		}
-
+		
 		$this->partnerName = kString::stripUtf8InvalidChars($this->partnerName);
 		$this->description = kString::stripUtf8InvalidChars($this->description);
 		$this->adminName = kString::stripUtf8InvalidChars($this->adminName);
@@ -651,7 +657,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->passwordStructureValidations = array();
 			$this->passwordStructureValidationsDescription = null;
 		}
-
+		
 	}
 	
 	private function copyMissingConversionProfiles(Partner $partner)
@@ -670,7 +676,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			if (!$audioThumbEntry || $audioThumbEntry->getMediaType() != entry::ENTRY_MEDIA_TYPE_IMAGE)
 				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_AUDIO_THUMB_ENTRY_ID_ERROR, $audioThumbEntryId);
 		}
-
+		
 		$liveThumbEntryId = $this->liveThumbEntryId;
 		if ($liveThumbEntryId)
 		{
@@ -688,15 +694,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$this->validatePropertyNumeric('defaultLiveStreamSegmentDuration');
 			$this->validatePropertyMinMaxValue('defaultLiveStreamSegmentDuration', KalturaLiveEntry::MIN_ALLOWED_SEGMENT_DURATION_MILLISECONDS, KalturaLiveEntry::MAX_ALLOWED_SEGMENT_DURATION_MILLISECONDS);
 		}
-
+		
 		if (!$this->isNull('defaultRecordingConversionProfile'))
-        {
-            $this->validatePropertyNumeric('defaultRecordingConversionProfile');
-            $conversionProfile = conversionProfile2Peer::retrieveByPKAndPartnerId($this->defaultRecordingConversionProfile, $sourceObject->getId());
-            if ($this->defaultRecordingConversionProfile != 0 && !$conversionProfile) {  // 0 is for disable the feature - not need to check if conversion profile exist
-                throw new KalturaAPIException(SystemPartnerErrors::PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR, $this->defaultRecordingConversionProfile);
-            }
-        }
+		{
+			$this->validatePropertyNumeric('defaultRecordingConversionProfile');
+			$conversionProfile = conversionProfile2Peer::retrieveByPKAndPartnerId($this->defaultRecordingConversionProfile, $sourceObject->getId());
+			if ($this->defaultRecordingConversionProfile != 0 && !$conversionProfile) {  // 0 is for disable the feature - not need to check if conversion profile exist
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR, $this->defaultRecordingConversionProfile);
+			}
+		}
 		
 		if ($sourceObject->getAllowedFromEmailWhiteList() != $this->allowedFromEmailWhiteList)
 		{
@@ -718,7 +724,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			KalturaLog::debug('All domains are allowing Kaltura');
 		}
 	}
-
+	
 	protected static function getDomains($fromEmailList)
 	{
 		$domains = array();
@@ -760,22 +766,22 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		} else {
 			$object_to_fill->setLiveDeliveryProfileIds(json_decode($this->liveDeliveryProfileIds, true));
 		}
-
+		
 		if(empty($this->eSearchLanguages)) {
 			$object_to_fill->setESearchLanguages(array());
 		} else {
 			$object_to_fill->setESearchLanguages(json_decode($this->eSearchLanguages, true));
 		}
-
+		
 		if (!$this->isNull('partnerParentId') && $this->partnerParentId > 0)
 		{
-		    $parentPartnerDb = PartnerPeer::retrieveByPK($this->partnerParentId);
-		    
-		    if ($parentPartnerDb->getPartnerGroupType() != KalturaPartnerGroupType::GROUP 
-		        && $parentPartnerDb->getPartnerGroupType() != KalturaPartnerGroupType::VAR_GROUP)
-		    {
-		        throw new KalturaAPIException(SystemPartnerErrors::UNABLE_TO_FORM_GROUP_ASSOCIATION, $this->partnerParentId, $parentPartnerDb->getPartnerGroupType());
-		    }
+			$parentPartnerDb = PartnerPeer::retrieveByPK($this->partnerParentId);
+			
+			if ($parentPartnerDb->getPartnerGroupType() != KalturaPartnerGroupType::GROUP
+				&& $parentPartnerDb->getPartnerGroupType() != KalturaPartnerGroupType::VAR_GROUP)
+			{
+				throw new KalturaAPIException(SystemPartnerErrors::UNABLE_TO_FORM_GROUP_ASSOCIATION, $this->partnerParentId, $parentPartnerDb->getPartnerGroupType());
+			}
 		}
 		
 		if(!is_null($this->permissions))
@@ -876,7 +882,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			foreach($pluginInstances as $pluginInstance)
 			{
 				$pluginInstance->permissionEnabled($partnerId, $permissionName);
-			}					
+			}
 		}
 	}
 }

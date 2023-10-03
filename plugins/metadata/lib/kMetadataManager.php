@@ -21,9 +21,9 @@ class kMetadataManager
 	);
 	
 	protected static $metadataFieldTypesToValidate = array(
-	    MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT,
-	    MetadataSearchFilter::KMC_FIELD_TYPE_USER,
-	    MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT,
+		MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT,
+		MetadataSearchFilter::KMC_FIELD_TYPE_USER,
+		MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT,
 	);
 	
 	/**
@@ -35,21 +35,21 @@ class kMetadataManager
 	{
 		switch ($objectType)
 		{
-		    case MetadataObjectType::ENTRY:
-		        return new MetadataEntryPeer();
-		        
-		    case MetadataObjectType::CATEGORY:
-		        return new MetadataCategoryPeer();
-		        
-		    case MetadataObjectType::PARTNER:
-		        return new MetadataPartnerPeer();
-		        
-		    case MetadataObjectType::USER:
-		        return new MetadataKuserPeer();
-
-		    case MetadataObjectType::USER_ENTRY:
-			return new MetadataUserEntryPeer();
-		        
+			case MetadataObjectType::ENTRY:
+				return new MetadataEntryPeer();
+			
+			case MetadataObjectType::CATEGORY:
+				return new MetadataCategoryPeer();
+			
+			case MetadataObjectType::PARTNER:
+				return new MetadataPartnerPeer();
+			
+			case MetadataObjectType::USER:
+				return new MetadataKuserPeer();
+			
+			case MetadataObjectType::USER_ENTRY:
+				return new MetadataUserEntryPeer();
+			
 			default:
 				return KalturaPluginManager::loadObject('IMetadataPeer', $objectType);
 		}
@@ -57,20 +57,20 @@ class kMetadataManager
 	
 	protected static function getObjectPeerByFieldType($fieldType)
 	{
-	    switch ($fieldType)
-	    {
-	        case MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT:
-	            return new MetadataEntryPeer();
-	             
-	        case MetadataSearchFilter::KMC_FIELD_TYPE_USER:
-	            return new MetadataKuserPeer();
-
-	        case MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT:
-	            return new MetadataDynamicObjectPeer();
-	             
-	        default:
-	            return null; 
-	    }
+		switch ($fieldType)
+		{
+			case MetadataSearchFilter::KMC_FIELD_TYPE_OBJECT:
+				return new MetadataEntryPeer();
+			
+			case MetadataSearchFilter::KMC_FIELD_TYPE_USER:
+				return new MetadataKuserPeer();
+			
+			case MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT:
+				return new MetadataDynamicObjectPeer();
+			
+			default:
+				return null;
+		}
 	}
 	
 	/**
@@ -84,7 +84,7 @@ class kMetadataManager
 		$peer = self::getObjectPeer($objectType);
 		if(!$peer)
 			return null;
-			
+		
 		return $peer->retrieveByPK($metadata->getObjectId());
 	}
 	
@@ -130,16 +130,16 @@ class kMetadataManager
 			/* @var $element DOMNode */
 			$values[] = $element->textContent;
 		}
-
+		
 		return $values;
 	}
 	
 	/**
 	 * Function expects a particular metadataObject and retrieves the value(s) of a specific field from the XML of the object
-	 * 
+	 *
 	 * @param Metadata $object
 	 * @param string $fieldSystemName
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function getMetadataValueForField (Metadata $object, $fieldSystemName)
@@ -204,9 +204,9 @@ class kMetadataManager
 				$profileField->setExplodeChars($xPathData['explodeChars']);
 			if(isset($xPathData['matchType']))
 				$profileField->setMatchType(intval($xPathData['matchType']));
-
+			
 			self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
-
+			
 			$profileField->save();
 			
 			unset($xPaths[$xPath]);
@@ -241,7 +241,7 @@ class kMetadataManager
 				$profileField->save();
 			}
 		}
-	
+		
 		// set none searchable existing fields
 		$xPaths = kXsd::findXpathsByAppInfo($xmlString, self::APP_INFO_SEARCH, 'false', false);
 		foreach($profileFields as $profileField)
@@ -249,7 +249,7 @@ class kMetadataManager
 			$xPath = $profileField->getXpath();
 			if(!isset($xPaths[$xPath]))
 				continue;
-				
+			
 			$xPathData = $xPaths[$xPath];
 			if(isset($xPathData['name']))
 				$profileField->setKey($xPathData['name']);
@@ -257,13 +257,13 @@ class kMetadataManager
 				$profileField->setLabel($xPathData['label']);
 			if(isset($xPathData['type']))
 				$profileField->setType($xPathData['type']);
-				
+			
 			$profileField->setStatus(MetadataProfileField::STATUS_NONE_SEARCHABLE);
 			$profileField->setMetadataProfileVersion($metadataProfile->getVersion());
 			$profileField->save();
-
+			
 			self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
-
+			
 			unset($xPaths[$xPath]);
 		}
 		
@@ -286,11 +286,11 @@ class kMetadataManager
 				$profileField->setType($xPathData['type']);
 				self::setAdditionalProfileFieldData($metadataProfile, $profileField, $xPathData);
 			}
-
+			
 			$profileField->save();
 		}
 	}
-
+	
 	public static function setAdditionalProfileFieldData(MetadataProfile $metadataProfile, MetadataProfileField $profileField, $xPathData)
 	{
 		if($profileField->getType() === MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
@@ -315,22 +315,22 @@ class kMetadataManager
 	{
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::info("Found " . count($metadatas) . " metadata object");
-
+		
 		return self::getMetadataValuesByMetadataObjects($metadatas);
 	}
-
+	
 	public static function getMetadataValuesByMetadataObjects(array $metadatas)
 	{
 		$dataFieldName = MetadataPlugin::getSphinxFieldName(MetadataPlugin::SPHINX_EXPANDER_FIELD_DATA);
-
+		
 		$searchValues = array();
-
+		
 		foreach($metadatas as $metadata)
 			$searchValues = self::getDataSearchValues($metadata, $searchValues);
-
+		
 		if (isset($searchValues[$dataFieldName]))
 			$searchValues[$dataFieldName] = implode(' ', $searchValues[$dataFieldName]);
-
+		
 		return $searchValues;
 	}
 	
@@ -363,9 +363,9 @@ class kMetadataManager
 			KalturaLog::err('Could not load metadata xml [' . kFileSyncUtils::getLocalFilePathForKey($key) . '] - ' . $ex->getMessage());
 			return '';
 		}
-					
+		
 		$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadata->getMetadataProfileId());
-	
+		
 		$searchItems = array();
 		$textItems = array();
 		foreach($profileFields as $profileField)
@@ -374,37 +374,37 @@ class kMetadataManager
 			$nodes = $xPath->query($profileField->getXpath());
 			if(!$nodes->length)
 				continue;
-
+			
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE ||
-			   	$profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
+				$profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
 				$node = $nodes->item(0);
-				if(!isset($searchValues[MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES])) 
+				if(!isset($searchValues[MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES]))
 					$searchValues[MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES] = array();
 				
 				$fieldName = MetadataPlugin::getSphinxFieldName($profileField->getId());
 				$searchValues[MetadataPlugin::SPHINX_DYNAMIC_ATTRIBUTES][$fieldName] = intval($node->nodeValue);
-					
+				
 				continue;
 			}
-
+			
 			$searchItemValues = array();
 			foreach($nodes as $node)
 				$searchItemValues[] = $node->nodeValue;
 			
 			if(!count($searchItemValues))
 				continue;
-
+			
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_TEXT ||
 				$profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
 			{
 				$textItems[] = implode(' ', $searchItemValues);
-
+				
 				$searchItems[$profileField->getId()] = array();
 				foreach ($searchItemValues as $searchItemValue)
 				{
 					if(iconv_strlen($searchItemValue, 'UTF-8') >= 128)
 						continue;
-						
+					
 					$searchItems[$profileField->getId()][] = $searchItemValue;
 					if($profileField->getMatchType() == MetadataProfileFieldMatchType::EXACT)
 					{
@@ -415,7 +415,7 @@ class kMetadataManager
 						}
 					}
 				}
-
+				
 				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
 					$profileField->getRelatedMetadataProfileId())
 				{
@@ -449,9 +449,9 @@ class kMetadataManager
 		foreach($searchItems as $key => $searchItem)
 			foreach($searchItem as $searchPhrase)
 				$searchTexts[] = MetadataPlugin::PLUGIN_NAME . '_' . "$key $searchPhrase " . kMetadataManager::SEARCH_TEXT_SUFFIX . '_' . $key;
-				
-	 	if(count($textItems))
-	 		$searchTexts['text'] = MetadataSearchFilter::createSphinxSearchCondition($metadata->getPartnerId(), implode(' ', $textItems) , true);
+		
+		if(count($textItems))
+			$searchTexts['text'] = MetadataSearchFilter::createSphinxSearchCondition($metadata->getPartnerId(), implode(' ', $textItems) , true);
 		
 		$ret = array();
 		foreach($searchTexts as $index => $value)
@@ -480,21 +480,21 @@ class kMetadataManager
 		{
 			$xsl = kXsd::compareXsd($prevXsd, $newXsd);
 		}
-			
+		
 		if($xsl === true)
 			return;
-
+		
 		if(PermissionPeer::isValidForPartner(MetadataPermissionName::FEATURE_METADATA_NO_TRANSFORMATION, $metadataProfile->getPartnerId()))
 			throw new kXsdException(kXsdException::TRANSFORMATION_REQUIRED);
-
+		
 		$prevVersion = $metadataProfile->getVersion();
 		$metadataProfile->incrementVersion();
 		$newVersion = $metadataProfile->getVersion();
 		$metadataProfile->save();//save has to be before we create a batch to make sure there is no race-condition where XSD is not updated before the batch runs.
-
+		
 		return self::addTransformMetadataJob($metadataProfile->getPartnerId(), $metadataProfile->getId(), $prevVersion, $newVersion, $xsl);
 	}
-
+	
 	/**
 	 * Validate the XML against the profile XSD and set the metadata status
 	 *
@@ -528,15 +528,15 @@ class kMetadataManager
 			KalturaLog::err($errorMessage);
 			return false;
 		}
-			
+		
 		libxml_use_internal_errors(true);
 		libxml_clear_errors();
 		$xml = new KDOMDocument();
 		$xml->loadXML($metadata);
 		if($xml->schemaValidateSource($xsdData))
 		{
-		    if(!self::validateMetadataObjects($metadataProfileId, $xml, $errorMessage))
-		    {
+			if(!self::validateMetadataObjects($metadataProfileId, $xml, $errorMessage))
+			{
 				KalturaLog::err($errorMessage);
 				return false;
 			}
@@ -551,38 +551,38 @@ class kMetadataManager
 	
 	protected static function validateMetadataObjects($metadataProfileId, KDOMDocument $xml, &$errorMessage)
 	{
-	    $profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
-	    $xPath = new DOMXPath($xml);
-	    
-	    foreach ($profileFields as $profileField)
-	    {
-	        /** @var MetadataProfileField $profileField */
-	        if(!in_array($profileField->getType(), self::$metadataFieldTypesToValidate))
-	            continue;
-	        
-	        $objectPeer = self::getObjectPeerByFieldType($profileField->getType());
-	        
-	        if(!$objectPeer)
-	        {
-	            $errorMessage = "Peer not found for field of type " . $profileField->getType();
-	            return false;
-	        }
-	        
-	        $objectIds = array();
-	        $nodes = $xPath->query($profileField->getXpath());
-	         
-	        foreach ($nodes as $node)
-	            $objectIds[] = $node->nodeValue;
-	         
-	        $objectIds = array_unique($objectIds);
-	        
-	        if(!$objectPeer->validateMetadataObjects($profileField, $objectIds, $errorMessage))
-	            return false;
-	    }
-	    
-	    return true;
+		$profileFields = MetadataProfileFieldPeer::retrieveByMetadataProfileId($metadataProfileId);
+		$xPath = new DOMXPath($xml);
+		
+		foreach ($profileFields as $profileField)
+		{
+			/** @var MetadataProfileField $profileField */
+			if(!in_array($profileField->getType(), self::$metadataFieldTypesToValidate))
+				continue;
+			
+			$objectPeer = self::getObjectPeerByFieldType($profileField->getType());
+			
+			if(!$objectPeer)
+			{
+				$errorMessage = "Peer not found for field of type " . $profileField->getType();
+				return false;
+			}
+			
+			$objectIds = array();
+			$nodes = $xPath->query($profileField->getXpath());
+			
+			foreach ($nodes as $node)
+				$objectIds[] = $node->nodeValue;
+			
+			$objectIds = array_unique($objectIds);
+			
+			if(!$objectPeer->validateMetadataObjects($profileField, $objectIds, $errorMessage))
+				return false;
+		}
+		
+		return true;
 	}
-
+	
 	public static function validateProfileFields($partnerId, $xsd)
 	{
 		$xPaths = array_merge(
@@ -612,7 +612,7 @@ class kMetadataManager
 	{
 		if($metadataProfileVersion)
 			$metadata->setMetadataProfileVersion($metadataProfileVersion);
-			
+		
 		$metadata->setStatus($status);
 		$metadata->save();
 		
@@ -628,7 +628,7 @@ class kMetadataManager
 	{
 		if(isset(self::$objectTypeNames[$objectType]))
 			return self::$objectTypeNames[$objectType];
-			
+		
 		return KalturaPluginManager::getObjectClass('IMetadataObject', $objectType);
 	}
 	
@@ -640,7 +640,7 @@ class kMetadataManager
 	{
 		if($object instanceof IMetadataObject || $object instanceof entry || $object instanceof category || $object instanceof kuser || $object instanceof Partner)
 			return true;
-			
+		
 		return false;
 	}
 	
@@ -651,17 +651,17 @@ class kMetadataManager
 	 */
 	public static function getTypeNameFromObject (BaseObject $object)
 	{
-	    foreach (self::$objectTypeNames as $objectType => $objectClassName)
-	    {
-	        if($object instanceof  $objectClassName)
-
-	            return $objectType;
-	    }
-	    
-	    if($object instanceof IMetadataObject)
-	    	return $object->getMetadataObjectType();
-	    	
-	    return MetadataObjectType::ENTRY;
+		foreach (self::$objectTypeNames as $objectType => $objectClassName)
+		{
+			if($object instanceof  $objectClassName)
+				
+				return $objectType;
+		}
+		
+		if($object instanceof IMetadataObject)
+			return $object->getMetadataObjectType();
+		
+		return MetadataObjectType::ENTRY;
 	}
 	
 	/**
@@ -726,9 +726,9 @@ class kMetadataManager
 	}
 	
 	/**
-	 * Receives metadata object ID and a previous version, and returns an array mapping the xpaths of fields changed from version $previousVersion 
+	 * Receives metadata object ID and a previous version, and returns an array mapping the xpaths of fields changed from version $previousVersion
 	 * to their new values in the current version
-	 * 
+	 *
 	 * @param int $metadataObjectId
 	 * @param int $previousVersion
 	 * @return array
@@ -744,13 +744,13 @@ class kMetadataManager
 		
 		$metadataObject = MetadataPeer::retrieveByPK($metadataObjectId);
 		$metadataCurrentData = kFileSyncUtils::file_get_contents($metadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA));
-		$metadataPreviousData = kFileSyncUtils::file_get_contents($metadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $previousVersion));	
+		$metadataPreviousData = kFileSyncUtils::file_get_contents($metadataObject->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA, $previousVersion));
 		
 		$diff = kXml::getDiff ($metadataCurrentData, $metadataPreviousData);
 		return $diff;
 		
 	}
-
+	
 	/**
 	 * Return search texts per object id
 	 *
@@ -763,10 +763,10 @@ class kMetadataManager
 	{
 		$metadatas = MetadataPeer::retrieveAllByObject($objectType, $objectId);
 		KalturaLog::info("Found " . count($metadatas) . " metadata object");
-
+		
 		return self::getElasticMetadataValuesByMetadataObjects($metadatas, $objectType);
 	}
-
+	
 	public static function getElasticMetadataValuesByMetadataObjects(array $metadatas, $objectType)
 	{
 		$metaDataSearchValues = array();
@@ -781,10 +781,10 @@ class kMetadataManager
 		{
 			$searchValues = null;
 		}
-
+		
 		return $searchValues; //return an array(metadata => array(...)) or null if no values
 	}
-
+	
 	/**
 	 * Parse the XML and update the array of elasticsearch values
 	 *
@@ -795,7 +795,7 @@ class kMetadataManager
 	{
 		$key = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		$xmlString = kFileSyncUtils::file_get_contents($key);
-
+		
 		try{
 			$xml = new KDOMDocument();
 			$xml->loadXML($xmlString);
@@ -809,9 +809,17 @@ class kMetadataManager
 		$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadata->getMetadataProfileId());
 		$metadataId = $metadata->getId();
 		$partnerId = $metadata->getPartnerId();
-		$maxMetadataLength = kConf::getArrayValue($partnerId, ElasticSearchPlugin::MAX_METADATA_INDEX_LENGTH,
-			ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP,kElasticSearchManager::METADATA_MAX_LENGTH);
-
+		
+		$maxMetadataLength = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EVENT_PLATFORM_PERMISSION, $partnerId)
+			? kElasticSearchManager::EVENT_PLATFORM_METADATA_MAX_LENGTH
+			: kElasticSearchManager::METADATA_MAX_LENGTH;
+		
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getSearchMaxMetadataIndexLength())
+		{
+			$maxMetadataLength = $partner->getSearchMaxMetadataIndexLength();
+		}
+		
 		foreach($profileFields as $profileField)
 		{
 			$profileFieldData = array();
@@ -828,15 +836,15 @@ class kMetadataManager
 					$profileFieldData['system_name'] = $systemName;
 				}
 			}
-
+			
 			$xpath = $profileField->getXpath();
 			$profileFieldData['xpath'] = $xpath;
 			$profileFieldData['metadata_field_id'] = $profileField->getId();
-
+			
 			$nodes = $xPath->query($profileField->getXpath());
 			if(!$nodes->length)
 				continue;
-
+			
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_DATE ||
 				$profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_INT){
 				$node = $nodes->item(0);
@@ -844,14 +852,14 @@ class kMetadataManager
 				$metaDataSearchValues[] = $profileFieldData;
 				continue;
 			}
-
+			
 			$searchItemValues = array();
 			foreach($nodes as $node)
 				$searchItemValues[] = $node->nodeValue;
-
+			
 			if(!count($searchItemValues))
 				continue;
-
+			
 			if($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_TEXT ||
 				$profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT)
 			{
@@ -860,7 +868,7 @@ class kMetadataManager
 				{
 					if(strlen($searchItemValue) > $maxMetadataLength)
 						$searchItemValue = substr($searchItemValue, 0, $maxMetadataLength);
-
+					
 					$profileFieldData['value_text'][] = $searchItemValue;
 				}
 				if ($profileField->getType() == MetadataSearchFilter::KMC_FIELD_TYPE_METADATA_OBJECT &&
@@ -893,9 +901,9 @@ class kMetadataManager
 				}
 				$profileFieldData['value_text'] = $searchItemValues;
 			}
-
+			
 			$metaDataSearchValues[] = $profileFieldData;
 		}
 	}
-
+	
 }

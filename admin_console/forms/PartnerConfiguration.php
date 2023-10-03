@@ -5,35 +5,35 @@
  */
 class Form_PartnerConfiguration extends Infra_Form
 {
-    const GROUP_ENABLE_DISABLE_FEATURES = 'GROUP_ENABLE_DISABLE_FEATURES';
-    const GROUP_CONTENT_INGESTION_OPTIONS = 'GROUP_CONTENT_INGESTION_OPTIONS';
-    const GROUP_PUBLISHER_DELIVERY_SETTINGS = 'GROUP_PUBLISHER_DELIVERY_SETTINGS';
-    const GROUP_REMOTE_STORAGE = 'GROUP_REMOTE_STORAGE';
-    const GROUP_NOTIFICATION_CONFIG = 'GROUP_NOTIFICATION_CONFIG';
-    const GROUP_ACCESS_CONTROL = 'GROUP_ACCESS_CONTROL';
-    const THUMBNAIL_CONFIGURATION = 'THUMBNAIL_CONFIGURATION';
-    const SECURITY_OPTIONS = 'GROUP_SECURITY_OPTIONS';
-    const ELASTIC_OPTIONS = 'GROUP_ELASTIC_OPTIONS';
-    const RECYCLE_BIN_OPTIONS = 'GROUP_RECYCLE_BIN_OPTIONS';
-    const LOGIN_SSO_OPTIONS = 'GROUP_LOGIN_SSO_OPTIONS';
-   	
-    protected $limitSubForms = array();
-    
-    /**
-     * @var array<Kaltura_Client_Type_PlayerDeliveryType>
-     */
-    protected $playerDeliveryTypes = array();
-    
-    public function __construct($options = null)
-    {
-    	if(isset($options['playerDeliveryTypes']))
-    	{
-    		$this->playerDeliveryTypes = $options['playerDeliveryTypes'];
-    		unset($options['playerDeliveryTypes']);
-    	}
-    	parent::__construct($options);
-    }
-    
+	const GROUP_ENABLE_DISABLE_FEATURES = 'GROUP_ENABLE_DISABLE_FEATURES';
+	const GROUP_CONTENT_INGESTION_OPTIONS = 'GROUP_CONTENT_INGESTION_OPTIONS';
+	const GROUP_PUBLISHER_DELIVERY_SETTINGS = 'GROUP_PUBLISHER_DELIVERY_SETTINGS';
+	const GROUP_REMOTE_STORAGE = 'GROUP_REMOTE_STORAGE';
+	const GROUP_NOTIFICATION_CONFIG = 'GROUP_NOTIFICATION_CONFIG';
+	const GROUP_ACCESS_CONTROL = 'GROUP_ACCESS_CONTROL';
+	const THUMBNAIL_CONFIGURATION = 'THUMBNAIL_CONFIGURATION';
+	const SECURITY_OPTIONS = 'GROUP_SECURITY_OPTIONS';
+	const ELASTIC_OPTIONS = 'GROUP_ELASTIC_OPTIONS';
+	const RECYCLE_BIN_OPTIONS = 'GROUP_RECYCLE_BIN_OPTIONS';
+	const LOGIN_SSO_OPTIONS = 'GROUP_LOGIN_SSO_OPTIONS';
+	
+	protected $limitSubForms = array();
+	
+	/**
+	 * @var array<Kaltura_Client_Type_PlayerDeliveryType>
+	 */
+	protected $playerDeliveryTypes = array();
+	
+	public function __construct($options = null)
+	{
+		if(isset($options['playerDeliveryTypes']))
+		{
+			$this->playerDeliveryTypes = $options['playerDeliveryTypes'];
+			unset($options['playerDeliveryTypes']);
+		}
+		parent::__construct($options);
+	}
+	
 	public function init()
 	{
 		$intValidator = new Zend_Validate_Int();
@@ -53,11 +53,11 @@ class Form_PartnerConfiguration extends Infra_Form
 		// Set the method for the display form to POST
 		$this->setMethod('post');
 		$this->setAttrib('id', 'frmPartnerConfigure');
-
+		
 		//$this->setDescription('partner-configure intro text');
 		$this->loadDefaultDecorators();
 		$this->addDecorator('Description', array('placement' => 'prepend'));
-		
+
 //		$this->addElement('text', 'account_name', array(
 //			'label' => 'Publisher Name:',
 //			'decorators' 	=> array('Label', 'Description')
@@ -108,32 +108,32 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 			'value'			=> 'en',
 		));
-
+		
 		$arr = array();
 		foreach(Zend_Registry::get('config')->languages as $language)
 			$arr[$language->id] = $language->name;
 		$this->getElement('language')->setMultiOptions($arr);
 		
 		$this->addElement('checkbox', 'default_entitlement_enforcement', array(
-				'label'	  => 'Default Entitlement Enforcement',
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
-			));
-
-		$this->addElement('checkbox', 'time_aligned_renditions', array(
-		    'label'	  => 'Kaltura Live Streams - Exclude Source Rendition',
-		    'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+			'label'	  => 'Default Entitlement Enforcement',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
-
+		
+		$this->addElement('checkbox', 'time_aligned_renditions', array(
+			'label'	  => 'Kaltura Live Streams - Exclude Source Rendition',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+		));
+		
 		$this->addElement('checkbox', 'enforce_https_api', array(
 			'label'	  => 'Enforce HTTPS API',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
-		
-//--------------------------- Publisher specific Delivery Settings ---------------------------
 
+//--------------------------- Publisher specific Delivery Settings ---------------------------
+		
 		$this->addElement('checkbox', 'enforce_delivery', array(
-				'label'	  => 'Enforce Delivery',
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+			'label'	  => 'Enforce Delivery',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
 		
 		$this->addElement('checkbox', 'checkbox_host', array(
@@ -146,12 +146,12 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('checkbox', 'checkbox_cdn_host', array(
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 		
 		$this->addElement('text', 'cdn_host', array(
-				'label'			=> 'CDN Host:',
-				'filters'		=> array('StringTrim'),
+			'label'			=> 'CDN Host:',
+			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('checkbox', 'checkbox_thumbnail_host', array(
@@ -164,9 +164,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('text', 'delivery_profile_ids', array(
-				'label'			=> "Delivery profile ids (JSON)",
-				'filters'		=> array('StringTrim'),
-				'readonly'		=> true,
+			'label'			=> "Delivery profile ids (JSON)",
+			'filters'		=> array('StringTrim'),
+			'readonly'		=> true,
 		));
 		
 		$this->addElement('text', 'live_delivery_profile_ids', array(
@@ -176,9 +176,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('select', 'deliveryFormat', array(
-				'label'			=> 'Add format',
-				'filters'		=> array('StringTrim'),
-				'registerInArrayValidator' => false,
+			'label'			=> 'Add format',
+			'filters'		=> array('StringTrim'),
+			'registerInArrayValidator' => false,
 		));
 		
 		$this->addElement('select', 'delivery_profile_type', array(
@@ -188,17 +188,17 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('button', 'editDeliveryProfiles', array(
-				'label'		=> 'Add',
-				'decorators'	=> array('ViewHelper'),
+			'label'		=> 'Add',
+			'decorators'	=> array('ViewHelper'),
 		));
-
+		
 		$this->getElement('editDeliveryProfiles')->setAttrib('onClick', 'addDeliveryProfile()');
-
+		
 		$this->addElement('checkbox', 'ignore_synonym_esearch', array(
 			'label'	=> 'Ignore synonyms in eSearch',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
-
+		
 		$this->addElement('checkbox', 'avoid_indexing_search_history', array(
 			'label'	=> 'Avoid indexing search history ',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
@@ -218,18 +218,24 @@ class Form_PartnerConfiguration extends Infra_Form
 		$maxWordsForNgram = $this->getElement('max_word_for_ngram');
 		$maxWordsForNgram->addValidator($intValidator) ;
 		
+		$this->addElement('select', 'search_max_metadata_index_length', array(
+			'label'          => 'Max metadata index length',
+			'filters'        => array('StringTrim'),
+			'multiOptions'   => array(256 => '256', 1024 => '1024', 2048 => '2048', 4096 => '4096', 8192 => '8192'),
+		));
+		
 		$this->addElement('hidden', 'e_search_languages', array(
 			'label'		=> 'e_search_languages',
 			'decorators'	=> array('ViewHelper'),
 		));
-
+		
 		$this->addElement('button', 'editESearchLanguages', array(
-		'label'		=> 'Add Languages',
-		'decorators'	=> array('ViewHelper'),
+			'label'		=> 'Add Languages',
+			'decorators'	=> array('ViewHelper'),
 		));
 		
 		$this->getElement('editESearchLanguages')->setAttrib('onClick', 'addESearchLanguage()');
-
+		
 		$this->addElement('checkbox', 'checkbox_cache_flavor_version', array(
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
@@ -238,7 +244,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Cache Flavor Version:',
 			'filters'		=> array('StringTrim'),
 		));
-
+		
 		$this->addElement('checkbox', 'restrict_thumbnail_by_ks', array(
 			'label'	  => 'Apply access control rule on thumbnail',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'live_stream_enabled')))
@@ -283,10 +289,10 @@ class Form_PartnerConfiguration extends Infra_Form
 				'class'		=> 'delivery_type',
 				'decorators'=> array('ViewHelper', array('Label', array('placement' => 'append')), array('Description', array('escape' => false)), array('HtmlTag',  array('tag' => 'dt')))
 			));
-
+			
 			$permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS][$playerDeliveryType->label] = 'delivery_type_' . $playerDeliveryType->id;
 		}
-		
+
 
 //--------------------------- Remote Storage Account policy ---------------------------
 		$storageServP = new Kaltura_Form_Element_EnumSelect('storage_serve_priority', array('enum' => 'Kaltura_Client_Enum_StorageServePriority'));
@@ -302,13 +308,13 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Import remote source for convert',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
-	
+
 //--------------------------- Advanced Notification settings ---------------------------
 		$this->addElement('text', 'notifications_config', array(
 			'label'			=> 'Notification Configuration:',
 			'filters'		=> array('StringTrim'),
 		));
-
+		
 		$this->addElement('text', 'allowed_from_email_white_list', array(
 			'label'			=> 'Allowed From Email WhiteList Notifications:',
 			'filters'		=> array('StringTrim'),
@@ -322,11 +328,11 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('text', 'def_thumb_offset', array(
 			'label'	  => 'Default Thumbnail Offset',
 		));
-
+		
 		$this->addElement('text', 'def_thumb_density', array(
 			'label'	  => 'Default Thumbnail Density',
 		));
-
+		
 		$this->addElement('checkbox', 'enable_bulk_upload_notifications_emails', array(
 			'label'	  => 'Bulk Upload Notifications Emails (Legacy)',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
@@ -368,7 +374,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('hidden', 'password_structure_validations', array(
 			'decorators'	=> array('ViewHelper'),
 		));
-		
+
 
 //--------------------------- Single Sign On ---------------------------
 		
@@ -378,17 +384,17 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 
 //--------------------------- Access Control ---------------------------
-
+		
 		$this->addElement('text', 'api_access_control_id', array(
 			'label'			=> 'API Access Control ID:',
 			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('checkbox', 'restrict_entry_by_metadata', array(
-				'label'	  => 'Apply access control on entry metadata',
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
+			'label'	  => 'Apply access control on entry metadata',
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
-		
+
 
 //--------------------------- Group Association ---------------------------
 		$partnerGroupTypes = new Kaltura_Form_Element_EnumSelect('partner_group_type', array('enum' => 'Kaltura_Client_Enum_PartnerGroupType'));
@@ -399,7 +405,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Parent Account Id:',
 			'filters'		=> array('StringTrim'),
 		));
-
+		
 		$this->addElement ('text','reference_id', array(
 			'label'			=> 'Reference Id:',
 			'filters'		=> array('StringTrim'),
@@ -435,13 +441,13 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Internal Use Account',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
-		
+
 //--------------------------- New Account Options ---------------------------
 		
 		$this->addElement('button', 'monitor_usage_history', array(
 			'label'	  => 'View History',
 		));
-
+		
 		$this->addElement('checkbox', 'extended_free_trail', array(
 			'label'	  => 'Extended Free Trial',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
@@ -460,7 +466,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'	  => 'Force First Login Message in KMC',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('class' => 'partner_configuration_checkbox_field_only')))
 		));
-		
+
 
 //--------------------------- Included Usage ---------------------------
 		$element = new Zend_Form_Element_Hidden('includedUsageLabel');
@@ -472,9 +478,9 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addElement('radio', 'mothly_bandwidth_combined', array(
 			'label'	  => 'Mothly Bandwidth:',
 			'multiOptions' => array(
-					        '1'=>'Combined Usage:',
-					        '2'=>'Separated Usage:'),
-					        
+				'1'=>'Combined Usage:',
+				'2'=>'Separated Usage:'),
+			
 			'decorators' => array('ViewHelper', array('HtmlTag',  array('tag' => 'dt', 'id' => 'mothly_bandwidth_combined')))
 		));
 		
@@ -483,12 +489,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 		
-	//--------------- Live Stream Params ----------------------------
+		//--------------- Live Stream Params ----------------------------
 		$sourceTypes = array(Kaltura_Client_Enum_SourceType::AKAMAI_LIVE => 'Akamai Live');
-
+		
 		$this->addElement('select', 'default_live_stream_entry_source_type', array(
-		   'label'   => 'Live Stream source type:',
-		   'filters'  => array('StringTrim')));
+			'label'   => 'Live Stream source type:',
+			'filters'  => array('StringTrim')));
 		$this->getElement('default_live_stream_entry_source_type')->setMultiOptions($sourceTypes);
 		
 		$this->addElement('text', 'live_stream_provision_params', array(
@@ -497,18 +503,18 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addElement('text', 'default_live_stream_segment_duration', array(
-				'label'			=> 'Default segment duration (Kaltura Live):',
-				'filters'		=> array('StringTrim'),
+			'label'			=> 'Default segment duration (Kaltura Live):',
+			'filters'		=> array('StringTrim'),
 		));
-
-        $this->addElement('text', 'default_recording_conversion_profile', array(
-            'label'			=> 'Default Recording Conversion Profile:',
-            'filters'		=> array('StringTrim'),
-        ));
-
-
+		
+		$this->addElement('text', 'default_recording_conversion_profile', array(
+			'label'			=> 'Default Recording Conversion Profile:',
+			'filters'		=> array('StringTrim'),
+		));
+		
+		
 		//--------------- Host white list ----------------------------
-
+		
 		$this->addElement('text', 'cdn_host_white_list', array(
 			'label'			=> 'CDN Host white list regex (comma seperated)',
 			'filters'		=> array('StringTrim'),
@@ -518,8 +524,8 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Allowed domains:',
 			'filters'		=> array('StringTrim'),
 		));
-
-
+		
+		
 		//--------------- HTML purifier behaviour ----------------------------
 		$htmlPurifierOptions = array(
 			Kaltura_Client_Enum_HTMLPurifierBehaviourType::IGNORE => 'Ignore',
@@ -531,7 +537,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label' => 'HTML Purifier Behaviour',
 			'filters' => array('StringTrim')));
 		$this->getElement('html_purifier_behaviour')->setMultiOptions($htmlPurifierOptions);
-
+		
 		$this->addElement('checkbox', 'html_purifier_base_list_usage', array(
 			'label'	  => 'Use only basic list for purification',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
@@ -548,43 +554,43 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 		$this->addLimitsElements();
-
-
+		
+		
 		//--------------- Publisher Environment ----------------------------
-
+		
 		$publisherEnvironmentOptions = array(
 			Kaltura_Client_Enum_PublisherEnvironmentType::OVP => 'OVP',
 			Kaltura_Client_Enum_PublisherEnvironmentType::OTT=> 'OTT',
 			Kaltura_Client_Enum_PublisherEnvironmentType::HYBRID => 'Hybrid',
 		);
-
+		
 		$this->addElement('select', 'publisher_environment_type', array(
 			'label' => 'Publisher Environment Type',
 			'filters' => array('StringTrim')));
 		$this->getElement('publisher_environment_type')->setMultiOptions($publisherEnvironmentOptions);
-
+		
 		$this->addElement('text', 'ovp_environment_url', array(
 			'label'			=> 'OVP environment url',
 			'filters'		=> array('StringTrim'),
 		));
-
+		
 		$this->addElement('text', 'ott_environment_url', array(
 			'label'			=> 'OTT environment url',
 			'filters'		=> array('StringTrim'),
 		));
 
 //--------------------------- Authentication Settings ---------------------------
-
+		
 		$this->addElement('checkbox', 'use_two_factor_authentication', array(
 			'label'	  => 'Use two factor authentication',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
-
+		
 		$this->addElement('checkbox', 'use_sso', array(
 			'label'	  => 'Use SSO',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
 		));
-
+		
 		$this->addElement('checkbox', 'block_direct_login', array(
 			'label'	  => 'Block direct login for SSO users',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field_only')))
@@ -605,7 +611,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->getElement('two_factor_authentication_mode')->setMultiOptions($twoFactorAuthenticationMode);
 
 //--------------------------- Self Serve Settings ---------------------------
-
+		
 		$this->addElement('checkbox', 'is_self_serve', array(
 			'label'	  => 'is Self Serve',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
@@ -615,7 +621,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Event Platform Allowed Templates:',
 			'filters'		=> array('StringTrim'),
 		));
-		
+
 //--------------------------- Recycle Bin Settings ---------------------------
 		
 		$recycleBinRetentionPeriod = new Kaltura_Form_Element_EnumSelect('recycle_bin_retention_period', array('enum' => 'Kaltura_Client_Enum_RecycleBinRetentionPeriod'));
@@ -626,7 +632,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$moduls = Zend_Registry::get('config')->moduls;
 		if ($moduls)
 		{
-	
+			
 			foreach($moduls as $name => $modul)
 			{
 				if ($modul->skip)
@@ -648,9 +654,9 @@ class Form_PartnerConfiguration extends Infra_Form
 					$element = $this->getElement($modul->permissionName);
 					$element->setDescription('<a class=linkToPage href="../'.$modul->indexLink.'">(config)</a>');
 					$element->addDecorators(array('ViewHelper',
-				        array('Label', array('placement' => 'append')),
-				        array('Description', array('escape' => false, 'tag' => false)),
-				      ));
+						array('Label', array('placement' => 'append')),
+						array('Description', array('escape' => false, 'tag' => false)),
+					));
 				}
 				$permissionNames[$modul->group][$modul->label] = $modul->permissionName;
 			}
@@ -661,9 +667,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			));
 			
 			$permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]['Content Moderation'] = 'moderate_content';
-		   	$permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
+			$permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Default Entitlement Enforcement'] = 'default_entitlement_enforcement';
 			$permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Enforce HTTPS API'] = 'enforce_https_api';
-		   	$permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Kaltura Live Streams - Exclude Source Rendition'] = 'time_aligned_renditions';
+			$permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]['Kaltura Live Streams - Exclude Source Rendition'] = 'time_aligned_renditions';
 			ksort($permissionNames[self::GROUP_ENABLE_DISABLE_FEATURES]);
 			ksort($permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS]);
 			ksort($permissionNames[self::GROUP_REMOTE_STORAGE]);
@@ -678,21 +684,21 @@ class Form_PartnerConfiguration extends Infra_Form
 		//adding display group to all features
 		
 		$this->addElement('checkbox', 'checkbox_audio_thumb_entry_id', array(
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 		
 		$this->addElement('text', 'audio_thumb_entry_id', array(
-				'label'   => 'Image Entry ID For Audio Entry Thumbnails:',
-				'filters'             => array('StringTrim'),
+			'label'   => 'Image Entry ID For Audio Entry Thumbnails:',
+			'filters'             => array('StringTrim'),
 		));
-
+		
 		$this->addElement('checkbox', 'checkbox_live_thumb_entry_id', array(
-				'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'dt', 'class' => 'partner_configuration_checkbox_field')))
 		));
 		
 		$this->addElement('text', 'live_thumb_entry_id', array(
-				'label'   => 'Image Entry ID For Live Entry Thumbnails:',
-				'filters'             => array('StringTrim'),
+			'label'   => 'Image Entry ID For Live Entry Thumbnails:',
+			'filters'             => array('StringTrim'),
 		));
 		
 		$permissionNames[self::THUMBNAIL_CONFIGURATION]['checkbox audio thumb entry id'] = 'checkbox_audio_thumb_entry_id';
@@ -708,7 +714,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		foreach ($displayGroups as $displayGroup)
 		{
 			$displayGroup->removeDecorator ('label');
-	  		$displayGroup->removeDecorator('DtDdWrapper');
+			$displayGroup->removeDecorator('DtDdWrapper');
 		}
 		//creating divs for left right dividing
 		$this->setDisplayColumn('generalInformation',  'recycleBin', true);
@@ -731,18 +737,18 @@ class Form_PartnerConfiguration extends Infra_Form
 		}
 		
 		$openLeftDisplayGroup = $this->getDisplayGroup($firstColumnElement);
-    	$openLeftDisplayGroup->setDecorators(array(
-             'FormElements',
-             'Fieldset',
-             array('HtmlTag',array('tag'=>'div','openOnly'=>true,'class'=> $class))
-    	 ));
-	
-    	$closeLeftDisplayGroup = $this->getDisplayGroup($lastColumnElement);
-    	$closeLeftDisplayGroup->setDecorators(array(
-             'FormElements',
-             'Fieldset',
-              array('HtmlTag',array('tag'=>'div','closeOnly'=>true))
-     	));
+		$openLeftDisplayGroup->setDecorators(array(
+			'FormElements',
+			'Fieldset',
+			array('HtmlTag',array('tag'=>'div','openOnly'=>true,'class'=> $class))
+		));
+		
+		$closeLeftDisplayGroup = $this->getDisplayGroup($lastColumnElement);
+		$closeLeftDisplayGroup->setDecorators(array(
+			'FormElements',
+			'Fieldset',
+			array('HtmlTag',array('tag'=>'div','closeOnly'=>true))
+		));
 	}
 	
 	/**
@@ -852,24 +858,24 @@ class Form_PartnerConfiguration extends Infra_Form
 			}
 		}
 		
-        $element = $this->getElement('use_default_streamers');
-        $element->setAttrib('checked', is_null($object->customDeliveryTypes) || !count($object->customDeliveryTypes));
+		$element = $this->getElement('use_default_streamers');
+		$element->setAttrib('checked', is_null($object->customDeliveryTypes) || !count($object->customDeliveryTypes));
 		if(!is_null($object->customDeliveryTypes))
 		{
 			foreach($object->customDeliveryTypes as $customDeliveryType)
 			{
 				/* @var $customDeliveryType Kaltura_Client_Type_KeyBooleanValue */
-		        $element = $this->getElement('delivery_type_' . $customDeliveryType->key);
+				$element = $this->getElement('delivery_type_' . $customDeliveryType->key);
 				if ($customDeliveryType->value)
 					$element->setAttrib('data-checked', true);
 				else
-			        $element->setAttrib('data-checked', false);
+					$element->setAttrib('data-checked', false);
 			}
 		}
 		
 		if(!$object->permissions || !count($object->permissions))
 			return;
-			
+		
 		foreach($object->permissions as $permission){
 			$this->setDefault($permission->name, ($permission->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE));
 		}
@@ -900,12 +906,12 @@ class Form_PartnerConfiguration extends Infra_Form
 			
 			if(is_null($systemPartnerConfiguration->permissions))
 				$systemPartnerConfiguration->permissions = array();
-				
+			
 			foreach($moduls as $name => $modul)
 			{
 				if(!$modul->enabled)
 					continue;
-					
+				
 				$permission = new Kaltura_Client_Type_Permission();
 				$permission->type = $modul->permissionType;
 				$permission->name = $modul->permissionName;
@@ -913,7 +919,7 @@ class Form_PartnerConfiguration extends Infra_Form
 				
 				if(!isset($properties[str_replace('.', '', $modul->permissionName)]) || !$properties[str_replace('.', '', $modul->permissionName)])
 					$permission->status = Kaltura_Client_Enum_PermissionStatus::BLOCKED;
-					
+				
 				$systemPartnerConfiguration->permissions[] = $permission;
 				
 				if (($modul->basePermissionName != '') && ($modul->basePermissionType != '')){
@@ -960,7 +966,7 @@ class Form_PartnerConfiguration extends Infra_Form
 				}
 			}
 		}
-
+		
 		$systemPartnerConfiguration->customDeliveryTypes = array();
 		if(!isset($properties['use_default_streamers']) || !$properties['use_default_streamers'])
 		{
@@ -968,7 +974,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			{
 				/** @var Kaltura_Client_Type_PlayerDeliveryType $playerDeliveryType */
 				$deliveryEnabled = isset($properties["delivery_type_{$playerDeliveryType->id}"]) && $properties["delivery_type_{$playerDeliveryType->id}"];
-
+				
 				// save custom delivery type only if it's different than system's default
 				if ($deliveryEnabled != $playerDeliveryType->enabledByDefault)
 				{
@@ -1005,13 +1011,13 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$monthlyStreamsSubForm = new Form_PartnerConfigurationOveragedLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES, 'Monthly Streams:');
 		$this->addLimitSubForm($monthlyStreamsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES);
-
+		
 		$numberOfEndUsersSubForm = new Form_PartnerConfigurationOveragedLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS, 'Number of End-Users:');
 		$this->addLimitSubForm($numberOfEndUsersSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS);
 		
 		$numberOfEntriesSubForm = new Form_PartnerConfigurationOveragedLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES, 'Number of videos allowed:');
 		$this->addLimitSubForm($numberOfEntriesSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES);
-
+		
 		$accessControlsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS, 'Maximum access control profiles:');
 		$this->addLimitSubForm($accessControlsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS);
 		
@@ -1026,7 +1032,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$liveRtcStreamsSubForm = new Form_PartnerConfigurationLimitSubForm(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS, 'Concurrent Live RTC streams:');
 		$liveRtcStreamsSubForm->requirePartnerPermission(Kaltura_Client_Enum_PermissionName::FEATURE_SELF_SERVE);
 		$this->addLimitSubForm($liveRtcStreamsSubForm, Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS);
-
+		
 		//Add dynamic limits from admin.ini
 		$limitLiveByAdminTag = Zend_Registry::get('config')->limitLiveByAdminTag ? Zend_Registry::get('config')->limitLiveByAdminTag : array();
 		foreach($limitLiveByAdminTag as $limit)
@@ -1035,7 +1041,7 @@ class Form_PartnerConfiguration extends Infra_Form
 			$limitSubForm = new Form_PartnerConfigurationLimitByAdminTagSubForm($limitType, $limit->label, $limit->adminTag);
 			$this->addLimitSubForm($limitSubForm, $limitType);
 		}
-
+		
 	}
 	/**
 	 * split the form elements into different display groups
@@ -1049,27 +1055,29 @@ class Form_PartnerConfiguration extends Infra_Form
 		
 		$this->addDisplayGroup(array_merge(array('delivery_profile_ids', 'live_delivery_profile_ids', 'deliveryFormat', 'delivery_profile_type', 'editDeliveryProfiles', 'enforce_delivery', 'checkbox_host', 'host', 'checkbox_cdn_host', 'cdn_host', 'checkbox_thumbnail_host', 'thumbnail_host', 'checkbox_cache_flavor_version', 'cache_flavor_version', 'support_animated_thumbnails'), $permissionNames[self::GROUP_PUBLISHER_DELIVERY_SETTINGS], array ('crossLine')), 'publisherSpecificDeliverySettings', array('legend' => 'Publisher Specific Delivery Settings'));
 		$this->addDisplayGroup(array_merge(array('storage_serve_priority', 'storage_delete_from_kaltura','import_remote_source_for_convert'), $permissionNames[self::GROUP_REMOTE_STORAGE] ,array('crossLine')), 'remoteStorageAccountPolicy', array('legend' => 'Remote Storage Policy'));
-
+		
 		$this->addDisplayGroup(array_merge(array('notifications_config', 'allowed_from_email_white_list', 'allow_multi_notification'), $permissionNames[self::GROUP_NOTIFICATION_CONFIG] ,array('crossLine')), 'advancedNotificationSettings', array('legend' => 'Advanced Notification Settings'));
 		$this->addDisplayGroup(array_merge(array('def_thumb_offset','def_thumb_density') , $permissionNames[self::GROUP_CONTENT_INGESTION_OPTIONS], array('enable_bulk_upload_notifications_emails', 'bulk_upload_notifications_email', 'crossLine')), 'publisherSpecificIngestionSettings', array('legend' => 'Content Ingestion Options'));
 		$this->addDisplayGroup(array('logout_url', 'crossLine'), 'signSignOn', array('legend' => 'Sign Sign On'));
 		$this->addDisplayGroup(array_merge(array('api_access_control_id', 'restrict_entry_by_metadata'), $permissionNames[self::GROUP_ACCESS_CONTROL], array('crossLine')), 'apiAccessControlIdGroup', array('legend' => 'Access Control'));
 		$this->addDisplayGroup(array_merge(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
-									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
-									 'login_block_period',
-									 'num_prev_pass_to_keep',
-									 'pass_replace_freq',
-									 'password_structure_validations_edit'),
-									 $permissionNames[self::SECURITY_OPTIONS],
-									array('crossLine')),
-									 'passwordSecurity', array('legend' => 'Password Security'));
+			// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
+			'login_block_period',
+			'num_prev_pass_to_keep',
+			'pass_replace_freq',
+			'password_structure_validations_edit'),
+			$permissionNames[self::SECURITY_OPTIONS],
+			array('crossLine')),
+			'passwordSecurity', array('legend' => 'Password Security'));
 		
 		$this->addDisplayGroup(array_merge(array('secondary_secret_role_id',),
-		                                   array('crossLine')), 'security', array('legend' => 'Security'));
+			array('crossLine')), 'security', array('legend' => 'Security'));
 		$this->addDisplayGroup(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'ALLOW_SSO_PER_USER',
-		                                   'two_factor_authentication_mode', 'crossLine'), 'authenticationSettings', array('legend' => 'Authentication Settings'));
-		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram'),
-		                                   array('crossLine'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
+			'two_factor_authentication_mode', 'crossLine'), 'authenticationSettings', array('legend' => 'Authentication Settings'));
+		
+		$this->addDisplayGroup(array_merge(array('ignore_synonym_esearch','avoid_indexing_search_history','editESearchLanguages','e_search_languages','trigram_percentage','max_word_for_ngram', 'search_max_metadata_index_length'),
+			array('crossLine'),$permissionNames[self::ELASTIC_OPTIONS]),'elasticSearch', array('legend' => 'Elastic Search Options'));
+		
 		$this->addDisplayGroup(array_merge($permissionNames[self::RECYCLE_BIN_OPTIONS], array('recycle_bin_retention_period')),'recycleBin', array('legend' => 'Recycle Bin Options'));
 		$this->addDisplayGroup(array('partner_package'), 'accountPackagesService', array('legend' => 'Service Packages'));
 		$this->addDisplayGroup(array('partner_package_class_of_service', 'vertical_clasiffication', 'crm_id', 'crm_link', 'internal_use', 'crossLine'), 'accountPackages');
@@ -1078,53 +1086,53 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array('is_first_login', 'crossLine'), 'accountOptions');
 		$this->addDisplayGroup(array('is_self_serve', 'event_platform_allowed_templates', 'crossLine'), 'selfServeSettings', array('legend' => 'Self Serve Settings'));
 		$this->addDisplayGroup(array('includedUsageLabel', 'mothly_bandwidth_combined',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overageUnit',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_overageUnit',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overageUnit'
-									),'includedUsage', array('legend' => 'Included Usage'));
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_max',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overagePrice',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE_AND_BANDWIDTH.'_overageUnit',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_max',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_overagePrice',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_BANDWIDTH.'_overageUnit',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_max',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overagePrice',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STORAGE.'_overageUnit'
+		),'includedUsage', array('legend' => 'Included Usage'));
 		$this->addDisplayGroup(array(
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
-									'excluded_admin_role_name',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
-									), 'configureKmcUsers');
-
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
+			'excluded_admin_role_name',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_max',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overagePrice',
+			Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ADMIN_LOGIN_USERS.'_overageUnit',
+		), 'configureKmcUsers');
+		
 		$dynamicLimitTypes = array();
 		$limitLiveByAdminTag = Zend_Registry::get('config')->limitLiveByAdminTag ? Zend_Registry::get('config')->limitLiveByAdminTag : array();
 		foreach($limitLiveByAdminTag as $limit)
 		{
 			$dynamicLimitTypes[] = Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_CONCURRENT_BY_ADMIN_TAG . "_$limit->adminTag" . '_max';
 		}
-
+		
 		$this->addDisplayGroup(array_merge(array(
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_overageUnit',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES.'_overageUnit',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS.'_overageUnit',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overagePrice',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overageUnit',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',
-									Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max',
-									)
-									, $dynamicLimitTypes, array('crossLine')), 'includedUsageSecondPart');
-
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_max',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_overagePrice',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::PUBLISHERS.'_overageUnit',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES.'_max',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES.'_overagePrice',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::MONTHLY_STREAM_ENTRIES.'_overageUnit',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS.'_max',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS.'_overagePrice',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::END_USERS.'_overageUnit',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_max',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overagePrice',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ENTRIES.'_overageUnit',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::ACCESS_CONTROLS.'_max',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_INPUTS.'_max',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_STREAM_OUTPUTS.'_max',
+				Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::LIVE_RTC_STREAM_INPUTS.'_max',
+			)
+			, $dynamicLimitTypes, array('crossLine')), 'includedUsageSecondPart');
+		
 		$this->addDisplayGroup(
 			array_merge(
 				array('default_live_stream_entry_source_type', 'live_stream_provision_params', 'default_live_stream_segment_duration', 'default_recording_conversion_profile'),
@@ -1134,7 +1142,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		);
 		$this->addDisplayGroup(array('allowed_domains','cdn_host_white_list'), 'cdnHostWhiteList');
 		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
-
+		
 		$this->addDisplayGroup(
 			array_merge(
 				array('publisher_environment_type', 'ovp_environment_url', 'ott_environment_url'),
@@ -1142,9 +1150,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			'publisherEnvironmentType',
 			array('legend' => 'Publisher Environment Settings')
 		);
-
-
-
+		
+		
+		
 	}
 	
 	protected function addLimitSubForm($subForm, $subFormName)
@@ -1155,26 +1163,26 @@ class Form_PartnerConfiguration extends Infra_Form
 	}
 	
 	/**
-     * Validate the form
-     *
-     * @param  array $data
-     * @return boolean
-     */
-    public function isValid($data)
-    {
-    	if (isset($data['extended_free_trail']) && $data['extended_free_trail']){
-		    $extended_free_trail_expiry_date = $this->getElement('extended_free_trail_expiry_date');
-		    $extended_free_trail_expiry_date->setRequired(true);
-		    $date = new Zend_Validate_Date('M/d/Y');
-		    $extended_free_trail_expiry_date->addValidator($date);
-		    $extended_free_trail_expiry_reason = $this->getElement('extended_free_trail_expiry_reason');
-    		$extended_free_trail_expiry_reason->setRequired(true);
-    	}
-    	
-    	
-    	return parent::isValid($data);
-    }
-
+	 * Validate the form
+	 *
+	 * @param  array $data
+	 * @return boolean
+	 */
+	public function isValid($data)
+	{
+		if (isset($data['extended_free_trail']) && $data['extended_free_trail']){
+			$extended_free_trail_expiry_date = $this->getElement('extended_free_trail_expiry_date');
+			$extended_free_trail_expiry_date->setRequired(true);
+			$date = new Zend_Validate_Date('M/d/Y');
+			$extended_free_trail_expiry_date->addValidator($date);
+			$extended_free_trail_expiry_reason = $this->getElement('extended_free_trail_expiry_reason');
+			$extended_free_trail_expiry_reason->setRequired(true);
+		}
+		
+		
+		return parent::isValid($data);
+	}
+	
 	/**
 	 * calculating the limitTypeKey according to the type of the limit
 	 * @param  $limit
@@ -1184,5 +1192,5 @@ class Form_PartnerConfiguration extends Infra_Form
 	{
 		return $limit instanceof Kaltura_Client_SystemPartner_Type_SystemPartnerLiveAdminTagLimit ? $limit->type . '_' . $limit->adminTag : $limit->type;
 	}
-
+	
 }
