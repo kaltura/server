@@ -227,18 +227,6 @@ class kmcngAction extends kalturaAction
 		$playerWrapper = array(
                     "uri" => '/apps/kmcng/' . $kmcngParams["kmcng_version"] . "/public/playerWrapper.html"
                 );
-		
-		$authBrokerBaseUrl = null;
-		if (kConf::hasParam('authBrokerBaseUrl'))
-		{
-			$authBrokerBaseUrl = kConf::get('authBrokerBaseUrl');
-		}
-		
-		$appRegistryBaseUrl = null;
-		if (kConf::hasParam('appRegistryBaseUrl'))
-		{
-			$appRegistryBaseUrl = kConf::get('appRegistryBaseUrl');
-		}
 
 		$config = array(
 			'ks' =>  ($this->getRequest()->getMethod() == sfRequest::POST && $this->getRequest()->getParameter('ks')) ? $this->getKs() : null,
@@ -274,10 +262,10 @@ class kmcngAction extends kalturaAction
 				"uploads" => $kmcngParams['uploads'],
 				"live" => $kmcngParams['live']
 			),
-			'authBrokerServer' => array(
-				'authBrokerBaseUrl' => $authBrokerBaseUrl,
-				'appRegistryBaseUrl' => $appRegistryBaseUrl
-			)
+			'externalServices' => array(
+				'authBrokerServer' => array('uri' => kConf::get('auth_broker_base_url', 'local', '')),
+				'appRegistryServer' => array('uri' => kConf::get('app_registry_base_url', 'local', ''))
+			),
 		);
 
 		return $config;
