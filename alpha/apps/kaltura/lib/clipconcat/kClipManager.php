@@ -1308,7 +1308,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$extraParams = '';
 		if($conversionData)
 		{
+			// for multi clip flow, reset the original values of the flavor params (-1) and edit the necessary fields for the current clip
 			$this->resetFlavorParamsObject($flavorParamsObj);
+			$originalConversionEnginesExtraParams = $flavorParamsObj->getConversionEnginesExtraParams();
 			if(isset($conversionData[self::EXTRA_CONVERSION_PARAMS]))
 			{
 				$extraParams = $conversionData[self::EXTRA_CONVERSION_PARAMS];
@@ -1332,8 +1334,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		if($conversionParams)
 		{
 			$flavorParamsObj->setForceFrameToMultiplication16(0);
-			$flavorParamsObj->setAspectRatioProcessingMode(0);
-			$flavorParamsObj->setIsAvoidVideoShrinkFramesizeToSource(0);
 			$flavorParamsObj->setHeight($conversionParams[self::HEIGHT]);
 			if(isset($conversionParams[self::FRAME_RATE]))
 			{
@@ -1361,6 +1361,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 */
 	protected function resetFlavorParamsObject(&$flavorParamsObj)
 	{
+		$flavorParamsObj->setAspectRatioProcessingMode(0);
+		$flavorParamsObj->setIsAvoidVideoShrinkFramesizeToSource(0);
+
 		/** @var flavorParams $flavorParamsObj*/
 		if($flavorParamsObj->getColumnsOldValue(assetParamsPeer::FRAME_RATE))
 		{

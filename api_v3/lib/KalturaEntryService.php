@@ -1974,8 +1974,7 @@ class KalturaEntryService extends KalturaBaseService
 				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
 			}
 
-			// if difference between audio and video durations is more than 0.5s then block
-			if(($mediaInfoObj->getVideoDuration() - $mediaInfoObj->getAudioDuration()) / 1000 >= 0.5)
+			if(!$mediaInfoObj->getAudioDuration())
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $sourceEntryId);
 			}
