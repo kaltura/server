@@ -90,7 +90,19 @@ class MicroServiceBaseService
 		$startTime = microtime(true);
 		$response = curl_exec($ch);
 		$timeTook = microtime(true) - $startTime;
-
+		
+		if (class_exists('KalturaMonitorClient'))
+		{
+			KalturaMonitorClient::monitorCurl(parse_url($this->serviceUrl, PHP_URL_HOST), $timeTook, $ch);
+		}
+		
+		$requestInfo = array(
+			'requestUrl' => $requestUrl,
+			'requestHeaders' => $requestHeaders,
+			'requestBody' => $requestParams
+		);
+		
+		KalturaLog::debug('Microservice request data: ' . print_r($requestInfo, true));
 		KalturaLog::debug('Microservice request took - ' . $timeTook. ' seconds');
 
 		$curlError = curl_error($ch);
@@ -126,5 +138,47 @@ class MicroServiceBaseService
 
 		//return json
 		return $result;
+	}
+	
+	protected static function getMicroservicesCache()
+	{
+		return kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_MICROSERVICES);
+	}
+	
+	protected static function getFromCache($key)
+	{
+		$cache = MicroServiceBaseService::getMicroservicesCache();
+		if (!$cache)
+		{
+			return false;
+		}
+		
+		$value = $cache->get($key);
+		if (!$value)
+		{
+			KalturaLog::debug("Cache value for key [$key] not found");
+			return false;
+		}
+		
+		KalturaLog::debug("Cache value for key [$key] found, value [$value]");
+		return $value;
+	}
+	
+	protected static function addToCache($key, $value, $expiry = 86000)
+	{
+		$cache = MicroServiceBaseService::getMicroservicesCache();
+		if (!$cache)
+		{
+			return;
+		}
+		
+		$res = $cache->add($key, $value, $expiry);
+		
+		if (!$res)
+		{
+			KalturaLog::debug("Failed to save key [$key] to cache - already stored?");
+		}
+		
+		KalturaLog::debug("Saved key [$key] to cache");
 	}
 }

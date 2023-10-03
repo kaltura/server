@@ -4,7 +4,7 @@
 /**
  * Skeleton subclass for performing query and update operations on the 'user_role' table.
  *
- * 
+ *
  *
  * You should add additional methods to this class to meet the
  * application requirements.  This class will only be generated as
@@ -24,7 +24,7 @@ class UserRolePeer extends BaseUserRolePeer
 			self::$s_criteria_filter = new criteriaFilter ();
 		}
 		
-		$c = new myCriteria(); 
+		$c = new myCriteria();
 		$c->addAnd ( UserRolePeer::STATUS, UserRoleStatus::DELETED, Criteria::NOT_EQUAL);
 		self::$s_criteria_filter->setFilter ( $c );
 	}
@@ -40,12 +40,12 @@ class UserRolePeer extends BaseUserRolePeer
 	{
 		if(!$idsString)
 			return true;
-			
+		
 		$ids = explode(',', trim($idsString));
 		
 		if (count($ids) > 1)
 		{
-			throw new kPermissionException('', kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED);	
+			throw new kPermissionException('', kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED);
 		}
 		
 		foreach ($ids as $id)
@@ -60,7 +60,7 @@ class UserRolePeer extends BaseUserRolePeer
 		return true;
 	}
 	
-		
+	
 	public static function getIdByStrId($strId)
 	{
 		// try to get strId to id mapping form cache
@@ -96,7 +96,7 @@ class UserRolePeer extends BaseUserRolePeer
 		if (!$id) {
 			KalturaLog::log("UserRole with str_id [$strId] not found in DB!");
 		}
-		return $id;		
+		return $id;
 	}
 	
 	
@@ -117,9 +117,9 @@ class UserRolePeer extends BaseUserRolePeer
 		UserRolePeer::setUseCriteriaFilter(true);
 		return $userRole;
 	}
-		
+	
 	public static function getCacheInvalidationKeys()
 	{
-		return array(array("userRole:id=%s", self::ID), array("userRole:systemName=%s", self::SYSTEM_NAME));		
+		return array(array("userRole:id=%s", self::ID), array("userRole:systemName=%s", self::SYSTEM_NAME));
 	}
 } // UserRolePeer

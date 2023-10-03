@@ -40,6 +40,7 @@ class kCacheManager
 	const CACHE_TYPE_DRUID_QUERIES = 'druidQueries';
 	const CACHE_TYPE_PLAYS_VIEWS = 'playsViews';
 	const CACHE_TYPE_AVRO_SCHEMAS = 'avroSchemas';
+	const CACHE_TYPE_MICROSERVICES = 'microservices';
 
 	protected static $caches = array();
 	
