@@ -50,7 +50,6 @@ class KAsyncConcat extends KJobHandlerWorker
 		// creates a temp file path
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
-		$this->concatMethod = isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
 
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
@@ -101,6 +100,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath.".mp4" : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
+		$this->concatMethod = !$data->multiSource && isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
 
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
@@ -232,9 +232,13 @@ class KAsyncConcat extends KJobHandlerWorker
 		 */
 		$clipStr = null;
 		if(isset($clipStart))
+		{
 			$clipStr = "-ss $clipStart";
+		}
 		if(isset($clipDuration))
+		{
 			$clipStr.= " -t $clipDuration";
+		}
 		if ($shouldSort)
 		{
 			sort($filesArr);
@@ -410,7 +414,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			kFile::unlink($concatStr);
 		}
 		
-		return ($rv == 0) ? true : false;
+		return $rv == 0;
 	}
 	
 	protected function concatFilesArr($filesArr, $outFileName)
