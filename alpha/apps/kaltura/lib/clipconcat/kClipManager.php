@@ -668,7 +668,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$this->updateKeyFrequency($aspectRatios, $currentWidth/$currentHeight, $duration);
 			if(!$resourceData[self::IMAGE_TO_VIDEO])
 			{
-				$this->updateKeyFrequency($allAudioChannels, $mediaInfoObj->getAudioChannels(), $duration);
+				$allAudioChannels[] = $mediaInfoObj->getAudioChannels();
 				$this->updateKeyFrequency($allAudioSampleRates, $mediaInfoObj->getAudioSamplingRate(), $duration);
 				$frameRate = max($frameRate, $mediaInfoObj->getVideoFrameRate());
 			}
@@ -750,7 +750,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function decideAudioChannels(array $allAudioChannels)
 	{
-		return self::DEFAULT_AUDIO_CHANNELS;
+		return min($allAudioChannels);
 	}
 
 	protected function limitByMaxProfileResolution($conversionProfileId, $aspectRatio, &$width, &$height)
