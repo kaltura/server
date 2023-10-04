@@ -16,6 +16,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const CONVERSION_PARAMS = 'conversionParams';
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
 	const VIDEO_DURATION = 'videoDuration';
+	const AUDIO_DURATION = 'audioDuration';
 	const EXTRA_CONVERSION_PARAMS = 'extraConversionParams';
 	const TEMP_ENTRY = 'tempEntry';
 	const SOURCE_ENTRY = 'sourceEntry';
@@ -709,6 +710,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$currentConversionParams[self::HEIGHT] = $height;
 			$currentConversionParams[self::AUDIO_CHANNELS] = $audioChannels;
 			$currentConversionParams[self::AUDIO_SAMPLE_RATE] = $audioSampleRate;
+			$currentConversionParams[self::VIDEO_DURATION] = $mediaInfoObj->getVideoDuration();
+			$currentConversionParams[self::AUDIO_DURATION] = $mediaInfoObj->getAudioDuration();
 
 			if($mediaInfoObj->getVideoWidth() != $width)
 			{
@@ -1096,7 +1099,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		{
 			$lastAssetId = null;
 			$allRelatedFiles = array();
-			$imageConvertCommands = array();
+			$convertCommands = array();
 			foreach ($clipConcatJobs as $clipConcatJob)
 			{
 				KalturaLog::debug('Going To Start Concat Job for Multi Clip Concat');
@@ -1120,7 +1123,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					foreach ($relatedFiles as $relatedFile)
 					{
 						$allRelatedFiles[] = $relatedFile;
-						$imageConvertCommands[] = $imageToVideo ? $this->getConvertImageCommand($jobData) : "-";
+						$convertCommands[] = $this->getConvertCommandForFile($jobData);
 					}
 					KalturaLog::debug("Asset Id: [$flavorAssetId], Related file : " . print_r($relatedFiles, true));
 					// assume concatenated assets have the same actualFlavorParamsId and take the last
@@ -1135,22 +1138,44 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 			// create one target flavor asset for all clip concat jobs
 			$targetFlavorAsset = $this->addNewAssetToTargetEntry($tempEntry, $flavorParamsId);
-			kJobsManager::addConcatJob($multiClipConcatJob, $targetFlavorAsset, $allRelatedFiles, false, null, null, $imageConvertCommands);
+			kJobsManager::addConcatJob($multiClipConcatJob, $targetFlavorAsset, $allRelatedFiles, false, null, null, $convertCommands);
 		}
 	}
 
-	protected function getConvertImageCommand($jobData)
+	protected function getConvertCommandForFile($jobData)
+	{
+		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+		if($imageToVideo)
+		{
+			return $this->getConvertImageToVideoCommand($jobData);
+		}
+
+		$audioDuration = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+		if(!$audioDuration)
+		{
+			return $this->getAddSilentAudioCommand($jobData);
+		}
+		return "-";
+	}
+
+	protected function getAddSilentAudioCommand($jobData)
+	{
+		$cmdStr = " -i __inFileName__";
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
+		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
+		$operationAttribute = $jobData->getOperationAttributes()[0];
+		$cmdStr .= " -f s16le -i /dev/zero -c:v libx264 -t " . $operationAttribute->getDuration()/1000;
+		$cmdStr .= " -bsf:a aac_adtstoasc -f mpegts -y __outFileName__ ";
+		return $cmdStr;
+	}
+
+	protected function getConvertImageToVideoCommand($jobData)
 	{
 		$cmdStr = " -loop 1 -i __inFileName__";
 		$conversionParams = $this->getJobDataConversionParams($jobData);
-		if(isset($conversionParams[self::AUDIO_CHANNELS]))
-		{
-			$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
-		}
-		if(isset($conversionParams[self::AUDIO_SAMPLE_RATE]))
-		{
-			$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
-		}
+		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
+		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
 
 		// image should have only one clipAttribute
 		$operationAttribute = $jobData->getOperationAttributes()[0];
