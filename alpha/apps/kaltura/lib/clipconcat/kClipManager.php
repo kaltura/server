@@ -699,23 +699,20 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$height = $conversionParams[self::HEIGHT];
 		$audioChannels = $conversionParams[self::AUDIO_CHANNELS];
 		$audioSampleRate = $conversionParams[self::AUDIO_SAMPLE_RATE];
+
 		foreach ($resourcesData as $key => $resourceData)
 		{
 			$imageToVideo = $resourceData[self::IMAGE_TO_VIDEO];
-			$currentConversionParams = array();
 			$mediaInfoObj = $resourceData[self::MEDIA_INFO_OBJECT];
+
+			$currentConversionParams = array();
 			$currentConversionParams[self::HEIGHT] = $height;
+			$currentConversionParams[self::AUDIO_CHANNELS] = $audioChannels;
+			$currentConversionParams[self::AUDIO_SAMPLE_RATE] = $audioSampleRate;
+
 			if($mediaInfoObj->getVideoWidth() != $width)
 			{
 				$currentConversionParams[self::WIDTH] = $width;
-			}
-			if($imageToVideo || $mediaInfoObj->getAudioChannels() != $audioChannels)
-			{
-				$currentConversionParams[self::AUDIO_CHANNELS] = $audioChannels;
-			}
-			if($imageToVideo || $mediaInfoObj->getAudioSamplingRate() != $audioSampleRate)
-			{
-				$currentConversionParams[self::AUDIO_SAMPLE_RATE] = $audioSampleRate;
 			}
 			if($imageToVideo)
 			{
@@ -723,7 +720,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			else if($mediaInfoObj->getAudioDuration() && abs($mediaInfoObj->getAudioDuration() - $mediaInfoObj->getVideoDuration()) > 200)
 			{
+				// apply both audio and video filter complex
 				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -async 1 ";
+				$currentConversionParams[self::WIDTH] = $width;
 			}
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
 		}
