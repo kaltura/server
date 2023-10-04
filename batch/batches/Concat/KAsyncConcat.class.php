@@ -50,6 +50,7 @@ class KAsyncConcat extends KJobHandlerWorker
 		// creates a temp file path
 		$this->localTempPath = self::$taskConfig->params->localTempPath;
 		$this->sharedTempPath = self::$taskConfig->params->sharedTempPath;
+		$this->concatMethod = isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
 
 		$res = self::createDir( $this->localTempPath );
 		if ( !$res )
@@ -100,7 +101,6 @@ class KAsyncConcat extends KJobHandlerWorker
 		$fileName = "{$job->entryId}_{$data->flavorAssetId}.mp4";
 		$localTempFilePath = $this->localTempPath . DIRECTORY_SEPARATOR . $fileName;
 		$sharedTempFilePath = $data->destFilePath ? $data->destFilePath.".mp4" : $this->sharedTempPath . DIRECTORY_SEPARATOR . $fileName;
-		$this->concatMethod = !$data->multiSource && isset(self::$taskConfig->params->concatMethod) ? self::$taskConfig->params->concatMethod : self::CONCAT_METHOD_FFMPEG;
 
 		$srcFiles = array();
 		foreach($data->srcFiles as $srcFile)
