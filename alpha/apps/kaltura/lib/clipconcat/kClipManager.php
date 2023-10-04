@@ -1150,7 +1150,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return $this->getConvertImageToVideoCommand($jobData);
 		}
 
-		$audioDuration = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+		$audioDuration = $this->getJobDataConversionParams($jobData, self::AUDIO_DURATION);
 		if(!$audioDuration)
 		{
 			return $this->getAddSilentAudioCommand($jobData);
@@ -1165,8 +1165,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
 		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
 		$operationAttribute = $jobData->getOperationAttributes()[0];
-		$cmdStr .= " -f s16le -i /dev/zero -c:v libx264 -t " . $operationAttribute->getDuration()/1000;
-		$cmdStr .= " -bsf:a aac_adtstoasc -f mpegts -y __outFileName__ ";
+		$cmdStr .= " -f s16le -i /dev/zero -c:v copy -t " . $operationAttribute->getDuration()/1000;
+		$cmdStr .= "  -c:a libfdk_aac -b:a 192k -f mpegts -y __outFileName__ ";
 		return $cmdStr;
 	}
 

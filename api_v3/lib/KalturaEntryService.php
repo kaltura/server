@@ -1974,11 +1974,6 @@ class KalturaEntryService extends KalturaBaseService
 				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
 			}
 
-			if(!$mediaInfoObj->getAudioDuration())
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $sourceEntryId);
-			}
-
 			$resourcesData[] = array(
 				kClipManager::SOURCE_ENTRY => $sourceEntry,
 				kClipManager::TEMP_ENTRY => $tempEntry,
