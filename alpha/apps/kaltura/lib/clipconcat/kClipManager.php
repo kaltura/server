@@ -24,6 +24,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const MAX_FRAME_RATE = 30;
 	const DEFAULT_SAMPLE_RATE = 44100;
 	const DEFAULT_AUDIO_CHANNELS = 1;
+
+	const AUDIO_VIDEO_DIFF_MS = 200;
 	const LOCK_EXPIRY = 10;
 
 	/**
@@ -668,10 +670,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$height = $height == 0 ? $currentHeight : min($currentHeight, $height);
 			$duration = $resourceData[self::VIDEO_DURATION];
 			$this->updateKeyFrequency($aspectRatios, $currentWidth/$currentHeight, $duration);
+			if($mediaInfoObj->getAudioChannels())
+			{
+				$allAudioChannels[] = $mediaInfoObj->getAudioChannels();
+			}
+			if($mediaInfoObj->getAudioSamplingRate())
+			{
+				$this->updateKeyFrequency($allAudioSampleRates, $mediaInfoObj->getAudioSamplingRate(), $duration);
+			}
 			if(!$resourceData[self::IMAGE_TO_VIDEO])
 			{
-				$this->updateKeyFrequency($allAudioChannels, $mediaInfoObj->getAudioChannels(), $duration);
-				$this->updateKeyFrequency($allAudioSampleRates, $mediaInfoObj->getAudioSamplingRate(), $duration);
 				$frameRate = max($frameRate, $mediaInfoObj->getVideoFrameRate());
 			}
 		}
@@ -721,11 +729,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$currentConversionParams[self::IMAGE_TO_VIDEO] = $imageToVideo;
 			}
-			else if($mediaInfoObj->getAudioDuration() && abs($mediaInfoObj->getAudioDuration() - $mediaInfoObj->getVideoDuration()) > 200)
+			else if($mediaInfoObj->getAudioDuration() && abs($mediaInfoObj->getAudioDuration() - $mediaInfoObj->getVideoDuration()) > self::AUDIO_VIDEO_DIFF_MS)
 			{
-				// apply both audio and video filter complex
-				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -async 1 ";
-				$currentConversionParams[self::WIDTH] = $width;
+				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0[a]' -map v -map [\"a\"] ";
 			}
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
 		}
@@ -757,7 +763,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function decideAudioChannels(array $allAudioChannels)
 	{
-		return self::DEFAULT_AUDIO_CHANNELS;
+		return min($allAudioChannels) > 1 ? 2 : 1 ;
 	}
 
 	protected function limitByMaxProfileResolution($conversionProfileId, $aspectRatio, &$width, &$height)
@@ -1363,7 +1369,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
 			}
-			if(isset($conversionParams[self::WIDTH]) && isset($conversionParams[self::HEIGHT]))
+			if(isset($conversionParams[self::WIDTH]))
 			{
 				$flavorParamsObj->setWidth($conversionParams[self::WIDTH]);
 				$flavorParamsObj->setAspectRatioProcessingMode(2);
