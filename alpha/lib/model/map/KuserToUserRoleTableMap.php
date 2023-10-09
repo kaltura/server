@@ -42,6 +42,7 @@ class KuserToUserRoleTableMap extends TableMap {
 		$this->addForeignKey('USER_ROLE_ID', 'UserRoleId', 'INTEGER', 'user_role', 'ID', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('APP_GUID', 'AppGuid', 'VARCHAR', false, 32, null);
 		// validators
 	} // initialize()
 

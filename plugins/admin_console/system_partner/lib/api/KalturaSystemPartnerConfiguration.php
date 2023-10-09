@@ -835,9 +835,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 					$passwordToFill[] = array(trim($regex),$description);
 				}
 			}
+			$object_to_fill->setPasswordStructureValidations($passwordToFill);
 		}
-		$object_to_fill->setPasswordStructureValidations($passwordToFill);
-		
+
 		if(!is_null($this->secondarySecretRoleId))
 		{
 			$object_to_fill->setSecondarySecretRoleId($this->secondarySecretRoleId);
