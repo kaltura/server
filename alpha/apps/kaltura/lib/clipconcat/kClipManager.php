@@ -24,8 +24,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const MAX_FRAME_RATE = 30;
 	const DEFAULT_SAMPLE_RATE = 44100;
 	const DEFAULT_AUDIO_CHANNELS = 1;
-
-	const AUDIO_VIDEO_DIFF_MS = 200;
 	const LOCK_EXPIRY = 10;
 
 	/**
@@ -759,7 +757,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function decideAudioChannels(array $allAudioChannels)
 	{
-		return min($allAudioChannels) > 1 ? 2 : 1 ;
+		return min($allAudioChannels) > 1 ? 2 : self::DEFAULT_AUDIO_CHANNELS;
 	}
 
 	protected function limitByMaxProfileResolution($conversionProfileId, $aspectRatio, &$width, &$height)
@@ -1158,20 +1156,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return $this->getAddSilentAudioCommand($jobData);
 		}
 
-		$videoDuration = $this->getJobDataConversionParams($jobData, self::VIDEO_DURATION);
-		if(abs($videoDuration - $audioDuration) > self::AUDIO_VIDEO_DIFF_MS)
-		{
-			return $this->getFillWithSilenceCommand();
-		}
 		return "-";
-	}
-
-	protected function getFillWithSilenceCommand()
-	{
-		$cmdStr = " -i __inFileName__ -c:v copy -c:a libfdk_aac -f mpegts";
-		$cmdStr .=  " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0[a]' -map v -map [\"a\"] ";
-		$cmdStr .=  " -max_muxing_queue_size 1024 -y __outFileName__ ";
-		return $cmdStr;
 	}
 
 	protected function getAddSilentAudioCommand($jobData)
