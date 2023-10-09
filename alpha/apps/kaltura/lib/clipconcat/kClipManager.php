@@ -1190,6 +1190,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		{
 			$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
 		}
+		$cmdStr .= " -c:v libx264 -pix_fmt yuv420p";
 		if(isset($conversionParams[self::WIDTH]) && isset($conversionParams[self::HEIGHT]))
 		{
 			$width = $conversionParams[self::WIDTH];
