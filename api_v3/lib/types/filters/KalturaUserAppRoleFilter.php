@@ -19,6 +19,19 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 	 */
 	public $userIdIn;
 	
+	/**
+	 * User Status
+	 *
+	 * @var KalturaUserStatus
+	 */
+	public $userStatusEqual;
+	
+	/**
+	 * User Status csv list (0 = Blocked | 1 = Active)
+	 *
+	 * @var string
+	 */
+	public $userStatusIn;
 	
 	static private $map_between_objects = array
 	(
@@ -51,6 +64,25 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		$c->addAnd(KuserToUserRolePeer::APP_GUID, null, Criteria::ISNOTNULL);
 		$c->addAnd(kuserPeer::PARTNER_ID, kCurrentContext::getCurrentPartnerId(), Criteria::EQUAL);
 		$c->addAnd(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
+		
+		// By default only retrieve Active kuser
+		if (!isset($this->userStatusEqual) && !isset($this->userStatusIn))
+		{
+			$c->addAnd(kuserPeer::STATUS, KuserStatus::ACTIVE, Criteria::EQUAL);
+		}
+		else
+		{
+			// yoss - I think we should be more strict here and verify the values so we won't expose to sql injection
+			if (isset($this->userStatusEqual))
+			{
+				$c->addAnd(kuserPeer::STATUS, $this->userStatusEqual, Criteria::EQUAL);
+			}
+
+			if (isset($this->userStatusIn))
+			{
+				$c->addAnd(kuserPeer::STATUS, explode(',', $this->userStatusIn), Criteria::IN);
+			}
+		}
 		
 		$userAppRoleFilter->attachToCriteria($c);
 		$pager->attachToCriteria($c);
@@ -136,9 +168,10 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 	
 	protected function fixCsvFilterProperties()
 	{
-		$this->userIdIn = !empty($this->userIdIn) ? kString::csvFixWhitespace($this->userIdIn) : null;
-		$this->appGuidIn = !empty($this->appGuidIn) ? kString::csvFixWhitespace($this->appGuidIn) : null;
-		$this->userRoleIdIn = !empty($this->userRoleIdIn) ? kString::csvFixWhitespace($this->userRoleIdIn) : null;
+		$this->userIdIn = isset($this->userIdIn) ? kString::csvFixWhitespace($this->userIdIn) : null;
+		$this->appGuidIn = isset($this->appGuidIn) ? kString::csvFixWhitespace($this->appGuidIn) : null;
+		$this->userRoleIdIn = isset($this->userRoleIdIn) ? kString::csvFixWhitespace($this->userRoleIdIn) : null;
+		$this->userStatusIn = isset($this->userStatusIn) ? kString::csvFixWhitespace($this->userStatusIn) : null;
 	}
 }
 

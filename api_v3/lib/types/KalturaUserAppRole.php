@@ -57,8 +57,8 @@ class KalturaUserAppRole extends KalturaAppRole
 		
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 		
-		// validate userId exists
-		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $this->userId);
+		// validate userId is active
+		$kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $this->userId);
 		
 		if (!$kuser)
 		{

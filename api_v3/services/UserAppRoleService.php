@@ -25,7 +25,7 @@ class UserAppRoleService extends KalturaBaseService
 	
 	protected function partnerGroup($peer = null)
 	{
-		// if the current KS is an impersonated KS from EP (-11) add EP PID to partner criteria
+		// if the current KS is an impersonated KS system partner (pid < 0) add pid to mysql query
 		if (kCurrentContext::$is_admin_session && isset(kCurrentContext::$master_partner_id) && kCurrentContext::$master_partner_id < 0)
 		{
 			return $this->partnerGroup . ',' . kCurrentContext::$master_partner_id;
@@ -94,7 +94,6 @@ class UserAppRoleService extends KalturaBaseService
 	 *
 	 * @throws KalturaAPIException
 	 * @throws PropelException
-	 * @throws kCoreException
 	 */
 	public function getAction($userId, $appGuid)
 	{
@@ -144,7 +143,6 @@ class UserAppRoleService extends KalturaBaseService
 	 *
 	 * @throws KalturaAPIException
 	 * @throws PropelException
-	 * @throws kCoreException
 	 */
 	public function deleteAction($userId, $appGuid)
 	{
@@ -161,7 +159,6 @@ class UserAppRoleService extends KalturaBaseService
 	 *
 	 * @throws KalturaAPIException
 	 * @throws PropelException
-	 * @throws kCoreException
 	 */
 	protected function getByUserAndAppGuid($userId, $appGuid)
 	{
@@ -173,23 +170,24 @@ class UserAppRoleService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION, $puserId);
 		}
 		
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $puserId);
-		
-		if (!$kuser)
-		{
-			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $puserId);
-		}
-		
 		if (!kString::isValidMongoId($appGuid))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_APP_GUID, $appGuid);
 		}
 		
-		// validate appGuid belong to ks partner
-		$appGuidExist = MicroServiceAppRegistry::getExistingAppGuid(kCurrentContext::getCurrentPartnerId(), $appGuid);
-		if (!$appGuidExist)
+		// if action is 'update' - verify kuser is active (not 'blocked')
+		if ($this->actionName == 'update')
 		{
-			throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $appGuid);
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $puserId);
+		}
+		else
+		{
+			$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $puserId);
+		}
+		
+		if (!$kuser)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $puserId);
 		}
 		
 		$dbUserAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($kuser->getId(), $appGuid);
