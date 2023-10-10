@@ -24,6 +24,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const MAX_FRAME_RATE = 30;
 	const DEFAULT_SAMPLE_RATE = 44100;
 	const DEFAULT_AUDIO_CHANNELS = 1;
+	const AUDIO_VIDEO_DIFF_MS = 200;
 	const LOCK_EXPIRY = 10;
 
 	/**
@@ -726,6 +727,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($imageToVideo)
 			{
 				$currentConversionParams[self::IMAGE_TO_VIDEO] = $imageToVideo;
+			}
+			else if($mediaInfoObj->getAudioDuration() && abs($mediaInfoObj->getAudioDuration() - $mediaInfoObj->getVideoDuration()) > self::AUDIO_VIDEO_DIFF_MS)
+			{
+				if($currentConversionParams[self::WIDTH])
+				{
+					$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0'";
+				}
+				else
+				{
+					// if we do not scale the clipped asset, then add stream mapping, because applying only audio filter_complex, changes the streams order and concat fails
+					$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0[a]' -map v -map [\"a\"] ";
+				}
 			}
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
 		}
