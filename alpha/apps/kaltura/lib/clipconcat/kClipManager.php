@@ -732,7 +732,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				if($currentConversionParams[self::WIDTH])
 				{
-					$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0'";
+					$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0' ";
 				}
 				else
 				{
