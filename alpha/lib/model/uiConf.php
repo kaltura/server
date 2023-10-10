@@ -34,6 +34,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	const UI_CONF_TYPE_KSR = 19;
 	const UI_CONF_TYPE_KUPLOAD = 20;
 	const UI_CONF_TYPE_WEBCASTING = 21;
+	const UI_CONF_TYPE_SAP = 22;
 
 
 	const UI_CONF_CREATION_MODE_MANUAL = 1;
@@ -82,6 +83,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 										self::UI_CONF_TYPE_KRECORD => "KRecord.swf",
 										self::UI_CONF_TYPE_KUPLOAD => "KUpload.swf",
 										self::UI_CONF_TYPE_WEBCASTING => "",
+										self::UI_CONF_TYPE_SAP => "",
 									);
 
 	private static $swf_directory_map = array (
@@ -106,6 +108,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		self::UI_CONF_TYPE_KRECORD => 'krecord',
 		self::UI_CONF_TYPE_KUPLOAD => "kupload",
 		self::UI_CONF_TYPE_WEBCASTING => "",
+		self::UI_CONF_TYPE_SAP => "",
 	);
 
 	const CUSTOM_DATA_CON_FILE_VERSION = 'conf_file_version';
@@ -208,6 +211,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 				self::UI_CONF_TYPE_KSR => "Kaltura Screen Recorder",
 				self::UI_CONF_TYPE_KUPLOAD => "Kaltura Simple Uploader",
 				self::UI_CONF_TYPE_WEBCASTING => "Kaltura Webcasting Studio",
+				self::UI_CONF_TYPE_SAP => "SAP",
 			);
 		}
 	}
