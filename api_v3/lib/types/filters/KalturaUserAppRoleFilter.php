@@ -37,6 +37,8 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 	(
 		"userIdEqual" => "_eq_user_id",
 		"userIdIn" => "_in_user_id",
+		"userStatusEqual" =>  "_eq_status",
+		"userStatusIn" =>  "_in_status"
 	);
 	
 	public function getMapBetweenObjects()
