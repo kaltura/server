@@ -74,7 +74,6 @@ class KalturaUserAppRoleFilter extends KalturaUserAppRoleBaseFilter
 		}
 		else
 		{
-			// yoss - I think we should be more strict here and verify the values so we won't expose to sql injection
 			if (isset($this->userStatusEqual))
 			{
 				$c->addAnd(kuserPeer::STATUS, $this->userStatusEqual, Criteria::EQUAL);
