@@ -392,6 +392,12 @@ class myPartnerUtils
 					return 'http://' . $apiHost;
 				}
 				break;
+			case 'serviceUrl':
+				if ($partner && $partner->getHost())
+				{
+					return preg_replace('/^https?/', $protocol, $partner->getHost());
+				}
+				return self::getCdnHost($partner_id, $protocol, 'api');
 			default:
 				if ($partner && $partner->getCdnHost())
 				{
