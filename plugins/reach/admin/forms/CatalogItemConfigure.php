@@ -109,6 +109,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$this->addElement($targetLanguage);
 		}
 		
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
+		{
+			$requireSource = new Kaltura_Form_Element_EnumSelect('requireSource', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
+			$requireSource->setLabel('Require Source Language Captions:');
+			$requireSource->setRequired(true);
+			$requireSource->setValue(Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE);
+			$this->addElement($requireSource);
+		}
+		
 		$audioCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION,
 											Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION,
 											Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING);
