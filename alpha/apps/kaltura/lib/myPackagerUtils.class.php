@@ -85,14 +85,18 @@ class myPackagerUtils
 			return self::captureRemoteThumbByDeliveryProfile($capturedThumbPath, $calc_vid_sec, $flavorAsset, $width, $height);
 		}
 
+		KalturaLog::debug("TTT: currentDcId [$$currentDcId] fileSync DC [{$fileSync->getDc()}] isCloudDc [" .myCloudUtils::isCloudDc($currentDcId) . "]");
 		if(myCloudUtils::isCloudDc($currentDcId) || $fileSync->getDc() != $currentDcId)
 		{
-			if(in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) || in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+			KalturaLog::debug("TTT: shred dc id " . print_r(kDataCenterMgr::getSharedStorageProfileIds(), true) . " getDcIds " . print_r(kDataCenterMgr::getDcIds(), true));
+			if(in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) || in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($fileSync->getPartnerId())))
 			{
+				KalturaLog::debug("TTT: In a");
 				return self::captureRemoteThumb($path, $capturedThumbPath, $calc_vid_sec, $width, $height);
 			}
 			else
 			{
+				KalturaLog::debug("TTT: In b");
 				return self::captureRemoteThumbByDeliveryProfile($capturedThumbPath, $calc_vid_sec, $flavorAsset, $width, $height);
 			}
 		}
@@ -293,6 +297,7 @@ class myPackagerUtils
 			$packagerUrl = kConf::get(self::PACKAGER_URL,kConfMapNames::LOCAL_SETTINGS, null);
 		}
 
+		KalturaLog::debug("TTT: getPackagerUrlFromConf packagerUrl [$packagerUrl] packagerUrlType [$packagerUrlType]");
 		switch ($packagerUrlType)
 		{
 			case kPackagerUrlType::REGULAR_THUMB:
@@ -446,6 +451,7 @@ class myPackagerUtils
 	protected static function curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width = null, $height = null, $offsetPrefix = '', $postFix = '', $offsetPostfix = '')
 	{
 		list($packagerThumbCapture, $tempThumbPath) = KThumbnailCapture::generateThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height, $offsetPrefix, $postFix, $offsetPostfix);
+		KalturaLog::debug("TTT: packagerThumbCapture [$packagerThumbCapture] tempThumbPath [$tempThumbPath]");
 
 		kFile::closeDbConnections();
 		$success = KCurlWrapper::getDataFromFile($packagerThumbCapture, $tempThumbPath, null, true);
@@ -468,7 +474,9 @@ class myPackagerUtils
 	 */
 	protected static function captureRemoteThumb($url, $capturedThumbPath, $calc_vid_sec, $width, $height)
 	{
+		KalturaLog::debug("TTT: captureRemoteThumb url [$url]");
 		$packagerCaptureUrl = self::getPackagerUrlFromConf(kPackagerUrlType::REMOTE_THUMB);
+		KalturaLog::debug("TTT: captureRemoteThumb $packagerCaptureUrl url [$packagerCaptureUrl]");
 		if($packagerCaptureUrl && $url)
 		{
 			return self::curlThumbUrlWithOffset($url, $calc_vid_sec, $packagerCaptureUrl, $capturedThumbPath, $width, $height);

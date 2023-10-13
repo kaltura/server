@@ -110,6 +110,12 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function shouldExcludeUserRecordingsIngest($puserId)
 	{
 		$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $puserId);
+		if(!$kuser)
+		{
+			KalturaLog::debug("User with id [$puserId] not found, recording will not be processed");
+			return false;
+		}
+
 		$userGroupsArray = KuserKgroupPeer::retrievePgroupIdsByKuserIds(array($kuser->getId()));
 		if ($this->getGroupParticipationType() == kZoomGroupParticipationType::OPT_IN)
 		{

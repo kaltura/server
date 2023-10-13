@@ -678,6 +678,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getLocalFileSyncForKey ( FileSyncKey $key , $strict = true )
 	{
 		$dc_ids = kDataCenterMgr::getSharedStorageProfileIds();
+
+		$partner = PartnerPeer::retrieveByPK($key->partner_id);
+		$partnerSharedStorageId = $partner->getSharedStorageProfileId();
+
+		$dc_ids[] = $partnerSharedStorageId;
 		$dc_ids[] = kDataCenterMgr::getCurrentDcId();
 		
 		$c = new Criteria();
@@ -947,7 +952,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
 		
 		$currentDcId = kDataCenterMgr::getCurrentDcId();
-		$currentDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$currentDcIds = kDataCenterMgr::getSharedStorageProfileIdsForPartner($key->partner_id);
 		$currentDcIds[] = $currentDcId;
 		
 		$c = new Criteria();

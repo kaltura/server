@@ -464,6 +464,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 		$propertyElement->setAttribute("insertOnly", $property->isInsertOnly() ? "1" : "0");
 		$propertyElement->setAttribute("writeOnly", $property->isWriteOnly() ? "1" : "0");
 		$propertyElement->setAttribute("multiLingual", $property->isMultiLingual() ? "1" : "0");
+		$propertyElement->setAttribute("masked", $property->isMasked() ? "1" : "0");
 		
 		if($property->getDynamicType())
 		{
@@ -511,6 +512,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 			/* @var $actionParam KalturaParamInfo */
 			$actionParamElement = $this->_doc->createElement("param");
 			$actionParamElement->setAttribute("name", $actionParam->getName());
+			$actionParamElement->setAttribute("masked", $actionParam->isMasked() ? "1" : "0");
 			
 			if ($actionParam->isAssociativeArray())
 			{
