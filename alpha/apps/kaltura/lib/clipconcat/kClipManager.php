@@ -1199,7 +1199,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
 		}
 		$cmdStr .= " -c:v libx264 -pix_fmt yuv420p";
-		// add white background for images to handle transparency, transparent pixels shows the background color
+		// add white background to the video to handle transparency, transparent pixels shows the background color
 		$whiteBackgroundFilter = "split=2[bg][fg];[bg]drawbox=c=white@1:replace=1:t=fill[bg];[bg][fg]overlay=format=auto";
 		if(isset($conversionParams[self::WIDTH]) && isset($conversionParams[self::HEIGHT]))
 		{
