@@ -256,7 +256,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getFileRoot()
 	{
 		$fileRoot = parent::getFileRoot();
-		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && strpos($fileRoot, myContentStorage::getFSContentRootPath()) === 0 )
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()) ) && strpos($fileRoot, myContentStorage::getFSContentRootPath()) === 0 )
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($this->getDc());
 			if($sharedStorageProfile)
@@ -270,7 +270,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getFileType()
 	{
 		$fileType = parent::getFileType();
-		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && $fileType == self::FILE_SYNC_FILE_TYPE_URL)
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()) ) && $fileType == self::FILE_SYNC_FILE_TYPE_URL)
 		{
 			$fileType = self::FILE_SYNC_FILE_TYPE_FILE;
 		}
@@ -280,7 +280,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 	public function getRemotePath()
 	{
-		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ))
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()) ))
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($this->getDc());
 			return $sharedStorageProfile->getStorageBaseDir() . $this->getFilePath();
@@ -324,7 +324,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC ||
-			(myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) && in_array($this->getDc(), kDataCenterMgr::getSharedStorageProfileIds())) )
+			(myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) && in_array($this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()))) )
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 
 		if(is_null($storage->getProtocol()))

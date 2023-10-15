@@ -517,7 +517,7 @@ class kJobsManager
 				$remoteConvertSupportedEngines = explode("," ,$partnerRemoteConvertSupportedEngines[$partner->getId()]);
 			}
 			
-			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds($partner->getId());
 			if( ($preferSharedDcForConvert && count($sharedDcIds) && in_array($dbCurrentConversionEngine, $remoteConvertSupportedEngines)) )
 			{
 				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);
@@ -1559,7 +1559,7 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($externalStorage->getProtocol());
 
-		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds())))
+		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds($flavor))))
 		{
 			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
 		}

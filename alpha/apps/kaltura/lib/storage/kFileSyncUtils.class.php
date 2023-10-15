@@ -99,7 +99,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	public static function getContentsByFileSync ( FileSync $file_sync , $local = true , $fetch_from_remote_if_no_local = true , $strict = true )
 	{
-		if ( $local || in_array($file_sync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		if ( $local || in_array($file_sync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($file_sync->getPartnerId())))
 			return self::getLocalContentsByFileSync($file_sync);
 		
 
@@ -677,7 +677,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 */
 	public static function getLocalFileSyncForKey ( FileSyncKey $key , $strict = true )
 	{
-		$dc_ids = kDataCenterMgr::getSharedStorageProfileIds();
+		$dc_ids = kDataCenterMgr::getSharedStorageProfileIds($key->partner_id);
 		$dc_ids[] = kDataCenterMgr::getCurrentDcId();
 		
 		$c = new Criteria();
@@ -945,11 +945,11 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	public static function getReadyFileSyncForKey ( FileSyncKey $key , $fetch_from_remote_if_no_local = false , $strict = true , $resolve = true )
 	{
 		KalturaLog::debug("key [$key], fetch_from_remote_if_no_local [$fetch_from_remote_if_no_local], strict [$strict]");
-		
+
 		$currentDcId = kDataCenterMgr::getCurrentDcId();
-		$currentDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$currentDcIds = kDataCenterMgr::getSharedStorageProfileIds($key->partner_id);
 		$currentDcIds[] = $currentDcId;
-		
+
 		$c = new Criteria();
 		$c = FileSyncPeer::getCriteriaForFileSyncKey( $key );
 		if ( ! $fetch_from_remote_if_no_local )
@@ -1015,7 +1015,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$dcFileSyncs = array();
 		$remoteFileSyncs = array();
 		$sharedFileSyncs = array();
-		$sharedStorageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$partnerId = count($file_sync_list) ? reset($file_sync_list)->getPartnerId() : null;
+		$sharedStorageProfileIds = kDataCenterMgr::getSharedStorageProfileIds($partnerId);
 
 		$isCloudDc = myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId());
 				
@@ -1323,8 +1324,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		{
 			return;
 		}
-		
-		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds($key->partner_id, true);
 		foreach ($sharedDcIds as $sharedDcId)
 		{
 			//If original file sync was already created in teh shared storage skip
@@ -2233,7 +2234,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$c->addAnd(FileSyncPeer::STATUS, FileSync::FILE_SYNC_STATUS_READY);
 
 		$c1 = $c->getNewCriterion(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL, Criteria::NOT_EQUAL);
-		$c1->addOr($c->getNewCriterion(FileSyncPeer::DC, kDataCenterMgr::getSharedStorageProfileIds(), Criteria::IN));
+		$c1->addOr($c->getNewCriterion(FileSyncPeer::DC, kDataCenterMgr::getSharedStorageProfileIds($syncKey->partner_id), Criteria::IN));
 		$c->addAnd($c1);
 
 		return FileSyncPeer::doSelect($c);
@@ -2368,7 +2369,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				 * so we need to make sure not to retrieve them.
 				 */
 				$c->addAnd(FileSyncPeer::FILE_TYPE, FileSync::FILE_SYNC_FILE_TYPE_URL);
-				$c->addAnd(FileSyncPeer::DC, kStorageExporter::getPeriodicStorageIds(), Criteria::NOT_IN);
+				$c->addAnd(FileSyncPeer::DC, kDataCenterMgr::getSharedStorageProfileIds($syncKey->partner_id), Criteria::NOT_IN);
 				break;
 
 			case StorageProfile::STORAGE_SERVE_PRIORITY_KALTURA_FIRST:

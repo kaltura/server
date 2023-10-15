@@ -752,7 +752,7 @@ class kFileBase
 		
 		$sig = base64_encode(hash_hmac('sha256', $path, $vodPackagerDirectSecret, true));
 		$sig = rtrim(strtr($sig, '+/', '-_'), '=');
-		return "http://$vodPackagerInternalDomain/direct/$storageType/sig/{$sig}/{$path}";
+		return "http://$vodPackagerInternalDomain/direct/$storageType/bucket/" . stripslashes($bucket) . "/sig/{$sig}/{$path}";
 	}
 	
 	public static function getStorageType($path)

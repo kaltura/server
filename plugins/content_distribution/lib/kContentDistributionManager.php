@@ -113,7 +113,7 @@ class kContentDistributionManager
   		}
   		
 		$dcs = array();
-		$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds($entryDistribution->getPartnerId());
 		foreach($fileSyncs as $fileSync)
 		{
 			/* @var $fileSync FileSync */

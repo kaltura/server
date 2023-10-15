@@ -24,7 +24,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		
 		
-/*		//to support list categories with entitlmenet for user that is a member of more then 100 large categories
+/*		//to support list categories with entitlement for user that is a member of more then 100 large categories
  		//large category is a category with > 10 members or > 100 entries. 				
   		if ($actionName == 'list' && kEntitlementUtils::getEntitlementEnforcement())
 		{
@@ -2048,7 +2048,7 @@ class KalturaEntryService extends KalturaBaseService
 				/* @var $fileSync FileSync */
 				if ( $fileSync && (!$local ||
 						($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL &&
-							in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()) )
+							in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($fileSync->getPartnerId())) )
 					))
 				{
 					$remoteDc = 1 - kDataCenterMgr::getCurrentDcId();
