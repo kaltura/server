@@ -809,8 +809,16 @@ class kMetadataManager
 		$profileFields = MetadataProfileFieldPeer::retrieveActiveByMetadataProfileId($metadata->getMetadataProfileId());
 		$metadataId = $metadata->getId();
 		$partnerId = $metadata->getPartnerId();
-		$maxMetadataLength = kConf::getArrayValue($partnerId, ElasticSearchPlugin::MAX_METADATA_INDEX_LENGTH,
-			ElasticSearchPlugin::ELASTIC_DYNAMIC_MAP,kElasticSearchManager::METADATA_MAX_LENGTH);
+
+		$maxMetadataLength = PermissionPeer::isValidForPartner(PermissionName::FEATURE_EVENT_PLATFORM_PERMISSION, $partnerId)
+			? kElasticSearchManager::EVENT_PLATFORM_METADATA_MAX_LENGTH
+			: kElasticSearchManager::METADATA_MAX_LENGTH;
+
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if($partner && $partner->getSearchMaxMetadataIndexLength())
+		{
+			$maxMetadataLength = $partner->getSearchMaxMetadataIndexLength();
+		}
 
 		foreach($profileFields as $profileField)
 		{
