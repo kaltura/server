@@ -1,5 +1,5 @@
 # Scorpius-19.18.0
-## MultiClipConcat closer ##
+## Add KMultiClipConcatCloser worker ##
 * Issue Type: Task
 * Issue ID: PLAT-24447
 ### Configuration ###
