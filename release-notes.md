@@ -1,4 +1,21 @@
 # Scorpius-19.18.0
+## MultiClipConcat closer ##
+* Issue Type: Task
+* Issue ID: PLAT-24447
+### Configuration ###
+Add the following to batch.ini:
+
+	enabledWorkers.KMultiClipConcatCloser = 1
+
+	[KMultiClipConcatCloser : JobCloserWorker]
+	id                              = @ID@
+	friendlyName                    = Multi Clip Concat Closer
+	type                            = KMultiClipConcatCloser
+    scriptPath                      = batches/ClipConcat/KMultiClipConcatCloserExe.php
+    maximumExecutionTime            = @MAXIMUM_EXECUTION_TIME@
+    params.maxTimeBeforeFail        = @MAX_TIME_BEFORE_FAIL@
+
+# Scorpius-19.18.0
 ## Pass AuthBroker and AppRegistry endpoints to kmcng ##
 * Issue Type: Task
 * Issue ID: PLAT-24425
