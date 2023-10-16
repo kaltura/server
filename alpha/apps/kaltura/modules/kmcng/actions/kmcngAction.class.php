@@ -9,6 +9,8 @@ class kmcngAction extends kalturaAction
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const PLAYER_V3_OVP_VERSIONS_TAG = 'playerV3OvpVersions';
 
+	private $partnerId = null;
+
 	public function execute()
 	{
 		if (!kConf::hasParam('kmcng'))
@@ -95,6 +97,7 @@ class kmcngAction extends kalturaAction
 
 	private function initConfig($deployUrl, $kmcngParams, $enforceSecureProtocol, $requestSecureProtocol)
 	{
+		$this->setRequestingPartnerId();
 		$this->liveAUiConf = uiConfPeer::getUiconfByTagAndVersion(self::LIVE_ANALYTICS_UICONF_TAG, kConf::get("liveanalytics_version"));
 		$this->contentUiconfsLivea = isset($this->liveAUiConf) ? array_values($this->liveAUiConf) : null;
 		$this->contentUiconfLivea = (is_array($this->contentUiconfsLivea) && reset($this->contentUiconfsLivea)) ? reset($this->contentUiconfsLivea) : null;
@@ -112,13 +115,17 @@ class kmcngAction extends kalturaAction
 		$this->contentUiconfPreviewV7 = (is_array($this->contentUiconfsPreviewV7)) ? reset($this->contentUiconfsPreviewV7) : null;
 
 		$secureCDNServerUri = "https://" . kConf::get("cdn_api_host_https");
-		if (!$enforceSecureProtocol && !$requestSecureProtocol)
-			$secureCDNServerUri = "http://" . kConf::get("cdn_api_host");
-
 		$serverAPIUri = kConf::get("www_host");
 		if (isset($kmcngParams["kmcng_custom_uri"]))
+		{
 			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
+		}
 
+		if($this->partnerId)
+		{
+			$secureCDNServerUri = myPartnerUtils::getCdnHost($this->partnerId, null, myPartnerUtils::HOST_TYPE_API);
+			$serverAPIUri = myPartnerUtils::getCdnHost($this->partnerId, null, myPartnerUtils::HOST_TYPE_API);
+		}
 
 		$loadVersionMapFromKConf = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
 
@@ -238,7 +245,7 @@ class kmcngAction extends kalturaAction
 				'previewUIConfV7' => ($this->contentUiconfPreviewV7) ? $this->contentUiconfPreviewV7->getId() : '',
 				),
 			'cdnServers' => array(
-				'serverUri' => "http://" . kConf::get("cdn_api_host"),
+				'serverUri' => $this->partnerId ? myPartnerUtils::getCdnHost($this->partnerId, null, myPartnerUtils::HOST_TYPE_API) : "http://" . kConf::get("cdn_api_host"),
 				'securedServerUri' => $secureCDNServerUri
 			),
 			'kpfServer' => array('kpfPackageManagerBaseUrl' => kconf::get('kpf_package_manager_base_url','local',null), 'kpfPurchaseManagerBaseUrl' => kconf::get('kpf_purchase_manager_base_url', 'local', null)) ,
@@ -298,6 +305,12 @@ class kmcngAction extends kalturaAction
 	}
 
 
+	private function getKsObject()
+	{
+		$ks = $this->getRequest()->getParameter('ks');
+		return kSessionUtils::crackKs($ks);
+	}
+
 	private function getKs()
 	{
 		$ks = $this->getRequest()->getParameter('ks');
@@ -325,5 +338,14 @@ class kmcngAction extends kalturaAction
 		}
 
 		return $ks;
+	}
+
+	private function setRequestingPartnerId()
+	{
+		$ksObj = $this->getKsObject();
+		if($ksObj)
+		{
+			$this->partnerId = $ksObj->partner_id;
+		}
 	}
 }

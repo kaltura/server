@@ -20,6 +20,10 @@ class myPartnerUtils
 	const MARKETO_WRONG_PASSWORD = 'marketo_wrong_password_campaign';
 
 	const TYPE_DOWNLOAD = 'download';
+
+	//host types
+	const HOST_TYPE_API = 'api';
+	const HOST_TYPE_THUMBNAIL = 'thumbnail';
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
@@ -347,7 +351,20 @@ class myPartnerUtils
 		if ( !$partner || (! $partner->getHost() ) ) return requestUtils::getRequestHost();
 		return $partner->getHost();
 	}
-	
+
+	public static function getUploadHost($partnerId, $currentDcId)
+	{
+		$dcConfig = kDataCenterMgr::getDcById($currentDcId);
+		$uploadHost = isset($dcConfig['uploadUrl']) ? $dcConfig['uploadUrl'] : null;
+
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		if(!$partner)
+		{
+			return $uploadHost;
+		}
+
+		return $partner->getHost() ? $partner->getHost() : $uploadHost;
+	}
 	
 	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null )
 	{
@@ -370,7 +387,7 @@ class myPartnerUtils
 
 		switch ($hostType)
 		{
-			case 'thumbnail':
+			case self::HOST_TYPE_THUMBNAIL:
 				if ($partner && $partner->getThumbnailHost())
 				{
 					return preg_replace('/^https?/', $protocol, $partner->getThumbnailHost());
@@ -380,7 +397,11 @@ class myPartnerUtils
 					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
 				}
 				return requestUtils::getThumbnailCdnHost($protocol);
-			case 'api':
+			case self::HOST_TYPE_API:
+				if ($partner && $partner->getHost())
+				{
+					return preg_replace('/^https?/', $protocol, $partner->getHost());
+				}
 				if ($protocol == 'https')
 				{
 					$apiHost = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
@@ -392,12 +413,6 @@ class myPartnerUtils
 					return 'http://' . $apiHost;
 				}
 				break;
-			case 'serviceUrl':
-				if ($partner && $partner->getHost())
-				{
-					return preg_replace('/^https?/', $protocol, $partner->getHost());
-				}
-				return self::getCdnHost($partner_id, $protocol, 'api');
 			default:
 				if ($partner && $partner->getCdnHost())
 				{
