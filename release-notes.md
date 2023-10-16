@@ -1,16 +1,16 @@
-# Scorpius-19.18.0
+# Scorpius-19.19.0
 ## Add KMultiClipConcatCloser worker ##
 * Issue Type: Task
 * Issue ID: PLAT-24447
 ### Configuration ###
 Add the following to batch.ini:
 
-	enabledWorkers.KMultiClipConcatCloser = 1
-
-	[KMultiClipConcatCloser : JobCloserWorker]
-	id                              = @ID@
-	friendlyName                    = Multi Clip Concat Closer
-	type                            = KMultiClipConcatCloser
+    enabledWorkers.KMultiClipConcatCloser = 1
+    
+    [KMultiClipConcatCloser : JobCloserWorker]
+    id                              = @ID@
+    friendlyName                    = Multi Clip Concat Closer
+    type                            = KMultiClipConcatCloser
     scriptPath                      = batches/ClipConcat/KMultiClipConcatCloserExe.php
     maximumExecutionTime            = @MAXIMUM_EXECUTION_TIME@
     params.maxTimeBeforeFail        = @MAX_TIME_BEFORE_FAIL@
