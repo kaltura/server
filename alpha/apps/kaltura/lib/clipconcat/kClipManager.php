@@ -1198,15 +1198,24 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
 		}
 		$cmdStr .= " -c:v libx264 -pix_fmt yuv420p";
+		// add white background to the video to handle transparency, transparent pixels shows the background color
+		$whiteBackgroundFilter = "split=2[bg][fg];[bg]drawbox=c=white@1:replace=1:t=fill[bg];[bg][fg]overlay=format=auto";
 		if(isset($conversionParams[self::WIDTH]) && isset($conversionParams[self::HEIGHT]))
 		{
 			$width = $conversionParams[self::WIDTH];
 			$height = $conversionParams[self::HEIGHT];
 			$frameSize = "$width:$height";
 			$cmdStr .= " -s " . str_replace(':', 'x', $frameSize);
-			$cmdStr .= " -filter_complex '[0:v]scale=iw*min($width/iw\,$height/ih):ih*min($width/iw\,$height/ih)[vflt0];[vflt0]pad=$width:$height:(ow-iw)/2:(oh-ih)/2'";
+			$scalingFilter = "scale=iw*min($width/iw\,$height/ih):ih*min($width/iw\,$height/ih)";
+			$paddingFilter = "pad=$width:$height:(ow-iw)/2:(oh-ih)/2";
+			$filter = "[0:v]" . $scalingFilter . "[vflt0];[vflt0]" . $paddingFilter . "[out];[out]" . $whiteBackgroundFilter;
 			$cmdStr .= " -aspect $frameSize";
 		}
+		else
+		{
+			$filter ="[0]$whiteBackgroundFilter";
+		}
+		$cmdStr .= " -filter_complex '$filter'";
 
 		// image should have only one clipAttribute
 		$operationAttribute = $jobData->getOperationAttributes()[0];
