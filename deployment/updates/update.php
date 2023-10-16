@@ -131,10 +131,10 @@ class ScriptsRunner
 
 	private function getServerVersion()
 	{
-		$serverVersion = kConf::get("kaltura_version", 'local', null);
-		if(!$serverVersion)
+		$serverVersion = mySystemUtils::getVersion();
+		if(!trim($serverVersion))
 		{
-			$serverVersion = mySystemUtils::getVersion();
+			$serverVersion = kConf::get("kaltura_version", 'local', null);
 		}
 
 		if(!trim($serverVersion))

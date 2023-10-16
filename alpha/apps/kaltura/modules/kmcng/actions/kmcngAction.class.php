@@ -261,7 +261,11 @@ class kmcngAction extends kalturaAction
 				"entitlements" => $kmcngParams['entitlements'],
 				"uploads" => $kmcngParams['uploads'],
 				"live" => $kmcngParams['live']
-			)
+			),
+			'externalServices' => array(
+				'authBrokerServer' => array('uri' => kConf::get('auth_broker_base_url', 'local', '')),
+				'appRegistryServer' => array('uri' => kConf::get('app_registry_base_url', 'local', ''))
+			),
 		);
 
 		return $config;

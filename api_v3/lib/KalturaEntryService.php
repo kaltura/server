@@ -1955,6 +1955,10 @@ class KalturaEntryService extends KalturaBaseService
 				$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 				$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, 'mediainfo');
 				$mediaInfo = $mediaInfoParser->getMediaInfo();
+				if(!$mediaInfo)
+				{
+					throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $sourceEntryId);
+				}
 				$mediaInfoObj = $mediaInfo->toInsertableObject();
 				$imageToVideo = 1;
 			}
@@ -1970,17 +1974,11 @@ class KalturaEntryService extends KalturaBaseService
 				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
 			}
 
-			// if difference between audio and video durations is more than 0.5s then block
-			if(($mediaInfoObj->getVideoDuration() - $mediaInfoObj->getAudioDuration()) / 1000 >= 0.5)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $sourceEntryId);
-			}
-
 			$resourcesData[] = array(
 				kClipManager::SOURCE_ENTRY => $sourceEntry,
 				kClipManager::TEMP_ENTRY => $tempEntry,
 				kClipManager::MEDIA_INFO_OBJECT => $mediaInfoObj,
-				kClipManager::DURATION => $duration,
+				kClipManager::VIDEO_DURATION => $duration,
 				kClipManager::IMAGE_TO_VIDEO => $imageToVideo
 			);
 

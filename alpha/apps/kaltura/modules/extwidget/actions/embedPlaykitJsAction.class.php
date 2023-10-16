@@ -175,7 +175,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$protocol = infraRequestUtils::getProtocol();
-		$host = myPartnerUtils::getCdnHost($this->partnerId, $protocol, 'api');
+		$host = myPartnerUtils::getCdnHost($this->partnerId, $protocol, 'serviceUrl');
 		$sourceMapLoaderURL = "$host/$this->sourceMapLoader/path/$this->bundle_name";
 		$bundleContent = str_replace("//# sourceMappingURL=$this->bundle_name.min.js.map", "//# sourceMappingURL=$sourceMapLoaderURL", $bundleContent);
 
@@ -345,9 +345,9 @@ class embedPlaykitJsAction extends sfAction
 		$protocol = infraRequestUtils::getProtocol();
 
 		// The default Kaltura service url:
-		$serviceUrl = requestUtils::getApiCdnHost().'/api_v3';
+		$serviceUrl = myPartnerUtils::getCdnHost($this->partnerId, $protocol, 'serviceUrl').'/api_v3';
 		// Default Kaltura CDN url:
-		$cdnUrl = requestUtils::getCdnHost($protocol);
+		$cdnUrl = myPartnerUtils::getCdnHost($this->partnerId, $protocol);
 		// Default Stats URL
 		$statsServiceUrl = $this->buildUrl($protocol,"stats_host");
 		// Default Live Stats URL
