@@ -1187,13 +1187,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	protected function getConvertImageToVideoCommand($jobData)
 	{
 		$cmdStr = " -loop 1 -i __inFileName__";
+		$cmdStr .= " -f s16le -i /dev/zero -c:a libfdk_aac -b:a 192k";
+
 		$conversionParams = $this->getJobDataConversionParams($jobData);
 		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
 		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
 
-		// image should have only one clipAttribute
-		$operationAttribute = $jobData->getOperationAttributes()[0];
-		$cmdStr .= " -f s16le -i /dev/zero -c:v libx264 -t " . $operationAttribute->getDuration()/1000;
 		if(isset($conversionParams[self::FRAME_RATE]))
 		{
 			$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
@@ -1217,7 +1216,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$filter ="[0]$whiteBackgroundFilter";
 		}
 		$cmdStr .= " -filter_complex '$filter'";
-		$cmdStr .= " -c:a libfdk_aac -b:a 192k";
+
+		// image should have only one clipAttribute
+		$operationAttribute = $jobData->getOperationAttributes()[0];
+		$duration = $operationAttribute->getDuration()/1000;
+		$cmdStr .= " -t $duration -shortest -fflags +shortest";
 		$cmdStr .= " -f mpegts -vsync 1";
 		$cmdStr .= " -y __outFileName__";
 		return $cmdStr;
