@@ -1,9 +1,3 @@
-*_111
-*_backup*
-tests/aws/
-tests/oci/
-tests/scripts/
-tests/Yossi_Tests/
 admin_console/lib/Kaltura/Client
 admin_console/lib/tests
 alpha/web/api_v3
