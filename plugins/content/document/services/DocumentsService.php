@@ -664,6 +664,22 @@ class DocumentsService extends KalturaEntryService
 		$this->approveReplace($dbEntry);
 		return $this->getEntry($entryId, -1, KalturaEntryType::DOCUMENT);
 	}
+	
+	protected function approveReplace(DocumentEntry $dbEntry)
+	{
+		if ($dbEntry->getReplacementStatus() == entryReplacementStatus::APPROVED_BUT_NOT_READY)
+		{
+			$dbReplacingEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
+			if ($dbReplacingEntry && $dbReplacingEntry->getStatus() == entryStatus::READY)
+			{
+				kBusinessConvertDL::replaceEntry($dbEntry);
+			}
+		}
+		else
+		{
+			parent::approveReplace($dbEntry);
+		}
+	}
 
 	/**
 	 * Cancels document replacement
@@ -691,7 +707,7 @@ class DocumentsService extends KalturaEntryService
 		//$entry->validatePropertyMinLength("name", 1);
 		$entry->validatePropertyNotNull("documentType");
 		
-		$dbEntry = parent::prepareEntryForInsert($entry);
+		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 	
 		if ($entry->conversionProfileId) 
 		{
