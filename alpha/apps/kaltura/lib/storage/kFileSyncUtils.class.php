@@ -1326,6 +1326,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds($key->partner_id, true);
+		if(!is_array($sharedDcIds))
+		{
+			$sharedDcIds = array($sharedDcIds);
+		}
 		foreach ($sharedDcIds as $sharedDcId)
 		{
 			//If original file sync was already created in teh shared storage skip

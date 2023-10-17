@@ -87,7 +87,7 @@ class kDataCenterMgr
 		{
 			$sharedStorageProfileId = null;
 			$partnerId = $partnerId ? $partnerId : kCurrentContext::getCurrentPartnerId();
-			$partner = $partnerId ? PartnerPeer::retrieveByPK($partnerId) : null;
+			$partner = ($partnerId && $partnerId > 0) ? PartnerPeer::retrieveByPK($partnerId) : null;
 			if($partner)
 			{
 				$sharedStorageProfileId = $partner->getSharedStorageProfileId();
@@ -103,13 +103,13 @@ class kDataCenterMgr
 
 		if($getFirst)
 		{
-			return array(reset(self::$shared_storage_profile_ids[$partnerId]));
+			return count(self::$shared_storage_profile_ids[$partnerId]) ? reset(self::$shared_storage_profile_ids[$partnerId]) : null;
 		}
 
 		return self::$shared_storage_profile_ids[$partnerId];
 	}
 
-	public static function getSharedStorageProfileIdsInternal()
+	public static function getGlobalSharedStorageProfileIds()
 	{
 		$sharedStorageProfileIds = kConf::get('shared_storage_profile_ids', 'cloud_storage', array());
 		if(is_array($sharedStorageProfileIds))

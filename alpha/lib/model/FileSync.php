@@ -331,10 +331,11 @@ class FileSync extends BaseFileSync implements IBaseObject
 		{
 			return null;
 		}
-		$kalturaPeriodicStorage = false;
-		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIds()))
+
+		$isKalturaSharedStorage = false;
+		if(in_array($this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId())))
 		{
-			$kalturaPeriodicStorage = true;
+			$isKalturaSharedStorage = true;
 		}
 
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
@@ -346,7 +347,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$url = $urlManager->getFileSyncUrl($this);
 		$baseUrl = $urlManager->getUrl();
 
-		if($kalturaPeriodicStorage)
+		if($isKalturaSharedStorage)
 		{
 			if($internalUsage && $storage->getProtocol() === StorageProfile::STORAGE_PROTOCOL_S3)
 			{
@@ -356,19 +357,29 @@ class FileSync extends BaseFileSync implements IBaseObject
 			{
 				return $this->getAssetDownloadUrl();
 			}
-			else
+			else if(in_array($this->getDc(), kDataCenterMgr::getGlobalSharedStorageProfileIds()))
 			{
 				$url = '/direct' . $url;
 				$authParams = $this->addKalturaAuthParams($url);
 				$url .= $authParams;
 
-				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0) {
+				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0)
+				{
+					$baseUrl = preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
+				}
+			}
+			else
+			{
+				$url = preg_replace('#//+#', '/', '/direct/bucket/' . $this->getFileRoot() . '/' . $url);
+				$authParams = $this->addKalturaAuthParams($url);
+				$url .= $authParams;
+
+				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0)
+				{
 					$baseUrl = preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
 				}
 			}
 		}
-
-
 
 		$url = ltrim($url, "/");
 		if (strpos($url, "://") === false)

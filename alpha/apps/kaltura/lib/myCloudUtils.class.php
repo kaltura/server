@@ -31,7 +31,7 @@ class myCloudUtils
 		return $exportRatio > $random;
 	}
 
-	public static function getPartnerSharedStoargeBaseDir($partnerId)
+	public static function getPartnerSharedStorageBaseDir($partnerId)
 	{
 		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($partnerId, true);
 		if($sharedStorageProfileId && $sharedStorageProfileId->getStorageBaseDir())

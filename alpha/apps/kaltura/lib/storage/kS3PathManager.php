@@ -56,7 +56,7 @@ class kS3PathManager extends kPathManager
 	 */
 	public function getExportCsvFilePath($partnerId, $fileName = '')
 	{
-		$storageBaseDir = myCloudUtils::getPartnerSharedStoargeBaseDir($partnerId);
+		$storageBaseDir = myCloudUtils::getPartnerSharedStorageBaseDir($partnerId);
 		if ($storageBaseDir)
 		{
 			return  $storageBaseDir . '/exportcsv/' . myContentStorage::getScatteredPathFromIntId($partnerId) . DIRECTORY_SEPARATOR. $fileName;
