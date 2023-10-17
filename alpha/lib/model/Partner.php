@@ -120,6 +120,8 @@ class Partner extends BasePartner
 	
 	private $cdnWhiteListCache = array();
 
+	const CUSTOM_DATE_MAX_METADATA_INDEX_LENGTH = 'max_metadata_index_length';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -2381,5 +2383,15 @@ class Partner extends BasePartner
 	public function setRecycleBinRetentionPeriod($v)
 	{
 		return $this->putInCustomData(self::RECYCLE_BIN_RETENTION_PERIOD, $v);
+	}
+
+	public function getSearchMaxMetadataIndexLength()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATE_MAX_METADATA_INDEX_LENGTH);
+	}
+
+	public function setSearchMaxMetadataIndexLength($v)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATE_MAX_METADATA_INDEX_LENGTH, $v);
 	}
 }
