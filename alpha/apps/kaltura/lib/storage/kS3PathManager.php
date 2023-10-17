@@ -32,7 +32,7 @@ class kS3PathManager extends kPathManager
 		if(!$storageProfileId && $partnerId)
 		{
 			$partner = PartnerPeer::retrieveByPK($partnerId);
-			$storageProfileId = $partner ? $partner->getSharedStorageProfileId() : null;
+			$storageProfileId = $partner ? $partnerSharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($partner->getId(), true) : null;
 		}
 		
 		if(!$storageProfileId)

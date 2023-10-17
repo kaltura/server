@@ -2276,25 +2276,12 @@ class Partner extends BasePartner
 
 	public function getSharedStorageProfileId()
 	{
-		$sharedStorageId = $this->getPartnerSharedStorageId();
-		if(!$sharedStorageId)
-		{
-			$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIdsInternal();
-			if(count($sharedStorageIds))
-			{
-				$sharedStorageId = reset($sharedStorageIds);
-			}
-		}
-
-		KalturaLog::debug("TTT: Shared storage Id found is [$sharedStorageId]");
-		return $sharedStorageId;
-	}
-
-	public function getPartnerSharedStorageId()
-	{
 		$partnerDedicatedStorage = StorageProfilePeer::retrieveByPartnerIdAndProtocol($this->getPartnerId(), StorageProfileProtocol::KALTURA_DC);
-		return $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
 
+		$sharedStorageId = $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
+		KalturaLog::debug("TTT: Shared storage Id found is [$sharedStorageId]");
+
+		return $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
 	}
 
 //	public function getSharedStorageProfileId()
