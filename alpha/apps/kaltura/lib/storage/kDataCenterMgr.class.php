@@ -93,7 +93,7 @@ class kDataCenterMgr
 				$sharedStorageProfileId = $partner->getSharedStorageProfileId();
 			}
 
-			$sharedStorageProfileIds = self::getSharedStorageProfileIdsInternal();
+			$sharedStorageProfileIds = self::getGlobalSharedStorageProfileIds();
 			if($sharedStorageProfileId)
 			{
 				$sharedStorageProfileIds = array_merge(array($sharedStorageProfileId), $sharedStorageProfileIds);
