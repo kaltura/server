@@ -138,6 +138,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COMBINED_LIVE_AVG_PLAY_TIME = 'combined_live_avg_play_time';
 	const METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC = 'meeting_high_eng_view_period_view_time_sum';
 	const METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO = 'combined_live_engaged_users_play_time_ratio';
+	const METRIC_VOD_LIVE_AVG_VIEW_TIME = 'vod_live_avg_view_time';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -561,6 +562,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => true,
+		self::METRIC_VOD_LIVE_AVG_VIEW_TIME => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1742,6 +1744,16 @@ class kKavaReportsMgr extends kKavaBase
 			    self::getArithmeticPostAggregator("subLiveAndMeeting", "+", array(
 					self::getFieldAccessPostAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC),
 				    self::getFieldAccessPostAggregator(self::METRIC_MEETING_VIEW_TIME_SEC))))));
+
+		self::$metrics_def[self::METRIC_VOD_LIVE_AVG_VIEW_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_UNIQUE_VOD_LIVE_VIEWERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_VOD_LIVE_AVG_VIEW_TIME, '/', array(
+				self::getArithmeticPostAggregator('sumVodLiveMeetingPlayTime', '+', array(
+					self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+					self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'),
+					self::getConstantRatioPostAggr('subVodPlayTime', self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'))),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VOD_LIVE_VIEWERS, self::METRIC_UNIQUE_VOD_LIVE_VIEWERS))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 
