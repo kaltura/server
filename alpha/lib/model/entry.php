@@ -3663,11 +3663,18 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$this->setSource($value);
 	}
-
-	public function addClonePendingEntry($entryId)
+	
+	public function addClonePendingEntry($entryId, $maxClonedEntriesHistory = 10)
 	{
 		$clonePendingEntries = $this->getClonePendingEntries();
 		$clonePendingEntries[] = $entryId;
+		
+		// limit $clonePendingEntries to the last $maxClonedEntriesHistory cloned entries (to avoid custom_data being too large for draft entries)
+		while (count($clonePendingEntries) > $maxClonedEntriesHistory)
+		{
+			array_shift($clonePendingEntries);
+		}
+		
 		$this->setClonePendingEntries($clonePendingEntries);
 	}
 
