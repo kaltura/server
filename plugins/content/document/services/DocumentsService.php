@@ -17,6 +17,8 @@ class DocumentsService extends KalturaEntryService
      */
     protected function attachResource(kResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
+		$dbEntry->setStatus(entryStatus::READY);
+		$dbEntry->save();
     	switch($resource->getType())
     	{
 			case 'kAssetsParamsResourceContainers':
@@ -664,22 +666,6 @@ class DocumentsService extends KalturaEntryService
 		$this->approveReplace($dbEntry);
 		return $this->getEntry($entryId, -1, KalturaEntryType::DOCUMENT);
 	}
-	
-	protected function approveReplace(DocumentEntry $dbEntry)
-	{
-		if ($dbEntry->getReplacementStatus() == entryReplacementStatus::APPROVED_BUT_NOT_READY)
-		{
-			$dbReplacingEntry = entryPeer::retrieveByPK($dbEntry->getReplacingEntryId());
-			if ($dbReplacingEntry && $dbReplacingEntry->getStatus() == entryStatus::READY)
-			{
-				kBusinessConvertDL::replaceEntry($dbEntry);
-			}
-		}
-		else
-		{
-			parent::approveReplace($dbEntry);
-		}
-	}
 
 	/**
 	 * Cancels document replacement
@@ -712,10 +698,6 @@ class DocumentsService extends KalturaEntryService
 		if ($entry->conversionProfileId) 
 		{
 			$dbEntry->setStatus(entryStatus::PRECONVERT);
-		}
-		else 
-		{
-			$dbEntry->setStatus(entryStatus::READY);
 		}
 			
 		$dbEntry->setDefaultModerationStatus();
