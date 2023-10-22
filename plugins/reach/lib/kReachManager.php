@@ -34,6 +34,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			"categoryEntry" => objectType::CATEGORY_ENTRY,
 			"CaptionAsset" => CaptionAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(CaptionAssetEventNotificationEventObjectType::CAPTION_ASSET),
 			"TranscriptAsset" => TranscriptAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(TranscriptAssetEventNotificationEventObjectType::TRANSCRIPT_ASSET),
+			"Metadata" => MetadataEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(MetadataEventNotificationEventObjectType::METADATA),
 			);
 
 		if (isset($mapObjectType[$eventObjectClassName]))
