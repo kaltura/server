@@ -260,8 +260,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		foreach ($languageEntryCaptionAsset as $language => $entryCaptionAsset)
 		{
 			KalturaLog::debug("Copy captions for language [$language]");
-			$captionAsset = $this->getNewCaptionAsset($entryCaptionAsset);
-			$captionAsset->language = $language;
+			$captionAsset = $this->getNewCaptionAsset($entryCaptionAsset, $language);
 			$newCaptionAsset = $this->addCaptionAsset($data->entryId, $captionAsset);
 			$newCaptionAssetResource = new KalturaStringResource();
 			foreach ($clipDescriptionArray as $clipDescription)
@@ -286,7 +285,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		}
 	}
 
-	protected function getNewCaptionAsset($entryCaptionAssetArray)
+	protected function getNewCaptionAsset($entryCaptionAssetArray, $language)
 	{
 		$captionAsset = new KalturaCaptionAsset();
 		foreach ($entryCaptionAssetArray as $entryCaptionAsset)
@@ -297,6 +296,8 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 				$captionAsset->fileExt = $entryCaptionAsset->fileExt;
 			}
 		}
+		$captionAsset->language = $language;
+		$captionAsset->label = $language;
 		return $captionAsset;
 	}
 
