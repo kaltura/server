@@ -245,8 +245,8 @@ class UserController extends Zend_Controller_Action
 </head>
 <body>
 <form class="login-form" action="' . $redirectUrl . '" method="post">
-    <input type="hidden" id="partnerId" name="partnerId" value="-2" />
-    <input type="hidden" id="user" name="user" value="sso.kaltura.com" />
+    <input type="hidden" id="appType" name="appType" value="adminConsole" />
+    <input type="hidden" id="email" name="email" value="sso@adminconsole.kaltura.com" />
 </form>
 </body>
 <script>
