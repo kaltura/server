@@ -79,7 +79,7 @@ abstract class zoomProcessor
 		return $kalturaUser;
 	}
 	
-	protected function getZoomRedirectUrlFromFile($recording)
+	protected function getZoomAuthorizationHeaderFromFile($recording)
 	{
 		if (!isset($recording->recordingFile->downloadToken) && !isset($this->dropFolder->accessToken))
 		{
