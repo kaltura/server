@@ -17,7 +17,14 @@ class DocumentsService extends KalturaEntryService
      */
     protected function attachResource(kResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
-		$dbEntry->setStatus(entryStatus::READY);
+		if ($dbEntry->getConversionProfile())
+		{
+			$dbEntry->setStatus(entryStatus::PRECONVERT);
+		}
+		else
+		{
+			$dbEntry->setStatus(entryStatus::READY);
+		}
 		$dbEntry->save();
     	switch($resource->getType())
     	{
@@ -694,13 +701,7 @@ class DocumentsService extends KalturaEntryService
 		$entry->validatePropertyNotNull("documentType");
 		
 		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
-	
-		if ($entry->conversionProfileId) 
-		{
-			$dbEntry->setStatus(entryStatus::PRECONVERT);
-		}
 			
-		$dbEntry->setDefaultModerationStatus();
 		$dbEntry->save();
 		
 		return $dbEntry;
