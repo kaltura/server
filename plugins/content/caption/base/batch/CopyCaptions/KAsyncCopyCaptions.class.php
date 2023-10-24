@@ -236,6 +236,10 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 	{
 		$errorMsg = '';
 		$clipDescriptionArray = $data->clipsDescriptionArray;
+		if (count($clipDescriptionArray) == 0)
+		{
+			return;
+		}
 		$originalCaptionAssets = $this->listCaptionAssets($clipDescriptionArray[0]->sourceEntryId);
 		if (!$data->fullCopy)
 		{
