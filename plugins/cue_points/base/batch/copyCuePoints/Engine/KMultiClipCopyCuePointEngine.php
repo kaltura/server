@@ -79,12 +79,27 @@ class KMultiClipCopyCuePointEngine extends KCopyCuePointEngine
 	 * @param string $destinationEntryId
 	 * @throws Exception
 	 */
-	private function mergeCuePoint($destinationEntryId)
+	protected function mergeCuePoint($destinationEntryId)
+	{
+		$cuePoints = $this->getCuePointsForMerge($destinationEntryId);
+		$this->mergeCuePointByType($cuePoints);
+	}
+
+	protected function getCuePointsForMerge($destinationEntryId)
 	{
 		$filter = $this->getCuePointFilterForMerge($destinationEntryId);
 		$pager = $this->getCuePointPager();
 		$cuePoints = $this->getAllCuePointFromNewEntry($filter, $pager);
-		$this->mergeCuePointByType($cuePoints);
+		$cuePointsForMerge = array();
+		foreach ($cuePoints as $cuePoint)
+		{
+			if ($cuePoint->systemName == self::MULTI_CLIP_CHAPTER_SYSTEM_NAME)
+			{
+				continue;
+			}
+			$cuePointsForMerge[] = $cuePoint;
+		}
+		return $cuePointsForMerge;
 	}
 
 	private function getCuePointFilterForMerge($destinationEntryId)

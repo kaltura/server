@@ -14,6 +14,7 @@ abstract class KCopyCuePointEngine
 	const CUE_POINT_CODE = 'codeCuePoint.Code';
 
 	const CUE_POINT_CLONE_PERMISSION_ERROR = 'NO_PERMISSION_TO_COPY_CUE_POINT_TO_ENTRY';
+	const MULTI_CLIP_CHAPTER_SYSTEM_NAME = "MULTI_CLIP_CHAPTER";
 
 	protected $data = null;
 	protected $partnerId = null;
@@ -24,11 +25,17 @@ abstract class KCopyCuePointEngine
 
 	protected function shouldCopyCuePoint($cuePoint)
 	{
+		if ($cuePoint->systemName == self::MULTI_CLIP_CHAPTER_SYSTEM_NAME)
+		{
+			return false;
+		}
 		$extendedShouldCopyTagsArray = array(self::CUE_POINT_CODE => array("poll-data"));
 		foreach($extendedShouldCopyTagsArray as $type => $tags)
 		{
 			if ($cuePoint->cuePointType == $type && count(array_intersect(explode(",", $cuePoint->tags), $tags)))
+			{
 				return true;
+			}
 		}
 		return false;
 	}

@@ -13,6 +13,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY = 1000;
+	const MULTI_CLIP_CHAPTER_SYSTEM_NAME = "MULTI_CLIP_CHAPTER";
 
 	/* (non-PHPdoc)
  	 * @see kBatchJobStatusEventConsumer::updatedJob()
@@ -105,6 +106,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$chapter->setThumbOffset($offset);
 		$chapter->setStartTime($offset);
 		$chapter->setName("$sourceEntryId");
+		$chapter->setSystemName(self::MULTI_CLIP_CHAPTER_SYSTEM_NAME);
 		$chapter->setStatus(KalturaCuePointStatus::READY);
 		$chapter->save();
 	}
