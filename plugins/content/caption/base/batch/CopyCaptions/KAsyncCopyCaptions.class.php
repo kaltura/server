@@ -124,14 +124,14 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		return $unsupportedFormats;
 	}
 
-	protected function cloneCaptionAsset($targetEntryId, $clonedCaptionAsset)
+	protected function cloneCaptionAsset($targetEntryId, $originalCaptionAsset)
 	{
 		$captionAsset = new KalturaCaptionAsset();
-		KalturaLog::info("Start copying properties from caption asset: [{$clonedCaptionAsset->id}] to new caption asset on entryId: [$targetEntryId]");
+		KalturaLog::info("Start copying properties from caption asset: [{$originalCaptionAsset->id}] to new caption asset on entryId: [$targetEntryId]");
 		$propertiesToCopy = array("tags", "fileExt", "language", "label", "format", "isDefault", "displayOnPlayer", "accuracy");
 		foreach ($propertiesToCopy as $property)
 		{
-			$captionAsset->$property = $clonedCaptionAsset->$property;
+			$captionAsset->$property = $originalCaptionAsset->$property;
 		}
 		$newCaption = $this->addCaptionAsset($targetEntryId, $captionAsset);
 		return $newCaption;
@@ -198,7 +198,6 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		return $captionContent;
 	}
 
-
 	protected function getCaptionContent($captionAssetId)
 	{
 		KalturaLog::info("Retrieve caption assets content for captionAssetId: [$captionAssetId]");
@@ -210,6 +209,21 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		catch(Exception $e)
 		{
 			KalturaLog::info("Can't serve caption asset id [$captionAssetId] " . $e->getMessage());
+		}
+		return $captionAssetContent;
+	}
+
+	protected function getWebvttCaptionContent($captionAssetId)
+	{
+		KalturaLog::info("Retrieve caption assets content in WebVTT format for captionAssetId: [$captionAssetId]");
+		try
+		{
+			$captionAssetContentUrl= $this->captionClientPlugin->captionAsset->serveWebVTT($captionAssetId, 0, -1);
+			$captionAssetContent = KCurlWrapper::getContent($captionAssetContentUrl);
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info("Can't serve WebVTT content for caption asset id [$captionAssetId] " . $e->getMessage());
 		}
 		return $captionAssetContent;
 	}
@@ -347,10 +361,13 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 	protected function clipAndConcatSub(KalturaCopyCaptionsJobData $data, $clipDescriptionArray, $originalCaptionAsset, $newCaptionAsset, $newCaptionAssetResource, &$errorMsg)
 	{
 		$captionAssetId = $originalCaptionAsset->id;
-		$captionContent = $this->getCaptionContent($captionAssetId);
-		if($originalCaptionAsset->format == CaptionType::SRT && $newCaptionAsset->format == CaptionType::WEBVTT)
+		if($originalCaptionAsset->format != CaptionType::WEBVTT && $newCaptionAsset->format == CaptionType::WEBVTT)
 		{
-			$captionContent = kCaptionsContentManager::convertSrtToWebvtt($captionContent);
+			$captionContent = $this->getWebvttCaptionContent($captionAssetId);
+		}
+		else
+		{
+			$captionContent = $this->getCaptionContent($captionAssetId);
 		}
 
 		KalturaLog::info("Create new caption file based on captionAssetId:[$captionAssetId]");

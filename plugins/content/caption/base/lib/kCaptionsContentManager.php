@@ -336,42 +336,4 @@ abstract class kCaptionsContentManager
 		return $newFileContent;
 	}
 
-	public static function convertSrtToWebvtt($content)
-	{
-		$newFileContent = webVttCaptionsContentManager::WEBVTT_PATTERN . kCaptionsContentManager::UNIX_LINE_ENDING;
-		$srtContentManager = new srtCaptionsContentManager();
-		$originalFileContentArray = kCaptionsContentManager::getFileContentAsArray($content);
-		while (($line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray)) !== false)
-		{
-			$currentBlock = '';
-			while ($line !== false && trim($line) !== '')
-			{
-				$currentBlock .= kCaptionsContentManager::srtToWebvttTimeLine($srtContentManager, $line);
-				$line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray);
-			}
-			$newFileContent .= kCaptionsContentManager::removeBlockIdentifier($currentBlock);
-		}
-		return $newFileContent;
-	}
-
-	protected static function removeBlockIdentifier($blockStr)
-	{
-		$blockArray = explode(kCaptionsContentManager::UNIX_LINE_ENDING, $blockStr);
-		array_shift($blockArray);
-		return implode(kCaptionsContentManager::UNIX_LINE_ENDING, $blockArray);
-	}
-
-	protected static function srtToWebvttTimeLine($srtContentManager, $line)
-	{
-		$matches = array();
-		$timecode_match = preg_match(srtCaptionsContentManager::SRT_TIMECODE_PATTERN, $line, $matches);
-		if ($timecode_match)
-		{
-			$startCaption = $srtContentManager->parseCaptionTime($matches[1]);
-			$endCaption = $srtContentManager->parseCaptionTime($matches[2]);
-			$timeLine = kWebVTTGenerator::formatWebVTTTimeStamp($startCaption) . ' --> ' . kWebVTTGenerator::formatWebVTTTimeStamp($endCaption);
-			$line = kCaptionsContentManager::UNIX_LINE_ENDING . $timeLine;
-		}
-		return $line . kCaptionsContentManager::UNIX_LINE_ENDING;
-	}
 }
