@@ -1,4 +1,4 @@
-# Scorpius-19.19.0
+# Scorpius-19.20.0
 ## Add virtualevent get permission for game service partner
 * Issue type: Feature
 * Issue Id: PLAT-24472
