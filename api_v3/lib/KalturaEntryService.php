@@ -149,8 +149,15 @@ class KalturaEntryService extends KalturaBaseService
 		if(!$partner->getEnabledService(PermissionName::FEATURE_ENTRY_REPLACEMENT_APPROVAL) || $dbEntry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 			$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 		$dbEntry->save();
-
+		
+		$this->changeToReadyIfDocument($tempDbEntry);
+		
 		$this->attachResource($kResource, $tempDbEntry);
+	}
+	
+	protected function changeToReadyIfDocument($dbEntry)
+	{
+	
 	}
 
 	protected function validateEntryForReplace($entryId, $dbEntry, $entryType = null)

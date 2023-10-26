@@ -17,15 +17,6 @@ class DocumentsService extends KalturaEntryService
      */
     protected function attachResource(kResource $resource, entry $dbEntry, asset $dbAsset = null)
     {
-		if ($dbEntry->getConversionProfile())
-		{
-			$dbEntry->setStatus(entryStatus::PRECONVERT);
-		}
-		else
-		{
-			$dbEntry->setStatus(entryStatus::READY);
-		}
-		$dbEntry->save();
     	switch($resource->getType())
     	{
 			case 'kAssetsParamsResourceContainers':
@@ -705,5 +696,18 @@ class DocumentsService extends KalturaEntryService
 		$dbEntry->save();
 		
 		return $dbEntry;
+	}
+	
+	protected function changeToReadyIfDocument($dbEntry)
+	{
+		if ($dbEntry->getConversionProfile())
+		{
+			$dbEntry->setStatus(entryStatus::PRECONVERT);
+		}
+		else
+		{
+			$dbEntry->setStatus(entryStatus::READY);
+		}
+		$dbEntry->save();
 	}
 }
