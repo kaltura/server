@@ -5,7 +5,7 @@
 ### Deployment ###
 run the following script:
 ```
-php deployment/updates/scripts/add_permissions/2023_10_25_update_gaming_services_permission
+php deployment/updates/scripts/add_permissions/2023_10_25_update_gaming_services_permission.php
 ```
 ## Add KMultiClipConcatCloser worker ##
 * Issue Type: Task
