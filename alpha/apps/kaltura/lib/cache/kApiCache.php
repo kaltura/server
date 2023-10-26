@@ -630,7 +630,7 @@ class kApiCache extends kApiCacheBase
 						continue;					// failed to get the invalidation time from memcache, can't use cache
 					}
 	
-					if ($cachedInvalidationTime < $invalidationTime)
+					if ($cachedInvalidationTime <= $invalidationTime)
 					{
 						if (self::$_debugMode)
 							$this->debugLog("validateCachingRules - invalidation keys changed since the response was cached");
