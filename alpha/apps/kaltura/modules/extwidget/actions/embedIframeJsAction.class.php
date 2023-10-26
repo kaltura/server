@@ -43,7 +43,7 @@ class embedIframeJsAction extends sfAction
 
 		$widget_id = $this->getRequestParameter("widget_id", '_' . $partner_id);
 
-		$host = myPartnerUtils::getCdnHost($partner_id, $protocol, 'api');
+		$host = myPartnerUtils::getCdnHost($partner_id, $protocol, myPartnerUtils::HOST_TYPE_API);
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
 

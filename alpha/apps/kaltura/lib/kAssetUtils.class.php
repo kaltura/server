@@ -88,7 +88,7 @@ class kAssetUtils
 
 		if($asset instanceof flavorAsset && $servePlayManifest)
 		{
-			$url =  requestUtils::getApiCdnHost() . $asset->getPlayManifestUrl($playManifestClientTag , $storageId);
+			$url =  myPartnerUtils::getCdnHost($asset->getPartnerId(), null, myPartnerUtils::HOST_TYPE_API) . $asset->getPlayManifestUrl($playManifestClientTag , $storageId);
 		}
 		else
 		{
@@ -187,7 +187,7 @@ class kAssetUtils
 			// in case of an https request, if a delivery profile which supports https doesn't exist use an http cdn api host
 			if (infraRequestUtils::getProtocol() == infraRequestUtils::PROTOCOL_HTTPS &&
 				DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($fileSync->getDc(), $asset->getEntryId(), PlaybackProtocol::HTTP, "https")))
-				$url = requestUtils::getApiCdnHost();
+				$url = myPartnerUtils::getCdnHost($partner->getId(), null, myPartnerUtils::HOST_TYPE_API);
 			else
 				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
 

@@ -622,7 +622,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		// in order to avoid conflicts with access_control (geo-location restriction), we always return the requestHost (www_host from kConf)
 		// and not the CDN host relevant for the partner.
 		
-		// Tan-Tan January 27 2011 - in some places we do need the cdn, I added a paramter useCdn to force it.
+		// Tan-Tan January 27 2011 - in some places we do need the cdn, I added a parameter useCdn to force it.
 		if($useCdn)
 		{
 			// TODO in that case we should use the serve flavor and the url manager in order to support secured and signed urls

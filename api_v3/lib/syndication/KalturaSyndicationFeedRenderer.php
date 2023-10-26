@@ -879,7 +879,7 @@ class KalturaSyndicationFeedRenderer
 			if (is_null($deliveryProfile))
 				$url = infraRequestUtils::PROTOCOL_HTTP . "://" . kConf::get("cdn_api_host");
 			else
-				$url = requestUtils::getApiCdnHost();
+				$url = myPartnerUtils::getCdnHost($partner->getId(), null, myPartnerUtils::HOST_TYPE_API);
 		
 			$url .= $flavorAsset->getPlayManifestUrl($clientTag, $storage->getId());
 		}
@@ -930,7 +930,7 @@ class KalturaSyndicationFeedRenderer
 					$shouldAddKtToken = true;
 			}
 
-			$cdnHost = requestUtils::getApiCdnHost();
+			$cdnHost = myPartnerUtils::getCdnHost($partner->getId(), null, myPartnerUtils::HOST_TYPE_API);
 			$clientTag = 'feed:' . $this->syndicationFeedDb->getId();
 			$url = $cdnHost . $flavorAsset->getPlayManifestUrl($clientTag, null, PlaybackProtocol::HTTP , $shouldAddKtToken);
 		}
