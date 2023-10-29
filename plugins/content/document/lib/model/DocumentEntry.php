@@ -28,6 +28,10 @@ class DocumentEntry extends entry
 		return kFileSyncUtils::getReadyFileSyncForKey($syncKey, true, false);
 	}
 
+	protected function copyTypedDependentFieldFromTemplate($template)
+	{
+	}
+
 	/* (non-PHPdoc)
 	 * @see lib/model/entry#getDownloadUrl()
 	 */
