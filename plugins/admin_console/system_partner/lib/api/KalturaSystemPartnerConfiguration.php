@@ -480,6 +480,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var int
 	 */
 	public $maxWordForNgram;
+
+	/**
+	 * @var int
+	 */
+	public $searchMaxMetadataIndexLength;
 	 
 	/**
 	 * @var KalturaTwoFactorAuthenticationMode
@@ -598,6 +603,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'allowedDomains',
 		'trigramPercentage',
 		'maxWordForNgram',
+		'searchMaxMetadataIndexLength',
 		'twoFactorAuthenticationMode',
 		'purifyImageContent',
 		'isSelfServe',

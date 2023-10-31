@@ -13,6 +13,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 {
 	const MAX_CUE_POINTS_TO_COPY_TO_VOD = 100;
 	const MAX_CUE_POINTS_TO_COPY = 1000;
+	const MULTI_CLIP_CHAPTER_SYSTEM_NAME = "MULTI_CLIP_CHAPTER";
 
 	/* (non-PHPdoc)
  	 * @see kBatchJobStatusEventConsumer::updatedJob()
@@ -66,6 +67,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		/** @var $data kMultiClipConcatJobData*/
 		$destEntryId = $data->getDestEntryId();
 		$partnerId = $data->getPartnerId();
+		$resourcesClipDescriptionArray = array();
 		foreach ($data->getOperationResources() as $operationResource)
 		{
 			$resource = $operationResource->getResource();
@@ -80,8 +82,12 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			}
 			$operationAttributes = $operationResource->getOperationAttributes();
 			self::addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $pastClipsDuration);
+			$resourceClipDescriptionArray = self::getClipDescriptionFromOperationAttribute($operationAttributes, $sourceEntryId, $pastClipsDuration);
+			$resourcesClipDescriptionArray = array_merge($resourcesClipDescriptionArray, $resourceClipDescriptionArray);
+			KalturaLog::debug("Cue Point Destination Entry ID: [$destEntryId] and source entry ID: [$sourceEntryId]");
 			$pastClipsDuration += self::getClipsDuration($operationAttributes);
 		}
+		kJobsManager::addMultiClipCopyCuePointsJob($destEntryId, $partnerId, $resourcesClipDescriptionArray);
 	}
 
 	/**
@@ -100,6 +106,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$chapter->setThumbOffset($offset);
 		$chapter->setStartTime($offset);
 		$chapter->setName("$sourceEntryId");
+		$chapter->setSystemName(self::MULTI_CLIP_CHAPTER_SYSTEM_NAME);
 		$chapter->setStatus(KalturaCuePointStatus::READY);
 		$chapter->save();
 	}
@@ -1144,10 +1151,10 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 			$this->reIndexCuePointEntry($cuePoint, $shouldReIndexToSphinx, $shouldReIndexToElastic);
 	}
 
-	private static function getClipDescriptionFromOperationAttribute($operationAttributes, $sourceEntryId)
+	private static function getClipDescriptionFromOperationAttribute($operationAttributes, $sourceEntryId, $baseOffset = 0)
 	{
 		$kClipDescriptionArray = array();
-		$globalOffset = 0;
+		$globalOffset = $baseOffset;
 		/** @var kClipAttributes $operationAttribute */
 		foreach ($operationAttributes as $operationAttribute)
 		{
