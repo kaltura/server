@@ -221,6 +221,9 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 			if (strpos($line,self::WEBVTT_PATTERN) === false)
 				$content .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
 		}
+		// make sure the content does not contain more than 2 consecutive newlines
+		$content = preg_replace('/\n\n+/', "\n\n", $content);
+
 		return $content;
 	}
 }

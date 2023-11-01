@@ -258,14 +258,29 @@ function getRandomPseudoBytes()
 	return md5(KCryptoWrapper::random_pseudo_bytes(16));
 }
 
+
 function getLivePackagerUrl()
 {
-	return kConf::get('live_packager_url');
+	$livePackagerUrl = kConf::get('live_packager_url');
+	$protocol = parse_url($livePackagerUrl, PHP_URL_SCHEME);
+	if(!$protocol)
+	{
+		$livePackagerUrl = "https://" . $livePackagerUrl;
+	}
+
+	return $livePackagerUrl;
 }
 
 function getVodPackagerUrl()
 {
-	return kConf::get('cdn_host_https');
+	$vodPackagerUrl = kConf::get('cdn_host_https');
+	$protocol = parse_url($vodPackagerUrl, PHP_URL_SCHEME);
+	if(!$protocol)
+	{
+		$vodPackagerUrl = "https://" . $vodPackagerUrl;
+	}
+
+	return $vodPackagerUrl;
 }
 
 KalturaLog::log('Done.');
