@@ -691,20 +691,23 @@ class DocumentsService extends KalturaEntryService
 		//$entry->validatePropertyMinLength("name", 1);
 		$entry->validatePropertyNotNull("documentType");
 		
-		$dbEntry = parent::prepareEntryForInsert($entry);
-	
-		if ($entry->conversionProfileId) 
-		{
-			$dbEntry->setStatus(entryStatus::PRECONVERT);
-		}
-		else 
-		{
-			$dbEntry->setStatus(entryStatus::READY);
-		}
+		$dbEntry = parent::prepareEntryForInsert($entry, $dbEntry);
 			
-		$dbEntry->setDefaultModerationStatus();
 		$dbEntry->save();
 		
 		return $dbEntry;
+	}
+	
+	protected function updateTempEntryStatus($dbEntry)
+	{
+		if ($dbEntry->getConversionProfile())
+		{
+			$dbEntry->setStatus(entryStatus::PRECONVERT);
+		}
+		else
+		{
+			$dbEntry->setStatus(entryStatus::READY);
+		}
+		$dbEntry->save();
 	}
 }
