@@ -1,3 +1,17 @@
+# Scorpius-19.20.0
+## Add partner for 'reports' microservice ##
+
+- Issue Type: Feature
+- Issue ID: VCP-15204
+
+### Configuration ###
+    Replace all tokens from the ini file (under 'reports') and remove".template" from the file name:
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_02_01_add_messaging_partner_and_permissions.php
+
+
 # Scorpius-19.19.0
 ## Add KMultiClipConcatCloser worker ##
 * Issue Type: Task
