@@ -150,12 +150,12 @@ class KalturaEntryService extends KalturaBaseService
 			$dbEntry->setReplacementStatus(entryReplacementStatus::APPROVED_BUT_NOT_READY);
 		$dbEntry->save();
 		
-		$this->changeToReadyIfDocument($tempDbEntry);
+		$this->updateTempEntryStatus($tempDbEntry);
 		
 		$this->attachResource($kResource, $tempDbEntry);
 	}
 	
-	protected function changeToReadyIfDocument($dbEntry)
+	protected function updateTempEntryStatus($dbEntry)
 	{
 	
 	}

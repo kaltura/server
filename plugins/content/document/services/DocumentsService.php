@@ -698,7 +698,7 @@ class DocumentsService extends KalturaEntryService
 		return $dbEntry;
 	}
 	
-	protected function changeToReadyIfDocument($dbEntry)
+	protected function updateTempEntryStatus($dbEntry)
 	{
 		if ($dbEntry->getConversionProfile())
 		{
