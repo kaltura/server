@@ -9,7 +9,7 @@
     /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment Scripts ###
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_02_01_add_messaging_partner_and_permissions.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_11_05_add_reports_partner_and_permissions.php
 
 
 # Scorpius-19.19.0
