@@ -50,7 +50,8 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 	protected static function jsonFormat($arr, $basePath)
 	{
 		$docMetadata = [];
-		foreach ($arr as $k => $v ) {
+		foreach ($arr as $k => $v )
+		{
 			$str = simplexml_load_string(kFileBase::getFileContent($basePath . $v));
 			$docMetadata[$k] = json_decode(json_encode($str), true);
 		}
