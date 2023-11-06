@@ -112,7 +112,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		}
 		
 		$this->createImagesListXML($imagesList, $outDirPath, $key);
-		parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME), $outDirPath . DIRECTORY_SEPARATOR);
+		parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME), $outDirPath);
 		self::encryptFileName($basePath, self::IMAGES_LIST_XML_NAME, $key);
 		self::encryptFileName($basePath, self::DOC_METADATA_JSON_NAME, $key);
 		return true;
