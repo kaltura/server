@@ -19,6 +19,14 @@
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_10_24_add_caption_asset_batch_permission.php
 
 
+## Add Slim Audio Player ##
+* Issue Type: Story
+* Issue ID: PLAT-24481
+### Configuration ###
+Add the following to admin.template.ini:
+
+    settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::SAP
+
 # Scorpius-19.19.0
 ## Add KMultiClipConcatCloser worker ##
 * Issue Type: Task
