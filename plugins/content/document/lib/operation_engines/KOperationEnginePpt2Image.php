@@ -21,37 +21,43 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 		}
 	}
 	
-	protected function createDirDescriber($outDir, $fileName) {
+	protected function createDirDescriber($outDir, $fileName, $key) {
 		$fileList = kFile::dirList($outDir, false);
-		$fileListXml = $this->createImagesListXML($fileList);
-		kFile::setFileContent($outDir . DIRECTORY_SEPARATOR . $fileName, $fileListXml->asXML());
-		KalturaLog::info('file list xml [' .$outDir . DIRECTORY_SEPARATOR . $fileName . '] created');
+		$fileListXml = $this->createImagesListXML($fileList, $outDir, $key);
+		kFile::setFileContent($outDir . $fileName, $fileListXml->asXML());
+		KalturaLog::info('file list xml [' . $outDir . $fileName . '] created');
 	}
 	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		$this->createOutputDirectory();
 		$realInFilePath = realpath($inFilePath);
+		$key = $this->getFileNameEncryptKey($operator);
+		$outDirPath = $this->outFilePath . DIRECTORY_SEPARATOR;
 		
 		parent::operate($operator, $realInFilePath, $configFilePath);
 		
-		$this->createDirDescriber($this->outFilePath, self::IMAGES_LIST_XML_NAME);
+		$this->createDirDescriber($outDirPath, self::IMAGES_LIST_XML_NAME, $key);
 
-		parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME, 'metadata' => self::METADATA_XML_NAME), $this->outFilePath . DIRECTORY_SEPARATOR);
-
+		parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME, 'metadata' => self::METADATA_XML_NAME), $outDirPath);
+		self::encryptFileName($outDirPath, self::IMAGES_LIST_XML_NAME, $key);
+		self::encryptFileName($outDirPath, self::METADATA_XML_NAME, $key);
+		self::encryptFileName($outDirPath, self::DOC_METADATA_JSON_NAME, $key);
 	    return true;
 	}
 	
-	// The returned xml will be stored in the images directory. it than can be downloaded by he user with serveFlavorAction and provide him
+	// The returned xml will be stored in the images directory. it than can be downloaded by the user with serveFlavorAction and provide him
 	// information about the created images.
-	private function createImagesListXML($imagesList){
+	private function createImagesListXML($imagesList, $outDir, $key){
 		sort($imagesList);
+		$i = 1;
 		$imagesListXML = new SimpleXMLElement('<'.self::LIST_XML_LABEL_ITEMS.'/>');
 		foreach ($imagesList as $image) {
 			if($image == self::METADATA_XML_NAME)
 				continue;
     		$imageNode = $imagesListXML->addChild(self::LIST_XML_LABEL_ITEM);
-    		$imageNode->addChild(self::LIST_XML_LABEL_NAME, $image);
+    		$imageNode->addAttribute(self::IMAGES_LIST_XML_ATTRIBUTE_INDEX, $i++);
+    		$imageNode->addChild(self::LIST_XML_LABEL_NAME, self::encryptFileName($outDir, $image, $key));
 		}
 		
 		$imagesListXML->addAttribute(self::LIST_XML_ATTRIBUTE_METADATA, self::METADATA_XML_NAME);

@@ -105,16 +105,12 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 			$this->data->engineMessage = $errorMsg;
 		}
 
-		$key = null;
-		if (strpos($operator->params, 'encryptFileNames') !== false)
-		{
-			$key = KBatchBase::$taskConfig->params->encryptSeed . $this->job->entryId;
-		}
+		$key = $this->getFileNameEncryptKey($operator);
 		
 		$this->createImagesListXML($imagesList, $outDirPath, $key);
 		parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME), $outDirPath);
-		self::encryptFileName($basePath, self::IMAGES_LIST_XML_NAME, $key);
-		self::encryptFileName($basePath, self::DOC_METADATA_JSON_NAME, $key);
+		self::encryptFileName($outDirPath, self::IMAGES_LIST_XML_NAME, $key);
+		self::encryptFileName($outDirPath, self::DOC_METADATA_JSON_NAME, $key);
 		return true;
 	}
 	
