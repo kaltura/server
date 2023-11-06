@@ -106,6 +106,9 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		$imagesListXML = $this->createImagesListXML($imagesList);
 	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
 	    KalturaLog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
+
+	    parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME), $outDirPath . DIRECTORY_SEPARATOR);
+
 	    return true;
 	}
 	
