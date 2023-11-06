@@ -1,3 +1,10 @@
+# Scorpius-19.20.0
+## Add caption permissions to batch ##
+* Issue Type: Task
+* Issue ID: PLAT-24455
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_10_24_add_caption_asset_batch_permission.php
+
 # Scorpius-19.19.0
 ## Add KMultiClipConcatCloser worker ##
 * Issue Type: Task
