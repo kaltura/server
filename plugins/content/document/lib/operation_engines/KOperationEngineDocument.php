@@ -56,6 +56,7 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 				$docMetadata[$key] = json_decode(json_encode($str), true);
 			}
 			kFile::setFileContent($basePath . self::DOC_METADATA_JSON_NAME, json_encode($docMetadata));
+
 		}
 		catch (Exception $e)
 		{
@@ -69,8 +70,8 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
             return $fileName;
         }
         $pathinfo = pathinfo ($fileName);
-        $newName = base64_encode(hash_hmac('sha256', $pathinfo['filename'], $key)) . '.' . $pathinfo['extension'];
-        KalturaLog::info(`RENAME: $fileName to $newName` );
+        $newName = rtrim(base64_encode(hash_hmac('sha256', $pathinfo['filename'], $key)), "=") . '.' . $pathinfo['extension'];
+        KalturaLog::info('RENAME: ' . $fileName . ' to ' . $newName);
         kFile::rename($basePath . $fileName, $basePath . $newName);
         return $newName;
     }
