@@ -17,6 +17,8 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 	const IMAGES_LIST_XML_LABEL_NAME = 'name';
 	
 	const IMAGES_LIST_XML_ATTRIBUTE_COUNT = 'count';
+
+	const IMAGES_LIST_XML_ATTRIBUTE_INDEX = 'index';
 	
 	const LEADING_ZEROS_PADDING = '-%03d';
 	
@@ -59,7 +61,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 	{
 		if(kFile::fullMkfileDir($this->outFilePath)){
 			//outFilePath will be the path to the directory in which the images will be saved.
-			$outDirPath = $this->outFilePath;
+			$outDirPath = $this->outFilePath . DIRECTORY_SEPARATOR;
 			//imageMagick decides the format of the output file according to the outFilePath's extension.so the format need to be added.
 			$this->outFilePath = $this->outFilePath.DIRECTORY_SEPARATOR.basename($this->outFilePath).self::LEADING_ZEROS_PADDING.'.'.$this->data->flavorParamsOutput->format;
 		}
@@ -97,19 +99,22 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		// Test output
 		// - Test black Image
 		$identifyExe = KBatchBase::$taskConfig->params->identify;
-		$firstImage = $outDirPath . DIRECTORY_SEPARATOR . $imagesList[0];
+		$firstImage = $outDirPath . $imagesList[0];
 		$errorMsg = $this->testBlackImage($identifyExe, $firstImage, $errorMsg);
 		if(!is_null($errorMsg)) {
 			$this->data->engineMessage = $errorMsg;
 		}
+
+		$key = null;
+		if (strpos($operator->params, 'encryptFileNames') !== false)
+		{
+			$key = KBatchBase::$taskConfig->params->encryptSeed . $this->job->entryId;
+		}
 		
-		$imagesListXML = $this->createImagesListXML($imagesList);
-	    kFile::setFileContent($outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
-	    KalturaLog::info('images list xml ['.$outDirPath.DIRECTORY_SEPARATOR.self::IMAGES_LIST_XML_NAME.'] created');
+		$this->createImagesListXML($imagesList, $outDirPath, $key);
+		parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME), $outDirPath . DIRECTORY_SEPARATOR);
 
-	    parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME), $outDirPath . DIRECTORY_SEPARATOR);
-
-	    return true;
+		return true;
 	}
 	
 	protected function operationComplete($rc, $output) {
@@ -124,17 +129,21 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		}
 	}
 	
-	// The returned xml will be stored in the images directory. it than can be downloaded by he user with serveFlavorAction and provide him
+	// The returned xml will be stored in the images directory. it than can be downloaded by the user with serveFlavorAction and provide him
 	// information about the created images.
-	private function createImagesListXML($imagesList){
+	private function createImagesListXML($imagesList, $outDirPath, $key){
 		sort($imagesList);
+		$i = 1;
 		$imagesListXML = new SimpleXMLElement('<'.self::IMAGES_LIST_XML_LABEL_ITEMS.'/>');
 		foreach ($imagesList as $image) {
     		$imageNode = $imagesListXML->addChild(self::IMAGES_LIST_XML_LABEL_ITEM);
-    		$imageNode->addChild(self::IMAGES_LIST_XML_LABEL_NAME, $image);
+		$imageNode->addAttribute(self::IMAGES_LIST_XML_ATTRIBUTE_INDEX, $i++);
+    		$imageNode->addChild(self::IMAGES_LIST_XML_LABEL_NAME, self::encryptFileName($outDirPath, $image, $key));
 		}
 		$imagesListXML -> addAttribute(self::IMAGES_LIST_XML_ATTRIBUTE_COUNT, count($imagesList));
-		return $imagesListXML;	
+		kFile::setFileContent($outDirPath . self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
+		KalturaLog::info('images list xml [' . $outDirPath . self::IMAGES_LIST_XML_NAME.'] created');
+		return true;	
 	}
 	
 	private function testPasswordRequired($file) {

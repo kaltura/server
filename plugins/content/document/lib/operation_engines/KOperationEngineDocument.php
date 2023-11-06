@@ -62,5 +62,17 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 			KalturaLog::error("Fail to create json file: " . $e->getMessage());
 		}
 	}
+
+    protected static function encryptFileName($basePath, $fileName, $key) {
+        if (!$key )
+        {
+            return $fileName;
+        }
+        $pathinfo = pathinfo ($fileName);
+        $newName = base64_encode(hash_hmac('sha256', $pathinfo['filename'], $key)) . '.' . $pathinfo['extension'];
+        KalturaLog::info(`RENAME: $fileName to $newName` );
+        kFile::rename($basePath . $fileName, $basePath . $newName);
+        return $newName;
+    }
 }
 
