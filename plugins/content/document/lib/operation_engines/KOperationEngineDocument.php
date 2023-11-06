@@ -49,13 +49,16 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
      */
 	protected static function jsonFormat($arr, $basePath)
 	{
-		$docMetadata = [];
-		foreach ($arr as $k => $v )
-		{
-			$str = simplexml_load_string(kFileBase::getFileContent($basePath . $v));
-			$docMetadata[$k] = json_decode(json_encode($str), true);
+		try {
+			$docMetadata = [];
+			foreach ($arr as $key => $path) {
+				$str = simplexml_load_string(kFileBase::getFileContent($basePath . $path));
+				$docMetadata[$key] = json_decode(json_encode($str), true);
+			}
+			kFile::setFileContent($basePath . self::DOC_METADATA_JSON_NAME, json_encode($docMetadata));
+		} catch (Exception $e) {
+			KalturaLog::error("Fail to create json file: " . $e->getMessage());
 		}
-		kFile::setFileContent($basePath . self::DOC_METADATA_JSON_NAME, json_encode($docMetadata));
 	}
 }
 

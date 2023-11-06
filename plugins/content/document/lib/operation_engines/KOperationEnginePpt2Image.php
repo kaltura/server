@@ -37,10 +37,7 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 		
 		$this->createDirDescriber($this->outFilePath, self::IMAGES_LIST_XML_NAME);
 
-		if (strpos($operator->params, 'jsonFormat') !== false)
-		{
-			parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME, 'metadata' => self::METADATA_XML_NAME), $this->outFilePath . DIRECTORY_SEPARATOR);
-		}
+		parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME, 'metadata' => self::METADATA_XML_NAME), $this->outFilePath . DIRECTORY_SEPARATOR);
 
 	    return true;
 	}
