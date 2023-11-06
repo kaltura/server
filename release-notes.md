@@ -1,3 +1,32 @@
+# Scorpius-19.20.0
+## Add partner for 'reports' microservice ##
+
+- Issue Type: Feature
+- Issue ID: VCP-15204
+
+### Configuration ###
+    Replace all tokens from the ini file (under 'reports') and remove".template" from the file name:
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_11_05_add_reports_partner_and_permissions.php
+
+
+## Add caption permissions to batch ##
+* Issue Type: Task
+* Issue ID: PLAT-24455
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_10_24_add_caption_asset_batch_permission.php
+
+
+## Add Slim Audio Player ##
+* Issue Type: Story
+* Issue ID: PLAT-24481
+### Configuration ###
+Add the following to admin.template.ini:
+
+    settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::SAP
+
 # Scorpius-19.19.0
 ## Add KMultiClipConcatCloser worker ##
 * Issue Type: Task
