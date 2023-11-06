@@ -56,7 +56,9 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 				$docMetadata[$key] = json_decode(json_encode($str), true);
 			}
 			kFile::setFileContent($basePath . self::DOC_METADATA_JSON_NAME, json_encode($docMetadata));
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			KalturaLog::error("Fail to create json file: " . $e->getMessage());
 		}
 	}
