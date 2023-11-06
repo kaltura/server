@@ -2,6 +2,8 @@
 
 abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 
+	const DOC_METADATA_JSON_NAME = 'docMetadata.json';
+
 	protected function getPdfInfo($file) {
 		$pdfInfoExe = KBatchBase::$taskConfig->params->pdfInfo;
 		$output = null;
@@ -38,6 +40,27 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 	
 		KalturaLog::info("file $filePath is of unexpected type : {$fileType}");
 		return "invalid file type: {$fileType}";
+	}
+
+    /**
+     * This function is merging and converting XML format to unify json format for the document conversion data
+     * @param $arr - array where the keys will be the keys in the output json and the values are path to XML files to convert
+     * @param $basePath - base path to all files
+     */
+	protected static function jsonFormat($arr, $basePath)
+	{
+		try {
+			$docMetadata = [];
+			foreach ($arr as $key => $path) {
+				$str = simplexml_load_string(kFileBase::getFileContent($basePath . $path));
+				$docMetadata[$key] = json_decode(json_encode($str), true);
+			}
+			kFile::setFileContent($basePath . self::DOC_METADATA_JSON_NAME, json_encode($docMetadata));
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::error("Fail to create json file: " . $e->getMessage());
+		}
 	}
 }
 
