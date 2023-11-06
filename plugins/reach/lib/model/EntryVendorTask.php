@@ -36,6 +36,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_TURN_AROUND_TIME =	'turnAroundTime';
 	const CUSTOM_DATA_EXTERNAL_TASK_ID =      'externalTaskId';
 	const CUSTOM_DATA_CONTENT_DURATION_MSEC =      'contentDurationMsec';
+	const CUSTOM_DATA_PROCESSED_ENTRY_DURATION_MSEC =      'processedEntryDurationMsec';
 	const SEVEN_DAYS =			 604800;
 	const BUSINESS_DAY_FRIDAY = 5;      //Monday is 1
 	const BUSINESS_DAY_NEXT_MONDAY = 8;
@@ -384,17 +385,18 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		{
 			$this->setFinishTime(time());
 		}
-		
-		/*
+
 		$entryDuration = $this->getEntry()->getLengthInMsecs();
-		$taskJobData = $this->getTaskJobData();
-		if(!$taskJobData)
+		if($entryDuration)
 		{
-			$taskJobData = new kVendorTaskData();
+			$taskJobData = $this->getTaskJobData();
+			if(!$taskJobData)
+			{
+				$taskJobData = new kVendorTaskData();
+			}
+			$taskJobData->setEntryDuration($entryDuration);
+			$this->setTaskJobData($taskJobData);
 		}
-		$taskJobData->setEntryDuration($entryDuration);
-		$this->setTaskJobData($taskJobData);
-		*/
 		
 		return parent::preSave($con);
 	}

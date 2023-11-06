@@ -13,10 +13,18 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 	 * @readonly
 	 */
 	public $entryDuration;
+
+	/**
+	 * The duration of the entry processed by the vendor in milliseconds
+	 * @var int
+	 * @requiresPermission insert, update
+	 */
+	public $processedEntryDuration;
 	
 	private static $map_between_objects = array
 	(
 		'entryDuration',
+		'processedEntryDuration'
 	);
 	
 	/* (non-PHPdoc)
