@@ -1,4 +1,13 @@
 # Scorpius-19.20.0
+## Add virtualevent get permission for game service partner
+* Issue type: Feature
+* Issue Id: PLAT-24472
+### Deployment ###
+run the following script:
+```
+php deployment/updates/scripts/add_permissions/2023_10_25_update_gaming_services_permission.php
+```
+
 ## Add partner for 'reports' microservice ##
 
 - Issue Type: Feature
