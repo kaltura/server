@@ -1633,7 +1633,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	
 	public function getCapabilities()
 	{
-		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, array());
+		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, '');
 		return explode(',', $capabilities);
 	}
 }
