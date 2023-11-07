@@ -879,7 +879,9 @@ class myEntryUtils
 
 		// remark added so ffmpeg will try to load the thumbnail from the original source
 		if ($entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE && !kFile::checkFileExists($orig_image_path))
+		{
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
+		}
 		
 		// check a request for animated thumbs without a concrete vid_slice
 		// in which case we'll create all the frames as one wide image
@@ -895,12 +897,18 @@ class myEntryUtils
 		$cacheLockKey = "thumb-processing-resize" . $finalThumbPath;
 		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thumbnail for 5 minutes
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
+		{
+			myEntryUtils::deleteLocalTempFile($fileToDelete);
 			KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
+		}
 
 		// limit creation of more than XX Imagemagick processes
 		if (kConf::hasParam("resize_thumb_max_processes_imagemagick") &&
 			trim(exec("ps -e -ocmd|awk '{print $1}'|grep -c ".kConf::get("bin_path_imagemagick") )) > kConf::get("resize_thumb_max_processes_imagemagick"))
+		{
+			myEntryUtils::deleteLocalTempFile($fileToDelete);
 			KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
+		}
 
 		if ($entry->getType() == entryType::PLAYLIST)
 			myPlaylistUtils::updatePlaylistStatistics($entry->getPartnerId(), $entry);
@@ -979,6 +987,7 @@ class myEntryUtils
 					$cacheLockKeyProcessing = "thumb-processing".$orig_image_path;
 					if ($cache && !$cache->add($cacheLockKeyProcessing, true, 5 * 60))
 					{
+						myEntryUtils::deleteLocalTempFile($fileToDelete);
 						KExternalErrors::dieError(KExternalErrors::PROCESSING_CAPTURE_THUMBNAIL);
 					}
 
@@ -1006,7 +1015,7 @@ class myEntryUtils
 
 						if (!$success)
 						{
-							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId);
+							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId, $fileToDelete);
 						}
 					}
 
@@ -1052,7 +1061,10 @@ class myEntryUtils
 				else
 				{
 					if (!file_exists($orig_image_path) || !filesize($orig_image_path))
+					{
+						myEntryUtils::deleteLocalTempFile($fileToDelete);
 						KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
+					}
 
 					$imageSizeArray = getimagesize($orig_image_path);
 					if ($thumbParams->getSupportAnimatedThumbnail() && is_array($imageSizeArray) && $imageSizeArray[2] === IMAGETYPE_GIF)
@@ -1075,7 +1087,9 @@ class myEntryUtils
 			}
 			
 			// die if resize operation failed
-			if ($convertedImagePath === null || !@kFile::fileSize($convertedImagePath)) {
+			if ($convertedImagePath === null || !@kFile::fileSize($convertedImagePath))
+			{
+				myEntryUtils::deleteLocalTempFile($fileToDelete);
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 			}
 			
@@ -1126,12 +1140,19 @@ class myEntryUtils
 		}
 
 
-		if($fileToDelete)
-		{
-			kFile::doDeleteFile($fileToDelete);
-		}
+		myEntryUtils::deleteLocalTempFile($fileToDelete);
 
 		return $finalThumbPath;
+	}
+	
+	private static function deleteLocalTempFile($filepath)
+	{
+		if (!is_file($filepath))
+		{
+			return;
+		}
+		
+		kFile::doDeleteFile($filepath);
 	}
 
 	private static function isTempFile($filePath)
@@ -1171,7 +1192,7 @@ class myEntryUtils
 	 * @return flavorAsset
 	 * @throws PropelException
 	 */
-	public static function getFlavorAssetForLocalCapture($entry, $allowNull = false)
+	public static function getFlavorAssetForLocalCapture($entry, $allowNull = false, $fileToDelete = null)
 	{
 		$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($entry->getId(), flavorParams::TAG_THUMBSOURCE);
 		if(is_null($flavorAsset))
@@ -1202,15 +1223,16 @@ class myEntryUtils
 
 		if (is_null($flavorAsset) && !$allowNull)
 		{
+			myEntryUtils::deleteLocalTempFile($fileToDelete);
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		}
 
 		return $flavorAsset;
 	}
 
-	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1)
+	public static function captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, &$flavorAssetId, $width = -1, $height = -1, $fileToDelete = null)
 	{
-		$flavorAsset = self::getFlavorAssetForLocalCapture($entry);
+		$flavorAsset = self::getFlavorAssetForLocalCapture($entry, false, $fileToDelete);
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset);
@@ -1228,6 +1250,7 @@ class myEntryUtils
 				$cache->delete($cacheLockKeyProcessing);
 			}
 			
+			myEntryUtils::deleteLocalTempFile($fileToDelete);
 			KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
 		}
 		
