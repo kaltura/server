@@ -13,6 +13,7 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 	const LIST_XML_LABEL_NAME = 'name';
 	const LIST_XML_ATTRIBUTE_METADATA = 'metadata';
 	const LIST_XML_ATTRIBUTE_COUNT = 'count';
+	const LIST_XML_ATTRIBUTE_INDEX = 'index';
 	
 	
 	protected function createOutputDirectory() {
@@ -56,7 +57,7 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 			if($image == self::METADATA_XML_NAME)
 				continue;
     		$imageNode = $imagesListXML->addChild(self::LIST_XML_LABEL_ITEM);
-    		$imageNode->addAttribute(self::IMAGES_LIST_XML_ATTRIBUTE_INDEX, $i++);
+    		$imageNode->addAttribute(self::LIST_XML_ATTRIBUTE_INDEX, $i++);
     		$imageNode->addChild(self::LIST_XML_LABEL_NAME, self::encryptFileName($outDir, $image, $key));
 		}
 		
