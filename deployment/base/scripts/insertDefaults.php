@@ -6,9 +6,19 @@ if($argc < 2)
 }
 
 $dirName = $argv[1];
+
+if (!file_exists($dirName) && isSupportedTemplateFile($dirName))
+{
+	echo("File [$dirName] support template file for token replacements\n");
+	
+	$dirName = str_replace('.ini', '.template.ini', $dirName);
+	
+	echo("New file is [$dirName]\n");
+}
+
 if(!file_exists($dirName))
 {
-	echo("Defaults configuration files directory [$dirName] is not a valid path");
+	echo("Defaults configuration files directory [$dirName] is not a valid path\n");
 	exit(-2);
 }
 $dirName = realpath($dirName);
@@ -281,6 +291,29 @@ function getVodPackagerUrl()
 	}
 
 	return $vodPackagerUrl;
+}
+
+function isSupportedTemplateFile($dirName)
+{
+	echo("File [$dirName] does not exist - checking if filename support template file\n");
+	
+	// escaping the dot for preg_match to avoid using it as a single wildcard character
+	$supportedTemplateFilenames = array(
+		'01\.Partner',
+		'07\.DeliveryProfile'
+	);
+	
+	$fileName = basename($dirName);
+	
+	foreach ($supportedTemplateFilenames as $supportedTemplateFilename)
+	{
+		if (preg_match("/^$supportedTemplateFilename\w*\.ini/", $fileName) === 1)
+		{
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 KalturaLog::log('Done.');
