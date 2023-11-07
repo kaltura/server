@@ -307,14 +307,21 @@ abstract class kCaptionsContentManager
 				{
 					$adjustedTimeLine = $this->createAdjustedTimeLine($matches, $clipStartTime, $clipEndTime, $globalOffset);
 					if($adjustedTimeLine)
-						$currentBlock .=$adjustedTimeLine;
+					{
+						$currentBlock .= $adjustedTimeLine;
+					}
 					else
+					{
 						$shouldAddBlockToNewFile = false;
+					}
 				}
 				else
+				{
 					$currentBlock .= $line . kCaptionsContentManager::UNIX_LINE_ENDING;
+				}
 				$line = kCaptionsContentManager::getNextValueFromArray($originalFileContentArray);
 			}
+			$shouldAddBlockToNewFile = $shouldAddBlockToNewFile && $currentBlock && trim($currentBlock) !== '';
 			if($shouldAddBlockToNewFile)
 			{
 				$newFileContent = $this->addBlockToNewFile($newFileContent, $currentBlock);
@@ -328,4 +335,5 @@ abstract class kCaptionsContentManager
 		$newFileContent .= $currentBlock . kCaptionsContentManager::UNIX_LINE_ENDING;
 		return $newFileContent;
 	}
+
 }
