@@ -17,6 +17,8 @@ class ZoomVendorIntegration extends VendorIntegration
 	const OPT_OUT_GROUP_NAMES = 'optOutGroupNames';
 	const OPT_IN_GROUP_NAMES = 'optInGroupNames';
 	const GROUP_PARTICIPATION_TYPE = 'groupParticipationType';
+	const HANDLE_COHOSTS_MODE = 'handleCohostsMode';
+	const HANDLE_ALTERNATIVE_HOST_MODE = 'handleAlternativeHostsMode';
 
 	public function setZoomAuthType($v)	{ $this->putInCustomData ( self::ZOOM_AUTH_TYPE, $v); }
 	public function getZoomAuthType()	{ return $this->getFromCustomData(self::ZOOM_AUTH_TYPE, null, kZoomAuthTypes::OAUTH); }
@@ -105,6 +107,26 @@ class ZoomVendorIntegration extends VendorIntegration
 	public function getGroupParticipationType()
 	{
 		return $this->getFromCustomData(self::GROUP_PARTICIPATION_TYPE, null, kZoomGroupParticipationType::NO_CLASSIFICATION);
+	}
+	
+	public function setHandleCohostsMode($v)
+	{
+		$this->putInCustomData(self::HANDLE_COHOSTS_MODE, $v);
+	}
+	
+	public function getHandleCohostsMode()
+	{
+		return $this->removeFromCustomData(self::HANDLE_COHOSTS_MODE);
+	}
+	
+	public function setHandleAlternativeHostsMode($v)
+	{
+		$this->putInCustomData(self::HANDLE_ALTERNATIVE_HOST_MODE, $v);
+	}
+	
+	public function getHandleAlternativeHostsMode()
+	{
+		return $this->removeFromCustomData(self::HANDLE_ALTERNATIVE_HOST_MODE, null, kHandleParticipantsMode::IGNORE);
 	}
 	
 	public function shouldExcludeUserRecordingsIngest($puserId)

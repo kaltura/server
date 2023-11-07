@@ -60,6 +60,16 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	 */
 	public $groupParticipationType;
 	
+	/**
+	 * @var KalturaHandleParticipantsMode
+	 */
+	public $handleCohostsMode;
+	
+	/**
+	 * @var KalturaHandleParticipantsMode
+	 */
+	public $handleAlternativeHostsMode;
+	
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -77,6 +87,8 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'groupParticipationType',
 		'optInGroupNames',
 		'optOutGroupNames',
+		'handleCohostsMode',
+		'handleAlternativeHostsMode',
 	);
 
 	public function getMapBetweenObjects()

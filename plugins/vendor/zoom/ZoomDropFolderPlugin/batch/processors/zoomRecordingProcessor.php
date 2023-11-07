@@ -55,10 +55,11 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 
 		$ownerId = ZoomBatchUtils::getEntryOwnerId($hostEmail, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration, $this->zoomClient);
 		$validatedHosts = $this->getValidatedHosts($recording->meetingMetadata->meetingId, $ownerId);
+		$validatedAlternativeHosts = $this->getValidatedAlternativeHosts($recording->meetingMetadata->meetingId, $ownerId);
 		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $ownerId);
 		if (in_array($recording->recordingFile->fileType, array(KalturaRecordingFileType::VIDEO, KalturaRecordingFileType::AUDIO)))
 		{
-			$entry = $this->handleVideoRecord($recording, $ownerId, $extraUsers, $validatedHosts);
+			$entry = $this->handleVideoRecord($recording, $ownerId, $extraUsers, $validatedHosts, $validatedAlternativeHosts);
 		}
 		else if($recording->recordingFile->fileType == KalturaRecordingFileType::CHAT)
 		{
@@ -78,7 +79,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	 * @throws kCoreException
 	 * @throws Exception
 	 */
-	protected function handleVideoRecord($recording, $ownerId, $validatedUsers, $validatedHosts)
+	protected function handleVideoRecord($recording, $ownerId, $validatedUsers, $validatedHosts, $validatedAlternativeHosts)
 	{
 		/* @var KalturaMediaEntry $entry*/
 		if (!$recording->isParentEntry)
@@ -103,7 +104,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 		}
 
-		$this->handleParticipants($updatedEntry, $validatedUsers, $validatedHosts);
+		$this->handleParticipants($updatedEntry, $validatedUsers, $validatedHosts, $validatedAlternativeHosts);
 		KBatchBase::impersonate($entry->partnerId);
 		$entry = KBatchBase::$kClient->baseEntry->update($entry->id, $updatedEntry);
 		
@@ -193,26 +194,37 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	 * @param KalturaMediaEntry $entry
 	 * @param array $validatedUsers
 	 * @param array $validatedHosts
+	 * @param array $validatedAlternativeHosts
 	 * @throws kCoreException
 	 */
-	protected function handleParticipants($entry, $validatedUsers, $validatedHosts)
+	protected function handleParticipants($entry, $validatedUsers, $validatedHosts, $validatedAlternativeHosts)
 	{
-		$entitledUsersPublish = array();
-		if($validatedHosts)
+		$entitledUsersPublishArray = array();
+		$entitledUsersEditArray = array();
+		
+		if ($validatedHosts)
 		{
-			$entitledUsersPublish = $validatedHosts;
-			$entry->entitledUsersPublish = implode(',', array_unique($validatedHosts));
-			$entry->entitledUsersEdit = implode(',', array_unique($validatedHosts));
-			KalturaLog::debug("Adding co-hosts and alternative hosts as entitled user publisher and editor, users: " . print_r($validatedHosts, true));
+			KalturaLog::debug("Handling co-hosts entitlements, users: " . print_r($validatedHosts, true));
+			list($entitledUsersPublishArray, $entitledUsersEditArray) = $this->handleHosts($validatedHosts, $this->dropFolder->zoomVendorIntegration->handleCohostsMode, $entitledUsersPublishArray, $entitledUsersEditArray);
 		}
-
-		$handleParticipantMode = $this->dropFolder->zoomVendorIntegration->handleParticipantsMode;
-		if ($validatedUsers && $handleParticipantMode != kHandleParticipantsMode::IGNORE)
+		if ($validatedAlternativeHosts)
 		{
-			switch ($handleParticipantMode)
+			KalturaLog::debug("Handling alternative hosts entitlements, users: " . print_r($validatedHosts, true));
+			list($entitledUsersPublishArray, $entitledUsersEditArray) = $this->handleHosts($validatedAlternativeHosts, $this->dropFolder->zoomVendorIntegration->handleAlternativeHostsMode, $entitledUsersPublishArray, $entitledUsersEditArray);
+		}
+		
+		KalturaLog::debug("Entitled users as co-publishers, users: " . print_r($entitledUsersPublishArray, true));
+		KalturaLog::debug("Entitled users as co-editors, users: " . print_r($entitledUsersEditArray, true));
+		$entry->entitledUsersPublish = implode(',', array_unique($entitledUsersPublishArray));
+		$entry->entitledUsersEdit = implode(',', array_unique($entitledUsersEditArray));
+		
+		$handleParticipantsMode = $this->dropFolder->zoomVendorIntegration->handleParticipantsMode;
+		if ($validatedUsers && $handleParticipantsMode != kHandleParticipantsMode::IGNORE)
+		{
+			switch ($handleParticipantsMode)
 			{
 				case kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS:
-					$entry->entitledUsersPublish = implode(',', array_unique(array_merge($validatedUsers, $entitledUsersPublish)));
+					$entry->entitledUsersPublish = implode(',', array_unique(array_merge($validatedUsers, $entitledUsersPublishArray)));
 					break;
 				case kHandleParticipantsMode::ADD_AS_CO_VIEWERS:
 					$entry->entitledUsersView = implode(',', array_unique($validatedUsers));
@@ -222,6 +234,29 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 					break;
 			}
 		}
+	}
+	
+	protected function handleHosts($hosts, $handleParticipantsMode, $entitledUsersPublishArray, $entitledUsersEditArray)
+	{
+		switch ($handleParticipantsMode)
+		{
+			case kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS:
+				$entitledUsersPublishArray = array_merge($entitledUsersPublishArray, array_unique($hosts));
+				break;
+			case kHandleParticipantsMode::ADD_AS_CO_EDITORS:
+				$entitledUsersEditArray = array_merge($entitledUsersPublishArray, array_unique($hosts));
+				break;
+			case kHandleParticipantsMode::ADD_AS_CO_EDITORS_CO_PUBLISHERS:
+				$entitledUsersPublishArray = array_merge($entitledUsersPublishArray, array_unique($hosts));
+				$entitledUsersEditArray = array_merge($entitledUsersPublishArray, array_unique($hosts));
+				break;
+			case kHandleParticipantsMode::ADD_AS_CO_VIEWERS:
+			case kHandleParticipantsMode::IGNORE:
+			default:
+				break;
+		}
+		
+		return array($entitledUsersPublishArray, $entitledUsersEditArray);
 	}
 	
 	protected function getValidatedUsers($zoomUsers, $partnerId, $createIfNotFound, $userToExclude)
@@ -354,10 +389,17 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$userToExclude = strtolower($userToExclude);
 		$zoomCoHosts = $this->getCoHostsEmails($recordingId);
 		$zoomAlternativeHosts = $this->getAlternativeHostsEmails($recordingId);
-		$zoomHosts = $zoomCoHosts ? array_merge($zoomCoHosts, $zoomAlternativeHosts) : $zoomAlternativeHosts;
+		$zoomHosts = $zoomCoHosts ? array_diff($zoomCoHosts, $zoomAlternativeHosts) : array();
 		$zoomHosts = empty($zoomHosts) ? null : $zoomHosts;
 		return $this->getValidatedUsers($zoomHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
 										$userToExclude);
+	}
+	
+	protected function getValidatedAlternativeHosts($recordingId, $userToExclude)
+	{
+		$zoomAlternativeHosts = $this->getAlternativeHostsEmails($recordingId);
+		return $this->getValidatedUsers($zoomAlternativeHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
+			$userToExclude);
 	}
 
 	protected function getAlternativeHostsEmails($recordingId)
