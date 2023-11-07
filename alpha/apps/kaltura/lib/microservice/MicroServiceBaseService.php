@@ -2,7 +2,7 @@
 /**
  * Base Micro Service
  */
-class MicroServiceBaseService
+abstract class MicroServiceBaseService
 {
 	const MICRO_SERVICE_PREFIX_PLACEHOLDER = "[micro-url-prefix]";
 	protected $serviceUrl = '';
@@ -10,11 +10,11 @@ class MicroServiceBaseService
 
 	/**
 	 * @param string $microServicePrefix - the service url prefix (app-registry.service-url/micro-service-url)
-	 * @param string $microServiceUrl - the specific micro-service url (app-registry)
+	 * @param string $serviceName - the specific micro-service url (app-registry)
 	 */
-	public function __construct($microServicePrefix, $microServiceUrl)
+	public function __construct($microServicePrefix, $serviceName)
 	{
-		$this->initService($microServicePrefix, $microServiceUrl);
+		$this->initService($microServicePrefix, $serviceName);
 	}
 
 	private function generateSession($partnerId)
@@ -34,14 +34,14 @@ class MicroServiceBaseService
 	 * init the micro service
 	 *
 	 * @param string $microServicePrefix - the service url prefix
-	 * @param string $microServiceUrl - the service action
+	 * @param string $serviceName - the service action
 	 */
-	private function initService($microServicePrefix, $microServiceUrl)
+	private function initService($microServicePrefix, $serviceName)
 	{
 		// service url
 		$serviceUrl = kConf::get("microservice_url");
 		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $microServicePrefix, $serviceUrl);
-		$this->serviceUrl = trim($serviceUrl, "\/") . '/' . trim($microServiceUrl, "\/");
+		$this->serviceUrl = trim($serviceUrl, "\/") . '/' . trim($serviceName, "\/");
 
 		if(strpos($this->serviceUrl, 'https://') !== false)
 		{
