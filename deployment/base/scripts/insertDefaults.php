@@ -7,7 +7,7 @@ if($argc < 2)
 
 $dirName = $argv[1];
 
-if (!file_exists($dirName) && isSupportedTemplateFile($dirName))
+if (!file_exists($dirName) && isTemplateFileSupported($dirName))
 {
 	echo("File [$dirName] support template file for token replacements\n");
 	
@@ -293,21 +293,21 @@ function getVodPackagerUrl()
 	return $vodPackagerUrl;
 }
 
-function isSupportedTemplateFile($dirName)
+function isTemplateFileSupported($dirName)
 {
 	echo("File [$dirName] does not exist - checking if filename support template file\n");
 	
 	// escaping the dot for preg_match to avoid using it as a single wildcard character
-	$supportedTemplateFilenames = array(
-		'01\.Partner',
-		'07\.DeliveryProfile'
+	$supportedRegexFilenameExpressions = array(
+		'01\.Partner\.ini',
+		'07\.DeliveryProfile\w+\.ini'
 	);
 	
 	$fileName = basename($dirName);
 	
-	foreach ($supportedTemplateFilenames as $supportedTemplateFilename)
+	foreach ($supportedRegexFilenameExpressions as $supportedRegexFilenameExpression)
 	{
-		if (preg_match("/^$supportedTemplateFilename\w*\.ini/", $fileName) === 1)
+		if (preg_match("/^$supportedRegexFilenameExpression$/", $fileName) === 1)
 		{
 			return true;
 		}
