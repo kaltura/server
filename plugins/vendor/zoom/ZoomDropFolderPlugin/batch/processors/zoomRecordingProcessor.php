@@ -202,12 +202,12 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$entitledUsersPublishArray = array();
 		$entitledUsersEditArray = array();
 		
-		if ($validatedHosts)
+		if ($validatedHosts && isset($this->dropFolder->zoomVendorIntegration->handleCohostsMode))
 		{
 			KalturaLog::debug("Handling co-hosts entitlements, users: " . print_r($validatedHosts, true));
 			list($entitledUsersPublishArray, $entitledUsersEditArray) = $this->handleHosts($validatedHosts, $this->dropFolder->zoomVendorIntegration->handleCohostsMode, $entitledUsersPublishArray, $entitledUsersEditArray);
 		}
-		if ($validatedAlternativeHosts)
+		if ($validatedAlternativeHosts && isset($this->dropFolder->zoomVendorIntegration->handleAlternativeHostsMode))
 		{
 			KalturaLog::debug("Handling alternative hosts entitlements, users: " . print_r($validatedHosts, true));
 			list($entitledUsersPublishArray, $entitledUsersEditArray) = $this->handleHosts($validatedAlternativeHosts, $this->dropFolder->zoomVendorIntegration->handleAlternativeHostsMode, $entitledUsersPublishArray, $entitledUsersEditArray);
@@ -389,7 +389,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		$userToExclude = strtolower($userToExclude);
 		$zoomCoHosts = $this->getCoHostsEmails($recordingId);
 		$zoomAlternativeHosts = $this->getAlternativeHostsEmails($recordingId);
-		$zoomHosts = $zoomCoHosts ? array_diff($zoomCoHosts, $zoomAlternativeHosts) : array();
+		$zoomHosts = array_merge($zoomCoHosts, $zoomAlternativeHosts);
 		$zoomHosts = empty($zoomHosts) ? null : $zoomHosts;
 		return $this->getValidatedUsers($zoomHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
 										$userToExclude);

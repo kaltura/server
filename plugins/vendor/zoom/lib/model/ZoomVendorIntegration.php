@@ -116,7 +116,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function getHandleCohostsMode()
 	{
-		return $this->removeFromCustomData(self::HANDLE_COHOSTS_MODE);
+		return $this->getFromCustomData(self::HANDLE_COHOSTS_MODE, null, kHandleParticipantsMode::IGNORE);
 	}
 	
 	public function setHandleAlternativeHostsMode($v)
@@ -126,7 +126,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	
 	public function getHandleAlternativeHostsMode()
 	{
-		return $this->removeFromCustomData(self::HANDLE_ALTERNATIVE_HOST_MODE, null, kHandleParticipantsMode::IGNORE);
+		return $this->getFromCustomData(self::HANDLE_ALTERNATIVE_HOST_MODE, null, kHandleParticipantsMode::IGNORE);
 	}
 	
 	public function shouldExcludeUserRecordingsIngest($puserId)
