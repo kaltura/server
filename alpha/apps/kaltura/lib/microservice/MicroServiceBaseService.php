@@ -29,19 +29,38 @@ abstract class MicroServiceBaseService
 		$privileges = "*,disableentitlement";
 		return kSessionBase::generateSession($ksVersion, $adminSecret, 'admin', kSessionBase::SESSION_TYPE_ADMIN, $partnerId, 3600, $privileges);
 	}
-
+	
+	/**
+	 * allow to get the service url without instantiating the whole class
+	 *
+	 * @param string $microServicePrefix
+	 * @param string $serviceName
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function buildServiceUrl($microServicePrefix, $serviceName)
+	{
+		$serviceUrl = kConf::get("microservice_url");
+		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $microServicePrefix, $serviceUrl);
+		return trim($serviceUrl, "\/") . '/' . trim($serviceName, "\/");
+	}
+	
+	public function getServiceUrl()
+	{
+		return $this->serviceUrl;
+	}
+	
 	/**
 	 * init the micro service
 	 *
 	 * @param string $microServicePrefix - the service url prefix
 	 * @param string $serviceName - the service action
+	 * @throws Exception
 	 */
 	private function initService($microServicePrefix, $serviceName)
 	{
 		// service url
-		$serviceUrl = kConf::get("microservice_url");
-		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $microServicePrefix, $serviceUrl);
-		$this->serviceUrl = trim($serviceUrl, "\/") . '/' . trim($serviceName, "\/");
+		$this->serviceUrl = MicroServiceBaseService::buildServiceUrl($microServicePrefix, $serviceName);
 
 		if(strpos($this->serviceUrl, 'https://') !== false)
 		{

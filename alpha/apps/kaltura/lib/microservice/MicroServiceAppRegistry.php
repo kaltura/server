@@ -1,15 +1,20 @@
 <?php
 /**
  * App Registry Micro Service
+ * This represents the 'app-registry' service under 'plat-app-registry' repo
  */
 class MicroServiceAppRegistry extends MicroServiceBaseService
 {
+	public static $hostPrefix = 'app-registry';
+	
+	public static $serviceName = 'app-registry';
+	
 	const APP_GUID_CACHE_KEY_PREFIX = 'appGuid_';
 	const APP_GUID_CACHE_TTL = 86400; // cached for 1 day
 	
 	public function __construct()
 	{
-		parent::__construct('app-registry','app-registry');
+		parent::__construct(MicroServiceAppRegistry::$hostPrefix, MicroServiceAppRegistry::$serviceName);
 	}
 	
 	public function get($partnerId, $appGuid)
