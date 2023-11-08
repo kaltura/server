@@ -263,8 +263,13 @@ class kmcngAction extends kalturaAction
 				"live" => $kmcngParams['live']
 			),
 			'externalServices' => array(
-				'authBrokerServer' => array('uri' => kConf::get('auth_broker_base_url', 'local', '')),
-				'appRegistryServer' => array('uri' => kConf::get('app_registry_base_url', 'local', ''))
+				'appRegistryEndpoint' => array('uri' => MicroServiceAppRegistry::buildServiceUrl(MicroServiceAppRegistry::$hostPrefix, MicroServiceAppRegistry::$serviceName)),
+				'appSubscriptionEndpoint' => array('uri' => MicroServiceAppSubscription::buildServiceUrl(MicroServiceAppSubscription::$hostPrefix, MicroServiceAppSubscription::$serviceName)),
+				'authManagerEndpoint' => array('uri' => MicroServiceAuthManager::buildServiceUrl(MicroServiceAuthManager::$hostPrefix, MicroServiceAuthManager::$serviceName)),
+				'authProfileEndpoint' => array('uri' => MicroServiceAuthProfile::buildServiceUrl(MicroServiceAuthProfile::$hostPrefix, MicroServiceAuthProfile::$serviceName)),
+				'spaProxyEndpoint' => array('uri' => MicroServiceSpaProxy::buildServiceUrl(MicroServiceSpaProxy::$hostPrefix, MicroServiceSpaProxy::$serviceName)),
+				'userProfileEndpoint' => array('uri' => MicroServiceUserProfile::buildServiceUrl(MicroServiceUserProfile::$hostPrefix, MicroServiceUserProfile::$serviceName)),
+				'userReportsEndpoint' => array('uri' => MicroServiceUserReports::buildServiceUrl(MicroServiceUserReports::$hostPrefix, MicroServiceUserReports::$serviceName))
 			),
 		);
 
