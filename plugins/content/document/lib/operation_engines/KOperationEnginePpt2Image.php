@@ -22,13 +22,6 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 		}
 	}
 	
-	protected function createDirDescriber($outDir, $fileName, $key) {
-		$fileList = kFile::dirList($outDir, false);
-		$fileListXml = $this->createImagesListXML($fileList, $outDir, $key);
-		kFile::setFileContent($outDir . $fileName, $fileListXml->asXML());
-		KalturaLog::info('file list xml [' . $outDir . $fileName . '] created');
-	}
-	
 	public function operate(kOperator $operator = null, $inFilePath, $configFilePath = null)
 	{
 		$this->createOutputDirectory();
@@ -37,17 +30,19 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 		$outDirPath = $this->outFilePath . DIRECTORY_SEPARATOR;
 		
 		parent::operate($operator, $realInFilePath, $configFilePath);
-		
-		$this->createDirDescriber($outDirPath, self::IMAGES_LIST_XML_NAME, $key);
 
+		$fileList = kFile::dirList($outDirPath, false);
+
+		$this->createImagesListXML($fileList, $outDirPath, $key);
 		parent::jsonFormat(array('pageList' => self::IMAGES_LIST_XML_NAME, 'metadata' => self::METADATA_XML_NAME), $outDirPath);
+
 		self::encryptFileName($outDirPath, self::IMAGES_LIST_XML_NAME, $key);
 		self::encryptFileName($outDirPath, self::METADATA_XML_NAME, $key);
 		self::encryptFileName($outDirPath, self::DOC_METADATA_JSON_NAME, $key);
 	    return true;
 	}
 	
-	// The returned xml will be stored in the images directory. it than can be downloaded by the user with serveFlavorAction and provide him
+	// The xml will be stored in the images directory. it than can be downloaded by the user with serveFlavorAction and provide him
 	// information about the created images.
 	private function createImagesListXML($imagesList, $outDir, $key){
 		sort($imagesList);
@@ -63,7 +58,10 @@ class KOperationEnginePpt2Image extends KOperationEngineDocument
 		
 		$imagesListXML->addAttribute(self::LIST_XML_ATTRIBUTE_METADATA, self::METADATA_XML_NAME);
 		$count = count($imagesList);
-		$imagesListXML -> addAttribute(self::LIST_XML_ATTRIBUTE_COUNT, $count ? $count - 1 : 0);
-		return $imagesListXML;	
+		$imagesListXML->addAttribute(self::LIST_XML_ATTRIBUTE_COUNT, $count ? $count - 1 : 0);
+
+		kFile::setFileContent($outDir . self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
+		KalturaLog::info('file list xml [' . $outDir . self::IMAGES_LIST_XML_NAME . '] created');
+		return true;
 	}
 }

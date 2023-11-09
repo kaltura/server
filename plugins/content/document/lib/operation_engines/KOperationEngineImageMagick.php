@@ -126,7 +126,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		}
 	}
 	
-	// The returned xml will be stored in the images directory. it than can be downloaded by the user with serveFlavorAction and provide him
+	// The xml will be stored in the images directory. it than can be downloaded by the user with serveFlavorAction and provide him
 	// information about the created images.
 	private function createImagesListXML($imagesList, $outDirPath, $key){
 		sort($imagesList);
@@ -137,7 +137,7 @@ class KOperationEngineImageMagick extends KOperationEngineDocument
 		$imageNode->addAttribute(self::IMAGES_LIST_XML_ATTRIBUTE_INDEX, $i++);
     		$imageNode->addChild(self::IMAGES_LIST_XML_LABEL_NAME, self::encryptFileName($outDirPath, $image, $key));
 		}
-		$imagesListXML -> addAttribute(self::IMAGES_LIST_XML_ATTRIBUTE_COUNT, count($imagesList));
+		$imagesListXML->addAttribute(self::IMAGES_LIST_XML_ATTRIBUTE_COUNT, count($imagesList));
 		kFile::setFileContent($outDirPath . self::IMAGES_LIST_XML_NAME, $imagesListXML->asXML());
 		KalturaLog::info('images list xml [' . $outDirPath . self::IMAGES_LIST_XML_NAME.'] created');
 		return true;	
