@@ -244,11 +244,11 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 				$entitledUsersPublishArray = array_merge($entitledUsersPublishArray, array_unique($hosts));
 				break;
 			case kHandleParticipantsMode::ADD_AS_CO_EDITORS:
-				$entitledUsersEditArray = array_merge($entitledUsersPublishArray, array_unique($hosts));
+				$entitledUsersEditArray = array_merge($entitledUsersEditArray, array_unique($hosts));
 				break;
 			case kHandleParticipantsMode::ADD_AS_CO_EDITORS_CO_PUBLISHERS:
 				$entitledUsersPublishArray = array_merge($entitledUsersPublishArray, array_unique($hosts));
-				$entitledUsersEditArray = array_merge($entitledUsersPublishArray, array_unique($hosts));
+				$entitledUsersEditArray = array_merge($entitledUsersEditArray, array_unique($hosts));
 				break;
 			case kHandleParticipantsMode::ADD_AS_CO_VIEWERS:
 			case kHandleParticipantsMode::IGNORE:
@@ -388,30 +388,22 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	{
 		$userToExclude = strtolower($userToExclude);
 		$zoomCoHosts = $this->getCoHostsEmails($recordingId);
-		$zoomAlternativeHosts = $this->getAlternativeHostsEmails($recordingId);
-		$zoomHosts = array_merge($zoomCoHosts, $zoomAlternativeHosts);
-		$zoomHosts = empty($zoomHosts) ? null : $zoomHosts;
-		return $this->getValidatedUsers($zoomHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
+		return $this->getValidatedUsers($zoomCoHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
 										$userToExclude);
 	}
 	
 	protected function getValidatedAlternativeHosts($recordingId, $userToExclude)
 	{
-		$zoomAlternativeHosts = $this->getAlternativeHostsEmails($recordingId);
-		return $this->getValidatedUsers($zoomAlternativeHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
-			$userToExclude);
-	}
-
-	protected function getAlternativeHostsEmails($recordingId)
-	{
+		$zoomAlternativeHosts = array();
 		$data = $this->getRecordingParentObject($recordingId);
-		if(isset($data[self::SETTINGS]) && isset($data[self::SETTINGS][self::ALTERNATIVE_HOSTS]))
+		if (isset($data[self::SETTINGS]) && isset($data[self::SETTINGS][self::ALTERNATIVE_HOSTS]))
 		{
 			KalturaLog::debug("Found the following alternative hosts [" . $data[self::SETTINGS][self::ALTERNATIVE_HOSTS] . "]");
 			$alternativeHostsEmails = explode(";", $data[self::SETTINGS][self::ALTERNATIVE_HOSTS]);
-			return $this->parseZoomEmails($alternativeHostsEmails);
+			$zoomAlternativeHosts = $this->parseZoomEmails($alternativeHostsEmails);
 		}
-		return array();
+		return $this->getValidatedUsers($zoomAlternativeHosts, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration->createUserIfNotExist,
+			$userToExclude);
 	}
 
 	protected function getCoHostsEmails($recordingId)
