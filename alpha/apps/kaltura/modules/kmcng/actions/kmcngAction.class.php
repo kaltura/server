@@ -263,13 +263,13 @@ class kmcngAction extends kalturaAction
 				"live" => $kmcngParams['live']
 			),
 			'externalServices' => array(
-				'appRegistryEndpoint' => array('uri' => MicroServiceAppRegistry::buildServiceUrl(MicroServiceAppRegistry::$hostPrefix, MicroServiceAppRegistry::$serviceName)),
-				'appSubscriptionEndpoint' => array('uri' => MicroServiceAppSubscription::buildServiceUrl(MicroServiceAppSubscription::$hostPrefix, MicroServiceAppSubscription::$serviceName)),
-				'authManagerEndpoint' => array('uri' => MicroServiceAuthManager::buildServiceUrl(MicroServiceAuthManager::$hostPrefix, MicroServiceAuthManager::$serviceName)),
-				'authProfileEndpoint' => array('uri' => MicroServiceAuthProfile::buildServiceUrl(MicroServiceAuthProfile::$hostPrefix, MicroServiceAuthProfile::$serviceName)),
-				'spaProxyEndpoint' => array('uri' => MicroServiceSpaProxy::buildServiceUrl(MicroServiceSpaProxy::$hostPrefix, MicroServiceSpaProxy::$serviceName)),
-				'userProfileEndpoint' => array('uri' => MicroServiceUserProfile::buildServiceUrl(MicroServiceUserProfile::$hostPrefix, MicroServiceUserProfile::$serviceName)),
-				'userReportsEndpoint' => array('uri' => MicroServiceUserReports::buildServiceUrl(MicroServiceUserReports::$hostPrefix, MicroServiceUserReports::$serviceName))
+				'appRegistryEndpoint' => array('uri' => MicroServiceAppRegistry::buildServiceUrl(MicroServiceHost::APP_REGISTRY, MicroServiceService::APP_REGISTRY)),
+				'appSubscriptionEndpoint' => array('uri' => MicroServiceAppSubscription::buildServiceUrl(MicroServiceHost::AUTH, MicroServiceService::APP_SUBSCRIPTION)),
+				'authManagerEndpoint' => array('uri' => MicroServiceAuthManager::buildServiceUrl(MicroServiceHost::AUTH, MicroServiceService::AUTH_MANAGER)),
+				'authProfileEndpoint' => array('uri' => MicroServiceAuthProfile::buildServiceUrl(MicroServiceHost::AUTH, MicroServiceService::AUTH_PROFILE)),
+				'spaProxyEndpoint' => array('uri' => MicroServiceSpaProxy::buildServiceUrl(MicroServiceHost::AUTH, MicroServiceService::SPA_PROXY)),
+				'userProfileEndpoint' => array('uri' => MicroServiceUserProfile::buildServiceUrl(MicroServiceHost::USER, MicroServiceService::USER_PROFILE)),
+				'userReportsEndpoint' => array('uri' => MicroServiceUserReports::buildServiceUrl(MicroServiceHost::USER, MicroServiceService::REPORTS))
 			),
 		);
 

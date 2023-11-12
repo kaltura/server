@@ -3,12 +3,10 @@
  * Spa Proxy Micro Service
  * This represents the 'spa-proxy' service under 'plat-auth' repo
  */
-class MicroServiceSpaProxy extends MicroServiceAuthBase
+class MicroServiceSpaProxy extends MicroServiceBaseService
 {
-	public static $serviceName = 'spa-proxy';
-	
 	public function __construct()
 	{
-		parent::__construct(MicroServiceSpaProxy::$serviceName);
+		parent::__construct(MicroServiceHost::AUTH, MicroServiceService::SPA_PROXY);
 	}
 }
