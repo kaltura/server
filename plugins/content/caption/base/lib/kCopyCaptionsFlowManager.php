@@ -1,5 +1,5 @@
 <?php
-class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectChangedEventConsumer, kObjectReplacedEventConsumer
+class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectChangedEventConsumer, kObjectReplacedEventConsumer, kBatchJobStatusEventConsumer
 {
 	/* (non-PHPdoc)
   * @see kObjectReplacedEventConsumer::shouldConsumeReplacedEvent()
@@ -238,6 +238,85 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 		}
 	}
 
+	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
+	{
+		if ($dbBatchJob->getJobType() == BatchJobType::MULTI_CLIP_CONCAT)
+		{
+			return $dbBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FINISHED;
+		}
+		return false;
+	}
+
+	public function updatedJob(BatchJob $dbBatchJob)
+	{
+		/* @var $multiClipConcatJobData kMultiClipConcatJobData*/
+		$multiClipConcatJobData = $dbBatchJob->getData();
+		$destEntryId = $multiClipConcatJobData->getDestEntryId();
+		$globalOffset = 0;
+		$kClipDescriptionArray = array();
+		foreach ($multiClipConcatJobData->getOperationResources() as $operationResource)
+		{
+			$resource = $operationResource->getResource();
+			if(!($resource instanceof kFileSyncResource))
+			{
+				continue;
+			}
+			$sourceEntryId = $resource->getOriginEntryId();
+			if(!$sourceEntryId)
+			{
+				continue;
+			}
+			$sourceEntry = entryPeer::retrieveByPK($sourceEntryId);
+			if (is_null($sourceEntry))
+			{
+				KalturaLog::info("Didn't copy captions for entry [$destEntryId] because source entry [$sourceEntryId] wasn't found");
+				continue;
+			}
+
+			$sourceEntryId = $sourceEntry->getId();
+			$captionAssets = assetPeer::retrieveByEntryId($sourceEntryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));
+			$operationAttributes = $operationResource->getOperationAttributes();
+			/** @var kClipAttributes $operationAttribute */
+			foreach ($operationAttributes as $operationAttribute)
+			{
+				if(!count($captionAssets))
+				{
+					$globalOffset += $operationAttribute->getDuration();
+					KalturaLog::debug("No captions found on source entry [$sourceEntryId]");
+					continue;
+				}
+				if (!$sourceEntryId)
+				{
+					//if no source entry we will not copy the entry ID. add clip offset to global offset and continue
+					$globalOffset += $operationAttribute->getDuration();
+					continue;
+				}
+				$kClipDescription = new kClipDescription();
+				$kClipDescription->setSourceEntryId($sourceEntryId);
+				$kClipDescription->setStartTime($operationAttribute->getOffset() ? $operationAttribute->getOffset() : 0);
+				$kClipDescription->setDuration($operationAttribute->getDuration() ? $operationAttribute->getDuration() : $sourceEntry->getLengthInMsecs());
+				self::setCaptionGlobalOffset($operationAttribute, $globalOffset, $kClipDescription);
+				$kClipDescriptionArray[] = $kClipDescription;
+
+				//add clip offset to global offset
+				$globalOffset += $operationAttribute->getDuration();
+			}
+		}
+		if(count($kClipDescriptionArray) == 0)
+		{
+			return;
+		}
+		$jobData = new kCopyCaptionsJobData();
+		$jobData->setEntryId($destEntryId);
+		$jobData->setClipsDescriptionArray($kClipDescriptionArray);
+		$jobData->setFullCopy(false);
+
+		$batchJob = new BatchJob();
+		$batchJob->setEntryId($destEntryId);
+		$batchJob->setPartnerId($multiClipConcatJobData->getPartnerId());
+
+		kJobsManager::addJob($batchJob, $jobData, BatchJobType::COPY_CAPTIONS);
+	}
 }
 
 

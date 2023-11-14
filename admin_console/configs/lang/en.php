@@ -391,6 +391,7 @@ return array(
 	'Kaltura_Client_Enum_UiConfObjType::KSR' => 'Kaltura Screen Recorder',
 	'Kaltura_Client_Enum_UiConfObjType::WEBCASTING' => 'Kaltura Webcasting Studio',
 	'Kaltura_Client_Enum_UiConfObjType::CLIPPER' => 'KMC Clipper',
+	'Kaltura_Client_Enum_UiConfObjType::SAP' => 'Slim Audio Player',
 
 	//audit trail
 	'Kaltura_Client_Enum_AuditTrailObjectType::ACCESS_CONTROL' => 'ACCESS_CONTROL',
