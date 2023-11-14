@@ -41,12 +41,20 @@ class UserAppRoleService extends KalturaBaseService
 	 *
 	 * @param KalturaUserAppRole $userAppRole
 	 * @return KalturaUserAppRole
-	 *
-	 * @throws KalturaAPIException
-	 * @throws PropelException
-	 * @throws Exception
 	 */
 	public function addAction(KalturaUserAppRole $userAppRole)
+	{
+		// prevent race condition where 2 or more concurrent requests are fired
+		$lockKey = 'userAppRole_add_' . kCurrentContext::getCurrentPartnerId() . '_' . $userAppRole->appGuid . '_' . $userAppRole->userId;
+		return kLock::runLocked($lockKey, array($this, 'addUserAppRole'), array($userAppRole));
+	}
+	
+	/**
+	 * @throws KalturaAPIException
+	 * @throws kCoreException
+	 * @throws PropelException
+	 */
+	function addUserAppRole(KalturaUserAppRole $userAppRole)
 	{
 		$dbUserAppRole = $userAppRole->toInsertableObject();
 		$dbUserAppRole->save();
