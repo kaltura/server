@@ -78,7 +78,7 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 			return $fileName;
 		}
 		try {
-			$pathinfo = pathinfo ($fileName);
+			$pathinfo = pathinfo($fileName);
 			$encryptName = base64_encode(hash_hmac('sha256', $pathinfo['filename'], $key, true));
 			$newName = str_replace('=', '', strtr($encryptName, '+/', '-_')) . '.' . $pathinfo['extension'];
 			KalturaLog::info('RENAME: ' . $fileName . ' to ' . $newName);
