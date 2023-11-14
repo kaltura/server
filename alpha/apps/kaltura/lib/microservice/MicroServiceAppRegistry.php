@@ -1,6 +1,7 @@
 <?php
 /**
  * App Registry Micro Service
+ * This represents the 'app-registry' service under 'plat-app-registry' repo
  */
 class MicroServiceAppRegistry extends MicroServiceBaseService
 {
@@ -9,7 +10,7 @@ class MicroServiceAppRegistry extends MicroServiceBaseService
 	
 	public function __construct()
 	{
-		parent::__construct('app-registry','app-registry');
+		parent::__construct(MicroServiceHost::APP_REGISTRY, MicroServiceService::APP_REGISTRY);
 	}
 	
 	public function get($partnerId, $appGuid)
