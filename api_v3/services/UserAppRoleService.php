@@ -53,6 +53,7 @@ class UserAppRoleService extends KalturaBaseService
 	 * @throws KalturaAPIException
 	 * @throws kCoreException
 	 * @throws PropelException
+	 * @throws Exception
 	 */
 	function addUserAppRole(KalturaUserAppRole $userAppRole)
 	{
