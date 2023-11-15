@@ -2,19 +2,28 @@
 /**
  * Base Micro Service
  */
-class MicroServiceBaseService
+abstract class MicroServiceBaseService
 {
 	const MICRO_SERVICE_PREFIX_PLACEHOLDER = "[micro-url-prefix]";
 	protected $serviceUrl = '';
 	protected $requestHeaders = array();
-
+	
 	/**
-	 * @param string $microServicePrefix - the service url prefix (app-registry.service-url/micro-service-url)
-	 * @param string $microServiceUrl - the specific micro-service url (app-registry)
+	 * @var string $hostName - the microservice host (host.[envName].ovp.kaltura.com)
 	 */
-	public function __construct($microServicePrefix, $microServiceUrl)
+	protected $hostName = null;
+	
+	/**
+	 * @var string $serviceName - the microservice service name (host.[envName].ovp.kaltura.com/api/version/serviceName)
+	 */
+	protected $serviceName = null;
+	
+	/**
+	 * @throws Exception
+	 */
+	public function __construct()
 	{
-		$this->initService($microServicePrefix, $microServiceUrl);
+		$this->initService($this->hostName, $this->serviceName);
 	}
 
 	private function generateSession($partnerId)
@@ -29,19 +38,38 @@ class MicroServiceBaseService
 		$privileges = "*,disableentitlement";
 		return kSessionBase::generateSession($ksVersion, $adminSecret, 'admin', kSessionBase::SESSION_TYPE_ADMIN, $partnerId, 3600, $privileges);
 	}
-
+	
+	/**
+	 * allow to get the service url without instantiating the whole class
+	 *
+	 * @param string $hostName
+	 * @param string $serviceName
+	 * @return string
+	 * @throws Exception
+	 */
+	public static function buildServiceUrl($hostName, $serviceName)
+	{
+		$serviceUrl = kConf::get("microservice_url");
+		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $hostName, $serviceUrl);
+		return trim($serviceUrl, "\/") . '/' . trim($serviceName, "\/");
+	}
+	
+	public function getServiceUrl()
+	{
+		return $this->serviceUrl;
+	}
+	
 	/**
 	 * init the micro service
 	 *
-	 * @param string $microServicePrefix - the service url prefix
-	 * @param string $microServiceUrl - the service action
+	 * @param string $hostName - the service url prefix
+	 * @param string $serviceName - the service action
+	 * @throws Exception
 	 */
-	private function initService($microServicePrefix, $microServiceUrl)
+	private function initService($hostName, $serviceName)
 	{
 		// service url
-		$serviceUrl = kConf::get("microservice_url");
-		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $microServicePrefix, $serviceUrl);
-		$this->serviceUrl = trim($serviceUrl, "\/") . '/' . trim($microServiceUrl, "\/");
+		$this->serviceUrl = MicroServiceBaseService::buildServiceUrl($hostName, $serviceName);
 
 		if(strpos($this->serviceUrl, 'https://') !== false)
 		{
