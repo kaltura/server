@@ -33,6 +33,7 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_VE_REGISTERED,
+				self::METRIC_REGISTERED_UNIQUE_USERS,
 			),
 		),
 
@@ -42,6 +43,7 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_VE_REGISTERED,
+				self::METRIC_REGISTERED_UNIQUE_USERS,
 			),
 		),
 
@@ -51,6 +53,7 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_VE_REGISTERED,
+				self::METRIC_REGISTERED_UNIQUE_USERS,
 			),
 		),
 
@@ -62,6 +65,7 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_VE_REGISTERED,
+				self::METRIC_REGISTERED_UNIQUE_USERS,
 			),
 			self::REPORT_ENRICH_DEF => array(
 				array(
@@ -88,7 +92,19 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_VE_REGISTERED,
+				self::METRIC_REGISTERED_UNIQUE_USERS,
 			),
+		),
+
+		ReportType::VE_USER_HIGHLIGHTS => array(
+			self::REPORT_METRICS => array(
+				self::METRIC_REGISTERED_UNIQUE_USERS,
+				self::METRIC_VE_ATTENDANCE_UNIQUE_USERS,
+			),
+			self::REPORT_GRAPH_METRICS => array(
+				self::METRIC_REGISTERED_UNIQUE_USERS,
+				self::METRIC_VE_ATTENDANCE_UNIQUE_USERS,
+			)
 		),
 	);
 
