@@ -5,10 +5,11 @@
  */
 class MicroServiceUserReports extends MicroServiceUserBase
 {
-	public static $serviceName = 'reports';
+	public static $service = 'reports';
 	
 	public function __construct()
 	{
-		parent::__construct(MicroServiceUserReports::$serviceName);
+		$this->serviceName = self::$service;
+		parent::__construct();
 	}
 }

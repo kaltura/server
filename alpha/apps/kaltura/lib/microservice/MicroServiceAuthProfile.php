@@ -5,10 +5,11 @@
  */
 class MicroServiceAuthProfile extends MicroServiceAuthBase
 {
-	public static $serviceName = 'auth-profile';
+	public static $service = 'auth-profile';
 	
 	public function __construct()
 	{
-		parent::__construct(MicroServiceAuthProfile::$serviceName);
+		$this->serviceName = self::$service;
+		parent::__construct();
 	}
 }

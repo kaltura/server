@@ -5,11 +5,12 @@
  */
 abstract class MicroServiceUserBase extends MicroServiceBaseService
 {
-	public static $hostPrefix = 'user';
+	public static $host = 'user';
 	
-	public function __construct($serviceName)
+	public function __construct()
 	{
-		parent::__construct(MicroServiceUserBase::$hostPrefix, $serviceName);
+		$this->hostName = self::$host;
+		parent::__construct();
 	}
 	
 	/**

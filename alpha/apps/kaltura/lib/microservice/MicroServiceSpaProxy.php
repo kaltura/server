@@ -5,10 +5,11 @@
  */
 class MicroServiceSpaProxy extends MicroServiceAuthBase
 {
-	public static $serviceName = 'spa-proxy';
+	public static $service = 'spa-proxy';
 	
 	public function __construct()
 	{
-		parent::__construct(MicroServiceSpaProxy::$serviceName);
+		$this->serviceName = self::$service;
+		parent::__construct();
 	}
 }

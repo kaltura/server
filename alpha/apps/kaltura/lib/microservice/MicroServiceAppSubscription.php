@@ -5,10 +5,11 @@
  */
 class MicroServiceAppSubscription extends MicroServiceAuthBase
 {
-	public static $serviceName = 'app-subscription';
+	public static $service = 'app-subscription';
 	
 	public function __construct()
 	{
-		parent::__construct(MicroServiceAppSubscription::$serviceName);
+		$this->serviceName = self::$service;
+		parent::__construct();
 	}
 }

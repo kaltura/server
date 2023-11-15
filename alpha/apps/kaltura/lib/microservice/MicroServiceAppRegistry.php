@@ -5,16 +5,17 @@
  */
 class MicroServiceAppRegistry extends MicroServiceBaseService
 {
-	public static $hostPrefix = 'app-registry';
-	
-	public static $serviceName = 'app-registry';
+	public static $host = 'app-registry';
+	public static $service = 'app-registry';
 	
 	const APP_GUID_CACHE_KEY_PREFIX = 'appGuid_';
 	const APP_GUID_CACHE_TTL = 86400; // cached for 1 day
 	
 	public function __construct()
 	{
-		parent::__construct(MicroServiceAppRegistry::$hostPrefix, MicroServiceAppRegistry::$serviceName);
+		$this->hostName = self::$host;
+		$this->serviceName = self::$service;
+		parent::__construct();
 	}
 	
 	public function get($partnerId, $appGuid)

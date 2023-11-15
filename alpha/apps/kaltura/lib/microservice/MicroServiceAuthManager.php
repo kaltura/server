@@ -5,10 +5,11 @@
  */
 class MicroServiceAuthManager extends MicroServiceAuthBase
 {
-	public static $serviceName = 'auth-manager';
+	public static $service = 'auth-manager';
 	
 	public function __construct()
 	{
-		parent::__construct(MicroServiceAuthManager::$serviceName);
+		$this->serviceName = self::$service;
+		parent::__construct();
 	}
 }
