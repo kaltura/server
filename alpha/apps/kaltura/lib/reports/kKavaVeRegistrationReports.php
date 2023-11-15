@@ -99,11 +99,11 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 		ReportType::VE_USER_HIGHLIGHTS => array(
 			self::REPORT_METRICS => array(
 				self::METRIC_REGISTERED_UNIQUE_USERS,
-				self::METRIC_VE_ATTENDANCE_UNIQUE_USERS,
+				self::METRIC_ATTENDANCE_UNIQUE_USERS,
 			),
 			self::REPORT_GRAPH_METRICS => array(
 				self::METRIC_REGISTERED_UNIQUE_USERS,
-				self::METRIC_VE_ATTENDANCE_UNIQUE_USERS,
+				self::METRIC_ATTENDANCE_UNIQUE_USERS,
 			)
 		),
 	);
