@@ -158,7 +158,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_TOTAL_JOBS = 'total_jobs';
 	const METRIC_MEETING_VIEW_TIME_SEC = 'meeting_view_time_sec';
 
-
 	// non druid metrics
 	const METRIC_BANDWIDTH_STORAGE_MB = 'combined_bandwidth_storage';
 	const METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB = 'aggregated_monthly_avg_storage';
@@ -231,6 +230,10 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DYNAMIC_VIEWERS_BUFFERING = 'viewers_buffering';
 	const METRIC_DYNAMIC_VIEWERS_DVR = 'viewers_dvr';
 	const METRIC_DYNAMIC_VIEWERS_ENGAGEMENT = 'viewers_engagement';
+
+	// virtual-events-registration specific metrics
+	const METRIC_REGISTERED_UNIQUE_USERS = 'registered_unique_users';
+	const METRIC_ATTENDANCE_UNIQUE_USERS = 'attendance_unique_users';
 
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
@@ -410,6 +413,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_VE_UNREGISTERED,
 		self::EVENT_TYPE_VE_INVITED,
 		self::EVENT_TYPE_VE_CREATED,
+		self::EVENT_TYPE_VE_AUTO_CONFIRMED,
+		self::EVENT_TYPE_VE_PARTICIPATED_POST_EVENT,
+		self::EVENT_TYPE_VE_INVITED_PENDING_REGISTRATION,
 		self::EVENT_TYPE_PAUSE,
 		self::EVENT_TYPE_RESUME,
 		self::EVENT_TYPE_MEETING_RAISE_HAND,
@@ -505,6 +511,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_REACTION_CLICKED_UNIQUE_USERS => 'floor',
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => 'floor',
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => 'floor',
+		self::METRIC_REGISTERED_UNIQUE_USERS => 'floor',
+		self::METRIC_ATTENDANCE_UNIQUE_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -563,6 +571,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => true,
 		self::METRIC_VOD_LIVE_AVG_VIEW_TIME => true,
+		self::METRIC_ATTENDANCE_UNIQUE_USERS => true,
+		self::METRIC_REGISTERED_UNIQUE_USERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1322,6 +1332,15 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$meeting_engagement))),
 			self::getLongSumAggregator(self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_REGISTERED_UNIQUE_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VE_REGISTERED),
+			self::getHyperUniqueAggregator(self::METRIC_REGISTERED_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_ATTENDANCE_UNIQUE_USERS] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE,
+				array(self::EVENT_TYPE_VE_ATTENDED, self::EVENT_TYPE_VE_PARTICIPATED, self::EVENT_TYPE_VE_PARTICIPATED_POST_EVENT)),
+			self::getHyperUniqueAggregator(self::METRIC_ATTENDANCE_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
