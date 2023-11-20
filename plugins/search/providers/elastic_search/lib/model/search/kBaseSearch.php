@@ -4,7 +4,7 @@
  * @subpackage model.search
  */
 
-abstract class getQueryAttributeskBaseSearch
+abstract class kBaseSearch
 {
 	protected $elasticClient;
 	protected $query;
@@ -13,6 +13,7 @@ abstract class getQueryAttributeskBaseSearch
 
 	protected $filterOnlyContext;
 	protected $forceInnerHitsSizeOverride;
+	protected $ignoreSynonymFromQuery;
 
 	public function __construct()
 	{
@@ -21,6 +22,7 @@ abstract class getQueryAttributeskBaseSearch
 		$this->mainBoolQuery = new kESearchBoolQuery();
 		$this->filterOnlyContext = false;
 		$this->forceInnerHitsSizeOverride = false;
+		$this->ignoreSynonymFromQuery = false;
 	}
 
 	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null);
@@ -160,7 +162,10 @@ abstract class getQueryAttributeskBaseSearch
 		}
 
 		$this->queryAttributes->setPartnerLanguages($partnerLanguages);
-		$this->queryAttributes->setIgnoreSynonymOnPartner($partner->getIgnoreSynonymEsearch());
+		if (!$this->ignoreSynonymFromQuery)
+		{
+			$this->queryAttributes->setIgnoreSynonymOnPartner($partner->getIgnoreSynonymEsearch());
+		}
 	}
 
 	protected function initOverrideInnerHits($objectId)
@@ -185,4 +190,8 @@ abstract class getQueryAttributeskBaseSearch
 		$this->forceInnerHitsSizeOverride = true;
 	}
 
+	public function setIgnoreSynonymFromQuery($v)
+	{
+		$this->ignoreSynonymFromQuery = $v;
+	}
 }
