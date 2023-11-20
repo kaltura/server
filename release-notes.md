@@ -1,3 +1,11 @@
+# Tucana-20.0.0
+## update Game Services partner permissions ##
+- Issue Type: Story
+- Issue ID: PLAT-24491
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_11_20_update_game_services_partner_permissions.php
+
 # Scorpius-19.20.0
 ## Add virtualevent get permission for game service partner
 * Issue type: Feature
