@@ -93,8 +93,10 @@ class ESearchService extends KalturaBaseService
 	 */
 	protected function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
-		list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder, $aggregations) =
+		list($coreSearchOperator, $objectStatusesArr, $objectId, $kPager, $coreOrder, $aggregations, $ignoreSynonym) =
 			self::initSearchActionParams($searchParams, $pager);
+		$coreSearchOperator->getQueryAttributes();
+		$this->queryAttributes->setIgnoreSynonymOnPartner(true);
 		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectId, $coreOrder, $aggregations);
 
 		list($coreResults, $objectCount, $aggregationsResult) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject);
@@ -125,8 +127,14 @@ class ESearchService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaESearchErrors::CRITERIA_EXCEEDED_MAX_MATCHES_ALLOWED);
 			}
 		}
+		
+		$ignoreSynonym = false;
+		if ($coreParams->getIgnoreSynonym())
+		{
+			$ignoreSynonym = true;
+		}
 
-		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy(), $coreParams->getAggregations());
+		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy(), $coreParams->getAggregations(), $ignoreSynonym);
 	}
 
 }

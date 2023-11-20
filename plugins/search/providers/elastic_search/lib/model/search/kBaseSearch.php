@@ -4,7 +4,7 @@
  * @subpackage model.search
  */
 
-abstract class kBaseSearch
+abstract class getQueryAttributeskBaseSearch
 {
 	protected $elasticClient;
 	protected $query;
