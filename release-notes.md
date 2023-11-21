@@ -1,4 +1,17 @@
 # Tucana-20.0.0
+## Enable Page Builder ##
+* Issue Type: Task
+* Issue ID: PLAT-24486
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.pageBuilder.enabled = true
+moduls.pageBuilder.permissionType = 2
+moduls.pageBuilder.label = "Enable Page Builder in EP"
+moduls.pageBuilder.permissionName = FEATURE_PAGE_BUILDER_PERMISSION
+moduls.pageBuilder.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 ## update Game Services partner permissions ##
 - Issue Type: Story
 - Issue ID: PLAT-24491
