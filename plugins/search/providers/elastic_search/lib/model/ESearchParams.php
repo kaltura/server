@@ -34,6 +34,11 @@ class ESearchParams extends BaseObject
 	 * @var ESearchAggregations
 	 */
 	protected $aggregations;
+	
+	/**
+	 * @var bool
+	 */
+	protected $ignoreSynonym;
 
 	/**
 	 * @return ESearchOperator
@@ -130,5 +135,20 @@ class ESearchParams extends BaseObject
 	{
 		return $this->aggregations;
 	}
-
+	
+	/**
+	 * @return bool
+	 */
+	public function getIgnoreSynonym()
+	{
+		return $this->ignoreSynonym;
+	}
+	
+	/**
+	 * @param bool $ignoreSynonym
+	 */
+	public function setIgnoreSynonym($ignoreSynonym)
+	{
+		$this->ignoreSynonym = $ignoreSynonym;
+	}
 }
