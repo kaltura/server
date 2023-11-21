@@ -12,6 +12,13 @@ moduls.pageBuilder.permissionName = FEATURE_PAGE_BUILDER_PERMISSION
 moduls.pageBuilder.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
+## Deploy new Flavor params and conversion profile for KME PDF conversion ##
+- Issue Type: Task
+- Issue ID: NR2-7971
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_10_31_deploy_kaltura_meetings_pdf_documents_conversion_data.php
+    
 ## update Game Services partner permissions ##
 - Issue Type: Story
 - Issue ID: PLAT-24491
