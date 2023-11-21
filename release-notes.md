@@ -1,4 +1,17 @@
 # Tucana-20.0.0
+## Enable Auth Broker ##
+* Issue Type: Task
+* Issue ID: PLAT-24513
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.authBroker.enabled = true
+moduls.authBroker.permissionType = 2
+moduls.authBroker.label = "Enable Auth Broker"
+moduls.authBroker.permissionName = FEATURE_AUTH_BROKER_PERMISSION
+moduls.authBroker.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 ## Enable Page Builder ##
 * Issue Type: Task
 * Issue ID: PLAT-24486
