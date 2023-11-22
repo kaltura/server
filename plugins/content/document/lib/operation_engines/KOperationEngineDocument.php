@@ -42,6 +42,14 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 		return "invalid file type: {$fileType}";
 	}
 
+	protected function getFileNameEncryptKey($operator) {
+		if (strpos($operator->params, 'encryptFileNames') !== false)
+		{
+			return KBatchBase::$taskConfig->params->encryptSeed . $this->job->entryId;
+		}
+		return null;
+	}
+
     /**
      * This function is merging and converting XML format to unify json format for the document conversion data
      * @param $arr - array where the keys will be the keys in the output json and the values are path to XML files to convert
@@ -56,10 +64,30 @@ abstract class KOperationEngineDocument extends KSingleOutputOperationEngine {
 				$docMetadata[$key] = json_decode(json_encode($str), true);
 			}
 			kFile::setFileContent($basePath . self::DOC_METADATA_JSON_NAME, json_encode($docMetadata));
+
 		}
 		catch (Exception $e)
 		{
-			KalturaLog::error("Fail to create json file: " . $e->getMessage());
+			KalturaLog::warning("Fail to create json file: " . $e->getMessage());
+		}
+	}
+
+	protected static function encryptFileName($basePath, $fileName, $key) {
+		if (!$key )
+		{
+			return $fileName;
+		}
+		try {
+			$pathinfo = pathinfo($fileName);
+			$encryptName = base64_encode(hash_hmac('sha256', $pathinfo['filename'], $key, true));
+			$newName = str_replace('=', '', strtr($encryptName, '+/', '-_')) . '.' . $pathinfo['extension'];
+			KalturaLog::info('RENAME: ' . $fileName . ' to ' . $newName);
+			kFile::rename($basePath . $fileName, $basePath . $newName);
+			return $newName;
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::warning("Fail to encryptFileName for file" . $fileName . "] due to: " . $e->getMessage());
 		}
 	}
 }

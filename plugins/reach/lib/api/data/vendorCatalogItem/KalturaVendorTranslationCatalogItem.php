@@ -11,9 +11,15 @@ class KalturaVendorTranslationCatalogItem extends KalturaVendorCaptionsCatalogIt
 	 */
 	public $targetLanguage;
 	
+	/**
+	 * @var bool
+	 */
+	public $requireSource;
+	
 	private static $map_between_objects = array
 	(
 		'targetLanguage',
+		'requireSource',
 	);
 	
 	protected function getServiceFeature()

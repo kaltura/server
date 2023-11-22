@@ -1,22 +1,15 @@
 <?php
 /**
  * User Profile Micro Service
+ * This represents the 'user-profile' service under 'plat-user' repo
  */
-class MicroServiceUserProfile extends MicroServiceBaseService
+class MicroServiceUserProfile extends MicroServiceUserBase
 {
+	public static $service = 'user-profile';
+	
 	public function __construct()
 	{
-		parent::__construct('user','user-profile');
-	}
-
-	/**
-	 * List User Profiles
-	 *
-	 * @param $filter
-	 * @param $pager
-	 */
-	public function list($partnerId, $filter, $pager = array())
-	{
-		return $this->serve($partnerId, 'list', array('filter' => $filter, 'pager' => $pager));
+		$this->serviceName = self::$service;
+		parent::__construct();
 	}
 }

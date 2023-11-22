@@ -1,3 +1,44 @@
+# Tucana-20.0.0
+## Enable Auth Broker ##
+* Issue Type: Task
+* Issue ID: PLAT-24513
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.authBroker.enabled = true
+moduls.authBroker.permissionType = 2
+moduls.authBroker.label = "Enable Auth Broker"
+moduls.authBroker.permissionName = FEATURE_AUTH_BROKER_PERMISSION
+moduls.authBroker.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Enable Page Builder ##
+* Issue Type: Task
+* Issue ID: PLAT-24486
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.pageBuilder.enabled = true
+moduls.pageBuilder.permissionType = 2
+moduls.pageBuilder.label = "Enable Page Builder in EP"
+moduls.pageBuilder.permissionName = FEATURE_PAGE_BUILDER_PERMISSION
+moduls.pageBuilder.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Deploy new Flavor params and conversion profile for KME PDF conversion ##
+- Issue Type: Task
+- Issue ID: NR2-7971
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_10_31_deploy_kaltura_meetings_pdf_documents_conversion_data.php
+    
+## update Game Services partner permissions ##
+- Issue Type: Story
+- Issue ID: PLAT-24491
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_11_20_update_game_services_partner_permissions.php
+
 # Scorpius-19.20.0
 ## Add virtualevent get permission for game service partner
 * Issue type: Feature
