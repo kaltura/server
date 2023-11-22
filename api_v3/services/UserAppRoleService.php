@@ -55,6 +55,7 @@ class UserAppRoleService extends KalturaBaseService
 		$lockKey = 'userAppRole_add_' . kCurrentContext::getCurrentPartnerId() . '_' . $userAppRole->appGuid . '_' . $userAppRole->userId;
 		$dbUserAppRole = kLock::runLocked($lockKey, array($this, 'addUserAppRole'), array($dbUserAppRole));
 		
+		$userAppRole = new KalturaUserAppRole();
 		$userAppRole->fromObject($dbUserAppRole, $this->getResponseProfile());
 		
 		return $userAppRole;
