@@ -912,21 +912,21 @@ class KCurlWrapper
 		return 1;
 	}
 
-    public static function getRedirectUrl($url, $headers)
-    {
-        $redirectUrl = $url;
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_NOBODY, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        $result = curl_exec($curl);
-        if ($result !== false)
-        {
-            $redirectUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
-        }
-        return $redirectUrl;
-    }
+    	public static function getRedirectUrl($url, $headers)
+    	{
+        	$redirectUrl = $url;
+        	$curl = curl_init($url);
+        	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        	curl_setopt($curl, CURLOPT_HEADER, true);
+        	curl_setopt($curl, CURLOPT_NOBODY, true);
+        	curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        	$result = curl_exec($curl);
+        	if ($result !== false)
+        	{
+            		$redirectUrl = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
+        	}
+        	return $redirectUrl;
+    	}
 }
 
