@@ -133,8 +133,8 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$flavorAsset = kFlowHelper::createOriginalFlavorAsset($entry->getPartnerId(), $entry->getId(), $recordingFile->fileExtension);
 		$jobData = new kImportJobData();
 		$jobData->setUrlHeaders($headers);
-        $jobData->setShouldRedirect(true);
-        kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url, $flavorAsset, null, $jobData);
+        	$jobData->setShouldRedirect(true);
+        	kJobsManager::addImportJob(null, $entry->getId(), $entry->getPartnerId(), $url, $flavorAsset, null, $jobData);
 		return $entry;
 	}
 
