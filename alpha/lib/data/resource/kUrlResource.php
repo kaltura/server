@@ -24,18 +24,18 @@ class kUrlResource extends kContentResource
 	 */
 	private $urlHeaders;
 
-    /**
-     * @var bool
-     */
-    private $shouldRedirect;
+    	/**
+     	 * @var bool
+     	 */
+    	private $shouldRedirect;
 
-    /**
-     * @return bool
-     */
-    public function getShouldRedirect()
-    {
-        return $this->shouldRedirect;
-    }
+    	/**
+     	 * @return bool
+     	 */
+    	public function getShouldRedirect()
+    	{
+        	return $this->shouldRedirect;
+    	}
 
 	/**
 	 * @return string
