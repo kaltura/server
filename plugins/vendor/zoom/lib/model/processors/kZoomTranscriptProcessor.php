@@ -53,7 +53,7 @@ class kZoomTranscriptProcessor extends kZoomProcessor
 				$captionAssetResource = new KalturaUrlResource();
 				$captionAssetResource->url = $recordingFile->download_url;
 				$captionAssetResource->urlHeaders = $headers;
-                $captionAssetResource->shouldRedirect = true;
+                		$captionAssetResource->shouldRedirect = true;
 				$captionAssetService->setContentAction($captionAsset->getId(), $captionAssetResource);
 			}
 			catch (Exception $e)
