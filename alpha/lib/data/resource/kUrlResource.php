@@ -61,7 +61,7 @@ class kUrlResource extends kContentResource
 	{
 		$importJobData = new kImportJobData();
 		$importJobData->setUrlHeaders($this->getUrlHeaders());
-        $importJobData->setShouldRedirect($this->getShouldRedirect());
+        	$importJobData->setShouldRedirect($this->getShouldRedirect());
 		return $importJobData;
 	}
 	
