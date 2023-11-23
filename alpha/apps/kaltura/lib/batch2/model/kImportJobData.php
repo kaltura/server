@@ -35,31 +35,31 @@ class kImportJobData extends kJobData
 	 */
 	private $destFileSharedPath;
 
-    /**
-     * @var array
-     */
+        /**
+         * @var array
+         */
 	private $urlHeaders;
 
-    /**
-     * @var bool
-     */
-    private $shouldRedirect;
+        /**
+         * @var bool
+     	 */
+    	private $shouldRedirect;
 
-    /**
-     * @return bool
-     */
-    public function getShouldRedirect()
-    {
-        return $this->shouldRedirect;
-    }
+    	/**
+     	 * @return bool
+     	 */
+    	public function getShouldRedirect()
+    	{
+        	return $this->shouldRedirect;
+    	}
 
-    /**
-     * @param bool $shouldRedirect
-     */
-    public function setShouldRedirect($shouldRedirect)
-    {
-        $this->shouldRedirect = $shouldRedirect;
-    }
+    	/**
+     	 * @param bool $shouldRedirect
+     	 */
+    	public function setShouldRedirect($shouldRedirect)
+    	{
+        	$this->shouldRedirect = $shouldRedirect;
+    	}
 
 	/**
 	 * @return the $srcFileUrl
