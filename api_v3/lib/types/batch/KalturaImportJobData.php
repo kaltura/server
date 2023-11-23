@@ -29,6 +29,16 @@ class KalturaImportJobData extends KalturaJobData
 	 * @var string
 	 */
 	public $destFileSharedPath;
+
+    	/**
+     	 * @var array
+     	 */
+    	public $urlHeaders;
+
+    	/**
+     	 * @var bool
+     	 */
+    	public $shouldRedirect;
     
 	private static $map_between_objects = array
 	(
@@ -36,7 +46,9 @@ class KalturaImportJobData extends KalturaJobData
 		"destFileLocalPath" ,
 		"flavorAssetId" ,
 		"fileSize",
-		"destFileSharedPath"
+		"destFileSharedPath",
+        	"urlHeaders",
+        	"shouldRedirect"
 	);
 
 	public function getMapBetweenObjects ( )
