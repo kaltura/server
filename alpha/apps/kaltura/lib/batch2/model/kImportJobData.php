@@ -34,10 +34,10 @@ class kImportJobData extends kJobData
 	 * @var string
 	 */
 	private $destFileSharedPath;
-	
-	/**
-	 * @var array
-	 */
+
+    /**
+     * @var array
+     */
 	private $urlHeaders;
 
     /**

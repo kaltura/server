@@ -207,7 +207,7 @@ class KAsyncImport extends KJobHandlerWorker
 		{
             if ($data->shouldRedirect)
             {
-                $sourceUrl =  ZoomHelper::getRedirectUrl($data->srcFileUrl, $data->urlHeaders);
+                $sourceUrl =  KCurlWrapper::getRedirectUrl($data->srcFileUrl, $data->urlHeaders);
             }
             else
             {

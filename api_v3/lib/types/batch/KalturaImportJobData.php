@@ -32,8 +32,8 @@ class KalturaImportJobData extends KalturaJobData
 
     /**
      * @var array
-	 */
-	public $urlHeaders;
+     */
+    public $urlHeaders;
 
     /**
      * @var bool
