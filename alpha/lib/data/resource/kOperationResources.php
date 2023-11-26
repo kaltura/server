@@ -10,6 +10,11 @@ class kOperationResources extends kContentResource
 	 * @var array<kOperationResource>
 	 */
 	private $resources;
+	/**
+	 *
+	 * @var ChapterNamingPolicy
+	 */
+	private $chapterNamingPolicy;
 
 	/**
 	 * @return array
@@ -25,5 +30,21 @@ class kOperationResources extends kContentResource
 	public function setResources(array $resources)
 	{
 		$this->resources = $resources;
+	}
+
+	/**
+	 * @return ChapterNamingPolicy
+	 */
+	public function getChapterNamingPolicy()
+	{
+		return $this->chapterNamingPolicy;
+	}
+
+	/**
+	 * @param ChapterNamingPolicy $chapterNamingPolicy
+	 */
+	public function setChapterNamingPolicy($chapterNamingPolicy)
+	{
+		$this->chapterNamingPolicy = $chapterNamingPolicy;
 	}
 }

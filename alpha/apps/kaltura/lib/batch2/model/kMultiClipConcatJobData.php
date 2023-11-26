@@ -27,6 +27,11 @@ class kMultiClipConcatJobData extends kJobData
 	private $priority;
 
 	/**
+	 * @var ChapterNamingPolicy
+	 */
+	private $chapterNamingPolicy;
+
+	/**
 	 * @var array
 	 */
 	private $operationResources;
@@ -115,4 +120,19 @@ class kMultiClipConcatJobData extends kJobData
 		$this->operationResources = $operationResources;
 	}
 
+	/**
+	 * @return ChapterNamingPolicy
+	 */
+	public function getChapterNamingPolicy()
+	{
+		return $this->chapterNamingPolicy;
+	}
+
+	/**
+	 * @param ChapterNamingPolicy $chapterNamingPolicy
+	 */
+	public function setChapterNamingPolicy($chapterNamingPolicy)
+	{
+		$this->chapterNamingPolicy = $chapterNamingPolicy;
+	}
 }

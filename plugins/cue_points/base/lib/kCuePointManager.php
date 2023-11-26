@@ -68,7 +68,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$destEntryId = $data->getDestEntryId();
 		$partnerId = $data->getPartnerId();
 		$resourcesClipDescriptionArray = array();
-		foreach ($data->getOperationResources() as $operationResource)
+		foreach ($data->getOperationResources() as $key => $operationResource)
 		{
 			$resource = $operationResource->getResource();
 			if(!($resource instanceof kFileSyncResource))
@@ -81,7 +81,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 				continue;
 			}
 			$operationAttributes = $operationResource->getOperationAttributes();
-			self::addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $pastClipsDuration);
+			self::addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $pastClipsDuration, $key, $data->getChapterNamingPolicy());
 			$resourceClipDescriptionArray = self::getClipDescriptionFromOperationAttribute($operationAttributes, $sourceEntryId, $pastClipsDuration);
 			$resourcesClipDescriptionArray = array_merge($resourcesClipDescriptionArray, $resourceClipDescriptionArray);
 			KalturaLog::debug("Cue Point Destination Entry ID: [$destEntryId] and source entry ID: [$sourceEntryId]");
@@ -97,7 +97,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 * @param int $offset
 	 * @throws PropelException
 	 */
-	protected static function addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $offset)
+	protected static function addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $offset, $chapterIndex, $chapterNamingPolicy)
 	{
 		$chapter = new ThumbCuePoint();
 		$chapter->setPartnerId($partnerId);
@@ -105,10 +105,32 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$chapter->setSubType(ThumbCuePointSubType::CHAPTER);
 		$chapter->setThumbOffset($offset);
 		$chapter->setStartTime($offset);
-		$chapter->setName("$sourceEntryId");
+		$chapterName = self::getChapterNameByPolicy($sourceEntryId, $chapterIndex, $chapterNamingPolicy);
+		$chapter->setName("$chapterName");
 		$chapter->setSystemName(self::MULTI_CLIP_CHAPTER_SYSTEM_NAME);
 		$chapter->setStatus(KalturaCuePointStatus::READY);
 		$chapter->save();
+	}
+
+	protected static function getChapterNameByPolicy($sourceEntryId, $chapterIndex, $chapterNamingPolicy)
+	{
+		$entry = null;
+		if($chapterNamingPolicy != ChapterNamingPolicy::NUMERICAL)
+		{
+			$entry = entryPeer::retrieveByPK($sourceEntryId);
+		}
+		switch ($chapterNamingPolicy)
+		{
+			case ChapterNamingPolicy::NUMERICAL:
+				return "Chapter $chapterIndex";
+
+			case ChapterNamingPolicy::BY_ENTRY_ID:
+				return $entry->getId();
+
+			case ChapterNamingPolicy::BY_ENTRY_NAME:
+			default:
+				return $entry->getName();
+		}
 	}
 
 	/**

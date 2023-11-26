@@ -104,6 +104,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData->setPartnerId($partnerId);
 		$jobData->setPriority($priority);
 		$jobData->setOperationResources($resources->getResources());
+		$jobData->setChapterNamingPolicy($resources->getChapterNamingPolicy());
 
 		$batchJob = kJobsManager::addJob($parentJob, $jobData, BatchJobType::MULTI_CLIP_CONCAT);
 		return $batchJob;

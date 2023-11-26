@@ -27,6 +27,11 @@ class KalturaMultiClipConcatJobData extends KalturaJobData
 	public $priority;
 
 	/**
+	 * @var KalturaChapterNamingPolicy
+	 */
+	public $chapterNamingPolicy;
+
+	/**
 	 * @var KalturaOperationResourceArray
 	 */
 	public $operationResources;
@@ -38,7 +43,8 @@ class KalturaMultiClipConcatJobData extends KalturaJobData
 		'multiTempEntryId',
 		'partnerId',
 		'priority',
-		'operationResources'
+		'operationResources',
+		'chapterNamingPolicy'
 	);
 
 	/* (non-PHPdoc)
