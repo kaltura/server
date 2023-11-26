@@ -12,9 +12,9 @@ class kOperationResources extends kContentResource
 	private $resources;
 	/**
 	 *
-	 * @var ChapterNamingPolicy
+	 * @var ChapterNamePolicy
 	 */
-	private $chapterNamingPolicy;
+	private $chapterNamePolicy;
 
 	/**
 	 * @return array
@@ -33,18 +33,18 @@ class kOperationResources extends kContentResource
 	}
 
 	/**
-	 * @return ChapterNamingPolicy
+	 * @return ChapterNamePolicy
 	 */
-	public function getChapterNamingPolicy()
+	public function getChapterNamePolicy()
 	{
-		return $this->chapterNamingPolicy;
+		return $this->chapterNamePolicy;
 	}
 
 	/**
-	 * @param ChapterNamingPolicy $chapterNamingPolicy
+	 * @param ChapterNamePolicy $chapterNamePolicy
 	 */
-	public function setChapterNamingPolicy($chapterNamingPolicy)
+	public function setChapterNamePolicy($chapterNamePolicy)
 	{
-		$this->chapterNamingPolicy = $chapterNamingPolicy;
+		$this->chapterNamePolicy = $chapterNamePolicy;
 	}
 }

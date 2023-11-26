@@ -11,14 +11,14 @@ class KalturaOperationResources extends KalturaContentResource
 	public $resources;
 
 	/**
-	 * @var KalturaChapterNamingPolicy
+	 * @var KalturaChapterNamePolicy
 	 */
-	public $chapterNamingPolicy;
+	public $chapterNamePolicy;
 
 	private static $map_between_objects = array
 	(
 		'resources',
-		'chapterNamingPolicy',
+		'chapterNamePolicy',
 	);
 
 	/* (non-PHPdoc)

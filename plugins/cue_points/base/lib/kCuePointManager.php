@@ -81,7 +81,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 				continue;
 			}
 			$operationAttributes = $operationResource->getOperationAttributes();
-			self::addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $pastClipsDuration, $key, $data->getChapterNamingPolicy());
+			self::addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $pastClipsDuration, $key, $data->getChapterNamePolicy());
 			$resourceClipDescriptionArray = self::getClipDescriptionFromOperationAttribute($operationAttributes, $sourceEntryId, $pastClipsDuration);
 			$resourcesClipDescriptionArray = array_merge($resourcesClipDescriptionArray, $resourceClipDescriptionArray);
 			KalturaLog::debug("Cue Point Destination Entry ID: [$destEntryId] and source entry ID: [$sourceEntryId]");
@@ -97,7 +97,7 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 	 * @param int $offset
 	 * @throws PropelException
 	 */
-	protected static function addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $offset, $chapterIndex, $chapterNamingPolicy)
+	protected static function addChapterCuePoint($partnerId, $sourceEntryId, $destEntryId, $offset, $chapterIndex, $chapterNamePolicy)
 	{
 		$chapter = new ThumbCuePoint();
 		$chapter->setPartnerId($partnerId);
@@ -105,29 +105,30 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$chapter->setSubType(ThumbCuePointSubType::CHAPTER);
 		$chapter->setThumbOffset($offset);
 		$chapter->setStartTime($offset);
-		$chapterName = self::getChapterNameByPolicy($sourceEntryId, $chapterIndex, $chapterNamingPolicy);
+		$chapterName = self::getChapterNameByPolicy($sourceEntryId, $chapterIndex, $chapterNamePolicy);
 		$chapter->setName("$chapterName");
 		$chapter->setSystemName(self::MULTI_CLIP_CHAPTER_SYSTEM_NAME);
 		$chapter->setStatus(KalturaCuePointStatus::READY);
 		$chapter->save();
 	}
 
-	protected static function getChapterNameByPolicy($sourceEntryId, $chapterIndex, $chapterNamingPolicy)
+	protected static function getChapterNameByPolicy($sourceEntryId, $chapterIndex, $chapterNamePolicy)
 	{
 		$entry = null;
-		if($chapterNamingPolicy != ChapterNamingPolicy::NUMERICAL)
+		if($chapterNamePolicy != ChapterNamePolicy::NUMERICAL)
 		{
 			$entry = entryPeer::retrieveByPK($sourceEntryId);
 		}
-		switch ($chapterNamingPolicy)
+		switch ($chapterNamePolicy)
 		{
-			case ChapterNamingPolicy::NUMERICAL:
+			case ChapterNamePolicy::NUMERICAL:
+				$chapterIndex++;
 				return "Chapter $chapterIndex";
 
-			case ChapterNamingPolicy::BY_ENTRY_ID:
+			case ChapterNamePolicy::BY_ENTRY_ID:
 				return $entry->getId();
 
-			case ChapterNamingPolicy::BY_ENTRY_NAME:
+			case ChapterNamePolicy::BY_ENTRY_NAME:
 			default:
 				return $entry->getName();
 		}
