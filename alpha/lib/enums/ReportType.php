@@ -207,6 +207,7 @@ interface ReportType extends BaseEnum
    const VE_REGISTERED_ROLES = 50003;
    const VE_REGISTERED_COUNTRIES = 50004;
    const VE_REGISTERED_WORLD_REGIONS = 50005;
+   const VE_USER_HIGHLIGHTS = 50006;
 
    // event platform reports
    const EP_WEBCAST_HIGHLIGHTS = 60001;

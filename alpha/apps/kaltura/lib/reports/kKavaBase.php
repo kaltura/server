@@ -154,6 +154,10 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VE_UNREGISTERED = 'unregistered';
 	const EVENT_TYPE_VE_INVITED = 'invited';
 	const EVENT_TYPE_VE_CREATED = 'created';
+	const EVENT_TYPE_VE_AUTO_CONFIRMED = 'autoConfirmed';
+	const EVENT_TYPE_VE_PARTICIPATED_POST_EVENT = 'participatedPostEvent';
+	const EVENT_TYPE_VE_INVITED_PENDING_REGISTRATION = 'invitedPendingRegistration';
+
 
 	// event types - meeting events
 	const EVENT_TYPE_MEETING_JOIN_SESSION = 'joinSession';
