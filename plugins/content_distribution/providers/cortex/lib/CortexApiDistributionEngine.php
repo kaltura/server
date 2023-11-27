@@ -467,6 +467,16 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		}
 		catch(Exception $e)
 		{
+			if ($needDel)
+			{
+				kFile::unlink($videoFilePath);
+			}
+			
+			if($isRemote)
+			{
+				kFile::unlink($tempVideoFilePath);
+			}
+			
 			return false;
 		}
 	}
