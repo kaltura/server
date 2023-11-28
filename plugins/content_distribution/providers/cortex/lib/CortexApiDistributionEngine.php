@@ -472,7 +472,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 				kFile::unlink($videoFilePath);
 			}
 			
-			if($isRemote)
+			if(isset($tempVideoFilePath))
 			{
 				kFile::unlink($tempVideoFilePath);
 			}
