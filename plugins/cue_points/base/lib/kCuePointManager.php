@@ -118,6 +118,10 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		if($chapterNamePolicy != ChapterNamePolicy::NUMERICAL)
 		{
 			$entry = entryPeer::retrieveByPK($sourceEntryId);
+			if(!$entry)
+			{
+				throw new kCoreException("Entry [$sourceEntryId] not found", kCoreException::INVALID_ENTRY_ID);
+			}
 		}
 		switch ($chapterNamePolicy)
 		{
