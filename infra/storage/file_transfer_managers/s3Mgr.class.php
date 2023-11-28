@@ -363,7 +363,7 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch ( Exception $e )
 		{
-			self::safeLog("Couldn't determine if path [$remote_file] is dir: {$e->getMessage()}");
+			KalturaLog::err("Couldn't determine if path [$remote_file] is dir: {$e->getMessage()}");
 		}
 		return false;
 	}
