@@ -41,6 +41,11 @@ class LiveCaptionFeature extends LiveFeature
 	protected $language;
 
 	/**
+	 * @var string
+	 */
+	protected $captionFormat;
+
+	/**
 	 * @param string $v
 	 */
 	public function setMediaUrl($v)
@@ -113,6 +118,19 @@ class LiveCaptionFeature extends LiveFeature
 	public function getLanguage()
 	{
 		return $this->language;
+	}
+
+	/**
+	 * @param string $v
+	 */
+	public function setCaptionFormat($v)
+	{
+		$this->captionFormat = $v;
+	}
+
+	public function getCaptionFormat()
+	{
+		return $this->captionFormat;
 	}
 
 	public function getApiType()
