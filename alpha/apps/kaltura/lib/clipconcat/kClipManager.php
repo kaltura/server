@@ -1179,29 +1179,33 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function getDefaultConvertCommandForFile($jobData, $effectsFilter)
 	{
-		if($effectsFilter)
+		if(!$effectsFilter)
 		{
-			$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
-			$bitrate = $flavorParamsObj->getVideoBitRate();
-			$cmdStr = " -i __inFileName__";
-			$cmdStr .= " -filter_complex '$effectsFilter'";
-			$cmdStr .= " -c:v libx264 -subq 5 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4";
-			$cmdStr .= " -coder 1 -refs 2 -x264opts stitchable -vprofile main -force_key_frames expr:'gte(t,n_forced*2)'";
-			$cmdStr .= " -pix_fmt yuv420p -b:v $bitrate" . "k";
-			$cmdStr .= " -c:a libfdk_aac -b:a 192k";
-
-			$conversionParams = $this->getJobDataConversionParams($jobData);
-			$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
-			$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
-
-			if(isset($conversionParams[self::FRAME_RATE]))
-			{
-				$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
-			}
-			$cmdStr .= " -f mpegts -vsync 1 -y __outFileName__ ";
-			return $cmdStr;
+			return "-";
 		}
-		return "-";
+		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
+		if(!$flavorParamsObj)
+		{
+			return "-";
+		}
+		$bitrate = $flavorParamsObj->getVideoBitRate();
+		$cmdStr = " -i __inFileName__";
+		$cmdStr .= " -filter_complex '$effectsFilter'";
+		$cmdStr .= " -c:v libx264 -subq 5 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4";
+		$cmdStr .= " -coder 1 -refs 2 -x264opts stitchable -vprofile main -force_key_frames expr:'gte(t,n_forced*2)'";
+		$cmdStr .= " -pix_fmt yuv420p -b:v $bitrate" . "k";
+		$cmdStr .= " -c:a libfdk_aac -b:a 192k";
+
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
+		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
+
+		if(isset($conversionParams[self::FRAME_RATE]))
+		{
+			$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
+		}
+		$cmdStr .= " -f mpegts -vsync 1 -y __outFileName__ ";
+		return $cmdStr;
 	}
 
 	protected function getEffectsFilter($jobData, $operationAttribute)
