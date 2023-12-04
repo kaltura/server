@@ -174,10 +174,10 @@ class rawAction extends sfAction
 				header("Content-Disposition: attachment; filename=\"$name\"");
 			}
 			
-			$archive_file = $file_sync->getFullPath();
-			$mime_type = kFile::mimeType($archive_file);
+			$archiveFile = $file_sync->getFullPath();
+			$mimeType = kFile::mimeType($archiveFile);
 			
-			kFileUtils::dumpFile($file_sync->getFullPath(), $mime_type, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
+			kFileUtils::dumpFile($archiveFile, $mimeType, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
 		}
 		elseif ($entry->getType() == entryType::DATA)
 		{
