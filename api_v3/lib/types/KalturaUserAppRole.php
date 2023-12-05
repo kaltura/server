@@ -26,11 +26,7 @@ class KalturaUserAppRole extends KalturaAppRole
 	/**
 	 * @param $kuserToUserRole
 	 * @param $skip
-	 * @return KuserToUserRole|null
-	 *
-	 * @throws KalturaAPIException
-	 * @throws PropelException
-	 * @throws kCoreException
+	 * @return KuserToUserRole
 	 */
 	public function toInsertableObject($kuserToUserRole = null, $skip = array())
 	{
@@ -43,9 +39,7 @@ class KalturaUserAppRole extends KalturaAppRole
 	}
 	
 	/**
-	 * @throws PropelException
 	 * @throws KalturaAPIException
-	 * @throws kCoreException
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
@@ -72,7 +66,6 @@ class KalturaUserAppRole extends KalturaAppRole
 	
 	/**
 	 * @throws KalturaAPIException
-	 * @throws kCoreException
 	 */
 	public function validateForUpdate($kuserToUserRole, $propertiesToSkip = array())
 	{
@@ -139,8 +132,6 @@ class KalturaUserAppRole extends KalturaAppRole
 	 * @return void
 	 *
 	 * @throws KalturaAPIException
-	 * @throws kCoreException
-	 * @throws PropelException
 	 */
 	private static function isValidForInsert(kuser $kuser, $appGuid, $userRoleId)
 	{
@@ -169,13 +160,6 @@ class KalturaUserAppRole extends KalturaAppRole
 		if (!$appGuidExist)
 		{
 			throw new KalturaAPIException(KalturaErrors::APP_GUID_NOT_FOUND, $appGuid);
-		}
-		
-		// validate user does not have a role for the requested appGuid
-		$userAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($kuser->getId(), $appGuid);
-		if ($userAppRole)
-		{
-			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_ALREADY_EXISTS, $kuser->getPuserId(), $appGuid);
 		}
 	}
 }

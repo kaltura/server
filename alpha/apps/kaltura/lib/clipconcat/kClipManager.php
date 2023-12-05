@@ -104,6 +104,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData->setPartnerId($partnerId);
 		$jobData->setPriority($priority);
 		$jobData->setOperationResources($resources->getResources());
+		$jobData->setChapterNamePolicy($resources->getChapterNamePolicy());
 
 		$batchJob = kJobsManager::addJob($parentJob, $jobData, BatchJobType::MULTI_CLIP_CONCAT);
 		return $batchJob;
@@ -1128,15 +1129,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$flavorAssetsOnTempEntry = assetPeer::retrieveByEntryId($jobData->getTempEntryId(), array(assetType::FLAVOR));
 				usort($flavorAssetsOnTempEntry, array("kClipManager", "cmpByClipOrder"));
 				$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+
+				// each file of the concatenated files is an output of an operation attribute
 				$files = $this->getFilesPath($flavorAssetsOnTempEntry, $imageToVideo);
+				$operationAttributesSorted = $jobData->getOperationAttributes();
 
 				foreach ($files as $flavorAssetId => $relatedFiles)
 				{
 					/** @var array $relatedFiles */
-					foreach ($relatedFiles as $relatedFile)
+					foreach ($relatedFiles as $key => $relatedFile)
 					{
 						$allRelatedFiles[] = $relatedFile;
-						$convertCommands[] = $this->getConvertCommandForFile($jobData);
+						$convertCommands[] = $this->getConvertCommandForFile($jobData, $operationAttributesSorted[$key]);
 					}
 					KalturaLog::debug("Asset Id: [$flavorAssetId], Related file : " . print_r($relatedFiles, true));
 					// assume concatenated assets have the same actualFlavorParamsId and take the last
@@ -1155,37 +1159,99 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
-	protected function getConvertCommandForFile($jobData)
+	protected function getConvertCommandForFile($jobData, $operationAttribute)
 	{
+		/** @var kClipConcatJobData $jobData */
+		$effectsFilter = $this->getEffectsFilter($jobData, $operationAttribute);
 		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
 		if($imageToVideo)
 		{
-			return $this->getConvertImageToVideoCommand($jobData);
+			return $this->getConvertImageToVideoCommand($jobData, $operationAttribute, $effectsFilter);
 		}
 
 		$audioDuration = $this->getJobDataConversionParams($jobData, self::AUDIO_DURATION);
 		if(!$audioDuration)
 		{
-			return $this->getAddSilentAudioCommand($jobData);
+			return $this->getAddSilentAudioCommand($jobData, $operationAttribute, $effectsFilter);
 		}
 
-		return "-";
+		return $this->getDefaultConvertCommandForFile($jobData, $effectsFilter);
 	}
 
-	protected function getAddSilentAudioCommand($jobData)
+	protected function getDefaultConvertCommandForFile($jobData, $effectsFilter)
 	{
+		if(!$effectsFilter)
+		{
+			return "-";
+		}
+		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
+		if(!$flavorParamsObj)
+		{
+			return "-";
+		}
+		$bitrate = $flavorParamsObj->getVideoBitRate();
+		$cmdStr = " -i __inFileName__";
+		$cmdStr .= " -filter_complex '$effectsFilter'";
+		$cmdStr .= " -c:v libx264 -subq 5 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4";
+		$cmdStr .= " -coder 1 -refs 2 -x264opts stitchable -vprofile main -force_key_frames expr:'gte(t,n_forced*2)'";
+		$cmdStr .= " -pix_fmt yuv420p -b:v $bitrate" . "k";
+		$cmdStr .= " -c:a libfdk_aac -b:a 192k";
+
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
+		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
+
+		if(isset($conversionParams[self::FRAME_RATE]))
+		{
+			$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
+		}
+		$cmdStr .= " -f mpegts -vsync 1 -y __outFileName__ ";
+		return $cmdStr;
+	}
+
+	protected function getEffectsFilter($jobData, $operationAttribute)
+	{
+		/** @var kClipConcatJobData $jobData */
+		if($this->shouldApplyEffectsOnConcat($jobData))
+		{
+			$effectsManager = new kEffectsManager();
+			return $effectsManager->addVideoEffects($operationAttribute);
+		}
+		return "";
+	}
+
+	protected function shouldApplyEffectsOnConcat($jobData)
+	{
+		$width = $this->getJobDataConversionParams($jobData, self::WIDTH);
+		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+		return $width || $imageToVideo;
+	}
+
+	protected function getAddSilentAudioCommand($jobData, $operationAttribute, $effectsFilter)
+	{
+		/** @var kClipConcatJobData $jobData */
 		$cmdStr = " -i __inFileName__";
 		$conversionParams = $this->getJobDataConversionParams($jobData);
 		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
 		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
-		$operationAttribute = $jobData->getOperationAttributes()[0];
-		$cmdStr .= " -f s16le -i /dev/zero -c:v copy -t " . $operationAttribute->getDuration()/1000;
+		$cmdStr .= " -f s16le -i /dev/zero";
+		if($effectsFilter != "")
+		{
+			$cmdStr .= " -filter_complex '[0:v]$effectsFilter'";
+			$cmdStr .= " -c:v libx264 -pix_fmt yuv420p";
+		}
+		else
+		{
+			$cmdStr .= " -c:v copy";
+		}
+		$cmdStr .= " -t " . $operationAttribute->getDuration()/1000;
 		$cmdStr .= "  -c:a libfdk_aac -b:a 192k -f mpegts -y __outFileName__ ";
 		return $cmdStr;
 	}
 
-	protected function getConvertImageToVideoCommand($jobData)
+	protected function getConvertImageToVideoCommand($jobData, $operationAttribute, $effectsFilter)
 	{
+		/** @var kClipConcatJobData $jobData */
 		$cmdStr = " -loop 1 -i __inFileName__";
 		$cmdStr .= " -f s16le -i /dev/zero -c:a libfdk_aac -b:a 192k";
 
@@ -1208,17 +1274,28 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$cmdStr .= " -s " . str_replace(':', 'x', $frameSize);
 			$scalingFilter = "scale=iw*min($width/iw\,$height/ih):ih*min($width/iw\,$height/ih)";
 			$paddingFilter = "pad=$width:$height:(ow-iw)/2:(oh-ih)/2";
-			$filter = "[0:v]" . $scalingFilter . "[vflt0];[vflt0]" . $paddingFilter . "[out];[out]" . $whiteBackgroundFilter;
+			if($effectsFilter != "")
+			{
+				$filter = "[0:v]" . $effectsFilter . "[vflt0];[vflt0]" . $scalingFilter . "[vflt1];[vflt1]" . $paddingFilter;
+			}
+			else
+			{
+				$filter = "[0:v]" . $scalingFilter . "[vflt1];[vflt1]" . $paddingFilter . "[out];[out]" . $whiteBackgroundFilter;
+			}
 			$cmdStr .= " -aspect $frameSize";
+		}
+		else if($effectsFilter != "")
+		{
+			$filter = "[0:v]$effectsFilter";
 		}
 		else
 		{
 			$filter ="[0]$whiteBackgroundFilter";
 		}
+
 		$cmdStr .= " -filter_complex '$filter'";
 
 		// image should have only one clipAttribute
-		$operationAttribute = $jobData->getOperationAttributes()[0];
 		$duration = $operationAttribute->getDuration()/1000;
 		$cmdStr .= " -t $duration -shortest -fflags +shortest";
 		$cmdStr .= " -f mpegts -vsync 1";
@@ -1327,7 +1404,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param bool $isAudio
 	 * @return string
 	 */
-	protected function editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParamsArray = array(), $isAudio = false, $baseExtraParams = '')
+	protected function editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParamsArray = array(), $isAudio = false, $baseExtraParams = '', $effects = true)
 	{
 		$newConversionExtraParams = array();
 		for ($i = 0; $i < count($conversionEngines) ; $i++)
@@ -1337,7 +1414,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$extraParams .= $conversionExtraParamsArray[$i];
 			}
-			if (!$isAudio && ($conversionEngines[$i] == conversionEngineType::FFMPEG || $conversionEngines[$i] == conversionEngineType::FFMPEG_AUX))
+			if ($effects && !$isAudio && in_array($conversionEngines[$i], array(conversionEngineType::FFMPEG, conversionEngineType::FFMPEG_AUX)))
 			{
 				$extraParams .= $this->addEffects($singleAttribute);
 			}
@@ -1369,7 +1446,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
 		$conversionExtraParams = $originalConversionEnginesExtraParams ? explode('|', $originalConversionEnginesExtraParams) : null;
-		$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParams, $isAudio, $extraParams);
+		// do not apply effects if: 1.image to video conversion, 2.resizing (already using filter complex)
+		$allowEffects = !$conversionData || (!isset($conversionData[self::IMAGE_TO_VIDEO]) && !isset($conversionData[self::WIDTH]));
+		$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParams, $isAudio, $extraParams, $allowEffects);
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
 		if($conversionData && $flavorParamsObj instanceof flavorParams)
 		{

@@ -31,7 +31,7 @@ class kEffectsManager
 	 * @param kClipAttributes $singleAttribute
 	 * @return string
 	 */
-	private function addVideoEffects($singleAttribute)
+	public function addVideoEffects($singleAttribute)
 	{
 		$fadeIn = "";
 		$fadeOut = "";

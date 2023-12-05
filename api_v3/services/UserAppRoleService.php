@@ -43,18 +43,40 @@ class UserAppRoleService extends KalturaBaseService
 	 * @return KalturaUserAppRole
 	 *
 	 * @throws KalturaAPIException
+	 * @throws kCoreException
 	 * @throws PropelException
 	 * @throws Exception
 	 */
 	public function addAction(KalturaUserAppRole $userAppRole)
 	{
 		$dbUserAppRole = $userAppRole->toInsertableObject();
-		$dbUserAppRole->save();
+		
+		// prevent race condition where 2 or more concurrent requests are fired
+		$lockKey = 'userAppRole_add_' . kCurrentContext::getCurrentPartnerId() . '_' . $userAppRole->appGuid . '_' . $userAppRole->userId;
+		$dbUserAppRole = kLock::runLocked($lockKey, array($this, 'addUserAppRole'), array($dbUserAppRole));
 		
 		$userAppRole = new KalturaUserAppRole();
 		$userAppRole->fromObject($dbUserAppRole, $this->getResponseProfile());
 		
 		return $userAppRole;
+	}
+	
+	/**
+	 * @throws PropelException
+	 * @throws Exception
+	 */
+	function addUserAppRole(KuserToUserRole $dbUserAppRole)
+	{
+		// validate user does not have a role for the requested appGuid
+		$userAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($dbUserAppRole->getKuserId(), $dbUserAppRole->getAppGuid());
+		if ($userAppRole)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_ALREADY_EXISTS, $dbUserAppRole->getKuserId(), $dbUserAppRole->getAppGuid());
+		}
+		
+		$dbUserAppRole->save();
+		
+		return $dbUserAppRole;
 	}
 	
 	/**
