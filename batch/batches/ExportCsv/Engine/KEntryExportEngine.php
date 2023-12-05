@@ -25,7 +25,7 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 		catch(Exception $e)
 		{
 			KBatchBase::$kClient->setClientTag($clientTag);
-			KalturaLog::err($e->getMessage());
+			throw new Exception("Could not list entries : \n Error: " . $e->getMessage());
 		}
 
 		KBatchBase::$kClient->setClientTag($clientTag);
