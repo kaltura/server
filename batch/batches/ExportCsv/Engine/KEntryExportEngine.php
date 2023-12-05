@@ -18,7 +18,16 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 		{
 			KBatchBase::$kClient->setClientTag($clientTag ." useESearch");
 		}
-		$items = KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
+		try
+		{
+			$items = KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
+		}
+		catch(Exception $e)
+		{
+			KBatchBase::$kClient->setClientTag($clientTag);
+			KalturaLog::err($e->getMessage());
+		}
+
 		KBatchBase::$kClient->setClientTag($clientTag);
 		return $items;
 	}
