@@ -13,7 +13,23 @@ class KEntryExportEngine extends KMappedObjectExportEngine
 
 	protected function getItemList($filter, $pager)
 	{
-		return KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
+		$clientTag = KBatchBase::$kClient->getClientTag();
+		if(is_object($filter->advancedSearch))
+		{
+			KBatchBase::$kClient->setClientTag($clientTag ." useESearch");
+		}
+		try
+		{
+			$items = KBatchBase::$kClient->baseEntry->listAction($filter, $pager);
+		}
+		catch(Exception $e)
+		{
+			KBatchBase::$kClient->setClientTag($clientTag);
+			throw new Exception("Could not list entries : \n Error: " . $e->getMessage());
+		}
+
+		KBatchBase::$kClient->setClientTag($clientTag);
+		return $items;
 	}
 
 	protected function getDefaultHeaderRowToCsv()
