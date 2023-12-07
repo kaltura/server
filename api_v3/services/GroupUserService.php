@@ -78,6 +78,7 @@ class GroupUserService extends KalturaBaseService
 		}
 		
 		$dbGroupUser->save();
+		
 		return $dbGroupUser;
 	}
 
