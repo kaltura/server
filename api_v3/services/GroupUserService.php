@@ -14,7 +14,7 @@ class GroupUserService extends KalturaBaseService
 		parent::initService($serviceId, $serviceName, $actionName);
 		$this->applyPartnerFilterForClass('KuserKgroup');
 	}
-
+	
 	/**
 	 * Add new GroupUser
 	 *
@@ -22,6 +22,7 @@ class GroupUserService extends KalturaBaseService
 	 * @param KalturaGroupUser $groupUser
 	 * @return KalturaGroupUser
 	 * @throws KalturaAPIException
+	 * @throws Exception
 	 */
 	function addAction(KalturaGroupUser $groupUser)
 	{
@@ -39,11 +40,6 @@ class GroupUserService extends KalturaBaseService
 		if ( !$kgroup || $kgroup->getType() != KuserType::GROUP)
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupUser->userId );
 
-		//verify kuser does not belongs to kgroup
-		$kuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
-		if($kuserKgroup)
-			throw new KalturaAPIException (KalturaErrors::GROUP_USER_ALREADY_EXISTS);
-
 		$this->validateKuserkGroupCoExistence($kgroup, $kuser->getId());
 
 		//verify user does not belongs to more than max allowed groups
@@ -58,10 +54,32 @@ class GroupUserService extends KalturaBaseService
 		$dbGroupUser = $groupUser->toInsertableObject();
 		$dbGroupUser->setPartnerId($this->getPartnerId());
 		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
-		$dbGroupUser->save();
+		
+		$lockKey = 'groupUser_add_' . $kuser->getPartnerId() . '_' . $kuser->getId() . '_' . $kgroup->getId();
+		$dbGroupUser = kLock::runLocked($lockKey, array($this, 'addGroupUser'), array($dbGroupUser));
+		
+		$groupUser = new KalturaGroupUser();
 		$groupUser->fromObject($dbGroupUser);
 
 		return $groupUser;
+	}
+	
+	/**
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	function addGroupUser(KuserKgroup $dbGroupUser)
+	{
+		//verify kuser does not belongs to kgroup
+		$kuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($dbGroupUser->getKuserId(), $dbGroupUser->getKgroupId());
+		if($kuserKgroup)
+		{
+			throw new KalturaAPIException (KalturaErrors::GROUP_USER_ALREADY_EXISTS);
+		}
+		
+		$dbGroupUser->save();
+		
+		return $dbGroupUser;
 	}
 
 	/**
