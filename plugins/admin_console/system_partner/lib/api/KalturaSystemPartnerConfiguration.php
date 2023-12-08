@@ -871,6 +871,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$object_to_fill->setAllowedDomains('');
 		}
 		
+		if (is_null($this->cdnHostWhiteList))
+		{
+			$object_to_fill->setCdnHostWhiteList(null);
+		}
+		
 		return $object_to_fill;
 	}
 	

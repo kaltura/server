@@ -2006,8 +2006,18 @@ class Partner extends BasePartner
 
 	public function setCdnHostWhiteList($whiteListRegEx)
 	{
-		$whiteListArr = explode(',', rtrim($whiteListRegEx, ','));
-		$this->putInCustomData(self::CDN_HOST_WHITE_LIST, serialize($whiteListArr));
+		// set default value to null to avoid a case where we pass ' ' or '' and store an array of empty string
+		$value = null;
+		
+		// in case white space is given, store null
+		$whiteListRegEx = trim($whiteListRegEx);
+		if (!empty($whiteListRegEx))
+		{
+			$whiteListArr = explode(',', rtrim($whiteListRegEx, ','));
+			$value = serialize($whiteListArr);
+		}
+		
+		$this->putInCustomData(self::CDN_HOST_WHITE_LIST, $value);
 	}
 
 	public function getUsageWarnings() { return $this->getFromCustomData(self::CUSTOM_DATA_USAGE_WARNINGS, null, array()); }
