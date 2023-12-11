@@ -1,3 +1,11 @@
+# Tucana-20.1.0
+## Update Flavor params for KME PPT conversion ##
+- Issue Type: Task
+- Issue ID: PLAT-24380
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_11_30_update_KME_PPT_flavorParams.php
+
 # Tucana-20.0.0
 ## Enable Auth Broker ##
 * Issue Type: Task

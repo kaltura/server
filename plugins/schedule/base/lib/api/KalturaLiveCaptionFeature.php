@@ -32,6 +32,11 @@ class KalturaLiveCaptionFeature extends KalturaLiveFeature
 
 	/**
 	 * @var string
+	 */
+	public $captionFormat;
+
+	/**
+	 * @var string
 	 * 3 letter code
 	 */
 	public $language;
@@ -42,7 +47,8 @@ class KalturaLiveCaptionFeature extends KalturaLiveFeature
 		'captionUrl',
 		'captionToken',
 		'inputDelay',
-		'language'
+		'language',
+		'captionFormat'
 	);
 
 	/* (non-PHPdoc)
