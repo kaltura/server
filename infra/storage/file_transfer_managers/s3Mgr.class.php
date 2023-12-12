@@ -135,23 +135,8 @@ class s3Mgr extends kFileTransferMgr
 				return false;
 			}
 
-			return $this->generateS3Client();
+			return $this->generateCachedCredentialsS3Client();
 		}
-
-		$config = array(
-			'credentials' => array(
-				'key'    => $sftp_user,
-				'secret' => $sftp_pass,
-			),
-			'region' => $this->s3Region,
-			'signature' => $this->signatureType ? $this->signatureType : 'v4',
-			'version' => '2006-03-01',
-		);
-
-		if ($this->endPoint)
-			$config['endpoint'] = $this->endPoint;
-
-		$this->s3 = S3Client::factory($config);
 
 		/**
 		 * There is no way of "checking the credentials" on s3.
@@ -159,26 +144,58 @@ class s3Mgr extends kFileTransferMgr
 		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
 		 * code elsewhere if the permissions are not sufficient.
 		 **/
+		return $this->generateStaticCredsClient($sftp_user, $sftp_pass);
+	}
+
+	private function generateCachedCredentialsS3Client()
+	{
+		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn);
+		$config = $this->getBaseClientConfig();
+		$config['credentials'] = $cacheProviderCredentials;
+		$this->s3Client = S3Client::factory($config);
+
 		return true;
 	}
 
-	private function generateS3Client()
+	private function generateStaticCredsClient($key, $secret)
 	{
-		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
+		$config = $this->getBaseClientConfig();
+		$config['credentials'] = array(
+			'key'    => $this->accessKeyId,
+			'secret' => $this->accessKeySecret,
+		);
 
-		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
-		$roleRefresh->setRoleArn($this->s3Arn);
-		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
-		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
-
-		$this->s3 = S3Client::factory(array(
-			'credentials' => $roleCreds,
-			'region' => $this->s3Region,
-			'signature' => 'v4',
-			'version' => '2006-03-01'
-		));
+		$this->s3Client = S3Client::factory($config);
 
 		return true;
+	}
+
+	private function getBaseClientConfig()
+	{
+		$config = array(
+			'region' => $this->s3Region,
+			'signature' => 'v4',
+			'version' => '2006-03-01',
+			'ua_append' => array($this->getClientUserAgent()),
+			'retries' => 'legacy'
+		);
+
+		if ($this->endPoint)
+			$config['endpoint'] = $this->endPoint;
+
+		return $config;
+	}
+
+	private function getClientUserAgent()
+	{
+		$appName = self::DEFAULT_S3_APP_NAME;
+		$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
+		if($this->userAgentRegex && preg_match($this->userAgentRegex, $hostName, $matches) && isset($matches[0]))
+		{
+			$appName = $matches[0];
+		}
+
+		return "APN/1.0 $this->userAgentPartner/1.0 $appName/1.0";
 	}
 
 
