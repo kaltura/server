@@ -2384,4 +2384,14 @@ class Partner extends BasePartner
 	{
 		return $this->putInCustomData(self::CUSTOM_DATE_MAX_METADATA_INDEX_LENGTH, $v);
 	}
+
+	public function getEnableGameServicesAnalytics()
+	{
+		return $this->getFromCustomData("enableGameServicesAnalytics", null, false);
+	}
+
+	public function setEnableGameServicesAnalytics($v)
+	{
+		return $this->putInCustomData("enableGameServicesAnalytics", $v);
+	}
 }
