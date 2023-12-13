@@ -158,7 +158,7 @@ class UserController extends Zend_Controller_Action
 	protected function shouldUseSsoLogin()
 	{
 		$settings = Zend_Registry::get('config')->settings;
-		if(isset($settings->ssoLogin) && $settings->ssoLogin == true)
+		if( (isset($settings->ssoLogin) && $settings->ssoLogin == true) || (isset($settings->authBrokerSsoLogin) && $settings->authBrokerSsoLogin == true) )
 		{
 			return true;
 		}
@@ -228,7 +228,15 @@ class UserController extends Zend_Controller_Action
 
 		try
 		{
-			$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $partnerId);
+			if($settings->authBrokerSsoLogin && $settings->authRedirectUrl)
+			{
+				$redirectUrl = $settings->authRedirectUrl;
+			}
+			else
+			{
+				$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $partnerId);
+			}
+			
 			if(!$redirectUrl)
 			{
 				throw new Exception('Missing authentication server url', self::MISSING_AUTH_SERVER_URL);
@@ -238,7 +246,9 @@ class UserController extends Zend_Controller_Action
 			$ks = isset($_GET['ks']) ? $_GET['ks'] : null;
 			if(!$ks)
 			{
-				$body = '<!DOCTYPE html>
+				if($settings->authBrokerSsoLogin)
+				{
+					$body = '<!DOCTYPE html>
 <html>
 <head>
     <title>Submit</title>
@@ -253,9 +263,14 @@ class UserController extends Zend_Controller_Action
 document.querySelector(".login-form").submit();
 </script>
 </html>';
-				$this->getResponse()->setBody($body);
-				$this->getResponse()->sendResponse();
-				die();
+					$this->getResponse()->setBody($body);
+					$this->getResponse()->sendResponse();
+					die();
+				}
+				else
+				{
+					$this->getResponse()->setRedirect($redirectUrl);
+				}
 			}
 			else
 			{
