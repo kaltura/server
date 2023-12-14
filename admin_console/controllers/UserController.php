@@ -256,7 +256,7 @@ class UserController extends Zend_Controller_Action
 <body>
 <form class="login-form" action="' . $redirectUrl . '" method="post">
     <input type="hidden" id="appType" name="appType" value="adminConsole" />
-    <input type="hidden" id="email" name="email" value="sso@adminconsole.kaltura.com" />
+    <input type="hidden" id="email" name="email" value="adminconsole@kaltura.com" />
 </form>
 </body>
 <script>
