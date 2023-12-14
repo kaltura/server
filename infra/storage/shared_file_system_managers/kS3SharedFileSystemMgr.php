@@ -12,25 +12,30 @@ require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
 require_once(dirname(__FILE__) . '/../RefreshableRole.class.php');
 
 use Aws\S3\S3Client;
-
-use Aws\Credentials\CredentialProvider;
-use Aws\DoctrineCacheAdapter;
-use Doctrine\Common\Cache\FilesystemCache;
-
+use Aws\Sts\StsClient;
 
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\AwsException;
+use Aws\S3\Enum\CannedAcl;
+
+use Aws\Common\Credentials\Credentials;
+use Doctrine\Common\Cache\FilesystemCache;
+use Guzzle\Cache\DoctrineCacheAdapter;
+use Aws\Common\Credentials\CacheableCredentials;
+
 
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
 	const MULTIPART_UPLOAD_MINIMUM_FILE_SIZE = 5368709120;
 	const MAX_PARTS_NUMBER = 10000;
 	const MIN_PART_SIZE = 5242880;
-
-	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getAwsErrorCode";
-	const AWS_404_ERROR = "NotFound";
-	const AWS_404_NO_SUCH_KEY = 'NoSuchKey';
-
+	
+	//This works only for SDK V3 for V2 need to use ‌NoSuchKey && getAwsErrorCode
+	//const AWS_404_ERROR = 'NotFound';
+	
+	const GET_EXCEPTION_CODE_FUNCTION_NAME = "getStatusCode";
+	const AWS_404_ERROR = 404;
+	
 	const S3_ARN_ROLE_ENV_NAME = "S3_ARN_ROLE";
 	const DEFAULT_S3_APP_NAME = "Kaltura-Server";
 	
@@ -87,7 +92,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
 	}
-	private function getClientUserAgent()
+	
+	private function setClientUserAgent()
 	{
 		$appName = self::DEFAULT_S3_APP_NAME;
 		$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
@@ -95,8 +101,8 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			$appName = $matches[0];
 		}
-
-		return "APN/1.0 $this->userAgentPartner/1.0 $appName/1.0";
+		
+		$this->s3Client->setUserAgent("APN/1.0 $this->userAgentPartner/1.0 $appName/1.0");
 	}
 	
 	private function login()
@@ -114,57 +120,58 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				self::safeLog('Class Aws\S3\StsClient was not found!!');
 				return false;
 			}
-
-			return $this->generateCachedCredentialsS3Client();
+			
+			return $this->generateS3Client();
 		}
-
+		
+		$config = array(
+			'credentials' => array(
+				'key'    => $this->accessKeyId,
+				'secret' => $this->accessKeySecret,
+			),
+			'region' => $this->s3Region,
+			'signature' => $this->signatureType ? $this->signatureType : 'v4',
+			'version' => '2006-03-01',
+		);
+		
+		if ($this->endPoint)
+			$config['endpoint'] = $this->endPoint;
+		
+		$this->s3Client = S3Client::factory($config);
+		$this->setClientUserAgent();
+		
 		/**
 		 * There is no way of "checking the credentials" on s3.
 		 * Doing a ListBuckets would only check that the user has the s3:ListAllMyBuckets permission
 		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
 		 * code elsewhere if the permissions are not sufficient.
 		 **/
-		return $this->generateStaticCredsClient();
-	}
-
-	private function generateCachedCredentialsS3Client()
-	{
-		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn, $this->s3Region);
-		$config = $this->getBaseClientConfig();
-		$config['credentials'] = $cacheProviderCredentials;
-		$this->s3Client = S3Client::factory($config);
-
 		return true;
 	}
-
-	private function generateStaticCredsClient()
+	
+	private function generateS3Client()
 	{
-		$config = $this->getBaseClientConfig();
-		$config['credentials'] = array(
-			'key'    => $this->accessKeyId,
-			'secret' => $this->accessKeySecret,
-		);
-
-		$this->s3Client = S3Client::factory($config);
-
-		return true;
-	}
-
-	private function getBaseClientConfig()
-	{
-		$config = array(
+		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
+		
+		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
+		$roleRefresh->setRoleArn($this->s3Arn);
+		$roleRefresh->setS3Region($this->s3Region);
+		
+		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
+		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
+		
+		$this->s3Client = S3Client::factory(array(
+			'credentials' => $roleCreds,
 			'region' => $this->s3Region,
-			'signature' => $this->signatureType ? $this->signatureType : 'v4',
-			'version' => '2006-03-01',
-			'ua_append' => array($this->getClientUserAgent())
-		);
-
-		if ($this->endPoint)
-			$config['endpoint'] = $this->endPoint;
-
-		return $config;
+			'signature' => 'v4',
+			'version' => '2006-03-01'
+		));
+		
+		$this->setClientUserAgent();
+		
+		return true;
 	}
-
+	
 	protected function getBucketAndFilePath($filePath)
 	{
 		return explode("/",ltrim($filePath,"/"),2);
@@ -224,7 +231,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		return false;
 	}
-
+	
 	protected function doPutFileContentAtomic($filePath, $fileContent, $flags = 0, $context = null)
 	{
 		return $this->doPutFileContent($filePath, (string)$fileContent);
@@ -278,12 +285,12 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			
 			$retries--;
 		}
-
-		KalturaLog::err("put file content failed with error: {$res}");
-
+		
+		KalturaLog::err("put file content failed with error: {$res->getMessage()}");
+		
 		return false;
 	}
-
+	
 	protected function doCopy($fromFilePath, $toFilePath)
 	{
 		$params = $this->initBasicS3Params($toFilePath);
@@ -475,7 +482,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			KalturaLog::err("Failed to delete source file : [$src]");
 			return false;
 		}
-		
 		return true;
 	}
 	
@@ -675,8 +681,9 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		$cmd = $this->s3Client->getCommand('GetObject', $params);
 
-		$request = $this->s3Client->createPresignedRequest($cmd, time() + 5 * 86400);
-		return (string)$request->getUri();;
+		$expiry = time() + 5 * 86400;
+		$preSignedUrl = $cmd->createPresignedUrl($expiry);
+		return $preSignedUrl;
 	}
 	
 	protected function doMimeType($filePath)
@@ -756,13 +763,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	
 	protected function doFilemtime($filePath)
 	{
-		$result = $this->s3Call('getObject', null, $filePath, array(self::AWS_404_NO_SUCH_KEY));
+		$result = $this->s3Call('getObject', null, $filePath);
 		
 		if(!$result)
 		{
 			return false;
 		}
-		return strtotime($result['LastModified']);
+		return $result['Last-Modified'];
 	}
 	
 	protected function doMoveLocalToShared($src, $dest, $copy = false)
@@ -791,9 +798,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			list($success, $res) = $this->doPutFileHelper($dest, $fp, $params);
 			if ($success)
-			{
 				break;
-			}
 			
 			sleep(rand(1,3));
 			$retries--;
@@ -892,7 +897,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		{
 			$params = $this->initBasicS3Params($filePath);
 		}
-
+		
 		$retries = $this->retriesNum;
 		while ($retries > 0)
 		{

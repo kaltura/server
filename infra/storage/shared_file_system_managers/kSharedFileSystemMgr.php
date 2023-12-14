@@ -444,7 +444,7 @@ abstract class kSharedFileSystemMgr
 		$to = kFileBase::fixPath($to);
 		
 		if (!kString::beginsWith($from, self::$kSharedRootPath)) {
-			return $this->doMoveLocalToShared($from, $to, $copy);
+			return $this->doMoveLocalToShared($from, $to);
 		}
 		
 		return $this->doMoveFile($from, $to, $override_if_exists, $copy);
