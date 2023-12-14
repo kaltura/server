@@ -31,7 +31,7 @@ class KalturaImportJobData extends KalturaJobData
 	public $destFileSharedPath;
 
     	/**
-     	 * @var array
+     	 * @var KalturaStringArray
      	 */
     	public $urlHeaders;
 
