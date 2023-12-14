@@ -6,17 +6,14 @@ require_once(dirname(__FILE__) . '/../../vendor/aws/aws-autoloader.php');
 use Aws\S3\S3Client;
 use Aws\Sts\StsClient;
 
+use Aws\DoctrineCacheAdapter;
+use Doctrine\Common\Cache\FilesystemCache;
+use Aws\Credentials\CredentialProvider;
+use Aws\Credentials\InstanceProfileProvider;
+use Aws\Credentials\AssumeRoleCredentialProvider;
+
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\AwsException;
-use Aws\S3\Enum\CannedAcl;
-
-use Aws\Common\Credentials\Credentials;
-use Aws\Common\Credentials\RefreshableInstanceProfileCredentials;
-use Aws\Common\Credentials\AbstractRefreshableCredentials;
-use Aws\Common\Credentials\CacheableCredentials;
-
-use Doctrine\Common\Cache\FilesystemCache;
-use Guzzle\Cache\DoctrineCacheAdapter;
 
 class RefreshableRole
 {
