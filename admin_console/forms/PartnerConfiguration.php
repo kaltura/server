@@ -514,7 +514,12 @@ class Form_PartnerConfiguration extends Infra_Form
 
 
 		//--------------- Host white list ----------------------------
-
+		
+		$this->addElement('text', 'custom_analytics_domain', array(
+			'label'			=> 'Custom Analytics Domain:',
+			'filters'		=> array('StringTrim'),
+		));
+		
 		$this->addElement('text', 'cdn_host_white_list', array(
 			'label'			=> 'CDN Host white list regex (comma seperated)',
 			'filters'		=> array('StringTrim'),
@@ -1140,8 +1145,9 @@ class Form_PartnerConfiguration extends Infra_Form
 			'liveStreamConfig',
 			array('legend' => 'Live Stream Config')
 		);
-		$this->addDisplayGroup(array('allowed_domains','cdn_host_white_list'), 'cdnHostWhiteList');
-		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour');
+		$this->addDisplayGroup(array('custom_analytics_domain', 'crossLine'), 'analytics', array('legend' => 'Analytics'));
+		$this->addDisplayGroup(array('allowed_domains', 'cdn_host_white_list', 'crossLine'), 'cdnHostWhiteList', array('legend' => 'Host White List'));
+		$this->addDisplayGroup(array_merge(array('html_purifier_base_list_usage', 'purify_image_content', 'html_purifier_behaviour'), array('crossLine')), 'htmlPurifierBehaviour', array('legend' => 'HTML Purifier'));
 
 		$this->addDisplayGroup(
 			array_merge(
