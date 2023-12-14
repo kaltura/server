@@ -228,6 +228,7 @@ class UserController extends Zend_Controller_Action
 
 		try
 		{
+			$redirectUrl = null;
 			if($settings->authBrokerSsoLogin && $settings->authRedirectUrl)
 			{
 				$redirectUrl = $settings->authRedirectUrl;
