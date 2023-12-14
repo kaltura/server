@@ -1,3 +1,17 @@
+# Tucana-20.2.0
+## Enable CNC Assistant Signals ##
+* Issue Type: Task
+* Issue ID: PLAT-24548
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.cncAssistantSignals.enabled = true
+moduls.cncAssistantSignals.permissionType = 2
+moduls.cncAssistantSignals.label = "Enable CNC Assistant Signals"
+moduls.cncAssistantSignals.permissionName = FEATURE_CNC_ASSISTANT_SIGNALS_PERMISSION
+moduls.cncAssistantSignals.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Tucana-20.1.0
 ## Update Flavor params for KME PPT conversion ##
 - Issue Type: Task

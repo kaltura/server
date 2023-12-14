@@ -205,7 +205,14 @@ class KAsyncImport extends KJobHandlerWorker
 
 		try
 		{
-			$sourceUrl = $data->srcFileUrl;
+            		if ($data->shouldRedirect)
+            		{
+                		$sourceUrl =  KCurlWrapper::getRedirectUrl($data->srcFileUrl, $data->urlHeaders);
+            		}
+            		else
+            		{
+                		$sourceUrl = $data->srcFileUrl;
+            		}
 
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
 			$fileSize = null;

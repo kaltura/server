@@ -1028,10 +1028,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	{
 		if ($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 		{
-			if ($object->getName() == PermissionName::FEATURE_RECYCLE_BIN)
-			{
-				self::handleRecycleBinPermission($object);
-			}
+			self::handlePermissions($object);
 			self::markPartnerRoleCacheDirty($object->getPartnerId());
 			return true;
 		}
@@ -1077,10 +1074,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	{
 		if ($object instanceof Permission && $object->getPartnerId() != PartnerPeer::GLOBAL_PARTNER)
 		{
-			if ($object->getName() == PermissionName::FEATURE_RECYCLE_BIN)
-			{
-				self::handleRecycleBinPermission($object);
-			}
+			self::handlePermissions($object);
 			// changes in permissions for partner, may require new cache generation
 			self::markPartnerRoleCacheDirty($object->getPartnerId());
 			return true;
@@ -1098,7 +1092,29 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		return true;
 	}
-	
+
+	protected static function handlePermissions($object)
+	{
+		switch ($object->getName())
+		{
+			case PermissionName::FEATURE_RECYCLE_BIN:
+				self::handleRecycleBinPermission($object);
+				return;
+
+			case PermissionName::GAME_PLUGIN_PERMISSION:
+				self::handleGamePluginPermission($object);
+				return;
+		}
+	}
+
+	protected static function handleGamePluginPermission($permission)
+	{
+		$partner = PartnerPeer::retrieveByPK($permission->getPartnerId());
+		$enablePermission = $permission->getStatus() == PermissionStatus::ACTIVE;
+		$partner->setEnableGameServicesAnalytics($enablePermission);
+		$partner->save();
+	}
+
 	protected static function handleRecycleBinPermission($permission)
 	{
 		if ($permission->getStatus() == PermissionStatus::ACTIVE)

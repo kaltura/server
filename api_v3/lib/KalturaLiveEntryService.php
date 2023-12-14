@@ -260,7 +260,7 @@ class KalturaLiveEntryService extends KalturaEntryService
 
 		// If while we were waiting for the lock, someone has updated the recorded entry id - we should use it.
 		$dbEntry->reload();
-		if (($dbEntry->getRecordStatus() != RecordStatus::PER_SESSION) && ($dbEntry->getRecordedEntryId()))
+		if ($dbEntry->getRecordedEntryId())
 		{
 			$recordedEntry = entryPeer::retrieveByPK($dbEntry->getRecordedEntryId());
 			if ($recordedEntry)

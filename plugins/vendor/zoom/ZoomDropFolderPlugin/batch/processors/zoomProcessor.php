@@ -79,7 +79,7 @@ abstract class zoomProcessor
 		return $kalturaUser;
 	}
 	
-	protected function getZoomRedirectUrlFromFile($recording)
+	protected function getZoomAuthorizationHeaderFromFile($recording)
 	{
 		if (!isset($recording->recordingFile->downloadToken) && !isset($this->dropFolder->accessToken))
 		{
@@ -96,9 +96,8 @@ abstract class zoomProcessor
 		}
 		
 		$authorizationHeader = "Authorization: Bearer $accessToken";
-		$redirectUrl = ZoomHelper::getRedirectUrl($recording->recordingFile->downloadUrl, array($authorizationHeader));
 		$headerStringObject = new KalturaString();
 		$headerStringObject->value = $authorizationHeader;
-		return array($redirectUrl, array($headerStringObject));
+		return array($headerStringObject);
 	}
 }
