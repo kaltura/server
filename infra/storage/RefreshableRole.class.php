@@ -20,7 +20,7 @@ class RefreshableRole
 	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
 	const ASSUME_ROLE_CREDENTIALS_EXPIRY_TIME = 43200;
 
-	public function getCacheCredentialsProvider($roleArn, $s3Region = null)
+	public static function getCacheCredentialsProvider($roleArn, $s3Region = null)
 	{
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache_v3';
 
@@ -33,7 +33,7 @@ class RefreshableRole
 		);
 
 		//Added to support regional STS endpoints in case external traffic is blocked
-		if($this->s3Region)
+		if($s3Region)
 		{
 			$stsArgs['region'] = $s3Region;
 			$stsArgs['endpoint'] = "https://sts.{$s3Region}.amazonaws.com";
