@@ -511,6 +511,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $recycleBinRetentionPeriod;
 	
+	/**
+	 * @var string
+	 */
+	public $customAnalyticsDomain;
+	
 	
 	private static $map_between_objects = array
 	(
@@ -609,6 +614,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'isSelfServe',
 		'eventPlatformAllowedTemplates',
 		'recycleBinRetentionPeriod',
+		'customAnalyticsDomain',
 	);
 
 	public function getMapBetweenObjects()
@@ -869,6 +875,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		else
 		{
 			$object_to_fill->setAllowedDomains('');
+		}
+		
+		if (is_null($this->customAnalyticsDomain))
+		{
+			$object_to_fill->setCustomAnalyticsDomain('');
 		}
 		
 		return $object_to_fill;
