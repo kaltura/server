@@ -11,6 +11,7 @@ define('PARTNER_VERTICAL', 'v');
 define('PARTNER_PARENT_ID', 'pp');
 define('PARTNER_SERVICE_EDITION', 'se');
 define('PARTNER_ACCOUNT_TYPE','at');
+define('PARTNER_GS_ENABLED', 'gs');
 
 define('ENTRY_KUSER_ID', 'ku');
 define('ENTRY_TYPE', 't');
@@ -150,6 +151,7 @@ function getPartnerUpdates($updatedAt)
 				PARTNER_PARENT_ID => $row['PARTNER_PARENT_ID'],
 				PARTNER_SERVICE_EDITION => $row['PARTNER_PACKAGE'],
 				PARTNER_ACCOUNT_TYPE => getPartnerAccountType($customData),
+				PARTNER_GS_ENABLED => isset($customData['enableGameServicesAnalytics']) ? $customData['enableGameServicesAnalytics'] : false,
 			);
 			$info = json_encode($info);
 		}
