@@ -158,7 +158,7 @@ class UserController extends Zend_Controller_Action
 	protected function shouldUseSsoLogin()
 	{
 		$settings = Zend_Registry::get('config')->settings;
-		if( (isset($settings->ssoLogin) && $settings->ssoLogin == true) || (isset($settings->authBrokerSsoLogin) && $settings->authBrokerSsoLogin == true) )
+		if(isset($settings->ssoLogin) && $settings->ssoLogin == true)
 		{
 			return true;
 		}
@@ -229,7 +229,7 @@ class UserController extends Zend_Controller_Action
 		try
 		{
 			$redirectUrl = null;
-			if($settings->authBrokerSsoLogin && $settings->authRedirectUrl)
+			if($settings->authRedirectUrl)
 			{
 				$redirectUrl = $settings->authRedirectUrl;
 			}
@@ -247,7 +247,7 @@ class UserController extends Zend_Controller_Action
 			$ks = isset($_GET['ks']) ? $_GET['ks'] : null;
 			if(!$ks)
 			{
-				if($settings->authBrokerSsoLogin)
+				if($settings->authRedirectUrl)
 				{
 					$body = '<!DOCTYPE html>
 <html>
