@@ -129,7 +129,6 @@ class embedIframeJsAction extends sfAction
 					if ($whiteListHost) {
 						$headers["X-Forwarded-Host"] = $whiteListHost;
 					} else {
-						//In case X-Forwarded-Host is not in the allow list remove the header to avoid it being passed in the dumped request
 						unset($_SERVER['HTTP_X_FORWARDED_HOST']);
 					}
 				}
