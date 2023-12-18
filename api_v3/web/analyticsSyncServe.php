@@ -85,6 +85,16 @@ function getPartnerAccountType($customData)
 	return 0;
 }
 
+function getPartnerGameServiceEnabled($customData)
+{
+	if (isset($customData['enableGameServicesAnalytics']) && $customData['enableGameServicesAnalytics'])
+	{
+		return true;
+	}
+
+	return false;
+}
+
 function getEntrySourceTypeInt($sourceType, $adminTags, $customData)
 {
 	global $sourceFromAdminTag, $externalSources;
@@ -151,7 +161,7 @@ function getPartnerUpdates($updatedAt)
 				PARTNER_PARENT_ID => $row['PARTNER_PARENT_ID'],
 				PARTNER_SERVICE_EDITION => $row['PARTNER_PACKAGE'],
 				PARTNER_ACCOUNT_TYPE => getPartnerAccountType($customData),
-				PARTNER_GS_ENABLED => isset($customData['enableGameServicesAnalytics']) ? $customData['enableGameServicesAnalytics'] : false,
+				PARTNER_GS_ENABLED => getPartnerGameServiceEnabled($customData),
 			);
 			$info = json_encode($info);
 		}
