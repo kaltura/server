@@ -14,8 +14,10 @@ class SystemPartnerService extends KalturaBaseService
 		
 		// since plugin might be using KS impersonation, we need to validate the requesting
 		// partnerId from the KS and not with the $_POST one
-		if(!SystemPartnerPlugin::isAllowedPartner(kCurrentContext::$master_partner_id))
+		if(!SystemPartnerPlugin::isAllowedPartner(kCurrentContext::getCurrentPartnerId()))
+		{
 			throw new KalturaAPIException(SystemPartnerErrors::FEATURE_FORBIDDEN, SystemPartnerPlugin::PLUGIN_NAME);
+		}
 	}
 
 	
