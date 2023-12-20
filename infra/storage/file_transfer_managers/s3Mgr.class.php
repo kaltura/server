@@ -172,8 +172,7 @@ class s3Mgr extends kFileTransferMgr
 			'region' => $this->s3Region,
 			'signature' => 'v4',
 			'version' => '2006-03-01',
-			'ua_append' => array($this->getClientUserAgent()),
-			'retries' => 'legacy'
+			'ua_append' => array($this->getClientUserAgent())
 		);
 
 		if ($this->endPoint)
