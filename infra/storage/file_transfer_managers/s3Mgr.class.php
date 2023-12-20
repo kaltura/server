@@ -157,8 +157,8 @@ class s3Mgr extends kFileTransferMgr
 	{
 		$config = $this->getBaseClientConfig();
 		$config['credentials'] = array(
-			'key'    => $this->accessKeyId,
-			'secret' => $this->accessKeySecret,
+			'key'    => $key,
+			'secret' => $secret,
 		);
 
 		$this->s3Client = S3Client::factory($config);
