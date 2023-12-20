@@ -12,11 +12,11 @@ require_once(dirname(__FILE__) . '/kSharedFileSystemMgr.php');
 require_once(dirname(__FILE__) . '/../RefreshableRole.class.php');
 
 use Aws\S3\S3Client;
+use Aws\Sts\StsClient;
 
 use Aws\Credentials\CredentialProvider;
 use Aws\DoctrineCacheAdapter;
 use Doctrine\Common\Cache\FilesystemCache;
-
 
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\AwsException;
