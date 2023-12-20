@@ -148,7 +148,7 @@ class s3Mgr extends kFileTransferMgr
 		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn);
 		$config = $this->getBaseClientConfig();
 		$config['credentials'] = $cacheProviderCredentials;
-		$this->s3Client = S3Client::factory($config);
+		$this->s3 = S3Client::factory($config);
 
 		return true;
 	}
@@ -157,11 +157,11 @@ class s3Mgr extends kFileTransferMgr
 	{
 		$config = $this->getBaseClientConfig();
 		$config['credentials'] = array(
-			'key'    => $this->accessKeyId,
-			'secret' => $this->accessKeySecret,
+			'key'    => $key,
+			'secret' => $secret,
 		);
 
-		$this->s3Client = S3Client::factory($config);
+		$this->s3 = S3Client::factory($config);
 
 		return true;
 	}
@@ -172,8 +172,7 @@ class s3Mgr extends kFileTransferMgr
 			'region' => $this->s3Region,
 			'signature' => 'v4',
 			'version' => '2006-03-01',
-			'ua_append' => array($this->getClientUserAgent()),
-			'retries' => 'legacy'
+			'ua_append' => array($this->getClientUserAgent())
 		);
 
 		if ($this->endPoint)
