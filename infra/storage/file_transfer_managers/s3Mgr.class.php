@@ -148,7 +148,7 @@ class s3Mgr extends kFileTransferMgr
 		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn);
 		$config = $this->getBaseClientConfig();
 		$config['credentials'] = $cacheProviderCredentials;
-		$this->s3Client = S3Client::factory($config);
+		$this->s3 = S3Client::factory($config);
 
 		return true;
 	}
@@ -161,7 +161,7 @@ class s3Mgr extends kFileTransferMgr
 			'secret' => $secret,
 		);
 
-		$this->s3Client = S3Client::factory($config);
+		$this->s3 = S3Client::factory($config);
 
 		return true;
 	}
