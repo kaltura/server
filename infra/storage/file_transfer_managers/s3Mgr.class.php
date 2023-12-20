@@ -6,17 +6,12 @@ require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-aut
 use Aws\S3\S3Client;
 use Aws\Sts\StsClient;
 
+use Aws\Credentials\CredentialProvider;
+use Aws\DoctrineCacheAdapter;
+use Doctrine\Common\Cache\FilesystemCache;
+
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\AwsException;
-use Aws\S3\Enum\CannedAcl;
-
-use Aws\Common\Credentials\Credentials;
-use Aws\Common\Credentials\RefreshableInstanceProfileCredentials;
-use Aws\Common\Credentials\AbstractRefreshableCredentials;
-use Aws\Common\Credentials\CacheableCredentials;
-
-use Doctrine\Common\Cache\FilesystemCache;
-use Guzzle\Cache\DoctrineCacheAdapter;
 
 /**
  * Extends the 'kFileTransferMgr' class & implements a file transfer manager using the Amazon S3 protocol with Authentication Version 4.
@@ -30,7 +25,7 @@ class s3Mgr extends kFileTransferMgr
 	/* @var S3Client $s3 */
 	private $s3;
 
-	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
+	protected $filesAcl = 'private'; //CannedAcl::PRIVATE_ACCESS;
 	protected $s3Region = '';
 	protected $sseType = '';
 	protected $sseKmsKeyId = '';
