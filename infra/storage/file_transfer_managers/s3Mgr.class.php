@@ -38,6 +38,7 @@ class s3Mgr extends kFileTransferMgr
 	const LAST_MODIFICATION = 'LastModified';
 	const CONTENT_LENGTH = 'ContentLength';
 	const HEAD_OBJECT = 'headObject';
+	const DEFAULT_S3_APP_NAME = "Kaltura-Server";
 
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
