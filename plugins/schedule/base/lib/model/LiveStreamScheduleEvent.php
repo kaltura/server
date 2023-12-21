@@ -366,6 +366,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	public function getFromCustomData( $name , $namespace = null , $defaultValue = null )
 	{
 		$res = parent::getFromCustomData($name, $namespace, $defaultValue);
+
 		if (!$res) {
 			$parentId = $this->getParentId();
 			if ($parentId)
@@ -381,6 +382,7 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	public function createRecurrence($scheduleEvent, $date)
 	{
 		$newScheduleEvent = parent::createRecurrence($scheduleEvent, $date);
+
 		if ($scheduleEvent->getSourceEntryId()) {
 			$newScheduleEvent->setTemplateEntryId($scheduleEvent->getTemplateEntryId());
 		}
