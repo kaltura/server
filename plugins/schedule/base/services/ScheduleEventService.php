@@ -125,7 +125,7 @@ class ScheduleEventService extends KalturaBaseService
 
 		if ($dates)
 			foreach($dates as $date)
-				$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
+				$this->createRecurrence($dbScheduleEvent, $date);
 	}
 
 	/**
@@ -161,7 +161,7 @@ class ScheduleEventService extends KalturaBaseService
 
 		$class = get_class($dbScheduleEvent);
 		foreach($dates as $date)
-			$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
+			$this->createRecurrence($dbScheduleEvent, $date);
 	}
 
 
@@ -348,15 +348,10 @@ class ScheduleEventService extends KalturaBaseService
 		return $ends;
 	}
 
-	private function createRecurrence($class, $recurringScheduleEventId, $date, $duration)
+	private function createRecurrence($scheduleEvent, $date)
 	{
-		$scheduleEvent = new $class();
-		$scheduleEvent->setRecurrenceType(ScheduleEventRecurrenceType::RECURRENCE);
-		$scheduleEvent->setParentId($recurringScheduleEventId);
-		$scheduleEvent->setStartDate($date);
-		$scheduleEvent->setOriginalStartDate($date);
-		$scheduleEvent->setEndDate($date + $duration);
-		$scheduleEvent->save();
+		$newScheduleEvent = $scheduleEvent->createRecurrence($scheduleEvent, $date);
+		$newScheduleEvent->save();
 	}
 
 
