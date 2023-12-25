@@ -527,7 +527,12 @@ class s3Mgr extends kFileTransferMgr
 		$this->s3->registerStreamWrapper();
 	}
 	
-	public function getRemoteUrl($remote_file, $expiry = null)
+	public function getRemoteUrl($remote_file)
+	{
+		return $this->getPreSignedUrl($params);
+	}
+	
+	private function getPreSignedUrl($params, $expiry = null)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		
@@ -559,6 +564,6 @@ class s3Mgr extends kFileTransferMgr
 			return $this->s3->getObjectUrl($bucket, $remote_file);
 		}
 		
-		return $this->getRemoteUrl($remote_file, $expires);
+		return $this->getPreSignedUrl($remote_file, $expires);
 	}
 }
