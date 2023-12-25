@@ -541,16 +541,17 @@ class s3Mgr extends kFileTransferMgr
 			'Key'    => $remote_file,
 		);
 		
-		$cmd = $this->s3->getCommand('GetObject', $params);
-		
 		if(!$expiry)
 		{
 			$expiry = time() + 600;
 		}
-		$preSignedUrl = $cmd->createPresignedUrl($expiry);
+		
+		$cmd = $this->s3->getCommand('GetObject', $params);
+		
+		$request = $this->s3Client->createPresignedRequest($cmd, $expiry);
+		$preSignedUrl = (string)$request->getUri();;
 		
 		KalturaLog::debug("remote_file: [$remote_file] presignedUrl [$preSignedUrl]");
-		
 		return $preSignedUrl;
 	}
 
