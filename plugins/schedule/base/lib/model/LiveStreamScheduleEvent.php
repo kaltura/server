@@ -373,7 +373,10 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 			if ($parentId)
 			{
 				$parentScheduleEvent = ScheduleEventPeer::retrieveByPK($parentId);
-				$res = $parentScheduleEvent->getFromCustomData($name, $namespace, $defaultValue);
+				if ($parentScheduleEvent)
+				{
+					$res = $parentScheduleEvent->getFromCustomData($name, $namespace, $defaultValue);
+				}
 			}
 		}
 
