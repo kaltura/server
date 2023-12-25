@@ -527,7 +527,7 @@ class s3Mgr extends kFileTransferMgr
 		$this->s3->registerStreamWrapper();
 	}
 	
-	public function getRemoteUrl($remote_file, $expires = null)
+	public function getRemoteUrl($remote_file, $expiry = null)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		
@@ -538,7 +538,10 @@ class s3Mgr extends kFileTransferMgr
 		
 		$cmd = $this->s3->getCommand('GetObject', $params);
 		
-		$expiry = $expires ? $expires : (time() + 600);
+		if(!$expiry)
+		{
+			$expiry = time() + 600;
+		}
 		$preSignedUrl = $cmd->createPresignedUrl($expiry);
 		
 		KalturaLog::debug("remote_file: [$remote_file] presignedUrl [$preSignedUrl]");
