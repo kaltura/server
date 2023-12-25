@@ -532,7 +532,7 @@ class s3Mgr extends kFileTransferMgr
 		return $this->getPreSignedUrl($params);
 	}
 	
-	private function getPreSignedUrl($params, $expiry = null)
+	private function getPreSignedUrl($remote_file, $expiry = null)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		
