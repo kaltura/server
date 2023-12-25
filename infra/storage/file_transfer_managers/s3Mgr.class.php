@@ -529,7 +529,7 @@ class s3Mgr extends kFileTransferMgr
 	
 	public function getRemoteUrl($remote_file)
 	{
-		return $this->getPreSignedUrl($params);
+		return $this->getPreSignedUrl($remote_file);
 	}
 	
 	private function getPreSignedUrl($remote_file, $expiry = null)
