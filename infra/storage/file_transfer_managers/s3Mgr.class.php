@@ -529,6 +529,11 @@ class s3Mgr extends kFileTransferMgr
 	
 	public function getRemoteUrl($remote_file)
 	{
+		return $this->getPreSignedUrl($remote_file);
+	}
+	
+	private function getPreSignedUrl($remote_file, $expiry = null)
+	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		
 		$params = array(
@@ -536,20 +541,30 @@ class s3Mgr extends kFileTransferMgr
 			'Key'    => $remote_file,
 		);
 		
+		if(!$expiry)
+		{
+			$expiry = time() + 600;
+		}
+		
 		$cmd = $this->s3->getCommand('GetObject', $params);
 		
-		$expiry = time() + 600;
-		$preSignedUrl = $cmd->createPresignedUrl($expiry);
+		$request = $this->s3->createPresignedRequest($cmd, $expiry);
+		$preSignedUrl = (string)$request->getUri();
 		
 		KalturaLog::debug("remote_file: [$remote_file] presignedUrl [$preSignedUrl]");
-		
 		return $preSignedUrl;
 	}
 
 	public function getFileUrl($remote_file, $expires = null)
 	{
-		list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
-		KalturaLog::debug("remote_file: " . $remote_file);
-		return $this->s3->getObjectUrl($bucket, $remote_file, $expires);
+		KalturaLog::debug("Get file url for remote_file: " . $remote_file);
+		
+		if(!$expires)
+		{
+			list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
+			return $this->s3->getObjectUrl($bucket, $remote_file);
+		}
+		
+		return $this->getPreSignedUrl($remote_file, $expires);
 	}
 }
