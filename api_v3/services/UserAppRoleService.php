@@ -71,7 +71,7 @@ class UserAppRoleService extends KalturaBaseService
 		$userAppRole = KuserToUserRolePeer::getByKuserIdAndAppGuid($dbUserAppRole->getKuserId(), $dbUserAppRole->getAppGuid());
 		if ($userAppRole)
 		{
-			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_ALREADY_EXISTS, $dbUserAppRole->getKuserId(), $dbUserAppRole->getAppGuid());
+			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_ALREADY_EXISTS, $dbUserAppRole->getPuserId(), $dbUserAppRole->getAppGuid());
 		}
 		
 		$dbUserAppRole->save();

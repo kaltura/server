@@ -23,7 +23,28 @@ class kUrlResource extends kContentResource
 	 * @var array
 	 */
 	private $urlHeaders;
-	
+
+    	/**
+     	 * @var bool
+     	 */
+    	private $shouldRedirect;
+
+    	/**
+     	 * @return bool
+     	 */
+    	public function getShouldRedirect()
+    	{
+        	return $this->shouldRedirect;
+    	}
+
+        /**
+         * @param bool $shouldRedirect
+         */
+        public function setShouldRedirect($shouldRedirect)
+        {
+            $this->shouldRedirect = $shouldRedirect;
+        }
+
 	/**
 	 * @return string
 	 */
@@ -48,6 +69,7 @@ class kUrlResource extends kContentResource
 	{
 		$importJobData = new kImportJobData();
 		$importJobData->setUrlHeaders($this->getUrlHeaders());
+        	$importJobData->setShouldRedirect($this->getShouldRedirect());
 		return $importJobData;
 	}
 	
