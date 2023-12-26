@@ -194,9 +194,13 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 			case 'getLiveStatus':
 				if ($this->getSourceEntryId() && ($this->getCalculatedStartTime() + kSimuliveUtils::MINIMUM_TIME_TO_PLAYABLE_SEC <= time()))
 				{
-					// Simulive flow (and event is playable)
-					$output = EntryServerNodeStatus::PLAYABLE;
-					return true;
+					$sourceEntry = entryPeer::retrieveByPK($this->getSourceEntryId());
+					if (!$sourceEntry instanceof LiveStreamEntry || $sourceEntry->isCurrentlyLive())
+					{
+						// entry is considered as live entry
+						$output = EntryServerNodeStatus::PLAYABLE;
+						return true;
+					}
 				}
 			default:
 				return false;

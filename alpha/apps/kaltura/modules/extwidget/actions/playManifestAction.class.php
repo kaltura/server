@@ -1574,5 +1574,10 @@ class playManifestAction extends kalturaAction
 		$srcEntryType = $sourceEntry->getType();
 		// for simulive case with playlist source - servedEntryType should be MEDIA_CLIP
 		$this->servedEntryType = $srcEntryType == entryType::PLAYLIST ? entryType::MEDIA_CLIP : $srcEntryType;
+		if ($srcEntryType == entryType::LIVE_STREAM)
+		{
+			//live delivery profile is defined according to source entry
+			$this->deliveryAttributes->setEntryId($sourceEntry->getEntryId());
+		}
 	}
 }
