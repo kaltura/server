@@ -121,11 +121,10 @@ class ScheduleEventService extends KalturaBaseService
 	{
 		$dates = $this->getRecurrencesDates($dbScheduleEvent);
 		self::setRecurringDates($dates, $dbScheduleEvent);
-		$class = get_class($dbScheduleEvent);
 
 		if ($dates)
 			foreach($dates as $date)
-				$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
+				$this->createRecurrence($dbScheduleEvent, $date);
 	}
 
 	/**
@@ -159,9 +158,8 @@ class ScheduleEventService extends KalturaBaseService
 		$dates = array_diff($newDates, $existingScheduleEventStartDates);
 		KalturaLog::debug("Adding " .count($dates) . " new recurrences");
 
-		$class = get_class($dbScheduleEvent);
 		foreach($dates as $date)
-			$this->createRecurrence($class, $dbScheduleEvent->getId(), $date, $dbScheduleEvent->getDuration());
+			$this->createRecurrence($dbScheduleEvent, $date);
 	}
 
 
@@ -348,15 +346,10 @@ class ScheduleEventService extends KalturaBaseService
 		return $ends;
 	}
 
-	private function createRecurrence($class, $recurringScheduleEventId, $date, $duration)
+	private function createRecurrence($scheduleEvent, $date)
 	{
-		$scheduleEvent = new $class();
-		$scheduleEvent->setRecurrenceType(ScheduleEventRecurrenceType::RECURRENCE);
-		$scheduleEvent->setParentId($recurringScheduleEventId);
-		$scheduleEvent->setStartDate($date);
-		$scheduleEvent->setOriginalStartDate($date);
-		$scheduleEvent->setEndDate($date + $duration);
-		$scheduleEvent->save();
+		$newScheduleEvent = $scheduleEvent->createRecurrence($scheduleEvent, $date);
+		$newScheduleEvent->save();
 	}
 
 
