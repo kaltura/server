@@ -348,7 +348,7 @@ class ScheduleEventService extends KalturaBaseService
 
 	private function createRecurrence($scheduleEvent, $date)
 	{
-		$newScheduleEvent = $scheduleEvent->createRecurrence($scheduleEvent, $date);
+		$newScheduleEvent = $scheduleEvent->createRecurrence($date);
 		$newScheduleEvent->save();
 	}
 
