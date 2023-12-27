@@ -37,6 +37,14 @@ class kUrlResource extends kContentResource
         	return $this->shouldRedirect;
     	}
 
+        /**
+         * @param bool $shouldRedirect
+         */
+        public function setShouldRedirect($shouldRedirect)
+        {
+            $this->shouldRedirect = $shouldRedirect;
+        }
+
 	/**
 	 * @return string
 	 */

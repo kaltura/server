@@ -121,6 +121,8 @@ class Partner extends BasePartner
 	private $cdnWhiteListCache = array();
 
 	const CUSTOM_DATE_MAX_METADATA_INDEX_LENGTH = 'max_metadata_index_length';
+	
+	const CUSTOM_ANALYTICS_DOMAIN = 'custom_analytics_domain';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -2403,5 +2405,15 @@ class Partner extends BasePartner
 	public function setEnableGameServicesAnalytics($v)
 	{
 		return $this->putInCustomData("enableGameServicesAnalytics", $v);
+	}
+	
+	public function getCustomAnalyticsDomain()
+	{
+		return $this->getFromCustomData(self::CUSTOM_ANALYTICS_DOMAIN);
+	}
+	
+	public function setCustomAnalyticsDomain($v)
+	{
+		return $this->putInCustomData(self::CUSTOM_ANALYTICS_DOMAIN, $v);
 	}
 }

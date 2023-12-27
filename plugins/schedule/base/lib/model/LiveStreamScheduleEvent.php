@@ -356,4 +356,42 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 			$features[] = $name;
 		}
 	}
+
+	/**
+	 * @param string $name
+	 * @param string $namespace
+	 * @param string $defaultValue
+	 * @return string
+	 */
+	public function getFromCustomData( $name , $namespace = null , $defaultValue = null )
+	{
+		$res = parent::getFromCustomData($name, $namespace, $defaultValue);
+
+		if (!$res)
+		{
+			$parentId = $this->getParentId();
+			if ($parentId)
+			{
+				$parentScheduleEvent = ScheduleEventPeer::retrieveByPK($parentId);
+				if ($parentScheduleEvent)
+				{
+					$res = $parentScheduleEvent->getFromCustomData($name, $namespace, $defaultValue);
+				}
+			}
+		}
+
+		return $res;
+	}
+
+	public function createRecurrence($date)
+	{
+		$newScheduleEvent = parent::createRecurrence($date);
+
+		if ($this->getSourceEntryId())
+		{
+			$newScheduleEvent->setTemplateEntryId($this->getTemplateEntryId());
+		}
+
+		return $newScheduleEvent;
+	}
 }

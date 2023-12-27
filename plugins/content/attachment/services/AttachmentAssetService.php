@@ -241,13 +241,21 @@ class AttachmentAssetService extends KalturaAssetService
 	 */
 	protected function attachUrl(AttachmentAsset $attachmentAsset, kUrlResource $contentResource)
 	{
-		$url = $contentResource->getUrl();
+		if ($contentResource->getShouldRedirect())
+		{
+			$url = KCurlWrapper::getRedirectUrl($contentResource->getUrl(),$contentResource->getUrlHeaders());
+		}
+		else
+		{
+			$url = $contentResource->getUrl();
+		}
+		
 		$fileName = basename($url);
 		if(strlen($fileName) > self::MAX_FILE_NAME_LENGTH)
 		{
 			$fileName = md5($url);
 		}
-
+		
 		$fullPath = myContentStorage::getFSUploadsPath() . '/' . $fileName;
 
         //curl does not supports sftp protocol, therefore we will use 'addImportJob'
