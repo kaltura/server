@@ -383,13 +383,13 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 		return $res;
 	}
 
-	public function createRecurrence($scheduleEvent, $date)
+	public function createRecurrence($date)
 	{
-		$newScheduleEvent = parent::createRecurrence($scheduleEvent, $date);
+		$newScheduleEvent = parent::createRecurrence($date);
 
-		if ($scheduleEvent->getSourceEntryId())
+		if ($this->getSourceEntryId())
 		{
-			$newScheduleEvent->setTemplateEntryId($scheduleEvent->getTemplateEntryId());
+			$newScheduleEvent->setTemplateEntryId($this->getTemplateEntryId());
 		}
 
 		return $newScheduleEvent;
