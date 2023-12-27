@@ -192,10 +192,11 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 		switch ($context)
 		{
 			case 'getLiveStatus':
-				if ($this->getSourceEntryId() && ($this->getCalculatedStartTime() + kSimuliveUtils::MINIMUM_TIME_TO_PLAYABLE_SEC <= time()))
+				if ($this->getSourceEntryId() && $this->getSourceEntryId() != $this->getTemplateEntryId() &&
+					$this->getCalculatedStartTime() + kSimuliveUtils::MINIMUM_TIME_TO_PLAYABLE_SEC <= time())
 				{
 					$sourceEntry = entryPeer::retrieveByPK($this->getSourceEntryId());
-					if (!$sourceEntry instanceof LiveStreamEntry || $sourceEntry->isCurrentlyLive())
+					if($sourceEntry && (!$sourceEntry instanceof LiveStreamEntry || $sourceEntry->isCurrentlyLive()))
 					{
 						// entry is considered as live entry
 						$output = EntryServerNodeStatus::PLAYABLE;
