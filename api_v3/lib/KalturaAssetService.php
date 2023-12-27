@@ -70,7 +70,7 @@ abstract class KalturaAssetService extends KalturaBaseService
 			}
 		}
 		
-		if($serveRemote && $fileSync && !in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		if($serveRemote && $fileSync && !in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($fileSync->getPartnerId())))
 		{
 			header("Location: " . $fileSync->getExternalUrl($asset->getEntryId()));
 			die;

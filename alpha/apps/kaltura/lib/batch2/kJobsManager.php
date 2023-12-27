@@ -517,7 +517,7 @@ class kJobsManager
 				$remoteConvertSupportedEngines = explode("," ,$partnerRemoteConvertSupportedEngines[$partner->getId()]);
 			}
 			
-			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds($partner->getId());
 			if( ($preferSharedDcForConvert && count($sharedDcIds) && in_array($dbCurrentConversionEngine, $remoteConvertSupportedEngines)) )
 			{
 				$fileSync = kFileSyncUtils::getReadyFileSyncForKeyAndDc($srcSyncKey, $sharedDcIds);
@@ -569,7 +569,8 @@ class kJobsManager
 		$currentSrcFileSyncs = $convertData->getSrcFileSyncs() ? $convertData->getSrcFileSyncs() : array();
 		$convertData->setSrcFileSyncs(array_merge($srcFileSyncs, $currentSrcFileSyncs));
 
-		if($partner->getSharedStorageProfileId() && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
+		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($partner->getId(), true);
+		if($sharedStorageProfileId && self::shouldUseSharedStorageForEngine($dbCurrentConversionEngine))
 		{
 			$convertData->setDestFileSyncSharedPath(self::getSharedPath($partner,$parentJob,$flavorAsset));
 		}
@@ -646,7 +647,7 @@ class kJobsManager
 	
 	private static function getSharedPath ($partner,$parentJob,$flavorAsset)
 	{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK(kDataCenterMgr::getSharedStorageProfileIds($partner->getId(), true));
 			$pathMgr = $sharedStorageProfile->getPathManager();
 			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
 			$nextVersion = $newVersion = kFileSyncUtils::calcObjectNewVersion($flavorAsset->getId(), $flavorAsset->getVersion(), FileSyncObjectType::ASSET, asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
@@ -1072,13 +1073,13 @@ class kJobsManager
 			$batchJob->setEntryId($entryId);
 			$batchJob->setPartnerId($partnerId);
 		}
-		
-		$partner = PartnerPeer::retrieveByPK($partnerId);
+
 		$importToShared = kConf::get('enable_import_to_shared', 'runtime_config', null);
 		$excludePartnersImportToShared = kConf::get('exclude_partners_import_to_shared', 'runtime_config', array());
-		if($importToShared && $partner->getSharedStorageProfileId() && !in_array($partnerId, $excludePartnersImportToShared))
+		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($partnerId, true);
+		if($importToShared && $sharedStorageProfileId && !in_array($partnerId, $excludePartnersImportToShared))
 		{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($sharedStorageProfileId);
 			$pathMgr = $sharedStorageProfile->getPathManager();
 			
 			$sharedPath = null;
@@ -1183,11 +1184,11 @@ class kJobsManager
 			$entry->setStatus(entryStatus::PRECONVERT);
 			$entry->save();
 		}
- 	
-		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
-		if($partner->getSharedStorageProfileId())
+
+		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($asset->getPartnerId(), true);
+		if($sharedStorageProfileId)
 		{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($sharedStorageProfileId);
 			$pathMgr = $sharedStorageProfile->getPathManager();
 			
 			//When convert is done we call incrementVersion so when creating the path we need to make sure path version is correct
@@ -1559,7 +1560,7 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($externalStorage->getProtocol());
 
-		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds())))
+		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds($flavor))))
 		{
 			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
 		}

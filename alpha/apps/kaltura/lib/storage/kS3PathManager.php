@@ -32,7 +32,7 @@ class kS3PathManager extends kPathManager
 		if(!$storageProfileId && $partnerId)
 		{
 			$partner = PartnerPeer::retrieveByPK($partnerId);
-			$storageProfileId = $partner ? $partner->getSharedStorageProfileId() : null;
+			$storageProfileId = $partner ? $partnerSharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($partner->getId(), true) : null;
 		}
 		
 		if(!$storageProfileId)
@@ -56,7 +56,7 @@ class kS3PathManager extends kPathManager
 	 */
 	public function getExportCsvFilePath($partnerId, $fileName = '')
 	{
-		$storageBaseDir = myCloudUtils::getPartnerSharedStoargeBaseDir($partnerId);
+		$storageBaseDir = myCloudUtils::getPartnerSharedStorageBaseDir($partnerId);
 		if ($storageBaseDir)
 		{
 			return  $storageBaseDir . '/exportcsv/' . myContentStorage::getScatteredPathFromIntId($partnerId) . DIRECTORY_SEPARATOR. $fileName;

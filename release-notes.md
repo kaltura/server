@@ -61,6 +61,18 @@ moduls.pageBuilder.group = GROUP_ENABLE_DISABLE_FEATURES
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2023_11_20_update_game_services_partner_permissions.php
 
+## Add partner for 'Provisioner' microservice ##
+
+- Issue Type: Feature
+- Issue ID: FOUN-1439
+
+### Configuration ###
+    Replace all tokens from the ini file (under 'provisioner') and remove".template" from the file name:
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_11_22_add_provisioner_partner_and_permissions.php
+
 # Scorpius-19.20.0
 ## Add virtualevent get permission for game service partner
 * Issue type: Feature

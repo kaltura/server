@@ -49,7 +49,7 @@ class kPlaybackContextDataHelper
 	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
 	{
 		$this->playbackContext = new kPlaybackContext();
-		$this->storageIds = kStorageExporter::getPeriodicStorageIds();
+		$this->storageIds = kDataCenterMgr::getSharedStorageProfileIds($dbEntry->getPartnerId());
 
 		$this->generateRestrictedMessages($contextDataHelper);
 

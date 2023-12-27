@@ -84,6 +84,15 @@ class StorageProfilePeer extends BaseStorageProfilePeer
 		
 		return StorageProfilePeer::doSelectOne($criteria, $con);
 	}
+
+	public static function retrieveByPartnerIdAndProtocol($partnerId, $protocol, $con = null)
+	{
+		$criteria = new Criteria(StorageProfilePeer::DATABASE_NAME);
+		$criteria->add(StorageProfilePeer::PARTNER_ID, $partnerId);
+		$criteria->add(StorageProfilePeer::PROTOCOL, $protocol);
+
+		return StorageProfilePeer::doSelectOne($criteria, $con);
+	}
 	
 	public static function getCacheInvalidationKeys()
 	{

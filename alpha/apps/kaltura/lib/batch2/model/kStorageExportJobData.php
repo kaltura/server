@@ -70,7 +70,7 @@ class kStorageExportJobData extends kStorageJobData
 			$this->setPort($externalStorage->getPort());
 		}
 
-		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds())))
+		if(in_array($srcFileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($fileSync->getPartnerId())))
 		{
 			$assetId = $srcFileSync->getObjectId();
 			$asset = assetPeer::retrieveById($assetId);

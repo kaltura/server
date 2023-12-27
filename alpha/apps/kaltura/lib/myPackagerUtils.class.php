@@ -87,7 +87,7 @@ class myPackagerUtils
 
 		if(myCloudUtils::isCloudDc($currentDcId) || $fileSync->getDc() != $currentDcId)
 		{
-			if(in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) || in_array($fileSync->getDc(), kStorageExporter::getPeriodicStorageIds()))
+			if(in_array($fileSync->getDc(), kDataCenterMgr::getDcIds()) || in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($fileSync->getPartnerId())))
 			{
 				return self::captureRemoteThumb($path, $capturedThumbPath, $calc_vid_sec, $width, $height);
 			}

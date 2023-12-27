@@ -112,7 +112,7 @@ class kPathManager
 		$cloudStorageObjectMap = kConf::get('cloud_storage_object_map', 'cloud_storage', array());
 		if( array_intersect($objectKeys, $cloudStorageObjectMap) && myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) )
 		{
-			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds();
+			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds($key->getPartnerId());
 			$storageProfileId = reset($storageProfileIds);
 		}
 		
@@ -131,7 +131,7 @@ class kPathManager
 		$storageProfileId = null;
 		if ($shouldUseShared)
 		{
-			$ids = kDataCenterMgr::getSharedStorageProfileIds();
+			$ids = kDataCenterMgr::getSharedStorageProfileIds($partnerId);
 			$storageProfileId = reset($ids);
 		}
 		$storageProfile = self::getStorageProfile($storageProfileId);

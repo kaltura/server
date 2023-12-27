@@ -2277,32 +2277,45 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE, $v);
 	}
-	
+
 	public function getSharedStorageProfileId()
 	{
-		$sharedStorageId = null;
-		$allSharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$partnerDedicatedStorage = StorageProfilePeer::retrieveByPartnerIdAndProtocol($this->getPartnerId(), StorageProfileProtocol::KALTURA_DC);
 
-		$sharedIncludePartnerIds = kConf::get('shared_include_partner_ids', 'cloud_storage', array());
-		if (in_array($this->getId(), $sharedIncludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedIncludePartnerIds))
+		$sharedStorageId = $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
+		if($sharedStorageId)
 		{
-			$sharedStorageId = reset($allSharedStorageIds);
+			KalturaLog::debug("Shared storage Id found for partner [{$this->getId()}] is [$sharedStorageId]");
 		}
 
-		$sharedPartnerPackages = kConf::get('shared_partner_package_types', 'cloud_storage', array());
-		if (in_array($this->getPartnerPackage(), $sharedPartnerPackages) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedPartnerPackages))
-		{
-			$sharedStorageId = reset($allSharedStorageIds);
-		}
-
-		$sharedExcludePartnerIds = kConf::get('shared_exclude_partner_ids', 'cloud_storage', array());
-		if (in_array($this->getId(), $sharedExcludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedExcludePartnerIds))
-		{
-			$sharedStorageId = null;
-		}
-
-		return $sharedStorageId;
+		return $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
 	}
+
+//	public function getSharedStorageProfileId()
+//	{
+//		$sharedStorageId = null;
+//		$allSharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
+//
+//		$sharedIncludePartnerIds = kConf::get('shared_include_partner_ids', 'cloud_storage', array());
+//		if (in_array($this->getId(), $sharedIncludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedIncludePartnerIds))
+//		{
+//			$sharedStorageId = reset($allSharedStorageIds);
+//		}
+//
+//		$sharedPartnerPackages = kConf::get('shared_partner_package_types', 'cloud_storage', array());
+//		if (in_array($this->getPartnerPackage(), $sharedPartnerPackages) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedPartnerPackages))
+//		{
+//			$sharedStorageId = reset($allSharedStorageIds);
+//		}
+//
+//		$sharedExcludePartnerIds = kConf::get('shared_exclude_partner_ids', 'cloud_storage', array());
+//		if (in_array($this->getId(), $sharedExcludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedExcludePartnerIds))
+//		{
+//			$sharedStorageId = null;
+//		}
+//
+//		return $sharedStorageId;
+//	}
 	
 	public function setSharedStorageProfileId($v)
 	{
