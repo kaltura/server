@@ -2283,7 +2283,10 @@ class Partner extends BasePartner
 		$partnerDedicatedStorage = StorageProfilePeer::retrieveByPartnerIdAndProtocol($this->getPartnerId(), StorageProfileProtocol::KALTURA_DC);
 
 		$sharedStorageId = $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
-		KalturaLog::debug("TTT: Shared storage Id found is [$sharedStorageId]");
+		if($sharedStorageId)
+		{
+			KalturaLog::debug("Shared storage Id found for partner [{$this->getId()}] is [$sharedStorageId]");
+		}
 
 		return $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
 	}
