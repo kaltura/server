@@ -37,6 +37,7 @@
 					<select class="options" onchange="doAction(this.value, '<?php echo $user->partnerId; ?>','<?php echo $user->id; ?>')">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="kmcNewLogin"><?php echo $this->translate('Login - KMCNG'); ?></option>
+						<option value="epLogin"><?php echo $this->translate('Login - EP'); ?></option>
 						<?php //if (Infra_AclHelper::isAllowed('partner','reset-user-password')): ?>
 							<option value="resetUserPassword" ><?php echo $this->translate('Reset Password'); ?></option>
 						<?php //endif; ?>
@@ -56,6 +57,12 @@ function kmcLogin(partnerId, userId) {
 function kmcNewLogin(partnerId, userId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kmc-new-redirect', 'partner_id' => '')); ?>' + partnerId + '/user_id/' + userId;
 	window.open(url);
+}
+
+function epLogin(partnerId, userId)
+{
+    var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'ep-redirect', 'partner_id' => ''), null, true); ?>' + partnerId + '/user_id/' + userId;
+    window.open(url);
 }
 
 $( function() {
