@@ -761,7 +761,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		   if($inputRatio != $outputRatio || $inputWidth < $inputHeight)
 		   {
-				   return true;
+			   return true;
 		   }
 		   return false;
 	}
