@@ -20,7 +20,6 @@ class KalturaDataEntry extends KalturaBaseEntry
 	public $retrieveDataContentByGet;
 	
 	private static $map_between_objects = array(
-		"dataContent",
 		"retrieveDataContentByGet",
 	);
 	
@@ -57,9 +56,10 @@ class KalturaDataEntry extends KalturaBaseEntry
 		$retrieveDataContentByGet = $dbDataEntry->getRetrieveDataContentByGet();
 		if($this->shouldGet('retrieveDataContentByGet', $responseProfile))
 			$this->retrieveDataContentByGet = $retrieveDataContentByGet;
-		
-		if($retrieveDataContentByGet != true && $this->shouldGet('dataContent', $responseProfile))
-			$this->dataContent = '';
+
+		$this->dataContent = '';
+		if($retrieveDataContentByGet === true && $this->shouldGet('dataContent', $responseProfile))
+			$this->dataContent = $dbDataEntry->getDataContent();
 
 		//$this->dataContent = kString::stringToSafeXml($this->dataContent);
 	}
