@@ -124,7 +124,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const SI = 'Sinhalese';
 	const SS = 'Siswati';
 	const SK = 'Slovak';
-	const SL = 'Slovenian';
+	const SL = 'Slovene';
 	const SO = 'Somali';
 	const ES = 'Spanish';
 	const ES_XL = 'Spanish (Latin America)';
