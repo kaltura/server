@@ -58,7 +58,7 @@ class kSimuliveUtils
 		if ($postEndEntry)
 		{
 			$sourceEntries[] = $postEndEntry;
-			$sourceEntryLabels[] = "postEntryContent-".$postEndEntry->getEntryId();
+			$sourceEntryLabels[] = "postEntryContent" . self::LABEL_SEPERATOR . $postEndEntry->getEntryId();
 		}
 
 		list($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets) = self::getSourceAssets($sourceEntries);
@@ -352,15 +352,16 @@ class kSimuliveUtils
 	}
 
 	/**
-	 * @param $labels
-	 * @param $startTime
-	 * @param $durations
+	 * Adding to each label the content stat time
+	 * @param array $labels
+	 * @param int $startTime
+	 * @param array $durations
 	 * @return void
 	 */
 	public static function addTimestamps(&$labels, $startTime, $durations)
 	{
 		$timestamp = $startTime;
-		$labels[0] .= self::LABEL_SEPERATOR .$timestamp;
+		$labels[0] .= self::LABEL_SEPERATOR . $timestamp;
 		for ($i = 1; $i < count($labels); $i++)
 		{
 			$timestamp = $timestamp + $durations[$i-1];
