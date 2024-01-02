@@ -83,7 +83,7 @@ class kSimuliveUtils
 		$audioAssets = self::createPaddedAssetsArray($entriesAudioAssets);
 
 		$assets = array_merge($flavorAssets, $captionAssets, $audioAssets);
-		$eventLabel = "eventId" . self::LABEL_SEPERATOR .$currentEvent->getId();
+		$eventLabel = "eventId" . self::LABEL_SEPERATOR . $currentEvent->getId();
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs, $sourceEntryLabels, $eventLabel);
 	}
 
