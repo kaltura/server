@@ -162,10 +162,14 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_DIMENSION_MAP => array(
 				'user_id' => self::DIMENSION_KUSER_ID,
 				'user_name' => self::DIMENSION_KUSER_ID,
+				'email' => self::DIMENSION_KUSER_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
+				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name', 'email'),
 				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'columns' => array('EMAIL'),
+				)
 			),
 			self::REPORT_JOIN_REPORTS => array(
 				// player events - live
