@@ -16,7 +16,15 @@ class kUserSearch extends kBaseESearch
     {
         kUserElasticEntitlement::init();
         if (!count($statuses))
+		{
             $statuses = array(KuserStatus::ACTIVE);
+		}
+		
+		if ($objectId)
+		{
+			$objectId = $this->translateObjectId($objectId);
+		}
+		
         $this->initQuery($statuses, $objectId, $pager, $order);
         $result = $this->execSearch($eSearchOperator);
         return $result;
@@ -44,5 +52,20 @@ class kUserSearch extends kBaseESearch
     {
         return kuserPeer::retrieveByPKs($ids);
     }
-
+	
+	protected function translateObjectId($objectId)
+	{
+		// backward compatibility - if some client already send 'kuserId', continue
+		$kuser = kuserPeer::retrieveByPK($objectId);
+		if (!$kuser)
+		{
+			$kuser = kuserPeer::getActiveKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $objectId);
+			if ($kuser)
+			{
+				$objectId = $kuser->getKuserId();
+			}
+		}
+		
+		return $objectId;
+	}
 }
