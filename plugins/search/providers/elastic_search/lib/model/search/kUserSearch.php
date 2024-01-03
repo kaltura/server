@@ -16,15 +16,15 @@ class kUserSearch extends kBaseESearch
     {
         kUserElasticEntitlement::init();
         if (!count($statuses))
-		{
+        {
             $statuses = array(KuserStatus::ACTIVE);
-		}
-		
-		if ($objectId)
-		{
-			$objectId = $this->translateObjectId($objectId);
-		}
-		
+        }
+
+        if ($objectId)
+        {
+            $objectId = $this->translateObjectId($objectId);
+        }
+
         $this->initQuery($statuses, $objectId, $pager, $order);
         $result = $this->execSearch($eSearchOperator);
         return $result;
