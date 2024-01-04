@@ -28,8 +28,23 @@ class KalturaESearchUserParams extends KalturaESearchParams
 		}
 
 		self::validateSearchOperator($this->searchOperator);
+		
+		$this->translateObjectId();
 
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
-
+	
+	protected function translateObjectId()
+	{
+		if (!$this->objectId)
+		{
+			return;
+		}
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->objectId);
+		if ($kuser)
+		{
+			$this->objectId = $kuser->getKuserId();
+		}
+	}
 }
