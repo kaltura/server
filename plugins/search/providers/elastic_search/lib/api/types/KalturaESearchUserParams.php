@@ -42,9 +42,6 @@ class KalturaESearchUserParams extends KalturaESearchParams
 		}
 		
 		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->objectId);
-		if ($kuser)
-		{
-			$this->objectId = $kuser->getKuserId();
-		}
+		$this->objectId = $kuser ? $kuser->getId() : -1;
 	}
 }
