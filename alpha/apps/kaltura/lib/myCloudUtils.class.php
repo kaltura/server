@@ -34,9 +34,13 @@ class myCloudUtils
 	public static function getPartnerSharedStorageBaseDir($partnerId)
 	{
 		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($partnerId, true);
-		if($sharedStorageProfileId && $sharedStorageProfileId->getStorageBaseDir())
+		if($sharedStorageProfileId)
 		{
-			return $sharedStorageProfileId->getStorageBaseDir();
+			$storageProfile = StorageProfilePeer::retrieveByPK($sharedStorageProfileId);
+			if($storageProfile && $storageProfile->getStorageBaseDir())
+			{
+				return $storageProfile->getStorageBaseDir();
+			}
 		}
 		return null;
   }
