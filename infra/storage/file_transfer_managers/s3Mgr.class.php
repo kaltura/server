@@ -118,16 +118,16 @@ class s3Mgr extends kFileTransferMgr
 	{
 		if(!class_exists('Aws\S3\S3Client'))
 		{
-			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
+			self::safeLog('Class Aws\S3\S3Client was not found!!', 'err');
 			return false;
 		}
 
 		if($this->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
-			KalturaLog::debug('Found env VAR from config- ' . $this->s3Arn);
+			self::safeLog('Found env VAR from config- ' . $this->s3Arn, 'debug');
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
-				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
+				self::safeLog('Class Aws\S3\StsClient was not found!!', 'err');
 				return false;
 			}
 
@@ -229,7 +229,7 @@ class s3Mgr extends kFileTransferMgr
 			if ($success)
 				return true;
 
-			KalturaLog::debug("Failed to export File: " . $remote_file . " number of retries left: " . $retries);
+			self::safeLog("Failed to export File: " . $remote_file . " number of retries left: " . $retries, 'debug');
 			$retries--;
 		}
 		//throw temporary exception so that the batch will retry
@@ -239,24 +239,24 @@ class s3Mgr extends kFileTransferMgr
 	private function doPutFileHelper($remote_file , $local_file, $params)
 	{
 		list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
-		KalturaLog::debug("remote_file: " . $remote_file);
+		self::safeLog("remote_file: " . $remote_file, 'debug');
 		$fp = null;
 		try
 		{
 			$size = kFile::fileSize($local_file);
-			KalturaLog::debug("file size is : " . $size);
+			self::safeLog("file size is : " . $size, 'debug');
 			$options = array('params' => $params);
 			$concurrency = $this->getConcurrency();
 			if($concurrency)
 			{
 				$options['concurrency'] = $concurrency;
 			}
-			KalturaLog::debug("Executing Multipart upload to S3: for " . $local_file);
+			self::safeLog("Executing Multipart upload to S3: for " . $local_file, 'debug');
 			$fp = fopen($local_file, 'r');
 			
 			if (!$fp)
 			{
-				KalturaLog::err("Failed to fopen given file [$local_file]");
+				self::safeLog("Failed to fopen given file [$local_file]", 'err');
 				return array(false, "Failed to fopen given file [$local_file]");
 			}
 			
@@ -272,7 +272,7 @@ class s3Mgr extends kFileTransferMgr
 				fclose($fp);
 			}
 
-			KalturaLog::debug("File uploaded to Amazon, info: " . print_r($res, true));
+			self::safeLog("File uploaded to Amazon, info: " . print_r($res, true), 'debug');
 			return array(true, null);
 		}
 		catch (Exception $e)
@@ -281,7 +281,7 @@ class s3Mgr extends kFileTransferMgr
 			{
 				fclose($fp);
 			}
-			KalturaLog::err("error uploading file " . $local_file . " s3 info: " . $e->getMessage());
+			self::safeLog("error uploading file " . $local_file . " s3 info: " . $e->getMessage(), 'err');
 			return array(false, $e->getMessage());
 		}
 	}
@@ -306,7 +306,7 @@ class s3Mgr extends kFileTransferMgr
 	protected function doGetFile($remote_file, $local_file = null)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
-		KalturaLog::debug("remote_file: ".$remote_file);
+		self::safeLog("remote_file: ".$remote_file, 'debug');
 
 		$params = array(
 			'Bucket' => $bucket,
@@ -347,7 +347,7 @@ class s3Mgr extends kFileTransferMgr
 			return true;
 		}
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
-		KalturaLog::debug("remote_file: ".$remote_file);
+		self::safeLog("remote_file: ".$remote_file, 'debug');
 
 		$exists = $this->s3->doesObjectExist($bucket, $remote_file);
 		return $exists;
@@ -375,7 +375,7 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch ( Exception $e )
 		{
-			self::safeLog("Couldn't determine if path [$remote_file] is dir: {$e->getMessage()}");
+			self::safeLog("Couldn't determine if path [$remote_file] is dir: {$e->getMessage()}", 'err');
 		}
 		return false;
 	}
@@ -390,7 +390,7 @@ class s3Mgr extends kFileTransferMgr
 	protected function doDelFile($remote_file)
 	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
-		KalturaLog::debug("remote_file: ".$remote_file);
+		self::safeLog("remote_file: ".$remote_file, 'debug');
 
 		$deleted = false;
 		try
@@ -404,7 +404,7 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch ( Exception $e )
 		{
-			KalturaLog::err("Couldn't delete file [$remote_file] from bucket [$bucket]: {$e->getMessage()}");
+			self::safeLog("Couldn't delete file [$remote_file] from bucket [$bucket]: {$e->getMessage()}", 'err');
 		}
 
 		return $deleted;
@@ -421,7 +421,7 @@ class s3Mgr extends kFileTransferMgr
 	{
 		$dirList = array();
 		list($bucket, $remoteDir) = explode("/",ltrim($remote_path,"/"),2);
-		KalturaLog::debug("Listing dir contents for bucket [$bucket] and dir [$remoteDir]");
+		self::safeLog("Listing dir contents for bucket [$bucket] and dir [$remoteDir]", 'debug');
 		
 		try
 		{
@@ -441,7 +441,7 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch ( Exception $e )
 		{
-			KalturaLog::err("Couldn't list file objects for remote path, [$remote_path] from bucket [$bucket]: {$e->getMessage()}");
+			self::safeLog("Couldn't list file objects for remote path, [$remote_path] from bucket [$bucket]: {$e->getMessage()}", 'err');
 		}
 		
 		return $dirList;
@@ -491,7 +491,7 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch (S3Exception $e)
 		{
-			KalturaLog::warning($e->getMessage());
+			self::safeLog($e->getMessage(), 'warning');
 			return false;
 		}
 	}
@@ -551,13 +551,13 @@ class s3Mgr extends kFileTransferMgr
 		$request = $this->s3->createPresignedRequest($cmd, $expiry);
 		$preSignedUrl = (string)$request->getUri();
 		
-		KalturaLog::debug("remote_file: [$remote_file] presignedUrl [$preSignedUrl]");
+		self::safeLog("remote_file: [$remote_file] presignedUrl [$preSignedUrl]", 'debug');
 		return $preSignedUrl;
 	}
 
 	public function getFileUrl($remote_file, $expires = null)
 	{
-		KalturaLog::debug("Get file url for remote_file: " . $remote_file);
+		self::safeLog("Get file url for remote_file: " . $remote_file, 'debug');
 		
 		if(!$expires)
 		{

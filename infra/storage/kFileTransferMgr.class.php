@@ -884,5 +884,18 @@ abstract class kFileTransferMgr
 	{
 		return true;
 	}
+	
+	/**
+	 * This function is required since this code can run before the autoloader
+	 *
+	 * @param string $msg
+	 */
+	public static function safeLog($msg, $logType = "log")
+	{
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
+			KalturaLog::$logType($msg);
+		}
+	}
 }
 
