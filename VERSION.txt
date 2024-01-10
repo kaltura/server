@@ -1,1 +1,1 @@
-Scorpius-19.20.0
+Tucana-20.4.0
