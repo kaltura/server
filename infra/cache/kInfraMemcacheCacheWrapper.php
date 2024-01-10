@@ -165,7 +165,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 		while ($this->memcache)
 		{
 			$this->lastError = '';
-
+			
 			set_error_handler(array($this, 'errorHandler'));
 			$params[0] = $this->normalizeKeys($params[0]);
 			$start = microtime(true);
