@@ -50,4 +50,5 @@ class KalturaCatalogItemLanguage extends KalturaStringEnum
 	const ES_XL = KalturaLanguage::ES_XL;
 	const CA = KalturaLanguage::CA;
 	const CS = KalturaLanguage::CS;
+	const AUTO_DETECT = "Auto Detect";
 }
