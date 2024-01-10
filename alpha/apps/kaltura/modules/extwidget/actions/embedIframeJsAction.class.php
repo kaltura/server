@@ -128,6 +128,8 @@ class embedIframeJsAction extends sfAction
 					$whiteListHost = myPartnerUtils::getWhiteListHost($partner);
 					if ($whiteListHost) {
 						$headers["X-Forwarded-Host"] = $whiteListHost;
+					} else {
+						unset($_SERVER['HTTP_X_FORWARDED_HOST']);
 					}
 				}
 

@@ -1,9 +1,129 @@
+# Tucana-20.3.0
+## Enable CNC Stage Monitor ##
+* Issue Type: Task
+* Issue ID: PLAT-24561
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.cncStageMonitor.enabled = true
+moduls.cncStageMonitor.label = "Enable CNC Stage Monitor"
+moduls.cncStageMonitor.permissionType = 2
+moduls.cncStageMonitor.permissionName = FEATURE_CNC_STAGE_MONITOR_PERMISSION
+moduls.cncStageMonitor.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Tucana-20.2.0
+## Enable CNC Assistant Signals ##
+* Issue Type: Task
+* Issue ID: PLAT-24548
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.cncAssistantSignals.enabled = true
+moduls.cncAssistantSignals.permissionType = 2
+moduls.cncAssistantSignals.label = "Enable CNC Assistant Signals"
+moduls.cncAssistantSignals.permissionName = FEATURE_CNC_ASSISTANT_SIGNALS_PERMISSION
+moduls.cncAssistantSignals.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Tucana-20.1.0
+## Update Flavor params for KME PPT conversion ##
+- Issue Type: Task
+- Issue ID: PLAT-24380
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_11_30_update_KME_PPT_flavorParams.php
+
+# Tucana-20.0.0
+## Enable Auth Broker ##
+* Issue Type: Task
+* Issue ID: PLAT-24513
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.authBroker.enabled = true
+moduls.authBroker.permissionType = 2
+moduls.authBroker.label = "Enable Auth Broker"
+moduls.authBroker.permissionName = FEATURE_AUTH_BROKER_PERMISSION
+moduls.authBroker.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Enable Page Builder ##
+* Issue Type: Task
+* Issue ID: PLAT-24486
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.pageBuilder.enabled = true
+moduls.pageBuilder.permissionType = 2
+moduls.pageBuilder.label = "Enable Page Builder in EP"
+moduls.pageBuilder.permissionName = FEATURE_PAGE_BUILDER_PERMISSION
+moduls.pageBuilder.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Deploy new Flavor params and conversion profile for KME PDF conversion ##
+- Issue Type: Task
+- Issue ID: NR2-7971
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2023_10_31_deploy_kaltura_meetings_pdf_documents_conversion_data.php
+    
+## update Game Services partner permissions ##
+- Issue Type: Story
+- Issue ID: PLAT-24491
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2023_11_20_update_game_services_partner_permissions.php
+
+## Add partner for 'Provisioner' microservice ##
+
+- Issue Type: Feature
+- Issue ID: FOUN-1439
+
+### Configuration ###
+    Replace all tokens from the ini file (under 'provisioner') and remove".template" from the file name:
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_11_22_add_provisioner_partner_and_permissions.php
+
 # Scorpius-19.20.0
+## Add virtualevent get permission for game service partner
+* Issue type: Feature
+* Issue Id: PLAT-24472
+### Deployment ###
+run the following script:
+```
+php deployment/updates/scripts/add_permissions/2023_10_25_update_gaming_services_permission.php
+```
+
+## Add partner for 'reports' microservice ##
+
+- Issue Type: Feature
+- Issue ID: VCP-15204
+
+### Configuration ###
+    Replace all tokens from the ini file (under 'reports') and remove".template" from the file name:
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_11_05_add_reports_partner_and_permissions.php
+
+
 ## Add caption permissions to batch ##
 * Issue Type: Task
 * Issue ID: PLAT-24455
 ### Deployment Scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_10_24_add_caption_asset_batch_permission.php
+
+
+## Add Slim Audio Player ##
+* Issue Type: Story
+* Issue ID: PLAT-24481
+### Configuration ###
+Add the following to admin.template.ini:
+
+    settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::SAP
 
 # Scorpius-19.19.0
 ## Add KMultiClipConcatCloser worker ##

@@ -6,17 +6,12 @@ require_once(KAutoloader::buildPath(KALTURA_ROOT_PATH, 'vendor', 'aws', 'aws-aut
 use Aws\S3\S3Client;
 use Aws\Sts\StsClient;
 
+use Aws\Credentials\CredentialProvider;
+use Aws\DoctrineCacheAdapter;
+use Doctrine\Common\Cache\FilesystemCache;
+
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\AwsException;
-use Aws\S3\Enum\CannedAcl;
-
-use Aws\Common\Credentials\Credentials;
-use Aws\Common\Credentials\RefreshableInstanceProfileCredentials;
-use Aws\Common\Credentials\AbstractRefreshableCredentials;
-use Aws\Common\Credentials\CacheableCredentials;
-
-use Doctrine\Common\Cache\FilesystemCache;
-use Guzzle\Cache\DoctrineCacheAdapter;
 
 /**
  * Extends the 'kFileTransferMgr' class & implements a file transfer manager using the Amazon S3 protocol with Authentication Version 4.
@@ -30,7 +25,7 @@ class s3Mgr extends kFileTransferMgr
 	/* @var S3Client $s3 */
 	private $s3;
 
-	protected $filesAcl = CannedAcl::PRIVATE_ACCESS;
+	protected $filesAcl = 'private'; //CannedAcl::PRIVATE_ACCESS;
 	protected $s3Region = '';
 	protected $sseType = '';
 	protected $sseKmsKeyId = '';
@@ -43,6 +38,7 @@ class s3Mgr extends kFileTransferMgr
 	const LAST_MODIFICATION = 'LastModified';
 	const CONTENT_LENGTH = 'ContentLength';
 	const HEAD_OBJECT = 'headObject';
+	const DEFAULT_S3_APP_NAME = "Kaltura-Server";
 
 	// instances of this class should be created usign the 'getInstance' of the 'kFileTransferMgr' class
 	protected function __construct(array $options = null)
@@ -135,23 +131,8 @@ class s3Mgr extends kFileTransferMgr
 				return false;
 			}
 
-			return $this->generateS3Client();
+			return $this->generateCachedCredentialsS3Client();
 		}
-
-		$config = array(
-			'credentials' => array(
-				'key'    => $sftp_user,
-				'secret' => $sftp_pass,
-			),
-			'region' => $this->s3Region,
-			'signature' => $this->signatureType ? $this->signatureType : 'v4',
-			'version' => '2006-03-01',
-		);
-
-		if ($this->endPoint)
-			$config['endpoint'] = $this->endPoint;
-
-		$this->s3 = S3Client::factory($config);
 
 		/**
 		 * There is no way of "checking the credentials" on s3.
@@ -159,26 +140,57 @@ class s3Mgr extends kFileTransferMgr
 		 * which we don't use anywhere else in the code anyway. The code will fail soon enough in the
 		 * code elsewhere if the permissions are not sufficient.
 		 **/
+		return $this->generateStaticCredsClient($sftp_user, $sftp_pass);
+	}
+
+	private function generateCachedCredentialsS3Client()
+	{
+		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn);
+		$config = $this->getBaseClientConfig();
+		$config['credentials'] = $cacheProviderCredentials;
+		$this->s3 = S3Client::factory($config);
+
 		return true;
 	}
 
-	private function generateS3Client()
+	private function generateStaticCredsClient($key, $secret)
 	{
-		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
+		$config = $this->getBaseClientConfig();
+		$config['credentials'] = array(
+			'key'    => $key,
+			'secret' => $secret,
+		);
 
-		$roleRefresh = new RefreshableRole(new Credentials('', '', '', 1));
-		$roleRefresh->setRoleArn($this->s3Arn);
-		$roleCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/roleCache/"));
-		$roleCreds = new CacheableCredentials($roleRefresh, $roleCache, 'creds_cache_key');
-
-		$this->s3 = S3Client::factory(array(
-			'credentials' => $roleCreds,
-			'region' => $this->s3Region,
-			'signature' => 'v4',
-			'version' => '2006-03-01'
-		));
+		$this->s3 = S3Client::factory($config);
 
 		return true;
+	}
+
+	private function getBaseClientConfig()
+	{
+		$config = array(
+			'region' => $this->s3Region,
+			'signature' => 'v4',
+			'version' => '2006-03-01',
+			'ua_append' => array($this->getClientUserAgent())
+		);
+
+		if ($this->endPoint)
+			$config['endpoint'] = $this->endPoint;
+
+		return $config;
+	}
+
+	private function getClientUserAgent()
+	{
+		$appName = self::DEFAULT_S3_APP_NAME;
+		$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
+		if($this->userAgentRegex && preg_match($this->userAgentRegex, $hostName, $matches) && isset($matches[0]))
+		{
+			$appName = $matches[0];
+		}
+
+		return "APN/1.0 $this->userAgentPartner/1.0 $appName/1.0";
 	}
 
 
@@ -517,6 +529,11 @@ class s3Mgr extends kFileTransferMgr
 	
 	public function getRemoteUrl($remote_file)
 	{
+		return $this->getPreSignedUrl($remote_file);
+	}
+	
+	private function getPreSignedUrl($remote_file, $expiry = null)
+	{
 		list($bucket, $remote_file) = explode("/",ltrim($remote_file,"/"),2);
 		
 		$params = array(
@@ -524,20 +541,30 @@ class s3Mgr extends kFileTransferMgr
 			'Key'    => $remote_file,
 		);
 		
+		if(!$expiry)
+		{
+			$expiry = time() + 600;
+		}
+		
 		$cmd = $this->s3->getCommand('GetObject', $params);
 		
-		$expiry = time() + 600;
-		$preSignedUrl = $cmd->createPresignedUrl($expiry);
+		$request = $this->s3->createPresignedRequest($cmd, $expiry);
+		$preSignedUrl = (string)$request->getUri();
 		
 		KalturaLog::debug("remote_file: [$remote_file] presignedUrl [$preSignedUrl]");
-		
 		return $preSignedUrl;
 	}
 
 	public function getFileUrl($remote_file, $expires = null)
 	{
-		list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
-		KalturaLog::debug("remote_file: " . $remote_file);
-		return $this->s3->getObjectUrl($bucket, $remote_file, $expires);
+		KalturaLog::debug("Get file url for remote_file: " . $remote_file);
+		
+		if(!$expires)
+		{
+			list($bucket, $remote_file) = explode("/", ltrim($remote_file, "/"), 2);
+			return $this->s3->getObjectUrl($bucket, $remote_file);
+		}
+		
+		return $this->getPreSignedUrl($remote_file, $expires);
 	}
 }

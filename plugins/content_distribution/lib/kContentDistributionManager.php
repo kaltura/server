@@ -44,12 +44,12 @@ class kContentDistributionManager
 		$batchJob->setPartnerId($asset->getPartnerId());
 		$batchJob->setObjectId($asset->getId());
 		$batchJob->setObjectType(BatchJobObjectType::ASSET);
-		
-		$partner = PartnerPeer::retrieveByPK($asset->getPartnerId());
+
 		$importToSharedLocation = kConf::get('enable_import_to_shared', 'runtime_config', null);
-		if($importToSharedLocation && $partner->getSharedStorageProfileId())
+		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($asset->getPartnerId(), true);
+		if($importToSharedLocation && $sharedStorageProfileId)
 		{
-			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($sharedStorageProfileId);
 			$pathMgr = $sharedStorageProfile->getPathManager();
 			
 			list($root, $path) = $pathMgr->generateFilePathArr($asset, asset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, $asset->getVersion());
@@ -113,7 +113,7 @@ class kContentDistributionManager
   		}
   		
 		$dcs = array();
-		$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$sharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds($entryDistribution->getPartnerId());
 		foreach($fileSyncs as $fileSync)
 		{
 			/* @var $fileSync FileSync */

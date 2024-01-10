@@ -121,6 +121,8 @@ class Partner extends BasePartner
 	private $cdnWhiteListCache = array();
 
 	const CUSTOM_DATE_MAX_METADATA_INDEX_LENGTH = 'max_metadata_index_length';
+	
+	const CUSTOM_ANALYTICS_DOMAIN = 'custom_analytics_domain';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -2275,32 +2277,45 @@ class Partner extends BasePartner
 	{
 		$this->putInCustomData(self::TWO_FACTOR_AUTHENTICATION_MODE, $v);
 	}
-	
+
 	public function getSharedStorageProfileId()
 	{
-		$sharedStorageId = null;
-		$allSharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$partnerDedicatedStorage = StorageProfilePeer::retrieveByPartnerIdAndProtocol($this->getPartnerId(), StorageProfileProtocol::KALTURA_DC);
 
-		$sharedIncludePartnerIds = kConf::get('shared_include_partner_ids', 'cloud_storage', array());
-		if (in_array($this->getId(), $sharedIncludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedIncludePartnerIds))
+		$sharedStorageId = $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
+		if($sharedStorageId)
 		{
-			$sharedStorageId = reset($allSharedStorageIds);
+			KalturaLog::debug("Shared storage Id found for partner [{$this->getId()}] is [$sharedStorageId]");
 		}
 
-		$sharedPartnerPackages = kConf::get('shared_partner_package_types', 'cloud_storage', array());
-		if (in_array($this->getPartnerPackage(), $sharedPartnerPackages) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedPartnerPackages))
-		{
-			$sharedStorageId = reset($allSharedStorageIds);
-		}
-
-		$sharedExcludePartnerIds = kConf::get('shared_exclude_partner_ids', 'cloud_storage', array());
-		if (in_array($this->getId(), $sharedExcludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedExcludePartnerIds))
-		{
-			$sharedStorageId = null;
-		}
-
-		return $sharedStorageId;
+		return $partnerDedicatedStorage ? $partnerDedicatedStorage->getId() : null;
 	}
+
+//	public function getSharedStorageProfileId()
+//	{
+//		$sharedStorageId = null;
+//		$allSharedStorageIds = kDataCenterMgr::getSharedStorageProfileIds();
+//
+//		$sharedIncludePartnerIds = kConf::get('shared_include_partner_ids', 'cloud_storage', array());
+//		if (in_array($this->getId(), $sharedIncludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedIncludePartnerIds))
+//		{
+//			$sharedStorageId = reset($allSharedStorageIds);
+//		}
+//
+//		$sharedPartnerPackages = kConf::get('shared_partner_package_types', 'cloud_storage', array());
+//		if (in_array($this->getPartnerPackage(), $sharedPartnerPackages) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedPartnerPackages))
+//		{
+//			$sharedStorageId = reset($allSharedStorageIds);
+//		}
+//
+//		$sharedExcludePartnerIds = kConf::get('shared_exclude_partner_ids', 'cloud_storage', array());
+//		if (in_array($this->getId(), $sharedExcludePartnerIds) || in_array(self::ALL_PARTNERS_WILD_CHAR, $sharedExcludePartnerIds))
+//		{
+//			$sharedStorageId = null;
+//		}
+//
+//		return $sharedStorageId;
+//	}
 	
 	public function setSharedStorageProfileId($v)
 	{
@@ -2383,5 +2398,25 @@ class Partner extends BasePartner
 	public function setSearchMaxMetadataIndexLength($v)
 	{
 		return $this->putInCustomData(self::CUSTOM_DATE_MAX_METADATA_INDEX_LENGTH, $v);
+	}
+
+	public function getEnableGameServicesAnalytics()
+	{
+		return $this->getFromCustomData("enableGameServicesAnalytics", null, false);
+	}
+
+	public function setEnableGameServicesAnalytics($v)
+	{
+		return $this->putInCustomData("enableGameServicesAnalytics", $v);
+	}
+	
+	public function getCustomAnalyticsDomain()
+	{
+		return $this->getFromCustomData(self::CUSTOM_ANALYTICS_DOMAIN);
+	}
+	
+	public function setCustomAnalyticsDomain($v)
+	{
+		return $this->putInCustomData(self::CUSTOM_ANALYTICS_DOMAIN, $v);
 	}
 }

@@ -15,6 +15,8 @@
  */
 class VendorTranslationCatalogItem extends VendorCaptionsCatalogItem 
 {
+	const CUSTOM_DATA_REQUIRE_SOURCE = 'require_source';
+	
 	public function applyDefaultValues()
 	{
 		$this->setServiceFeature(VendorServiceFeature::TRANSLATION);
@@ -35,5 +37,15 @@ class VendorTranslationCatalogItem extends VendorCaptionsCatalogItem
 
         return null;
     }
+	
+	public function setRequireSource($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_REQUIRE_SOURCE, $v);
+	}
+	
+	public function getRequireSource()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_REQUIRE_SOURCE, null, true);
+	}
 
 } // VendorTranslationCatalogItem

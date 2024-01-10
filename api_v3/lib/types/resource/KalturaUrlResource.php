@@ -23,11 +23,17 @@ class KalturaUrlResource extends KalturaContentResource
 	 * @var KalturaStringArray
 	 */
 	public $urlHeaders;
+
+    	/**
+     	 * @var bool
+     	 */
+    	public $shouldRedirect;
 	
 	private static $map_between_objects = array(
 		'url',
 		'forceAsyncDownload',
 		'urlHeaders',
+        	'shouldRedirect',
 		);
 	
 	/* (non-PHPdoc)

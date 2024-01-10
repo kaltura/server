@@ -228,7 +228,16 @@ class UserController extends Zend_Controller_Action
 
 		try
 		{
-			$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $partnerId);
+			$redirectUrl = null;
+			if($settings->authRedirectUrl)
+			{
+				$redirectUrl = $settings->authRedirectUrl;
+			}
+			else
+			{
+				$redirectUrl = $ssoPlugin->sso->login('', 'admin_console', $partnerId);
+			}
+			
 			if(!$redirectUrl)
 			{
 				throw new Exception('Missing authentication server url', self::MISSING_AUTH_SERVER_URL);
@@ -238,7 +247,31 @@ class UserController extends Zend_Controller_Action
 			$ks = isset($_GET['ks']) ? $_GET['ks'] : null;
 			if(!$ks)
 			{
-				$this->getResponse()->setRedirect($redirectUrl);
+				if($settings->authRedirectUrl)
+				{
+					$body = '<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit</title>
+</head>
+<body>
+<form class="login-form" action="' . $redirectUrl . '" method="post">
+    <input type="hidden" id="appType" name="appType" value="adminConsole" />
+    <input type="hidden" id="email" name="email" value="adminconsole@kaltura.com" />
+</form>
+</body>
+<script>
+document.querySelector(".login-form").submit();
+</script>
+</html>';
+					$this->getResponse()->setBody($body);
+					$this->getResponse()->sendResponse();
+					die();
+				}
+				else
+				{
+					$this->getResponse()->setRedirect($redirectUrl);
+				}
 			}
 			else
 			{

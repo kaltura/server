@@ -547,7 +547,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		list($fileSync, $serveRemote) = kFileSyncUtils::getFileSyncByStoragePriority($this->getPartnerId(), $syncKey, true);
 		
 		//Shared storage file syncs should not be handled as remote
-		$serveRemote = $serveRemote && $fileSync && !in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds());
+		$serveRemote = $serveRemote && $fileSync && !in_array($fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()));
 		
 		if($serveRemote && $fileSync)
 		{
@@ -802,7 +802,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	public function getSharedPendingFileSync()
 	{
 		$key = $this->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$sharedDcIds = kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId());
 		$pendingFileSync = kFileSyncUtils::getPendingFileSyncForKey($key, reset($sharedDcIds));
 		if(!$pendingFileSync)
 		{

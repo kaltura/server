@@ -211,7 +211,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 				self::UI_CONF_TYPE_KSR => "Kaltura Screen Recorder",
 				self::UI_CONF_TYPE_KUPLOAD => "Kaltura Simple Uploader",
 				self::UI_CONF_TYPE_WEBCASTING => "Kaltura Webcasting Studio",
-				self::UI_CONF_TYPE_SAP => "SAP",
+				self::UI_CONF_TYPE_SAP => "Slim Audio Player",
 			);
 		}
 	}
@@ -296,7 +296,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		
 		if ($externalPath)
 		{
-			$file_root = myCloudUtils::getPartnerSharedStoargeBaseDir($this->getPartnerId());
+			$file_root = myCloudUtils::getPartnerSharedStorageBaseDir($this->getPartnerId());
 			$dir = myContentStorage::getScatteredPathFromIntId($this->getId() * 10);
 			$file_path = "/generatedUiConf/$dir/ui_conf_{$this->getId()}_$version.xml";
 			if ($suffix)

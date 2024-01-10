@@ -256,7 +256,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getFileRoot()
 	{
 		$fileRoot = parent::getFileRoot();
-		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && strpos($fileRoot, myContentStorage::getFSContentRootPath()) === 0 )
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()) ) && strpos($fileRoot, myContentStorage::getFSContentRootPath()) === 0 )
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($this->getDc());
 			if($sharedStorageProfile)
@@ -270,7 +270,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 	public function getFileType()
 	{
 		$fileType = parent::getFileType();
-		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ) && $fileType == self::FILE_SYNC_FILE_TYPE_URL)
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()) ) && $fileType == self::FILE_SYNC_FILE_TYPE_URL)
 		{
 			$fileType = self::FILE_SYNC_FILE_TYPE_FILE;
 		}
@@ -280,7 +280,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 
 	public function getRemotePath()
 	{
-		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds() ))
+		if(in_array( $this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()) ))
 		{
 			$sharedStorageProfile = StorageProfilePeer::retrieveByPK($this->getDc());
 			return $sharedStorageProfile->getStorageBaseDir() . $this->getFilePath();
@@ -324,17 +324,18 @@ class FileSync extends BaseFileSync implements IBaseObject
 	{
 		$storage = StorageProfilePeer::retrieveByPK($this->getDc());
 		if(!$storage || $storage->getProtocol() === StorageProfile::STORAGE_KALTURA_DC ||
-			(myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) && in_array($this->getDc(), kDataCenterMgr::getSharedStorageProfileIds())) )
+			(myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) && in_array($this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId()))) )
 			return kDataCenterMgr::getInternalRemoteUrl($this);
 
 		if(is_null($storage->getProtocol()))
 		{
 			return null;
 		}
-		$kalturaPeriodicStorage = false;
-		if(in_array($this->getDc(), kStorageExporter::getPeriodicStorageIds()))
+
+		$isKalturaSharedStorage = false;
+		if(in_array($this->getDc(), kDataCenterMgr::getSharedStorageProfileIds($this->getPartnerId())))
 		{
-			$kalturaPeriodicStorage = true;
+			$isKalturaSharedStorage = true;
 		}
 
 		$urlManager = DeliveryProfilePeer::getRemoteDeliveryByStorageId(DeliveryProfileDynamicAttributes::init($this->getDc(), $entryId, PlaybackProtocol::HTTP, infraRequestUtils::getProtocol()));
@@ -346,7 +347,7 @@ class FileSync extends BaseFileSync implements IBaseObject
 		$url = $urlManager->getFileSyncUrl($this);
 		$baseUrl = $urlManager->getUrl();
 
-		if($kalturaPeriodicStorage)
+		if($isKalturaSharedStorage)
 		{
 			if($internalUsage && $storage->getProtocol() === StorageProfile::STORAGE_PROTOCOL_S3)
 			{
@@ -356,19 +357,29 @@ class FileSync extends BaseFileSync implements IBaseObject
 			{
 				return $this->getAssetDownloadUrl();
 			}
-			else
+			else if(in_array($this->getDc(), kDataCenterMgr::getGlobalSharedStorageProfileIds()))
 			{
 				$url = '/direct' . $url;
 				$authParams = $this->addKalturaAuthParams($url);
 				$url .= $authParams;
 
-				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0) {
+				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0)
+				{
+					$baseUrl = preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
+				}
+			}
+			else
+			{
+				$url = preg_replace('#//+#', '/', '/direct/bucket/' . $this->getFileRoot() . '/' . $url);
+				$authParams = $this->addKalturaAuthParams($url);
+				$url .= $authParams;
+
+				if (infraRequestUtils::getProtocol() === infraRequestUtils::PROTOCOL_HTTPS && strpos($baseUrl, 'http://') === 0)
+				{
 					$baseUrl = preg_replace('/http:\/\//', 'https://', $baseUrl, 1);
 				}
 			}
 		}
-
-
 
 		$url = ltrim($url, "/");
 		if (strpos($url, "://") === false)

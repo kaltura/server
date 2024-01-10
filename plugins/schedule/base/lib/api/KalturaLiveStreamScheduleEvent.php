@@ -135,7 +135,8 @@ class KalturaLiveStreamScheduleEvent extends KalturaBaseLiveScheduleEvent
 		}
 		if (isset($this->sourceEntryId))
 		{
-			$this->validateEntryField('sourceEntryId');
+			$allowedTypes = kCurrentContext::$is_admin_session ? array() : array(KalturaEntryType::MEDIA_CLIP, KalturaEntryType::PLAYLIST);
+			$this->validateEntryField('sourceEntryId', $allowedTypes);
 		}
 		if (isset($this->preStartEntryId))
 		{

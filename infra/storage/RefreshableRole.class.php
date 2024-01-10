@@ -6,76 +6,48 @@ require_once(dirname(__FILE__) . '/../../vendor/aws/aws-autoloader.php');
 use Aws\S3\S3Client;
 use Aws\Sts\StsClient;
 
+use Aws\DoctrineCacheAdapter;
+use Doctrine\Common\Cache\FilesystemCache;
+use Aws\Credentials\CredentialProvider;
+use Aws\Credentials\InstanceProfileProvider;
+use Aws\Credentials\AssumeRoleCredentialProvider;
+
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\AwsException;
-use Aws\S3\Enum\CannedAcl;
 
-use Aws\Common\Credentials\Credentials;
-use Aws\Common\Credentials\RefreshableInstanceProfileCredentials;
-use Aws\Common\Credentials\AbstractRefreshableCredentials;
-use Aws\Common\Credentials\CacheableCredentials;
-
-use Doctrine\Common\Cache\FilesystemCache;
-use Guzzle\Cache\DoctrineCacheAdapter;
-
-class RefreshableRole extends AbstractRefreshableCredentials
+class RefreshableRole
 {
 	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
 	const ASSUME_ROLE_CREDENTIALS_EXPIRY_TIME = 43200;
-	
-	private $roleArn = null;
-	private $s3Region = null;
-	
-	public function refresh()
+
+	public static function getCacheCredentialsProvider($roleArn, $s3Region = null)
 	{
-		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache';
-		
-		$credentials = new Credentials('', '');
-		$ipRefresh = new RefreshableInstanceProfileCredentials(new Credentials('', '', '', 1));
-		$ipCache = new DoctrineCacheAdapter(new FilesystemCache("$credentialsCacheDir/instanceProfileCache"));
-		$ipCreds = new CacheableCredentials($ipRefresh, $ipCache, 'refresh_role_creds_key');
-		
-		$stsFactoryParams = array(
-			'credentials' => $ipCreds,
+		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache_v3';
+
+		$profile = new InstanceProfileProvider();
+		$cache = new DoctrineCacheAdapter(new FilesystemCache($credentialsCacheDir));
+
+		$stsArgs = array(
+			'version' => '2011-06-15',
+			'credentials' => $profile,
 		);
-		
+
 		//Added to support regional STS endpoints in case external traffic is blocked
-		if($this->s3Region)
+		if($s3Region)
 		{
-			$stsFactoryParams['region'] = $this->s3Region;
-			$stsFactoryParams['endpoint'] = "https://sts.{$this->s3Region}.amazonaws.com";
+			$stsArgs['region'] = $s3Region;
+			$stsArgs['endpoint'] = "https://sts.{$s3Region}.amazonaws.com";
 		}
-		
-		$sts = StsClient::factory($stsFactoryParams);
-		$call = $sts->assumeRole(array(
-			'RoleArn' => $this->roleArn,
-			'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
-			'DurationSeconds' => self::ASSUME_ROLE_CREDENTIALS_EXPIRY_TIME
+
+		$provider = new AssumeRoleCredentialProvider(array(
+			'client' => new StsClient($stsArgs),
+			'assume_role_params' => array(
+				'RoleArn' => $roleArn,
+				'RoleSessionName' => self::ROLE_SESSION_NAME_PREFIX . date('m_d_G', time()),
+				'DurationSeconds' => self::ASSUME_ROLE_CREDENTIALS_EXPIRY_TIME
+			),
 		));
-		
-		$creds = $call['Credentials'];
-		$result = new Credentials(
-			$creds['AccessKeyId'],
-			$creds['SecretAccessKey'],
-			$creds['SessionToken'],
-			strtotime($creds['Expiration'])
-		);
-		
-		$this->credentials->setAccessKeyId($result->getAccessKeyId())
-			->setSecretKey($result->getSecretKey())
-			->setSecurityToken($result->getSecurityToken())
-			->setExpiration($result->getExpiration());
-		
-		return $credentials;
-	}
-	
-	public function setRoleArn($roleArn)
-	{
-		$this->roleArn = $roleArn;
-	}
-	
-	public function setS3Region($s3Region)
-	{
-		$this->s3Region = $s3Region;
+
+		return CredentialProvider::cache($provider, $cache);
 	}
 }

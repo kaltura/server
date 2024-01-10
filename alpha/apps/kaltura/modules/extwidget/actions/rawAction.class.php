@@ -173,7 +173,11 @@ class rawAction extends sfAction
 				$name = kString::removeNewLine($name. '.' .$ext);
 				header("Content-Disposition: attachment; filename=\"$name\"");
 			}
-			kFileUtils::dumpFile($file_sync->getFullPath(), null, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
+			
+			$archiveFile = $file_sync->getFullPath();
+			$mimeType = kFile::mimeType($archiveFile);
+			
+			kFileUtils::dumpFile($archiveFile, $mimeType, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
 		}
 		elseif ($entry->getType() == entryType::DATA)
 		{
@@ -321,7 +325,7 @@ class rawAction extends sfAction
 		if($shouldProxy || !empty($relocate))
 		{
 			// dump the file
-			if(isset($file_sync) && $file_sync && in_array($file_sync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+			if(isset($file_sync) && $file_sync && in_array($file_sync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($file_sync->getPartnerId())))
 			{
 				$archive_file = $file_sync->getRemotePath();
 			}

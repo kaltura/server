@@ -242,7 +242,7 @@ class downloadAction extends sfAction
 		{
 			$url = kAssetUtils::getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir);
 		}
-		else if(in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds()))
+		else if(in_array( $fileSync->getDc(), kDataCenterMgr::getSharedStorageProfileIds($flavorAsset->getPartnerId())))
 		{
 			return;
 		}

@@ -189,23 +189,30 @@ class KAsyncImport extends KJobHandlerWorker
 	 * Will take a single KalturaBatchJob and fetch the URL to the job's destFile
 	 */
 	private function fetchFile(KalturaBatchJob $job, KalturaImportJobData $data)
-	{
-		$jobSubType = $job->jobSubType;
+    	{
+        	$jobSubType = $job->jobSubType;
+        	$urlHeadersArray = $data->urlHeaders ? $this->getUrlHeadersArray($data->urlHeaders) : $data->urlHeaders;
+        	$sshProtocols = array(
+            		kFileTransferMgrType::SCP,
+            		kFileTransferMgrType::SFTP,
+        	);
 
-		$sshProtocols = array(
-			kFileTransferMgrType::SCP,
-			kFileTransferMgrType::SFTP,
-		);
+        	if (in_array($jobSubType, $sshProtocols))
+        	{
+            		// use SSH file transfer manager for SFTP/SCP
+            		return $this->fetchFileSsh($job, $data);
+        	}
 
-		if (in_array($jobSubType, $sshProtocols))
-		{
-			// use SSH file transfer manager for SFTP/SCP
-			return $this->fetchFileSsh($job, $data);
-		}
-
-		try
-		{
-			$sourceUrl = $data->srcFileUrl;
+        	try
+        	{
+            		if ($data->shouldRedirect)
+            		{
+                		$sourceUrl =  KCurlWrapper::getRedirectUrl($data->srcFileUrl, $urlHeadersArray);
+            		}
+            		else
+            		{
+                		$sourceUrl = $data->srcFileUrl;
+            		}
 
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
 			$fileSize = null;
@@ -292,7 +299,7 @@ class KAsyncImport extends KJobHandlerWorker
 			}
 
 			$this->shouldUseAxelDownloadEngine($job->partnerId, $jobSubType, $sourceUrl);
-			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->downloadExec($sourceUrl, $data->destFileLocalPath, $resumeOffset, $data->urlHeaders);
+			list($res,$responseStatusCode,$errorMessage,$errNumber) = $this->downloadExec($sourceUrl, $data->destFileLocalPath, $resumeOffset, $urlHeadersArray);
 
 			if($responseStatusCode && KCurlHeaderResponse::isError($responseStatusCode))
 			{
@@ -742,4 +749,15 @@ class KAsyncImport extends KJobHandlerWorker
 				return false;
 		}
 	}
+
+    	private function getUrlHeadersArray($urlHeaders)
+    	{
+        	$urlHeadersArray = array();
+        	foreach($urlHeaders as $urlHeader)
+        	{
+            		$urlHeadersArray[] = $urlHeader->value;
+        	}
+        	return $urlHeadersArray;
+    	}
+
 }

@@ -89,10 +89,10 @@ class DocumentEntry extends entry
 		$flavorSyncKey = $flavor->getSyncKey ( asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET );
 		$file_path = kFileSyncUtils::getReadyLocalFilePathForKey ( $flavorSyncKey );
 		$orig_image_path = null;
-		if (is_dir($file_path)){
+		if (kFile::isDir($file_path)) {
 			if (is_null($fileName))
 				 KExternalErrors::dieError ( KExternalErrors::MISSING_PARAMETER, 'file name' );
-			$orig_image_path = $file_path . DIRECTORY_SEPARATOR . $fileName;
+			$orig_image_path = $file_path . DIRECTORY_SEPARATOR . $fileName . '.' . $flavor->getFormat();
 		}
 		try 
 		{
