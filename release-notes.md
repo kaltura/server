@@ -1,3 +1,17 @@
+# Tucana-20.3.0
+## Enable CNC Stage Monitor ##
+* Issue Type: Task
+* Issue ID: PLAT-24561
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.cncStageMonitor.enabled = true
+moduls.cncStageMonitor.label = "Enable CNC Stage Monitor"
+moduls.cncStageMonitor.permissionType = 2
+moduls.cncStageMonitor.permissionName = FEATURE_CNC_STAGE_MONITOR_PERMISSION
+moduls.cncStageMonitor.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Tucana-20.2.0
 ## Enable CNC Assistant Signals ##
 * Issue Type: Task
@@ -60,6 +74,18 @@ moduls.pageBuilder.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2023_11_20_update_game_services_partner_permissions.php
+
+## Add partner for 'Provisioner' microservice ##
+
+- Issue Type: Feature
+- Issue ID: FOUN-1439
+
+### Configuration ###
+    Replace all tokens from the ini file (under 'provisioner') and remove".template" from the file name:
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2023_11_22_add_provisioner_partner_and_permissions.php
 
 # Scorpius-19.20.0
 ## Add virtualevent get permission for game service partner

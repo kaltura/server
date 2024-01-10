@@ -31,12 +31,12 @@ class myCloudUtils
 		return $exportRatio > $random;
 	}
 
-	public static function getPartnerSharedStoargeBaseDir($partnerId)
+	public static function getPartnerSharedStorageBaseDir($partnerId)
 	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if($partner && $partner->getSharedStorageProfileId())
+		$sharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($partnerId, true);
+		if($sharedStorageProfileId)
 		{
-			$storageProfile = StorageProfilePeer::retrieveByPK($partner->getSharedStorageProfileId());
+			$storageProfile = StorageProfilePeer::retrieveByPK($sharedStorageProfileId);
 			if($storageProfile && $storageProfile->getStorageBaseDir())
 			{
 				return $storageProfile->getStorageBaseDir();

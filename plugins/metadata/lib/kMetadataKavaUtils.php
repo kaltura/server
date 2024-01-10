@@ -17,7 +17,7 @@ class kMetadataKavaUtils
 	
 	protected static function getMetadataReadyFileSyncs($objectIds, $partnerId, $metadataProfileId)
 	{
-		$dcIds = kDataCenterMgr::getSharedStorageProfileIds();
+		$dcIds = kDataCenterMgr::getSharedStorageProfileIds($partnerId);
 		$dcIds[] = kDataCenterMgr::getCurrentDcId();
 
 		$criteria = new Criteria();

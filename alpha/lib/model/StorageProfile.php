@@ -43,6 +43,7 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	const CUSTOM_DATA_SHOULD_EXPORT_CAPTIONS ='should_export_captions';
 	const CUSTOM_DATA_PATH_PREFIX = 'path_prefix';
 	const CUSTOM_DATA_PORT = 'port';
+	const CUSTOM_DATA_ADDITIONAL_INFO = 'additional_info';
 
 	/**
 	 * @var kStorageProfileScope
@@ -510,15 +511,13 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	{
 		if ($fileSync && $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL && $partner )
 		{
-			if ( $partner->getImportRemoteSourceForConvert())
+			$cloudStorageProfileIds = kDataCenterMgr::getSharedStorageProfileIds($fileSync->getPartnerId());
+			if(in_array($fileSync->getDc(), $cloudStorageProfileIds))
 			{
-				return true;
+				return false;
 			}
-			else
-			{
-				$cloudStorageProfileIds = kStorageExporter::getPeriodicStorageIds();
-				return in_array($fileSync->getDc(), $cloudStorageProfileIds);
-			}
+
+			return $partner->getImportRemoteSourceForConvert();
 		}
 		return false;
 	}
@@ -551,5 +550,15 @@ class StorageProfile extends BaseStorageProfile implements IBaseObject
 	public function setPort($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_PORT	, $v);
+	}
+	
+	public function getAdditionalInfo()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_ADDITIONAL_INFO,null, null);
+	}
+
+	public function setAdditionalInfo($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_ADDITIONAL_INFO	, $v);
 	}
 }

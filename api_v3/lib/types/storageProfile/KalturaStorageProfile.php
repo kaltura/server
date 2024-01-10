@@ -222,6 +222,11 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $excludedEntryTypes;
+	
+	/**
+	 * @var KalturaKeyValueArray
+	 */
+	public $additionalInfo;
 
 	private static $map_between_objects = array
 	(
@@ -263,7 +268,8 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 		'exportPeriodically',
 		'excludedFlavorParamsIds',
 		'shouldExportCaptions',
-		'excludedEntryTypes'
+		'excludedEntryTypes',
+		'additionalInfo',
 	);
 	
 	/* (non-PHPdoc)
@@ -367,6 +373,16 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 			$object_to_fill->setDeliveryProfileIds($deliveryProfiles);
 		}
 		
+		$additionalInfoArray = array();
+		if (!is_null($this->additionalInfo))
+		{
+			foreach ($this->additionalInfo->toArray() as $keyValue)
+			{
+				$this->insertObject($additionalInfoArray, $keyValue->key, $keyValue->value);
+			}
+			$object_to_fill->setAdditionalInfo($additionalInfoArray);
+		}
+		
 		return $object_to_fill;
 	}
 	
@@ -378,9 +394,17 @@ class KalturaStorageProfile extends KalturaObject implements IFilterable
 	    parent::doFromObject($source_object, $responseProfile);
 	    
 		if($this->shouldGet('pathManagerParams', $responseProfile))
+		{
 			$this->pathManagerParams = KalturaKeyValueArray::fromKeyValueArray($source_object->getPathManagerParams());
+		}
 		if($this->shouldGet('deliveryProfileIds', $responseProfile))
+		{
 			$this->deliveryProfileIds = KalturaKeyValueArray::fromKeyValueArray($source_object->getDeliveryProfileIds());
+		}
+		if($this->shouldGet('additionalInfo', $responseProfile))
+		{
+			$this->additionalInfo = KalturaKeyValueArray::fromKeyValueArray($source_object->getAdditionalInfo());
+		}
 	}
 	
 	/* (non-PHPdoc)

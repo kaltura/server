@@ -265,9 +265,8 @@ class kFlowHelper
 		{
 			$flavorAsset->setSize(kFile::fileSize($data->getDestFileLocalPath()));
 		}
-		
-		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
-		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+
+		$partnerSharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($flavorAsset->getPartnerId(), true);
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		if($partnerSharedStorageProfileId && $data->getDestFileSharedPath())
 		{
@@ -614,9 +613,8 @@ class kFlowHelper
 		$flavorAsset->save();
 
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
-		
-		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
-		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+
+		$partnerSharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($flavorAsset->getPartnerId(), true);
 		if($partnerSharedStorageProfileId && $data->getDestFilePath() && kFile::isSharedPath($data->getDestFilePath()))
 		{
 			KalturaLog::debug("Partner shared storage id found with ID [$partnerSharedStorageProfileId], creating external file sync");
@@ -973,9 +971,8 @@ class kFlowHelper
 	{
 		$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$storageProfileId = $flavorParamsOutput->getSourceRemoteStorageProfileId();
-		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
-		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
-		
+		$partnerSharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($flavorAsset->getPartnerId(), true);
+
 		if($storageProfileId == StorageProfile::STORAGE_KALTURA_DC)
 		{
 			if($partnerSharedStorageProfileId && $data->getDestFileSyncSharedPath())
@@ -1399,8 +1396,7 @@ class kFlowHelper
 		}
 
 		// Creates the file sync
-		$partner = PartnerPeer::retrieveByPK($flavorAsset->getPartnerId());
-		$partnerSharedStorageProfileId = $partner->getSharedStorageProfileId();
+		$partnerSharedStorageProfileId = kDataCenterMgr::getSharedStorageProfileIds($flavorAsset->getPartnerId(), true);
 		if($logFileExists)
 		{
 			$logSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_CONVERT_LOG);

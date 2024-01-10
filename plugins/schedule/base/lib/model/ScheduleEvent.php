@@ -475,5 +475,18 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	{
 		return $this->getEndDate(null);
 	}
+
+	public function createRecurrence($date)
+	{
+		$class = get_class($this);
+		$newScheduleEvent = new $class();
+		$newScheduleEvent->setRecurrenceType(ScheduleEventRecurrenceType::RECURRENCE);
+		$newScheduleEvent->setParentId($this->getId());
+		$newScheduleEvent->setStartDate($date);
+		$newScheduleEvent->setOriginalStartDate($date);
+		$newScheduleEvent->setEndDate($date + $this->getDuration());
+
+		return $newScheduleEvent;
+	}
 	
 } // ScheduleEvent
