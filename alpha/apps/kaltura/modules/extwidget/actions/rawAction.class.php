@@ -448,6 +448,7 @@ class rawAction extends sfAction
 			else
 			{
 				// or redirect if no proxy
+				header('Access-Control-Allow-Origin: *');
 				$this->redirect($remote_url);
 			}
 		}
