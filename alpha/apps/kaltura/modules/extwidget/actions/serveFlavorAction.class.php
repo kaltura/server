@@ -120,7 +120,7 @@ class serveFlavorAction extends kalturaAction
 
 	public static function serveLiveMediaSet($durations, $sequences, $playlistStartTime = 1451624400000,
 										 $firstClipStartTime, $initialClipIndex, $initialSegmentIndex,
-										 $repeat, $discontinuity, $dvrWindow = null, $endTime = null)
+										 $repeat, $discontinuity, $dvrWindow = null, $endTime = null, $setId = null)
 	{
 		$mpegtsWrapValue = 1 << 33;
 		$offset = intval(($mpegtsWrapValue / 2 - ($firstClipStartTime * 90) % $mpegtsWrapValue) / 90);
@@ -128,6 +128,10 @@ class serveFlavorAction extends kalturaAction
 		$mediaSet['playlistType'] = 'live';
 		$mediaSet['firstClipTime'] = $firstClipStartTime + $offset;
 		$mediaSet['discontinuity'] = $discontinuity;
+		if ($setId)
+		{
+			$mediaSet['id'] = $setId;
+		}
 
 		if (!is_null($endTime))
 		{
@@ -431,14 +435,14 @@ class serveFlavorAction extends kalturaAction
 				{
 					$offset = 0;
 				}
-				list($durations, $assets, $startTime, $endTime, $dvrWindow) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
+				list($durations, $assets, $startTime, $endTime, $dvrWindow, $ids, $setId) = kSimuliveUtils::getSimuliveEventDetails($entry, time() + $offset);
 				if ($assets)
 				{
-					$sequences = self::buildSequencesArray($assets);
+					$sequences = self::buildSequencesArray($assets, $ids);
 					$initialSegmentIndex = floor($startTime / $entry->getSegmentDuration());
 					$initialClipIndex = 1; // currently as simulive support only 1 video
 					$mediaSet = $this->serveLiveMediaSet($durations, $sequences, $startTime, $startTime,
-						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime);
+						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime, $setId);
 					if ($offset)
 					{
 						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] += $offset;
@@ -949,7 +953,7 @@ class serveFlavorAction extends kalturaAction
 	 * @param array $assets
 	 * @return array
 	 */
-	public static function buildSequencesArray($assets)
+	public static function buildSequencesArray($assets, $ids)
 	{
 		$sequences = array();
 
@@ -969,11 +973,11 @@ class serveFlavorAction extends kalturaAction
 				}
 			}
 
-			foreach ($assetArray as $asset)
+			foreach ($assetArray as $index => $asset)
 			{
 				if ($asset == null)
 				{
-					$sequence['clips'][] = $isAudioAssets ? array("type" => "silence") : array("sourceType" => "file", "type" => "source", "path" => "empty");
+					$sequence['clips'][] = $isAudioAssets ? array("type" => "silence") : array("sourceType" => "file", "type" => "source", "path" => "empty", "id" => $ids[$index]);
 					continue;
 				}
 				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -982,7 +986,9 @@ class serveFlavorAction extends kalturaAction
 				{
 					KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
 				}
-				$sequence['clips'][] = self::getClipData($path, $asset, $sourceType);
+				$clipData = self::getClipData($path, $asset, $sourceType);
+				$clipData['id'] = $ids[$index];
+				$sequence['clips'][] = $clipData;
 
 				if ($asset->getLanguage())
 				{
