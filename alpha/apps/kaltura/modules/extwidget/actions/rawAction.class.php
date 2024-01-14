@@ -149,8 +149,8 @@ class rawAction extends sfAction
 			
 			if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
-				$headersForRedirect = array('Access-Control-Allow-Origin: *');
-				$file_sync = $this->redirectIfRemote($flavor_asset, flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, null, true, $name, $headersForRedirect);
+				header('Access-Control-Allow-Origin: *');
+				$file_sync = $this->redirectIfRemote($flavor_asset, flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, null, true, $name);
 			}
 			else
 			{
@@ -389,7 +389,7 @@ class rawAction extends sfAction
 	 * @throws PropelException
 	 * @throws sfStopException
 	 */
-	private function redirectIfRemote ( $obj , $sub_type , $version , $strict = true , $fileName = null, $headersForRedirect = array())
+	private function redirectIfRemote ( $obj , $sub_type , $version , $strict = true , $fileName = null)
 	{
 		$dataKey = $obj->getSyncKey( $sub_type , $version );
 		list ( $file_sync , $local ) = kFileSyncUtils::getReadyFileSyncForKey( $dataKey ,true , false );
@@ -408,7 +408,7 @@ class rawAction extends sfAction
 				return null;
 		}
 		
-		return $this->redirectFileSyncIfRemote($file_sync, $local, $obj, $fileName, $headersForRedirect);
+		return $this->redirectFileSyncIfRemote($file_sync, $local, $obj, $fileName);
 	}
 
 	/**
@@ -419,7 +419,7 @@ class rawAction extends sfAction
 	 * @return mixed
 	 * @throws sfStopException
 	 */
-	private function redirectFileSyncIfRemote($file_sync, $local, $object, $fileName = null, $headersForRedirect = array())
+	private function redirectFileSyncIfRemote($file_sync, $local, $object, $fileName = null)
 	{
 		if(kFile::isSharedPath($file_sync->getFullPath()) || in_array($file_sync->getDc(), kStorageExporter::getPeriodicStorageIds()))
 		{
@@ -432,7 +432,6 @@ class rawAction extends sfAction
 					$ext = pathinfo($file_sync->getFullPath(), PATHINFO_EXTENSION);
 					$fileName = $fileName. '.' .$ext;
 					$url = kAssetUtils::getDownloadRedirectUrl($downloadDeliveryProfile, $object, $fileName, $isDir);
-					$this->addHeadersToResponse($headersForRedirect);
 					$this->redirect($url);
 				}
 			}
@@ -449,20 +448,11 @@ class rawAction extends sfAction
 			}
 			else
 			{
-				$this->addHeadersToResponse($headersForRedirect);
 				$this->redirect($remote_url);
 			}
 		}
 		
 		return $file_sync;
-	}
-	
-	private function addHeadersToResponse($headers)
-	{
-		foreach ($headers as $header)
-		{
-			header($header);
-		}
 	}
 	
 	private function getAllowedFlavorAssets(KSecureEntryHelper $secureEntryHelper, $entryId, $format = null, $isOriginal = false, $isBestPlay = false)
