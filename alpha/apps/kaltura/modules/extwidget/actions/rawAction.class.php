@@ -431,6 +431,7 @@ class rawAction extends sfAction
 					$ext = pathinfo($file_sync->getFullPath(), PATHINFO_EXTENSION);
 					$fileName = $fileName. '.' .$ext;
 					$url = kAssetUtils::getDownloadRedirectUrl($downloadDeliveryProfile, $object, $fileName, $isDir);
+					header('Access-Control-Allow-Origin: *');
 					$this->redirect($url);
 				}
 			}
