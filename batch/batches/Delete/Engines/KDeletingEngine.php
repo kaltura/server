@@ -124,8 +124,9 @@ abstract class KDeletingEngine
 		KBatchBase::impersonate($this->partnerId);
 		$ret = $this->delete($filter);
 		self::$deletedRecordCount += $ret;
-		if((self::$deletedRecordCount % $this->deleteOperationBulkSize) == 0)
+		if(self::$deletedRecordCount >= $this->deleteOperationBulkSize)
 		{
+			self::$deletedRecordCount = 0;
 			sleep($this->deleteOperationBackOffInterval);
 		}
 		
