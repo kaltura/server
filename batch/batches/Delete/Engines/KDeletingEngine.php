@@ -5,8 +5,8 @@
  */
 abstract class KDeletingEngine
 {
-	const DELETE_BACKOFF_BULK_SIZE = 500;
-	const DELETE_BACKOFF_INTERVAL = 5;
+	const DELETE_BACKOFF_BULK_SIZE = 100;
+	const DELETE_BACKOFF_INTERVAL = 2;
 	
 	/**
 	 * @var KalturaClient
