@@ -118,8 +118,10 @@ class kmcngAction extends kalturaAction
 		$serverAPIUri = kConf::get("www_host");
 		if (isset($kmcngParams["kmcng_custom_uri"]))
 			$serverAPIUri = $kmcngParams["kmcng_custom_uri"];
-
-
+		
+		$productionSettings = kConf::get('production', 'admin', null);
+		$epUrl = $productionSettings['settings']['epUrl'];
+		
 		$loadVersionMapFromKConf = kConf::get("loadFromKConf", kConfMapNames::EMBED_PLAYKIT, null);
 
 		list($playerVersionsMapVersionConfig, $playerVersionsMapConfVars) = $this->getConfigByTagAndVersion($loadVersionMapFromKConf, self::PLAYER_V3_VERSIONS_TAG, "latest");
@@ -243,6 +245,7 @@ class kmcngAction extends kalturaAction
 			),
 			'kpfServer' => array('kpfPackageManagerBaseUrl' => kconf::get('kpf_package_manager_base_url','local',null), 'kpfPurchaseManagerBaseUrl' => kconf::get('kpf_purchase_manager_base_url', 'local', null)) ,
 			'analyticsServer' => array('uri' => kConf::get('analytics_host', 'local',  '')),
+			'epServer' => array('uri' => $epUrl),
 			"externalApps" => array(
 				"studioV2" => $studio,
 				"studioV3" => $studioV3,
