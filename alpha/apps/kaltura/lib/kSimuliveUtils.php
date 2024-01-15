@@ -14,6 +14,7 @@ class kSimuliveUtils
 	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'timeOffset';
 	const SCHEDULE_TIME_URL_PARAM = 'time';
 	const DURATION_ROUND_THRESHOLD_MILISECONDS = 100;
+	const LABEL_SEPARATOR = '-';
 	/**
 	 * @param LiveEntry $entry
 	 * @param int $time
@@ -39,12 +40,18 @@ class kSimuliveUtils
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
 
 		$sourceEntries = $sourceEntry->getType() == entryType::PLAYLIST ? myPlaylistUtils::retrieveStitchedPlaylistEntries($sourceEntry) : array($sourceEntry);
+		$sourceEntryLabels = array();
+		foreach ($sourceEntries as $source)
+		{
+			$sourceEntryLabels[] = "content" . self::LABEL_SEPARATOR . $source->getEntryId();
+		}
 
 		// getting the preStart assets (only if the preStartEntry exists)
 		$preStartEntry = kSimuliveUtils::getPreStartEntry($currentEvent);
 		if ($preStartEntry)
 		{
 			array_unshift($sourceEntries, $preStartEntry);
+			array_unshift($sourceEntryLabels, "preStartContent" . self::LABEL_SEPARATOR . $preStartEntry->getEntryId());
 		}
 
 		// getting the postEnd assets (only if the postEndEntry exists)
@@ -52,12 +59,14 @@ class kSimuliveUtils
 		if ($postEndEntry)
 		{
 			$sourceEntries[] = $postEndEntry;
+			$sourceEntryLabels[] = "postEntryContent" . self::LABEL_SEPARATOR . $postEndEntry->getEntryId();
 		}
 
 		list($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets) = self::getSourceAssets($sourceEntries);
 		$durations = self::getSourceDurations($sourceEntries, $currentEvent);
 
 		$endTime = $startTime + array_sum($durations);
+		self::addTimestamps($sourceEntryLabels, $startTime, $durations);
 
 		if (self::shouldLiveInterrupt($entry, $currentEvent))
 		{
@@ -76,7 +85,8 @@ class kSimuliveUtils
 		$audioAssets = self::createPaddedAssetsArray($entriesAudioAssets);
 
 		$assets = array_merge($flavorAssets, $captionAssets, $audioAssets);
-		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs);
+		$eventLabel = "eventId" . self::LABEL_SEPARATOR . $currentEvent->getId();
+		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs, $sourceEntryLabels, $eventLabel);
 	}
 
 	/**
@@ -341,6 +351,24 @@ class kSimuliveUtils
 			}
 		}
 		return $durations;
+	}
+
+	/**
+	 * Adding to each label the content stat time
+	 * @param array $labels
+	 * @param int $startTime
+	 * @param array $durations
+	 * @return void
+	 */
+	public static function addTimestamps(&$labels, $startTime, $durations)
+	{
+		$timestamp = $startTime;
+		$labels[0] .= self::LABEL_SEPARATOR . $timestamp;
+		for ($i = 1; $i < count($labels); $i++)
+		{
+			$timestamp = $timestamp + $durations[$i-1];
+			$labels[$i] .=  self::LABEL_SEPARATOR . $timestamp;
+		}
 	}
 
 	/**
