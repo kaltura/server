@@ -23,7 +23,7 @@ const VIRTUALEVENT_PLUGIN_PERMISSION = 'VIRTUALEVENT_PLUGIN_PERMISSION';
 //------------------------------------------------------
 
 
-require_once(__DIR__ . '/../../bootstrap.php');
+require_once(__DIR__ . '/../../../deployment/bootstrap.php');
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 KalturaStatement::setDryRun($dryRun);
