@@ -14,7 +14,7 @@ class kSimuliveUtils
 	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'timeOffset';
 	const SCHEDULE_TIME_URL_PARAM = 'time';
 	const DURATION_ROUND_THRESHOLD_MILISECONDS = 100;
-	const LABEL_SEPERATOR = '-';
+	const LABEL_SEPARATOR = '-';
 	/**
 	 * @param LiveEntry $entry
 	 * @param int $time
@@ -43,7 +43,7 @@ class kSimuliveUtils
 		$sourceEntryLabels = array();
 		foreach ($sourceEntries as $source)
 		{
-			$sourceEntryLabels[] = "content" . self::LABEL_SEPERATOR . $source->getEntryId();
+			$sourceEntryLabels[] = "content" . self::LABEL_SEPARATOR . $source->getEntryId();
 		}
 
 		// getting the preStart assets (only if the preStartEntry exists)
@@ -51,7 +51,7 @@ class kSimuliveUtils
 		if ($preStartEntry)
 		{
 			array_unshift($sourceEntries, $preStartEntry);
-			array_unshift($sourceEntryLabels, "preStartContent" . self::LABEL_SEPERATOR . $preStartEntry->getEntryId());
+			array_unshift($sourceEntryLabels, "preStartContent" . self::LABEL_SEPARATOR . $preStartEntry->getEntryId());
 		}
 
 		// getting the postEnd assets (only if the postEndEntry exists)
@@ -59,7 +59,7 @@ class kSimuliveUtils
 		if ($postEndEntry)
 		{
 			$sourceEntries[] = $postEndEntry;
-			$sourceEntryLabels[] = "postEntryContent" . self::LABEL_SEPERATOR . $postEndEntry->getEntryId();
+			$sourceEntryLabels[] = "postEntryContent" . self::LABEL_SEPARATOR . $postEndEntry->getEntryId();
 		}
 
 		list($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets) = self::getSourceAssets($sourceEntries);
@@ -85,7 +85,7 @@ class kSimuliveUtils
 		$audioAssets = self::createPaddedAssetsArray($entriesAudioAssets);
 
 		$assets = array_merge($flavorAssets, $captionAssets, $audioAssets);
-		$eventLabel = "eventId" . self::LABEL_SEPERATOR . $currentEvent->getId();
+		$eventLabel = "eventId" . self::LABEL_SEPARATOR . $currentEvent->getId();
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs, $sourceEntryLabels, $eventLabel);
 	}
 
@@ -363,11 +363,11 @@ class kSimuliveUtils
 	public static function addTimestamps(&$labels, $startTime, $durations)
 	{
 		$timestamp = $startTime;
-		$labels[0] .= self::LABEL_SEPERATOR . $timestamp;
+		$labels[0] .= self::LABEL_SEPARATOR . $timestamp;
 		for ($i = 1; $i < count($labels); $i++)
 		{
 			$timestamp = $timestamp + $durations[$i-1];
-			$labels[$i] .=  self::LABEL_SEPERATOR . $timestamp;
+			$labels[$i] .=  self::LABEL_SEPARATOR . $timestamp;
 		}
 	}
 
