@@ -4363,7 +4363,12 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			$context = array();
 		}
-		$context['columns'] = array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)');
+		$columns = array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)');
+		if (isset($context['columns']))
+		{
+			$columns = array_merge($columns, $context['columns']);
+		}
+		$context['columns'] = $columns;
 
 		return self::getUsersInfo($ids, $partner_id, $context);
 	}
