@@ -395,8 +395,15 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 		if ($this->getSourceEntryId())
 		{
 			$newScheduleEvent->setTemplateEntryId($this->getTemplateEntryId());
+			$newScheduleEvent->setStartScreenTime($date + $this->getPreStartTime());
+			$newScheduleEvent->setEndScreenTime($date + $this->getPreStartTime() + $this->getDuration());
 		}
 
 		return $newScheduleEvent;
+	}
+
+	public function getMarginTime()
+	{
+		return $this->getDuration() + $this->getPreStartTime() + $this->getPostEndTime();
 	}
 }
