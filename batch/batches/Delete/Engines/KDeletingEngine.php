@@ -126,6 +126,7 @@ abstract class KDeletingEngine
 		self::$deletedRecordCount += $ret;
 		if(self::$deletedRecordCount >= $this->deleteOperationBulkSize)
 		{
+			KalturaLog::debug("Handled [" . self::$deletedRecordCount . "] at this cycle, will now backoff for [{$this->deleteOperationBackOffInterval}]");
 			self::$deletedRecordCount = 0;
 			sleep($this->deleteOperationBackOffInterval);
 		}
