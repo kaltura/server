@@ -9,7 +9,7 @@ KAutoloader::register();
 
 $code = array();
 
-$options = getopt('iu:p:h:P:dst', array(
+$options = getopt('iu:p:h:P:dstf:', array(
 	'ignore',
 	'user:',
 	'password:',
@@ -17,7 +17,8 @@ $options = getopt('iu:p:h:P:dst', array(
 	'port:',
 	'database-only:',
 	'scripts-only:',
-	'replace-xml-tokens:'
+	'replace-xml-tokens:',
+	'file:'
 ));
 
 $ignoreErrors = false;
@@ -58,6 +59,12 @@ if(isset($options['P']))
 if(isset($options['port']))
 	$params['port'] = $options['port'];
 
+$params['file'] = null;
+if(isset($options['f']))
+	$params['file'] = $options['f'];
+if(isset($options['file']))
+	$params['file'] = $options['file'];
+
 $updateRunner = new ScriptsRunner();
 $updateRunner->init($ignoreErrors, $params);
 
@@ -79,7 +86,7 @@ if(!$skipDB)
 if(!$skipScripts)
 {
 	$phpDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . "scripts";
-	$updateRunner->runPhpScripts($phpDir);
+	$updateRunner->runPhpScripts($phpDir, $params['file']);
 }
 
 exit(0);
@@ -115,7 +122,14 @@ class ScriptsRunner
 		}
 
 		foreach($params as $key => $value)
+		{
+			if(!in_array($key, array('user','password','host','port')))
+			{
+				KalturaLog::debug("Not setting key [$key] on dbParams as it not related to db connection config");
+				continue;
+			}
 			$this->dbParams[$key] = $value;
+		}
 
 		foreach($this->dbParams as $key => $value)
 		{
@@ -249,8 +263,15 @@ class ScriptsRunner
 		}
 	}
 
-	public function runPhpScripts($phpDir)
+	public function runPhpScripts($phpDir, $singleFile = null)
 	{
+		if($singleFile)
+		{
+			$this->handleScriptFile($phpDir . DIRECTORY_SEPARATOR . $singleFile);
+			KalturaLog::debug("Handling single file execution: [$singleFile]");
+			return;
+		}
+		
 		$phpFiles = $this->getDirContnet($phpDir);
 		foreach($phpFiles as $phpFile)
 		{
@@ -360,7 +381,7 @@ class ScriptsRunner
 
 	function runPHPScript($file)
 	{
-		if(! is_file($file))
+		if(!is_file($file))
 		{
 			KalturaLog::err("Could not run script: script not found $file");
 			return false;
