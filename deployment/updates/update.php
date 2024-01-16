@@ -268,7 +268,7 @@ class ScriptsRunner
 		if($singleFile)
 		{
 			$this->handleScriptFile($phpDir . DIRECTORY_SEPARATOR . $singleFile);
-			echo "Handling single file execution: [$singleFile] \n";
+			KalturaLog::debug("Handling single file execution: [$singleFile]");
 			return;
 		}
 		
