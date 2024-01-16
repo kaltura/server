@@ -139,7 +139,8 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 	{
 		if (strlen($key) > 250)
 		{
-			$key = md5($key);
+			/*$key = md5($key);*/
+			self::safeLog("normalizeKey: key length is bigger then 250 need to hash it ${key}");
 		}
 
 		return $key;
