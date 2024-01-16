@@ -55,7 +55,7 @@ while (count($partners))
 		}
 		
 		$eventPlatformPermission = PermissionPeer::getByNameAndPartner(FEATURE_EVENT_PLATFORM_PERMISSION, $partner->getId());
-		if ($eventPlatformPermission && $eventPlatformPermission == PermissionStatus::ACTIVE)
+		if ($eventPlatformPermission && $eventPlatformPermission->getStatus() == PermissionStatus::ACTIVE)
 		{
 			print("Permission [" . FEATURE_EVENT_PLATFORM_PERMISSION . "] already set for partner id [". $partner->getId() ."] Skipping\n");
 			continue;
