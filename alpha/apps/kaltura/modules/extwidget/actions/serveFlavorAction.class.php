@@ -975,9 +975,10 @@ class serveFlavorAction extends kalturaAction
 
 			foreach ($assetArray as $index => $asset)
 			{
+				$clipId = isset($ids[$index]) ? $ids[$index] : '';
 				if ($asset == null)
 				{
-					$sequence['clips'][] = $isAudioAssets ? array("type" => "silence") : array("sourceType" => "file", "type" => "source", "path" => "empty", "id" => $ids[$index]);
+					$sequence['clips'][] = $isAudioAssets ? array("type" => "silence") : array("sourceType" => "file", "type" => "source", "path" => "empty", "id" => $clipId);
 					continue;
 				}
 				$syncKey = $asset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -987,7 +988,7 @@ class serveFlavorAction extends kalturaAction
 					KalturaLog::debug('missing path for asset ' . $asset->getId() . ' version ' . $asset->getVersion());
 				}
 				$clipData = self::getClipData($path, $asset, $sourceType);
-				$clipData['id'] = $ids[$index];
+				$clipData['id'] = $clipId;
 				$sequence['clips'][] = $clipData;
 
 				if ($asset->getLanguage())
