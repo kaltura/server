@@ -272,7 +272,6 @@ class ScriptsRunner
 			return;
 		}
 		
-		die();
 		$phpFiles = $this->getDirContnet($phpDir);
 		foreach($phpFiles as $phpFile)
 		{
