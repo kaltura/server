@@ -476,6 +476,11 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		return $this->getEndDate(null);
 	}
 
+	public function getMarginTime()
+	{
+		return 0;
+	}
+
 	public function createRecurrence($date)
 	{
 		$class = get_class($this);
@@ -484,7 +489,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 		$newScheduleEvent->setParentId($this->getId());
 		$newScheduleEvent->setStartDate($date);
 		$newScheduleEvent->setOriginalStartDate($date);
-		$newScheduleEvent->setEndDate($date + $this->getDuration());
+		$newScheduleEvent->setEndDate($date + $this->getDuration() + $this->getMarginTime());
 
 		return $newScheduleEvent;
 	}
