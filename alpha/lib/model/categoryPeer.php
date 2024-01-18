@@ -80,8 +80,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 			if($kuser)
 			{
 				// get the groups that the user belongs to in case she is not associated to the category directly
-				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
-				$kgroupIds[] = $kuser->getId();
+				$kgroupIds = array_merge([$kuser->getId()], KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId()));
 				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
      			$crit->addOr($membersCrit);
