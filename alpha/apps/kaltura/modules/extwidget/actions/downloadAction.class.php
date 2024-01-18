@@ -237,7 +237,7 @@ class downloadAction extends sfAction
 
 	private function handleFileSyncRedirection($fileSync, asset $flavorAsset, $fileName, $isDir)
 	{
-		$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $flavorAsset->getEntryId());
+		$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $flavorAsset->getEntryId(), $flavorAsset->getPartnerId());
 		if($downloadDeliveryProfile && $flavorAsset && !$fileSync->isEncrypted())
 		{
 			$url = kAssetUtils::getDownloadRedirectUrl($downloadDeliveryProfile, $flavorAsset, $fileName, $isDir);

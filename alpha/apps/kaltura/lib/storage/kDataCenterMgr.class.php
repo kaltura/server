@@ -7,7 +7,8 @@ class kDataCenterMgr
 {
 	private static $s_current_dc;
 	private static $is_multi_dc = null;
-
+	
+	private static $shared_dc_ids = array();
 	private static $shared_storage_profile_ids = array();
 	const REMOTE_FILE_GET_CONTENTS_TIMEOUT = 60;
 
@@ -120,20 +121,30 @@ class kDataCenterMgr
 	
 	public static function isDcIdShared($dcId)
 	{
+		$isDcIdShared = false;
+		
+		if(isset(self::$shared_dc_ids[$dcId]))
+		{
+			return self::$shared_dc_ids[$dcId];
+		}
+		
 		$sharedStorageProfileIds = self::getSharedStorageProfileIds();
 		if(in_array($dcId, $sharedStorageProfileIds))
 		{
+			self::$shared_dc_ids[$dcId] = true;
 			return true;
 		}
 
 		$storageProfile = StorageProfilePeer::retrieveByPK($dcId);
 		if(!$storageProfile)
 		{
+			self::$shared_dc_ids[$dcId] = false;
 			return false;
 		}
-
-
-		return $storageProfile->getProtocol() == StorageProfileProtocol::KALTURA_DC && $storageProfile->getPartnerId() != PartnerPeer::GLOBAL_PARTNER;
+		
+		
+		self::$shared_dc_ids[$dcId] = $storageProfile->getProtocol() == StorageProfileProtocol::KALTURA_DC && $storageProfile->getPartnerId() != PartnerPeer::GLOBAL_PARTNER;
+		return self::$shared_dc_ids[$dcId];
 	}
 
 	// returns a tupple with the id and the DC's properties

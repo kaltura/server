@@ -149,7 +149,7 @@ class kAssetUtils
 		{
 			if($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_READY)
 			{
-				$deliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $asset->getEntryId());
+				$deliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($fileSync->getDc(), $asset->getEntryId(), $asset->getPartnerId());
 				if($deliveryProfile)
 				{
 					return $deliveryProfile;
