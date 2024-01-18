@@ -453,7 +453,6 @@ class KCurlWrapper
 	public function getHeader($sourceUrl, $noBody = false, $allowInternalUrl = false)
 	{
 		curl_setopt($this->ch, CURLOPT_HEADER, true);
-		curl_setopt($this->ch, CURLOPT_BINARYTRANSFER, true);
 		curl_setopt($this->ch, CURLOPT_WRITEFUNCTION, 'KCurlWrapper::read_body');
 
 		if (!self::setSourceUrl($this->ch, $sourceUrl, $this->protocol, $this->host, $allowInternalUrl, true))
