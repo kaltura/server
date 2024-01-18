@@ -71,9 +71,10 @@ class kPathManager
 	 */
 	public static function getFilePathArr(FileSyncKey $key, $storageProfileId = null)
 	{
-		KalturaLog::log(__METHOD__." - key [$key], storageProfileId [$storageProfileId]");
-		
+		KalturaLog::log(__METHOD__." - key [$key], requested storageProfileId [$storageProfileId]");
 		$storageProfileId = self::getStorageProfileIdForKey($key, $storageProfileId);
+		KalturaLog::log(__METHOD__." - key [$key], chosen storageProfileId [$storageProfileId]");
+		
 		$storageProfile = self::getStorageProfile($storageProfileId);
 		if(is_null($storageProfile))
 			throw new Exception("Storage Profile [$storageProfileId] not found");
@@ -100,6 +101,11 @@ class kPathManager
 	
 	public static function getStorageProfileIdForKey(FileSyncKey $key, $storageProfileId = null)
 	{
+		if($storageProfileId && !in_array($storageProfileId, kDataCenterMgr::getSharedStorageProfileIds($key->getPartnerId())))
+		{
+			return $storageProfileId;
+		}
+		
 		$object = kFileSyncUtils::retrieveObjectForSyncKey($key);
 		$class = get_class($object);
 		
