@@ -134,10 +134,31 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 		$this->lastError = count($splitError) > 1 ? 'MEMC_' . $splitError[1] : 'MEMC_ERROR';
 		return false;
 	}
-	
+
+	private function normalizeKey($key)
+	{
+		if (strlen($key) > 250)
+		{
+			/*$key = md5($key);*/
+			self::safeLog("normalizeKey: key length is bigger then 250 need to hash it ${key}");
+		}
+
+		return $key;
+	}
+
+	private function normalizeKeys($keys)
+	{
+		if (is_array($keys))
+		{
+			return array_map(array($this, 'normalizeKey'), $keys);
+		}
+
+		return $this->normalizeKey($keys);
+	}
+
 	/**
 	 * @param string $methodName
-	 * @param array $params
+	 * @param array $params - first parameter must be key or keys (as today)
 	 * @return mixed false on error
 	 */
 	protected function callAndDetectErrors($methodName, $params)
@@ -147,6 +168,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 			$this->lastError = '';
 			
 			set_error_handler(array($this, 'errorHandler'));
+			$params[0] = $this->normalizeKeys($params[0]);
 			$start = microtime(true);
 			$result = call_user_func_array(array($this->memcache, $methodName), $params);
 			$end = microtime(true);
