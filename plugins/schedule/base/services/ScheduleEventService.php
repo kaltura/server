@@ -364,7 +364,7 @@ class ScheduleEventService extends KalturaBaseService
 		if (!is_null($dates) && !empty($dates))
 		{
 			$dbScheduleEvent->setStartDate($dates[0]);
-			$dbScheduleEvent->setEndDate($dates[0] + $dbScheduleEvent->getDuration());
+			$dbScheduleEvent->setEndDate($dates[0] + $dbScheduleEvent->getDuration() + $dbScheduleEvent->getMarginTime());
 		}
 		$dbScheduleEvent->save();
 	}

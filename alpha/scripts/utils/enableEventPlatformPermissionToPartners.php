@@ -24,7 +24,7 @@ const FEATURE_EVENT_PLATFORM_PERMISSION = 'FEATURE_EVENT_PLATFORM_PERMISSION';
 //------------------------------------------------------
 
 
-require_once(__DIR__ . '/../../bootstrap.php');
+require_once(__DIR__ . '/../../../deployment/bootstrap.php');
 
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 KalturaStatement::setDryRun($dryRun);
@@ -42,9 +42,9 @@ while (count($partners))
 	foreach ($partners as $partner)
 	{
 		$existingEventPermission = PermissionPeer::getByNameAndPartner(FEATURE_EVENT_PLATFORM_PERMISSION, $partner->getId());
-		if($existingEventPermission)
+		if ($existingEventPermission)
 		{
-			print("Existing Event Platform permission on partner: [" . $partner->getId(). "] \n");
+			print("Existing Event Platform permission on partner: [" . $partner->getId(). "] with status [" . $existingEventPermission->getStatus(). "] \n");
 		}
 		
 		/* @var $partner Partner */
@@ -54,10 +54,15 @@ while (count($partners))
 			continue;
 		}
 		
-		print("Set permission [" . FEATURE_EVENT_PLATFORM_PERMISSION . "] for partner id [". $partner->getId() ."]\n");
 		$eventPlatformPermission = PermissionPeer::getByNameAndPartner(FEATURE_EVENT_PLATFORM_PERMISSION, $partner->getId());
+		if ($eventPlatformPermission && $eventPlatformPermission->getStatus() == PermissionStatus::ACTIVE)
+		{
+			print("Permission [" . FEATURE_EVENT_PLATFORM_PERMISSION . "] already set for partner id [". $partner->getId() ."] Skipping\n");
+			continue;
+		}
 		if (!$eventPlatformPermission)
 		{
+			print("Create new permission [" . FEATURE_EVENT_PLATFORM_PERMISSION . "] for partner id [". $partner->getId() ."]\n");
 			$eventPlatformPermission = new Permission();
 			$eventPlatformPermission->setType(PermissionType::SPECIAL_FEATURE);
 			$eventPlatformPermission->setPartnerId($partner->getId());
@@ -66,6 +71,7 @@ while (count($partners))
 		
 		$eventPlatformPermission->setStatus(PermissionStatus::ACTIVE);
 		$eventPlatformPermission->save();
+		print("Set permission [" . FEATURE_EVENT_PLATFORM_PERMISSION . "] for partner id [". $partner->getId() ."]\n");
 	}
 	
 	kMemoryManager::clearMemory();

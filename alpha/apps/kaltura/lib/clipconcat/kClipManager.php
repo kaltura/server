@@ -17,6 +17,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
 	const VIDEO_DURATION = 'videoDuration';
 	const AUDIO_DURATION = 'audioDuration';
+	const INVERTED_SOURCE = 'invertedSource';
 	const EXTRA_CONVERSION_PARAMS = 'extraConversionParams';
 	const TEMP_ENTRY = 'tempEntry';
 	const SOURCE_ENTRY = 'sourceEntry';
@@ -721,9 +722,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$currentConversionParams[self::VIDEO_DURATION] = $mediaInfoObj->getVideoDuration();
 			$currentConversionParams[self::AUDIO_DURATION] = $mediaInfoObj->getAudioDuration();
 
-			if($mediaInfoObj->getVideoWidth() != $width)
+			$shouldResize = $this->shouldResize($mediaInfoObj, $width, $height);
+			if(shouldResize)
 			{
-				$currentConversionParams[self::WIDTH] = $width;
+				$currentConversionParams[self::WIDTH] = $width; // trigger resize
+				if($mediaInfoObj->getVideoWidth() < $mediaInfoObj->getVideoHeight())
+				{
+					$currentConversionParams[self::INVERTED_SOURCE] = true;
+				}
 			}
 			if($imageToVideo)
 			{
@@ -731,7 +737,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			else if($mediaInfoObj->getAudioDuration() && abs($mediaInfoObj->getAudioDuration() - $mediaInfoObj->getVideoDuration()) > self::AUDIO_VIDEO_DIFF_MS)
 			{
-				if($currentConversionParams[self::WIDTH])
+				if($shouldResize)
 				{
 					$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0' ";
 				}
@@ -743,6 +749,21 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
 		}
+	}
+
+	protected function shouldResize($inputMediaInfo, $outputWidth, $outputHeight)
+	{
+		   $inputWidth = $inputMediaInfo->getVideoWidth();
+		   $inputHeight = $inputMediaInfo->getVideoHeight();
+
+		   $inputRatio = $inputWidth / $inputHeight;
+		   $outputRatio = $outputWidth / $outputHeight;
+
+		   if($inputRatio != $outputRatio || $inputWidth < $inputHeight)
+		   {
+			   return true;
+		   }
+		   return false;
 	}
 
 	protected function decideResolution($conversionProfileId, $aspectRatio, &$width, &$height)
@@ -1474,6 +1495,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$flavorParamsObj->setWidth($conversionParams[self::WIDTH]);
 				$flavorParamsObj->setAspectRatioProcessingMode(2);
 				$flavorParamsObj->setIsAvoidVideoShrinkFramesizeToSource(1);
+			}
+			if(isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE])
+			{
+				// for inverted source calculation, the output flavor is inverted
+				// _arProcessingMode = 6, inverts back the output flavor
+				$flavorParamsObj->setAspectRatioProcessingMode(6);
 			}
 			if(isset($conversionParams[self::AUDIO_CHANNELS]))
 			{

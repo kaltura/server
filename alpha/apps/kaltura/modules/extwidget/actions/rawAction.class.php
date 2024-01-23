@@ -149,7 +149,8 @@ class rawAction extends sfAction
 			
 			if($flavor_asset && $flavor_asset->getStatus() == flavorAsset::FLAVOR_ASSET_STATUS_READY)
 			{
-				$file_sync = $this->redirectIfRemote ( $flavor_asset ,  flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET , null , true, $name);
+				header('Access-Control-Allow-Origin: *');
+				$file_sync = $this->redirectIfRemote($flavor_asset, flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET, null, true, $name);
 			}
 			else
 			{
@@ -435,7 +436,7 @@ class rawAction extends sfAction
 				}
 			}
 		}
-
+		
 		if ( !$local )
 		{
 			$shouldProxy = $this->getRequestParameter("forceproxy", false);
@@ -447,7 +448,6 @@ class rawAction extends sfAction
 			}
 			else
 			{
-				// or redirect if no proxy
 				$this->redirect($remote_url);
 			}
 		}

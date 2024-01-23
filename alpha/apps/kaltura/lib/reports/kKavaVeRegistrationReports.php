@@ -2,6 +2,8 @@
 
 class kKavaVeRegistrationReports extends kKavaReportsMgr
 {
+	const VE_REGISTRATION_QUERY_CACHE_EXPIRATION = 30;
+
 	protected static $reports_def = array(
 
 		ReportType::VE_HIGHLIGHTS => array(
@@ -106,6 +108,12 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 		),
 	);
 
+	protected static function initQueryCache()
+	{
+		self::$query_cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_DRUID_QUERIES);
+		self::$query_cache_expiration = self::VE_REGISTRATION_QUERY_CACHE_EXPIRATION;
+	}
+
 	public static function getReportDef($report_type, $input_filter)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
@@ -117,6 +125,7 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 		$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_VE_REGISTRATION;
 
 		self::initTransformTimeDimensions();
+		self::initQueryCache();
 
 		return $report_def;
 	}

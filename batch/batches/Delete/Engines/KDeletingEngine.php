@@ -5,6 +5,9 @@
  */
 abstract class KDeletingEngine
 {
+	const DELETE_BACKOFF_BULK_SIZE = 100;
+	const DELETE_BACKOFF_INTERVAL = 2;
+	
 	/**
 	 * @var KalturaClient
 	 */
@@ -26,6 +29,24 @@ abstract class KDeletingEngine
 	 * @var int
 	 */
 	private $batchPartnerId;
+	
+	/**
+	 * The batch delete amount allowed before backing off for the time defined in $deleteOperationBackOffInterval
+	 * @var int
+	 */
+	private $deleteOperationBulkSize;
+	
+	/**
+	 * Backoff time for the process to not overload the service with repetitive updates
+	 * @var int
+	 */
+	private $deleteOperationBackOffInterval;
+	
+	/**
+	 * Amount of operations executed by the process
+	 * @var int
+	 */
+	private static $deletedRecordCount = 0;
 	
 	/**
 	 * @param int $objectType of enum KalturaDeleteObjectType
@@ -74,8 +95,22 @@ abstract class KDeletingEngine
 		$this->pager = new KalturaFilterPager();
 		$this->pager->pageSize = 100;
 		
+		$this->deleteOperationBulkSize = self::DELETE_BACKOFF_BULK_SIZE;
+		if(KBatchBase::$taskConfig->params && KBatchBase::$taskConfig->params->bulkSize)
+		{
+			$this->deleteOperationBulkSize = KBatchBase::$taskConfig->params->bulkSize;
+		}
+		
+		$this->deleteOperationBackOffInterval = self::DELETE_BACKOFF_INTERVAL;
+		if(KBatchBase::$taskConfig->params && KBatchBase::$taskConfig->params->backOffInterval)
+		{
+			$this->deleteOperationBackOffInterval = KBatchBase::$taskConfig->params->backOffInterval;
+		}
+		
 		if(KBatchBase::$taskConfig->params && KBatchBase::$taskConfig->params->pageSize)
+		{
 			$this->pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+		}
 	}
 
 	
@@ -88,6 +123,14 @@ abstract class KDeletingEngine
 	{
 		KBatchBase::impersonate($this->partnerId);
 		$ret = $this->delete($filter);
+		self::$deletedRecordCount += $ret;
+		if(self::$deletedRecordCount >= $this->deleteOperationBulkSize)
+		{
+			KalturaLog::debug("Handled [" . self::$deletedRecordCount . "] at this cycle, will now backoff for [{$this->deleteOperationBackOffInterval}]");
+			self::$deletedRecordCount = 0;
+			sleep($this->deleteOperationBackOffInterval);
+		}
+		
 		KBatchBase::unimpersonate();
 		
 		return $ret;

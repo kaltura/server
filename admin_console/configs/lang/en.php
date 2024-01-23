@@ -71,6 +71,7 @@ return array(
 	'Kaltura_Client_Enum_BatchJobType::CLIP_CONCAT' => 'Clip Concat',
 	'Kaltura_Client_Enum_BatchJobType::MULTI_CLIP_CONCAT' => 'Multi Clip Concat',
 	'Kaltura_Client_Enum_BatchJobType::CONVERT_CAPTION_ASSET' => 'Convert Caption Asset',
+	'Kaltura_Client_Enum_BatchJobType::LIVE_ENTRY_ARCHIVE' => 'Live Entry Archive',
 
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG' => 'Convert - FFMpeg',
 	'Kaltura_Client_Enum_ConversionEngineType::FFMPEG_AUX' => 'Convert - FFMpeg Aux',
