@@ -256,6 +256,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
+		$c->add(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
 		if ($startTime) // if giving start time - ignore all the events that already finished
 		{
 			$c->add(ScheduleEventPeer::END_DATE, $startTime - self::TIME_MARGIN, Criteria::GREATER_EQUAL);
