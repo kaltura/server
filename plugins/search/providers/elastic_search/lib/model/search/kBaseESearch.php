@@ -119,7 +119,7 @@ abstract class kBaseESearch extends kBaseSearch
 
 	public static function getSplitIndexNamePerPartner($indexName, $partnerId)
 	{
-		$clusterName = kConf::get('elasticCluster', 'elastic', null);
+		$clusterName = kESearchUtils::getElasticClusterName();
 		if(!$clusterName)
 		{
 			KalturaLog::debug("Could not get elastic cluster name");

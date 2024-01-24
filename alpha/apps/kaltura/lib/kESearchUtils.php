@@ -1,0 +1,39 @@
+<?php
+class kESearchUtils
+{
+	const ELASTIC_CLUSTER_NAME = 'elastic_cluster_name';
+	const ELASTIC_CLUSTER_NAME_TTL = 60;
+	
+	public static function getElasticClusterName()
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
+		if ($cache)
+		{
+			$elasticClusterName = $cache->get(self::ELASTIC_CLUSTER_NAME);
+			
+			if ($elasticClusterName)
+			{
+				KalturaLog::log("Returning value from memcache [$elasticClusterName]");
+				return $elasticClusterName;
+			}
+		}
+		
+		$elasticClient = new elasticClient();
+		$elasticClusterName = $elasticClient->getElasticClusterName();
+		unset($elasticClient);
+		
+		$clusterToServer = kConf::get('cluster_name_to_server', 'elastic', array());
+		if (count($clusterToServer) && array_key_exists($elasticClusterName, $clusterToServer))
+		{
+			$elasticClusterName = $clusterToServer[$elasticClusterName];
+		}
+		
+		if ($cache)
+		{
+			KalturaLog::log("Storing elastic cluster name [$elasticClusterName] in memcache");
+			$cache->set(self::ELASTIC_CLUSTER_NAME, $elasticClusterName, self::ELASTIC_CLUSTER_NAME_TTL);
+		}
+		
+		return $elasticClusterName;
+	}
+}

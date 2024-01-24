@@ -462,6 +462,18 @@ class elasticClient
 		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_PING, self::MONITOR_NO_INDEX);
 		return $response;
 	}
+	
+	/**
+	 * get elastic cluster name
+	 * @return mixed|string
+	 */
+	public function getElasticClusterName()
+	{
+		$response = $this->ping();
+		
+		// this is backward compatible with old method: $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
+		return isset($response['cluster_name']) ? $response['cluster_name'] : 0;
+	}
 
 	/**
 	 * check health of elastic cluster
