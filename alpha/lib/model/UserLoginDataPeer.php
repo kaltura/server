@@ -854,8 +854,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			$userQuota = $partner->getAdminLoginUsersQuota();
 			$adminLoginUsersNum = $partner->getAdminLoginUsersNumber();
 			$excludedAdminRoleUsersNum = self::getExcludedAdminRoleUsersNumber($partner);
+			$adminWithoutExcluded = $adminLoginUsersNum - $excludedAdminRoleUsersNum;
 			// check if login users quota exceeded - value -1 means unlimited
-			if ($adminLoginUsersNum  && (is_null($userQuota) || ($userQuota != -1 && $userQuota <= $adminLoginUsersNum - $excludedAdminRoleUsersNum))) {
+			if ($adminLoginUsersNum  && (is_null($userQuota) || ($userQuota != -1 && $userQuota <= $adminWithoutExcluded))) {
 				throw new kUserException('', kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
 			}
 		}
