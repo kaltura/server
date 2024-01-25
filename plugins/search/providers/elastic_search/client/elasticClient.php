@@ -471,7 +471,8 @@ class elasticClient
 	{
 		$response = $this->ping();
 		
-		// this is backward compatible with old method: $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
+		// this is backward compatible with the old method:
+		// $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
 		return isset($response['cluster_name']) ? $response['cluster_name'] : 0;
 	}
 

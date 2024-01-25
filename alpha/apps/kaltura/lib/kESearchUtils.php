@@ -2,11 +2,13 @@
 class kESearchUtils
 {
 	const ELASTIC_CLUSTER_NAME = 'elastic_cluster_name';
-	const ELASTIC_CLUSTER_NAME_TTL = 60;
+	const ELASTIC_CLUSTER_NAME_TTL = 30;
 	
 	public static function getElasticClusterName()
 	{
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_EXECUTED_CLUSTER);
+		$retry = 0;
+		
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::ELASTIC_CLUSTER_NAME);
 		if ($cache)
 		{
 			$elasticClusterName = $cache->get(self::ELASTIC_CLUSTER_NAME);
@@ -20,6 +22,14 @@ class kESearchUtils
 		
 		$elasticClient = new elasticClient();
 		$elasticClusterName = $elasticClient->getElasticClusterName();
+		
+		while (!$elasticClusterName && $retry < 3)
+		{
+			$elasticClusterName = $elasticClient->getElasticClusterName();
+			$retry++;
+			sleep(1);
+		}
+		
 		unset($elasticClient);
 		
 		$clusterToServer = kConf::get('cluster_name_to_server', 'elastic', array());
