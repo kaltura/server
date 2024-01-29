@@ -121,8 +121,6 @@ class kDataCenterMgr
 	
 	public static function isDcIdShared($dcId)
 	{
-		$isDcIdShared = false;
-		
 		if(isset(self::$shared_dc_ids[$dcId]))
 		{
 			return self::$shared_dc_ids[$dcId];
