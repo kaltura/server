@@ -54,20 +54,31 @@ class AppUpdater
 		{
 			$this->currentAppsVersionsMap[$appVersionMatches[1][$i]] = $appVersionMatches[2][$i];
 		}
+		KalturaLog::debug("currentAppsVersionsMap: " . print_r($this->currentAppsVersionsMap));
 	}
 	
 	private function buildNextAppVersions()
 	{
 		$this->nextAppsVersionsMap = kConf::getMap('kaltura_app_versions');
+		KalturaLog::debug("nextAppsVersionsMap: " . print_r($this->nextAppsVersionsMap));
 	}
 	
 	private function buildAppsVersionDiffMap()
 	{
-		foreach ($this->nextAppsVersionsMap as $appName => $appVersion) {
+		foreach ($this->nextAppsVersionsMap as $appName => $appVersion)
+		{
 			if (!isset($this->currentAppsVersionsMap[$appName]) || $this->currentAppsVersionsMap[$appName] != $appVersion)
 			{
 				$this->appVersionsDiff[$appName] = $appVersion;
 			}
+		}
+		
+		KalturaLog::debug("appVersionsDiff: " . print_r($this->appVersionsDiff));
+		
+		if(!count($this->appVersionsDiff))
+		{
+			KalturaLog::debug("No app diff found process will exit");
+			exit(EXEC_STATUS_SUCCESS);
 		}
 	}
 	
