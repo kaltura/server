@@ -59,11 +59,11 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 					$objectType = BatchJobObjectType::USER;
 					break;
 				default:
+					$objectType = BatchJobObjectType::ENTRY;
 					if ($object instanceof asset) {
 						$objectType = BatchJobObjectType::ASSET;
 					}
 
-					$objectType = BatchJobObjectType::ENTRY;
 					break;
 			}
 		}
