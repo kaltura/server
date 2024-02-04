@@ -32,12 +32,6 @@ class kESearchUtils
 		
 		unset($elasticClient);
 		
-		$clusterToServer = kConf::get('cluster_name_to_server', 'elastic', array());
-		if (count($clusterToServer) && array_key_exists($elasticClusterName, $clusterToServer))
-		{
-			$elasticClusterName = $clusterToServer[$elasticClusterName];
-		}
-		
 		if ($cache)
 		{
 			KalturaLog::log("Storing elastic cluster name [$elasticClusterName] in memcache");
