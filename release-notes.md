@@ -1,3 +1,16 @@
+# Tucana-20.6.0
+## Deploy Document_To_Image flavor param ##
+
+- Issue Type: Task
+- Issue ID: VCP-16083
+
+### Configuration ###
+None.
+
+### Deployment scripts ###
+
+	  php /opt/kaltura/app/deployment/updates/scripts/2024_02_06_deploy_document_to_image_conversion_data.php
+
 # Tucana-20.3.0
 ## Enable CNC Stage Monitor ##
 * Issue Type: Task
