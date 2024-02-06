@@ -270,10 +270,20 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @readonly
 	 */
 	public $ignoreSeoLinks;
-
+	
 	/**
 	 * @var bool
 	 * @readonly
+	 */
+	public $useTwoFactorAuthentication;
+	
+	/**
+	 * @var bool
+	 */
+	public $useSso;
+	
+	/**
+	 * @var bool
 	 */
 	public $blockDirectLogin;
 
@@ -494,7 +504,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	
 	private static $map_between_objects = array
 	(
-		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'blockDirectLogin',
+		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'useTwoFactorAuthentication', 'useSso', 'blockDirectLogin',
 		'description' , 'commercialUse' , 'landingPage' , 'userLandingPage' , 'contentCategories' , 'type' , 'phone' , 'describeYourself' ,
 		'adultContent' , 'defConversionProfileType' , 'notify' , 'status' , 'allowQuickEdit' , 'mergeEntryLists' , 'notificationsConfig' , 'allowedFromEmailWhiteList',
 		'maxUploadSize' , 'partnerPackage' , 'secret' , 'adminSecret' , 'allowMultiNotification', 'adminLoginUsersQuota', 'adminUserId',
