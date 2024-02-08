@@ -24,7 +24,7 @@ class AppUpdater
 	
 	public function init()
 	{
-		$this->statsBoyInternalDomain = $appsHost = kConf::get('apps_host', kConfMapNames::RUNTIME_CONFIG, null);
+		$this->statsBoyInternalDomain = kConf::get('apps_host', kConfMapNames::RUNTIME_CONFIG, null);
 		$this->buildCurrentAppVersions();;
 		$this->buildNextAppVersions();;
 	}
@@ -93,15 +93,17 @@ class AppUpdater
 	private function deployApp($appName, $appVersion)
 	{
 		$tmpConfigFileDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $appName;
-		if (!mkdir($tmpConfigFileDir) &&
-			mkdir("$tmpConfigFileDir/v2/") &&
-			mkdir("$tmpConfigFileDir/v7/"))
+		kFile::fullMkfileDir("$tmpConfigFileDir/v2/");
+		kFile::fullMkfileDir("$tmpConfigFileDir/v7/");
+		
+		if (!kFile::checkFileExists("$tmpConfigFileDir/v2/") ||
+			!kFile::checkFileExists("$tmpConfigFileDir/v7/"))
 		{
 			KalturaLog::err("Failed to create tmp dir for app config download [$tmpConfigFileDir]");
 			die(EXEC_STATUS_FAILURE);
 		}
 		
-		if (!$this->deploy($tmpConfigFileDir))
+		if (!$this->deploy($tmpConfigFileDir, $appName, $appVersion))
 		{
 			KalturaLog::err("Failed to download config file [$tmpConfigFileDir]");
 			die(EXEC_STATUS_FAILURE);
@@ -114,44 +116,45 @@ class AppUpdater
 		switch ($appName)
 		{
 			case 'kmcng':
-				$baseUrl = $this->statsBoyInternalDomain . "apps/kmc-ng/" . $appVersion;
+				$baseUrl = $this->statsBoyInternalDomain . "/apps/kmcng/" . $appVersion;
 				$this->deployV2Player($tmpDir, $baseUrl, $appName, $appVersion);
 				$this->deployV7Player($tmpDir, $baseUrl, $appName, $appVersion);
 				break;
 			case 'kea':
-				$baseUrl = $this->statsBoyInternalDomain . "apps/kea/" . $appVersion;
+				$baseUrl = $this->statsBoyInternalDomain . "/apps/kea/" . $appVersion;
 				$this->deployV2Player($tmpDir, $baseUrl, $appName, $appVersion);
 				$this->deployV7Player($tmpDir, $baseUrl, $appName, $appVersion);
 				break;
 			case 'captions':
-				$baseUrl = $this->statsBoyInternalDomain . "apps/captionstudio/" . $appVersion;
+				$baseUrl = $this->statsBoyInternalDomain . "/apps/captionstudio/" . $appVersion;
 				$this->deployV7Player($tmpDir, $baseUrl, $appName, $appVersion);
 				break;
 			case 'kmcanalytics':
-				$baseUrl = $this->statsBoyInternalDomain . "apps/kmcAnalytics/" . $appVersion;
+				$baseUrl = $this->statsBoyInternalDomain . "/apps/kmc-analytics/" . $appVersion;
 				$this->deployV2Player($tmpDir, $baseUrl, $appName, $appVersion);
 				$this->deployV7Player($tmpDir, $baseUrl, $appName, $appVersion);
 				break;
 			default:
-				$baseUrl = $this->statsBoyInternalDomain . "apps/$appName/" . $appVersion;
+				$baseUrl = $this->statsBoyInternalDomain . "/apps/$appName/" . $appVersion;
 				$this->deployV7Player($tmpDir, $baseUrl, $appName, $appVersion);
 				break;
 		}
+		
+		return true;
 	}
 	
 	private function deployV2Player($tmpDir, $baseUrl, $appName, $appVersion)
 	{
 		$curlWrapper = new KCurlWrapper();
-		$downloadConfig = $curlWrapper->exec($baseUrl . "/deploy/config.ini", "$tmpDir/v2/");
+		$downloadConfig = $curlWrapper->exec($baseUrl . "/deploy/config.ini", "$tmpDir/v2/config.ini");
 		if (!$downloadConfig || $curlWrapper->getHttpCode() !== 200 || $curlWrapper->getError())
 		{
 			KalturaLog::err("Failed to download v2 player config from [$baseUrl/deploy/config.ini], Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()}");
 			die(EXEC_STATUS_FAILURE);
 		}
-		exec("sed -i 's/component.version=.*/component.version=latest/g' $baseUrl/deploy/config.ini");
 		
 		$curlWrapper = new KCurlWrapper();
-		$downloadPlayerJson = $curlWrapper->exec($baseUrl . "/deploy/player.json", "$tmpDir/v2/");
+		$downloadPlayerJson = $curlWrapper->exec($baseUrl . "/deploy/player.json", "$tmpDir/v2/player.json");
 		if (!$downloadPlayerJson || $curlWrapper->getHttpCode() !== 200 || $curlWrapper->getError())
 		{
 			KalturaLog::err("Failed to download v2 player config from [$baseUrl/deploy/player.json], Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()}");
@@ -159,7 +162,7 @@ class AppUpdater
 		}
 		
 		$curlWrapper = new KCurlWrapper();
-		$downloadPlayerXml = $curlWrapper->exec($baseUrl . "/deploy/player.xml", "$tmpDir/v2/");
+		$downloadPlayerXml = $curlWrapper->exec($baseUrl . "/deploy/player.xml", "$tmpDir/v2/player.xml");
 		if (!$downloadPlayerXml || $curlWrapper->getHttpCode() !== 200 || $curlWrapper->getError())
 		{
 			KalturaLog::err("Failed to download v2 player config from [$baseUrl/deploy/player.xml], Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()}");
@@ -170,22 +173,21 @@ class AppUpdater
 		
 	}
 	
-	private function deployV7Player()
+	private function deployV7Player($tmpDir, $baseUrl, $appName, $appVersion)
 	{
 		$curlWrapper = new KCurlWrapper();
-		$downloadConfig = $curlWrapper->exec($baseUrl . "/deploy/config.ini", "$tmpDir/v7/");
+		$downloadConfig = $curlWrapper->exec($baseUrl . "/deploy_v7/config.ini", "$tmpDir/v7/config.ini");
 		if (!$downloadConfig || $curlWrapper->getHttpCode() !== 200 || $curlWrapper->getError())
 		{
-			KalturaLog::err("Failed to download v2 player config from [$baseUrl/deploy/config.ini], Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()}");
+			KalturaLog::err("Failed to download v7 player config from [$baseUrl/deploy/config.ini], Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()}");
 			die(EXEC_STATUS_FAILURE);
 		}
-		exec("sed -i 's/component.version=.*/component.version=latest/g' $baseUrl/deploy/config.ini");
 		
 		$downloadPlayerJson = $curlWrapper = new KCurlWrapper();
-		$curlWrapper->exec($baseUrl . "/deploy/player.json", "$tmpDir/v7/");
+		$curlWrapper->exec($baseUrl . "/deploy_v7/player.json", "$tmpDir/v7/player.json");
 		if (!$downloadPlayerJson || $curlWrapper->getHttpCode() !== 200 || $curlWrapper->getError())
 		{
-			KalturaLog::err("Failed to download v2 player config from [$baseUrl/deploy/player.json], Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()}");
+			KalturaLog::err("Failed to download v7 player config from [$baseUrl/deploy/player.json], Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()}");
 			die(EXEC_STATUS_FAILURE);
 		}
 		
@@ -196,6 +198,7 @@ class AppUpdater
 	{
 		//php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --user=www-data --group=www-data --ini=./deploy/config.ini
 		$command = "php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --user=www-data --group=www-data --ini=$configDirLocation/config.ini";
+		KalturaLog::debug("Running command [$command]");
 		$res = exec($command, $output, $return_var);
 		if($return_var != 0)
 		{
