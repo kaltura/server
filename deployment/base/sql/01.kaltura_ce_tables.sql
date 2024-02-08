@@ -1214,7 +1214,7 @@ CREATE TABLE IF NOT EXISTS `flickr_token` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`kalt_token`),
   KEY `is_valid_index` (`is_valid`,`kalt_token`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `generic_distribution_provider` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
