@@ -2,7 +2,7 @@
 class kESearchUtils
 {
 	const CLUSTER_NAME_CACHE_KEY = 'elastic_cluster_name';
-	const CLUSTER_NAME_CACHE_KEY_TTL = 30;
+	const CLUSTER_NAME_CACHE_KEY_TTL = 55;
 	
 	protected static function getClusterNameCache()
 	{
