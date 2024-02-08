@@ -58,7 +58,6 @@ class kESearchUtils
 		}
 		
 		$elasticClient = new elasticClient(null, null, null, 0.5);
-//		$elasticClient->setTimeout(5);
 		$elasticClusterName = $elasticClient->getElasticClusterName();
 		
 		$retry = 0;
