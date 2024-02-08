@@ -1,42 +1,91 @@
 <?php
 class kESearchUtils
 {
-	const ELASTIC_CLUSTER_NAME = 'elastic_cluster_name';
-	const ELASTIC_CLUSTER_NAME_TTL = 30;
+	const CLUSTER_NAME_CACHE_KEY = 'elastic_cluster_name';
+	const CLUSTER_NAME_CACHE_KEY_TTL = 30;
+	
+	protected static function getClusterNameCache()
+	{
+		return kCacheManager::getSingleLayerCache(kCacheManager::ELASTIC_CLUSTER_NAME);
+	}
+	
+	protected static function addClusterNameToCache($key, $value, $expiry = 60)
+	{
+		$cache = kESearchUtils::getClusterNameCache();
+		if (!$cache)
+		{
+			return;
+		}
+		
+		// using 'add' and not 'set' - to avoid overriding the ttl
+		$res = $cache->add($key, $value, $expiry);
+		
+		if (!$res)
+		{
+			return;
+		}
+		
+		KalturaLog::debug("Saved elastic cluster_name [$value] in cache");
+	}
+	
+	protected static function getClusterNameFromCache()
+	{
+		$cache = kESearchUtils::getClusterNameCache();
+		if (!$cache)
+		{
+			return false;
+		}
+		
+		$key = self::CLUSTER_NAME_CACHE_KEY;
+		$elasticClusterName = $cache->get($key);
+		
+		if (!$elasticClusterName)
+		{
+			KalturaLog::debug("Cache value for key [$key] not found");
+			return false;
+		}
+		
+		KalturaLog::debug("Cache value for key [$key] found, value [$elasticClusterName]");
+		return $elasticClusterName;
+	}
 	
 	public static function getElasticClusterName()
 	{
-		$retry = 0;
-		
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::ELASTIC_CLUSTER_NAME);
-		if ($cache)
+		$elasticClusterName = kESearchUtils::getClusterNameFromCache();
+		if ($elasticClusterName)
 		{
-			$elasticClusterName = $cache->get(self::ELASTIC_CLUSTER_NAME);
-			
-			if ($elasticClusterName)
-			{
-				KalturaLog::log("Returning value from memcache [$elasticClusterName]");
-				return $elasticClusterName;
-			}
+			return $elasticClusterName;
 		}
 		
-		$elasticClient = new elasticClient();
+		$elasticClient = new elasticClient(null, null, null, 2);
+//		$elasticClient->setTimeout(5);
 		$elasticClusterName = $elasticClient->getElasticClusterName();
+		
+		$retry = 0;
 		
 		while (!$elasticClusterName && $retry < 3)
 		{
-			$elasticClusterName = $elasticClient->getElasticClusterName();
 			$retry++;
+			
+			// we can try to check cache again, in case other php process added it
+			$elasticClusterName = kESearchUtils::getClusterNameFromCache(self::CLUSTER_NAME_CACHE_KEY);
+			if ($elasticClusterName)
+			{
+				break;
+			}
+			
+			$elasticClusterName = $elasticClient->getElasticClusterName();
+			if ($elasticClusterName)
+			{
+				break;
+			}
+			
 			sleep(1);
 		}
 		
 		unset($elasticClient);
 		
-		if ($cache)
-		{
-			KalturaLog::log("Storing elastic cluster name [$elasticClusterName] in memcache");
-			$cache->set(self::ELASTIC_CLUSTER_NAME, $elasticClusterName, self::ELASTIC_CLUSTER_NAME_TTL);
-		}
+		kESearchUtils::addClusterNameToCache(self::CLUSTER_NAME_CACHE_KEY, $elasticClusterName, self::CLUSTER_NAME_CACHE_KEY_TTL);
 		
 		return $elasticClusterName;
 	}
