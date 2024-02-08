@@ -429,7 +429,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 		if ($this->old_status != $this->status && $this->status == CategoryKuserStatus::DELETED)
 		{
 			$kuser = kuserPeer::getKuserByPartnerAndUid($this->partner_id, $this->getPuserId());
-			if ($kuser->getType() == KuserType::GROUP)
+			if ($kuser && $kuser->getType() == KuserType::GROUP)
 			{
 				$filter = new categoryKuserFilter();
 				$filter->setCategoryIdEqual($this->getCategoryId());
