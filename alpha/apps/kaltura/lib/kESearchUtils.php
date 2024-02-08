@@ -57,7 +57,7 @@ class kESearchUtils
 			return $elasticClusterName;
 		}
 		
-		$elasticClient = new elasticClient(null, null, null, 2);
+		$elasticClient = new elasticClient(null, null, null, 0.5);
 //		$elasticClient->setTimeout(5);
 		$elasticClusterName = $elasticClient->getElasticClusterName();
 		
@@ -67,7 +67,7 @@ class kESearchUtils
 		{
 			$retry++;
 			
-			// we can try to check cache again, in case other php process added it
+			// check cache again, in case other php process added it
 			$elasticClusterName = kESearchUtils::getClusterNameFromCache(self::CLUSTER_NAME_CACHE_KEY);
 			if ($elasticClusterName)
 			{
@@ -80,7 +80,7 @@ class kESearchUtils
 				break;
 			}
 			
-			sleep(1);
+			sleep(0.5);
 		}
 		
 		unset($elasticClient);
