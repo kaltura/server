@@ -425,7 +425,7 @@ class rawAction extends sfAction
 		{
 			if($object instanceof asset)
 			{
-				$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($file_sync->getDc(), $object->getEntryId());
+				$downloadDeliveryProfile = myPartnerUtils::getDownloadDeliveryProfile($file_sync->getDc(), $object->getEntryId(), $object->getPartnerId());
 				if($downloadDeliveryProfile && $object)
 				{
 					$isDir = kFile::isDir($file_sync->getFullPath());

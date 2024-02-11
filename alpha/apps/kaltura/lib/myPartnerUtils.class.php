@@ -1764,7 +1764,7 @@ class myPartnerUtils
 
 		if(!is_null($storageProfileId))
 		{
-			$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId());
+			$downloadAllowed = self::isDownloadAllowed($storageProfileId, $entry->getId(), $entry->getPartnerId());
 			switch($downloadAllowed)
 			{
 				case kUrlRecognizer::RECOGNIZED_OK:
@@ -2187,9 +2187,9 @@ class myPartnerUtils
 		return PartnerAuthenticationType::PASSWORD_ONLY;
 	}
 
-	public static function isDownloadAllowed ($storageProfileId, $entryId)
+	public static function isDownloadAllowed ($storageProfileId, $entryId, $partnerId)
 	{
-		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId, $entryId);
+		$downloadDeliveryProfile = self::getDownloadDeliveryProfile($storageProfileId, $entryId, $partnerId);
 		if(!$downloadDeliveryProfile)
 		{
 			return kUrlRecognizer::NOT_RECOGNIZED;
@@ -2204,8 +2204,13 @@ class myPartnerUtils
 		return kUrlRecognizer::NOT_RECOGNIZED;
 	}
 
-	public static function getDownloadDeliveryProfile($storageProfileId, $entryId)
+	public static function getDownloadDeliveryProfile($storageProfileId, $entryId, $partnerId)
 	{
+		if(in_array($storageProfileId, kDataCenterMgr::getSharedStorageProfileIds($partnerId)))
+		{
+			return null;
+		}
+		
 		$storageProfile = StorageProfilePeer::retrieveByPK($storageProfileId);
 		if(!$storageProfile)
 		{
