@@ -67,7 +67,7 @@ class kESearchUtils
 			$retry++;
 			
 			// check cache again, in case other php process added it
-			$elasticClusterName = kESearchUtils::getClusterNameFromCache(self::CLUSTER_NAME_CACHE_KEY);
+			$elasticClusterName = kESearchUtils::getClusterNameFromCache();
 			if ($elasticClusterName)
 			{
 				break;
@@ -78,8 +78,6 @@ class kESearchUtils
 			{
 				break;
 			}
-			
-			sleep(0.5);
 		}
 		
 		unset($elasticClient);
