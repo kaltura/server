@@ -127,7 +127,13 @@ class kSimuliveUtils
 	public static function getSimuliveEvent(Entry $entry, $startTime = 0, $duration = 0)
 	{
 		$events = self::getSimuliveEvents($entry, $startTime, $duration);
-		return $events ? $events[0] : null;
+		if (!$events)
+		{
+			return null;
+		}
+		$lastEvent = end($events);
+		KalturaLog::debug("First event: {$events[0]->getId()} Last event: {$lastEvent->getId()}");
+		return $lastEvent;
 	}
 
 	/**
