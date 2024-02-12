@@ -6,7 +6,7 @@ class kESearchUtils
 	
 	protected static function getClusterNameCache()
 	{
-		return kCacheManager::getSingleLayerCache(kCacheManager::ELASTIC_CLUSTER_NAME);
+		return kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_ELASTIC_CLUSTER_NAME);
 	}
 	
 	protected static function addClusterNameToCache($key, $value, $expiry = 60)
