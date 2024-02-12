@@ -61,7 +61,7 @@ class elasticClient
 	 * @param null $elasticVersion
 	 * @param null $curlTimeout - timeout in seconds
 	 */
-	public function __construct($host = null, $port = null, $elasticVersion = null, $curlTimeout = null)
+	public function __construct($host = null, $port = null, $elasticVersion = null, $curlTimeout = null, $curlTimeoutMilliseconds = false)
 	{
 		if (!$host)
 		{
@@ -91,7 +91,7 @@ class elasticClient
 		
 		if (!$curlTimeout)
 			$curlTimeout = kConf::get('elasticClientCurlTimeout', 'elastic', 10);
-		$this->setTimeout($curlTimeout);
+		$this->setTimeout($curlTimeout, $curlTimeoutMilliseconds);
 
 		$this->bulkSize = kConf::get('bulkSize', 'elastic', self::DEFAULT_BULK_SIZE);
 		$this->initBulkBuffer();
@@ -131,10 +131,16 @@ class elasticClient
 
 	/**
 	 * @param int $seconds
+	 * @param int $useMilliseconds - if 'true' $seconds will be treated as milliseconds
 	 * @return boolean
 	 */
-	public function setTimeout($seconds)
+	public function setTimeout($seconds, $useMilliseconds = false)
 	{
+		if ($useMilliseconds)
+		{
+			return curl_setopt($this->ch, CURLOPT_TIMEOUT_MS, $seconds); 
+		}
+		
 		return curl_setopt($this->ch, CURLOPT_TIMEOUT, $seconds);
 	}
 	
