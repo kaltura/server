@@ -78,6 +78,7 @@ class TagService extends KalturaBaseService
             /* @var $tag Tag */
             switch ($tag->getObjectType()) {
                 case taggedObjectType::ENTRY:
+				case taggedObjectType::LIVESTREAMENTRY:
                     $deletedTags += $this->resolveEntryTag($tag);
                     break;
                 case taggedObjectType::CATEGORY:
