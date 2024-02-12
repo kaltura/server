@@ -261,17 +261,17 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			KalturaLog::debug('meeting file is: ' . print_r($meetingFile, true));
 			$kZoomRecording = new kZoomRecording();
 			$kZoomRecording->parseType($meetingFile[self::TYPE]);
-            if ($kZoomRecording->recordingType == KalturaRecordingType::WEBINAR && !$this->dropFolder->zoomVendorIntegration->enableWebinarUploads)
-            {
-                KalturaLog::debug('webinar uploads is disabled for vendor integration id: ' . $this->dropFolder->zoomVendorIntegration->id);
-                continue;
-            }
-            if($kZoomRecording->recordingType == KalturaRecordingType::MEETING && !$this->dropFolder->zoomVendorIntegration->enableMeetingUpload)
-            {
-                KalturaLog::debug('meeting uploads is disabled for vendor integration id: ' . $this->dropFolder->zoomVendorIntegration->id);
-                continue;
-            }
-            $recordingFilesOrdered = ZoomHelper::orderRecordingFiles($meetingFile[self::RECORDING_FILES],
+            		if($kZoomRecording->recordingType == KalturaRecordingType::WEBINAR && !$this->dropFolder->zoomVendorIntegration->enableWebinarUploads)
+            		{
+                		KalturaLog::debug('webinar uploads is disabled for vendor integration id: ' . $this->dropFolder->zoomVendorIntegration->id);
+                		continue;
+            		}
+            		if($kZoomRecording->recordingType == KalturaRecordingType::MEETING && !$this->dropFolder->zoomVendorIntegration->enableMeetingUpload)
+            		{
+                		KalturaLog::debug('meeting uploads is disabled for vendor integration id: ' . $this->dropFolder->zoomVendorIntegration->id);
+                		continue;
+            		}
+            		$recordingFilesOrdered = ZoomHelper::orderRecordingFiles($meetingFile[self::RECORDING_FILES],
 				self::RECORDING_START,
 				self::RECORDING_TYPE,
 				$fileInStatusProcessingExists);
