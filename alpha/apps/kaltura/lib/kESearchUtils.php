@@ -57,7 +57,7 @@ class kESearchUtils
 			return $elasticClusterName;
 		}
 		
-		$elasticClient = new elasticClient(null, null, null, 500, true);
+		$elasticClient = new elasticClient(null, null, null, 500);
 		$elasticClusterName = $elasticClient->getElasticClusterName();
 		
 		$retry = 0;
