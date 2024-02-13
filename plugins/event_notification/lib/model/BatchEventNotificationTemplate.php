@@ -27,7 +27,9 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 	{
 		$entryId = null;
 		$parentJob = null;
-		
+
+		$objectType = BatchJobObjectType::ENTRY;
+		$objectId = null;
 		if($scope instanceof kEventScope)
 		{
 			$event = $scope->getEvent();
@@ -37,6 +39,7 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 			}
 		
 			$object = $scope->getObject();
+			$objectId = $scope->getObject()->getId();
 			if($object instanceof entry)
 			{
 				$entryId = $object->getId();
@@ -46,7 +49,6 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 				$entryId = $object->getEntryId();
 			}
 
-			$objectType = null;
 			switch (get_class($object))
 			{
 				case 'entry':
@@ -60,7 +62,8 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 					break;
 				default:
 					$objectType = BatchJobObjectType::ENTRY;
-					if ($object instanceof asset) {
+					if ($object instanceof asset)
+					{
 						$objectType = BatchJobObjectType::ASSET;
 					}
 
@@ -73,7 +76,7 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 			$eventNotificationType = $this->getType();
 		}
 		
-		$job = $this->addEventNotificationDispatchJob($eventNotificationType, $jobData, $scope->getPartnerId(), $entryId, $parentJob, $scope->getObject()->getId(), $objectType);
+		$job = $this->addEventNotificationDispatchJob($eventNotificationType, $jobData, $scope->getPartnerId(), $entryId, $parentJob, $objectId, $objectType);
 		return $job->getId();
 	}
 
