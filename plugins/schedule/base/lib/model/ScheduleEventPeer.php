@@ -265,6 +265,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		{
 			$c->add(ScheduleEventPeer::START_DATE, $endTime + self::TIME_MARGIN, Criteria::LESS_EQUAL);
 		}
+		$c->addAscendingOrderByColumn(ScheduleEventPeer::START_DATE);
 		$filter = new ScheduleEventFilter();
 		$filter->setTemplateEntryIdEqual($templateEntryId);
 		$filter->attachToCriteria($c);
