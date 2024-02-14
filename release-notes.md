@@ -9,7 +9,7 @@ First replace all tokens from the ini file below (under media-repurposing sectio
 deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment Scripts ###
-	php deployment/updates/scripts/2024_02_14_media_repurposing_add_partner.php
+	php deployment/updates/scripts/add_permissions/2024_02_14_media_repurposing_add_partner.php
 
 # Tucana-20.3.0
 ## Enable CNC Stage Monitor ##
