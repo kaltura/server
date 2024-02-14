@@ -1,3 +1,17 @@
+# Tucana-20.5.0
+## Enable Lead Scoring ##
+* Issue Type: Task
+* Issue ID: PLAT-24644
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.gameLeadScoring.enabled = true
+moduls.gameLeadScoring.permissionType = 2
+moduls.gameLeadScoring.label = "Enable Game Services - Lead Scoring"
+moduls.gameLeadScoring.permissionName = GAME_LEADSCORING_PLUGIN_PERMISSION
+moduls.gameLeadScoring.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Tucana-20.3.0
 ## Enable CNC Stage Monitor ##
 * Issue Type: Task
