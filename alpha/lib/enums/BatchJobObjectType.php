@@ -9,5 +9,5 @@ interface BatchJobObjectType extends BaseEnum
 	const CATEGORY		= 2;
 	const FILE_SYNC		= 3;
 	const ASSET 		= 4;
-	const USER			= 5;
+	const USER		= 5;
 }
