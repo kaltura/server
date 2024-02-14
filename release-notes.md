@@ -1,4 +1,4 @@
-# Tucana-20.06.0
+# Tucana-20.6.0
 ## Add partner and permissions for media repurposing ##
 - Issue Type: Task
 - Issue ID: PLAT-24613
