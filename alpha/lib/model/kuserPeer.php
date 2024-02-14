@@ -662,6 +662,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 			                                      $quickStartGuideLink);
 			if ($roleNameToUseDynamicEmailTemplate)
 			{
+				$appLink = kEmails::getDynamicTemplateBaseLink($roleNames, 'dynamic_email_app_link');
+				$loginLink = kEmails::getDynamicTemplateBaseLink($roleNames, 'dynamic_email_login_link');
 				$associativeBodyParams = array(
 					kEmails::TAG_AUTH_TYPE             => $authType,
 					kEmails::TAG_EXISTING_USER         => $existingUser,
@@ -674,13 +676,12 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 					kEmails::TAG_ROLE_NAME             => $roleNameToUseDynamicEmailTemplate,
 					kEmails::TAG_PUSER_ID              => $puserId,
 					kEmails::TAG_KMC_LINK              => $kmcLink,
+					kEmails::TAG_APP_LINK              => $appLink,
 					kEmails::TAG_CONTACT_LINK          => $contactLink,
 					kEmails::TAG_BEGINNERS_GUID_LINK   => $beginnersGuideLink,
-					kEmails::TAG_QUICK_START_GUID_LINK => $quickStartGuideLink);
-				if ($authType == PartnerAuthenticationType::SSO)
-				{
-					$associativeBodyParams[kEmails::TAG_LOGIN_LINK] = $bodyParams[3];
-				}
+					kEmails::TAG_QUICK_START_GUID_LINK => $quickStartGuideLink,
+					kEmails::TAG_LOGIN_LINK            => $loginLink
+				);
 			}
 		}
 
