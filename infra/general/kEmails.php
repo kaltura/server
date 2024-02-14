@@ -15,6 +15,7 @@ class kEmails
 	const TAG_PARTNER_ID                = '@partnerId@';
 	const TAG_PUSER_ID                  = '@puserId@';
 	const TAG_KMC_LINK                  = '@kmcLink@';
+	const TAG_APP_LINK                   = '@appLink@';
 	const TAG_CONTACT_LINK              = '@contactLink@';
 	const TAG_BEGINNERS_GUID_LINK       = '@beginnersGuideLink@';
 	const TAG_QUICK_START_GUID_LINK     = '@quickStartGuideLink@';
