@@ -11,6 +11,19 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 ### Deployment Scripts ###
 	php deployment/updates/scripts/add_permissions/2024_02_14_media_repurposing_add_partner.php
 
+## Enable Lead Scoring ##
+* Issue Type: Task
+* Issue ID: PLAT-24644
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.gameLeadScoring.enabled = true
+moduls.gameLeadScoring.permissionType = 2
+moduls.gameLeadScoring.label = "Enable Game Services - Lead Scoring"
+moduls.gameLeadScoring.permissionName = GAME_LEADSCORING_PLUGIN_PERMISSION
+moduls.gameLeadScoring.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Tucana-20.3.0
 ## Enable CNC Stage Monitor ##
 * Issue Type: Task
@@ -23,20 +36,6 @@ moduls.cncStageMonitor.label = "Enable CNC Stage Monitor"
 moduls.cncStageMonitor.permissionType = 2
 moduls.cncStageMonitor.permissionName = FEATURE_CNC_STAGE_MONITOR_PERMISSION
 moduls.cncStageMonitor.group = GROUP_ENABLE_DISABLE_FEATURES
-```
-
-# Tucana-20.2.0
-## Enable CNC Assistant Signals ##
-* Issue Type: Task
-* Issue ID: PLAT-24548
-### Deployment ###
-Add the following to admin.ini:
-```
-moduls.cncAssistantSignals.enabled = true
-moduls.cncAssistantSignals.permissionType = 2
-moduls.cncAssistantSignals.label = "Enable CNC Assistant Signals"
-moduls.cncAssistantSignals.permissionName = FEATURE_CNC_ASSISTANT_SIGNALS_PERMISSION
-moduls.cncAssistantSignals.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
 # Tucana-20.1.0
