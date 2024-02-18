@@ -39,7 +39,7 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 			}
 		
 			$object = $scope->getObject();
-			$objectId = $scope->getObject()->getId();
+			$objectId = $scope->getObject() ? $scope->getObject()->getId() : null;
 			if($object instanceof entry)
 			{
 				$entryId = $object->getId();
