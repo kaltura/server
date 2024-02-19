@@ -1,4 +1,16 @@
 # Tucana-20.6.0
+## Add partner and permissions for media repurposing ##
+- Issue Type: Task
+- Issue ID: PLAT-24613
+
+### Configuration ###
+First replace all tokens from the ini file below (under media-repurposing section) and remove ".template" from the file name:
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2024_02_14_media_repurposing_add_partner.php
+
 ## Enable Lead Scoring ##
 * Issue Type: Task
 * Issue ID: PLAT-24644
