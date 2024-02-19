@@ -634,6 +634,7 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveStreamDetails = new KalturaLiveStreamDetails();
 		$isLive = $liveStreamEntry->isCurrentlyLive();
 		$liveStreamDetails->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
+		$liveStreamDetails->liveViewers = $isLive ? $this->getNumberOfViewers($id) : $liveStreamDetails->liveViewers;
 		if (in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			$this->updateInternalLiveStreamDetails($liveStreamEntry, $liveStreamDetails);
@@ -647,6 +648,18 @@ class LiveStreamService extends KalturaLiveEntryService
 		KalturaLog::info("broadcastStatus of entry [$id] is [$liveStreamDetails->broadcastStatus] and isLive is [$isLive]");
 		$this->responseHandlingIsLive($isLive);
 		return $liveStreamDetails;
+	}
+
+	protected function getNumberOfViewers($entryId)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cache)
+		{
+			throw new kUploadTokenException("Cache instance required for Live Viewers Caching Could not initiated", kCoreException::PLAYS_VIEWS_CACHE_NOT_INITIALIZED);
+		}
+		$numberOfViewers = $cache->get("plays_views_" . $entryId);
+
+		return $numberOfViewers ?: 0;
 	}
 
 	/**
