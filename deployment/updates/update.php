@@ -357,7 +357,6 @@ class ScriptsRunner
 		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['dbname'], $this->dbParams['port']);
 		
 		$result = mysqli_query($link, "select count(*) as exist from version_management where server_version = '". $this->serverVersion . "'");
-//		$result = mysqli_query($link, 'select count(*) as exist from version_management where server_version = \'Tucana-20.5.0\'');
 		
 		if (!$result)
 		{
