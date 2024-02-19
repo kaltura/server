@@ -89,6 +89,11 @@ if(!$skipScripts)
 	$updateRunner->runPhpScripts($phpDir, $params['file']);
 }
 
+if (!$updateRunner->checkVersionExist())
+{
+	$updateRunner->addEmptyVersionLine();
+}
+
 exit(0);
 
 class ScriptsRunner
@@ -188,14 +193,14 @@ class ScriptsRunner
 
 	private function getAdminConsoleSecret()
 	{
+		$res = array();
+		
 		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], null, $this->dbParams['port']);
 
 		$db_selected = mysqli_select_db($link,$this->dbParams['dbname']);
 		$result = mysqli_query($link,'select admin_secret from partner where id = -2;');
 		if($result)
 		{
-			$res = array();
-
 			while($row = mysqli_fetch_assoc($result))
 			{
 				$res = $row['admin_secret'];
@@ -340,6 +345,35 @@ class ScriptsRunner
 		KalturaLog::debug("insert into version_management(filename,status,server_version) values ('" . $filePathToInsert . "',".$execStatus.",'".$this->serverVersion."')");
 
 		return $result;
+	}
+	
+	public function addEmptyVersionLine()
+	{
+		return $this->updateVersion('no_new_scripts_to_execute', self::EXEC_STATUS_SUCCESS);
+	}
+	
+	public function checkVersionExist()
+	{
+		$link = mysqli_connect($this->dbParams['host'], $this->dbParams['user'], $this->dbParams['password'], $this->dbParams['dbname'], $this->dbParams['port']);
+		
+		$result = mysqli_query($link, "select count(*) as exist from version_management where server_version = '". $this->serverVersion . "'");
+//		$result = mysqli_query($link, 'select count(*) as exist from version_management where server_version = \'Tucana-20.5.0\'');
+		
+		if (!$result)
+		{
+			return false;
+		}
+		
+		$row = mysqli_fetch_assoc($result);
+		if (!array_key_exists('exist', $row))
+		{
+			return false;
+		}
+		
+		mysqli_free_result($result);
+		mysqli_close($link);
+		
+		return $row['exist'];
 	}
 
 	function handleScriptFile($scriptFile)
