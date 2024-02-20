@@ -295,6 +295,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
                 		{
                     			if ($e->getCode() === 'DUPLICATE_USER_BY_ID')
                     			{
+						//User could already be created by another session, so consider it validated
                         			$validatedUsers[] = $zoomUser->getProcessedName();
                     			}
                     			else
