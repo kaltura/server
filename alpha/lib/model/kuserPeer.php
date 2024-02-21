@@ -601,11 +601,10 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		list($userName, $creatorUserName, $publisherName, $puserId) = myKuserUtils::sanitizeFields(array($userName, $creatorUserName, $partner->getName(), $user->getPuserId()));
 
 		$roleNameToUseDynamicEmailTemplate = kEmails::getDynamicEmailUserRoleName($roleNames);
-		if (!$existingUser)
-		{
-			$dynamicLink = ($roleNameToUseDynamicEmailTemplate) ? kEmails::getDynamicTemplateBaseLink($roleNames) : null;
-			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey(), null, $dynamicLink);
-		}
+		$dynamicLink = $roleNameToUseDynamicEmailTemplate ? kEmails::getDynamicTemplateBaseLink($roleNames) : null;
+		$passHashKey = $user->getLoginData() ? $user->getLoginData()->getPasswordHashKey() : null;
+		$resetPasswordLink = UserLoginDataPeer::getPassResetLink($passHashKey, null, $dynamicLink);
+
 		$kmcLink = trim(kConf::get('apphome_url'), '/') . '/kmcng';
 		$adminConsoleLink = trim(kConf::get('admin_console_url'));
 		$contactLink = kConf::get('contact_url');
