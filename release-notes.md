@@ -1,4 +1,15 @@
 # Tucana-20.6.0
+## Add permissions to update rootEntryId for KME partner ##
+Add permissions to KME partner for update baseentry rootEntryId field
+
+* Issue Type: Task
+* Issue ID: NR2-8156
+
+### Deployment Scripts ###
+```
+php deployment/updates/scripts/add_permissions/2024_02_21_rootEntryId-writable-to-kme.php
+```
+
 ## Add partner and permissions for media repurposing ##
 - Issue Type: Task
 - Issue ID: PLAT-24613
