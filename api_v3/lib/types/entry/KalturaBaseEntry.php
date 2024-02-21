@@ -323,7 +323,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 *
 	 * @var string
 	 * @filter eq,in
-	 * @readonly
+	 * @requiresPermission insert,update
 	 */
 	public $rootEntryId;
 	
