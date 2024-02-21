@@ -604,7 +604,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		$dynamicLink = $roleNameToUseDynamicEmailTemplate ? kEmails::getDynamicTemplateBaseLink($roleNames) : null;
 		if ($dynamicLink || !$existingUser)
 		{
-			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($user->getLoginData()->getPasswordHashKey(), null, $dynamicLink);
+			$passHashKey = $user->getLoginData() ? $user->getLoginData()->getPasswordHashKey() : null;
+			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($passHashKey, null, $dynamicLink);
 		}
 		$kmcLink = trim(kConf::get('apphome_url'), '/') . '/kmcng';
 		$adminConsoleLink = trim(kConf::get('admin_console_url'));
