@@ -51,6 +51,7 @@ class CredentialProvider
     const ENV_SESSION = 'AWS_SESSION_TOKEN';
     const ENV_TOKEN_FILE = 'AWS_WEB_IDENTITY_TOKEN_FILE';
     const ENV_SHARED_CREDENTIALS_FILE = 'AWS_SHARED_CREDENTIALS_FILE';
+	const HOUR_IN_SECONDS = 3600;
 
     /**
      * Create a default credential provider that
@@ -268,8 +269,8 @@ class CredentialProvider
                     $cacheKey
                 ) {
 	                $ttl = null === $creds->getExpiration() ? 0 : $creds->getExpiration() - time();
-	                if($ttl > 3600) {
-		                $ttl = 3600;
+	                if($ttl > self::HOUR_IN_SECONDS) {
+		                $ttl = self::HOUR_IN_SECONDS;
 	                }
                     $cache->set(
                         $cacheKey,
