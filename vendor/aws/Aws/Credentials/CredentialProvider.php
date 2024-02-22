@@ -51,7 +51,7 @@ class CredentialProvider
     const ENV_SESSION = 'AWS_SESSION_TOKEN';
     const ENV_TOKEN_FILE = 'AWS_WEB_IDENTITY_TOKEN_FILE';
     const ENV_SHARED_CREDENTIALS_FILE = 'AWS_SHARED_CREDENTIALS_FILE';
-	const HOUR_IN_SECONDS = 3600;
+    const HOUR_IN_SECONDS = 3600;
 
     /**
      * Create a default credential provider that
