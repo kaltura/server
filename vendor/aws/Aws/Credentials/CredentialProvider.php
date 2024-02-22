@@ -267,11 +267,14 @@ class CredentialProvider
                     $cache,
                     $cacheKey
                 ) {
+	                $ttl = null === $creds->getExpiration() ? 0 : $creds->getExpiration() - time();
+	                if($ttl > 3600) {
+		                $ttl = 3600;
+	                }
                     $cache->set(
                         $cacheKey,
                         $creds,
-                        null === $creds->getExpiration() ?
-                            0 : $creds->getExpiration() - time()
+                        $ttl
                     );
 
                     return $creds;
