@@ -19,6 +19,7 @@ class KalturaESearchGroupOrderByItem extends KalturaESearchOrderByItem
 		KalturaESearchGroupOrderByFieldName::UPDATED_AT => ESearchGroupOrderByFieldName::UPDATED_AT,
 		KalturaESearchGroupOrderByFieldName::SCREEN_NAME => ESearchGroupOrderByFieldName::SCREEN_NAME,
 		KalturaESearchGroupOrderByFieldName::USER_ID => ESearchGroupOrderByFieldName::USER_ID,
+        KalturaESearchGroupOrderByFieldName::FULL_NAME => ESearchGroupOrderByFieldName::FULL_NAME,
 		KalturaESearchGroupOrderByFieldName::MEMBERS_COUNT => ESearchGroupOrderByFieldName::MEMBERS_COUNT,
 	);
 
