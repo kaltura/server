@@ -58,6 +58,12 @@ class AppUpdater
 	public function init($application, $version)
 	{
 		$this->statsBoyInternalDomain = kConf::get('apps_host', kConfMapNames::RUNTIME_CONFIG, null);
+		if(!$this->statsBoyInternalDomain)
+		{
+			KalturaLog::debug("Failed to get stats boy internal url [{$this->statsBoyInternalDomain}], application will not be deployed");
+			exit(EXEC_STATUS_FAILURE);
+		}
+		
 		$this->application = $application;
 		$this->version = $version;
 	}
