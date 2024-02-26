@@ -10,84 +10,61 @@ KAutoloader::register();
 const EXEC_STATUS_FAILURE = 1;
 const EXEC_STATUS_SUCCESS = 0;
 
+$options = getopt('a:v:', array(
+	'application:',
+	'version:',
+));
+
+$application = null;
+$version = null;
+
+if(isset($options['a']))
+{
+	$application = $options['a'];
+}
+if (isset($options['application']))
+{
+	$application = $options['application'];
+}
+
+if(isset($options['v']))
+{
+	$version = $options['v'];
+}
+if (isset($options['version']))
+{
+	$version = $options['version'];
+}
+
+if(!$application || !$version)
+{
+	KalturaLog::debug("Missing mandatory param [$application] [$version]");
+	exit(EXEC_STATUS_FAILURE);
+}
+
 $appUpdater = new AppUpdater();
-$appUpdater->init();
+$appUpdater->init($application, $version);
 $appUpdater->run();
 exit(EXEC_STATUS_SUCCESS);
 
 class AppUpdater
 {
 	private $statsBoyInternalDomain;
-	private $currentAppsVersionsMap = array();
-	private $nextAppsVersionsMap = array();
-	private $appVersionsDiff = array();
 	
-	public function init()
+	private $application;
+	
+	private $version;
+	
+	public function init($application, $version)
 	{
 		$this->statsBoyInternalDomain = kConf::get('apps_host', kConfMapNames::RUNTIME_CONFIG, null);
-		$this->buildCurrentAppVersions();;
-		$this->buildNextAppVersions();;
+		$this->application = $application;
+		$this->version = $version;
 	}
 	
 	public function run()
 	{
-		$this->buildAppsVersionDiffMap();
-		$this->deployApps();
-	}
-	
-	private function buildCurrentAppVersions()
-	{
-		$versionMapUrl = $this->statsBoyInternalDomain . "/app_versions";
-		
-		$curlWrapper = new KCurlWrapper();
-		$response = $curlWrapper->exec($versionMapUrl);
-		if (!$response || $curlWrapper->getHttpCode() !== 200 || $curlWrapper->getError())
-		{
-			KalturaLog::err("Failed to get version map when calling [$versionMapUrl], Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()}");
-			die(EXEC_STATUS_FAILURE);
-		}
-		
-		preg_match_all('/app="(.*)",version="(.*)"/m', $response, $appVersionMatches);
-		
-		$length = count($appVersionMatches[1]);
-		for ($i = 0; $i < $length; $i++)
-		{
-			$this->currentAppsVersionsMap[$appVersionMatches[1][$i]] = $appVersionMatches[2][$i];
-		}
-		KalturaLog::debug("currentAppsVersionsMap: " . print_r($this->currentAppsVersionsMap));
-	}
-	
-	private function buildNextAppVersions()
-	{
-		$this->nextAppsVersionsMap = kConf::getMap('kaltura_app_versions');
-		KalturaLog::debug("nextAppsVersionsMap: " . print_r($this->nextAppsVersionsMap));
-	}
-	
-	private function buildAppsVersionDiffMap()
-	{
-		foreach ($this->nextAppsVersionsMap as $appName => $appVersion)
-		{
-			if (!isset($this->currentAppsVersionsMap[$appName]) || $this->currentAppsVersionsMap[$appName] != $appVersion)
-			{
-				$this->appVersionsDiff[$appName] = $appVersion;
-			}
-		}
-		
-		KalturaLog::debug("appVersionsDiff: " . print_r($this->appVersionsDiff));
-		
-		if(!count($this->appVersionsDiff))
-		{
-			KalturaLog::debug("No app diff found process will exit");
-			exit(EXEC_STATUS_SUCCESS);
-		}
-	}
-	
-	private function deployApps()
-	{
-		foreach ($this->appVersionsDiff as $appName => $appVersion)
-		{
-			$this->deployApp($appName, $appVersion);
-		}
+		$this->deployApp($this->application, $this->version);
 	}
 	
 	private function deployApp($appName, $appVersion)
@@ -196,7 +173,6 @@ class AppUpdater
 	
 	private function runDeployV2($configDirLocation)
 	{
-		//php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --user=www-data --group=www-data --ini=./deploy/config.ini
 		$command = "php /opt/kaltura/app/deployment/uiconf/deploy_v2.php --user=www-data --group=www-data --ini=$configDirLocation/config.ini";
 		KalturaLog::debug("Running command [$command]");
 		$res = exec($command, $output, $return_var);
