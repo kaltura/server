@@ -69,11 +69,51 @@ class authenticationUtils
 	public static function addSsoMailJob($partner, $kuser, $mailType)
 	{
 		$partnerId = $partner->getId();
+		$puserId = $kuser->getPuserId();
+		$userName = $kuser->getFullName();
+		$loginEmail = $kuser->getEmail();
 		$publisherName = $partner->getName();
-		$loginLink = kConf::get('login_link','sso');
-		$bodyParams = array($kuser->getFullName(), $partnerId, $loginLink, $kuser->getEmail(), $partnerId, $publisherName, $publisherName, $kuser->getUserRoleNames(), $publisherName, $kuser->getPuserId());
+		$roleNames = $kuser->getUserRoleNames();
 
-		$job = kJobsManager::addMailJob(
+		$roleNameToUseDynamicEmailTemplate = kEmails::getDynamicEmailUserRoleName($roleNames);
+		if ($roleNameToUseDynamicEmailTemplate)
+		{
+			$appLink = kEmails::getDynamicTemplateBaseLink($roleNames, 'dynamic_email_app_link');
+			$loginLink = kEmails::getDynamicTemplateBaseLink($roleNames, 'dynamic_email_login_link');
+			$dynamicLink = kEmails::getDynamicTemplateBaseLink($roleNames);
+
+			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($kuser->getLoginData()->getPasswordHashKey(), null, $dynamicLink);
+
+			$associativeBodyParams = array(
+				kEmails::TAG_ROLE_NAME             => $roleNameToUseDynamicEmailTemplate,
+				kEmails::TAG_USER_NAME             => $userName,
+				kEmails::TAG_PUBLISHER_NAME        => $publisherName,
+				kEmails::TAG_LOGIN_EMAIL           => $loginEmail,
+				kEmails::TAG_PARTNER_ID            => $partnerId,
+				kEmails::TAG_PUSER_ID              => $puserId,
+				kEmails::TAG_APP_LINK              => $appLink,
+				kEmails::TAG_LOGIN_LINK            => $loginLink,
+				kEmails::TAG_RESET_PASSWORD_LINK   => $resetPasswordLink
+			);
+
+			$dynamicEmailContents = kEmails::getDynamicEmailData($mailType, $roleNameToUseDynamicEmailTemplate);
+			$dynamicEmailContents->setEmailBody(kEmails::populateCustomEmailBody($dynamicEmailContents->getEmailBody(), $associativeBodyParams));
+
+			return kJobsManager::addDynamicEmailJob(
+				$partnerId,
+				$mailType,
+				kMailJobData::MAIL_PRIORITY_NORMAL,
+				$loginEmail,
+				'partner_registration_confirmation_email',
+				'partner_registration_confirmation_name',
+				$dynamicEmailContents
+			);
+		}
+
+		$loginLink = kConf::get('login_link','sso');
+		$bodyParams = array($userName, $partnerId, $loginLink, $loginEmail, $partnerId, $publisherName, $publisherName, $roleNames, $publisherName, $puserId);
+
+		return kJobsManager::addMailJob(
 			null,
 			0,
 			$kuser->getPartnerId(),
@@ -84,8 +124,6 @@ class authenticationUtils
 			$kuser->getEmail(),
 			$bodyParams
 		);
-
-		return $job;
 	}
 
 	public static function verify2FACode($loginData, $otp)

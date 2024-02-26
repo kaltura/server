@@ -805,7 +805,31 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	{
 		return in_array($partner->getExcludedAdminRoleName(), explode(',', $userRoleNames), true);
 	}
-	
+
+	protected static function getExcludedAdminRoleUsersNumber($partner)
+	{
+		$excludedRoleName = $partner->getExcludedAdminRoleName();
+		if (!$excludedRoleName || $excludedRoleName == '')
+		{
+			return 0;
+		}
+		$excludedUserRole = UserRolePeer::getByNameAndPartnerId($excludedRoleName, $partner->getId());
+		if (!$excludedUserRole)
+		{
+			return 0;
+		}
+		try
+		{
+			$numExcludedRoleUsers = $excludedUserRole->countKuserToUserRoles();
+		}
+		catch (Exception $e)
+		{
+			return 0;
+		}
+
+		return $numExcludedRoleUsers;
+	}	
+
 	/**
 	 * Adds a new user login data record
 	 * @param unknown_type $loginEmail
@@ -836,6 +860,15 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			$userQuota = $partner->getAdminLoginUsersQuota();
 			$adminLoginUsersNum = $partner->getAdminLoginUsersNumber();
+			if($adminLoginUsersNum)
+			{
+				$excludedAdminRoleUsersNum = self::getExcludedAdminRoleUsersNumber($partner);
+				if($excludedAdminRoleUsersNum)
+				{
+					$adminLoginUsersNum = $adminLoginUsersNum - $excludedAdminRoleUsersNum;
+				}
+
+			}
 			// check if login users quota exceeded - value -1 means unlimited
 			if ($adminLoginUsersNum  && (is_null($userQuota) || ($userQuota != -1 && $userQuota <= $adminLoginUsersNum))) {
 				throw new kUserException('', kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);

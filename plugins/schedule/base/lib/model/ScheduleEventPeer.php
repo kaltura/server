@@ -256,6 +256,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 	{
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
+		$c->add(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
 		if ($startTime) // if giving start time - ignore all the events that already finished
 		{
 			$c->add(ScheduleEventPeer::END_DATE, $startTime - self::TIME_MARGIN, Criteria::GREATER_EQUAL);
@@ -264,6 +265,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		{
 			$c->add(ScheduleEventPeer::START_DATE, $endTime + self::TIME_MARGIN, Criteria::LESS_EQUAL);
 		}
+		$c->addAscendingOrderByColumn(ScheduleEventPeer::START_DATE);
 		$filter = new ScheduleEventFilter();
 		$filter->setTemplateEntryIdEqual($templateEntryId);
 		$filter->attachToCriteria($c);
@@ -282,6 +284,7 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		
 		$c = KalturaCriteria::create(ScheduleEventPeer::OM_CLASS);
 		$c->add(ScheduleEventPeer::TYPE, $types, Criteria::IN);
+		$c->add(ScheduleEventPeer::STATUS, ScheduleEventStatus::ACTIVE, Criteria::EQUAL);
 		$c->add(ScheduleEventPeer::END_DATE, $time, Criteria::GREATER_EQUAL);
 		$c->add(ScheduleEventPeer::START_DATE, $time, Criteria::LESS_EQUAL);
 		$filter = new ScheduleEventFilter();
