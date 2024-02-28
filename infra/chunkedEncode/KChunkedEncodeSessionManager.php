@@ -153,11 +153,12 @@
 							 */
 							// Calc the generated chunk duration
 						$generatedChunkDur = $job->stat->finish-$job->stat->start;
-						if($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur){
+							// for the last chunk - no need to validate chunk dur
+						if(($job->id<$maxChunks-1) && ($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur)){
 							$msgStr = "Chunk id ($chunkData->index): too short chunk dur - $generatedChunkDur";
 							$msgStr.= ", should be ".round($chunkData->gap,4).", thresh:".round($chunkDurThreshInSec,4);
 							$msgStr.= ", delta:".round($chunkData->gap-$generatedChunkDur,4);
-
+							KalturaLog::log($msgStr);
 							$job->state = $job::STATE_FAIL;
 							$manager->SaveJob($job);
 							$this->jobs[$idx] = $job;
