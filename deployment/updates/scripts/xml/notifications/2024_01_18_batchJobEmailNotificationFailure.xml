@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+  <config>
+    <serviceUrl>@SERVICE_URL@</serviceUrl>
+    <partnerId>-2</partnerId>
+    <clientTag>Stand alone php 1.0.0</clientTag>
+    <curlTimeout>30</curlTimeout>
+    <userAgent>Stand alone php 1.0.0</userAgent>
+  </config>
+  <session>
+    <partnerId>-2</partnerId>
+    <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+    <sessionType>2</sessionType>
+  </session>
+
+  <multirequest>
+    <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+      <template objectType="KalturaEmailNotificationTemplate">
+        <name>HTTP notification failed</name>
+        <systemName>Http_Notification_failed</systemName>
+        <description>Email when HTTP notification job been failed</description>
+        <automaticDispatchEnabled>1</automaticDispatchEnabled>
+        <eventType>1</eventType>
+        <!-- EventNotificationEventType::BATCH_JOB_STATUS -->
+        <eventObjectType>10</eventObjectType>
+        <!-- EventNotificationEventObjectType::BATCHJOB -->
+        <eventConditions objectType="array">
+          <item objectType="KalturaEventFieldCondition">
+            <description>Batch job of type notification</description>
+            <field objectType="KalturaEvalBooleanField">
+              <code>$scope->getEvent()->getBatchJob()->getJobType() == EventNotificationPlugin::getBatchJobTypeCoreValue(EventNotificationBatchType::EVENT_NOTIFICATION_HANDLER)</code>
+            </field>
+          </item>
+          <item objectType="KalturaEventFieldCondition">
+            <description>Http notification</description>
+            <field objectType="KalturaEvalBooleanField">
+              <code>$scope->getEvent()->getBatchJob()->getJobSubType() == HttpNotificationPlugin::getHttpNotificationTemplateTypeCoreValue(HttpNotificationTemplateType::HTTP)</code>
+            </field>
+          </item>
+          <item objectType="KalturaEventFieldCondition">
+            <description>Batch job status is failed</description>
+            <field objectType="KalturaEvalBooleanField">
+              <code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED</code>
+            </field>
+          </item>
+        </eventConditions>
+        <format>1</format>
+        <subject>[Kaltura] - Http notification failed</subject>
+        <body><![CDATA[ <p>Entry with ID {entry_id} failed with HTTP notification</p> entry name:{entry_name}  - PID:{pid} - ObjectId: {object_id} <p>Message:{event_notification_msg}</p> ]]></body>
+        <fromEmail>{from_email}</fromEmail>
+        <fromName>{from_name}</fromName>
+        <contentParameters objectType="array">
+          <item objectType="KalturaEventNotificationParameter">
+            <key>from_email</key>
+            <value objectType="KalturaEvalStringField">
+              <code>kConf::get("partner_notification_email")</code>
+            </value>
+          </item>
+          <item objectType="KalturaEventNotificationParameter">
+            <key>from_name</key>
+            <value objectType="KalturaEvalStringField">
+              <code>kConf::get("partner_notification_name")</code>
+            </value>
+          </item>
+          <item objectType="KalturaEventNotificationParameter">
+            <key>pid</key>
+            <description>Partner ID</description>
+            <value objectType="KalturaEvalStringField">
+              <code>$scope->getObject()->getPartnerId()</code>
+            </value>
+          </item>
+          <item objectType="KalturaEventNotificationParameter">
+            <key>entry_id</key>
+            <description>Entry ID</description>
+            <value objectType="KalturaEvalStringField">
+              <code>$scope->getObject()->getEntryId()</code>
+            </value>
+          </item>
+          <item objectType="KalturaEventNotificationParameter">
+            <key>object_id</key>
+            <description>object_id</description>
+            <value objectType="KalturaEvalStringField">
+              <code>$scope->getObject()->getObjectId()</code>
+            </value>
+          </item>
+          <item objectType="KalturaEventNotificationParameter">
+            <key>job_id</key>
+            <description>Batch Job ID</description>
+            <value objectType="KalturaEvalStringField">
+              <code>$scope->getEvent()->getBatchJob()->getId()</code>
+            </value>
+          </item>
+          <item objectType="KalturaEventNotificationParameter">
+            <key>entry_name</key>
+            <description>Entry name</description>
+            <value objectType="KalturaEvalStringField">
+              <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getName() : ''</code>
+            </value>
+          </item>
+          <item objectType="KalturaEventNotificationParameter">
+            <key>event_notification_msg</key>
+            <description>Event Notification Message</description>
+            <value objectType="KalturaEvalStringField">
+              <code>$scope->getEvent()->getBatchJob()->getMessage()</code>
+            </value>
+          </item>
+        </contentParameters>
+        <method>2</method>
+        <!-- KalturaHttpNotificationMethod::POST -->
+      </template>
+    </request>
+    <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="{variable:partnerId}">
+      <id>{1:result:id}</id>
+      <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+    </request>
+  </multirequest>
+</xml>
