@@ -12,7 +12,7 @@ class KalturaFrontController
 	private $params = array();
 	private $service = "";
 	private $action = "";
-	private $disptacher = null;
+	private $dispatcher = null;
 	private $serializer;
 	private $exceptionHandlers = null;
 
