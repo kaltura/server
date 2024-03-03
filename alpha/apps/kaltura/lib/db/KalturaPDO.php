@@ -185,7 +185,7 @@ class KalturaPDO extends PropelPDO
 	/* (non-PHPdoc)
 	 * @see PDO::query()
 	 */
-	public function query()
+	public function query($statement, $mode = PDO::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args)
 	{
 		kApiCache::disableConditionalCache();
 	
@@ -203,7 +203,7 @@ class KalturaPDO extends PropelPDO
 			if (version_compare(PHP_VERSION, '5.3', '<'))
 				$result = call_user_func_array(array($this, 'parent::query'), $args);
 			else
-				$result = call_user_func_array('parent::query', $args);
+				$result = call_user_func_array(parent::query(...), $args);
 		}
 		catch(PropelException $pex)
 		{

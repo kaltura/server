@@ -157,7 +157,7 @@ class Spyc
         $last =& $this->_allNodes[$this->_lastNode];
         $last->data[key($last->data)] .= "\n";
       }
-      else if ($ifchk{0} != '#' && substr($ifchk, 0, 3) != '---')
+      else if ($ifchk[0] != '#' && substr($ifchk, 0, 3) != '---')
       {
         // Create a new node and get its indent
         $node         = new YAMLNode();

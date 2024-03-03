@@ -104,18 +104,16 @@ class simpleAutoloader
   }
 }
 
-function __autoload($class)
-{
-  static $initialized = false;
-
-  if (!$initialized)
-  {
-    simpleAutoloader::initialize(sfConfig::get('sf_symfony_lib_dir'));
-    $initialized = true;
-  }
-
-  return simpleAutoloader::__autoload($class);
-}
+spl_autoload_register(function ($class) {
+	static $initialized = false;
+	
+	if (!$initialized) {
+		simpleAutoloader::initialize(sfConfig::get('sf_symfony_lib_dir'));
+		$initialized = true;
+	}
+	
+	return simpleAutoloader::__autoload($class);
+});
 
 // trap -V before pake
 if (in_array('-V', $argv) || in_array('--version', $argv))

@@ -71,7 +71,7 @@ private	function imagettftext_cr(&$img, $size, $angle, $x, $y, $content_color, $
 	$rand_max  = strlen($key_chars) - 1;
 	for ($i = 0; $i < $this->length; $i++) {
 	    $rand_pos  = rand(0, $rand_max);
-	    $text.= $key_chars{$rand_pos};
+	    $text.= $key_chars[$rand_pos];
 	}
 	$this->captcha = $text; // save what we create
 	

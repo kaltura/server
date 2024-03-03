@@ -81,7 +81,7 @@ class Properties {
             if($line == "")
                 continue;
                     
-            if ($line{0} == '#' or $line{0} == ';') {
+            if ($line[0] == '#' or $line[0] == ';') {
                 // it's a comment, so continue to next line
                 continue;
             } else {

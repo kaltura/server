@@ -28,14 +28,14 @@ class kLockInfoData
 	}
 
 	/**
-	 * @return the $urgency
+	 * @return int $urgency
 	 */
 	public function getUrgency() {
 		return $this->urgency;
 	}
 
 	/**
-	 * @return the $estimatedEffort
+	 * @return int $estimatedEffort
 	 */
 	public function getEstimatedEffort() {
 		return $this->estimatedEffort;

@@ -35,7 +35,7 @@ passthru("php {$exe} {$template} {$generatedConf} {$args}", $returnVar);
 if ($returnVar > 0)
 	exit ($returnVar);
 
-$args = implode(array_keys($indexSchemas), ' ');
+$args = implode(' ', array_keys($indexSchemas));
 
 $exe = __DIR__ . "/IndexObjectsGenerator.php";
 $template = __DIR__ . "/../../../../configurations/sphinx/kaltura.conf.source";

@@ -47,7 +47,8 @@ class sfMySQLDatabase extends sfDatabase
 
     // determine how to get our
     $method = $this->getParameter('method', 'normal');
-
+	$parameters = array();
+	
     switch ($method)
     {
       case 'normal':
@@ -113,7 +114,7 @@ class sfMySQLDatabase extends sfDatabase
     }
 
     // select our database
-    if ($database != null && !@mysql_select_db($database, $this->connection))
+    if ($database != null && !@mysqli_select_db($database, $this->connection))
     {
       // can't select the database
       $error = 'Failed to select MySQLDatabase "%s"';

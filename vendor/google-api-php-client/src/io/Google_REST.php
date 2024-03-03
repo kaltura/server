@@ -120,7 +120,7 @@ class Google_REST {
     $requestUrl = str_replace('%40', '@', $requestUrl);
 
     if (count($queryVars)) {
-      $requestUrl .= '?' . implode($queryVars, '&');
+      $requestUrl .= '?' . implode('&', $queryVars);
     }
 
     return $requestUrl;

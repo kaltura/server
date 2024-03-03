@@ -603,7 +603,7 @@ class myReportsMgr
 		$result = kSessionUtils::startKSession ( $partner_id, $secret, null, $ksStr, $expiry, false, "", $privilege );
 		
 		if ($result < 0)
-			throw new Exception ( "Failed to generate session for asset [" . $this->getId () . "] of type " . $this->getType () );
+			throw new Exception ( "Failed to generate session for partner [$partner_id] of type User");
 			
 		//url is built with DC url in order to be directed to the same DC of the saved file
 		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/report.csv";
