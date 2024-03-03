@@ -16,9 +16,9 @@
   <multirequest>
     <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
       <template objectType="KalturaEmailNotificationTemplate">
-        <name>HTTP notification failed</name>
+        <name>HTTP notification for captions job has failed</name>
         <systemName>Http_Notification_failed</systemName>
-        <description>Email when HTTP notification job been failed</description>
+        <description>Email when HTTP notification for caption job has been failed</description>
         <automaticDispatchEnabled>1</automaticDispatchEnabled>
         <eventType>1</eventType>
         <!-- EventNotificationEventType::BATCH_JOB_STATUS -->
@@ -43,10 +43,22 @@
               <code>$scope->getEvent()->getBatchJob()->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED</code>
             </field>
           </item>
+          <item objectType="KalturaEventFieldCondition">
+            <description>Object is asset</description>
+            <field objectType="KalturaEvalBooleanField">
+              <code>!is_null(assetPeer::retrieveById($scope->getEvent()->getBatchJob()->getObjectId()))</code>
+            </field>
+          </item>
+          <item objectType="KalturaEventFieldCondition">
+            <description>Object is caption asset</description>
+            <field objectType="KalturaEvalBooleanField">
+              <code>(assetPeer::retrieveById($scope->getEvent()->getBatchJob()->getObjectId()))->getType() == CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)</code>
+            </field>
+          </item>
         </eventConditions>
         <format>1</format>
-        <subject>[Kaltura] - Http notification failed</subject>
-        <body><![CDATA[ <p>Entry with ID {entry_id} failed with HTTP notification</p> entry name:{entry_name}  - PID:{pid} - ObjectId: {object_id} <p>Message:{event_notification_msg}</p> ]]></body>
+        <subject>[Kaltura] - Http notification for captions has failed</subject>
+        <body><![CDATA[ <p>Entry with ID {entry_id} failed with HTTP notification</p> entry name:{entry_name}  - PID:{pid} - CaptionAssetId: {object_id} <p>Message:{event_notification_msg}</p> ]]></body>
         <fromEmail>{from_email}</fromEmail>
         <fromName>{from_name}</fromName>
         <contentParameters objectType="array">
