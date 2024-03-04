@@ -46,7 +46,7 @@
           <item objectType="KalturaEventFieldCondition">
             <description>Object is asset</description>
             <field objectType="KalturaEvalBooleanField">
-              <code>!is_null(assetPeer::retrieveById($scope->getEvent()->getBatchJob()->getObjectId()))</code>
+              <code>$scope->getEvent()->getBatchJob()->getObjectType() == BatchJobObjectType::ASSET</code>
             </field>
           </item>
           <item objectType="KalturaEventFieldCondition">
@@ -57,8 +57,8 @@
           </item>
         </eventConditions>
         <format>1</format>
-        <subject>[Kaltura] - Http notification for captions has failed</subject>
-        <body><![CDATA[ <p>Entry with ID {entry_id} failed with HTTP notification</p> entry name:{entry_name}  - PID:{pid} - CaptionAssetId: {object_id} <p>Message:{event_notification_msg}</p> ]]></body>
+        <subject>[Kaltura] - Caption asset webhook has failed</subject>
+        <body><![CDATA[ <p>HTTP notification failed for PID {pid} entry ID {entry_id} entry name {entry_name} caption asset ID {object_id}</p>Message:{event_notification_msg}]]></body>
         <fromEmail>{from_email}</fromEmail>
         <fromName>{from_name}</fromName>
         <contentParameters objectType="array">
