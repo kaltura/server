@@ -26,12 +26,14 @@ class HTMLPurifier_Length
     protected $isValid;
 
     /**
-     * Array Lookup array of units recognized by CSS 2.1
+     * Array Lookup array of units recognized by CSS 3
      * @type array
      */
     protected static $allowedUnits = array(
         'em' => true, 'ex' => true, 'px' => true, 'in' => true,
-        'cm' => true, 'mm' => true, 'pt' => true, 'pc' => true
+        'cm' => true, 'mm' => true, 'pt' => true, 'pc' => true,
+        'ch' => true, 'rem' => true, 'vw' => true, 'vh' => true,
+        'vmin' => true, 'vmax' => true
     );
 
     /**
@@ -76,7 +78,7 @@ class HTMLPurifier_Length
         if ($this->n === '0' && $this->unit === false) {
             return true;
         }
-        if (!ctype_lower($this->unit)) {
+        if ($this->unit === false || !ctype_lower($this->unit)) {
             $this->unit = strtolower($this->unit);
         }
         if (!isset(HTMLPurifier_Length::$allowedUnits[$this->unit])) {

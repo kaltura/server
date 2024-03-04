@@ -22,6 +22,8 @@ class HTMLPurifier_ChildDef_List extends HTMLPurifier_ChildDef
     // XXX: This whole business with 'wrap' is all a bit unsatisfactory
     public $elements = array('li' => true, 'ul' => true, 'ol' => true);
 
+    public $whitespace;
+
     /**
      * @param array $children
      * @param HTMLPurifier_Config $config
@@ -38,13 +40,19 @@ class HTMLPurifier_ChildDef_List extends HTMLPurifier_ChildDef
             return false;
         }
 
+        // if li is not allowed, delete parent node
+        if (!isset($config->getHTMLDefinition()->info['li'])) {
+            trigger_error("Cannot allow ul/ol without allowing li", E_USER_WARNING);
+            return false;
+        }
+
         // the new set of children
         $result = array();
 
         // a little sanity check to make sure it's not ALL whitespace
         $all_whitespace = true;
 
-        $current_li = false;
+        $current_li = null;
 
         foreach ($children as $node) {
             if (!empty($node->is_whitespace)) {
@@ -65,7 +73,7 @@ class HTMLPurifier_ChildDef_List extends HTMLPurifier_ChildDef
                 // to handle non-list elements; non-list elements should
                 // not be appended to an existing li; only li created
                 // for non-list. This distinction is not currently made.
-                if ($current_li === false) {
+                if ($current_li === null) {
                     $current_li = new HTMLPurifier_Node_Element('li');
                     $result[] = $current_li;
                 }

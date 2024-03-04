@@ -464,10 +464,14 @@ class sfWebRequest extends sfRequest
   protected function loadParameters()
   {
     // merge GET parameters
-    if (get_magic_quotes_gpc())
-    {
-      $_GET = sfToolkit::stripslashesDeep($_GET);
-    }
+    // Deprecated as of PHP 8
+    //if (get_magic_quotes_gpc())
+    //{
+    //  $_GET = sfToolkit::stripslashesDeep($_GET);
+    //}
+	
+    // merge GET parameters
+    $_GET = sfToolkit::stripslashesDeep($_GET);
     $this->getParameterHolder()->addByRef($_GET);
 
     $pathInfo = $this->getPathInfo();
@@ -506,10 +510,13 @@ class sfWebRequest extends sfRequest
     }
 
     // merge POST parameters
-    if (get_magic_quotes_gpc())
-    {
-      $_POST = sfToolkit::stripslashesDeep((array) $_POST);
-    }
+    // Deprecated as of php8
+    //if (get_magic_quotes_gpc())
+    //{
+    //  $_POST = sfToolkit::stripslashesDeep((array) $_POST);
+    //}
+    
+    $_POST = sfToolkit::stripslashesDeep((array) $_POST);
     $this->getParameterHolder()->addByRef($_POST);
 
     // move symfony parameters in a protected namespace (parameters prefixed with _sf_)
@@ -779,7 +786,9 @@ class sfWebRequest extends sfRequest
 
     if (isset($_COOKIE[$name]))
     {
-      $retval = get_magic_quotes_gpc() ? stripslashes($_COOKIE[$name]) : $_COOKIE[$name];
+      //get_magic_quotes_gpc deprecated as of PHP 8
+      //$retval = get_magic_quotes_gpc() ? stripslashes($_COOKIE[$name]) : $_COOKIE[$name];
+      $retval = $_COOKIE[$name];
     }
 
     return $retval;

@@ -33,6 +33,11 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
     protected $compress = false;
 
     /**
+     * @var HTMLPurifier_Config
+     */
+    protected $genConfig;
+
+    /**
      * @param string $name Form element name for directives to be stuffed into
      * @param string $doc_url String documentation URL, will have fragment tagged on
      * @param bool $compress Integer max length before compressing a directive name, set to false to turn off
@@ -48,7 +53,7 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
         $this->compress = $compress;
         // initialize sub-printers
         $this->fields[0] = new HTMLPurifier_Printer_ConfigForm_default();
-        $this->fields[HTMLPurifier_VarParser::BOOL] = new HTMLPurifier_Printer_ConfigForm_bool();
+        $this->fields[HTMLPurifier_VarParser::C_BOOL] = new HTMLPurifier_Printer_ConfigForm_bool();
     }
 
     /**
@@ -327,6 +332,10 @@ class HTMLPurifier_Printer_ConfigForm_default extends HTMLPurifier_Printer
                 case HTMLPurifier_VarParser::HASH:
                     $nvalue = '';
                     foreach ($value as $i => $v) {
+                        if (is_array($v)) {
+                            // HACK
+                            $v = implode(";", $v);
+                        }
                         $nvalue .= "$i:$v" . PHP_EOL;
                     }
                     $value = $nvalue;
@@ -335,7 +344,7 @@ class HTMLPurifier_Printer_ConfigForm_default extends HTMLPurifier_Printer
                     $value = '';
             }
         }
-        if ($type === HTMLPurifier_VarParser::MIXED) {
+        if ($type === HTMLPurifier_VarParser::C_MIXED) {
             return 'Not supported';
             $value = serialize($value);
         }

@@ -996,9 +996,9 @@ class Spyc
     $keys  = array_merge(array_keys($arr1), array_keys($arr2));
     $vals  = array_merge(array_values($arr1), array_values($arr2));
     $ret   = array();
-    foreach ($keys as $key)
+    foreach ($keys as $k => $key)
     {
-      list($unused, $val) = each($vals);
+	  $val = $vals[$k];
       if (isset($ret[$key]) && is_int($key))
       {
         $ret[] = $val;

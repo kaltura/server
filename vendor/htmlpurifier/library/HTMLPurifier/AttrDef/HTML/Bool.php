@@ -7,7 +7,7 @@ class HTMLPurifier_AttrDef_HTML_Bool extends HTMLPurifier_AttrDef
 {
 
     /**
-     * @type bool
+     * @type string
      */
     protected $name;
 
@@ -17,7 +17,7 @@ class HTMLPurifier_AttrDef_HTML_Bool extends HTMLPurifier_AttrDef
     public $minimized = true;
 
     /**
-     * @param bool $name
+     * @param bool|string $name
      */
     public function __construct($name = false)
     {
@@ -32,9 +32,6 @@ class HTMLPurifier_AttrDef_HTML_Bool extends HTMLPurifier_AttrDef
      */
     public function validate($string, $config, $context)
     {
-        if (empty($string)) {
-            return false;
-        }
         return $this->name;
     }
 

@@ -873,8 +873,8 @@
       $vals  = array_merge($vals1,$vals2); 
       $ret   = array(); 
 
-      foreach($keys as $key) { 
-        list($unused,$val) = each($vals);
+      foreach($keys as $k => $key) {
+	    $val = $vals[$k];
         // This is the good part!  If a key already exists, but it's part of a
         // sequence (an int), just keep addin numbers until we find a fresh one.
         if (isset($ret[$key]) and is_int($key)) {
