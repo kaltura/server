@@ -107,9 +107,9 @@ class Zend_Cache_Frontend_Class extends Zend_Cache_Core
      */
     public function __construct(array $options = array())
     {
-        while (list($name, $value) = each($options)) {
-            $this->setOption($name, $value);
-        }
+		foreach($options as $name => $value) {
+			$this->setOption($name, $value);
+		}
         if ($this->_specificOptions['cached_entity'] === null) {
             Zend_Cache::throwException('cached_entity must be set !');
         }

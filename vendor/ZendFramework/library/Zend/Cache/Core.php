@@ -137,9 +137,9 @@ class Zend_Cache_Core
             Zend_Cache::throwException("Options passed were not an array"
             . " or Zend_Config instance.");
         }
-        while (list($name, $value) = each($options)) {
-            $this->setOption($name, $value);
-        }
+		foreach ($options as $name => $value) {
+			$this->setOption($name, $value);
+		}
         $this->_loggerSanity();
     }
 
@@ -152,9 +152,9 @@ class Zend_Cache_Core
     public function setConfig(Zend_Config $config)
     {
         $options = $config->toArray();
-        while (list($name, $value) = each($options)) {
-            $this->setOption($name, $value);
-        }
+	    foreach ($options as $name => $value) {
+		    $this->setOption($name, $value);
+	    }
         return $this;
     }
 
@@ -504,13 +504,13 @@ class Zend_Cache_Core
         if ((!isset($this->_options['cache_id_prefix'])) || ($this->_options['cache_id_prefix'] == '')) return $array;
         // we need to remove cache_id_prefix from ids (see #ZF-6178)
         $res = array();
-        while (list(,$id) = each($array)) {
-            if (strpos($id, $this->_options['cache_id_prefix']) === 0) {
-                $res[] = preg_replace("~^{$this->_options['cache_id_prefix']}~", '', $id);
-            } else {
-                $res[] = $id;
-            }
-        }
+		foreach ($array as $key => $id) {
+			if (strpos($id, $this->_options['cache_id_prefix']) === 0) {
+				$res[] = preg_replace("~^{$this->_options['cache_id_prefix']}~", '', $id);
+			} else {
+				$res[] = $id;
+			}
+		}
         return $res;
     }
 

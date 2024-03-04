@@ -88,9 +88,9 @@ class Zend_Cache_Frontend_File extends Zend_Cache_Core
      */
     public function __construct(array $options = array())
     {
-        while (list($name, $value) = each($options)) {
-            $this->setOption($name, $value);
-        }
+	    foreach ($options as $name => $value) {
+		    $this->setOption($name, $value);
+	    }
         if (!isset($this->_specificOptions['master_files'])) {
             Zend_Cache::throwException('master_files option must be set');
         }

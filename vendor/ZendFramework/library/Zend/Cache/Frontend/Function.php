@@ -63,9 +63,9 @@ class Zend_Cache_Frontend_Function extends Zend_Cache_Core
      */
     public function __construct(array $options = array())
     {
-        while (list($name, $value) = each($options)) {
-            $this->setOption($name, $value);
-        }
+	    foreach ($options as $name => $value) {
+		    $this->setOption($name, $value);
+	    }
         $this->setOption('automatic_serialization', true);
     }
 
