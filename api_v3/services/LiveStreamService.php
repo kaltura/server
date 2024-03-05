@@ -618,6 +618,26 @@ class LiveStreamService extends KalturaLiveEntryService
     }
 
 	/**
+	 * Deliver information about the livestream
+	 *
+	 * @action getLiveStreamInfo
+	 * @param string $entryId Id of the live stream entry
+	 * @return KalturaLiveStreamInfo
+	 * @ksIgnored
+	 *
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 */
+	public function getLiveStreamInfo($entryId)
+	{
+		$liveStreamEntry = $this->fetchLiveEntry($entryId);
+		$isLive = $liveStreamEntry->isCurrentlyLive();
+		$liveStreamInfo = new KalturaLiveStreamInfo();
+		$liveStreamInfo->liveViewers = $isLive ? $this->getNumberOfViewers($entryId) : $liveStreamInfo->liveViewers;
+
+		return $liveStreamInfo;
+	}
+
+	/**
 	 * Delivering the status of a live stream (on-air/offline) if it is possible
 	 *
 	 * @action getDetails
@@ -634,7 +654,6 @@ class LiveStreamService extends KalturaLiveEntryService
 		$liveStreamDetails = new KalturaLiveStreamDetails();
 		$isLive = $liveStreamEntry->isCurrentlyLive();
 		$liveStreamDetails->broadcastStatus =  $isLive ? KalturaLiveStreamBroadcastStatus::LIVE : KalturaLiveStreamBroadcastStatus::OFFLINE;
-		$liveStreamDetails->liveViewers = $isLive ? $this->getNumberOfViewers($id) : $liveStreamDetails->liveViewers;
 		if (in_array($liveStreamEntry->getSource(), array(KalturaSourceType::LIVE_STREAM, KalturaSourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS)))
 		{
 			$this->updateInternalLiveStreamDetails($liveStreamEntry, $liveStreamDetails);
