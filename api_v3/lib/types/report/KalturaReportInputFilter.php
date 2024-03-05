@@ -287,6 +287,12 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $uiConfIdIn;
 
+	/**
+	 * filter by cue point id
+	 * @var string
+	 */
+	public $cuePointIdIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -329,7 +335,8 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'canonicalUrlIn' => 'canonical_urls',
 		'virtualEventIdIn' => 'virtual_event_ids',
 		'originIn' => 'origins',
-		'uiConfIdIn' => 'ui_conf_ids'
+		'uiConfIdIn' => 'ui_conf_ids',
+		'cuePointIdIn' => 'cue_point_ids',
 	);
 
 	protected function getMapBetweenObjects()

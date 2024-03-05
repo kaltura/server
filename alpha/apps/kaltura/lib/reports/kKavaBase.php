@@ -81,6 +81,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_UI_CONF_ID = 'uiConfId';
 	const DIMENSION_CATALOG_ITEM_ID = 'catalogItemId';
 	const DIMENSION_REACH_PROFILE_TYPE = 'reachProfileType';
+	const DIMENSION_CUE_POINT_ID = 'cuePointId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -642,6 +643,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
+			self::DIMENSION_CUE_POINT_ID => 1,
 		),
 		self::DATASOURCE_MEETING_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -659,6 +661,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
+			self::DIMENSION_CUE_POINT_ID => 1,
 		),
 	);
 
