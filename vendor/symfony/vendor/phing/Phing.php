@@ -916,7 +916,7 @@ class Phing {
         // This is a bit of a hack, but works better than previous solution of assuming
         // data_dir is on the include_path.
         $data_dir = '@DATA-DIR@';
-        if ($data_dir{0} != '@') { // if we're using PEAR then the @ DATA-DIR @ token will have been substituted.
+        if ($data_dir[0] != '@') { // if we're using PEAR then the @ DATA-DIR @ token will have been substituted.
             $data_path = $data_dir . DIRECTORY_SEPARATOR . $path;
             if (file_exists($data_path)) {
                    return $data_path;

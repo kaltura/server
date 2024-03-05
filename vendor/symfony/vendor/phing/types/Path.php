@@ -318,7 +318,7 @@ class Path extends DataType {
             try {
                 $element .= self::resolveFile($project, $pathElement);
             } catch (BuildException $e) {
-                $this->project->log("Dropping path element " . $pathElement 
+                $project->log("Dropping path element " . $pathElement
                     . " as it is not valid relative to the project", 
                     PROJECT_MSG_VERBOSE);
             }
@@ -355,8 +355,8 @@ class Path extends DataType {
      * replacements.  
      */
     protected static function translateFileSep(&$buffer, $pos) {
-        if ($buffer{$pos} == '/' || $buffer{$pos} == '\\') {
-            $buffer{$pos} = DIRECTORY_SEPARATOR;
+        if ($buffer[$pos] == '/' || $buffer[$pos] == '\\') {
+            $buffer[$pos] = DIRECTORY_SEPARATOR;
             return true;
         }
         return false;

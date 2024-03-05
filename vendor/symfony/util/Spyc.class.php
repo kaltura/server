@@ -157,7 +157,7 @@ class Spyc
         $last =& $this->_allNodes[$this->_lastNode];
         $last->data[key($last->data)] .= "\n";
       }
-      else if ($ifchk{0} != '#' && substr($ifchk, 0, 3) != '---')
+      else if ($ifchk[0] != '#' && substr($ifchk, 0, 3) != '---')
       {
         // Create a new node and get its indent
         $node         = new YAMLNode();
@@ -996,9 +996,9 @@ class Spyc
     $keys  = array_merge(array_keys($arr1), array_keys($arr2));
     $vals  = array_merge(array_values($arr1), array_values($arr2));
     $ret   = array();
-    foreach ($keys as $key)
+    foreach ($keys as $k => $key)
     {
-      list($unused, $val) = each($vals);
+      $val = $vals[$k];
       if (isset($ret[$key]) && is_int($key))
       {
         $ret[] = $val;

@@ -137,7 +137,7 @@ class PgSQLResultSet extends ResultSetCommon implements ResultSet {
 					$res[] = $this->strToArray(implode(',', $subarr[$in_subarr]));
 					$in_subarr--;
 				}
-			} elseif ($tok{0} === '{') { // we're inside a new sub-array							   
+			} elseif ($tok[0] === '{') { // we're inside a new sub-array
 				if ('}' !== substr($tok, -1, 1)) {
 					$in_subarr++;
 					// if sub-array has more than one element
