@@ -4,7 +4,7 @@
 - Issue ID: FOUN-1370
 
 ### Configuration ###
-    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET, TOPIC_NAME) from the template XML file below and remove ".template" from the file name:
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
 	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2024_03_03_add_kafka_room_entry_notifications.template.xml
 
 ### Deployment scripts ###

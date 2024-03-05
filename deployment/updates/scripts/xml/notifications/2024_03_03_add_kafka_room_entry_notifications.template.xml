@@ -24,7 +24,7 @@
                 <!-- EventNotificationEventType::OBJECT_CHANGED -->
                 <eventObjectType>1</eventObjectType>
                 <!-- EventNotificationEventObjectType::ENTRY -->
-                <topicName>@TOPIC_NAME@</topicName>
+                <topicName>entry</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
                 <apiObjectType>KalturaRoomEntry</apiObjectType>
