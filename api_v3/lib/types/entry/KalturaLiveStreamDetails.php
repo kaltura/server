@@ -25,11 +25,6 @@ class KalturaLiveStreamDetails extends KalturaObject
 	public $viewMode = KalturaViewMode::PREVIEW;
 
 	/**
-	 * @var int
-	 */
-	public $liveViewers = 0;
-
-	/**
 	 * @var bool
 	 */
 	public $wasBroadcast = false;
