@@ -122,6 +122,7 @@ class KalturaLog
 		$message = '';
 		foreach ($data as $value)
 		{
+			$value = $value ? $value : '';
 			$message .= strtr($value, ',', ' ') . ',';
 		}
 		$message = substr($message, 0, -1);

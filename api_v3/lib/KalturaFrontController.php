@@ -67,13 +67,14 @@ class KalturaFrontController
 	{
 		$duration = microtime(true) - $this->requestStart;
 		
+		$kuserId = kCurrentContext::$uid ? kCurrentContext::$uid : (kCurrentContext::$ks_uid ? kCurrentContext::$ks_uid : '');
 		KalturaLog::analytics(array(
 			'request_end',
 			'partnerId' => kCurrentContext::$partner_id,
 			'masterPartnerId' => kCurrentContext::$master_partner_id,
 			'ks' => kCurrentContext::$ks,
 			'isAdmin' => intval(kCurrentContext::$is_admin_session),
-			'kuserId' => '"' . str_replace('"', '\\"', (kCurrentContext::$uid ? kCurrentContext::$uid : kCurrentContext::$ks_uid)) . '"',
+			'kuserId' => '"' . str_replace('"', '\\"', $kuserId) . '"',
 			'duration' => $duration,
 			'success' => intval($success),
 			'errorCode' => $errorCode,

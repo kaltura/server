@@ -180,6 +180,8 @@ class kQueryCache
 				{
 					foreach ($values as $value)
 					{
+						//Passing value as null will result in deprecated notice in PHP8
+						$value = $value ? $value : '';
 						$value = strtolower(str_replace(' ', '_', $value));
 						$newInvalidationKeys[] = self::replaceVariable($invalidationKey, $value);
 					}

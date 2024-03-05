@@ -173,6 +173,9 @@ class Criteria implements IteratorAggregate {
 	 * @var        array
 	 */
 	private $map = array();
+	
+	/** Indiciates if filter was already attached to criteria, this shuld be defined on the object to avoid notice in PHP8 **/
+	public $creteria_filter_attached;
 
 	/**
 	 * Creates a new instance with the default capacity which corresponds to
@@ -190,7 +193,7 @@ class Criteria implements IteratorAggregate {
 	 * Implementing SPL IteratorAggregate interface.  This allows
 	 * you to foreach () over a Criteria object.
 	 */
-	public function getIterator()
+	public function getIterator(): Traversable
 	{
 		return new CriterionIterator($this);
 	}
@@ -1256,23 +1259,23 @@ class CriterionIterator implements Iterator {
 		$this->criteriaSize = count($this->criteriaKeys);
 	}
 
-	public function rewind() {
+	public function rewind(): void {
 		$this->idx = 0;
 	}
 
-	public function valid() {
+	public function valid(): bool {
 		return $this->idx < $this->criteriaSize;
 	}
 
-	public function key() {
+	public function key(): mixed {
 		return $this->criteriaKeys[$this->idx];
 	}
 
-	public function current() {
+	public function current(): mixed {
 		return $this->criteria->getCriterion($this->criteriaKeys[$this->idx]);
 	}
 
-	public function next() {
+	public function next(): void {
 		$this->idx++;
 	}
 
