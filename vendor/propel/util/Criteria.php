@@ -1372,7 +1372,7 @@ class Criterion  {
 
 		//init $this->realtable
 		$realtable = $criteria->getTableForAlias($this->table);
-		if (! strlen ( $realtable ) ) {
+		if (!$realtable || !strlen($realtable)) {
 			$realtable = $this->table;
 		}
 		$this->realtable = $realtable;
