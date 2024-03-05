@@ -1,3 +1,7 @@
+# Tucana-20.7.0
+### Deployment scripts ###
+    - php deployment/updates/scripts/2024_03_05_deploy_event_notification_batch_job_email_notification_failure.php
+
 # Tucana-20.6.0
 ## Add partner and permissions for media repurposing ##
 - Issue Type: Task
