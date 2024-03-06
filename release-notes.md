@@ -5,8 +5,14 @@
 - Issue ID: PLAT-24613
 
 ### Deployment Scripts ###
-	php deployment/updates/scripts/2024_03_05_deploy_event_notification_batch_job_email_notification_failure.php
  	php deployment/updates/scripts/add_permissions/2024_02_21_media_repurposing_add_permissions.php
+
+## Add permissions for media repurposing ##
+- Issue Type: Task
+- Issue ID: PSVAMB-49001
+
+### Add new event notification for batch job failure ###
+	php deployment/updates/scripts/2024_03_05_deploy_event_notification_batch_job_email_notification_failure.php
 
 # Tucana-20.6.0
 ## Add partner and permissions for media repurposing ##
