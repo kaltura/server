@@ -6,6 +6,7 @@
 class KalturaESearchBaseUserFieldName extends KalturaStringEnum
 {
 	const SCREEN_NAME = 'screen_name';
+	const FULL_NAME = 'full_name';
 	const EMAIL = 'email';
 	const TAGS = 'tags';
 	const UPDATED_AT = 'updated_at';
