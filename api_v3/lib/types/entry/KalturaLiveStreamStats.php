@@ -3,7 +3,7 @@
  * @package api
  * @subpackage objects
  */
-class KalturaLiveStreamInfo extends KalturaObject
+class KalturaLiveStreamStats extends KalturaObject
 {
 	/**
 	 * @var int

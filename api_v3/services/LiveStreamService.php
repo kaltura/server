@@ -11,6 +11,9 @@ class LiveStreamService extends KalturaLiveEntryService
 {
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 5;
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_LIVE = 30;
+
+	const GET_LIVE_STATS = 5;
+
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -617,23 +620,35 @@ class LiveStreamService extends KalturaLiveEntryService
         return true;
     }
 
+	private function responseHandlingGetStats($isLive)
+	{
+		if ($isLive)
+		{
+			KalturaResponseCacher::setExpiry(self::GET_LIVE_STATS);
+			KalturaResponseCacher::setHeadersCacheExpiry(self::GET_LIVE_STATS);
+		}
+
+		return $isLive;
+	}
+
 	/**
 	 * Deliver information about the livestream
 	 *
 	 * @action getLiveStreamInfo
 	 * @param string $entryId Id of the live stream entry
-	 * @return KalturaLiveStreamInfo
+	 * @return KalturaLiveStreamStats
 	 * @ksIgnored
 	 *
 	 * @throws KalturaErrors::INVALID_ENTRY_ID
 	 */
-	public function getLiveStreamInfo($entryId)
+	public function getLiveStreamStats($entryId)
 	{
 		$liveStreamEntry = $this->fetchLiveEntry($entryId);
 		$isLive = $liveStreamEntry->isCurrentlyLive();
-		$liveStreamInfo = new KalturaLiveStreamInfo();
-		$liveStreamInfo->liveViewers = $isLive ? $this->getNumberOfViewers($entryId) : $liveStreamInfo->liveViewers;
+		$liveStreamInfo = new KalturaLiveStreamStats();
+		$liveStreamInfo->liveViewers = $isLive ? $this->getNumberOfViewers($entryId) : 0;
 
+		$this->responseHandlingGetStats($isLive);
 		return $liveStreamInfo;
 	}
 
