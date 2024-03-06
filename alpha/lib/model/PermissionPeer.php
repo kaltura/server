@@ -174,18 +174,19 @@ class PermissionPeer extends BasePermissionPeer
 		// check if permissions depends on another permission which is not valid for partner
 		if ($checkDependency)
 		{
-			$dependsOn = trim($permission->getDependsOnPermissionNames());
-			$dependsOn = explode(',', $dependsOn);
+			$dependsOn = $permission->getDependsOnPermissionNames() ?
+				explode(',', trim($permission->getDependsOnPermissionNames())) :
+				array();
+			
 			$valid = true;
-			if ($dependsOn) {
-				foreach($dependsOn as $dependPermission) {
-					$dependPermission = trim($dependPermission);
-					if (!$dependPermission) {
-						continue;
-					}
-					$valid = $valid && self::isValidForPartner($dependPermission, $partnerId);
+			foreach($dependsOn as $dependPermission) {
+				$dependPermission = trim($dependPermission);
+				if (!$dependPermission) {
+					continue;
 				}
+				$valid = $valid && self::isValidForPartner($dependPermission, $partnerId);
 			}
+			
 			if (!$valid) {
 				self::$allowedPermissions[$partnerId][$permissionName] = false;
 				return false;

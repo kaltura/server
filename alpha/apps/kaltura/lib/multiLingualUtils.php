@@ -199,8 +199,9 @@ class multiLingualUtils
 	
 	public static function setCorrectLanguageValuesInResponse(&$responseObject, $dbObject, $requestLanguage = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$multiLanguageMap = json_decode(self::getMultiLanguageMapping($dbObject), true);
-		if (strtolower($requestLanguage) === self::MULTI)
+		$multiLanguageMap = self::getMultiLanguageMapping($dbObject) ?
+			json_decode(self::getMultiLanguageMapping($dbObject), true) : null;
+		if ($requestLanguage && strtolower($requestLanguage) === self::MULTI)
 		{
 			self::setMultiLanguageStringInField($responseObject, $dbObject, $multiLanguageMap, $responseProfile);
 		}

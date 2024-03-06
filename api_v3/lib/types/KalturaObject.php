@@ -197,7 +197,7 @@ abstract class KalturaObject implements IApiObject
 				}
 				
 				// check for use of parent::
-				if (strpos($fieldValue, 'parent::') !== false)
+				if ($fieldValue && strpos($fieldValue, 'parent::') !== false)
 				{
 					KalturaLog::log("{$curGetter->class}::{$curGetter->name} uses parent");
 					$fieldValue = null;		// we have to use the getter since it uses a private property
@@ -310,7 +310,7 @@ abstract class KalturaObject implements IApiObject
 		// generate final code
 		if ($usesCustomData)
 		{
-			$result .= "\t\t\$customData = unserialize(\$srcObj->custom_data);\n";
+			$result .= "\t\t\$customData = \$srcObj->custom_data ? unserialize(\$srcObj->custom_data) : null;\n";
 		}
 	
 		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("' => true,\n\t\t\t'", array_keys($mappingFuncCode)) . "' => true\n\t\t);";
