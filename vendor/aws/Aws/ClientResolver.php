@@ -153,6 +153,7 @@ class ClientResolver
         ],
         'serializer' => [
             'default'   => [__CLASS__, '_default_serializer'],
+            'fn'        => [__CLASS__, '_apply_serializer'],
             'internal'  => true,
             'type'      => 'value',
             'valid'     => ['callable'],
@@ -834,6 +835,11 @@ class ClientResolver
         return UseDualStackConfigProvider::defaultProvider($args);
     }
 
+    public static function _apply_serializer($value, array &$args, HandlerList $list)
+    {
+        $list->prependBuild(Middleware::requestBuilder($value), 'builder');
+    }
+
     public static function _apply_debug($value, array &$args, HandlerList $list)
     {
         if ($value !== false) {
@@ -1173,6 +1179,10 @@ class ClientResolver
                 'string',
                 $args
             );
+        }
+
+        if (!empty($value)) {
+            $args['config']['configured_endpoint_url'] = true;
         }
 
         return $value;
