@@ -61,7 +61,7 @@ abstract class KalturaFilter extends KalturaObject
 	    $orderByMap = $this->getOrderByMap();
 	    if ($orderByMap)
 		{
-		    $orderProps = $this->orderBy ? explode(",", $this->orderBy) : array();
+		    $orderProps = !is_null($this->orderBy) ? explode(",", $this->orderBy) : array();
 		    foreach($orderProps as $prop)
 		    {
 		         if (isset($orderByMap[$prop]))

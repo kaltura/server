@@ -39,7 +39,7 @@ class DbManager
 	/**
 	 * @param array
 	 */
-	protected static $cachedConnIndexes = false;
+	protected static $cachedConnIndexes = array();
 	
 	/**
 	 * @param array

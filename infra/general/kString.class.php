@@ -298,7 +298,7 @@ class kString
 	 */
 	public static function stripUtf8InvalidChars($string)
 	{
-		$string = $string ? $string : "";
+		$string = !is_null($string) ? $string : "";
 		return @iconv('utf-8', 'utf-8', $string);
 	}
 	

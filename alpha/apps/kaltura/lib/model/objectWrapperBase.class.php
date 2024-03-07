@@ -450,28 +450,29 @@ abstract class objectWrapperBase implements Iterator
 			reset($this->m_obj);
 		}
 
-		public function current()
+		public function current(): mixed
 		{
 			//echo "current\n";
 			$this->verifyIterator();
 			return self::getWrapperClass ( current($this->m_obj) , $this->detail_level , $this->recursion_depth , $this->detail_policy_velocity );
 		}
 
-		public function key()
+		public function key(): mixed
 		{
 			//		echo "key\n";
 			$this->verifyIterator();
 			return  key($this->m_obj);
 		}
 
-		public function next()
+		public function next(): void
 		{
 			//	echo "next\n";
 			$this->verifyIterator();
-			return self::getWrapperClass ( next($this->m_obj) , $this->detail_level , $this->recursion_depth , $this->detail_policy_velocity );
+			//PHP8 void methods are not allowed to return values
+			//return self::getWrapperClass ( next($this->m_obj) , $this->detail_level , $this->recursion_depth , $this->detail_policy_velocity );
 		}
 
-		public function valid()
+		public function valid(): bool
 		{
 			if ( $this->m_obj == null ) return false;
 			//		echo "valid\n

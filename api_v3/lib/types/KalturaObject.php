@@ -11,6 +11,8 @@ abstract class KalturaObject implements IApiObject
 	 */
 	public $relatedObjects;
 	
+	private $purifyHtml = false;
+	
 	static protected $sourceFilesCache = array();
 	static protected $classPrivatesCache = array();
 	
@@ -197,7 +199,7 @@ abstract class KalturaObject implements IApiObject
 				}
 				
 				// check for use of parent::
-				if ($fieldValue && strpos($fieldValue, 'parent::') !== false)
+				if (!is_null($fieldValue) && strpos($fieldValue, 'parent::') !== false)
 				{
 					KalturaLog::log("{$curGetter->class}::{$curGetter->name} uses parent");
 					$fieldValue = null;		// we have to use the getter since it uses a private property
@@ -310,7 +312,7 @@ abstract class KalturaObject implements IApiObject
 		// generate final code
 		if ($usesCustomData)
 		{
-			$result .= "\t\t\$customData = \$srcObj->custom_data ? unserialize(\$srcObj->custom_data) : null;\n";
+			$result .= "\t\t\$customData = !is_null(\$srcObj->custom_data) ? unserialize(\$srcObj->custom_data) : null;\n";
 		}
 	
 		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("' => true,\n\t\t\t'", array_keys($mappingFuncCode)) . "' => true\n\t\t);";
@@ -493,7 +495,7 @@ abstract class KalturaObject implements IApiObject
 		 		$this_prop = $object_prop;
 			
 			$value = $this->$this_prop;
-			if (is_null($value)) 
+			if (is_null($value))
 				continue;
 				
 			if ($props_to_skip && is_array($props_to_skip) && in_array($this_prop, $props_to_skip)) 

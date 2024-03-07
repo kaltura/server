@@ -101,7 +101,7 @@ class ktagword {
 	{
 		$tag_list = array ();
 		
-		$current_admin_tags = explode ( self::TAG_SEPARATOR , $new_admin_tags_str ) ;
+		$current_admin_tags = !is_null($new_admin_tags_str) ? explode ( self::TAG_SEPARATOR , $new_admin_tags_str ) : array();
 
 		foreach ( $current_admin_tags as $tag )
 		{ 
