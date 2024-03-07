@@ -4119,7 +4119,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			'media_type' => $this->getMediaType(),
 			'source_type' => $this->getSourceType(),
 			'length_in_msecs' => $this->getLengthInMsecs(),
-			'admin_tags' => explode(',',$this->getAdminTags()),
+			'admin_tags' => explode(',',!is_null($this->getAdminTags()) ? $this->getAdminTags() : ""),
 			'credit' => $this->getCredit(),
 			'site_url' => $this->getSiteUrl(),
 			'start_date' => $this->getStartDate(null),
@@ -4602,7 +4602,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getAdminTagsArr()
 	{
-		$tags = explode(",", $this->getAdminTags());
+		$tags = explode(",", !is_null($this->getAdminTags()) ? $this->getAdminTags() : "");
 		$tagsToReturn = array();
 		foreach($tags as $tag)
 		{

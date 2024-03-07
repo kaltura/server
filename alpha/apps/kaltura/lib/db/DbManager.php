@@ -24,7 +24,7 @@ class DbManager
 	/**
 	 * @var array
 	 */
-	protected static $sphinxConnection = null;
+	protected static $sphinxConnection = array();
 	
 	/**
 	 * @var kBaseCacheWrapper 
@@ -44,7 +44,7 @@ class DbManager
 	/**
 	 * @param array
 	 */
-	protected static $connIndexes = false;
+	protected static $connIndexes = array();
 	
 	/**
 	 * @param array

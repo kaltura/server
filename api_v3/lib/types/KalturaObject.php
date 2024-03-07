@@ -18,6 +18,9 @@ abstract class KalturaObject implements IApiObject
 	
 	function __sleep()
 	{
+	    $purifyHtml = $this->purifyHtml;
+	    unset($this->purifyHtml);
+		
 	    $allVars = get_object_vars($this);
 	    $return = array();
 	    foreach(array_keys($allVars) as $name)
@@ -27,6 +30,8 @@ abstract class KalturaObject implements IApiObject
 	            $return[] = $name;
 	        }
 	    }
+		
+	    $this->purifyHtml = $purifyHtml;
 	    return $return;
 	}
 	
