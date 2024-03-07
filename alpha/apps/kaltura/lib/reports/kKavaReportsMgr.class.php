@@ -5251,7 +5251,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		// convert the result to a table
 		$metric_headers = isset($report_def[self::REPORT_METRICS]) ? 
-			$report_def[self::REPORT_METRICS] : array_keys(call_user_func_array('array_merge', $result));
+			$report_def[self::REPORT_METRICS] : array_keys(call_user_func_array('array_merge', array_values($result)));
 		$date_headers = $input_filter->interval != self::INTERVAL_ALL ? 
 			array(self::getDateColumnName($input_filter->interval)) : 
 			array();
