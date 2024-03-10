@@ -1518,7 +1518,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				}
 			}
 			
-			$cat = implode($fixedCat, categoryPeer::CATEGORY_SEPARATOR);
+			$cat = implode(categoryPeer::CATEGORY_SEPARATOR, $fixedCat);
 			
 			if (strlen($cat) > 0)
 				$trimedCategories[] = $cat;

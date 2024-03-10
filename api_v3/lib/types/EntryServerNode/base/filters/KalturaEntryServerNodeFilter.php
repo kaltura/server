@@ -41,7 +41,7 @@ class KalturaEntryServerNodeFilter extends KalturaEntryServerNodeBaseFilter
 				return array(array(), 0);
 			}
 			
-			$entryIds = implode($validEntryIds, ',');
+			$entryIds = implode(',', $validEntryIds);
 			$this->entryIdIn = $entryIds;
 		}
 

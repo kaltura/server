@@ -504,7 +504,7 @@ class Zend_Cache_Core
         if ((!isset($this->_options['cache_id_prefix'])) || ($this->_options['cache_id_prefix'] == '')) return $array;
         // we need to remove cache_id_prefix from ids (see #ZF-6178)
         $res = array();
-        while (list(,$id) = each($array)) {
+        foreach ($array as $key => $id) {
             if (strpos($id, $this->_options['cache_id_prefix']) === 0) {
                 $res[] = preg_replace("~^{$this->_options['cache_id_prefix']}~", '', $id);
             } else {
