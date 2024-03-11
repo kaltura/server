@@ -706,7 +706,8 @@ abstract class KalturaObject implements IApiObject
 		if ($this->$propertyName instanceof KalturaNullField)
 			return;
 		                                          
-		if (strlen($this->$propertyName) > $maxLength)
+		$propertyLen = !is_null($this->$propertyName) ? strlen($this->$propertyName) : 0;
+		if ($propertyLen > $maxLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $maxLength);
 	}
 	
