@@ -1,6 +1,7 @@
 <?php
 
 defined('KALTURA_ROOT_PATH') ||  define('KALTURA_ROOT_PATH', realpath(__DIR__ . '/../'));
+require_once(dirname(__FILE__) . '/cache/kApcWrapper.php');
 
 /**
  * @package infra
