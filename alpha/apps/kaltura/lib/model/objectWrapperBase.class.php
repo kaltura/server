@@ -442,7 +442,7 @@ abstract class objectWrapperBase implements Iterator
 			return $this->m_is_array;
 		}
 
-		public function rewind()
+		public function rewind(): void
 		{
 			if ( $this->m_obj == null ) return;
 			//		echo "rewind\n";
