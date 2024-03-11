@@ -7,6 +7,8 @@
  */
 abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObject
 {
+	public $userOrder = null;
+	
 	abstract public function buildServeFlavors();
 	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
