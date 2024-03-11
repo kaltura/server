@@ -52,7 +52,7 @@ class kApcWrapper
 		if (function_exists('apc_delete'))
 			return apc_delete($key);
 		if (function_exists('apcu_delete'))
-			return apcu_delete($keys);
+			return apcu_delete($key);
 		
 		return false;
 	}
