@@ -665,7 +665,8 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function getTags()
 	{
-		return trim(parent::getTags());
+		$tags = parent::getTags();
+		return $tags ? trim($tags) : $tags;
 	}
 
 	/**

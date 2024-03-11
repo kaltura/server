@@ -327,25 +327,25 @@ class PermissionPeer extends BasePermissionPeer
 			}
 			foreach ($permissions as $key => $permission)
 			{
-				$dependsOn = trim($permission->getDependsOnPermissionNames());
-				$dependsOn = explode(',', $dependsOn);
-				if ($dependsOn)
+				$dependsOn = $permission->getDependsOnPermissionNames() ?
+					explode(',', trim($permission->getDependsOnPermissionNames())) :
+					array();
+				
+				foreach($dependsOn as $dependPermission)
 				{
-					foreach($dependsOn as $dependPermission)
-					{
-						$dependPermission = trim($dependPermission);
-						if (!$dependPermission) {
-							// invalid text
-							continue;
-						}
-						if (!in_array($dependPermission, $permissionNames, true) && !in_array($dependPermission, $additionalPartnerPermissionNames, true)) {
-							// current permission depends on a non existing permission
-							unset($permissions[$key]);
-							$checkDependency = true; // need to recheck because we have delete a permission
-							break;
-						}
+					$dependPermission = trim($dependPermission);
+					if (!$dependPermission) {
+						// invalid text
+						continue;
+					}
+					if (!in_array($dependPermission, $permissionNames, true) && !in_array($dependPermission, $additionalPartnerPermissionNames, true)) {
+						// current permission depends on a non existing permission
+						unset($permissions[$key]);
+						$checkDependency = true; // need to recheck because we have delete a permission
+						break;
 					}
 				}
+				
 			}
 		}
 		return $permissions;
