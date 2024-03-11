@@ -1561,7 +1561,7 @@ class reportsInputFilter
 	public $virtual_event_ids;
 	public $origins;
 	public $ui_conf_ids;
-
+	public $context_ids;
 
 	public function getFilterBy() {
 		return "";
