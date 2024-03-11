@@ -829,8 +829,8 @@ class KalturaSyndicationFeedRenderer
 
 		echo $renderer->handleFooter();
 		
-		if ($this->feedProcessingKey && function_exists('apc_delete'))
-			apc_delete($this->feedProcessingKey);
+		if ($this->feedProcessingKey && kApcWrapper::functionExists('delete'))
+			kApcWrapper::apcDelete($this->feedProcessingKey);
 				
 		$microTimeEnd = microtime(true);
 		KalturaLog::info("syndicationFeedRenderer- render time for ({$this->syndicationFeed->type}) is " . ($microTimeEnd - $microTimeStart));
@@ -841,9 +841,9 @@ class KalturaSyndicationFeedRenderer
 	 */
 	private function enableApcProcessingFlag() {
 		$currentTime = time();
-		if ($this->feedProcessingKey && function_exists('apc_store') && $currentTime > $this->nextProcessingSetTime)
+		if ($this->feedProcessingKey && kApcWrapper::functionExists('store') && $currentTime > $this->nextProcessingSetTime)
 		{
-			apc_store($this->feedProcessingKey, true, 60);
+			kApcWrapper::apcStore($this->feedProcessingKey, true, 60);
 			$this->nextProcessingSetTime = $currentTime + 30;
 		}
 	}

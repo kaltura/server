@@ -507,10 +507,10 @@ class kFile extends kFileBase
 
 	public static function cacheRedirect($url)
 	{
-		if (function_exists('apc_store'))
+		if (kApcWrapper::functionExists('store'))
 		{
 			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-			apc_store("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
+			kApcWrapper::apcStore("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
 		}
 	}
 	

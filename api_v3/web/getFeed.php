@@ -76,9 +76,9 @@ $ks = getRequestParameter('ks');
 $state = getRequestParameter('state');
 
 $feedProcessingKey = "feedProcessing_{$feedId}_{$entryId}_{$limit}";
-if (function_exists('apc_fetch'))
+if (kApcWrapper::functionExists('fetch'))
 {
-	if (apc_fetch($feedProcessingKey))
+	if (kApcWrapper::apcFetch($feedProcessingKey))
 	{
 		KExternalErrors::dieError(KExternalErrors::PROCESSING_FEED_REQUEST);
 	}
