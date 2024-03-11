@@ -11,6 +11,7 @@ if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
 $start = microtime(true);
 require_once(dirname(__FILE__).'/../config/kConf.php');
 require_once(dirname(__FILE__)."/../../api_v3/lib/KalturaResponseCacher.php");
+require_once(dirname(__FILE__)."/../../infra/cache/kApcWrapper.php");
 
 function sendCachingHeaders($max_age = 864000, $private = false, $last_modified = null)
 {

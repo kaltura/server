@@ -9,6 +9,7 @@ require_once(dirname(__FILE__) . '/../request/kIpAddressUtils.php');
 require_once(dirname(__FILE__) . '/../request/kGeoUtils.php');
 require_once(dirname(__FILE__) . '/../kGeoCoderManager.php');
 require_once(dirname(__FILE__) . '/../../../../../infra/monitor/KalturaMonitorClient.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/cache/kApcWrapper.php');
 
 /**
  * @package server-infra

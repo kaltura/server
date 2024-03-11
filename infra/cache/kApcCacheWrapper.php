@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
+require_once(dirname(__FILE__) . '/kApcWrapper.php.php');
 
 /**
  * @package infra

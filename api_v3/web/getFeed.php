@@ -53,6 +53,7 @@ set_time_limit(0);
 
 // check cache before loading anything
 require_once(__DIR__ . "/../lib/KalturaResponseCacher.php");
+require_once(__DIR__ . "/../../infra/cache/kApcWrapper.php");
 $expiry = kConf::hasParam("v3cache_getfeed_default_expiry") ? kConf::get("v3cache_getfeed_default_expiry") : 86400;
 $cache = new KalturaResponseCacher(null, kCacheManager::CACHE_TYPE_API_V3_FEED, $expiry);
 $cache->checkOrStart();

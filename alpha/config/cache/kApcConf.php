@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../infra/cache/kApcWrapper.php";
 require_once __DIR__ . '/kBaseConfCache.php';
 require_once __DIR__ . '/kMapCacheInterface.php';
 require_once __DIR__ . '/kKeyCacheInterface.php';
