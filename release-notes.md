@@ -1,3 +1,12 @@
+# Tucana-20.8.0  
+## Add kuser.full_name to elastic kuser index  ##  
+- Issue Type: Task
+- Issue ID: PSVAMB-48998
+
+### Deployment Scripts ###
+ - Generate new clients
+ - Update Elastic index and re-index the kuser table
+
 # Tucana-20.7.0
 ## Add permissions for media repurposing ##
 - Issue Type: Task
