@@ -4,7 +4,6 @@ class DeliveryProfileComparator
 {
 	private $cdnhost;
 	private $isSecured;
-	private $userOrder;
 
 	function __construct( $isSecured , $cdnhost = null) {
 		$this->cdnhost = $cdnhost;
