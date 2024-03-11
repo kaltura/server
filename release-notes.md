@@ -1,5 +1,19 @@
-# Tucana-20.7.0
+# Tucana-20.8.0
+## Add Media Repurposing NG to partner config ##
+- Issue Type: Task
+- Issue ID: KMCNG-2571
 
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.mediaRepurposingNG.enabled = true
+moduls.mediaRepurposingNG.permissionType = 2
+moduls.mediaRepurposingNG.label = "Enable Media Repurposing NG"
+moduls.mediaRepurposingNG.permissionName = FEATURE_MEDIA_REPURPOSING_NG_PERMISSION
+moduls.mediaRepurposingNG.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Tucana-20.7.0
 ## Add permissions for media repurposing ##
 - Issue Type: Task
 - Issue ID: PLAT-24613
