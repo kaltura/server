@@ -140,7 +140,14 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         	}
         }
         $oldTags = $object->getColumnsOldValue(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME));
-        $newTags = $object->getTags();
+		if(is_null($oldTags)) {
+			$oldTags = '';
+		}
+        
+		$newTags = $object->getTags();
+		if(is_null($newTags)) {
+			$newTags = '';
+		}
         $tagsForDelete = implode(',', array_diff(explode(',', $oldTags), explode(',', $newTags)));
         $tagsForUpdate = implode(',', array_diff(explode(',', $newTags), explode(',', $oldTags)));
         

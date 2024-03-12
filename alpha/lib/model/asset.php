@@ -657,7 +657,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function getTagsArray()
 	{
-		if(!strlen(trim($this->getTags())))
+		if(is_null($this->getTags()) || !strlen(trim($this->getTags())))
 			return array();
 			
 		return explode(',', $this->getTags());
