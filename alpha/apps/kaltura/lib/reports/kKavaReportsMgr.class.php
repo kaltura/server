@@ -28,9 +28,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_SEGMENT_DOWNLOAD_TIME_SUM = 'segmentDownloadTimeSum';
 	const METRIC_MANIFEST_DOWNLOAD_TIME_SUM = 'manifestDownloadTimeSum';
 	const METRIC_VIEW_TIME_SUM = 'viewTimeSum';
-	const METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS = 'unique_combined_live_viewers';
-	const METRIC_UNIQUE_VOD_VIEW_PERIOD_USERS = 'unique_vod_viewers';
-	const METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS = 'unique_vod_live_viewers';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -139,6 +136,11 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC = 'meeting_high_eng_view_period_view_time_sum';
 	const METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO = 'combined_live_engaged_users_play_time_ratio';
 	const METRIC_VOD_LIVE_AVG_VIEW_TIME = 'vod_live_avg_view_time';
+	const METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS = 'unique_combined_live_viewers';
+	const METRIC_UNIQUE_VOD_VIEW_PERIOD_USERS = 'unique_vod_viewers';
+	const METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS = 'unique_vod_live_viewers';
+	const METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS = 'meeting_view_period_unique_users';
+	const METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO = 'meeting_engaged_play_time_ratio';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -511,6 +513,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => 'floor',
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => 'floor',
 		self::METRIC_REGISTERED_UNIQUE_USERS => 'floor',
+		self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -570,6 +573,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => true,
 		self::METRIC_VOD_LIVE_AVG_VIEW_TIME => true,
 		self::METRIC_REGISTERED_UNIQUE_USERS => true,
+		self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => true,
+		self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1028,6 +1033,10 @@ class kKavaReportsMgr extends kKavaBase
 					self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 					self::getNotFilter(self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_OFFLINE))))),
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+			self::getHyperUniqueAggregator(self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS] = self::getFilteredAggregator(
 			self::getAndFilter(array(
@@ -1760,6 +1769,13 @@ class kKavaReportsMgr extends kKavaBase
 					self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'),
 					self::getConstantRatioPostAggr('subVodPlayTime', self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'))),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS))));
+
+		self::$metrics_def[self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO,
+				self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC,
+				self::METRIC_MEETING_VIEW_TIME_SEC));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 
@@ -2694,7 +2710,8 @@ class kKavaReportsMgr extends kKavaBase
 			'canonical_urls' => array(self::DRUID_DIMENSION => self::DIMENSION_URL),
 			'virtual_event_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_VIRTUAL_EVENT_ID),
 			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
-			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID)
+			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID),
+			'cue_point_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CUE_POINT_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
