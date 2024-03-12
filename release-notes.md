@@ -1,4 +1,5 @@
-# Tucana-20.7.0
+# Tucana-20.8.0
+
 ## Add kafka event notification for room entry updates ##
 - Issue Type: Task
 - Issue ID: FOUN-1370
@@ -9,6 +10,27 @@
 
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/2024_03_03_deploy_kafka_room_events.php
+
+# Tucana-20.7.0
+
+## Add permissions for media repurposing ##
+- Issue Type: Task
+- Issue ID: PLAT-24613
+
+### Deployment Scripts ###
+ 	php deployment/updates/scripts/add_permissions/2024_02_21_media_repurposing_add_permissions.php
+
+## Add new event notification for batch job failure ##
+- Issue Type: Task
+- Issue ID: PSVAMB-49001
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/2024_03_05_deploy_event_notification_batch_job_email_notification_failure.php
+
+### Configuration ###
+First replace all tokens from the XML file below (under media-repurposing section) and remove ".template" from the file name:
+
+deployment/updates/scripts/xml/notifications/2024_01_18_batchJobEmailNotificationFailure.template.xml
 
 # Tucana-20.6.0
 ## Add partner and permissions for media repurposing ##
