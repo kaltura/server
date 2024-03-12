@@ -9,8 +9,21 @@ $newTemplateUpdate = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/no
 
 if(!file_exists($newTemplateUpdate) || !file_exists($script))
 {
-    KalturaLog::err("Missing update script file");
-    return;
+	KalturaLog::err("Missing update script file");
+	return;
+}
+
+if (!kConf::hasMap(kConfMapNames::KAFKA)){
+	KalturaLog::err("Kafka configuration file (kafka.ini) wasn't found!");
+	return;
+}
+
+$kafkaConfig = kConf::getMap(kConfMapNames::KAFKA);
+
+if (!isset($kafkaConfig['brokers']) && !(isset($kafkaConfig['host']) && isset($kafkaConfig['port'])))
+{
+	KalturaLog::err("No Kafka brokers configured");
+	return;
 }
 
 passthru("php $script $newTemplateUpdate");
