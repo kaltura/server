@@ -1429,6 +1429,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'status' => $this->getStatus(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
 			'screen_name' => $this->getScreenName(),
+			'full_name' => $this->getFullName(),
 			'kuser_type' => $this->getType(),
 			'email' => $this->getEmail(),
 			'tags' => $this->getTagsArray(), //todo - check
