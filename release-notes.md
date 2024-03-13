@@ -1,3 +1,17 @@
+# Tucana-20.8.0  
+## Add kuser.full_name to elastic kuser index as a searchable and order_by field ##  
+- Issue Type: Task
+- Issue ID: PSVAMB-48998
+
+#### Deployment ####
+- Generate new clients
+- Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default it 'kaltura_kuser')
+##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
+Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
+
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"full_name":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
+
+
 # Tucana-20.7.0
 
 ## Add permissions for media repurposing ##
