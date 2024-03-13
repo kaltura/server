@@ -172,7 +172,7 @@ abstract class KalturaFilter extends KalturaObject
 		
 		$newOrderBy = "";
 	    $orderByMap = $this->getOrderByMap();
-	    if ($orderByMap)
+	    if ($orderByMap && $this->orderBy)
 		{
 		    $orderProps = explode(",", $this->orderBy);
 		    foreach($orderProps as $prop)
