@@ -706,6 +706,7 @@ KalturaLog::log("Retrying chunk ($job->id) - oldKeyIdx:$tmpKey, newKeyIdx:$job->
 			$params = $this->chunker->params;
 			$source = $params->resolveSourcePath();
 			
+			//In PHP8 sending associative array as the subject will cause the returned value to be invalid
 			$cmdLine[0] = str_replace($params->unResolvedSourcePath,$source,$cmdLine[0]);
 			$job = new KChunkedEncodeJobData($this->name, $jobIdx, $cmdLine, $this->createTime);
 			$job->maxExecTime = $maxExecutionTime;
