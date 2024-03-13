@@ -1,3 +1,10 @@
+# Tucana-20.8.0
+## Live Viewers Caching ##
+- Issue Type: Task
+- Issue ID: PLAT-24535
+### Deployment Scripts ###
+```php deployment/updates/scripts/add_permissions/2024_03_12_livestream_getLiveStates_permissions.php```
+
 # Tucana-20.7.0
 ## Add permissions for media repurposing ##
 - Issue Type: Task
