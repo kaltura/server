@@ -358,7 +358,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	const ENRICH_CHUNK_SIZE = 10000;
 	const ENRICH_DIM_DELIMITER = '|';
-	const ENRICH_FOREACH_KEYS_FUNC = 'self::forEachKeys';
+	const ENRICH_FOREACH_KEYS_FUNC = 'kKavaReportsMgr::forEachKeys';
 	const CLIENT_TAG_PRIORITY = 5;
 	const FLAVOR_PARAM_VIEW_COUNT_PREFIX = 'flavor_param_view_count_';
 	const MICRO_SERVICE_CHUNK_SIZE = 500;
@@ -500,11 +500,11 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => 'floor',
 		self::METRIC_UNIQUE_SESSIONS => 'floor',
 		self::METRIC_UNIQUE_VIEWERS => 'floor',
-		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'self::floorAndLimitPercentage',
+		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'kKavaReportsMgr::floorAndLimitPercentage',
 		self::METRIC_UNIQUE_OWNERS => 'floor',
 		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
-		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
-		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
+		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'kKavaReportsMgr::limitPercentages',
+		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'kKavaReportsMgr::limitPercentages',
 		self::METRIC_UNIQUE_DOMAINS => 'floor',
 		self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS => 'floor',
 		self::METRIC_UNIQUE_VOD_VIEW_PERIOD_USERS => 'floor',
@@ -583,17 +583,17 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $dynamic_metrics = array(
-		self::METRIC_ENGAGEMENT_RANKING => 'self::getEngagementRankingDef',
-		self::METRIC_PLAYS_RANKING => 'self::getPlaysRankingDef',
-		self::METRIC_ENTRIES_RANKING => 'self::getEntriesRankingDef',
-		self::METRIC_DYNAMIC_VIEWERS => 'self::getDynamicViewersDef',
-		self::METRIC_DYNAMIC_VIEWERS_BUFFERING => 'self::getDynamicBufferingViewersDef',
-		self::METRIC_DYNAMIC_VIEWERS_DVR => 'self::getDynamicDvrViewersDef',
-		self::METRIC_DYNAMIC_VIEWERS_ENGAGEMENT => 'self::getDynamicEngagedViewersDef',
+		self::METRIC_ENGAGEMENT_RANKING => 'kKavaReportsMgr::getEngagementRankingDef',
+		self::METRIC_PLAYS_RANKING => 'kKavaReportsMgr::getPlaysRankingDef',
+		self::METRIC_ENTRIES_RANKING => 'kKavaReportsMgr::getEntriesRankingDef',
+		self::METRIC_DYNAMIC_VIEWERS => 'kKavaReportsMgr::getDynamicViewersDef',
+		self::METRIC_DYNAMIC_VIEWERS_BUFFERING => 'kKavaReportsMgr::getDynamicBufferingViewersDef',
+		self::METRIC_DYNAMIC_VIEWERS_DVR => 'kKavaReportsMgr::getDynamicDvrViewersDef',
+		self::METRIC_DYNAMIC_VIEWERS_ENGAGEMENT => 'kKavaReportsMgr::getDynamicEngagedViewersDef',
 	);
 
 	protected static $dynamic_metrics_to_aggregations = array(
-		self::METRIC_FLAVOR_PARAMS_VIEW_COUNT => 'self::getFlavorsParamsMetricsDef',
+		self::METRIC_FLAVOR_PARAMS_VIEW_COUNT => 'kKavaReportsMgr::getFlavorsParamsMetricsDef',
 	);
 
 	protected static $php_timezone_names = array(
