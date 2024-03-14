@@ -99,4 +99,24 @@ class kApcWrapper
 		
 		return $apcFetchEnabled && $apcStoreEnabled;
 	}
+	
+	public static function apcCacheInfo($cache_mode = '', $limited = false)
+	{
+		if (function_exists('apc_cache_info'))
+			return apc_cache_info($cache_mode, $limited);
+		if (function_exists('apcu_cache_info'))
+			return apcu_cache_info($limited);
+		
+		return null;
+	}
+	
+	public static function apcSmaInfo($limited = false)
+	{
+		if (function_exists('apc_sma_info'))
+			return apc_sma_info($limited);
+		if (function_exists('apcu_sma_info'))
+			return apcu_sma_info($limited);
+		
+		return null;
+	}
 }
