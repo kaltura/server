@@ -21,6 +21,7 @@ class KalturaESearchUserItem extends KalturaESearchAbstractUserItem
 
 	private static $map_field_enum = array(
 		KalturaESearchUserFieldName::SCREEN_NAME => ESearchUserFieldName::SCREEN_NAME,
+		KalturaESearchUserFieldName::FULL_NAME => ESearchUserFieldName::FULL_NAME,
 		KalturaESearchUserFieldName::EMAIL => ESearchUserFieldName::EMAIL,
 		KalturaESearchUserFieldName::TYPE => ESearchUserFieldName::TYPE,
 		KalturaESearchUserFieldName::TAGS => ESearchUserFieldName::TAGS,
