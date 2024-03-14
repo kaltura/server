@@ -230,6 +230,12 @@ class kmcngAction extends kalturaAction
                     "uri" => '/apps/kmcng/' . $kmcngParams["kmcng_version"] . "/public/playerWrapper.html"
                 );
 
+		$mediaRepurposingUrl = null;
+		if (kConf::hasParam('media_repurposing_base_url'))
+		{
+			$mediaRepurposingUrl = kConf::get('media_repurposing_base_url');
+		}
+
 		$config = array(
 			'ks' =>  ($this->getRequest()->getMethod() == sfRequest::POST && $this->getRequest()->getParameter('ks')) ? $this->getKs() : null,
 			'kalturaServer' => array(
@@ -246,6 +252,7 @@ class kmcngAction extends kalturaAction
 			'kpfServer' => array('kpfPackageManagerBaseUrl' => kconf::get('kpf_package_manager_base_url','local',null), 'kpfPurchaseManagerBaseUrl' => kconf::get('kpf_purchase_manager_base_url', 'local', null)) ,
 			'analyticsServer' => array('uri' => kConf::get('analytics_host', 'local',  '')),
 			'epServer' => array('uri' => $epUrl),
+			'mrEndpoint' => array('uri' => $mediaRepurposingUrl),
 			"externalApps" => array(
 				"studioV2" => $studio,
 				"studioV3" => $studioV3,

@@ -13,6 +13,11 @@ moduls.mediaRepurposingNG.permissionName = FEATURE_MEDIA_REPURPOSING_NG_PERMISSI
 moduls.mediaRepurposingNG.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
+Add the following to local.ini:
+```
+media_repurposing_base_url = @MEDIA_REPURPOSING_BASE_URL
+```
+
 # Tucana-20.7.0
 ## Add permissions for media repurposing ##
 - Issue Type: Task
