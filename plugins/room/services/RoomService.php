@@ -91,4 +91,43 @@ class RoomService extends KalturaEntryService
 		return $response;
 	}
 
+	/**
+	 *
+	 * @action createRecordedEntry
+	 * @param string $roomEntryId
+	 * @param KalturaMediaEntry $mediaEntry
+	 * @param string $cloneEntryId
+	 * @return KalturaMediaEntry the new recorded entry created
+	 */
+	public function createRecordedEntryAction(string $roomEntryId, KalturaMediaEntry $mediaEntry = null, $cloneEntryId = null)
+	{
+		$dbRoomEntry = entryPeer::retrieveByPK($roomEntryId);
+		if (!$dbRoomEntry || !($dbRoomEntry instanceof RoomEntry))
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $roomEntryId);
+		}
+		if ((!$mediaEntry && !$cloneEntryId) || ($mediaEntry && $cloneEntryId))
+		{
+			throw new KalturaAPIException( KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, 'mediaEntry / cloneEntryId');
+		}
+		if ($cloneEntryId)
+		{
+			$cloneEntry = entryPeer::retrieveByPK($cloneEntryId);
+			if (!$cloneEntry)
+			{
+				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $cloneEntryId);
+			}
+			$dbEntry = myEntryUtils::copyEntry($cloneEntry, $this->getPartner(), array());
+		}
+		else
+		{
+			$dbEntry = $this->prepareEntryForInsert($mediaEntry);
+		}
+		$dbEntry->setRootEntryId($roomEntryId);
+		$dbEntry->save();
+		$recordedEntry = new KalturaMediaEntry();
+		$recordedEntry->fromObject($dbEntry);
+		return $recordedEntry;
+	}
+
 }
