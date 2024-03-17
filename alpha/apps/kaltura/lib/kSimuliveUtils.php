@@ -85,7 +85,7 @@ class kSimuliveUtils
 		$audioAssets = self::createPaddedAssetsArray($entriesAudioAssets);
 
 		$assets = array_merge($flavorAssets, $captionAssets, $audioAssets);
-		$eventLabel = "eventId:" . $currentEvent->getId();
+		$eventLabel = self::addParamToId('eventId', $currentEvent->getId());
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs, $sourceEntryLabels, $eventLabel);
 	}
 
@@ -396,9 +396,10 @@ class kSimuliveUtils
 		}
 	}
 
-	public static function addParamToId($key, $value, $id=null)
+	public static function addParamToId($key, $value, $existId=null)
 	{
-		return $id ? $id . self::LABEL_SEPARATOR . $key . ":" . $value : $key . ":" . $value;
+		$id =  $key . '=' . $value;
+		return $existId ? $existId . '&' . $id : $id;
 	}
 
 }
