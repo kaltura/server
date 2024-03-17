@@ -1,4 +1,10 @@
-# Tucana-20.8.0  
+# Tucana-20.8.0
+## Live Viewers Caching ##
+- Issue Type: Task
+- Issue ID: PLAT-24535
+### Deployment Scripts ###
+```php deployment/updates/scripts/add_permissions/2024_03_12_livestream_getLiveStates_permissions.php```
+
 ## Add kuser.full_name to elastic kuser index as a searchable and order_by field ##  
 - Issue Type: Task
 - Issue ID: PSVAMB-48998
