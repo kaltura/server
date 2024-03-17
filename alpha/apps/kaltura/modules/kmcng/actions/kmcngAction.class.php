@@ -230,12 +230,6 @@ class kmcngAction extends kalturaAction
                     "uri" => '/apps/kmcng/' . $kmcngParams["kmcng_version"] . "/public/playerWrapper.html"
                 );
 
-		$vendorIntegrationsEndpoint = null;
-		if (kConf::hasParam('vendor_integrations_endpoint'))
-		{
-			$vendorIntegrationsEndpoint = kConf::get('vendor_integrations_endpoint');
-		}
-
 		$config = array(
 			'ks' =>  ($this->getRequest()->getMethod() == sfRequest::POST && $this->getRequest()->getParameter('ks')) ? $this->getKs() : null,
 			'kalturaServer' => array(
@@ -279,7 +273,7 @@ class kmcngAction extends kalturaAction
 				'spaProxyEndpoint' => array('uri' => MicroServiceSpaProxy::buildServiceUrl(MicroServiceSpaProxy::$host, MicroServiceSpaProxy::$service)),
 				'userProfileEndpoint' => array('uri' => MicroServiceUserProfile::buildServiceUrl(MicroServiceUserProfile::$host, MicroServiceUserProfile::$service)),
 				'userReportsEndpoint' => array('uri' => MicroServiceUserReports::buildServiceUrl(MicroServiceUserReports::$host, MicroServiceUserReports::$service)),
-				'vendorIntegrationsEndpoint' => array('uri' => $vendorIntegrationsEndpoint)
+				'vendorIntegrationsEndpoint' => array('uri' => MicroServiceVendorIntegrations::buildServiceUrl(MicroServiceVendorIntegrations::$host, MicroServiceVendorIntegrations::$service))
 			),
 		);
 
