@@ -11,6 +11,7 @@ class LiveStreamService extends KalturaLiveEntryService
 {
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 5;
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_LIVE = 30;
+
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -616,6 +617,44 @@ class LiveStreamService extends KalturaLiveEntryService
 
         return true;
     }
+
+	protected function responseHandlingGetStats()
+	{
+		$liveStatsInterval = kConf::get('liveStatsInterval',kConfMapNames::LIVE_SETTINGS, 20);
+		KalturaResponseCacher::setExpiry($liveStatsInterval);
+		KalturaResponseCacher::setHeadersCacheExpiry($liveStatsInterval);
+	}
+
+	/**
+	 * Deliver information about the livestream
+	 *
+	 * @action getLiveStreamStats
+	 * @param string $entryId Id of the live stream entry
+	 * @return KalturaLiveStreamStats
+	 * @ksIgnored
+	 *
+	 * @throws KalturaErrors::INVALID_ENTRY_ID
+	 */
+	public function getLiveStreamStatsAction($entryId)
+	{
+		$liveStreamInfo = new KalturaLiveStreamStats();
+		$liveStreamInfo->liveViewers = $this->getNumberOfViewers($entryId);
+
+		$this->responseHandlingGetStats();
+		return $liveStreamInfo;
+	}
+
+	protected function getNumberOfViewers($entryId)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		$numberOfViewers = 0;
+		if ($cache)
+		{
+			$numberOfViewers = $cache->get("live_viewers_" . $entryId);
+		}
+
+		return $numberOfViewers;
+	}
 
 	/**
 	 * Delivering the status of a live stream (on-air/offline) if it is possible

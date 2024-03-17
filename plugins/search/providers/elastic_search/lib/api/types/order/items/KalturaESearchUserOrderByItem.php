@@ -17,8 +17,9 @@ class KalturaESearchUserOrderByItem extends KalturaESearchOrderByItem
     private static $map_field_enum = array(
         KalturaESearchUserOrderByFieldName::CREATED_AT => ESearchUserOrderByFieldName::CREATED_AT,
         KalturaESearchUserOrderByFieldName::UPDATED_AT => ESearchUserOrderByFieldName::UPDATED_AT,
-	KalturaESearchUserOrderByFieldName::SCREEN_NAME => ESearchUserOrderByFieldName::SCREEN_NAME,
-	KalturaESearchUserOrderByFieldName::USER_ID => ESearchUserOrderByFieldName::USER_ID,
+        KalturaESearchUserOrderByFieldName::SCREEN_NAME => ESearchUserOrderByFieldName::SCREEN_NAME,
+        KalturaESearchUserOrderByFieldName::FULL_NAME => ESearchUserOrderByFieldName::FULL_NAME,
+        KalturaESearchUserOrderByFieldName::USER_ID => ESearchUserOrderByFieldName::USER_ID,
     );
 
     public function getMapBetweenObjects()
