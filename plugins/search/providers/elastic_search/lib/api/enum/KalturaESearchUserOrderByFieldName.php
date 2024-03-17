@@ -9,4 +9,5 @@ class KalturaESearchUserOrderByFieldName extends KalturaStringEnum
 	const CREATED_AT = 'created_at';
 	const SCREEN_NAME = 'screen_name';
 	const USER_ID = 'puser_id';
+	const FULL_NAME = 'full_name';
 }

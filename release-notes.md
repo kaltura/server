@@ -5,13 +5,51 @@
 ### Deployment Scripts ###
 ```php deployment/updates/scripts/add_permissions/2024_03_12_livestream_getLiveStates_permissions.php```
 
+## Add kuser.full_name to elastic kuser index as a searchable and order_by field ##  
+- Issue Type: Task
+- Issue ID: PSVAMB-48998
+
+#### Deployment ####
+- Generate new clients
+- Execute the curl command, replace esearch_host, esearch_port and kaltura_kuser index (default it 'kaltura_kuser')
+##### Note: command below is for elastic 7.x.x version, if you have different version, please refer to elastic documentations on how to update index mapping #####
+Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
+
+    curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"full_name":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
+
+## Add Media Repurposing NG to partner config ##
+- Issue Type: Task
+- Issue ID: KMCNG-2571
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.mediaRepurposingNG.enabled = true
+moduls.mediaRepurposingNG.permissionType = 2
+moduls.mediaRepurposingNG.label = "Enable Media Repurposing NG"
+moduls.mediaRepurposingNG.permissionName = FEATURE_MEDIA_REPURPOSING_NG_PERMISSION
+moduls.mediaRepurposingNG.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Tucana-20.7.0
 ## Add permissions for media repurposing ##
 - Issue Type: Task
 - Issue ID: PLAT-24613
 
 ### Deployment Scripts ###
-	php deployment/updates/scripts/add_permissions/2024_02_21_media_repurposing_add_permissions.php
+ 	php deployment/updates/scripts/add_permissions/2024_02_21_media_repurposing_add_permissions.php
+
+## Add new event notification for batch job failure ##
+- Issue Type: Task
+- Issue ID: PSVAMB-49001
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/2024_03_05_deploy_event_notification_batch_job_email_notification_failure.php
+
+### Configuration ###
+First replace all tokens from the XML file below (under media-repurposing section) and remove ".template" from the file name:
+
+deployment/updates/scripts/xml/notifications/2024_01_18_batchJobEmailNotificationFailure.template.xml
 
 # Tucana-20.6.0
 ## Add partner and permissions for media repurposing ##

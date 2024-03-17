@@ -58,7 +58,8 @@ class KalturaFrontController
 			'service' => $service,
 			'action' => $action,
 			'requestIndex' => $requestIndex,
-			'isInMultiRequest' => intval($isInMultiRequest)
+			'isInMultiRequest' => intval($isInMultiRequest),
+			'protocol' => infraRequestUtils::getProtocol(),
 		));
 	}
 	

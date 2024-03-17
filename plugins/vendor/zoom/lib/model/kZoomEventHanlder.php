@@ -227,12 +227,16 @@ class kZoomEventHanlder
 	{
 		/* @var kZoomRecording $recording */
 		$recording = $event->object;
-		if (($recording->recordingType == kRecordingType::WEBINAR && !$zoomVendorIntegration->getEnableWebinarUploads()) ||
-			$recording->recordingType == kRecordingType::MEETING && $zoomVendorIntegration->getEnableMeetingUpload() === 0)
-		{
-			KalturaLog::debug('webinar uploads is disabled for vendor integration id: ' . $zoomVendorIntegration->getId());
-			return;
-		}
+		if ($recording->recordingType == kRecordingType::WEBINAR && !$zoomVendorIntegration->getEnableWebinarUploads())
+        	{
+            		KalturaLog::debug('webinar uploads is disabled for vendor integration id: ' . $zoomVendorIntegration->getId());
+            		return;
+        	}
+        	if($recording->recordingType == kRecordingType::MEETING && !$zoomVendorIntegration->getEnableMeetingUpload())
+        	{
+            		KalturaLog::debug('meeting uploads is disabled for vendor integration id: ' . $zoomVendorIntegration->getId());
+            		return;
+        	}
 		$kMeetingMetaData = self::allocateMeetingMetaData($recording, $event);
 		KalturaLog::debug('meeting recording files are: ' . print_r($recording->recordingFiles, true));
 		$recordingFilesOrdered = $recording->orderRecordingFiles($recording->recordingFiles);
