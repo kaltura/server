@@ -618,9 +618,9 @@ class LiveStreamService extends KalturaLiveEntryService
         return true;
     }
 
-	protected function responseHandlingGetStats($isLive)
+	protected function responseHandlingGetStats()
 	{
-		$liveStatsInterval = kConf::get('liveStatsInterval','live');
+		$liveStatsInterval = kConf::get('liveStatsInterval',kConfMapNames::LIVE_SETTINGS, 20);
 		KalturaResponseCacher::setExpiry($liveStatsInterval);
 		KalturaResponseCacher::setHeadersCacheExpiry($liveStatsInterval);
 	}
@@ -637,12 +637,10 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function getLiveStreamStatsAction($entryId)
 	{
-		$liveStreamEntry = $this->fetchLiveEntry($entryId);
-		$isLive = $liveStreamEntry->isCurrentlyLive();
 		$liveStreamInfo = new KalturaLiveStreamStats();
-		$liveStreamInfo->liveViewers = $isLive ? $this->getNumberOfViewers($entryId) : 0;
+		$liveStreamInfo->liveViewers = $this->getNumberOfViewers($entryId);
 
-		$this->responseHandlingGetStats($isLive);
+		$this->responseHandlingGetStats();
 		return $liveStreamInfo;
 	}
 
