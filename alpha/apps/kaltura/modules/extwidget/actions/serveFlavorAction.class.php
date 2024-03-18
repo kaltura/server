@@ -169,16 +169,21 @@ class serveFlavorAction extends kalturaAction
 		$offsets = array_fill(0, count($original_durations), 0);
 		if ($entry->getMediaType() == PlaylistType::STATIC_LIST && $entry->getOperationAttributes())
 		{
-			$clipAttributes =  array_filter($entry->getOperationAttributes(), function($obj) {
+			$clipAttributes = array_filter($entry->getOperationAttributes(), function($obj) {
 				return $obj instanceof kClipAttributes;
 			});
 			for ($i = 0; $i < min(count($original_durations), count($clipAttributes)); $i++)
 			{
-				if ($clipAttributes[$i] && $clipAttributes[$i]->getOffset() < $original_durations[$i])
+				$offset = $clipAttributes[$i]->getOffset();
+				if ($offset > 0 && $offset < $original_durations[$i])
 				{
-					$offsets[$i] = $clipAttributes[$i]->getOffset();
-					$original_durations[$i] = min($clipAttributes[$i]->getDuration(),
-						$original_durations[$i] - $offsets[$i]);
+					$offsets[$i] = $offset;
+					$original_durations[$i] = $original_durations[$i] - $offset;
+				}
+				$duration = $clipAttributes[$i]->getDuration();
+				if ($duration > 0 && $duration < $original_durations[$i])
+				{
+					$original_durations[$i] = $duration;
 				}
 			}
 		}
