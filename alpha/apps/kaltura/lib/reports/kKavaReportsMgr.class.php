@@ -4412,6 +4412,20 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getKmeUsersInfo($ids, $partner_id, $context)
+	{
+		$context['columns'] = array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)',
+			'EMAIL', 'CUSTOM_DATA.is_guest');
+
+		$result = self::getUsersInfo($ids, $partner_id, $context);
+		foreach ($result as $id => &$row)
+		{
+			$row[3] = $row[3] ? 'Guest' : 'User';
+		}
+
+		return $result;
+	}
+
 	protected static function getEntriesSource($ids, $partner_id, $context)
 	{
 		$context['peer'] = 'entryPeer';
