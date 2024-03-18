@@ -11,16 +11,13 @@ abstract class KalturaObject implements IApiObject
 	 */
 	public $relatedObjects;
 	
-	private $purifyHtml = false;
+	private static $purifyHtml = false;
 	
 	static protected $sourceFilesCache = array();
 	static protected $classPrivatesCache = array();
 	
 	function __sleep()
 	{
-	    $purifyHtml = $this->purifyHtml;
-	    unset($this->purifyHtml);
-		
 	    $allVars = get_object_vars($this);
 	    $return = array();
 	    foreach(array_keys($allVars) as $name)
@@ -30,8 +27,6 @@ abstract class KalturaObject implements IApiObject
 	            $return[] = $name;
 	        }
 	    }
-		
-	    $this->purifyHtml = $purifyHtml;
 	    return $return;
 	}
 	
@@ -919,21 +914,20 @@ abstract class KalturaObject implements IApiObject
 	 */
 	protected function shouldPurify()
 	{
-		return isset($this->purifyHtml) && $this->purifyHtml;
+		return KalturaObject::$purifyHtml;
 	}
 
 	protected function disablePurify()
 	{
-		$this->purifyHtml = false;
-		unset($this->purifyHtml);
+		KalturaObject::$purifyHtml = false;
 	}
 
 	protected function enablePurify()
 	{
 		if (!isset(kCurrentContext::$HTMLPurifierBehaviour) || kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::IGNORE)
-			$this->purifyHtml = false;
+			KalturaObject::$purifyHtml = false;
 		else
-			$this->purifyHtml = true;
+			KalturaObject::$purifyHtml = true;
 	}
 
 	public function __debugInfo()
