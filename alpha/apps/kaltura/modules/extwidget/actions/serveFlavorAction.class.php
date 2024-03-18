@@ -175,14 +175,10 @@ class serveFlavorAction extends kalturaAction
 			for ($i = 0; $i < min(count($original_durations), count($clipAttributes)); $i++)
 			{
 				$offset = $clipAttributes[$i]->getOffset();
-				if ($offset > 0 && $offset < $original_durations[$i])
+				$duration = $clipAttributes[$i]->getDuration();
+				if ($offset > 0 && $duration > 0 && $original_durations[$i] - $offset > $duration)
 				{
 					$offsets[$i] = $offset;
-					$original_durations[$i] = $original_durations[$i] - $offset;
-				}
-				$duration = $clipAttributes[$i]->getDuration();
-				if ($duration > 0 && $duration < $original_durations[$i])
-				{
 					$original_durations[$i] = $duration;
 				}
 			}
