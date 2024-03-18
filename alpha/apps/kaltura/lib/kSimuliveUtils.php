@@ -399,7 +399,7 @@ class kSimuliveUtils
 	public static function addParamToId($key, $value, $existId=null)
 	{
 		$id =  $key . '=' . $value;
-		return $existId ? $existId . '&' . $id : $id;
+		return $existId ? $existId . ',' . $id : $id;
 	}
 
 }
