@@ -368,11 +368,11 @@ class kSimuliveUtils
 	public static function addTimestamps(&$labels, $startTime, $durations)
 	{
 		$timestamp = $startTime;
-		$labels[0] = self::addParam('timestamp', $timestamp, $labels[0]);
+		$labels[0] = self::addParam('startTime', $timestamp, $labels[0]);
 		for ($i = 1; $i < count($labels); $i++)
 		{
 			$timestamp = $timestamp + $durations[$i-1];
-			$labels[$i] = self::addParam('timestamp', $timestamp, $labels[$i]);
+			$labels[$i] = self::addParam('startTime', $timestamp, $labels[$i]);
 		}
 	}
 
