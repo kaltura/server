@@ -93,40 +93,27 @@ class RoomService extends KalturaEntryService
 
 	/**
 	 *
-	 * @action createRecordedEntry
+	 * @action attachRecordedEntry
 	 * @param string $roomEntryId
-	 * @param KalturaMediaEntry $mediaEntry
-	 * @param string $cloneEntryId
-	 * @return KalturaMediaEntry the new recorded entry created
+	 * @param string $mediaEntryId
+	 * @return KalturaMediaEntry the recorded entry with roomEntryId as its rootEntryId
 	 */
-	public function createRecordedEntryAction(string $roomEntryId, KalturaMediaEntry $mediaEntry = null, $cloneEntryId = null)
+	function attachRecordedEntryAction(string $roomEntryId, string $mediaEntryId)
 	{
 		$dbRoomEntry = entryPeer::retrieveByPK($roomEntryId);
 		if (!$dbRoomEntry || !($dbRoomEntry instanceof RoomEntry))
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $roomEntryId);
 		}
-		if ((!$mediaEntry && !$cloneEntryId) || ($mediaEntry && $cloneEntryId))
+		$mediaEntry = entryPeer::retrieveByPK($mediaEntryId);
+		if (!$mediaEntry)
 		{
-			throw new KalturaAPIException( KalturaErrors::PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE, 'mediaEntry / cloneEntryId');
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $mediaEntryId);
 		}
-		if ($cloneEntryId)
-		{
-			$cloneEntry = entryPeer::retrieveByPK($cloneEntryId);
-			if (!$cloneEntry)
-			{
-				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $cloneEntryId);
-			}
-			$dbEntry = myEntryUtils::copyEntry($cloneEntry, $this->getPartner(), array());
-		}
-		else
-		{
-			$dbEntry = $this->prepareEntryForInsert($mediaEntry);
-		}
-		$dbEntry->setRootEntryId($roomEntryId);
-		$dbEntry->save();
+		$mediaEntry->setRootEntryId($roomEntryId);
+		$mediaEntry->save();
 		$recordedEntry = new KalturaMediaEntry();
-		$recordedEntry->fromObject($dbEntry);
+		$recordedEntry->fromObject($mediaEntry);
 		return $recordedEntry;
 	}
 

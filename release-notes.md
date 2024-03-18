@@ -11,6 +11,15 @@ Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indic
 
     curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"full_name":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
 
+## Add attachRecordedEntry action to RoomService
+- Issue Type: Task
+- Issue ID: NR2-8156
+
+#### Deployment ####
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2024_03_18_update_room_permissions.php
 
 # Tucana-20.7.0
 
