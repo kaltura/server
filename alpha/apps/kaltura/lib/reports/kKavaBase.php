@@ -694,6 +694,7 @@ class kKavaBase extends kDruidBase
 		'kalturameeting' => 'Kaltura Meeting',
 		'onedrive' => 'OneDrive',
 		'webexapi' => 'Webex API',
+		'teamsentry' => 'Teams Entry',
 	);
 
 	protected static $sourceTypes = array(
