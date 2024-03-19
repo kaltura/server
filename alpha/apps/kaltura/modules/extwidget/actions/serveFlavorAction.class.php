@@ -164,26 +164,27 @@ class serveFlavorAction extends kalturaAction
 
 		return $mediaSet;
 	}
-	protected function retrievePlaylistoffsets($entry, &$original_durations)
+	// if the entry has clip attributes returns the offsets and updated durations, otherwise returns zeros and original durations
+	protected function retrievePlaylistAttributesData($entry, $durations)
 	{
-		$offsets = array_fill(0, count($original_durations), 0);
+		$offsets = array_fill(0, count($durations), 0);
 		if ($entry->getMediaType() == PlaylistType::STATIC_LIST && $entry->getOperationAttributes())
 		{
 			$clipAttributes = array_filter($entry->getOperationAttributes(), function($obj) {
 				return $obj instanceof kClipAttributes;
 			});
-			for ($i = 0; $i < min(count($original_durations), count($clipAttributes)); $i++)
+			for ($i = 0; $i < min(count($durations), count($clipAttributes)); $i++)
 			{
 				$offset = $clipAttributes[$i]->getOffset();
 				$duration = $clipAttributes[$i]->getDuration();
-				if ($offset > 0 && $duration > 0 && $original_durations[$i] - $offset > $duration)
+				if ($offset >= 0 && $duration > 0 && $durations[$i] - $offset > $duration)
 				{
 					$offsets[$i] = $offset;
-					$original_durations[$i] = $duration;
+					$durations[$i] = $duration;
 				}
 			}
 		}
-		return $offsets;
+		return array($offsets, $durations);
 	}
 	protected function servePlaylist($entry, $captionLanguages)
 	{
@@ -206,7 +207,7 @@ class serveFlavorAction extends kalturaAction
 		}
 		
 		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry, $captionLanguages);
-		$offsets = $this->retrievePlaylistoffsets($entry, $durations);
+		list($offsets, $durations) = $this->retrievePlaylistAttributesData($entry, $durations);
 		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null,
 			$captionFiles, $captionLanguages, $isLive, 0, 0, 0, 0, $offsets);
 	}
@@ -215,6 +216,7 @@ class serveFlavorAction extends kalturaAction
 	                                          $captionFiles, $captionLanguages, $isLive,
 	                                          $playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $offsets=null)
 	{
+		$offsets = $offsets ?? array_fill(0, count($entryIds), 0);
 		// get request parameters
 		if (!$flavorParamIds)
 		{
@@ -320,7 +322,7 @@ class serveFlavorAction extends kalturaAction
 						$storeCache = false;
 					}
 					$clipData = self::getClipData($path, $flavor, $sourceType);
-					if (isset($offsets)){
+					if ($offsets[$index]){
 						$clipData['clipFrom'] = $offsets[$index];
 					}
 					$clips[] = $clipData;
