@@ -1,5 +1,5 @@
 # Tucana-20.8.0
-## Add Team Recording Upload Integration to partner config##
+## Add Team Recording Upload Integration to partner config ##
 - Issue Type: Task
 - Issue ID: PLAT-24649
 
