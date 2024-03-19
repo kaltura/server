@@ -1,4 +1,18 @@
 # Tucana-20.8.0
+## Add Team Recording Upload Integration to partner config##
+- Issue Type: Task
+- Issue ID: PLAT-24649
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.teamsRecordingUploadIntegration.enabled = true
+moduls.teamsRecordingUploadIntegration.permissionType = 2
+moduls.teamsRecordingUploadIntegration.label = "Enable Teams recordings upload integration"
+moduls.teamsRecordingUploadIntegration.permissionName = FEATURE_TEAMS_RECORDING_UPLOAD_PERMISSION
+moduls.teamsRecordingUploadIntegration.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 ## Live Viewers Caching ##
 - Issue Type: Task
 - Issue ID: PLAT-24535
