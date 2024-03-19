@@ -57,7 +57,7 @@ class kSchedulingICal
 		return $component;
 	}
 
-	public static function formatDate($time, $timeZoneId = null )
+	public static function formatDate($time, $timeZoneId = null)
 	{
 		$original = date_default_timezone_get();
 		
