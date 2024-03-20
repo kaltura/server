@@ -479,7 +479,7 @@ class kMrssManager
 				$tags->addChild('tag', self::stringToSafeXml($tag));
 		}
 			
-		$categories = explode(',', $entry->getCategories());
+		$categories = $entry->getCategories() ? explode(',', $entry->getCategories()) : array();
 		if ($features && count($features) && in_array (ObjectFeatureType::CATEGORY_ENTRIES, $features))
 		{
 			$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());

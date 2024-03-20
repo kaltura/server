@@ -203,7 +203,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$serializedObject = parent::getTokenizer();
 		
 		try {
-			$object = unserialize($serializedObject);
+			$object = $serializedObject ? unserialize($serializedObject) : null;
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Error unserializing tokenizer for delivery id ['.$this->getId().']');

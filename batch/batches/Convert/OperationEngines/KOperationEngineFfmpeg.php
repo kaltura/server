@@ -13,7 +13,7 @@ class KOperationEngineFfmpeg  extends KSingleOutputOperationEngine
 		}
 		$cmdLine=KDLOperatorFfmpeg::ExpandForcedKeyframesParams($cmdLine);
 		
-		// impersonite
+		// impersonate
 		KBatchBase::impersonate($this->data->flavorParamsOutput->partnerId); // !!!!!!!!!!!$this->job->partnerId);
 
 				/*

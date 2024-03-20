@@ -90,10 +90,12 @@ class KDLFlavor extends KDLMediaDataSet {
 		 */
 		if($this->_video!=null && $prevFlavor->_video!=null) {
 			/*
-			 * The previous flavor should be atleast FlavorBitrateRedundencyFactor
+			 * The previous flavor should be at least FlavorBitrateRedundancyFactor
 			 * away, else - remove the current flavor.
+			 * PHP8 - Avoid dividing by 0 and assign $estimatedSize the value it would have got in PHP7
 			 */
-			$redundRatio = $this->_video->_bitRate/$prevFlavor->_video->_bitRate;
+			$redundRatio = $prevFlavor->_video->_bitRate ?
+				$this->_video->_bitRate/$prevFlavor->_video->_bitRate : INF;
 			if($redundRatio>1) $redundRatio = 1/$redundRatio;
 			if($redundRatio>KDLConstants::FlavorBitrateRedundencyFactor) {
 				$this->_flags = $this->_flags | KDLFlavor::RedundantFlagBit;

@@ -996,8 +996,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			 * The flavor considered to be redundant if it's bitrate
 			 * is closer than 15% to the matched flavor,
 			 * otherwise - skip it
+			 * If video bitrate is 0 we wont skip
 			 */
-			if($diff<0 || $diff/$matchSourceHeightFlavor->getVideoBitrate()>$thresholdRatio){
+			if($diff<0 ||
+				$matchSourceHeightFlavor->getVideoBitrate() === 0 ||
+				$diff/$matchSourceHeightFlavor->getVideoBitrate()>$thresholdRatio){
 				continue;
 			}
 			KalturaLog::log("Look for redundant: diff($diff),percent(".($diff*100/$matchSourceHeightFlavor->getVideoBitrate()).")");
@@ -1877,7 +1880,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	{
 		$ingestedNeeded = false;
 		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
-		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
+		$entryIngestedFlavors = $entry->getFlavorParamsIds() ? explode(',', $entry->getFlavorParamsIds()) : array();
 
 		foreach($flavors as $index => $flavor)
 		{
