@@ -478,7 +478,7 @@ class kString
 	public static function explode($string, $delimiter=',')
 	{
 		$output = array();
-		$values = explode($delimiter, $string);
+		$values = !is_null($string) ? explode($delimiter, $string) : array();
 		foreach ($values as $value)
 		{
 			$value = trim($value);

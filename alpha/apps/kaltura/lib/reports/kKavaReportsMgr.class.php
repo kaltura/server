@@ -4420,7 +4420,8 @@ class kKavaReportsMgr extends kKavaBase
 		$context['columns'][] = 'SOURCE';
 		$context['columns'][] = 'ADMIN_TAGS';
 		$context['columns'][] = 'CUSTOM_DATA';
-
+		
+		$result = array();
 		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
 		foreach ($enrichedResult as $id => $row)
 		{

@@ -395,7 +395,7 @@ class PlaylistService extends KalturaEntryService
 		$pagerSeparateQueries = self::decideWhereHandlingPager($pager,$entryFiltersViaEsearch, $entryFiltersViaSphinx);
 		$entryList = self::handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeparateQueries, $pager, $totalResults, $playlistContent);
 		myEntryUtils::updatePuserIdsForEntries($entryList);
-		KalturaLog::debug("entry ids count: " . count($entryList));
+		KalturaLog::debug("entry ids count: " . $entryList ? count($entryList) : 0);
 		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
 	}
 

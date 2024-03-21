@@ -1978,6 +1978,12 @@ class Partner extends BasePartner
 		$whiteList = $this->getCdnHostWhiteListArray();
 		foreach ($whiteList as $regEx)
 		{
+			//Avoid passing "/" as pattern as it triggers preg_match(): Unknown modifier '/'
+			if(!trim($regEx, "/"))
+			{
+				continue;
+			}
+			
 			if (preg_match("/".$regEx."/", $host)===1)//Should $regEx be escaped?
 			{
 				$this->cdnWhiteListCache[$host] = true;

@@ -723,7 +723,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$currentConversionParams[self::AUDIO_DURATION] = $mediaInfoObj->getAudioDuration();
 
 			$shouldResize = $this->shouldResize($mediaInfoObj, $width, $height);
-			if(shouldResize)
+			if($shouldResize)
 			{
 				$currentConversionParams[self::WIDTH] = $width; // trigger resize
 				if($mediaInfoObj->getVideoWidth() < $mediaInfoObj->getVideoHeight())

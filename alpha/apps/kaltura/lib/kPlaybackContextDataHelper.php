@@ -188,7 +188,7 @@ class kPlaybackContextDataHelper
 	private function getFlavorParamsIdsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
-		$flavorParamsIds = null;
+		$flavorParamsIds = array();
 		$flavorsParamsNotIn = false;
 
 		foreach ($actions as $action)
@@ -197,7 +197,7 @@ class kPlaybackContextDataHelper
 			if ($action->getType() == RuleActionType::LIMIT_FLAVORS)
 			{
 				/* @var $action kAccessControlLimitFlavorsAction */
-				$flavorsIds = explode(',', $action->getFlavorParamsIds());
+				$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
 				$flavorsParamsNotIn = $action->getIsBlockedList();
 			}
 		}
@@ -215,7 +215,7 @@ class kPlaybackContextDataHelper
 
 		list($flavorParamsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorParamsIdsToFilter($contextDataHelper);
 
-		if($flavorParamsIdsToFilter && count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
+		if(count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
 			self::filterFlavorAssetsByFlavorParamsIds($flavorAssets, $flavorParamsIdsToFilter, $flavorsParamsNotIn);
 
 		$this->flavorAssets = $flavorAssets;

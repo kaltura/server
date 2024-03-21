@@ -25,7 +25,7 @@ class kEvalStringField extends kStringField
 			throw new kCoreException("Evaluated code may be simple value only");
 			
 		KalturaLog::debug("Evaluating code [$this->code]" . ($this->description ? " for description [$this->description]" : ''));
-		return eval("return strval({$this->code});");
+		return eval("return @strval({$this->code});");
 	}
 	
 	/**

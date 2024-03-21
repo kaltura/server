@@ -646,7 +646,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function hasTag($v)
 	{
-		$tags = explode(',', $this->getTags());
+		$tags = kString::explode($this->getTags(), ',');
 		return in_array($v, $tags);
 	}
 	

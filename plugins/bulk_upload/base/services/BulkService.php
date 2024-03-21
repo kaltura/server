@@ -26,7 +26,7 @@ class BulkService extends KalturaBaseService
 	 */
 	function addEntriesAction($fileData, KalturaBulkUploadJobData $bulkUploadData = null, KalturaBulkUploadEntryData $bulkUploadEntryData = null)
 	{
-		if(get_class($bulkUploadData) == 'KalturaBulkUploadJobData')
+		if(!is_null($bulkUploadData) && get_class($bulkUploadData) == 'KalturaBulkUploadJobData')
 			throw new KalturaAPIException(KalturaErrors::OBJECT_TYPE_ABSTRACT, 'KalturaBulkUploadJobData');
 
 		$validContent = myXmlUtils::validateXmlFileContent($fileData['tmp_name']);

@@ -79,7 +79,7 @@ class LikeService extends KalturaBaseLikeService
 	    }
 	    
 	    $existingKVote = kvotePeer::doSelectByEntryIdAndPuserId($entryId, $this->getPartnerId(), $userId);
-	    if (!$existingKVote || !count($existingKVote))
+	    if (!$existingKVote)
 	    {
 	        return false;
 	    }
