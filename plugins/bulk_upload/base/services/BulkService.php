@@ -36,7 +36,7 @@ class BulkService extends KalturaBaseService
 		}
 
 
-	    if($bulkUploadEntryData->conversionProfileId == self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
+	    if($bulkUploadEntryData && $bulkUploadEntryData->conversionProfileId == self::PARTNER_DEFAULT_CONVERSION_PROFILE_ID)
 			$bulkUploadEntryData->conversionProfileId = $this->getPartner()->getDefaultConversionProfileId();
 	    
 	    if (!$bulkUploadData)

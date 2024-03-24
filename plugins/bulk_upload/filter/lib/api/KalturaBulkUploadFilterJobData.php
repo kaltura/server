@@ -40,7 +40,8 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 		if(is_null($dbData))
 			$dbData = new kBulkUploadFilterJobData();
 		
-		switch (get_class($this->templateObject))
+		$templateObjectClass = $this->templateObject ? get_class($this->templateObject) : null;
+		switch ($templateObjectClass)
 	    {
 	        case 'KalturaCategoryEntry':
 	           	$dbData->setTemplateObject(new categoryEntry());
@@ -83,12 +84,8 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	    }
 	    
 	    $this->templateObject = null;
-	    if(is_null($source_object->getTemplateObject()))
-	    {
-	        return;
-	    }
-	    
-	    switch (get_class($source_object->getTemplateObject()))
+	    $templateObjectClass = $source_object->getTemplateObject() ? get_class($source_object->getTemplateObject()) : null;
+	    switch ($templateObjectClass)
 	    {
 	        case 'categoryEntry':
 	            $this->templateObject = new KalturaCategoryEntry();

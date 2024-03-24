@@ -544,7 +544,7 @@ class kFile extends kFileBase
 	{
 		$mediaInfoParser = new KMediaInfoMediaParser($path);
 		$mediaInfo = $mediaInfoParser->getMediaInfo();
-		return $mediaInfo->containerFormat;
+		return $mediaInfo ? $mediaInfo->containerFormat : null;
 	}
 
 	/**

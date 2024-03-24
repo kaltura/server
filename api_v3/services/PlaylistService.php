@@ -217,7 +217,7 @@ class PlaylistService extends KalturaEntryService
 			throw new KalturaAPIException (APIErrors::INVALID_PLAYLIST_TYPE);
 		}
 			
-		if ($newPlaylist->playlistType && ($newPlaylist->playlistType != $dbPlaylist->getMediaType()))
+		if ($newPlaylist && $newPlaylist->playlistType && ($newPlaylist->playlistType != $dbPlaylist->getMediaType()))
 		{
 			throw new KalturaAPIException (APIErrors::CANT_UPDATE_PARAMETER, 'playlistType');
 		}
