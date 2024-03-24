@@ -80,10 +80,14 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	    if ($this->filter)
 	    {
 	        $this->filter->fromObject($source_object->getFilter());
-	    }       
+	    }
 	    
-	   	$this->templateObject = null;
-	   	
+	    $this->templateObject = null;
+	    if(is_null($source_object->getTemplateObject()))
+	    {
+	        return;
+	    }
+	    
 	    switch (get_class($source_object->getTemplateObject()))
 	    {
 	        case 'categoryEntry':
