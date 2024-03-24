@@ -99,7 +99,7 @@ abstract class KalturaFilter extends KalturaObject
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 				$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 			}
-			elseif($propertyInfo->getDynamicType()&& strlen($value))
+			elseif($propertyInfo->getDynamicType() && strlen($value))
 			{
 				$propertyType = $propertyInfo->getDynamicType();
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
