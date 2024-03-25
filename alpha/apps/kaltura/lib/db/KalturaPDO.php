@@ -16,10 +16,14 @@ class KalturaPDO extends PropelPDO
 	 */
 	const KALTURA_ATTR_NO_TRANSACTION = 'noTransaction';
 	
+	const KALTURA_ATTR_SSL_CA = 'sslCa';
+	
+	const KALTURA_ATTR_SSL_VERIFY_SERVER_CERT = 'verifyServerCert';
+	
 	/**
 	 * Sets the number of retries of doSave()
 	 */
-	const SAVE_MAX_RETRIES = 4; 
+	const SAVE_MAX_RETRIES = 4;
 	
 	protected static $comment = null;
 	protected $kalturaOptions = array();
@@ -37,6 +41,16 @@ class KalturaPDO extends PropelPDO
 		{
 			$this->connectionName = $driver_options[KalturaPDO::KALTURA_ATTR_NAME];
 			$this->kalturaOptions = DbManager::getKalturaConfig($this->connectionName);
+		}
+		
+		if(isset($this->kalturaOptions[KalturaPDO::KALTURA_ATTR_SSL_CA]))
+		{
+			$driver_options[PDO::MYSQL_ATTR_SSL_CA] = $this->getKalturaOption(KalturaPDO::KALTURA_ATTR_SSL_CA);
+		}
+		
+		if(isset($this->kalturaOptions[KalturaPDO::KALTURA_ATTR_SSL_VERIFY_SERVER_CERT]))
+		{
+			$driver_options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = $this->getKalturaOption(KalturaPDO::KALTURA_ATTR_SSL_VERIFY_SERVER_CERT);
 		}
 		
 		list($mysql, $connection) = explode(':', $dsn);
