@@ -411,9 +411,12 @@ class kSessionBase
 		
 		//Match internal allowed URIs
 		$internalAllowedUris = kConf::get('internal_allowed_uris', 'security', array());
-		if(in_array($requestUri, $internalAllowedUris))
+		foreach($internalAllowedUris as $internalAllowedUri)
 		{
-			return true;
+			if($requestUri == $internalAllowedUri || substr($requestUri, 0, strlen($internalAllowedUri) - 1) == substr($internalAllowedUri, 0, -1))
+			{
+				return true;
+			}
 		}
 		
 		foreach ($uris as $uri)
