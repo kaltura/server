@@ -51,7 +51,12 @@ abstract class MicroServiceBaseService
 	{
 		$serviceUrl = kConf::get("microservice_url");
 		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $hostName, $serviceUrl);
-		return trim($serviceUrl, "\/") . '/' . trim($serviceName, "\/");
+		$serviceUrl = trim($serviceUrl, "\/");
+		if ($serviceName)
+		{
+			$serviceUrl = $serviceUrl . '/' . trim($serviceName, "\/");
+		}
+		return $serviceUrl;
 	}
 	
 	public function getServiceUrl()

@@ -272,7 +272,9 @@ class kmcngAction extends kalturaAction
 				'authProfileEndpoint' => array('uri' => MicroServiceAuthProfile::buildServiceUrl(MicroServiceAuthProfile::$host, MicroServiceAuthProfile::$service)),
 				'spaProxyEndpoint' => array('uri' => MicroServiceSpaProxy::buildServiceUrl(MicroServiceSpaProxy::$host, MicroServiceSpaProxy::$service)),
 				'userProfileEndpoint' => array('uri' => MicroServiceUserProfile::buildServiceUrl(MicroServiceUserProfile::$host, MicroServiceUserProfile::$service)),
-				'userReportsEndpoint' => array('uri' => MicroServiceUserReports::buildServiceUrl(MicroServiceUserReports::$host, MicroServiceUserReports::$service))
+				'userReportsEndpoint' => array('uri' => MicroServiceUserReports::buildServiceUrl(MicroServiceUserReports::$host, MicroServiceUserReports::$service)),
+				'mrEndpoint' => array('uri' => MicroServiceMediaRepurposing::buildServiceUrl(MicroServiceMediaRepurposing::$host, MicroServiceMediaRepurposing::$service)),
+				'vendorIntegrationsEndpoint' => array('uri' => MicroServiceVendorIntegrations::buildServiceUrl(MicroServiceVendorIntegrations::$host, MicroServiceVendorIntegrations::$service))
 			),
 		);
 
