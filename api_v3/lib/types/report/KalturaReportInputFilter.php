@@ -293,6 +293,55 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $cuePointIdIn;
 
+	/**
+	 * filter by kaltura application
+	 * @var string
+	 */
+	public $kalturaAppIn;
+
+	/**
+	 * filter by button type
+	 * @var string
+	 */
+	public $buttonTypeIn;
+
+	/**
+	 * filter by button name
+	 * @var string
+	 */
+	public $buttonNameIn;
+
+	/**
+	 * filter by button value
+	 * @var string
+	 */
+	public $buttonValueIn;
+
+	/**
+	 * filter by page type
+	 * @var string
+	 */
+	public $pageTypeIn;
+
+	/**
+	 * filter by page name
+	 * @var string
+	 */
+	public $pageNameIn;
+
+	/**
+	 * filter by page value
+	 * @var string
+	 */
+	public $pageValueIn;
+
+	/**
+	 * filter by vertical
+	 * @var string
+	 */
+	public $partnerVerticalIn;
+
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -337,6 +386,14 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'originIn' => 'origins',
 		'uiConfIdIn' => 'ui_conf_ids',
 		'cuePointIdIn' => 'cue_point_ids',
+		'kalturaAppIn' => 'kaltura_applications',
+		'buttonTypeIn' => 'event_var1',
+		'buttonNameIn' => 'event_var2',
+		'buttonValueIn' => 'event_var3',
+		'pageTypeIn' => 'event_var1',
+		'pageNameIn' => 'event_var2',
+		'pageValueIn' => 'event_var3',
+		'partnerVerticalIn' => 'partner_vertical'
 	);
 
 	protected function getMapBetweenObjects()

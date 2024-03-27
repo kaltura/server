@@ -3,7 +3,7 @@
  * @package api
  * @subpackage filters
  */
-class KalturaReportInputBaseFilter extends KalturaObject 
+class KalturaReportInputBaseFilter extends KalturaObject
 {
 	/**
 	 * Start date as Unix timestamp (In seconds)
@@ -89,7 +89,10 @@ class KalturaReportInputBaseFilter extends KalturaObject
 			if (is_numeric($apiName)) {
 				$apiName = $memberName;
 			}
-			$reportInputFilter->$memberName = $this->$apiName;
+			if (isset($this->$apiName))
+			{
+				$reportInputFilter->$memberName = $this->$apiName;
+			}
 		}
 		return $reportInputFilter;
 	}
