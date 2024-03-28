@@ -2,7 +2,7 @@
 /**
  * @package deployment
  *
- * Deploy new Azerbaijani and Urdu language flavors for live
+ * Deploy new UHD flavors for live
  */
 require_once (__DIR__ . '/../../bootstrap.php');
 $script = realpath(dirname(__FILE__) . '/../../') . '/base/scripts/insertDefaults.php';
