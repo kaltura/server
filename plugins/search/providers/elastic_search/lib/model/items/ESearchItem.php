@@ -85,7 +85,7 @@ abstract class ESearchItem extends BaseObject implements IESearchItem
 
 	protected function validateAllowedSearchTypes($allowedSearchTypes, $fieldName)
 	{
-		if (!in_array($this->getItemType(),  $allowedSearchTypes[$fieldName]))
+		if (!isset($allowedSearchTypes[$fieldName]) || !in_array($this->getItemType(), $allowedSearchTypes[$fieldName]))
 		{
 			$data = array();
 			$data['itemType'] = $this->getItemType();
