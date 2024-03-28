@@ -154,7 +154,6 @@
 							 */
 							// Calc the generated chunk duration
 						$generatedChunkDur = $job->stat->finish-$job->stat->start;
-					}
 							// For the last chunk - no need to validate chunk dur
 						if($job->id==$maxChunks-1)
 							continue;
