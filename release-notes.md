@@ -1,4 +1,10 @@
 # Tucana-20.8.0
+## Promote Attendee to Admin ##
+- Issue Type: Task
+- Issue ID: PLAT-24661
+### Deployment Scripts ###
+```php deployment/updates/scripts/add_permissions/2024_03_24_user_promoteUser_permissions.php```
+
 ## Add Team Recording Upload Integration to partner config ##
 - Issue Type: Task
 - Issue ID: PLAT-24649

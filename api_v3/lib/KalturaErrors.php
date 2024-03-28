@@ -497,6 +497,10 @@ class KalturaErrors extends APIErrors
 
 	const USER_LOGIN_ALREADY_ENABLED = "USER_LOGIN_ALREADY_ENABLED;;User is already allowed to login";
 
+	const LOGIN_DATA_MISMATCH = "LOGIN_DATA_MISMATCH;;Actual user login id does not match provided current user login id";
+
+	const LOGIN_DATA_NOT_PROVIDED = "LOGIN_DATA_NOT_PROVIDED;;User login id not provided";
+
 	const USER_LOGIN_ALREADY_DISABLED = "USER_LOGIN_ALREADY_DISABLED;;User is already not allowed to login";
 
 	const PROPERTY_VALIDATION_NO_USAGE_PERMISSION = "PROPERTY_VALIDATION_NO_USAGE_PERMISSION;PROP;Current user does not have permission to use property \"@PROP@\"";

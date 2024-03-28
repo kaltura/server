@@ -1053,6 +1053,51 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		
 		return true;	
 	}
+
+	/**
+	 * Promote user to admin
+	 * @param string $newLoginId
+	 * @param string $currentLoginId
+	 * @throws kUserException::USER_LOGIN_ALREADY_ENABLED
+	 * @throws kUserException::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER
+	 * @throws kUserException::USER_LOGIN_ALREADY_DISABLED
+	 * @throws kUserException::INVALID_EMAIL
+	 * @throws kUserException::INVALID_PARTNER
+	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
+	 * @throws kUserException::LOGIN_ID_ALREADY_USED
+	 * @throws kUserException::LOGIN_DATA_NOT_PROVIDED
+	 * @throws kUserException::LOGIN_DATA_MISMATCH
+	 * @throws kUserException::LOGIN_ID_ALREADY_USED
+	 */
+	public function promoteUser($newLoginId, $currentLoginId)
+	{
+		$currentLoginData = UserLoginDataPeer::getByEmail($currentLoginId);
+		$newLoginData = UserLoginDataPeer::getByEmail($newLoginId);
+
+		if(!$currentLoginId)
+		{
+			throw new kUserException('', kUserException::LOGIN_DATA_NOT_PROVIDED);
+		}
+
+		if ($currentLoginData && $currentLoginId !== $currentLoginData->getLoginEmail())
+		{
+			throw new kUserException('', kUserException::LOGIN_DATA_MISMATCH);
+		}
+
+		if ($newLoginData && $newLoginData->getConfigPartnerId() == $this->getPartnerId())
+		{
+			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
+		}
+
+		if ($currentLoginData)
+		{
+			$this->disableLogin();
+		}
+		$this->setIsAdmin(true);
+
+		return $this->enableLogin($newLoginId);
+	}
 	
 	/**
 	 * Enable user login 
