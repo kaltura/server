@@ -19,10 +19,12 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_VE_REGISTRATION = 'virtual-events-registration';
 	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
 	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
+	const DATASOURCE_APPLICATION_EVENTS = 'application-events';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
 	const DIMENSION_PARTNER_PARENT_ID = 'partnerParentId';
+	const DIMENSION_PARTNER_VERTICAL = 'partnerVertical';
 	const DIMENSION_ENTRY_ID = 'entryId';
 	const DIMENSION_LOCATION_COUNTRY = 'location.country';
 	const DIMENSION_LOCATION_REGION = 'location.region';
@@ -82,6 +84,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CATALOG_ITEM_ID = 'catalogItemId';
 	const DIMENSION_REACH_PROFILE_TYPE = 'reachProfileType';
 	const DIMENSION_CUE_POINT_ID = 'cuePointId';
+	const DIMENSION_KALTURA_APPLICATION = 'kalturaApplication';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -163,6 +166,10 @@ class kKavaBase extends kDruidBase
 	// event types - meeting events
 	const EVENT_TYPE_MEETING_JOIN_SESSION = 'joinSession';
 	const EVENT_TYPE_MEETING_RAISE_HAND = 'raiseHand';
+
+	// event types - application events
+	const EVENT_TYPE_BUTTON_CLICKED = 'buttonClicked';
+	const EVENT_TYPE_PAGE_LOAD = 'pageLoad';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -663,6 +670,28 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_CUE_POINT_ID => 1,
 		),
+		self::DATASOURCE_APPLICATION_EVENTS => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_PARTNER_VERTICAL => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_LOCATION_ISP => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_KALTURA_APPLICATION => 1,
+			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_EVENT_VAR2 => 1,
+			self::DIMENSION_EVENT_VAR3 => 1,
+		),
 	);
 
 	protected static $datasources_hash_dimensions = array(
@@ -694,6 +723,7 @@ class kKavaBase extends kDruidBase
 		'kalturameeting' => 'Kaltura Meeting',
 		'onedrive' => 'OneDrive',
 		'webexapi' => 'Webex API',
+		'teamsentry' => 'Teams Entry',
 	);
 
 	protected static $sourceTypes = array(

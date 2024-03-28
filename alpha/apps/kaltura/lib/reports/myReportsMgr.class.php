@@ -1562,6 +1562,8 @@ class reportsInputFilter
 	public $origins;
 	public $ui_conf_ids;
 	public $cue_point_ids;
+	public $kaltura_applications;
+	public $partner_vertical;
 
 
 	public function getFilterBy() {

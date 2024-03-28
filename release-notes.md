@@ -1,4 +1,40 @@
+# Tucana-20.9.0
+## Add new UHD flavor param for live  ##
+- Issue Type: Task
+- Issue ID: LIV-937
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.liveUHdFlavors.enabled = true
+moduls.liveUHdFlavors.permissionType = 2
+moduls.liveUHdFlavors.label = Kaltura Live UHD Flavors
+moduls.liveUHdFlavors.permissionName = FEATURE_KALTURA_LIVE_STREAM_UHD_FLAVORS
+moduls.liveUHdFlavors.basePermissionType = 2
+moduls.liveUHdFlavors.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+moduls.liveUHdFlavors.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+### Deployment Scripts ###
+```
+    php deployment/updates/scripts/2024_03_24_add_1080_live_flavour_param.php
+```
+
 # Tucana-20.8.0
+## Add Team Recording Upload Integration to partner config ##
+- Issue Type: Task
+- Issue ID: PLAT-24649
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.teamsRecordingUploadIntegration.enabled = true
+moduls.teamsRecordingUploadIntegration.permissionType = 2
+moduls.teamsRecordingUploadIntegration.label = "Enable Teams recordings upload integration"
+moduls.teamsRecordingUploadIntegration.permissionName = FEATURE_TEAMS_RECORDING_UPLOAD_PERMISSION
+moduls.teamsRecordingUploadIntegration.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 ## Live Viewers Caching ##
 - Issue Type: Task
 - Issue ID: PLAT-24535
@@ -16,6 +52,17 @@
 Elastic docs: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/indices-put-mapping.html
 
     curl -XPUT "http://@KALTURA_ESEARCH_HOST@:@KALTURA_ESEARCH_PORT@/@KUSER_INDEX_NAME@/_mapping" -H 'Content-Type: application/json' -d'{"properties": {"full_name":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
+
+
+## Add attachRecordedEntry action to RoomService
+- Issue Type: Task
+- Issue ID: NR2-8156
+
+#### Deployment ####
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2024_03_18_update_room_permissions.php
 
 ## Add Media Repurposing NG to partner config ##
 - Issue Type: Task

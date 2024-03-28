@@ -421,7 +421,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_RESUME,
 		self::EVENT_TYPE_MEETING_RAISE_HAND,
 		self::EVENT_TYPE_POLL_ANSWERED,
-		self::EVENT_TYPE_MEETING_JOIN_SESSION
+		self::EVENT_TYPE_MEETING_JOIN_SESSION,
+		self::EVENT_TYPE_BUTTON_CLICKED,
+		self::EVENT_TYPE_PAGE_LOAD
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -483,7 +485,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_RESUME => 'count_resume_clicked',
 		self::EVENT_TYPE_MEETING_RAISE_HAND => 'count_raise_hand_clicked',
 		self::EVENT_TYPE_POLL_ANSWERED => 'count_poll_answered',
-		self::EVENT_TYPE_MEETING_JOIN_SESSION => 'count_meeting_join_session'
+		self::EVENT_TYPE_MEETING_JOIN_SESSION => 'count_meeting_join_session',
+		self::EVENT_TYPE_BUTTON_CLICKED => 'count_button_clicked',
+		self::EVENT_TYPE_PAGE_LOAD => 'count_page_load'
 	);
 
 	//global transform
@@ -2712,6 +2716,8 @@ class kKavaReportsMgr extends kKavaBase
 			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
 			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID),
 			'cue_point_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CUE_POINT_ID),
+			'partner_vertical' => array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_VERTICAL),
+			'kaltura_applications' => array(self::DRUID_DIMENSION => self::DIMENSION_KALTURA_APPLICATION),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -4407,6 +4413,20 @@ class kKavaReportsMgr extends kKavaBase
 		foreach ($result as $id => &$row)
 		{
 			$row[1] = $row[1] ? $row[1] : $row[0];
+		}
+
+		return $result;
+	}
+
+	protected static function getKmeUsersInfo($ids, $partner_id, $context)
+	{
+		$context['columns'] = array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)',
+			'EMAIL', 'CUSTOM_DATA.is_guest');
+
+		$result = self::getUsersInfo($ids, $partner_id, $context);
+		foreach ($result as $id => &$row)
+		{
+			$row[3] = $row[3] ? 'Guest' : 'User';
 		}
 
 		return $result;
