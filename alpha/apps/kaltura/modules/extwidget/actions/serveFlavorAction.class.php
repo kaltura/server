@@ -177,7 +177,7 @@ class serveFlavorAction extends kalturaAction
 			{
 				$offset = $clipAttributes[$i]->getOffset();
 				$duration = $clipAttributes[$i]->getDuration();
-				if ($offset >= 0 && $duration > 0 && $durations[$i] - $offset > $duration)
+				if ($offset >= 0 && $duration > 0 && $durations[$i] - $offset >= $duration)
 				{
 					$offsets[$i] = $offset;
 					$durations[$i] = $duration;
@@ -216,7 +216,7 @@ class serveFlavorAction extends kalturaAction
 	                                          $captionFiles, $captionLanguages, $isLive,
 	                                          $playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $offsets=null)
 	{
-		$offsets = $offsets ?? array_fill(0, count($entryIds), 0);
+		$offsets = $offsets ? $offsets : array_fill(0, count($entryIds), 0);
 		// get request parameters
 		if (!$flavorParamIds)
 		{
