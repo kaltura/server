@@ -6,6 +6,10 @@
 class kUserException extends kCoreException
 {
 	const LOGIN_DATA_NOT_FOUND = 'LOGIN_DATA_NOT_FOUND';
+
+	const LOGIN_DATA_MISMATCH = 'LOGIN_DATA_MISMATCH';
+
+	const LOGIN_DATA_NOT_PROVIDED = 'LOGIN_DATA_NOT_PROVIDED';
 	
 	const WRONG_PASSWORD = 'WRONG_PASSWORD';
 	
