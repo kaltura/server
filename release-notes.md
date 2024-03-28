@@ -1,5 +1,5 @@
 # Tucana-20.9.0
-## Add Team Recording Upload Integration to partner config ##
+## Add new UHD flavor param for live  ##
 - Issue Type: Task
 - Issue ID: LIV-937
 
