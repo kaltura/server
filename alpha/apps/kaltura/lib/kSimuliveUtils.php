@@ -395,7 +395,7 @@ class kSimuliveUtils
 		}
 	}
 
-	private static function generateSourceLabel($type, $srcId)
+	protected static function generateSourceLabel($type, $srcId)
 	{
 		$label = '';
 		$label = self::addParam('type', $type, $label);
