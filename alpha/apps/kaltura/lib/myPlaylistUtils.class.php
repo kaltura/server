@@ -570,6 +570,7 @@ class myPlaylistUtils
 		$entryFiltersViaEsearch = array();
 		$entryFiltersViaSphinx = array();
 		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
+		$entryFilters = $entryFilters ? $entryFilters : array();
 		foreach ($entryFilters as $entryFilter)
 		{
 			$entryFilterFromXml = self::fillEntryFilter($entryFilter);
