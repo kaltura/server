@@ -1918,7 +1918,37 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
-			self::REPORT_METRICS => array(self::EVENT_TYPE_PAGE_LOAD, self::EVENT_TYPE_BUTTON_CLICKED)
+			self::REPORT_METRICS => array(self::EVENT_TYPE_PAGE_LOAD, self::EVENT_TYPE_BUTTON_CLICKED),
+			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PAGE_LOAD, self::EVENT_TYPE_BUTTON_CLICKED)
+		),
+
+		ReportType::APPLICATION_EVENTS_MAP_OVERLAY_COUNTRY => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_APPLICATION_EVENTS,
+			self::REPORT_DIMENSION_MAP => array(
+				'object_id' =>  self::DIMENSION_LOCATION_COUNTRY,
+				'country' => self::DIMENSION_LOCATION_COUNTRY,
+				'coordinates' => self::DIMENSION_LOCATION_COUNTRY
+			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'object_id',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toShortName',
+				),
+				array(
+					self::REPORT_ENRICH_INPUT =>  array('country'),
+					self::REPORT_ENRICH_OUTPUT => 'coordinates',
+					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'country',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaCountryCodes::toLongMappingName',
+				),
+			),
+			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
+			self::REPORT_METRICS => array(self::EVENT_TYPE_BUTTON_CLICKED, self::EVENT_TYPE_PAGE_LOAD),
 		)
 	);
 

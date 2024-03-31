@@ -76,6 +76,7 @@ interface ReportType extends BaseEnum
    const REACH_PROFILE_USAGE = 66;
    const SELF_SERVE_BANDWIDTH = 67;
    const APPLICATION_EVENTS_HIGHLIGHTS = 68;
+   const APPLICATION_EVENTS_MAP_OVERLAY_COUNTRY = 69;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;
