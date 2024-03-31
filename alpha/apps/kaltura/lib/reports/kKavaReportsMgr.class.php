@@ -2227,7 +2227,13 @@ class kKavaReportsMgr extends kKavaBase
 	/// common query functions
 	protected static function shouldUseKava($partner_id, $report_type) 
 	{
-		if ($report_type < 0)	// kava custom reports
+		if(!is_numeric($report_type))
+		{
+			//Report type is an enum extended by quiz so in this case we shouldn't use Kava
+			return false;
+		}
+		
+		if ($report_type < 0)	//Kava custom reports
 		{
 			return true;
 		}
