@@ -30,9 +30,13 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * C'tor
 		 */
-		public function __construct($storeToken=null)
+		public function __construct($storeToken=null, $host=null, $port=null, $flags=1)
 		{
 			$this->storeToken = $storeToken;
+				// 'flags=1' stands for 'compress stored data'
+			if(isset($host) && isset($port) && isset($flags)){
+				$this->Setup(array('host'=>$host, 'port'=>$port, 'flags'=>$flags));
+			}
 		}
 
 		/* ---------------------------
@@ -82,7 +86,8 @@ ini_set("memory_limit","512M");
 			}
 				// Just to remove non printables from the log msg
 			$str = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $str);
-			KalturaLog::log("Session($job->session) - Set job $key($str)");
+			KalturaLog::log("Job:$str");
+			KalturaLog::log("Session($job->session) - Set job key:$key, state:$job->state");
 			return true;
 		}
 		 
@@ -370,6 +375,7 @@ ini_set("memory_limit","512M");
 		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine, $sharedChunkPath = null)
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, concurrentMin:$concurrentMin, sessionName:$sessionName, cmdLine:$cmdLine, sharedChunkPath:$sharedChunkPath");
+
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
 				// 'flags=1' stands for 'compress stored data'
 			$config = array('host'=>$host, 'port'=>$port, 'flags'=>1);
@@ -665,10 +671,11 @@ ini_set("memory_limit","512M");
 				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
 ///////////////
 // DEBUG ONLY
-// $dirName = dirname(__FILE__); 
-// $cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
-// $cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
-// $cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
+//$dirName = dirname(__FILE__);
+//$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
+//$cmdLine.= 'require_once \'/tmp/KChunkedEncodeSessionManager.php\';';
+//$cmdLine.= 'require_once \'/tmp/KChunkedEncodeMemcacheWrap.php\';';
+//$cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
 ///////////////
 				$cmdLine.= '\$rv=KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
 				$cmdLine.= '\''.($this->memcacheConfig['host']).'\',';
