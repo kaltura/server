@@ -144,20 +144,14 @@
 			$setup = $chunker->setup;	
 
 			$maxChunks = $chunker->GetMaxChunks();
-			$chunkDurThreshInSec=$chunker->chunkDurThreshInFrames*$chunker->params->frameDuration;
 			foreach($this->jobs as $idx=>$job) {
 				if($job->state==$job::STATE_SUCCESS) {			
 					$chunkData = $chunker->GetChunk($job->id);
 					if(isset($job->stat)){
-							/*
-							 * Validate chunk dur
-							 */
-							// Calc the generated chunk duration
-						$generatedChunkDur = $job->stat->finish-$job->stat->start;
 							// For the last chunk - no need to validate chunk dur
 						if($job->id==$maxChunks-1)
 							continue;
-						if($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur){
+						if($chunker->validateChunkDuration($chunkData,$job->stat->start,$job->stat->finish)===false) {
 								// Too short chunk duration mostly caused by low framerate 
 								// and missing frames at the chunk end (regular P/B, not I).
 								// Solution - gradually increase the chunk overlap, 
@@ -182,7 +176,7 @@
 				if($job->state==$job::STATE_FAIL) {
 						// The last chunk generation might be affected by improperly set source metadata.
 						// Occationally, the file ends before reaching the timing that was declared in the metadata.
-						// This results the last chunk failure,.
+						// This results the last chunk failure.
 						// To handle such cases, the failed job of the last chunk, forced to SUCCESS state after 
 						// few generation attempts.
 					if($job->id==$maxChunks-1 && $job->msg=="missing chunk stat"){
@@ -270,6 +264,7 @@
 		 */
 		protected function retryJob($manager, $job)
 		{
+KalturaLog::log("id:$job->id, keyIdx:$job->keyIdx, state:$job->state");
 			$job->state = $job::STATE_RETRY;
 			$manager->SaveJob($job);
 		}
@@ -295,9 +290,15 @@
 		/* ---------------------------
 		 * C'tor
 		 */
-		public function __construct(KChunkedEncodeSetup $setup, $storeManager, $name=null)
+		public function __construct(KChunkedEncodeSetup $setup, $storeManager, $name=null, $chunker=null)
 		{
-			parent::__construct($setup, $name);
+                        parent::__construct($setup, $name);
+			if(isset($chunker)){
+				$this->chunker = $chunker;
+			}
+			else
+				$this->chunker = new KChunkedEncode($setup);
+
 			if(!isset($this->chunker->setup->concurrent))
 				$this->chunker->setup->concurrent = 20;
 			
@@ -339,6 +340,20 @@
 		 */
 		public function getElapsed() { 
 			return (time()-$this->createTime);
+		}
+
+		/* ---------------------------
+		 * ExecuteSession
+		 */
+		public function ExecuteSession()
+		{
+			if(($rv=$this->Initialize())!=true) {
+				$this->Report();
+				return $rv;
+			}
+			$rv = $this->Generate();
+			$this->Report();
+			return $rv;
 		}
 
 		/* ---------------------------
