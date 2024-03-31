@@ -82,9 +82,9 @@
 				KalturaLog::log($msgStr="ERROR: missing essential - source");
 				return false;
 			}
-
 				// Get source mediaData. Required for 'supported' validation
-			$this->sourceFileDt = $this->getMediaData($params->source);
+			$this->sourceFileDt = $this->getMediaData($params->source,
+											$setup->ffmpegBin, $setup->ffprobeBin);
 			if(!isset($this->sourceFileDt)){
 				KalturaLog::log($msgStr="ERROR: failed on media data retrieval of the source file ($params->source)");
 				return false;
@@ -142,6 +142,11 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			if(isset($setup->fps)){
 				$params->fps = $setup->fps;
 			}
+				// Handles marginal case of frame duration longer than the source dur -
+				// set the fps to be 1/sourceDur
+			if($params->duration<1/$params->fps)
+				$params->fps = round(1/$params->duration,6);
+
 			if(isset($setup->gop)){
 				$params->gop = round($setup->gop*$params->fps);
 			}
@@ -151,7 +156,8 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				return false;
 			}
 			
-			if(($key=array_search("-vsync", $params->cmdLineArr))!==false && $params->cmdLineArr[$key+1]!=1) {
+			if(($key=array_search("-vsync", $params->cmdLineArr))!==false 
+				&& !($params->cmdLineArr[$key+1]==1 || $params->cmdLineArr[$key+1]=="cfr")) {
 				KalturaLog::log($msgStr="UNSUPPORTED: vsync param (".($params->cmdLineArr[$key+1])."), should be 1 (cfr)");
 				return false;
 			}
@@ -254,7 +260,8 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 
 				// Get mediaData for external reference file, if such provided 
 			if(isset($this->setup->ref)) {
-				$this->refFileDt = $this->getMediaData($this->setup->ref);
+				$this->refFileDt = $this->getMediaData($this->setup->ref,
+											$setup->ffmpegBin, $setup->ffprobeBin);
 			}
 
 			KalturaLog::log("cmdLine:$this->cmdLine");
@@ -343,9 +350,7 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 		}
 	
 		/********************
-		 * 0:  OK
-		 * 1:  first pass
-		 * -1: error
+		 * buildTemplateVideoCommandLine
 		 */
 		protected function buildTemplateVideoCommandLine() 
 		{
@@ -380,8 +385,11 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				$cmdLineArr[$key+1]=self::handleForcedKeyFrames($cmdLineArr[$key+1], $cmdLineArr, $params, $this->setup->chunkDuration);
 			}
 			
+				// Disable audio processing for cmdLines that miss aud settings
+				// that have excplicit '-an' notation
 			if(($key=array_search("-c:a", $cmdLineArr))!==false
-			|| ($key=array_search("-acodec", $cmdLineArr))!==false) {
+			|| ($key=array_search("-acodec", $cmdLineArr))!==false
+			|| ($key=array_search("-an", $cmdLineArr))!==false) {
 				unset($cmdLineArr[$key+1]);
 				$cmdLineArr[$key]='-an';
 			}
@@ -426,11 +434,31 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				}
 			}
 			
-			$cmdLineArr[] = "-map 0:v:0";
 			if($this->chunkFileFormat=="mpegts")
 				$cmdLineArr[] = "-flags -global_header";
+
+				// Include only video related named mappings, in the video template cmd-line,
+				// remove the audio related named mappings
+			if(isset($params->mappings) && isset($params->audioFilters->filterGraph)) {
+				foreach($params->mappings as $map){
+					if(strstr($map,$params->audioFilters->filterGraph->labelOut)!==false) {
+						if(($key=array_search($map, $cmdLineArr))!==false) {
+							unset($cmdLineArr[$key]);
+							unset($cmdLineArr[$key-1]);
+						}
+					}
+				}
+			}
+
 			if(isset($params->videoFilters->filterStr))
 				$cmdLineArr[] = "-filter_complex ".($params->videoFilters->filterStr);
+			else {
+				// 'general' mapping is needed only when there is no other (filter) mapping,
+				// otherwise duplicate streams generated (behavior chnage in FFMpeg6)
+				if(!(in_array('v:0', $params->mappings)||in_array('0:v:0', $params->mappings)))
+					$cmdLineArr[] = "-map 0:v:0";
+			}
+
 			if($params->vcodec=='libx264')
 				$cmdLineArr[] = "-bsf h264_mp4toannexb";
 			if($toAddFps)
@@ -538,7 +566,6 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				}
 				$adjustedFilterStr = $filterGraph->CompoundString($lastLabelOut);
 			}
-			
 				/*
 				 * Handle Subs/SRT - change original file name to splitted 
 				 */
@@ -550,13 +577,18 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				$adjustedFilterStr = str_replace($this->params->videoFilters->subsFilename, 
 										$adjustedSubsFilename, $adjustedFilterStr);
 			}
-			else if(isset($adjustedFilterStr)) {
-				$adjustedFilterStr = str_replace($lastLabelOut, "", $adjustedFilterStr);
+
+			if(isset($adjustedFilterStr)) {
+				$replaceLabelOut="";
+				if(isset($filterGraphBase->labelOut))
+					$replaceLabelOut="[$filterGraphBase->labelOut]";
+				$adjustedFilterStr = str_replace($lastLabelOut, $replaceLabelOut, $adjustedFilterStr);
 			}
+			KalturaLog::log("adjustedFilterStr1:$adjustedFilterStr, lastLabelOut:$lastLabelOut, ".$filterGraphBase->labelOut);
 			
 				/*
-				 * For the last chunk, make sure that the loop/t period does not overflow the end of the file, 
-				 * causing failure on duration validation
+				 * For the last chunk, make sure that the loop/t period does not overflow 
+				 * the end of the file, causing failure on duration validation
 				 */
 			if($this->params->duration-$start<$chunkWithOverlap){
 				$keys=array_keys($cmdLineArr,'-loop');
@@ -574,6 +606,7 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				$cmdLine = implode(' ',$cmdLineArr);
 			}
 			
+			KalturaLog::log(print_r($cmdLine,1));
 			return $cmdLine;
 		}
 		
@@ -634,7 +667,6 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 					$cmdLine = " -decryption_key $params->decryption_key$cmdLine";
 				
 				$cmdLine = " -threads ".$this->params->threadsDec.$cmdLine;
-				
 				$cmdLine = $this->adjustTimeRelatedFilters($cmdLine, $chunkIdx, $start, $chunkWithOverlap);
 				$cmdLine = $this->adjustForcedKeyFrames($cmdLine, $start, $chunkData);
 			}
@@ -881,7 +913,8 @@ KalturaLog::log("fetchedFileSize:".filesize($fetchedChunkName));
 				$mode = $this->setup->sharedChunkPath ? "shared_audio" : "audio";
 				$audioFilename = $this->getSessionName($mode);
 				if($setup->duration!=-1){
-					$fileDt = self::getMediaData($audioFilename);
+					$fileDt = self::getMediaData($audioFilename,
+										$setup->ffmpegBin, $setup->ffprobeBin);
 					if(isset($fileDt) && round($fileDt->containerDuration,4)>$params->duration) {
 						$audioInputParams = " -t ".$params->duration;
 						KalturaLog::log("cut input audio to ".$params->duration);
@@ -1018,7 +1051,6 @@ KalturaLog::log("fetchedFileSize:".filesize($fetchedChunkName));
 			$cmdLine.= " -frames:v ".$chunkData->toFix;
 			$cmdLine.= " -copyts -y ".$chunkFixName;
 			KalturaLog::log("fix cmdLine: $cmdLine");
-			
 			return $cmdLine;
 		}
 		
@@ -1053,8 +1085,8 @@ KalturaLog::log("fetchedFileSize:".filesize($fetchedChunkName));
 			  * The code below removes 'async' this case
 			  */
 			$asyncStr = "-async 1";
-			if(isset($params->audioFilters)){
-				$filterStr = "-filter_complex ".($params->audioFilters);
+			if(isset($params->audioFilters->filterStr)){
+				$filterStr = "-filter_complex ".($params->audioFilters->filterStr);
 				if(strstr($filterStr,"amerge")!==false){
 					$asyncStr = null;
 				}
@@ -1084,11 +1116,27 @@ KalturaLog::log("fetchedFileSize:".filesize($fetchedChunkName));
 			if(isset($filterStr))
 				$cmdLine.= " $filterStr";
 			
+				// Include in the audio cmd-line, only audio related, 
+				// named mappings. remove the video related named mappings
 			if(isset($params->mappings)) {
-				$mappings = implode(" -map ",$params->mappings);
-				$cmdLine.= " -map ".implode(" -map ",$params->mappings);
+				if(isset($params->videoFilters->filterGraph)) {
+					foreach($params->mappings as $map){
+						if(strstr($map,$params->videoFilters->filterGraph->labelOut)===false)
+							$cmdLine.= " -map $map";
+					}
+				}
+				else {
+					if(isset($params->audioFilters->filterGraph)) {
+						foreach($params->mappings as $map){
+							if(strstr($map,$params->audioFilters->filterGraph->labelOut)!==false)
+								$cmdLine.= " -map $map";
+						}
+					}
+				}
 			}
-			else
+				// 'general' mapping is needed only when there is no other (filter) mapping,
+				// otherwise duplicate streams generated (behavior chnage in FFMpeg6)
+			else if(!isset($filterStr))
 				$cmdLine.= " -map 0:a:0";
 			
 			$cmdLine.= " -metadata:s:a:0 language=";
@@ -1173,8 +1221,10 @@ KalturaLog::log("fetchedFileSize:".filesize($fetchedChunkName));
 		 */
 		public function ValidateMergedFile(&$msgStr)
 		{
+			$setup = $this->setup;
 			$mergedFilename = $this->getSessionName();
-			$fileDt = $this->getMediaData($mergedFilename);
+			$fileDt = $this->getMediaData($mergedFilename, 
+								$setup->ffmpegBin, $setup->ffprobeBin);
 			if(!isset($fileDt)){
 				KalturaLog::log($msgStr="FAILED to merge, missing merged file ($mergedFilename)!");
 				return false;
@@ -1429,16 +1479,24 @@ $roundDgts=4;
 					$start+=($frameDuration);
 				}
 			}
-			$chunkData->calcGapToNext($params->duration, $frameDuration);
+				// Handles marginal case of a very short single chunk
+			if($idx==0){
+				$duration = min($frameDuration, $this->sourceFileDt->videoDuration/1000);
+				$chunkData = new KChunkData($idx, $start, $duration);
+				$this->chunkDataArr[0] = $chunkData;
+			}
+			else
+				$chunkData->calcGapToNext($params->duration, $frameDuration);
 		}
 
 		/********************
 		 *
 		 */
-		protected static function getMediaData($fileName)
+		protected static function getMediaData($fileName,
+									$ffmpegBin="ffmpeg", $ffprobeBin="ffprobe")
 		{
 			try {
-				$medPrsr = new KFFMpegMediaParser($fileName);//new KMediaInfoMediaParser($fileName);
+				$medPrsr = new KFFMpegMediaParser($fileName, $ffmpegBin, $ffprobeBin);
 				$m=$medPrsr->getMediaInfo();
 				return $m;
 			}
@@ -1571,6 +1629,29 @@ $vMax*=2;
 			KalturaLog::log("vMax:$vMax, aMax:$aMax");
 			return array($vMax,$aMax);
 		}
+		
+		/* ---------------------------
+		 * validateChunkDuration
+		 */
+		public function validateChunkDuration($chunkData, $start, $finish)
+		{
+			$chunkDurThreshInSec=$this->chunkDurThreshInFrames*$this->params->frameDuration;
+			{
+					/*
+					 * Validate chunk dur
+					 */
+					// Calc the generated chunk duration
+				$generatedChunkDur = $finish-$start;
+				if($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur){
+					$msgStr = "Chunk id ($chunkData->index): too short chunk dur - $generatedChunkDur";
+					$msgStr.= ", should be ".round($chunkData->gap,4).", thresh:".round($chunkDurThreshInSec,4);
+					$msgStr.= ", delta:".round($chunkData->gap-$generatedChunkDur,4);
+					KalturaLog::log($msgStr);
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 	
 	/********************
@@ -1647,8 +1728,23 @@ $vMax*=2;
 		public $pathResolveTime = null;			// Last source path resolve time
 		public $pathResolveInterval = 3600*10;	// Time interval between resolves (10hrs)
 		
+		public $supportedVideoFilters = null;
+		//array("scale","fade","crop","overlay","rotate","yadif","subtitles");
+		public $supportedAudioFilters = null;
+		//array("pan","amix","amerge","loudnorm");
+
 		/********************
-		 *
+		 * 
+		 */
+		public function __construct() {
+			$this->videoFilters =  new stdClass();
+			$this->audioFilters =  new stdClass();
+			$this->supportedVideoFilters = KDLConstants::$SupportedVideoFilters;
+			$this->supportedAudioFilters = KDLConstants::$SupportedAudioFilters;
+		}
+		
+		/********************
+		 * GetEncodingSettings
 		 */
 		public function GetEncodingSettings($cmdLine) 
 		{
@@ -1809,39 +1905,42 @@ $vMax*=2;
 			}
 
 			if(isset($this->filter_complex) && count($this->filter_complex)>0) {
+
 				foreach($this->filter_complex as $idx=>$val){
-					$filterStr = self::adjustFilters($cmdLineArr[$idx+1], 'video');
+						/*
+						 * Process video filters
+						 */
+					list($filterStr, $filterGraph) = 
+							self::adjustFilters($cmdLineArr[$idx+1], $this->supportedVideoFilters);
 					if(isset($filterStr)) {
 						$this->videoFilters->filterStr = $filterStr;
+						$this->videoFilters->filterGraph = $filterGraph;
+							// Check and prepare for 'fade' filters
+						$stam = new stdClass();
+						$stam->name = 'fade';
+						$filterGraph->LoopFilters(null,'KChunkedEncodeParams::iterFiltersByName', $stam);
+						if(isset($stam->filters)){
+							$this->videoFilters->fadeFilters = $stam->filters;
+						}
+							// Check and prepare for 'subs' filter
+						$stam = new stdClass();
+						$stam->name = 'subtitles';
+						$filterGraph->LoopFilters(null,'KChunkedEncodeParams::iterFiltersByName', $stam);
+						if(isset($stam->filters)){
+							$subsFilter = $stam->filters[0];
+							$paramArr=explode(':',$subsFilter->_paramStr);
+							list($str,$fileName)=explode('=',$paramArr[0]);
+							$this->videoFilters->subsFilename =  $fileName;
+						}
 					}
-					$filterStr = self::adjustFilters($cmdLineArr[$idx+1], 'audio');
-					if(isset($filterStr))
-						$this->audioFilters = $filterStr;
-				}
-				if(isset($this->videoFilters->filterStr)){
 						/*
-						 * Check and prepare for 'fade' filters
+						 * Process audio filters
 						 */
-					$filterStr = trim($this->videoFilters->filterStr,'\'');
-					$filterGraph = new KFFmpegFilterGraph();
-					$filterGraph->Parse($filterStr);
-					$this->videoFilters->filterGraph = $filterGraph;
-					$stam = new stdClass();
-					$filterGraph->LoopFilters(null,'iterFuncFadeFilters', $stam);
-					if(isset($stam->filters)){
-						$this->videoFilters->fadeFilters = $stam->filters;
-					}
-
-						/*
-						 * Check and prepare for 'subs' filter
-						 */
-					$stam = new stdClass();
-					$filterGraph->LoopFilters(null,'iterFuncSubsFilters', $stam);
-					if(isset($stam->filters)){
-						$subsFilter = $stam->filters[0];
-						$paramArr=explode(':',$subsFilter->_paramStr);
-						list($str,$fileName)=explode('=',$paramArr[0]);
-						$this->videoFilters->subsFilename =  $fileName;
+					list($filterStr, $filterGraph) = 
+							self::adjustFilters($cmdLineArr[$idx+1], $this->supportedAudioFilters);
+					if(isset($filterStr)) {
+						$this->audioFilters->filterStr = $filterStr;
+						$this->audioFilters->filterGraph = $filterGraph;
 					}
 				}
 			}
@@ -1889,41 +1988,64 @@ $vMax*=2;
 		}
 		
 		/********************
-		 *
+		 * adjustFilters
 		 */
-		protected static function adjustFilters($filterStr, $mode) 
+		protected static function adjustFilters($complexFilterStr, $includeFilters) 
 		{
-			$filterStr = trim($filterStr, "'");
-			$filterArr = explode(';',$filterStr);
-			$filterArrOut = array();
-			$skipArr = array();
-			foreach($filterArr as $idx=>$filter){
-				if(strstr($filter, "aresample")!==false) {
-					$skipArr[$idx] = 1;
-				}
-				else if($mode=='audio' && preg_match("/\b(pan|amix|amerge|loudnorm)\b/", $filter)==1) { 
-					$filterArrOut[$idx] = $filter;
-				}
-				else if($mode=='video' && preg_match("/\b(scale|fade|crop|overlay|rotate|yadif|subtitles)\b/", $filter)==1) { 
-					$filterArrOut[$idx] = $filter;
-				}
+			$filterGraph = new KFFmpegFilterGraph();
+			$filterGraph->Parse(trim($complexFilterStr, "'"));
+			
+			$includeFiltersPattern = "/\b(".implode('|',$includeFilters).")\b/";
+// !!!!!!!! $pattern = '/\b(' . implode('|', array_map('preg_quote', $supportedVideoFilters)) . ')\b/';
+
+			KalturaLog::log("complexFilterStr:$complexFilterStr, includeFiltersPattern:includeFiltersPattern");
+			
+			$filterChainArr = explode(';',$complexFilterStr);
+			$includeArr = array();
+			$excludeArr = array();
+			
+				// Scan the complex filter graph for included/excluded filters			 
+			foreach($filterChainArr as $idx=>$filter) {
+				KalturaLog::log("filter chain:$filter");
+				if(preg_match($includeFiltersPattern, $filter)==1)
+					$includeArr[$idx] = $filter;
 				else
-					$skipArr[$idx] = 1;
+					$excludeArr[$idx] = $filter;
 			}
-			if(count($filterArrOut)==0){
+				// exit with null if nothing included 
+			if(count($includeArr)==0) {
 				return null;
 			}
-			foreach($skipArr as $idx=>$val) {
-				if($idx>0 && key_exists($idx-1,$filterArrOut)){
-					$filter = $filterArrOut[$idx-1];
-					if(strpos($filter,'[')==($last=strrpos($filter,'[')))
-						continue;
-					$filter = substr_replace($filter, null, $last);
-					$filterArrOut[$idx-1] = $filter;
+				// if nothing excluded - nothing to adjust 
+			if(count($excludeArr)==0) {
+				return array($complexFilterStr,$filterGraph);
+			}
+				// Remove the excluded filters from the main filter graph
+			foreach($excludeArr as $idx=>$val) {
+				if($idx>0 && key_exists($idx-1,$includeArr)) {
+					$excludeFilter = new KFFmpegFilter();
+					$excludeFilter->Parse($excludeArr[$idx]);
+					KalturaLog::log("excluded filter:$excludeFilter->name");
+					$filter=$filterGraph->FindEntityByName($excludeFilter->name);
+					$filterGraph->RemoveEntity($filter);
 				}
 			}
-			$filterStr = "'".implode(';',$filterArrOut)."'";
-			return $filterStr;
+			
+			$complexFilterStr = $filterGraph->CompoundString($lastLabelOut);
+			KalturaLog::log("complexFilterStr:$complexFilterStr");
+			return array($complexFilterStr,$filterGraph);
+		}
+		
+		/********************
+		 * iterFiltersByName
+		 *	FilterGraph iteration helper func
+		 */
+		public static function iterFiltersByName($entity, $obj)
+		{
+			KalturaLog::log("Filter Name:$entity->name, criterion:$obj->name");
+			if($entity->name==$obj->name)
+				$obj->filters[] = $entity;
+			return null;
 		}
 	}
 	
@@ -1962,27 +2084,3 @@ $vMax*=2;
 		}
 	}
 	
-		/********************
-		 * iterFuncFadeFilters
-		 *	FilterGraph iteration helper func
-		 */
-	function iterFuncFadeFilters($entity, $obj)
-	{
-		KalturaLog::log("Name:".$entity->name);
-		if($entity->name=='fade')
-			$obj->filters[] = $entity;
-		return null;
-	}
-		
-		/********************
-		 * iterFuncSubsFilters
-		 *	FilterGraph iteration helper func
-		 */
-	function iterFuncSubsFilters($entity, $obj)
-	{
-		KalturaLog::log("Name:".$entity->name);
-		if($entity->name=='subtitles')
-			$obj->filters[] = $entity;
-		return null;
-	}
-
