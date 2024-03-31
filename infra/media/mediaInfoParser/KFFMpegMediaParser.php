@@ -672,7 +672,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 	{
 		KalturaLog::log("srcFileName($srcFileName)");
 	
-		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=gt(scene\,.4)\" -show_entries frame=pkt_pts_time";
+			// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=gt(scene\,.4)\" -show_entries frame=pkt_pts_time,pts_time";
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("SceneCuts detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
@@ -710,7 +711,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		}
 		
 		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)$trimStr\" -show_entries frame=pkt_pts_time";
+			// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+		$cmdLine = "$ffprobeBin -show_frames -select_streams v -of default=nk=1:nw=1 -f lavfi \"movie='$srcFileName',select=eq(pict_type\,PICT_TYPE_I)$trimStr\" -show_entries frame=pkt_pts_time,pts_time";
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
@@ -813,7 +815,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		$srcFileName = kFile::realPath($srcFileName);
 			// The cmdLine was fixed with '-map v' to copy to the pipe ONLY the video stream.
 		$cmdLine = "$ffmpegBin -i \"$srcFileName\" -c:v copy -map v -f matroska -y -v quiet -t $seconds - ";
-		$cmdLine.= "| $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,top_field_first| head -10 2>&1";
+			// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+		$cmdLine.= "| $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=interlaced_frame,pkt_pts_time,pts_time,top_field_first| head -10 2>&1";
 
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
@@ -917,7 +920,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		$trimStr=null;
 		
 		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffprobeBin \"$srcFileName\" -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,key_frame,coded_picture_number";
+			// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+		$cmdLine = "$ffprobeBin \"$srcFileName\" -show_frames -select_streams v -v quiet -of json -show_entries frame=pkt_pts_time,pts_time,key_frame,coded_picture_number";
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Key Frames detection failed on ffmpeg call - rv($rv),lastLine($lastLine)");
@@ -943,7 +947,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		KalturaLog::log("Src:$srcFileName, thresh:$threshold, start:$startFrom, dur:$duration");
 		
 		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffmpegBin -ss $startFrom -t ".($duration+1)." -i '$srcFileName' -copyts -c:v copy -f matroska -y -v quiet -vsync 0 - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=pkt_pts_time,pkt_duration_time,pkt_pos,pkt_size,pict_type,coded_picture_number,interlaced_frame -v quiet 2>&1";
+			// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+		$cmdLine = "$ffmpegBin -ss $startFrom -t ".($duration+1)." -i '$srcFileName' -copyts -c:v copy -f matroska -y -v quiet -vsync 0 - | $ffprobeBin -show_frames -select_streams v - -of csv -show_entries frame=pkt_pts_time,pts_time,pkt_duration_time,pkt_pos,pkt_size,pict_type,coded_picture_number,interlaced_frame -v quiet 2>&1";
 		KalturaLog::log("cmdLine: $cmdLine");
 
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
@@ -1032,7 +1037,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		KalturaLog::log("srcFileName($srcFileName)");
 		
 		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffprobeBin -f lavfi -i \"amovie='$srcFileName',astats=metadata=1:reset=$reset\" -show_entries frame=pkt_pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet";
+			// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+		$cmdLine = "$ffprobeBin -f lavfi -i \"amovie='$srcFileName',astats=metadata=1:reset=$reset\" -show_entries frame=pkt_pts_time,pts_time:frame_tags=lavfi.astats.Overall.RMS_level -of csv=p=0 -v quiet";
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 		if($rv!=0) {
 			KalturaLog::err("Volume level detection failed on ffprobe call - rv($rv),lastLine($lastLine)");
@@ -1101,7 +1107,8 @@ KalturaLog::log("kf2gopHist norm:".serialize($kf2gopHist));
 		}
 
 		$srcFileName = kFile::realPath($srcFileName);
-		$cmdLine = "$ffmpegBin -ss $startFrom -i \"$srcFileName\" -copyts $copyStreams -f matroska -y -v quiet - | $ffprobeBin - -show_frames -of csv -show_entries frame=media_type,pkt_pts_time,pkt_duration_time   2>&1";
+			// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+		$cmdLine = "$ffmpegBin -ss $startFrom -i \"$srcFileName\" -copyts $copyStreams -f matroska -y -v quiet - | $ffprobeBin - -show_frames -of csv -show_entries frame=media_type,pkt_pts_time,pts_time,pkt_duration_time   2>&1";
 		KalturaLog::log($cmdLine);
 		$lastLine=kExecWrapper::exec($cmdLine , $outputArr, $rv);
 
