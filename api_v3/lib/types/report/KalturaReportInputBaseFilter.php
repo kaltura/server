@@ -89,10 +89,7 @@ class KalturaReportInputBaseFilter extends KalturaObject
 			if (is_numeric($apiName)) {
 				$apiName = $memberName;
 			}
-			if (isset($this->$apiName))
-			{
-				$reportInputFilter->$memberName = $this->$apiName;
-			}
+			$reportInputFilter->$memberName = $this->$apiName;
 		}
 		return $reportInputFilter;
 	}
