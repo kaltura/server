@@ -1900,21 +1900,10 @@ class kKavaReports extends kKavaReportsMgr
 		ReportType::APPLICATION_EVENTS_HIGHLIGHTS => array(
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_APPLICATION_EVENTS,
 			self::REPORT_DIMENSION_MAP => array(
-				'partner_id' => self::DIMENSION_PARTNER_ID,
-				'partner_name' => self::DIMENSION_PARTNER_ID,
 				'type' => self::DIMENSION_EVENT_VAR1,
 				'name' => self::DIMENSION_EVENT_VAR2,
 				'value' => self::DIMENSION_EVENT_VAR3,
 
-			),
-			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('partner_name'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'peer' => 'PartnerPeer',
-					'int_ids_only' => true,
-					'columns' => array('PARTNER_NAME'),
-				)
 			),
 			self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 			self::REPORT_SKIP_PARTNER_FILTER => true,		// object_ids contains the partner ids (validated externally)
