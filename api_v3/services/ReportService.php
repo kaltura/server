@@ -18,7 +18,6 @@ class ReportService extends KalturaBaseService
 		ReportType::REACH_PROFILE_USAGE,
 		ReportType::REACH_CATALOG_USAGE,
 		ReportType::CDN_BANDWIDTH_USAGE,
-		ReportType::APPLICATION_EVENTS_HIGHLIGHTS,
 	);
 
 	public function initService($serviceId, $serviceName, $actionName)
