@@ -54,9 +54,9 @@ class APIErrors
 			// Create and fill the argsDictionary dictionary
 			for ( $i = 0; $i < $numParamNames; $i++ )
 			{
-				// Map the arg's name to its value and validate the arg is string type to avoid calling strip_tags with none string value
+				// Map the arg's name to its value, cast to string to avoid calling strip_tags with none string value
 				// NOTE: N/A means there was a mismatch in the number of supplied arguments (i.e. a bug in the calling code)
-				$argsDictionary[$paramNames[$i]] = (isset($errorArgsArray[$i]) && is_string($errorArgsArray[$i])) ? strip_tags($errorArgsArray[$i]) : "N/A";
+				$argsDictionary[$paramNames[$i]] = isset($errorArgsArray[$i]) ? strip_tags((string)$errorArgsArray[$i]) : "N/A";
 	
 				// Replace the arg's placeholder with its value in the destination string
 				$message = str_replace("@{$paramNames[$i]}@", $argsDictionary[ $paramNames[$i] ], $message);
