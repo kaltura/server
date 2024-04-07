@@ -565,10 +565,18 @@ class MetadataService extends KalturaBaseService
 	
 	protected function validateMetadataFile($fileData)
 	{
+		//If tmp_name is not set probably file upload has failed
+		if(!isset($fileData['tmp_name']))
+		{
+			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $fileData['name']);
+		}
+		
 		$filePath = $fileData['tmp_name'];
 		$fileName = $fileData['name'];
 		if(!file_exists($filePath))
+		{
 			throw new KalturaAPIException(MetadataErrors::METADATA_FILE_NOT_FOUND, $fileData['name']);
+		}
 		
 		if (myUploadUtils::isFileTypeRestricted($filePath, $fileName))
 		{

@@ -800,7 +800,11 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
-		@fclose($fp);
+		if(is_resource())
+		{
+			@fclose($fp);
+		}
+		
 		if (!$success)
 		{
 			KalturaLog::err("Failed to upload file: [$src] to [$dest]");

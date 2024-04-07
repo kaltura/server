@@ -1999,6 +1999,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		 * Handle replacement flow - use original entry/asset enc-key, if it is already has one.
 		 * Otherwise (non-replacement) - acquire uDRM encryptionParams
 		 */
+		$encryptionParamsKey = null;
 		if(($entry=entryPeer::retrieveByPK($flavorAsset->getEntryId()))!==null
 		&& ($replacedEntryId=$entry->getReplacedEntryId())!==null) {
 
