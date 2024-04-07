@@ -504,10 +504,16 @@ class myFileConverter
 
 	public static function getImageDimensionsFromString($imgStr)
 	{
-		$image = imagecreatefromstring($imgStr);
-		$width = imagesx($image);
-		$height = imagesy($image);
-		imagedestroy($image);
+		$height = $width = null;
+		
+		if($imgStr)
+		{
+			$image = imagecreatefromstring($imgStr);
+			$width = imagesx($image);
+			$height = imagesy($image);
+			imagedestroy($image);
+		}
+		
 		return array($width, $height);
 	}
 }

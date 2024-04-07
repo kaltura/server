@@ -277,11 +277,16 @@ class kFileBase
         try
         {
             if(! file_exists($file_name))
+            {
                 return NULL;
+            }
+            
             $fh = fopen($file_name, $mode);
-
             if($fh == NULL)
+            {
                 return NULL;
+            }
+			
             if($from_byte > 0)
             {
                 fseek($fh, $from_byte);
@@ -297,6 +302,12 @@ class kFileBase
                 $length = self::fileSize($file_name);
             }
 
+            //Trying to read 0 length will cause Uncaught ValueError, length must be greater than 0
+            if($length <= 0)
+            {
+                return null;
+            }
+            
             $theData = fread($fh, $length);
             fclose($fh);
             return $theData;

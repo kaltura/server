@@ -47,8 +47,15 @@ class kEventObjectChangedCondition extends kCondition
 		if(!($event instanceof kObjectChangedEvent))
 			return false;
 			
-		$trigerColumns = explode(',', $this->modifiedColumns);
+		$triggerColumns = explode(',', $this->modifiedColumns);
 		$modifiedColumns = $event->getModifiedColumns();
+		
+		//Unset CUSTOM_DATA from modifiedColumns as they are already added by the below code in a flat way on the array
+		//Here CUSTOM_DATA comes as an array object which will cause "Array to string conversion" when running array_intersect
+		if(isset($modifiedColumns['CUSTOM_DATA']))
+		{
+			unset($modifiedColumns['CUSTOM_DATA']);
+		}
 		
 		$object = $event->getObject();
 		if(method_exists($object, 'getCustomDataOldValues'))
@@ -67,9 +74,9 @@ class kEventObjectChangedCondition extends kCondition
 			}
 		}
 		
-		$foundColumns = array_intersect($modifiedColumns, $trigerColumns);
+		$foundColumns = array_intersect($modifiedColumns, $triggerColumns);
 		
-		KalturaLog::debug("Trigger columns [" . print_r($trigerColumns, true) . "]");
+		KalturaLog::debug("Trigger columns [" . print_r($triggerColumns, true) . "]");
 		KalturaLog::debug("Found columns [" . print_r($foundColumns, true) . "]");
 		
 		return count($foundColumns) > 0;
