@@ -581,6 +581,14 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		{
 			return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
 		}
+		$forceDeliveries = $entry ? $entry->getEnforceDeliveries() : array();
+		foreach ($forceDeliveries as $forceDelivery)
+		{
+			if (strpos($this->getEnforceDeliveriesSupport(), $forceDelivery) === false)
+			{
+				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
+			}
+		}
 		return parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
 	}
 }

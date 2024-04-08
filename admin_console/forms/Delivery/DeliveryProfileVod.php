@@ -12,7 +12,11 @@ class Form_Delivery_DeliveryProfileVod extends Form_Delivery_DeliveryProfileConf
 			'label'			=> 'Simulive support:',
 		));
 
-		return array('simuliveSupport');
+		$this->addElement('text', 'enforceDeliveriesSupport', array(
+			'label'			=> 'Enforce deliveries support:',
+		));
+
+		return array('simuliveSupport', 'enforceDeliveriesSupport');
 	}
 
 }

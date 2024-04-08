@@ -192,6 +192,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $this->getFromCustomData("simuliveSupport", null, false);
 	}
 
+	public function setEnforceDeliveriesSupport($v)
+	{
+		$this->putInCustomData("enforceDeliveriesSupport", $v);
+	}
+
+	public function getEnforceDeliveriesSupport()
+	{
+		return $this->getFromCustomData("enforceDeliveriesSupport", null, "");
+	}
+
 	/**
 	 * This function returns the tokenizer this delivery profile is working with
 	 * @return kUrlRecognizer
