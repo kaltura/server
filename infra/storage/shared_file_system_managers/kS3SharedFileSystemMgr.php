@@ -800,7 +800,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		}
 		
 		//Silence error to avoid warning caused by file handle being changed by the s3 client upload action
-		if(is_resource())
+		if(is_resource($fp))
 		{
 			@fclose($fp);
 		}
