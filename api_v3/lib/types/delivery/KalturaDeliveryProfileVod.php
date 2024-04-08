@@ -13,7 +13,7 @@ class KalturaDeliveryProfileVod extends KalturaDeliveryProfile
 
 	private static $map_between_objects = array
 	(
-		'simuliveSupport',
+		'simuliveSupport'
 	);
 
 	public function getMapBetweenObjects ( )
