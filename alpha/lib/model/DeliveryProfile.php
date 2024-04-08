@@ -84,6 +84,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
 	 */
 	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		$entry = $deliveryAttributes->getEntry();
+		$forceDeliveries = $entry ? $entry->getEnforceDeliveries() : array();
+		foreach ($forceDeliveries as $forceDelivery)
+		{
+			if (strpos($this->getEnforceDeliveriesSupport(), $forceDelivery) === false)
+			{
+				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
+			}
+		}
+
 		if(!$deliveryAttributes->getMediaProtocol())
 			return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
 

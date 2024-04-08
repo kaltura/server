@@ -11,15 +11,9 @@ class KalturaDeliveryProfileVod extends KalturaDeliveryProfile
 	 */
 	public $simuliveSupport;
 
-	/**
-	 * @var string
-	 */
-	public $enforceDeliveriesSupport;
-
 	private static $map_between_objects = array
 	(
 		'simuliveSupport',
-		'enforceDeliveriesSupport'
 	);
 
 	public function getMapBetweenObjects ( )
