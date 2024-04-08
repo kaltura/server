@@ -382,8 +382,11 @@ class KalturaFrontController
 			return null;
 		}
 		
-		if (is_array($object) && isset($object[$currentProperty]))
+		if (is_array($object))
 		{
+			if(!isset($object[$currentProperty]))
+				return null;
+			
 			return $this->getValueFromObject($object[$currentProperty], $path);
 		}
 		
