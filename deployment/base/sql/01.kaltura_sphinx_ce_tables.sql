@@ -6,7 +6,7 @@ USE `kaltura_sphinx_log`;
 SET GLOBAL sql_mode = '';
 /*Table structure for table `sphinx_log` */
 CREATE TABLE IF NOT EXISTS `sphinx_log` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `executed_server_id` int(11) NOT NULL,
   `object_type` varchar(255) NOT NULL,
   `object_id` varchar(20) NOT NULL,
