@@ -1563,7 +1563,6 @@ class reportsInputFilter
 	public $ui_conf_ids;
 	public $cue_point_ids;
 
-
 	public function getFilterBy() {
 		return "";
 			

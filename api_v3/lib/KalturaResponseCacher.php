@@ -17,7 +17,8 @@ class KalturaResponseCacher extends kApiCache
 	const RESPONSE_TYPE_PHP = 3;
 
 	const BATCH_PARTNER_ID = -1;
-	
+	const MEDIA_REPURPOSING_PARTNER_ID = -23;
+
 	const ON_ERROR = '_onError';
 	
 	static protected $rateLimitKey;
@@ -603,7 +604,8 @@ class KalturaResponseCacher extends kApiCache
 	
 	public static function rateLimit($service, $action, $params, $partnerId = null, $ksPartnerId = null)
 	{
-		if (!kConf::hasMap('api_rate_limit') || $ksPartnerId == self::BATCH_PARTNER_ID)
+		$unlimitedPartnerIds = array(self::BATCH_PARTNER_ID, self::MEDIA_REPURPOSING_PARTNER_ID);
+		if (!kConf::hasMap('api_rate_limit') || in_array($ksPartnerId, $unlimitedPartnerIds))
 		{
 			return true;
 		}

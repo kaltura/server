@@ -1,3 +1,25 @@
+# Tucana-20.9.0
+## Add new UHD flavor param for live  ##
+- Issue Type: Task
+- Issue ID: LIV-937
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.liveUHdFlavors.enabled = true
+moduls.liveUHdFlavors.permissionType = 2
+moduls.liveUHdFlavors.label = Kaltura Live UHD Flavors
+moduls.liveUHdFlavors.permissionName = FEATURE_KALTURA_LIVE_STREAM_UHD_FLAVORS
+moduls.liveUHdFlavors.basePermissionType = 2
+moduls.liveUHdFlavors.basePermissionName = FEATURE_KALTURA_LIVE_STREAM
+moduls.liveUHdFlavors.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+### Deployment Scripts ###
+```
+    php deployment/updates/scripts/2024_03_24_add_1080_live_flavour_param.php
+```
+
 # Tucana-20.8.0
 ## Add Team Recording Upload Integration to partner config ##
 - Issue Type: Task
