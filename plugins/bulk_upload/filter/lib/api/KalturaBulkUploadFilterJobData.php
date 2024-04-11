@@ -63,7 +63,9 @@ class KalturaBulkUploadFilterJobData extends KalturaBulkUploadJobData
 	    
 	    /* @var $source_object kBulkUploadFilterJobData */
 	    $this->filter = null;
-	    switch (get_class($source_object->getFilter()))
+	    $objectFilter = $source_object->getFilter();
+	    $objectFilterClass = (!is_null($objectFilter)) ? get_class($objectFilter) : null;
+	    switch ($objectFilterClass)
 	    {
 	        case 'categoryEntryFilter':
 	            $this->filter = new KalturaCategoryEntryFilter();
