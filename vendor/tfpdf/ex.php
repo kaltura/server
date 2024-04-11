@@ -4,7 +4,7 @@
 // otherwise tFPDF will use [path to tFPDF]/font/unifont/ directory
 // define("_SYSTEM_TTFONTS", "C:/Windows/Fonts/");
 
-require('vendor/autoload.php');
+require('tfpdf.php');
 
 $pdf = new tFPDF();
 $pdf->AddPage();
