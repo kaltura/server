@@ -293,7 +293,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $cuePointIdIn;
 
-    /**
+    	/**
 	 * filter by context ids
 	 * @var string
 	 */
