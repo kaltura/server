@@ -10,8 +10,6 @@ class kKavaCnCReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED, self::METRIC_REACTION_CLICKED_PARTICIPATION, self::EVENT_TYPE_GROUP_MESSAGE_SENT, self::METRIC_GROUP_CHAT_PARTICIPATION, self::METRIC_POLL_PARTICIPATION, self::METRIC_Q_AND_A_PARTICIPATION, self::METRIC_Q_AND_A_THREADS_COUNT),
 		),
-
-
 	);
 
 	public static function getReportDef($report_type, $input_filter)
