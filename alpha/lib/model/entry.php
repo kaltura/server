@@ -1420,7 +1420,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return;
 			
-		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
+		$newCats = !is_null($newCats) ? explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats) : array();
 		
 		$this->trimCategories($newCats);
 		
@@ -1442,7 +1442,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return;
 		
-		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $v);
+		$newCats = !is_null($v) ? explode(self::ENTRY_CATEGORY_SEPARATOR, $v) : array();
 		
 		$this->trimCategories($newCats);
 		

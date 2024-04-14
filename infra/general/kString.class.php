@@ -534,8 +534,12 @@ class kString
 	
 	public static function validateEscape($str)
 	{
-		$trailingEscapesCount = strlen($str) - strlen(rtrim($str, '\\'));
+		if(is_null($str))
+		{
+			return true;
+		}
 		
+		$trailingEscapesCount = strlen($str) - strlen(rtrim($str, '\\'));
 		return $trailingEscapesCount % 2 == 0;
 	}
 

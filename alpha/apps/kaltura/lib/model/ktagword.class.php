@@ -23,6 +23,7 @@ class ktagword {
 	 */
 	static public function tagsListFromParagraph($paragraph , &$fixed_paragraph)
 	{
+		$paragraph = !is_null($paragraph) ? $paragraph : "";
 		$tagwords = explode( self::TAG_SEPARATOR, $paragraph);
 
 		$validTagwords = array();
