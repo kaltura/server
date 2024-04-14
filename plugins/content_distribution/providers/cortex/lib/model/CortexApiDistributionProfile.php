@@ -34,7 +34,6 @@ class CortexApiDistributionProfile extends ConfigurableDistributionProfile
 		$validationErrors = parent::validateForSubmission($entryDistribution, $action);
 
 		$maxLengthFields = array (
-		    CortexApiDistributionField::MEDIA_TITLE => self::MEDIA_TITLE_MAXIMUM_LENGTH,
 		    CortexApiDistributionField::MEDIA_DESCRIPTION => self::MEDIA_DESCRIPTION_MAXIMUM_LENGTH,
 		    CortexApiDistributionField::MEDIA_KEYWORDS => self::MEDIA_KEYWORDS_MAXIMUM_LENGTH,
 		    CortexApiDistributionField::MEDIA_USER_ID => self::MEDIA_TITLE_MAXIMUM_LENGTH // TODO: check this

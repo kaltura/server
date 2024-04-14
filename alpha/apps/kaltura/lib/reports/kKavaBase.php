@@ -83,6 +83,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_UI_CONF_ID = 'uiConfId';
 	const DIMENSION_CATALOG_ITEM_ID = 'catalogItemId';
 	const DIMENSION_REACH_PROFILE_TYPE = 'reachProfileType';
+	const DIMENSION_CUE_POINT_ID = 'cuePointId';
 	const DIMENSION_CONTEXT_ID = 'contextId';
 
 	// metrics
@@ -663,6 +664,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
+			self::DIMENSION_CUE_POINT_ID => 1,
 		),
 		self::DATASOURCE_MEETING_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -680,6 +682,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
+			self::DIMENSION_CUE_POINT_ID => 1,
 		),
 		self::DATASOURCE_CNC_EVENTS => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -733,6 +736,7 @@ class kKavaBase extends kDruidBase
 		'kalturameeting' => 'Kaltura Meeting',
 		'onedrive' => 'OneDrive',
 		'webexapi' => 'Webex API',
+		'teamsentry' => 'Teams Entry',
 	);
 
 	protected static $sourceTypes = array(

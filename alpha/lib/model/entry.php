@@ -4647,5 +4647,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		self::$allow_override_read_only_fields = $v;
 	}
+	
+	public function getEnforceDeliveries()
+	{
+		$enforceDeliveries = array();
+		foreach ($this->getAdminTagsArr() as $tag) {
+			if (kString::beginsWith($tag, 'enforce_delivery:'))
+			{
+				$enforceDeliveries[] = explode(':', $tag)[1];
+			}
+		}
+		return $enforceDeliveries;
+	}
 
 }

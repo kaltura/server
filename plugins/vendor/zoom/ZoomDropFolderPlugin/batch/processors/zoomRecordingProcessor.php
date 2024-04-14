@@ -286,8 +286,24 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			elseif($createIfNotFound)
 			{
-				$this->createNewUser($partnerId, $zoomUser->getProcessedName());
-				$validatedUsers[] = $zoomUser->getProcessedName();
+                		try
+                		{
+                    			$this->createNewUser($partnerId,$zoomUser->getProcessedName());
+                    			$validatedUsers[] = $zoomUser->getProcessedName();
+                		}
+                		catch (Exception $e)
+                		{
+                    			if ($e->getCode() === 'DUPLICATE_USER_BY_ID')
+                    			{
+						//User could already be created by another session, so consider it validated
+                        			$validatedUsers[] = $zoomUser->getProcessedName();
+                    			}
+                    			else
+                    			{
+                        			//Re-throw the exception if it's not related to duplicate user ID
+                        			throw $e;
+                    			}
+                		}
 			}
 		}
 		KBatchBase::unimpersonate();

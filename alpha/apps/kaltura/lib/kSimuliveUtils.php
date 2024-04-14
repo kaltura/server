@@ -85,7 +85,7 @@ class kSimuliveUtils
 		$audioAssets = self::createPaddedAssetsArray($entriesAudioAssets);
 
 		$assets = array_merge($flavorAssets, $captionAssets, $audioAssets);
-		$eventLabel = "eventId" . self::LABEL_SEPARATOR . $currentEvent->getId();
+		$eventLabel = self::addParamToId('eventId', $currentEvent->getId());
 		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs, $sourceEntryLabels, $eventLabel);
 	}
 
@@ -127,7 +127,13 @@ class kSimuliveUtils
 	public static function getSimuliveEvent(Entry $entry, $startTime = 0, $duration = 0)
 	{
 		$events = self::getSimuliveEvents($entry, $startTime, $duration);
-		return $events ? $events[0] : null;
+		if (!$events)
+		{
+			return null;
+		}
+		$lastEvent = end($events);
+		KalturaLog::debug("First event: {$events[0]->getId()} Last event: {$lastEvent->getId()}");
+		return $lastEvent;
 	}
 
 	/**
@@ -389,4 +395,11 @@ class kSimuliveUtils
 			KExternalErrors::dieError(KExternalErrors::INVALID_KS);
 		}
 	}
+
+	public static function addParamToId($key, $value, $existId=null)
+	{
+		$id =  $key . '=' . $value;
+		return $existId ? $existId . ',' . $id : $id;
+	}
+
 }
