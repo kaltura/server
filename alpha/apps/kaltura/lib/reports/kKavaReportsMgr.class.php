@@ -261,6 +261,7 @@ class kKavaReportsMgr extends kKavaBase
 	const KAVA_WEBCAST_REPORTS_CLASS = 'kKavaWebcastReports';
 	const KAVA_VE_REGISTRATION_CLASS = 'kKavaVeRegistrationReports';
 	const KAVA_EP_REPORTS_CLASS = 'kKavaEventPlatformReports';
+	const KAVA_CNC_REPORTS_CLASS = 'kKavaCnCReports';
 
 	/// report settings
 	// report settings - common
@@ -456,6 +457,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED,
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED,
 		self::EVENT_TYPE_POLL_RECEIVED,
+		self::EVENT_TYPE_CNC_REACTION_CLICKED,
+		self::EVENT_TYPE_CNC_POLL_ANSWERED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -535,7 +538,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_SENT => 'count_cnc_chat_connection_request_sent',
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED => 'count_cnc_chat_cconnection_request_approved',
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED => 'count_cnc_chat_connection_request_canceled',
-		self::EVENT_TYPE_POLL_RECEIVED => 'count_poll_recieved',
+		self::EVENT_TYPE_POLL_RECEIVED => 'count_poll_received',
+		self::EVENT_TYPE_CNC_REACTION_CLICKED => 'count_reaction_clicked',
+		self::EVENT_TYPE_CNC_POLL_ANSWERED => 'count_poll_answered'
 	);
 
 	//global transform
@@ -767,6 +772,7 @@ class kKavaReportsMgr extends kKavaBase
 		4 => self::KAVA_WEBCAST_REPORTS_CLASS,
 		5 => self::KAVA_VE_REGISTRATION_CLASS,
 		6 => self::KAVA_EP_REPORTS_CLASS,
+		7 => self::KAVA_CNC_REPORTS_CLASS,
 	);
 	
 	protected static $aggregations_def = array();
