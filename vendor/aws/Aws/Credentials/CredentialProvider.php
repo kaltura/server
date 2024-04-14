@@ -51,6 +51,7 @@ class CredentialProvider
     const ENV_SESSION = 'AWS_SESSION_TOKEN';
     const ENV_TOKEN_FILE = 'AWS_WEB_IDENTITY_TOKEN_FILE';
     const ENV_SHARED_CREDENTIALS_FILE = 'AWS_SHARED_CREDENTIALS_FILE';
+    const REFRESH_INTERVAL_FACTOR = 10;
 
     /**
      * Create a default credential provider that
@@ -267,11 +268,11 @@ class CredentialProvider
                     $cache,
                     $cacheKey
                 ) {
+                    $ttl = null === $creds->getExpiration() ? 0 : intval(($creds->getExpiration() - time())/self::REFRESH_INTERVAL_FACTOR);
                     $cache->set(
                         $cacheKey,
                         $creds,
-                        null === $creds->getExpiration() ?
-                            0 : $creds->getExpiration() - time()
+                        $ttl
                     );
 
                     return $creds;

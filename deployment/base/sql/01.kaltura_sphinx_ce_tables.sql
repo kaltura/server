@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `sphinx_log` (
   KEY `created_at` (`created_at`),
   KEY `partner_id` (`partner_id`),
   KEY `dc_id` (`dc`,`id`)
-) ENGINE=MYISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 /*Table structure for table `sphinx_log_server` */
 CREATE TABLE IF NOT EXISTS `sphinx_log_server` (
@@ -35,4 +35,4 @@ CREATE TABLE IF NOT EXISTS `sphinx_log_server` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `sphinx_log_server_FI_1` (`last_log_id`)
-) ENGINE=MYISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

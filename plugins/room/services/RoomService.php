@@ -91,4 +91,30 @@ class RoomService extends KalturaEntryService
 		return $response;
 	}
 
+	/**
+	 *
+	 * @action attachRecordedEntry
+	 * @param string $roomEntryId
+	 * @param string $mediaEntryId
+	 * @return KalturaMediaEntry the recorded entry with roomEntryId as its rootEntryId
+	 */
+	function attachRecordedEntryAction(string $roomEntryId, string $mediaEntryId)
+	{
+		$dbRoomEntry = entryPeer::retrieveByPK($roomEntryId);
+		if (!$dbRoomEntry || !($dbRoomEntry instanceof RoomEntry))
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $roomEntryId);
+		}
+		$mediaEntry = entryPeer::retrieveByPK($mediaEntryId);
+		if (!$mediaEntry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $mediaEntryId);
+		}
+		$mediaEntry->setRootEntryId($roomEntryId);
+		$mediaEntry->save();
+		$recordedEntry = new KalturaMediaEntry();
+		$recordedEntry->fromObject($mediaEntry);
+		return $recordedEntry;
+	}
+
 }

@@ -79,10 +79,16 @@ class kAuthManager implements kObjectChangedEventConsumer
 
 	protected static function handleSsoMail($object, $adminKuser)
 	{
-		$job = authenticationUtils::addSsoMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_SSO_EMAIL);
-		if(!$job)
+		try
 		{
-			KalturaLog::warning('Mail Job was not added');
+			if(!authenticationUtils::addSsoMailJob($object, $adminKuser, kuserPeer::KALTURA_EXISTING_USER_ENABLE_SSO_EMAIL))
+			{
+				KalturaLog::warning('SSO Mail Job was not added');
+			}
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Error adding SSO Mail Job ' . $e->getMessage());
 		}
 	}
 
