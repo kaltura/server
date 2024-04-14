@@ -197,7 +197,7 @@ class kPlaybackContextDataHelper
 			if ($action->getType() == RuleActionType::LIMIT_FLAVORS)
 			{
 				/* @var $action kAccessControlLimitFlavorsAction */
-				$flavorsIds = explode(',', $action->getFlavorParamsIds());
+                $flavorParamsIds = explode(',', $action->getFlavorParamsIds());
 				$flavorsParamsNotIn = $action->getIsBlockedList();
 			}
 		}
