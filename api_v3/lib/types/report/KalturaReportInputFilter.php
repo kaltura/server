@@ -342,7 +342,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'virtualEventIdIn' => 'virtual_event_ids',
 		'originIn' => 'origins',
 		'uiConfIdIn' => 'ui_conf_ids',
-  	    'cuePointIdIn' => 'cue_point_ids',
+  	    	'cuePointIdIn' => 'cue_point_ids',
 		'contextIdIn' => 'context_ids'
 	);
 

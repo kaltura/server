@@ -573,7 +573,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => 'floor',
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => 'floor',
 		self::METRIC_REGISTERED_UNIQUE_USERS => 'floor',
-        self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => 'floor',
+        	self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_LOGGED_IN_USERS => 'floor',
 		self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS => 'floor',
 		self::METRIC_UNIQUE_SENT_Q_AND_A_USERS => 'floor',
@@ -640,7 +640,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => true,
 		self::METRIC_VOD_LIVE_AVG_VIEW_TIME => true,
 		self::METRIC_REGISTERED_UNIQUE_USERS => true,
-        self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => true,
+        	self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => true,
 		self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO => true,
 		self::METRIC_UNIQUE_LOGGED_IN_USERS => true,
 		self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS => true,
@@ -1890,7 +1890,7 @@ class kKavaReportsMgr extends kKavaBase
 					self::getConstantRatioPostAggr('subVodPlayTime', self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'))),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS))));
 
-        self::$metrics_def[self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO] = array(
+        	self::$metrics_def[self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO,
