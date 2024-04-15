@@ -77,15 +77,15 @@ class TwoFactorAuthenticator
      * @param string $title
      * @return string
      */
-    public static function getQRCodeUrl($name, $secret, $title = null)
-    {
-        $urlencoded = urlencode('otpauth://totp/'.$name.'?secret='.$secret.'');
+	public static function getQRCodeUrl($name, $secret, $title = null)
+	{
+		$urlencoded = urlencode('otpauth://totp/'.$name.'?secret='.$secret.'');
 		if(isset($title))
 		{
 			$urlencoded .= urlencode('&issuer='.urlencode($title));
 		}
 		return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&ecc=M&data='.$urlencoded.'';
-    }
+	}
 
     /**
      * Check if the code is correct. This will accept codes starting from $discrepancy*30sec ago to $discrepancy*30sec from now
