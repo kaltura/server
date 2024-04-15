@@ -82,9 +82,9 @@ class TwoFactorAuthenticator
         $urlencoded = urlencode('otpauth://totp/'.$name.'?secret='.$secret.'');
 		if(isset($title))
 		{
-	            $urlencoded .= urlencode('&issuer='.urlencode($title));
-	    }
-	    return 'http://api.qrserver.com/v1/create-qr-code/?&size=150x150&margin=0&ecc=M&data='.$urlencoded.'';
+			$urlencoded .= urlencode('&issuer='.urlencode($title));
+		}
+		return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&ecc=M&data='.$urlencoded.'';
     }
 
     /**
