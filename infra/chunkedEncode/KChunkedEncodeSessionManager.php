@@ -249,10 +249,9 @@
 					 */
 //					if(!array_key_exists($job->id, $this->failed))
 					{
-						$failedIdx = $job->keyIdx;
-						$this->retryJob($manager, $job);
-						$this->failed[$job->id] = $failedIdx;
-						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$maxExecutionTime");
+						$job->timeout=1;
+						KalturaLog::log("($job->id, atm:$job->attempt)doubled the maxExecutionTime,$job->maxExecTime,elapsed:$elapsed");
+						$this->failed[$job->id] = $job->keyIdx;
 					}
 				}
 			}
@@ -264,7 +263,7 @@
 		 */
 		protected function retryJob($manager, $job)
 		{
-KalturaLog::log("id:$job->id, keyIdx:$job->keyIdx, state:$job->state");
+			KalturaLog::log("id:$job->id, keyIdx:$job->keyIdx, state:$job->state");
 			$job->state = $job::STATE_RETRY;
 			$manager->SaveJob($job);
 		}
@@ -286,6 +285,7 @@ KalturaLog::log("id:$job->id, keyIdx:$job->keyIdx, state:$job->state");
 		protected $audioJobs = null;
 		
 		protected $storeManager = null;
+		public $chunker = null;
 
 		/* ---------------------------
 		 * C'tor
@@ -667,9 +667,11 @@ KalturaLog::log("id:$job->id, keyIdx:$job->keyIdx, state:$job->state");
 		 */
 		protected function processFailedJob($job)
 		{
-			if($job->state==$job::STATE_PENDING || $job->state==$job::STATE_RUNNING) {
+			if($job->state==$job::STATE_PENDING)
 				return true;
-			}
+			if($job->state==$job::STATE_RUNNING && !(isset($job->timeout) && $job->timeout==1)) 
+				return true;
+
 			KalturaLog::log("Job dump:".serialize($job));
 			if(array_key_exists($job->id, $this->audioJobs->jobs) && $this->audioJobs->jobs[$job->id]->process==$job->process)
 				$logFilename = $this->chunker->getSessionName("audio").".log";		
@@ -683,21 +685,30 @@ KalturaLog::log("id:$job->id, keyIdx:$job->keyIdx, state:$job->state");
 				KalturaLog::log("FAILED - job id($job->id) exeeded retry limit ($job->attempt, max:$this->maxRetries)");
 				return false;
 			}
-			$failedIdx = $job->keyIdx;
-			$job->state = $job::STATE_RETRY;
-			$this->storeManager->SaveJob($job);
-	
-			$job->state = $job::STATE_PENDING;
-			
-			//Reset job time stamps to avoid exec timeout when retrying failed job
-			$job->resetParams();
-			
 			$job->attempt++;
-			if($this->storeManager->AddJob($job)===false) {
-				KalturaLog::log("FAILED to retry job($job->id)");
-				return false;
+			
+				// For chunk timeouts 'retry attmept' means - extend jobs maxExexutionTime
+			if($job->timeout==1) {
+				$job->maxExecTime=round($job->maxExecTime*1.15);
+				$job->timeout=0;
+				$this->storeManager->SaveJob($job);
+				KalturaLog::log("Extend execution timeout, chunk ($job->id, maxExecTime:$job->maxExecTime, attempt:$job->attempt");
 			}
-			KalturaLog::log("Retry chunk ($job->id, failedKey:$failedIdx,newKey:$job->keyIdx, attempt:$job->attempt");
+			else {
+				$failedIdx = $job->keyIdx;
+				$job->state = $job::STATE_RETRY;
+				$this->storeManager->SaveJob($job);
+		
+					//Reset job time stamps to avoid exec timeout when retrying failed job
+				$job->resetParams();
+				$job->state = $job::STATE_PENDING;
+				
+				if($this->storeManager->AddJob($job)===false) {
+					KalturaLog::log("FAILED to retry job($job->id)");
+					return false;
+				}
+				KalturaLog::log("Retry chunk ($job->id, failedKey:$failedIdx,newKey:$job->keyIdx, attempt:$job->attempt");
+			}
 			return true;
 		}
 
@@ -767,9 +778,63 @@ KalturaLog::log("id:$job->id, keyIdx:$job->keyIdx, state:$job->state");
 			return parent::executeCmdline($cmdLine);
 		}
 
+		/********************
+		 * getSessionReportStats
+		 */
+		public function getSessionReportStats() 		
+		{
+			$chunker = $this->chunker;
+			$sessionStats = new KChunkedEncodeSessionReportStats();
+			$sessionStats->num = $chunker->GetMaxChunks();
+			$sessionStats->lasted = $this->finishTime - $this->createTime;
+			{
+				KalturaLog::log("CSV,idx,startedAt,user,system,elapsed,cpu");
+				foreach($this->chunkExecutionDataArr as $idx=>$execData){
+					$sessionStats->userCpu +=    $execData->user;
+					$sessionStats->systemCpu +=  $execData->system;
+					$sessionStats->elapsedCpu += $execData->elapsed;
+					
+					KalturaLog::log("CSV,$idx,$execData->startedAt,$execData->user,$execData->system,$execData->elapsed,$execData->cpu");
+				}
+				$cnt = $chunker->GetMaxChunks();
 
+			}
+			
+//			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));
+
+			if(isset($this->concurrencyHistogram) && count($this->concurrencyHistogram)>0){
+				ksort($this->concurrencyHistogram);
+				$ttlStr = "Concurrency";
+				$tmStr = "Concurrency";
+				$concurSum = 0;
+				$tmSum = 0;
+				foreach($this->concurrencyHistogram as $concur=>$tm){
+					$ttlStr.=",$concur";
+					$tmStr.= ",$tm";
+					$concurSum+= ($concur*$tm);
+					$tmSum+= $tm;
+				}
+				KalturaLog::log($ttlStr);
+				KalturaLog::log($tmStr);
+				$concurrencyLevel = (round(($concurSum/$tmSum),2));
+			}
+
+			KalturaLog::log("***********************************************************");
+			KalturaLog::log("* Session Summary (".date("Y-m-d H:i:s").")");
+			KalturaLog::log("* ");
+			if(isset($concurrencyLevel)) {
+				$val = round(end($this->concurrencyHistogram)/1000,2);
+				$idle = round($this->concurrencyHistogram[0]/1000,2);
+				$sessionStats->concurrency = $concurrencyLevel;
+				$sessionStats->concurrencyMax = key($this->concurrencyHistogram);
+				$sessionStats->concurrencyMaxTime = $val;
+				$sessionStats->concurrencyIdleTime = $idle;
+			}
+
+			KalturaLog::log("SessionStats:".$sessionStats->ToString());
+			return $sessionStats;
+		}
 	}
 	/*****************************
 	 * End of KChunkedEncodeSessionManager
 	 *****************************/
-	
