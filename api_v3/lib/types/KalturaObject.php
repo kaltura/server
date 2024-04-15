@@ -317,7 +317,7 @@ abstract class KalturaObject implements IApiObject
 	
 		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("' => true,\n\t\t\t'", array_keys($mappingFuncCode)) . "' => true\n\t\t);";
 		$result .= '
-		if($responseProfile){
+		if($responseProfile && $responseProfile->fields){
 			$fieldsArray = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
 			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS){
 				$get = array_intersect_key($get, $fieldsArray);
@@ -335,7 +335,7 @@ abstract class KalturaObject implements IApiObject
 	
 	public function shouldGet($propertyName, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if($responseProfile)
+		if($responseProfile && $responseProfile->fields)
 		{
 			$fields = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
 			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS)

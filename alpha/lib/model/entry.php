@@ -166,6 +166,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	private $archive_extension = null;
 	
+	private $copy_metadata = true;
+	
 	private static $mediaTypeNames = array(
 		self::ENTRY_MEDIA_TYPE_AUTOMATIC => 'AUTOMATIC',
 		self::ENTRY_MEDIA_TYPE_ANY => 'ANY',
@@ -1078,6 +1080,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return $this->archive_extension;
 	}
+	
+	public function setCopyMetadata($v)
+	{
+		$this->copy_metadata = $v;
+	}
+	
+	public function getCopyMetadata()
+	{
+		return $this->copy_metadata;
+	}
 
 	/**
 	 * The method returns the var_dumpd_options, in case the entry was created via clone operation.
@@ -1462,14 +1474,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return null;
-		return parent::getCategories();
+		$result = parent::getCategories();
+		return is_null($result) ? '' : $result;
 	}
 
 	public function getCategoriesIds()
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return null;
-		return parent::getCategoriesIds();
+		
+		$result = parent::getCategoriesIds();
+		return is_null($result) ? '' : $result;
 	}
 
 	/*public function renameCategory($oldFullName, $newFullName)
@@ -3555,7 +3570,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$categories	= categoryPeer::doSelect($c);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
-		//get all memebrs
+		//get all members
 		foreach ($categories as $category)
 		{
 			if(!count($category->getMembers()))

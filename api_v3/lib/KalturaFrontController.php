@@ -182,7 +182,7 @@ class KalturaFrontController
 				{
 					$params[$key] = $this->replaceMultiRequestResults($index, $path, $params[$key], $result);
 				}
-				elseif (preg_match('/^\{([0-9]+):result:?(.*)?\}$/', $path, $matches))
+				elseif ($path && preg_match('/^\{([0-9]+):result:?(.*)?\}$/', $path, $matches))
 				{
 					if(intval($matches[1]) == $index)
 					{
@@ -190,8 +190,11 @@ class KalturaFrontController
 						$valueFromObject = $this->getValueFromObject($result, $attributePath);
 						if(!$valueFromObject)
 							KalturaLog::debug("replaceMultiRequestResults: Empty value returned from object");
-							
-						$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
+						
+						if(!is_null($params[$key]))
+						{
+							$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
+						}
 					}
 				}
 			}
@@ -744,7 +747,7 @@ class KalturaFrontController
 
 	public function serialize($object, $className, $serializerType, IResponseProfile $coreResponseProfile = null)
 	{
-		if (!class_exists($className)) {
+		if (is_null($className) || !class_exists($className)) {
 			KalturaLog::err("Class [$className] was not found!");
 			return null;
 		}

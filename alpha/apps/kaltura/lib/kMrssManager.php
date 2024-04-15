@@ -111,6 +111,11 @@ class kMrssManager
 	 */
 	public static function stringToSafeXml($string)
 	{
+		if(is_null($string))
+		{
+			return '';
+		}
+		
 		$string = @iconv('utf-8', 'utf-8', $string);
 		$safe = kString::xmlEncode($string);
 		return $safe;
@@ -261,7 +266,8 @@ class kMrssManager
 		}
 		else
 		{
-			$thumbnail->addAttribute('url', kAssetUtils::getAssetUrl($thumbAsset));
+			$assetUrl = kAssetUtils::getAssetUrl($thumbAsset);
+			$thumbnail->addAttribute('url', !is_null($assetUrl) ? $assetUrl : '');
 		}
 		$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
 		$thumbnail->addAttribute('isDefault', $thumbAsset->hasTag(thumbParams::TAG_DEFAULT_THUMB) ? 'true' : 'false');

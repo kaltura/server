@@ -518,8 +518,12 @@ class kString
 	
 	public static function validateQuotes($str)
 	{
-		preg_match_all('#\\\\*"#', $str, $matches);
 		$valid = true;
+		$matches = array();
+		if(!is_null($str))
+		{
+			preg_match_all('#\\\\*"#', $str, $matches);
+		}
 		
 		foreach ($matches[0] as $match)
 		{
@@ -549,7 +553,8 @@ class kString
 		if(!$enableParamsMasking)
 			return $str;
 
-		return str_repeat($maskChar, $maxLength ? min(strlen($str), $maxLength) : strlen($str));
+		$strlen = !is_null($str) ? strlen($str) : 0;
+		return str_repeat($maskChar, $maxLength ? min($strlen, $maxLength) : $strlen);
 	}
 	
 	public static function isValidMongoId($string)
@@ -562,5 +567,15 @@ class kString
 		// trim whitespace from beginning and end (leaving inner whitespace untouched)
 		$trimmedArray = array_map('trim', explode(',', $csv));
 		return implode(',', $trimmedArray);
+	}
+	
+	public static function strToLow($str)
+	{
+		if(is_null($str))
+		{
+			return '';
+		}
+		
+		return strtolower($str);
 	}
 }

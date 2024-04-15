@@ -365,7 +365,7 @@ class myPlaylistUtils
 	 */
 	public static function getEntryIdsFromStaticPlaylistString($entry_id_list_str)
 	{
-		if(!trim($entry_id_list_str))
+		if(is_null($entry_id_list_str) || !trim($entry_id_list_str))
 		{
 			return null;
 		}

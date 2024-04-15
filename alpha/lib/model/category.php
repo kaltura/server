@@ -1983,7 +1983,7 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 			'pending_members_count' => $this->getPendingMembersCount(),
 			'pending_entries_count' => $this->getPendingEntriesCount(),
 			'description' => $this->getDescription(),
-			'tags' => explode(',', $this->getTags()),
+			'tags' => !is_null($this->getTags()) ? explode(',', $this->getTags()) : array(),
 			'display_in_search' => $this->getDisplayInSearch(),
 			'inheritance_type' => $this->getInheritanceType(),
 			'kuser_id' => $this->getKuserId(),
@@ -2075,5 +2075,16 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$this->setDirectEntriesCount(0);
 		$this->save();
 	}
-
+	
+	public function getPrivacyContext()
+	{
+		$result = parent::getPrivacyContext();
+		return is_null($result) ? '' : $result;
+	}
+	
+	public function getPrivacyContexts()
+	{
+		$result = parent::getPrivacyContexts();
+		return is_null($result) ? '' : $result;
+	}
 }
