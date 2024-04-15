@@ -299,12 +299,22 @@ KalturaLog::log("dur:$duration, samplingPoints:$samplingPoints, stepInterval:$st
 		{
 			/*
 			 * estimateDuration
-			 * estimatedKeyFrameCount - I frame count that shoudl represent both the ForcedKF's and scenecut flavors. Typically - duration_in_sec * 3
+			 * estimatedKeyFrameCount - I frame count that should represent both the ForcedKF's and scenecut flavors. Typically - duration_in_sec * 3
 			 */
 			KalturaLog::log("estimateDuration($estimateDuration), estimatedKeyFrameCount($estimatedKeyFrameCount), fps($fps), frameStat:".print_r($framesStat,1));
 			
-			$estimatedSize = ($framesStat->I->size/$framesStat->I->cnt)*$estimatedKeyFrameCount;
-			$p2bRatio = ($framesStat->P->size + $framesStat->B->size)/($framesStat->P->cnt + $framesStat->B->cnt);
+			//PHP8 - Avoid dividing by 0 and assign $estimatedSize the value it would have got in PHP7
+			$estimatedSize = ($framesStat->I->cnt !== 0)
+				? ($framesStat->I->size/$framesStat->I->cnt)*$estimatedKeyFrameCount
+				: INF;
+			
+			//PHP8 - Avoid dividing by 0 and assign $estimatedSize the value it would have got in PHP7
+			$framesStatSize = $framesStat->P->size + $framesStat->B->size;
+			$framesStatCount = $framesStat->P->cnt + $framesStat->B->cnt;
+			$p2bRatio = ($framesStatCount === 0)
+				? ($framesStatSize === 0 ? NAN : INF)
+				: ($framesStatSize/$framesStatCount);
+			
 			$estimatedSize+= ($estimateDuration*$fps-$estimatedKeyFrameCount)*$p2bRatio;
 			$complexityValue = round($estimatedSize*8/$estimateDuration/1024);
 

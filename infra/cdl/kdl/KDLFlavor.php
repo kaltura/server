@@ -90,10 +90,12 @@ class KDLFlavor extends KDLMediaDataSet {
 		 */
 		if($this->_video!=null && $prevFlavor->_video!=null) {
 			/*
-			 * The previous flavor should be atleast FlavorBitrateRedundencyFactor
+			 * The previous flavor should be at least FlavorBitrateRedundancyFactor
 			 * away, else - remove the current flavor.
+			 * PHP8 - Avoid dividing by 0 and assign $estimatedSize the value it would have got in PHP7
 			 */
-			$redundRatio = $this->_video->_bitRate/$prevFlavor->_video->_bitRate;
+			$redundRatio = $prevFlavor->_video->_bitRate ?
+				$this->_video->_bitRate/$prevFlavor->_video->_bitRate : INF;
 			if($redundRatio>1) $redundRatio = 1/$redundRatio;
 			if($redundRatio>KDLConstants::FlavorBitrateRedundencyFactor) {
 				$this->_flags = $this->_flags | KDLFlavor::RedundantFlagBit;
@@ -697,12 +699,24 @@ $plannedDur = 0;
 					$sourceNormalizedBitrate = $complexityNormalizedBitrate;
 			}
 				// Calc resolution matching factor - target-frame-pixels/source-framee-pixels.
-				// The factor limited by 1, to avoid increasing of the cappingBitarate
-			$resolutionMatchFactor = min($targetVid->_height*$targetVid->_width/($sourceVid->_height*$sourceVid->_width),1);
+				// The factor limited by 1, to avoid increasing of the cappingBitrate
+			//PHP8:TODO - backwards compatibility avoid division by 0
+			$sourceWithMultiply = $sourceVid->_height*$sourceVid->_width;
+			$targetWithMultiply = $targetVid->_height*$targetVid->_width;
+			$value = ($sourceWithMultiply != 0) ?
+				($targetWithMultiply/$sourceWithMultiply) :
+				( ($targetWithMultiply == 0) ? 0 : INF);
+				
+			$resolutionMatchFactor = min($value,1);
 				// Calc compensation factor, to avoid filtering out of smaller resol'ed flavors
 				// The 'compensationFactor' is higher for flavors w/lower bitrate.
 				// The factor should be >1, to avoid further reduction.
-			$compensationFactor = max($sourceNormalizedBitrate/$flavorVid->_bitRate,1);
+			
+			//PHP8:TODO - backwards compatibility avoid division by 0
+			$value = ($flavorVid->_bitRate != 0) ?
+				($sourceNormalizedBitrate/$flavorVid->_bitRate) :
+				( ($sourceNormalizedBitrate == 0) ? 0 : INF);
+			$compensationFactor = max($value,1);
 			
 			$cappingBitrate = min(round($sourceNormalizedBitrate*$resolutionMatchFactor*$compensationFactor),$targetVid->_bitRate);
 			if($cappingBitrate<$flavorVid->_bitRate*KDLConstants::FlavorBitrateComplianceFactor) {

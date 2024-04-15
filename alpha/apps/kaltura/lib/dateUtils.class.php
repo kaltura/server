@@ -97,7 +97,7 @@ class dateUtils
 		$minutes = (int)(( $time_in_secs - $hours * 3600 ) / 60);
 		$seconds = (int)( $time_in_secs - $minutes * 60 - $hours * 3600 ) ;
 		$decimal = (int)(($time_in_msecs%1000) / 100 );
-		$str = ( $hours > 10 ? "$hours:" : $hours > 0 ? "0$hours:" : "" ) .  
+		$str = ( $hours > 10 ? "$hours:" : ($hours > 0 ? "0$hours:" : "") ) .
 			( $minutes > 10 ? $minutes : "0$minutes" ) . ":" . 
 			( $seconds > 10 ? $seconds : "0$seconds" ) . ".$decimal";
 		return $str ;

@@ -53,7 +53,7 @@ class KalturaEventNotificationParameter extends KalturaObject
 		/* @var $dbObject kEventValueCondition */
 		parent::doFromObject($dbObject, $responseProfile);
 		
-		$valueType = get_class($dbObject->getValue());
+		$valueType = $dbObject->getValue() ? get_class($dbObject->getValue()) : null;
 		KalturaLog::debug("Loading KalturaStringValue from type [$valueType]");
 		switch ($valueType)
 		{

@@ -299,7 +299,7 @@ class sfRouting
         $elements[count($elements) - 1] = $matches[1];
         $route = '/'.implode('/', $elements);
       }
-      else if ($route{strlen($route) - 1} == '/')
+      else if ($route[strlen($route) - 1] == '/')
       {
         $suffix = '/';
       }

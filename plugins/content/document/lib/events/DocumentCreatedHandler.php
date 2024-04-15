@@ -20,7 +20,7 @@ class DocumentCreatedHandler implements kObjectCreatedEventConsumer, kObjectAdde
 	public function setDocumentType(entry $object)
 	{
 		$fileName = $object->getSourceLink();
-		$ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+		$ext = !is_null($fileName) ? strtolower(pathinfo($fileName, PATHINFO_EXTENSION)) : "";
 		foreach(self::$fileExtensions as $documentType => $extensions)
 		{
 			if(in_array($ext, $extensions))

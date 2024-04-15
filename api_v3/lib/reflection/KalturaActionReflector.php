@@ -72,9 +72,9 @@ class KalturaActionReflector extends KalturaReflector
 		$this->_actionId = $actionId;
 		
 		$fetchFromAPCSuccess = null;
-		if(function_exists('apc_fetch'))
+		if(kApcWrapper::functionExists('fetch'))
 		{
-			$actionFromCache = apc_fetch("{$this->_serviceId}_{$this->_actionId}", $fetchFromAPCSuccess);
+			$actionFromCache = kApcWrapper::apcFetch("{$this->_serviceId}_{$this->_actionId}", $fetchFromAPCSuccess);
 			if($fetchFromAPCSuccess && $actionFromCache[KalturaServicesMap::SERVICES_MAP_MODIFICATION_TIME] == KalturaServicesMap::getServiceMapModificationTime())
 			{
 				$this->_actionInfo = $actionFromCache["actionInfo"];
@@ -126,7 +126,7 @@ class KalturaActionReflector extends KalturaReflector
 					
 				$parsedDocComment = new KalturaDocCommentParser( $docComment, array(
 					KalturaDocCommentParser::DOCCOMMENT_REPLACENET_PARAM_NAME => $name , ) );
-				$paramClass = $reflectionParam->getClass(); // type hinting for objects
+				$paramClass = $reflectionParam->getType(); // type hinting for objects
 				if ($paramClass)
 				{
 					$type = $paramClass->getName();
@@ -151,7 +151,7 @@ class KalturaActionReflector extends KalturaReflector
 					$paramInfo->setDefaultValue($reflectionParam->getDefaultValue());
 					$paramInfo->setOptional(true);
 				}
-				else if ($reflectionParam->getClass() && $reflectionParam->allowsNull()) // for object parameter
+				else if ($reflectionParam->getType() && $reflectionParam->allowsNull()) // for object parameter
 				{
 					$paramInfo->setOptional(true);
 				}
@@ -271,7 +271,7 @@ class KalturaActionReflector extends KalturaReflector
 	 */
 	protected function cacheReflectionValues()
 	{
-		if (!function_exists('apc_store'))
+		if (!kApcWrapper::functionExists('store'))
 			return;
 			
 		$servicesMapLastModTime = KalturaServicesMap::getServiceMapModificationTime();
@@ -283,7 +283,7 @@ class KalturaActionReflector extends KalturaReflector
 			"actionClassInfo" => $this->getActionClassInfo(),
 		);
 		
-		$success = apc_store("{$this->_serviceId}_{$this->_actionId}", $cacheValue);
+		$success = kApcWrapper::apcStore("{$this->_serviceId}_{$this->_actionId}", $cacheValue);
 	}
 
 

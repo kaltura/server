@@ -736,7 +736,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 			else
 			{
-				$splitIndexValue = kQueryCache::getCriterionValues($criteria, $splitIndexAttr);
+				$splitIndexValue = kQueryCache::getCriterionValues($criteria, $splitIndexAttr, true);
 				if($splitIndexValue && count($splitIndexValue) > 1 )
 				{
 					KalturaLog::debug("Found multiple values for Split index attribute, will query distributed index");

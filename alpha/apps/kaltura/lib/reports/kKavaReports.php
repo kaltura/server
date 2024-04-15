@@ -11,7 +11,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_USERS),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
@@ -25,7 +25,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO, self::EVENT_TYPE_PLAYER_IMPRESSION),
 			self::REPORT_GRAPH_TYPE => self::GRAPH_BY_NAME,
@@ -40,7 +40,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
@@ -90,7 +90,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'name',
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo'
 			),
 			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
@@ -103,7 +103,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
 			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION),
@@ -117,7 +117,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('name', 'full_name'),
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME))'),
 				)
@@ -134,7 +134,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'name',
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo'
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYTHROUGH_25, self::EVENT_TYPE_PLAYTHROUGH_50, self::EVENT_TYPE_PLAYTHROUGH_75, self::EVENT_TYPE_PLAYTHROUGH_100, self::METRIC_PLAYTHROUGH_RATIO),
 			self::REPORT_GRAPH_TYPE => self::GRAPH_BY_NAME,
@@ -149,7 +149,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'name',
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo'
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_EDIT_CLICKED, self::EVENT_TYPE_SHARE_CLICKED, self::EVENT_TYPE_DOWNLOAD_CLICKED, self::EVENT_TYPE_REPORT_CLICKED),
@@ -229,7 +229,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
@@ -242,7 +242,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('name'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'peer' => 'categoryPeer',
 					'int_ids_only' => true,
@@ -293,7 +293,7 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 				),
 
 				// media entries
@@ -317,7 +317,7 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedEntriesGraphs',
 				),
 
 				// named users
@@ -341,7 +341,7 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_TOTAL),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedUsersGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedUsersGraphs',
 				),
 
 				// plays
@@ -351,7 +351,7 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
 				),
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
 			self::REPORT_COLUMN_MAP => array(
 				'total_plays' => self::EVENT_TYPE_PLAY,
 				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
@@ -377,7 +377,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('status', 'partner_name', 'created_at'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'peer' => 'PartnerPeer',
 					'int_ids_only' => true,
@@ -432,7 +432,7 @@ class kKavaReports extends kKavaReportsMgr
 						),
 						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 						self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 					),
 
 					// entries
@@ -448,7 +448,7 @@ class kKavaReports extends kKavaReportsMgr
 						self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
 						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 						self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
-						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedEntriesGraphs',
 					),
 
 					// named users
@@ -472,7 +472,7 @@ class kKavaReports extends kKavaReportsMgr
 						),
 						self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 						self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_TOTAL),
-						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedUsersGraphs',
+						self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedUsersGraphs',
 					),
 
 					// plays
@@ -482,7 +482,7 @@ class kKavaReports extends kKavaReportsMgr
 						self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION),
 					),
 				),
-				self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+				self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
 				self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_AVERAGE_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_PEAK_ENTRIES, self::METRIC_PEAK_USERS, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB, self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB, self::METRIC_PEAK_STORAGE_MB,)
 				),
 			),
@@ -510,7 +510,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'name',
-				self::REPORT_ENRICH_FUNC => 'self::getUserScreenNameWithFallback'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUserScreenNameWithFallback'
 			),
 			self::REPORT_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_SHOW),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_COUNT_TOTAL, self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_SHOW),
@@ -537,7 +537,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_media_source_name',
 				self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
-				self::REPORT_ENRICH_CONTEXT => 'self::toSafeId',
+				self::REPORT_ENRICH_CONTEXT => 'kKavaReportsMgr::toSafeId',
 			),
 		),
 
@@ -550,7 +550,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_screen_name', 'user_full_name'),
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'SCREEN_NAME', 'FULL_NAME'),
 				)),
@@ -571,7 +571,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('name', 'full_name'),
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME))'),
 				)
@@ -599,7 +599,7 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
 					self::REPORT_METRICS => array(self::METRIC_ENTRIES_TOTAL, self::METRIC_DURATION_TOTAL_MSEC),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL, self::METRIC_DURATION_TOTAL_MSEC),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphsBaseToEnd',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedEntriesGraphsBaseToEnd',
 				),
 
 				// storage total
@@ -608,7 +608,7 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
 					self::REPORT_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphsBaseToEnd',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphsBaseToEnd',
 				),
 			),
 			self::REPORT_TABLE_MAP => array(
@@ -644,7 +644,7 @@ class kKavaReports extends kKavaReportsMgr
 				'total_storage_mb' => self::METRIC_LATEST_STORAGE_MB,
 				'total_msecs' => self::METRIC_LATEST_DURATION_MSEC,
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
 		),
 
 		ReportType::SPECIFIC_USER_USAGE => array(
@@ -668,7 +668,7 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
 					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL, self::METRIC_DURATION_TOTAL_MSEC),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphsBaseToEnd',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedEntriesGraphsBaseToEnd',
 				),
 
 				// storage total
@@ -676,7 +676,7 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
 					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_END,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphsBaseToEnd',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphsBaseToEnd',
 				),
 			),
 
@@ -713,7 +713,7 @@ class kKavaReports extends kKavaReportsMgr
 				'total_storage_mb' => self::METRIC_LATEST_STORAGE_MB,
 				'total_msecs' => self::METRIC_LATEST_DURATION_MSEC,
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
 		),
 
 		ReportType::PARTNER_USAGE => array(
@@ -753,7 +753,7 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 				),
 			),
 			self::REPORT_GRAPH_MAP => array(
@@ -785,8 +785,8 @@ class kKavaReports extends kKavaReportsMgr
 				'combined_bandwidth_storage' => self::METRIC_BANDWIDTH_STORAGE_MB,
 				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
-			self::REPORT_GRAPH_FINALIZE_FUNC => 'self::addCombinedUsageGraph',
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
+			self::REPORT_GRAPH_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedUsageGraph',
 		),
 
 		ReportType::ENTRY_USAGE => array(
@@ -810,7 +810,7 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedEntriesGraphs',
 				),
 			),
 			self::REPORT_COLUMN_MAP => array(
@@ -818,7 +818,7 @@ class kKavaReports extends kKavaReportsMgr
 				'deleted_entries' => self::METRIC_ENTRIES_DELETED,
 				'peak_entries' => self::METRIC_PEAK_ENTRIES,
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData'
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData'
 		),
 
 		myReportsMgr::REPORT_TYPE_ADMIN_CONSOLE => array(
@@ -832,7 +832,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('STATUS', 'partner name', 'created at', 'partner package'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'peer' => 'PartnerPeer',
 					'int_ids_only' => true,
@@ -888,10 +888,10 @@ class kKavaReports extends kKavaReportsMgr
 							),
 							self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 							self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-							self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+							self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 						),
 					),
-					self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+					self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
 					self::REPORT_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB, self::METRIC_AVERAGE_STORAGE_MB, self::METRIC_PEAK_STORAGE_MB),
 				),
 				array(
@@ -900,7 +900,7 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
 				),
 			),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedUsageColumn',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedUsageColumn',
 			self::REPORT_TABLE_MAP => array(
 				'count loads' => self::EVENT_TYPE_PLAYER_IMPRESSION,
 				'count plays' => self::EVENT_TYPE_PLAY,
@@ -930,7 +930,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('status', 'partner_name', 'created_at'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'peer' => 'PartnerPeer',
 					'int_ids_only' => true,
@@ -972,12 +972,12 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 				),
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedUsageColumn',
-			self::REPORT_GRAPH_FINALIZE_FUNC => 'self::addCombinedUsageGraph',
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedUsageColumn',
+			self::REPORT_GRAPH_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedUsageGraph',
 			self::REPORT_TABLE_MAP => array(
 				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
 				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
@@ -1033,16 +1033,16 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 				),
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
-			self::REPORT_TOTAL_FROM_TABLE_FUNC => 'self::getTotalPeakStorageFromTable',
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
+			self::REPORT_TOTAL_FROM_TABLE_FUNC => 'kKavaReportsMgr::getTotalPeakStorageFromTable',
 		),
 
 		// Note: historically this report returns the bandwidth in kb in table, and in mb in graph
 		myReportsMgr::REPORT_TYPE_PARTNER_BANDWIDTH_USAGE => array(
-			self::REPORT_EDIT_FILTER_FUNC => 'self::partnerUsageEditFilter',
+			self::REPORT_EDIT_FILTER_FUNC => 'kKavaReportsMgr::partnerUsageEditFilter',
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
@@ -1068,10 +1068,10 @@ class kKavaReports extends kKavaReportsMgr
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
 					),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 				),
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
 			self::REPORT_GRAPH_MAP => array(
 				'bandwidth' => self::METRIC_BANDWIDTH_SIZE_MB,
 			),
@@ -1079,11 +1079,11 @@ class kKavaReports extends kKavaReportsMgr
 				'avg_continuous_aggr_storage_mb' => self::METRIC_AVERAGE_STORAGE_MB,
 				'sum_partner_bandwidth_kb' => self::METRIC_BANDWIDTH_SIZE_KB,
 			),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addRollupRow',
 		),
 
 		myReportsMgr::REPORT_TYPE_PARTNER_USAGE_DASHBOARD => array(
-			self::REPORT_EDIT_FILTER_FUNC => 'self::partnerUsageEditFilter',
+			self::REPORT_EDIT_FILTER_FUNC => 'kKavaReportsMgr::partnerUsageEditFilter',
 			self::REPORT_JOIN_GRAPHS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
@@ -1109,15 +1109,15 @@ class kKavaReports extends kKavaReportsMgr
 						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
 					),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 				),
 			),
-			self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
 			self::REPORT_TABLE_MAP => array(
 				'avg_continuous_aggr_storage_mb' => self::METRIC_AVERAGE_STORAGE_MB,
 				'sum_partner_bandwidth_kb' => self::METRIC_BANDWIDTH_SIZE_KB,
 			),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addRollupRow',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addRollupRow',
 		),
 
 		ReportType::REACH_USAGE => array(
@@ -1132,7 +1132,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
 			self::REPORT_METRICS => array(self::METRIC_SUM_PRICE),
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::METRIC_SUM_PRICE),
@@ -1167,7 +1167,7 @@ class kKavaReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country','region','city'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -1237,7 +1237,7 @@ class kKavaReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -1269,7 +1269,7 @@ class kKavaReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -1305,14 +1305,14 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_ENRICH_DEF => array(
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at', 'status', 'media_type', 'duration_msecs', 'entry_source'),
-					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesSource',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT', 'STATUS', 'MEDIA_TYPE', 'LENGTH_IN_MSECS'),
 					)
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
 						'peer' => 'kuserPeer',
@@ -1333,7 +1333,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'creator_name', 'created_at'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)', '@CREATED_AT'),
 					'peer' => 'kuserPeer',
@@ -1371,7 +1371,7 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_DURATION_ADDED_MSEC, self::METRIC_UNIQUE_CONTRIBUTORS),
 				),
 			),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addContributorRankingColumn',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addContributorRankingColumn',
 			self::REPORT_TABLE_MAP => array(
 				'count_plays' => self::EVENT_TYPE_PLAY,
 				'added_entries' => self::METRIC_ENTRIES_ADDED,
@@ -1403,7 +1403,7 @@ class kKavaReports extends kKavaReportsMgr
 				'percentile' => self::DIMENSION_PERCENTILES
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD, self::METRIC_UNIQUE_USERS),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addZeroPercentiles',
 		),
 
 		ReportType::CONTENT_REPORT_REASONS => array(
@@ -1422,7 +1422,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('entry_name', 'status', 'entry_source'),
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesSource',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('NAME', 'STATUS'),
 				),
@@ -1452,14 +1452,14 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_ENRICH_DEF => array(
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name', 'created_at', 'status', 'media_type', 'duration_msecs', 'entry_source'),
-					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesSource',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('NAME', 'KUSER_ID', '@CREATED_AT', 'STATUS', 'MEDIA_TYPE', 'LENGTH_IN_MSECS'),
 					)
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
 						'peer' => 'kuserPeer',
@@ -1477,7 +1477,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'name',
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo'
 			),
 			self::REPORT_JOIN_REPORTS => array(
 				// player events metrics
@@ -1511,7 +1511,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'name',
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo'
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
 			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS),
@@ -1551,11 +1551,11 @@ class kKavaReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'extract_time',
 					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
-					self::REPORT_ENRICH_CONTEXT => 'self::timestampToUnixtime',
+					self::REPORT_ENRICH_CONTEXT => 'kKavaReportsMgr::timestampToUnixtime',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'status', 'entry_source'),
-					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesSource',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('NAME', 'STATUS'),
 						),
@@ -1584,7 +1584,7 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_ENRICH_DEF => array(
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('name', 'entries_count', 'direct_sub_categories_count', 'parent_name'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'peer' => 'categoryPeer',
 						'int_ids_only' => true,
@@ -1593,7 +1593,7 @@ class kKavaReports extends kKavaReportsMgr
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('parent_name'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'peer' => 'categoryPeer',
 						'int_ids_only' => true,
@@ -1632,10 +1632,10 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_DIMENSION_MAP => array(
 				'percentile' => self::DIMENSION_PERCENTILES
 			),
-			self::REPORT_EDIT_FILTER_FUNC => 'self::mapFieldsEditFilter',
+			self::REPORT_EDIT_FILTER_FUNC => 'kKavaReportsMgr::mapFieldsEditFilter',
 			self::REPORT_EDIT_FILTER_CONTEXT => array('hotspot_ids', 'event_var1'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_HOTSPOT_CLICKED),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addZeroPercentiles',
 		),
 
 		ReportType::INTERACTIVE_VIDEO_NODE_SWITCH_HOTSPOT_CLICKED_PERCENTILES => array(
@@ -1649,10 +1649,10 @@ class kKavaReports extends kKavaReportsMgr
 					self::DRUID_VALUES => array(self::VALUE_UNKNOWN)
 				)
 			),
-			self::REPORT_EDIT_FILTER_FUNC => 'self::mapFieldsEditFilter',
+			self::REPORT_EDIT_FILTER_FUNC => 'kKavaReportsMgr::mapFieldsEditFilter',
 			self::REPORT_EDIT_FILTER_CONTEXT => array('hotspot_ids', 'event_var3'),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_NODE_SWITCH),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addZeroPercentiles',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addZeroPercentiles',
 		),
 
 		ReportType::TOP_CUSTOM_VAR2 => array(
@@ -1721,7 +1721,7 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL, self::METRIC_INTERACTIVE_VIDEOS_TOTAL),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedEntriesGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedEntriesGraphs',
 				),
 				// bandwidth
 				array(
@@ -1760,7 +1760,7 @@ class kKavaReports extends kKavaReportsMgr
 					),
 					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
-					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'self::addAggregatedStorageGraphs',
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
 				),
 				// meeting view time
 				array(
@@ -1771,9 +1771,9 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_MEETING_VIEW_TIME),
 				),
 			),
-					self::REPORT_GRAPH_AGGR_FUNC => 'self::aggregateUsageData',
-					self::REPORT_GRAPH_FINALIZE_FUNC => 'self::addCombinedLiveViewTimeGraph',
-					self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedLiveViewTimeColumn',
+					self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
+					self::REPORT_GRAPH_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedLiveViewTimeGraph',
+					self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedLiveViewTimeColumn',
 					self::REPORT_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_PEAK_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_LATEST_ENTRIES, self::METRIC_LATEST_INTERACTIVE_VIDEOS, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS, self::METRIC_AVERAGE_STORAGE_MB, self::METRIC_MEETING_RECORDING_HOURS_ADDED, self::METRIC_MEETING_VIEW_TIME, self::METRIC_COMBINED_LIVE_VIEW_TIME),
 					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_PEAK_STORAGE_MB, self::METRIC_TRANSCODING_SIZE_MB, self::METRIC_LATEST_ENTRIES, self::METRIC_LATEST_INTERACTIVE_VIDEOS, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_SUM_PRICE, self::METRIC_TOTAL_JOBS, self::METRIC_AVERAGE_STORAGE_MB, self::METRIC_MEETING_RECORDING_HOURS_ADDED, self::METRIC_MEETING_VIEW_TIME, self::METRIC_COMBINED_LIVE_VIEW_TIME),
 					)
@@ -1803,7 +1803,7 @@ class kKavaReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('name'),
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'peer' => 'assetParamsPeer',
 					'columns' => array('NAME'),

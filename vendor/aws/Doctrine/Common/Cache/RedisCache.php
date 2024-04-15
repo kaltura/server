@@ -1,44 +1,33 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
- */
 
 namespace Doctrine\Common\Cache;
 
 use Redis;
 
+use function array_combine;
+use function array_diff_key;
+use function array_fill_keys;
+use function array_filter;
+use function array_keys;
+use function count;
+use function defined;
+use function extension_loaded;
+use function is_bool;
+
 /**
  * Redis cache provider.
  *
+ * @deprecated Deprecated without replacement in doctrine/cache 1.11. This class will be dropped in 2.0
+ *
  * @link   www.doctrine-project.org
- * @since  2.2
- * @author Osman Ungur <osmanungur@gmail.com>
  */
 class RedisCache extends CacheProvider
 {
-    /**
-     * @var Redis|null
-     */
+    /** @var Redis|null */
     private $redis;
 
     /**
      * Sets the redis instance to use.
-     *
-     * @param Redis $redis
      *
      * @return void
      */
@@ -69,9 +58,62 @@ class RedisCache extends CacheProvider
     /**
      * {@inheritdoc}
      */
+    protected function doFetchMultiple(array $keys)
+    {
+        $fetchedItems = array_combine($keys, $this->redis->mget($keys));
+
+        // Redis mget returns false for keys that do not exist. So we need to filter those out unless it's the real data.
+        $keysToFilter = array_keys(array_filter($fetchedItems, static function ($item): bool {
+            return $item === false;
+        }));
+
+        if ($keysToFilter) {
+            $multi = $this->redis->multi(Redis::PIPELINE);
+            foreach ($keysToFilter as $key) {
+                $multi->exists($key);
+            }
+
+            $existItems     = array_filter($multi->exec());
+            $missedItemKeys = array_diff_key($keysToFilter, $existItems);
+            $fetchedItems   = array_diff_key($fetchedItems, array_fill_keys($missedItemKeys, true));
+        }
+
+        return $fetchedItems;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doSaveMultiple(array $keysAndValues, $lifetime = 0)
+    {
+        if ($lifetime) {
+            // Keys have lifetime, use SETEX for each of them
+            $multi = $this->redis->multi(Redis::PIPELINE);
+            foreach ($keysAndValues as $key => $value) {
+                $multi->setex($key, $lifetime, $value);
+            }
+
+            $succeeded = array_filter($multi->exec());
+
+            return count($succeeded) == count($keysAndValues);
+        }
+
+        // No lifetime, use MSET
+        return (bool) $this->redis->mset($keysAndValues);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function doContains($id)
     {
-        return $this->redis->exists($id);
+        $exists = $this->redis->exists($id);
+
+        if (is_bool($exists)) {
+            return $exists;
+        }
+
+        return $exists > 0;
     }
 
     /**
@@ -91,7 +133,15 @@ class RedisCache extends CacheProvider
      */
     protected function doDelete($id)
     {
-        return $this->redis->delete($id) > 0;
+        return $this->redis->del($id) >= 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doDeleteMultiple(array $keys)
+    {
+        return $this->redis->del($keys) >= 0;
     }
 
     /**
@@ -108,13 +158,14 @@ class RedisCache extends CacheProvider
     protected function doGetStats()
     {
         $info = $this->redis->info();
-        return array(
-            Cache::STATS_HITS   => false,
-            Cache::STATS_MISSES => false,
+
+        return [
+            Cache::STATS_HITS   => $info['keyspace_hits'],
+            Cache::STATS_MISSES => $info['keyspace_misses'],
             Cache::STATS_UPTIME => $info['uptime_in_seconds'],
             Cache::STATS_MEMORY_USAGE      => $info['used_memory'],
-            Cache::STATS_MEMORY_AVAILABLE  => false
-        );
+            Cache::STATS_MEMORY_AVAILABLE  => false,
+        ];
     }
 
     /**
@@ -122,13 +173,14 @@ class RedisCache extends CacheProvider
      * igbinary support, that is used. Otherwise the default PHP serializer is
      * used.
      *
-     * @return integer One of the Redis::SERIALIZER_* constants
+     * @return int One of the Redis::SERIALIZER_* constants
      */
     protected function getSerializerValue()
     {
-        if (defined('HHVM_VERSION')) {
-            return Redis::SERIALIZER_PHP;
+        if (defined('Redis::SERIALIZER_IGBINARY') && extension_loaded('igbinary')) {
+            return Redis::SERIALIZER_IGBINARY;
         }
-        return defined('Redis::SERIALIZER_IGBINARY') ? Redis::SERIALIZER_IGBINARY : Redis::SERIALIZER_PHP;
+
+        return Redis::SERIALIZER_PHP;
     }
 }

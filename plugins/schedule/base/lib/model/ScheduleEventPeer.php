@@ -420,8 +420,14 @@ class ScheduleEventPeer extends BaseScheduleEventPeer implements IRelatedObjectP
 		$roots = array();
 		if($object instanceof EntryScheduleEvent)
 		{
-			$categories =  categoryPeer::retrieveByPKs(explode(',', $object->getCategoryIds()));
-			$entries =  entryPeer::retrieveByPKs(explode(',', $object->getEntryIds()));
+			$categories = !is_null($object->getCategoryIds()) ?
+				categoryPeer::retrieveByPKs(explode(',', $object->getCategoryIds())) :
+				array();
+			
+			$entries = !is_null($object->getEntryIds()) ?
+				entryPeer::retrieveByPKs(explode(',', $object->getEntryIds())) :
+				array();
+			
 			$recurrenceObjects = array();
 			if($object->getRecurrenceType()==ScheduleEventRecurrenceType::RECURRING) {
 				$recurrenceObjects = self::retrieveByParentId($object->getId(), array());

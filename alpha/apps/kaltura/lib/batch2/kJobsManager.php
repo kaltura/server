@@ -1560,7 +1560,7 @@ class kJobsManager
 		$batchJob->setObjectType(BatchJobObjectType::FILE_SYNC);
 		$batchJob->setJobSubType($externalStorage->getProtocol());
 
-		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds($flavor))))
+		if(in_array($srcFileSync->getDc(), array_merge(kStorageExporter::getPeriodicStorageIds(), kDataCenterMgr::getSharedStorageProfileIds($partnerId))))
 		{
 			$batchJob->setDc(kDataCenterMgr::getCurrentDcId());
 		}

@@ -938,6 +938,8 @@ class flavorParamsOutputWrap extends flavorParamsOutput {
 	
 	public  $_errors=array(),
 			$_warnings=array();
+	
+	public  $_isEncrypted;
 
 	/* ------------------------------
 	 * IsValid

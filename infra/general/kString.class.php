@@ -298,6 +298,7 @@ class kString
 	 */
 	public static function stripUtf8InvalidChars($string)
 	{
+		$string = !is_null($string) ? $string : "";
 		return @iconv('utf-8', 'utf-8', $string);
 	}
 	
@@ -477,7 +478,7 @@ class kString
 	public static function explode($string, $delimiter=',')
 	{
 		$output = array();
-		$values = explode($delimiter, $string);
+		$values = !is_null($string) ? explode($delimiter, $string) : array();
 		foreach ($values as $value)
 		{
 			$value = trim($value);
@@ -517,8 +518,12 @@ class kString
 	
 	public static function validateQuotes($str)
 	{
-		preg_match_all('#\\\\*"#', $str, $matches);
 		$valid = true;
+		$matches = array();
+		if(!is_null($str))
+		{
+			preg_match_all('#\\\\*"#', $str, $matches);
+		}
 		
 		foreach ($matches[0] as $match)
 		{
@@ -533,8 +538,12 @@ class kString
 	
 	public static function validateEscape($str)
 	{
-		$trailingEscapesCount = strlen($str) - strlen(rtrim($str, '\\'));
+		if(is_null($str))
+		{
+			return true;
+		}
 		
+		$trailingEscapesCount = strlen($str) - strlen(rtrim($str, '\\'));
 		return $trailingEscapesCount % 2 == 0;
 	}
 
@@ -544,7 +553,8 @@ class kString
 		if(!$enableParamsMasking)
 			return $str;
 
-		return str_repeat($maskChar, $maxLength ? min(strlen($str), $maxLength) : strlen($str));
+		$strlen = !is_null($str) ? strlen($str) : 0;
+		return str_repeat($maskChar, $maxLength ? min($strlen, $maxLength) : $strlen);
 	}
 	
 	public static function isValidMongoId($string)
@@ -557,5 +567,15 @@ class kString
 		// trim whitespace from beginning and end (leaving inner whitespace untouched)
 		$trimmedArray = array_map('trim', explode(',', $csv));
 		return implode(',', $trimmedArray);
+	}
+	
+	public static function strToLow($str)
+	{
+		if(is_null($str))
+		{
+			return '';
+		}
+		
+		return strtolower($str);
 	}
 }

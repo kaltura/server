@@ -388,7 +388,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             if(in_array(entryPeer::CUSTOM_DATA, $modifiedColumns))
             {
                 $oldCustomData = $object->getCustomDataOldValues();
-                $oldCustomDataKeys = array_keys($oldCustomData[$namespace]);
+                $oldCustomDataKeys = isset($oldCustomData[$namespace])
+	                ? array_keys($oldCustomData[$namespace])
+                    : array();
+				
                 if(count(array_intersect($customDataFieldsToMonitor, $oldCustomDataKeys)) > 0)
                     return true;
             }

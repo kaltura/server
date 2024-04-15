@@ -32,7 +32,7 @@ class serveFlavorAction extends kalturaAction
 
 	protected function storeCache($renderer, $partnerId)
 	{
-		if (!function_exists('apc_store') || 
+		if (!kApcWrapper::functionExists('store') ||
 			$_SERVER["REQUEST_METHOD"] != "GET" || 
 			$renderer instanceof kRendererString)
 		{
@@ -42,7 +42,7 @@ class serveFlavorAction extends kalturaAction
 		$renderer->partnerId = $partnerId;
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
 		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$_SERVER["REQUEST_URI"];
-		apc_store($cacheKey, $renderer, 86400);
+		kApcWrapper::apcStore($cacheKey, $renderer, 86400);
 		header("X-Kaltura:cache-key");
 	}
 	protected function getSimpleMappingRenderer($path, asset $asset = null, FileSync $fileSync = null, $sourceType = kFileSyncUtils::SOURCE_TYPE_FILE)

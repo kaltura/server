@@ -106,16 +106,21 @@ class kFileSystemConf extends kBaseConfCache implements kMapCacheInterface
 		{
 			$iniFile[] = $baseConfigFile;
 		}
-		$hostNameRegexPattern = '/' . strtolower($hostNameRegex) . '/';
-		$iniFilesFiles = kFile::listDir($configDir . self::HOSTS_DIR . $mapName);
-		foreach ($iniFilesFiles as $iniFileItem)
+		
+		if(!is_null($hostNameRegex))
 		{
-			$mapHostNameRegex = $iniFileItem[0];
-			if(preg_match($hostNameRegexPattern, $mapHostNameRegex))
+			$hostNameRegexPattern = '/' . strtolower($hostNameRegex) . '/';
+			$iniFilesFiles = kFile::listDir($configDir . self::HOSTS_DIR . $mapName);
+			foreach ($iniFilesFiles as $iniFileItem)
 			{
-				$iniFile[] = $configDir . self::HOSTS_DIR . $mapName . DIRECTORY_SEPARATOR .$mapHostNameRegex;
+				$mapHostNameRegex = $iniFileItem[0];
+				if(preg_match($hostNameRegexPattern, $mapHostNameRegex))
+				{
+					$iniFile[] = $configDir . self::HOSTS_DIR . $mapName . DIRECTORY_SEPARATOR .$mapHostNameRegex;
+				}
 			}
 		}
+		
 		return $iniFile;
 	}
 

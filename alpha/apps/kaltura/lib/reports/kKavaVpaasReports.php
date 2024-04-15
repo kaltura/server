@@ -122,7 +122,7 @@ class kKavaVpaasReports extends kKavaReports
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',//we already validated in prev enrich
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',//we already validated in prev enrich
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('IFNULL(TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME)), PUSER_ID)'),
 						'peer' => 'kuserPeer',
@@ -130,7 +130,7 @@ class kKavaVpaasReports extends kKavaReports
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('entry_source'),
-					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesSource',
 				),
 			)
 		),
@@ -181,7 +181,7 @@ class kKavaVpaasReports extends kKavaReports
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('entry_source'),
-					self::REPORT_ENRICH_FUNC => 'self::getEntriesSource',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesSource',
 				),
 			),
 		),

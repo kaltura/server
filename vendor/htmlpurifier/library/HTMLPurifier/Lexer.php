@@ -47,6 +47,11 @@ class HTMLPurifier_Lexer
      * If it does, set to true.
      */
     public $tracksLineNumbers = false;
+	
+	/**
+	 * @type HTMLPurifier_EntityParser
+	 */
+	private $_entity_parser;
 
     // -- STATIC ----------------------------------------------------------
 

@@ -147,10 +147,10 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 	{
 		$pluginClassName = null;
 		$cacheKey = null;
-		if (function_exists('apc_fetch'))
+		if (kApcWrapper::functionExists('fetch'))
 		{
 			$cacheKey = "criteriaClass-$objectType";
-			$pluginClassName = apc_fetch($cacheKey);
+			$pluginClassName = kApcWrapper::apcFetch($cacheKey);
 		}
 		
 		$pluginInstances = KalturaPluginManager::getPluginInstances('IKalturaCriteriaFactory', $pluginClassName);
@@ -161,7 +161,7 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 			{
 				if (!$pluginClassName && $cacheKey)
 				{
-					apc_store($cacheKey, get_class($pluginInstance));
+					kApcWrapper::apcStore($cacheKey, get_class($pluginInstance));
 				}
 				return $criteria;
 			}
@@ -280,6 +280,11 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 
 	public static function escapeString($str, $escapeType = SearchIndexFieldEscapeType::DEFAULT_ESCAPE, $iterations = 2)
 	{
+		if(is_null($str))
+		{
+			$str = '';
+		}
+		
 		if (!kString::validateQuotes($str))
 		{
 			KalturaLog::log("Sphinx Field Error: uneven number of unescaped [\"] for field [$str]");
@@ -318,7 +323,6 @@ class KalturaCriteria extends Criteria implements IKalturaDbQuery
 		elseif($escapeType == SearchIndexFieldEscapeType::MD5_LOWER_CASE)
 		{
 			$str = strtolower($str);
-
 			if(substr($str, -2) == '\*')
 				return md5(substr($str, 0, strlen($str) - 2)) . '\\\*';
 

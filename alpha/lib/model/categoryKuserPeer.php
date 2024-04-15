@@ -191,7 +191,7 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		$criteria->add(categoryKuserPeer::KUSER_ID, $kuserId);
 		$criteria->add(categoryKuserPeer::STATUS, CategoryKuserStatus::ACTIVE);
 
-		$categoryKusers = categoryKuserPeer::doSelectOne($criteria, $con);
+		$categoryKusers = categoryKuserPeer::doSelect($criteria, $con);
 		if(count($categoryKusers) < count($categoriesIds))
 			return false;
 			

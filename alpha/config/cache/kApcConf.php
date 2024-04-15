@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../../../infra/cache/kApcWrapper.php";
 require_once __DIR__ . '/kBaseConfCache.php';
 require_once __DIR__ . '/kMapCacheInterface.php';
 require_once __DIR__ . '/kKeyCacheInterface.php';
@@ -11,7 +12,7 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 	public function __construct()
 	{
 		$reloadFile = kEnvironment::get('cache_root_path').'base.reload';
-		$this->apcFunctionsExist = function_exists('apc_fetch');
+		$this->apcFunctionsExist = kApcWrapper::functionExists('fetch');
 		$this->reloadFileExist = file_exists($reloadFile);
 		if($this->reloadFileExist)
 		{
@@ -27,14 +28,14 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 	public function delete($mapName)
 	{
 		if($this->apcFunctionsExist)
-			return apc_delete(self::CONF_MAP_PREFIX.$mapName);
+			return kApcWrapper::apcDelete(self::CONF_MAP_PREFIX.$mapName);
 	}
 
 	public function load($key, $mapName)
 	{
 		if($this->apcFunctionsExist && !$this->reloadFileExist)
 		{
-			$mapStr = apc_fetch(self::CONF_MAP_PREFIX.$mapName);
+			$mapStr = kApcWrapper::apcFetch(self::CONF_MAP_PREFIX.$mapName);
 			$map = json_decode($mapStr,true);
 			if ($map && $this->validateMap($map, $mapName, $key))
 			{
@@ -51,7 +52,7 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 		{
 			$this->addKeyToMap($map, $mapName, $key);
 			$mapStr = json_encode($map);
-			return apc_store(self::CONF_MAP_PREFIX.$mapName, $mapStr, $ttl);
+			return kApcWrapper::apcStore(self::CONF_MAP_PREFIX.$mapName, $mapStr, $ttl);
 		}
 		return false;
 	}
@@ -59,7 +60,7 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 	public function loadKey()
 	{
 		if($this->apcFunctionsExist && !$this->reloadFileExist)
-			return apc_fetch(kBaseConfCache::CONF_CACHE_VERSION_KEY);
+			return kApcWrapper::apcFetch(kBaseConfCache::CONF_CACHE_VERSION_KEY);
 
 		return null;
 	}
@@ -68,10 +69,10 @@ class kApcConf extends kBaseConfCache implements kMapCacheInterface , kKeyCacheI
 	{
 		if($this->apcFunctionsExist && PHP_SAPI != 'cli')
 		{
-			$existingKey = apc_fetch(kBaseConfCache::CONF_CACHE_VERSION_KEY);
+			$existingKey = kApcWrapper::apcFetch(kBaseConfCache::CONF_CACHE_VERSION_KEY);
 			if(!$existingKey || strcmp($existingKey, $key))
 			{
-				return apc_store(kBaseConfCache::CONF_CACHE_VERSION_KEY, $key, $ttl);
+				return kApcWrapper::apcStore(kBaseConfCache::CONF_CACHE_VERSION_KEY, $key, $ttl);
 			}
 		}
 		return null;

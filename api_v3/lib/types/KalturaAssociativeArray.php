@@ -8,7 +8,7 @@ abstract class KalturaAssociativeArray extends KalturaTypedArray
 	/* (non-PHPdoc)
 	 * @see KalturaTypedArray::offsetSet()
 	 */
-	public function offsetSet($offset, $value) 
+	public function offsetSet($offset, $value): void
 	{
 		$this->validateType($value);
 		
@@ -20,7 +20,7 @@ abstract class KalturaAssociativeArray extends KalturaTypedArray
 		{
 			$this->array[$offset] = $value;
 		}
-			
+		
 		$this->count = count ( $this->array );
 	}
 }

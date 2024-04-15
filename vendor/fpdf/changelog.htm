@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Changelog</title>
 <link type="text/css" rel="stylesheet" href="fpdf.css">
 <style type="text/css">
@@ -11,6 +11,48 @@ dd {margin:1em 0 1em 1em}
 <body>
 <h1>Changelog</h1>
 <dl>
+<dt><strong>v1.86</strong> (2023-06-25)</dt>
+<dd>
+- Added a parameter to AddFont() to specify the directory where to load the font definition file.<br>
+- Fixed a bug related to the PDF creation date.<br>
+</dd>
+<dt><strong>v1.85</strong> (2022-11-10)</dt>
+<dd>
+- Removed deprecation notices on PHP 8.2.<br>
+- Removed notices when passing null values instead of strings.<br>
+- The FPDF_VERSION constant was replaced by a class constant.<br>
+- The creation date of the PDF now includes the timezone.<br>
+- The content-type is now always application/pdf, even for downloads.<br>
+</dd>
+<dt><strong>v1.84</strong> (2021-08-28)</dt>
+<dd>
+- Fixed an issue related to annotations.<br>
+</dd>
+<dt><strong>v1.83</strong> (2021-04-18)</dt>
+<dd>
+- Fixed an issue related to annotations.<br>
+</dd>
+<dt><strong>v1.82</strong> (2019-12-07)</dt>
+<dd>
+- Removed a deprecation notice on PHP 7.4.<br>
+</dd>
+<dt><strong>v1.81</strong> (2015-12-20)</dt>
+<dd>
+- Added GetPageWidth() and GetPageHeight().<br>
+- Fixed a bug in SetXY().<br>
+</dd>
+<dt><strong>v1.8</strong> (2015-11-29)</dt>
+<dd>
+- PHP 5.1.0 or higher is now required.<br>
+- The MakeFont utility now subsets fonts, which can greatly reduce font sizes.<br>
+- Added ToUnicode CMaps to improve text extraction.<br>
+- Added a parameter to AddPage() to rotate the page.<br>
+- Added a parameter to SetY() to indicate whether the x position should be reset or not.<br>
+- Added a parameter to Output() to specify the encoding of the name, and special characters are now properly encoded. Additionally the order of the first two parameters was reversed to be more logical (however the old order is still supported for compatibility).<br>
+- The Error() method now throws an exception.<br>
+- Adding contents before the first AddPage() or after Close() now raises an error.<br>
+- Outputting text with no font selected now raises an error.<br>
+</dd>
 <dt><strong>v1.7</strong> (2011-06-18)</dt>
 <dd>
 - The MakeFont utility has been completely rewritten and doesn't depend on ttf2pt1 anymore.<br>
@@ -65,7 +107,7 @@ dd {margin:1em 0 1em 1em}
 <dd>
 - Type1 font support.<br>
 - Added Baltic encoding.<br>
-- The class now works internally in points with the origin at the bottom in order to avoid two bugs occurring with Acrobat 5 :<br>&nbsp;&nbsp;* The line thickness was too large when printed under Windows 98 SE and ME.<br>&nbsp;&nbsp;* TrueType fonts didn't appear immediately inside the plug-in (a substitution font was used), one had to cause a window refresh to make them show up.<br>
+- The class now works internally in points with the origin at the bottom in order to avoid two bugs occurring with Acrobat 5:<br>&nbsp;&nbsp;* The line thickness was too large when printed on Windows 98 SE and ME.<br>&nbsp;&nbsp;* TrueType fonts didn't appear immediately inside the plug-in (a substitution font was used), one had to cause a window refresh to make them show up.<br>
 - It's no longer necessary to set the decimal separator as dot to produce valid documents.<br>
 - The clickable area in a cell was always on the left independently from the text alignment.<br>
 - JPEG images in CMYK mode appeared in inverted colors.<br>
