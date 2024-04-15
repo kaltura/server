@@ -372,7 +372,7 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * ExecuteSession
 		 */
-		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine, $sharedChunkPath = null)
+		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine, $sharedChunkPath = null, $ffmpegBin=null, $ffprobeBin=null)
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, concurrentMin:$concurrentMin, sessionName:$sessionName, cmdLine:$cmdLine, sharedChunkPath:$sharedChunkPath");
 
@@ -387,8 +387,17 @@ ini_set("memory_limit","512M");
 			$setup->cleanUp = 0;
 			$setup->cmd = $cmdLine;
 			$setup->sharedChunkPath = $sharedChunkPath;
+			if(isset($ffmpegBin))
+				$setup->ffmpegBin = $ffmpegBin;
+			if(isset($ffprobeBin))
+				$setup->ffprobeBin = $ffprobeBin;
 
-			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName);
+			if(KFFmpegToPartnerMatch::getVersion()==4)
+				$chunker = new KChunkedEncode4($setup);
+			else
+				$chunker = new KChunkedEncode($setup);
+
+			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName, $chunker);
 			
 			if(($rv=$session->Initialize())!=true) {
 				$session->Report();
