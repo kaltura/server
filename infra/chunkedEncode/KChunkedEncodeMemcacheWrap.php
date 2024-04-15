@@ -375,7 +375,6 @@ ini_set("memory_limit","512M");
 		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine, $sharedChunkPath = null, $ffmpegBin=null, $ffprobeBin=null)
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, concurrentMin:$concurrentMin, sessionName:$sessionName, cmdLine:$cmdLine, sharedChunkPath:$sharedChunkPath");
-
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
 				// 'flags=1' stands for 'compress stored data'
 			$config = array('host'=>$host, 'port'=>$port, 'flags'=>1);
@@ -405,7 +404,7 @@ ini_set("memory_limit","512M");
 			}
 			$rv = $session->Generate();
 			$session->Report();
-			return $rv;
+			return array($rv, $session);;
 		}
 
 	}
