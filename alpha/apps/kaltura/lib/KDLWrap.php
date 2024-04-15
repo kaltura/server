@@ -207,6 +207,58 @@ class KDLWrap
 			// if only audio streams exist without video we ignore the video mapping
 			if (($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID || $cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
 				&& !is_null($cdlMediaInfo))
+/* ================
+   ================
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+*/
+if(KFFmpegToPartnerMatch::getVersion()==4)			{
+				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
+				$command = null;
+				if ($contentStreams != null && isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
+				{
+					if (isset($contentStreams['video']))
+						$command .= '-map v:0 ';
+
+					$command .= '-map a ';
+					$streamIdx=0;
+					foreach ($contentStreams['audio'] as $audioStream)
+					{
+						if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
+							$command .= "-metadata:s:a:$streamIdx language={$audioStream['audioLanguage']} ";
+							$streamIdx++;
+					}
+				}
+				
+				$cmdLines = $cdlFlvrOut->getCommandLines();
+				foreach ($cmdLines as $key => $cmdLine)
+				{
+					if (($key == conversionEngineType::FFMPEG || $key == conversionEngineType::FFMPEG_AUX) && $command != null)
+					{
+						/***
+						 * assetParamsPeer::TEMP_FLAVOR_PARAM_ID (-2 ) is a temporary flvor param id of type mpegts
+						 * we created it for clip \ concat flow only and we do not save it to the DB
+						 * in this flavor we do not have the -map_metadata -1(as it is added in KDLOperatorFfmpeg2_1_3)
+						 *  but we still want to add the map section to the ffmpeg engine so we will not loose multi audio
+						 * as such we concat to the '-f mpegts' the audio\video mapping
+						 */
+						if ($cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
+						{
+							$cmdLines[$key] = str_replace('-f mpegts', $command . ' -f mpegts', $cmdLine);
+						}
+						else
+						{
+							$cmdLines[$key] = str_replace('-map_metadata -1', $command, $cmdLine);
+						}
+					}
+				}
+				$cdlFlvrOut->setCommandLines($cmdLines);
+			}
+
+else
+/* ================
+   ================
+*/
 			{
 				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
 				$audioLingualSetting = null;
