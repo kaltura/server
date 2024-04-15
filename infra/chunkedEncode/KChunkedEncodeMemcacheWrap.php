@@ -404,7 +404,7 @@ ini_set("memory_limit","512M");
 			}
 			$rv = $session->Generate();
 			$session->Report();
-			return array($rv, $session);;
+			return array($rv, $session);
 		}
 
 	}
