@@ -13,8 +13,15 @@ class KalturaRoomEntry extends KalturaBaseEntry
 	 */
 	public $roomType;
 
+	/**
+	 * The entryId of the broadcast that the room streaming to
+	 * @var string
+	 */
+	public $broadcastEntryId;
+
 	private static $map_between_objects = array(
 		'roomType',
+		'broadcastEntryId'
 	);
 
 	public function __construct()

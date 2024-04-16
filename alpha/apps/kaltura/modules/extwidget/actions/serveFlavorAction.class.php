@@ -165,7 +165,27 @@ class serveFlavorAction extends kalturaAction
 
 		return $mediaSet;
 	}
-	
+	// if the entry has clip attributes returns the offsets and updated durations, otherwise returns zeros and original durations
+	protected function retrievePlaylistAttributesData($entry, $durations)
+	{
+		$offsets = array_fill(0, count($durations), 0);
+		if ($entry->getMediaType() == PlaylistType::STATIC_LIST && $entry->getOperationAttributes())
+		{
+			$filterClipAttributes = function($obj) { return $obj instanceof kClipAttributes; };
+			$clipAttributes = array_filter($entry->getOperationAttributes(), $filterClipAttributes);
+			for ($i = 0; $i < min(count($durations), count($clipAttributes)); $i++)
+			{
+				$offset = $clipAttributes[$i]->getOffset();
+				$duration = $clipAttributes[$i]->getDuration();
+				if ($offset >= 0 && $duration > 0 && $durations[$i] - $offset >= $duration)
+				{
+					$offsets[$i] = $offset;
+					$durations[$i] = $duration;
+				}
+			}
+		}
+		return array($offsets, $durations);
+	}
 	protected function servePlaylist($entry, $captionLanguages)
 	{
 		// allow only manual playlist
@@ -187,14 +207,16 @@ class serveFlavorAction extends kalturaAction
 		}
 		
 		list($entryIds, $durations, $referenceEntry, $captionFiles) = myPlaylistUtils::executeStitchedPlaylist($entry, $captionLanguages);
+		list($offsets, $durations) = $this->retrievePlaylistAttributesData($entry, $durations);
 		$this->serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $entry, null,
-			$captionFiles, $captionLanguages, $isLive, 0, 0, 0, 0);
+			$captionFiles, $captionLanguages, $isLive, 0, 0, 0, 0, $offsets);
 	}
 
 	protected function serveEntriesAsPlaylist($entryIds, $durations, $referenceEntry, $origEntry, $flavorParamIds,
 	                                          $captionFiles, $captionLanguages, $isLive,
-	                                          $playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex)
+	                                          $playlistStartTime, $firstClipStartTime, $initialClipIndex, $initialSegmentIndex, $offsets=null)
 	{
+		$offsets = $offsets ? $offsets : array_fill(0, count($entryIds), 0);
 		// get request parameters
 		if (!$flavorParamIds)
 		{
@@ -242,6 +264,7 @@ class serveFlavorAction extends kalturaAction
 
 			unset($entryIds[$i]);
 			unset($durations[$i]);
+			unset($offsets[$i]);
 		}
 		$durations = array_values($durations);		// if some duration was unset, this makes sure that durations will be rendered as an array in the json
 
@@ -272,7 +295,7 @@ class serveFlavorAction extends kalturaAction
 				$origEntryFlavor = $referenceFlavor;
 				// build the clips of the current sequence
 				$clips = array();
-				foreach ($entryIds as $entryId)
+				foreach ($entryIds as $index => $entryId)
 				{
 					if (isset($groupedFlavors[$entryId][$flavorParamsId]))
 					{
@@ -298,8 +321,11 @@ class serveFlavorAction extends kalturaAction
 						$path = '';
 						$storeCache = false;
 					}
-
-					$clips[] = self::getClipData($path, $flavor, $sourceType);
+					$clipData = self::getClipData($path, $flavor, $sourceType);
+					if ($offsets[$index]){
+						$clipData['clipFrom'] = $offsets[$index];
+					}
+					$clips[] = $clipData;
 				}
 				$sequences[] = array('clips' => $clips, 'id' => $this->getServeUrlForFlavor($origEntryFlavor->getId(), $origEntry->getId()));
 			}

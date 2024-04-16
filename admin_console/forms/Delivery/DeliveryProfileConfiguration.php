@@ -135,9 +135,11 @@ class Form_Delivery_DeliveryProfileConfiguration extends Infra_Form
 	}
 	
 	protected function getAdvancedSettings() {
-		$element = new Infra_Form_Html ( 'place_holder1', array ('content' => '<span/>' ) );
-		$this->addElement ( $element );
-		return array ('place_holder1' );
+		$this->addElement('text', 'enforceDeliveriesSupport', array(
+			'label'			=> 'Enforce deliveries support:',
+		));
+
+		return array ('enforceDeliveriesSupport');
 	}
 	
 	public function populateFromObject($object, $add_underscore = true)

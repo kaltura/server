@@ -3,7 +3,7 @@
  * @package api
  * @subpackage filters
  */
-class KalturaReportInputBaseFilter extends KalturaObject 
+class KalturaReportInputBaseFilter extends KalturaObject
 {
 	/**
 	 * Start date as Unix timestamp (In seconds)
