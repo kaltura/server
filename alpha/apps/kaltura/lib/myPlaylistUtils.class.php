@@ -365,7 +365,7 @@ class myPlaylistUtils
 	 */
 	public static function getEntryIdsFromStaticPlaylistString($entry_id_list_str)
 	{
-		if(!trim($entry_id_list_str))
+		if(is_null($entry_id_list_str) || !trim($entry_id_list_str))
 		{
 			return null;
 		}
@@ -570,6 +570,7 @@ class myPlaylistUtils
 		$entryFiltersViaEsearch = array();
 		$entryFiltersViaSphinx = array();
 		list ($totalResults, $entryFilters) = self::getPlaylistFilterListStruct($xml);
+		$entryFilters = $entryFilters ? $entryFilters : array();
 		foreach ($entryFilters as $entryFilter)
 		{
 			$entryFilterFromXml = self::fillEntryFilter($entryFilter);
@@ -1332,7 +1333,7 @@ HTML;
     	                $getter = "get".$tokenPart;
     	                if (!method_exists($replaceValue, $getter))
     	                {
-    	                	KalturaLog::err("Method [$getter] not found on class [" . get_class($replaceValue) . "] for token [$property]");
+    	                	KalturaLog::err("Method [$getter] not found on class [" . $replaceValue ? get_class($replaceValue) : "NULL" . "] for token [$property]");
     	                	$replaceValue = null;
     	                	break;
     	                }

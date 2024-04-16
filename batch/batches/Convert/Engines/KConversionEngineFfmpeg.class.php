@@ -399,7 +399,7 @@ $pixFmt = "yuv420p";
 	/**
 	 * 
 	 */
-	protected static function buildNGSPairedDigitalWatermarkingCommandLine($cmdLine, $data)
+	public static function buildNGSPairedDigitalWatermarkingCommandLine($cmdLine, $data)
 	{
 			/*
 			 * Get source mediainfo for NGS prepprocessor params

@@ -70,9 +70,18 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		return self::doSelectOne($c);
 	}
 
-	private static function getValidPuserStr($puserId){
+	private static function getValidPuserStr($puserId)
+	{
+		//There are some strange cases where puserId is sent as array, in this case we will nullify it
+		if(is_array($puserId))
+		{
+			return null;
+		}
+		
 		if (!is_null($puserId))
+		{
 			$puserId = substr($puserId, 0, self::MAX_PUSER_LENGTH);
+		}
 		return $puserId;
 	}
 	

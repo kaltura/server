@@ -251,7 +251,7 @@ function add_search_conf_by_tag_code()
   $code[] = 'function TrimArray($arr){';
   $code[] = '  if (!is_array($arr)){ return $arr; }';
   $code[] = '';
-  $code[] = '  while (list($key, $value) = each($arr)){';
+  $code[] = '  foreach($arr as $key => $value ) {';
   $code[] = '    if (is_array($value)){';
   $code[] = '      $arr[$key] = TrimArray($value);';
   $code[] = '    }';

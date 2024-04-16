@@ -82,7 +82,7 @@ class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDele
 	protected static function addCacheVersion($key)
 	{
 		if(is_array($key))
-			return array_map(array('self', 'addCacheVersion'), $key);
+			return array_map(array('kResponseProfileCacher', 'addCacheVersion'), $key);
 			
 		return self::getCacheVersion() . '_' . $key;
 	}

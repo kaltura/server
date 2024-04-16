@@ -1217,6 +1217,6 @@ abstract class LiveEntry extends entry
 	 */
 	public function isLowLatencyEntry()
     {
-		return $this->isContainsAdminTag('lowlatency');
+		return $this->isContainsAdminTag(self::LOW_LATENCY_TAG);
 	}
 }

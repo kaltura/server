@@ -1,68 +1,54 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
- */
 
 namespace Doctrine\Common\Cache;
 
 use SQLite3;
 use SQLite3Result;
 
+use function array_search;
+use function implode;
+use function serialize;
+use function sprintf;
+use function time;
+use function unserialize;
+
+use const SQLITE3_ASSOC;
+use const SQLITE3_BLOB;
+use const SQLITE3_TEXT;
+
 /**
  * SQLite3 cache provider.
  *
- * @since  1.4
- * @author Jake Bell <jake@theunraveler.com>
+ * @deprecated Deprecated without replacement in doctrine/cache 1.11. This class will be dropped in 2.0
  */
 class SQLite3Cache extends CacheProvider
 {
     /**
      * The ID field will store the cache key.
      */
-    const ID_FIELD = 'k';
+    public const ID_FIELD = 'k';
 
     /**
      * The data field will store the serialized PHP value.
      */
-    const DATA_FIELD = 'd';
+    public const DATA_FIELD = 'd';
 
     /**
      * The expiration field will store a date value indicating when the
      * cache entry should expire.
      */
-    const EXPIRATION_FIELD = 'e';
+    public const EXPIRATION_FIELD = 'e';
 
-    /**
-     * @var SQLite3
-     */
+    /** @var SQLite3 */
     private $sqlite;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $table;
 
     /**
-     * Constructor.
-     *
-     * Calling the constructor will ensure that the database file and table 
+     * Calling the constructor will ensure that the database file and table
      * exist and will create both if they don't.
      *
-     * @param SQLite3 $sqlite
      * @param string $table
      */
     public function __construct(SQLite3 $sqlite, $table)
@@ -70,15 +56,20 @@ class SQLite3Cache extends CacheProvider
         $this->sqlite = $sqlite;
         $this->table  = (string) $table;
 
-        list($id, $data, $exp) = $this->getFields();
+        $this->ensureTableExists();
+    }
 
-        return $this->sqlite->exec(sprintf(
-            'CREATE TABLE IF NOT EXISTS %s(%s TEXT PRIMARY KEY NOT NULL, %s BLOB, %s INTEGER)',
-            $table,
-            $id,
-            $data,
-            $exp
-        ));
+    private function ensureTableExists(): void
+    {
+        $this->sqlite->exec(
+            sprintf(
+                'CREATE TABLE IF NOT EXISTS %s(%s TEXT PRIMARY KEY NOT NULL, %s BLOB, %s INTEGER)',
+                $this->table,
+                static::ID_FIELD,
+                static::DATA_FIELD,
+                static::EXPIRATION_FIELD
+            )
+        );
     }
 
     /**
@@ -86,11 +77,13 @@ class SQLite3Cache extends CacheProvider
      */
     protected function doFetch($id)
     {
-        if ($item = $this->findById($id)) {
-            return unserialize($item[self::DATA_FIELD]);
+        $item = $this->findById($id);
+
+        if (! $item) {
+            return false;
         }
 
-        return false;
+        return unserialize($item[self::DATA_FIELD]);
     }
 
     /**
@@ -98,7 +91,7 @@ class SQLite3Cache extends CacheProvider
      */
     protected function doContains($id)
     {
-        return (boolean) $this->findById($id, false);
+        return $this->findById($id, false) !== null;
     }
 
     /**
@@ -113,7 +106,7 @@ class SQLite3Cache extends CacheProvider
         ));
 
         $statement->bindValue(':id', $id);
-        $statement->bindValue(':data', serialize($data));
+        $statement->bindValue(':data', serialize($data), SQLITE3_BLOB);
         $statement->bindValue(':expire', $lifeTime > 0 ? time() + $lifeTime : null);
 
         return $statement->execute() instanceof SQLite3Result;
@@ -124,7 +117,7 @@ class SQLite3Cache extends CacheProvider
      */
     protected function doDelete($id)
     {
-        list($idField) = $this->getFields();
+        [$idField] = $this->getFields();
 
         $statement = $this->sqlite->prepare(sprintf(
             'DELETE FROM %s WHERE %s = :id',
@@ -157,15 +150,14 @@ class SQLite3Cache extends CacheProvider
      * Find a single row by ID.
      *
      * @param mixed $id
-     * @param boolean $includeData
      *
-     * @return array|null
+     * @return mixed[]|null
      */
-    private function findById($id, $includeData = true)
+    private function findById($id, bool $includeData = true): ?array
     {
-        list($idField) = $fields = $this->getFields();
+        [$idField] = $fields = $this->getFields();
 
-        if (!$includeData) {
+        if (! $includeData) {
             $key = array_search(static::DATA_FIELD, $fields);
             unset($fields[$key]);
         }
@@ -179,7 +171,7 @@ class SQLite3Cache extends CacheProvider
 
         $statement->bindValue(':id', $id, SQLITE3_TEXT);
 
-        $item = $statement->execute()->fetchArray();
+        $item = $statement->execute()->fetchArray(SQLITE3_ASSOC);
 
         if ($item === false) {
             return null;
@@ -197,20 +189,19 @@ class SQLite3Cache extends CacheProvider
     /**
      * Gets an array of the fields in our table.
      *
-     * @return array
+     * @psalm-return array{string, string, string}
      */
-    private function getFields()
+    private function getFields(): array
     {
-        return array(static::ID_FIELD, static::DATA_FIELD, static::EXPIRATION_FIELD);
+        return [static::ID_FIELD, static::DATA_FIELD, static::EXPIRATION_FIELD];
     }
 
     /**
      * Check if the item is expired.
      *
-     * @param array $item
-     * @return boolean
+     * @param mixed[] $item
      */
-    private function isExpired(array $item)
+    private function isExpired(array $item): bool
     {
         return isset($item[static::EXPIRATION_FIELD]) &&
             $item[self::EXPIRATION_FIELD] !== null &&

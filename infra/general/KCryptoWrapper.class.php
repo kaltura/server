@@ -4,11 +4,14 @@ class KCryptoWrapper
 {
         public static function getEncryptorClassName()
         {
-                if (extension_loaded('mcrypt')){
-		    return 'McryptWrapper';
-                }else{
-		    return 'OpenSSLWrapper';
-                }
+            if (extension_loaded('mcrypt'))
+            {
+                return 'McryptWrapper';
+            }
+            else
+            {
+                return 'OpenSSLWrapper';
+            }
         }
 
         public static function __callStatic($func, $args)

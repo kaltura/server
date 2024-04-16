@@ -115,6 +115,11 @@ class LiveStreamScheduleEvent extends BaseLiveStreamScheduleEvent implements ILi
 	public function getLiveFeatures()
 	{
 		$serializedFeatures = $this->getFromCustomData(self::FEATURES_ARRAY);
+		if(!$serializedFeatures)
+		{
+			return array();
+		}
+		
 		return unserialize($serializedFeatures) ? unserialize($serializedFeatures) : array();
 	}
 	

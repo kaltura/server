@@ -121,7 +121,6 @@ class TwoFactorAuthenticator
     public static function setCodeLength($length)
     {
         self::$_codeLength = $length;
-        return $this;
     }
 
     /**

@@ -63,7 +63,7 @@ class mySystemUtils
 
 	public static function ping()
 	{
-		if(function_exists('apc_fetch') && apc_fetch(self::APIV3_FAIL_PING))
+		if(kApcWrapper::functionExists('fetch') && kApcWrapper::apcFetch(self::APIV3_FAIL_PING))
 		{
 			return false;
 		}

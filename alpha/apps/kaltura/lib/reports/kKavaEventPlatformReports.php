@@ -63,7 +63,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::getEntriesNames'
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_VIEWERS, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY),
@@ -101,7 +101,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -123,7 +123,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -146,7 +146,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -166,7 +166,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name', 'email'),
-				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUserIdAndFullNameWithFallback',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('EMAIL'),
 				)
@@ -193,8 +193,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			),
 			self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_VIEW_TIME),
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_COMBINED_LIVE_VIEW_TIME),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedLiveVodColumn',
-			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addTotalCombinedLiveVodColumn',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedLiveVodColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'kKavaReportsMgr::addTotalCombinedLiveVodColumn',
 			self::REPORT_COLUMN_MAP => array(
 				'live_view_time' => self::METRIC_COMBINED_LIVE_VIEW_TIME,
 				'count_reaction_clicked' => self::EVENT_TYPE_REACTION_CLICKED,
@@ -210,7 +210,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'user_engagement' => self::DIMENSION_USER_ENGAGEMENT,
 			),
 			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW_PERIOD),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addOfflineMinutes'
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addOfflineMinutes'
 		),
 
 		ReportType::EP_WEBCAST_VOD_USER_TOP_CONTENT => array(
@@ -221,7 +221,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('name', 'full_name'),
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('PUSER_ID', 'TRIM(CONCAT(FIRST_NAME, " ", LAST_NAME))'),
 				)
@@ -243,7 +243,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('first_name', 'last_name', 'title', 'company', 'email'),
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('FIRST_NAME', 'LAST_NAME', 'CUSTOM_DATA.title', 'CUSTOM_DATA.company', 'EMAIL'),
 				),
@@ -251,8 +251,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_MEETING_VIEW_TIME, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_MEETING_VIEW_TIME, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addCombinedLiveVodColumn',
-			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addTotalCombinedLiveVodColumn',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedLiveVodColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'kKavaReportsMgr::addTotalCombinedLiveVodColumn',
 			self::REPORT_COLUMN_MAP => array(
 				'vod_view_time' => self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME,
 				'live_view_time' => self::METRIC_COMBINED_LIVE_VIEW_TIME,

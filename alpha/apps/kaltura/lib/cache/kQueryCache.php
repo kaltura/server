@@ -107,8 +107,10 @@ class kQueryCache
 		return substr_replace($formatString, $variableValue, $firstVarPos, 2);
 	}
 	
-	public static function getCriterionValues($criterion, $columnName)
+	public static function getCriterionValues($criterion, $columnName, $getFirstMatch = false)
 	{
+		$result = null;
+		
 		// get current criterion values
 		if ($criterion->getComparison() == Criteria::EQUAL)
 		{
@@ -131,20 +133,20 @@ class kQueryCache
 			$childClauses = $criterion->getClauses();
 			if (count($childClauses) != 1)
 			{
-				return null;			// we currently support a single OR child
+				return $getFirstMatch ? $result : null; // we currently support a single OR child
 			}
 			
 			$childClause = reset($childClauses);
 			$childColumn = $childClause->getTable() . "." . $childClause->getColumn();
 			if ($childColumn != $columnName)
 			{
-				return null;			// child clause is on a different column
+				return $getFirstMatch ? $result : null; // child clause is on a different column
 			}
 			
 			$childValues = self::getCriterionValues($childClause, $columnName);
 			if ($childValues === null)
 			{
-				return null;			// failed to get child values
+				return $getFirstMatch ? $result : null; // failed to get child values
 			}
 			
 			$result = array_merge($result, $childValues);
@@ -180,6 +182,8 @@ class kQueryCache
 				{
 					foreach ($values as $value)
 					{
+						//Passing value as null will result in deprecated notice in PHP8
+						$value = (is_null($value) || is_array($value)) ? '' : $value;
 						$value = strtolower(str_replace(' ', '_', $value));
 						$newInvalidationKeys[] = self::replaceVariable($invalidationKey, $value);
 					}

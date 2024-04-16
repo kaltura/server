@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__) . '/../../../../../infra/cache/kApcWrapper.php');
 require_once(dirname(__FILE__) . '/kApiCacheBase.php');
 require_once(dirname(__FILE__) . '/../../../../config/kConf.php');
 require_once(dirname(__FILE__) . '/../request/infraRequestUtils.class.php');
@@ -784,7 +785,7 @@ class kApiCache extends kApiCacheBase
 				break;
 			}
 
-			if (function_exists('apc_add') && apc_add('apiCacheLock-'.$this->_cacheKey, true, 1))
+			if (kApcWrapper::functionExists('add') && kApcWrapper::apcAdd('apiCacheLock-'.$this->_cacheKey, true, 1))
 			{
 				break;
 			}

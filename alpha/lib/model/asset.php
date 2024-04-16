@@ -646,7 +646,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function hasTag($v)
 	{
-		$tags = explode(',', $this->getTags());
+		$tags = kString::explode($this->getTags(), ',');
 		return in_array($v, $tags);
 	}
 	
@@ -657,7 +657,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function getTagsArray()
 	{
-		if(!strlen(trim($this->getTags())))
+		if(is_null($this->getTags()) || !strlen(trim($this->getTags())))
 			return array();
 			
 		return explode(',', $this->getTags());
@@ -665,7 +665,9 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 	
 	public function getTags()
 	{
-		return trim(parent::getTags());
+		$tags = parent::getTags();
+		//return $tags ? trim($tags) : $tags; //PHP8: Check if we need to return null or empty string
+		return $tags ? trim($tags) : '';
 	}
 
 	/**

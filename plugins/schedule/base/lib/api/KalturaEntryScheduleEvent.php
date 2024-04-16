@@ -59,7 +59,8 @@ abstract class KalturaEntryScheduleEvent extends KalturaScheduleEvent
 
 		if ($this->templateEntryId && $this->recurrenceType === KalturaScheduleEventRecurrenceType::NONE)
 		{
-			$eventIdsToIgnore = array_merge(array($this->id) , array_filter(explode(',', $this->linkedBy)));
+			$linkedByArray = !is_null($this->linkedBy) ? explode(',', $this->linkedBy) : array();
+			$eventIdsToIgnore = array_merge(array($this->id) , array_filter($linkedByArray));
 			$events = ScheduleEventPeer::retrieveOtherEvents($this->templateEntryId, $startDate, $endDate, $eventIdsToIgnore);
 			if ($events)
 			{

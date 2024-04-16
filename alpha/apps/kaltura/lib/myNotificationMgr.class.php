@@ -275,7 +275,12 @@ $debug .= "property: $not_property = [$value]\n";
 		{
 			$method_name = "get" . $name;
 			$method_name = str_replace ( "_" , "" , $method_name ); // this is to support underscores in the names rather than camelback
-			$res = call_user_func ( array ( $obj , $method_name ) );
+			
+			//Check is_callable to avoid notice when running call_user_func
+			if(is_callable(array ( $obj , $method_name )))
+			{
+				$res = call_user_func ( array ( $obj , $method_name ) );
+			}
 			$params[ $name ] = $res;
 		}
 

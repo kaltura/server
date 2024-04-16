@@ -507,7 +507,7 @@ class ReachProfile extends BaseReachProfile
 
 			if(!$checkEmptyRulesOnly)
 			{
-				if (!count($rule->getConditions()))
+				if (!$rule->getConditions() || !count($rule->getConditions()))
 				{
 					continue;
 				}

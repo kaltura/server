@@ -1036,7 +1036,9 @@ class kFlowHelper
 	private static function createNextJob(flavorParamsOutput $flavorParamsOutput, BatchJob $dbBatchJob, kConvertJobData $data, FileSyncKey $syncKey)
 	{
 		$operatorSet = new kOperatorSets();
-		$operatorSet->setSerialized(stripslashes($flavorParamsOutput->getOperators()));
+		$operators = $flavorParamsOutput->getOperators();
+		if($operators)
+			$operatorSet->setSerialized(stripslashes($operators));
 		$nextOperator = $operatorSet->getOperator($data->getCurrentOperationSet(), $data->getCurrentOperationIndex() + 1);
 
 		$nextJob = null;
