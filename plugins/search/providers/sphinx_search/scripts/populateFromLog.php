@@ -102,6 +102,7 @@ while(true)
 	$sphinxCon = null;
 	try
 	{
+		//TODO - need to find a way to pass user and pass when working with tls connection (Do not merge before handling this)
 		$sphinxCon = DbManager::createSphinxConnection($sphinxServer,$sphinxPort);
 		if(!count($sphinxRtTables))
 		{
