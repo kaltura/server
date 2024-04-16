@@ -469,10 +469,19 @@ class kString
 
 	public static function alignUtf8String($str, $maxLen)
 	{
+		if(is_null($str))
+		{
+			return '';
+		}
+		
 		if (mb_detect_encoding($str, 'UTF-8', true))
+		{
 			return mb_strcut($str, 0, $maxLen, "UTF-8");
+		}
 		else
+		{
 			return $str;
+		}
 	}
 
 	public static function explode($string, $delimiter=',')

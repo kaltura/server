@@ -66,7 +66,7 @@ class myPlaylistUtils
 			case PlaylistType::STATIC_LIST:
 			case PlaylistType::PATH:
 				$static_playlist_str = $playlist->getDataContent(true);
-				$static_playlist = explode ( "," , $static_playlist_str );
+				$static_playlist = !is_null($static_playlist_str) ? explode (",", $static_playlist_str) : array();
 				$fixed_playlist = array();
 				foreach ( $static_playlist as &$entry_id )
 				{
