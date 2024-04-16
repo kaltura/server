@@ -2162,16 +2162,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setEntitledPusersView($v)
 	{
 		$entitledUserPuserView = array();
-		
-		$v = trim($v);
-		if($v == '')
+		if(is_null($v) || trim($v) == '')
 		{
 			$this->putInCustomData ( "entitledUserPuserView" , serialize($entitledUserPuserView) );
 			return;
 		}
 		
-		$entitledPusersView = explode(',',$v);
-				
+		$entitledPusersView = explode(',', trim($v));
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		foreach ($entitledPusersView as $puserId)
 		{
@@ -2242,15 +2239,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$entitledUserPuserPublish = array();
-	
-		$v = trim($v);
-		if($v == '')
+		
+		if(is_null($v) || trim($v) == '')
 		{
 			$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );
 			return;
 		}
 		
-		$entitledPusersPublish = explode(',', $v);
+		$entitledPusersPublish = explode(',', trim($v));
 		if(!count($entitledPusersPublish))
 			return;
 			
