@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHP Class for handling Google Authenticator 2-factor authentication
+ * PHP Class for handling Authenticator 2-factor authentication
  *
  * @author Michael Kliewe
  * Edited by Hila Karimov
@@ -11,7 +11,7 @@
  * @link http://www.phpgangsta.de/
  */
 
-class GoogleAuthenticator
+class TwoFactorAuthenticator
 {
     protected static $_codeLength = 6;
 
@@ -70,20 +70,22 @@ class GoogleAuthenticator
     }
 
     /**
-     * Get QR-Code URL for image, from google charts
+     * Get QR-Code URL for image, from https://goqr.me/api/
      *
      * @param string $name
      * @param string $secret
      * @param string $title
      * @return string
      */
-    public static function getQRCodeGoogleUrl($name, $secret, $title = null) {
-        $urlencoded = urlencode('otpauth://totp/'.$name.'?secret='.$secret.'');
-	if(isset($title)) {
-                $urlencoded .= urlencode('&issuer='.urlencode($title));
-        }
-        return 'https://chart.googleapis.com/chart?chs=150x150&chld=M|0&cht=qr&chl='.$urlencoded.'';
-    }
+	public static function getQRCodeUrl($name, $secret, $title = null)
+	{
+		$urlencoded = urlencode('otpauth://totp/'.$name.'?secret='.$secret.'');
+		if(isset($title))
+		{
+			$urlencoded .= urlencode('&issuer='.urlencode($title));
+		}
+		return 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&margin=0&ecc=M&data='.$urlencoded.'';
+	}
 
     /**
      * Check if the code is correct. This will accept codes starting from $discrepancy*30sec ago to $discrepancy*30sec from now
@@ -114,7 +116,7 @@ class GoogleAuthenticator
      * Set the code length, should be >=6
      *
      * @param int $length
-     * @return PHPGangsta_GoogleAuthenticator
+     * @return PHPGangsta_TwoFactorAuthenticator
      */
     public static function setCodeLength($length)
     {

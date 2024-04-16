@@ -903,9 +903,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
 			{
 				// add google authenticator library to include path
-				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/TwoFactorAuthenticator.php';
 				//generate a new secret for user's admin console logins
-				$seed = GoogleAuthenticator::createSecret();
+				$seed = TwoFactorAuthenticator::createSecret();
 				$loginData->setSeedFor2FactorAuth($seed);
 			}
 			else
@@ -930,9 +930,9 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID)
 			{
 				// add google authenticator library to include path
-				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/TwoFactorAuthenticator.php';
 				//generate a new secret for user's admin console logins
-				$existingData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+				$existingData->setSeedFor2FactorAuth(TwoFactorAuthenticator::createSecret());
 				$existingData->save();
 			}
 			
@@ -974,8 +974,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 			if($generateNewSeed)
 			{
-				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
-				$userLoginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+				require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/TwoFactorAuthenticator.php';
+				$userLoginData->setSeedFor2FactorAuth(TwoFactorAuthenticator::createSecret());
 			}
 		}
 		return $generateNewSeed;
