@@ -38,13 +38,19 @@ class KDLOperatorWrapper extends KDLOperatorBase {
 //			return true;
 
 		if($this->_id==KDLTranscoders::FFMPEG_AUX) {
-			$transcoder = new KDLOperatorFfmpegAux($this->_id);
+			if(KFFmpegToPartnerMatch::getVersion()==4)
+				$transcoder = new KDLOperatorFfmpeg4_4($this->_id);
+			else
+				$transcoder = new KDLOperatorFfmpegAux($this->_id);
 			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
 				return true;
 		}
 			
 		if($this->_id==KDLTranscoders::FFMPEG) {
-			$transcoder = new KDLOperatorFfmpegMain($this->_id);
+			if(KFFmpegToPartnerMatch::getVersion()==4)
+				$transcoder = new KDLOperatorFfmpeg4_4($this->_id);
+			else
+				$transcoder = new KDLOperatorFfmpegMain($this->_id);
 			if($transcoder->CheckConstraints($source, $target, $errors, $warnings)==true)
 				return true;
 		}
@@ -145,7 +151,10 @@ class KDLTranscoderCommand {
 	 */
 	public function FFMpeg($extra=null)
 	{
-		$transcoder = new KDLOperatorFfmpegMain(KDLTranscoders::FFMPEG); 
+		if(KFFmpegToPartnerMatch::getVersion()==4)
+			$transcoder = new KDLOperatorFfmpeg4_4(KDLTranscoders::FFMPEG);
+		else
+			$transcoder = new KDLOperatorFfmpegMain(KDLTranscoders::FFMPEG); 
 		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 
@@ -180,7 +189,10 @@ class KDLTranscoderCommand {
 	 */
 	public function FFMpeg_aux($extra=null)
 	{/**/
-		$transcoder = new KDLOperatorFfmpegAux(KDLTranscoders::FFMPEG_AUX); 
+		if(KFFmpegToPartnerMatch::getVersion()==4)
+			$transcoder = new KDLOperatorFfmpeg4_4(KDLTranscoders::FFMPEG_AUX);
+		else
+			$transcoder = new KDLOperatorFfmpegAux(KDLTranscoders::FFMPEG_AUX); 
 		return $transcoder->GenerateCommandLine($this->_design,  $this->_target,$extra);
 	}
 
