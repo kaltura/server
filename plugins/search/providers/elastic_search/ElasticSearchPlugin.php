@@ -205,7 +205,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 		$eSearchAdapter = ESearchAdapterFactory::getAdapter($filter);
 		list($list, $totalCount) = $eSearchAdapter->retrieveElasticQueryCoreEntries($coreFilter, $corePager);
 		$newList = KalturaBaseEntryArray::fromDbArray($list, $responseProfile);
-		$response = new KalturaListResponse();
+		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
 
