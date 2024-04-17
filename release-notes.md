@@ -1,3 +1,25 @@
+# Tucana-20.10.0
+## Promote Attendee to Admin ##
+- Issue Type: Task
+- Issue ID: PLAT-24661
+### Deployment Scripts ###
+```php deployment/updates/scripts/add_permissions/2024_03_24_user_promoteUser_permissions.php```
+
+## Add Team Recording Upload Integration to partner config ##
+- Issue Type: Task
+- Issue ID: PLAT-24649
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.teamsRecordingUploadIntegration.enabled = true
+moduls.teamsRecordingUploadIntegration.permissionType = 2
+moduls.teamsRecordingUploadIntegration.label = "Enable Teams recordings upload integration"
+moduls.teamsRecordingUploadIntegration.permissionName = FEATURE_TEAMS_RECORDING_UPLOAD_PERMISSION
+moduls.teamsRecordingUploadIntegration.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+
 # Tucana-20.9.0
 ## Add new UHD flavor param for live  ##
 - Issue Type: Task
@@ -21,26 +43,6 @@ moduls.liveUHdFlavors.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
 # Tucana-20.8.0
-## Promote Attendee to Admin ##
-- Issue Type: Task
-- Issue ID: PLAT-24661
-### Deployment Scripts ###
-```php deployment/updates/scripts/add_permissions/2024_03_24_user_promoteUser_permissions.php```
-
-## Add Team Recording Upload Integration to partner config ##
-- Issue Type: Task
-- Issue ID: PLAT-24649
-
-### Configuration ###
-Add the following to admin.ini:
-```
-moduls.teamsRecordingUploadIntegration.enabled = true
-moduls.teamsRecordingUploadIntegration.permissionType = 2
-moduls.teamsRecordingUploadIntegration.label = "Enable Teams recordings upload integration"
-moduls.teamsRecordingUploadIntegration.permissionName = FEATURE_TEAMS_RECORDING_UPLOAD_PERMISSION
-moduls.teamsRecordingUploadIntegration.group = GROUP_ENABLE_DISABLE_FEATURES
-```
-
 ## Live Viewers Caching ##
 - Issue Type: Task
 - Issue ID: PLAT-24535
