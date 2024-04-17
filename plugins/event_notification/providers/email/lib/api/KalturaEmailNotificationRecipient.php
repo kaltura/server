@@ -71,7 +71,7 @@ class KalturaEmailNotificationRecipient extends KalturaObject
 			$this->email->fromObject($dbObject->getEmail());
 		
 			
-		$nameType = get_class($dbObject->getName());
+		$nameType = $dbObject->getName() ? get_class($dbObject->getName()) : null;
 		switch ($nameType)
 		{
 			case 'kStringValue':

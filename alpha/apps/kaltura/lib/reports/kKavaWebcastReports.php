@@ -61,7 +61,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -89,7 +89,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -118,7 +118,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -170,7 +170,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
-				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUserIdAndFullNameWithFallback',
 			),
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_REGISTERED,
@@ -210,7 +210,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			),
 			self::REPORT_PLAYBACK_TYPES => array(self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR),
 			self::REPORT_METRICS => array(self::METRIC_LIVE_ENGAGED_USERS_RATIO),
-			self::REPORT_EDIT_FILTER_FUNC => 'self::editWebcastEngagementTimelineFilter',
+			self::REPORT_EDIT_FILTER_FUNC => 'kKavaReportsMgr::editWebcastEngagementTimelineFilter',
 			self::REPORT_TABLE_FINALIZE_FUNC => "self::addZeroMinutes",
 		),
 

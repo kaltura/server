@@ -498,7 +498,7 @@ class entryFilter extends baseObjectFilter
 
 		kArray::trim($catIds);
 
-		$commaSeparatedStatuses = trim( $commaSeparatedStatuses );
+		$commaSeparatedStatuses = !is_null($commaSeparatedStatuses) ? trim( $commaSeparatedStatuses ) : "";
 		if ( empty( $commaSeparatedStatuses ) )
 		{
 			$statuses = null;

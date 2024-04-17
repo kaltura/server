@@ -609,7 +609,7 @@ class MediaService extends KalturaEntryService
 	 */
 	function addFromEntryAction($sourceEntryId, KalturaMediaEntry $mediaEntry = null, $sourceFlavorParamsId = null)
 	{
-    	if($mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
+    	if($mediaEntry && $mediaEntry->conversionQuality && !$mediaEntry->conversionProfileId)
     		$mediaEntry->conversionProfileId = $mediaEntry->conversionQuality;
 
 		$srcEntry = entryPeer::retrieveByPK($sourceEntryId);

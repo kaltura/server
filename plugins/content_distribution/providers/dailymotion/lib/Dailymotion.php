@@ -454,7 +454,9 @@ class Dailymotion
         $cookieName = 'dms_' . $this->grantInfo['key'];
         if (isset($_COOKIE[$cookieName]))
         {
-            parse_str(trim(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookieName]): $_COOKIE[$cookieName], '"'), $session);
+	        //PHP8 get_magic_quotes_gpc deprecated and always returned false either way
+            //parse_str(trim(get_magic_quotes_gpc() ? stripslashes($_COOKIE[$cookieName]): $_COOKIE[$cookieName], '"'), $session);
+	        parse_str(trim($_COOKIE[$cookieName], '"'), $session);
             return $session;
         }
     }

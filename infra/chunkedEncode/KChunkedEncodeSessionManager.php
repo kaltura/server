@@ -731,7 +731,9 @@
 		{
 			$params = $this->chunker->params;
 			$source = $params->resolveSourcePath();
-			$cmdLine = str_replace($params->unResolvedSourcePath,$source,$cmdLine);
+			
+			//In PHP8 sending associative array as the subject will cause the returned value to be invalid
+			$cmdLine[0] = str_replace($params->unResolvedSourcePath,$source,$cmdLine[0]);
 			$job = new KChunkedEncodeJobData($this->name, $jobIdx, $cmdLine, $this->createTime);
 			$job->maxExecTime = $maxExecutionTime;
 			if($this->storeManager->AddJob($job)===false) {

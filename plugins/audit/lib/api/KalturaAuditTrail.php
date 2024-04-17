@@ -232,6 +232,12 @@ class KalturaAuditTrail extends KalturaObject implements IRelatedFilterable
 		if($this->shouldGet('data', $responseProfile))
 		{
 			$dbData = $dbAuditTrail->getData();
+			//if $dbData not defined return
+			if(!$dbData)
+			{
+				return;
+			}
+			
 			switch(get_class($dbData))
 			{
 				case 'kAuditTrailChangeInfo':

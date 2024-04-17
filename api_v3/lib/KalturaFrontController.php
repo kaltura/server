@@ -68,13 +68,14 @@ class KalturaFrontController
 	{
 		$duration = microtime(true) - $this->requestStart;
 		
+		$kuserId = kCurrentContext::$uid ? kCurrentContext::$uid : (kCurrentContext::$ks_uid ? kCurrentContext::$ks_uid : '');
 		KalturaLog::analytics(array(
 			'request_end',
 			'partnerId' => kCurrentContext::$partner_id,
 			'masterPartnerId' => kCurrentContext::$master_partner_id,
 			'ks' => kCurrentContext::$ks,
 			'isAdmin' => intval(kCurrentContext::$is_admin_session),
-			'kuserId' => '"' . str_replace('"', '\\"', (kCurrentContext::$uid ? kCurrentContext::$uid : kCurrentContext::$ks_uid)) . '"',
+			'kuserId' => '"' . str_replace('"', '\\"', $kuserId) . '"',
 			'duration' => $duration,
 			'success' => intval($success),
 			'errorCode' => $errorCode,
@@ -181,7 +182,7 @@ class KalturaFrontController
 				{
 					$params[$key] = $this->replaceMultiRequestResults($index, $path, $params[$key], $result);
 				}
-				elseif (preg_match('/^\{([0-9]+):result:?(.*)?\}$/', $path, $matches))
+				elseif ($path && preg_match('/^\{([0-9]+):result:?(.*)?\}$/', $path, $matches))
 				{
 					if(intval($matches[1]) == $index)
 					{
@@ -189,8 +190,11 @@ class KalturaFrontController
 						$valueFromObject = $this->getValueFromObject($result, $attributePath);
 						if(!$valueFromObject)
 							KalturaLog::debug("replaceMultiRequestResults: Empty value returned from object");
-							
-						$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
+						
+						if(!is_null($params[$key]))
+						{
+							$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
+						}
 					}
 				}
 			}
@@ -381,8 +385,11 @@ class KalturaFrontController
 			return null;
 		}
 		
-		if (is_array($object) && isset($object[$currentProperty]))
+		if (is_array($object))
 		{
+			if(!isset($object[$currentProperty]))
+				return null;
+			
 			return $this->getValueFromObject($object[$currentProperty], $path);
 		}
 		
@@ -740,7 +747,7 @@ class KalturaFrontController
 
 	public function serialize($object, $className, $serializerType, IResponseProfile $coreResponseProfile = null)
 	{
-		if (!class_exists($className)) {
+		if (is_null($className) || !class_exists($className)) {
 			KalturaLog::err("Class [$className] was not found!");
 			return null;
 		}

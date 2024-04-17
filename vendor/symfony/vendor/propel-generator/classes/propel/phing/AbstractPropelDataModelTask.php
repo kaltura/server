@@ -369,7 +369,7 @@ abstract class AbstractPropelDataModelTask extends Task {
 		// This is a slight hack to workaround camel case inconsistencies for the DDL classes.
 		// Basically, we want to turn ?.?.?.sqliteDDLBuilder into ?.?.?.SqliteDDLBuilder
 		$lastdotpos = strrpos($classpath, '.');
-		if ($lastdotpos) $classpath{$lastdotpos+1} = strtoupper($classpath{$lastdotpos+1});
+		if ($lastdotpos) $classpath[$lastdotpos+1] = strtoupper($classpath[$lastdotpos+1]);
 		else ucfirst($classpath);
 		
 		if (empty($classpath)) {
@@ -414,8 +414,11 @@ abstract class AbstractPropelDataModelTask extends Task {
         			} else {						
 						// normalize the document using normalizer stylesheet
 						
+						$xslDom = new DOMDocument();
+						$xslDom->load($this->xslFile->getAbsolutePath());
+						
 						$xsl = new XsltProcessor();
-						$xsl->importStyleSheet(DomDocument::load($this->xslFile->getAbsolutePath()));
+						$xsl->importStyleSheet($xslDom);
 						$transformed = $xsl->transformToDoc($dom);
 						$newXmlFilename = substr($xmlFile->getName(), 0, strrpos($xmlFile->getName(), '.')) . '-transformed.xml';
 						

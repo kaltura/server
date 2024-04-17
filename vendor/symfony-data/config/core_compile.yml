@@ -33,5 +33,8 @@
 - %SF_SYMFONY_LIB_DIR%/view/escaper/sfOutputEscaper.class.php
 - %SF_SYMFONY_LIB_DIR%/view/escaper/sfOutputEscaperArrayDecorator.class.php
 - %SF_SYMFONY_LIB_DIR%/view/escaper/sfOutputEscaperGetterDecorator.class.php
-- %SF_SYMFONY_LIB_DIR%/view/escaper/sfOutputEscaperIteratorDecorator.class.php
+# PHP8 class order now matter so sfOutputEscaperObjectDecorator should be loaded before sfOutputEscaperIteratorDecorator
+# which extends it
 - %SF_SYMFONY_LIB_DIR%/view/escaper/sfOutputEscaperObjectDecorator.class.php
+- %SF_SYMFONY_LIB_DIR%/view/escaper/sfOutputEscaperIteratorDecorator.class.php
+

@@ -139,8 +139,15 @@ class languageCodeManager
 	{
 		$languageCode = null;
 		$languageObject = self::getObjectFromKalturaName($captionAssetLanguage);
+		if(!$languageObject)
+		{
+			return $languageCode;
+		}
+		
 		if($useThreeCodeLang)
+		{
 			$languageCode = $languageObject[self::ISO639_B];
+		}
 		else
 		{
 			if($languageObject[self::ISO639])

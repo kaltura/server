@@ -73,7 +73,7 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 	{
 		parent::doFromObject($dbObject, $responseProfile);
 		/* @var $dbObject kEmailNotificationCategoryRecipientProvider */
-		$categoryIdFieldType = get_class($dbObject->getCategoryId());
+		$categoryIdFieldType = $dbObject->getCategoryId() ? get_class($dbObject->getCategoryId()) : null;
 		KalturaLog::info("Retrieving API object for categoryId field of type [$categoryIdFieldType]");
 		switch ($categoryIdFieldType)
 		{
@@ -96,7 +96,7 @@ class KalturaEmailNotificationCategoryRecipientProvider extends KalturaEmailNoti
 			$this->categoryId->fromObject($dbObject->getCategoryId());
 		}
 
-		$categoryIdsFieldType = get_class($dbObject->getCategoryIds());
+		$categoryIdsFieldType = $dbObject->getCategoryIds() ? get_class($dbObject->getCategoryIds()) : null;
 		KalturaLog::info("Retrieving API object for categoryIds field of type [$categoryIdsFieldType]");
 		switch ($categoryIdsFieldType)
 		{

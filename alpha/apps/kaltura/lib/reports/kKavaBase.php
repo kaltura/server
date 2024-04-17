@@ -735,7 +735,7 @@ class kKavaBase extends kDruidBase
 	public static function getEntrySourceType($sourceType, $adminTags, $customData)
 	{
 		// check for specific admin tags
-		$adminTags = explode(',', strtolower($adminTags));
+		$adminTags = !is_null($adminTags) ? explode(',', strtolower($adminTags)) : array();
 		foreach ($adminTags as $adminTag)
 		{
 			$adminTag = trim($adminTag);

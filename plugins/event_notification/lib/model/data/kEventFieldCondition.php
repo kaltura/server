@@ -17,7 +17,7 @@ class kEventFieldCondition extends kCondition
 	/**
 	 * Needed in order to migrate old kEventFieldCondition that serialized before kCondition defined as parent class
 	 */
-	public function __wakeup()
+	public function __wakeup(): void
 	{
 		$this->setType(EventNotificationPlugin::getConditionTypeCoreValue(EventNotificationConditionType::EVENT_NOTIFICATION_FIELD));
 	}

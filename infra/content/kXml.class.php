@@ -29,7 +29,8 @@ class XSLTErrorCollector
 
 function xml_load_for_xslt($xmlStr)
 {
-	$dom = DOMDocument::loadXML($xmlStr);
+	$dom = new DOMDocument();
+	$dom->loadXML($xmlStr);
 	return $dom->documentElement;
 }
 

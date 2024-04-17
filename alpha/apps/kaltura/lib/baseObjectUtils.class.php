@@ -472,7 +472,7 @@ class baseObjectUtils
 			}
 		}
 		$res .= $xml_element_name == NULL ? "" :
-			$close_xml_element ? "/>\n" : ">\n" ;
+			($close_xml_element ? "/>\n" : ">\n");
 		return $res;		
 	}
 	

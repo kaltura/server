@@ -80,11 +80,11 @@ function big_endian_unpack ($format, $data) {
    foreach ($f as $f_k => $f_v) {
    $repeater = intval (substr ($f_v, 1));
    if ($repeater == 0) $repeater = 1;
-   if ($f_v{1} == '*')
+   if ($f_v[1] == '*')
    {
        $repeater = count ($ar) - $i;
    }
-   if ($f_v{0} != 'd') { $i += $repeater; continue; }
+   if ($f_v[0] != 'd') { $i += $repeater; continue; }
    $j = $i + $repeater;
    for ($a = $i; $a < $j; ++$a)
    {
@@ -120,6 +120,8 @@ class IP2Location {
 	var $databaseday;
 	var $databasecount;
 	var $databaseaddr;
+	var $ipv6databasecount;
+	var $ipv6databaseaddr;
 }
 
 class IP2LocationRecord {

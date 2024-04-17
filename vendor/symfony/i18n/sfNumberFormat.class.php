@@ -192,7 +192,7 @@ class sfNumberFormat
       // now for the integer groupings
       for ($i = 0; $i < $len; $i++)
       {
-        $char = $string{$len - $i - 1};
+        $char = $string[$len - $i - 1];
 
         if ($multiGroup && $count == 0)
         {

@@ -235,7 +235,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[$objectType] " . $e->getMessage());
+			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[" . $objectType ? $objectType : "UNDEFINED" . "] " . $e->getMessage());
 			$auditTrail = null;
 			return null;
 		}
