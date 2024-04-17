@@ -1057,7 +1057,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	/**
 	 * Promote user to admin
 	 * @param string $newLoginId
-	 * @param string $currentLoginId
+	 * @param string $existingLoginId
 	 * @throws kUserException::USER_LOGIN_ALREADY_ENABLED
 	 * @throws kUserException::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER
 	 * @throws kUserException::USER_LOGIN_ALREADY_DISABLED
@@ -1070,33 +1070,33 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 * @throws kUserException::LOGIN_DATA_MISMATCH
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 */
-	public function promoteUser($newLoginId, $currentLoginId)
+	public function promoteUser($newLoginId, $existingLoginId)
 	{
-		$currentLoginData = UserLoginDataPeer::getByEmail($currentLoginId);
+		$userLoginData = UserLoginDataPeer::getByEmail($this->getEmail());
+		if ($userLoginData)
+		{
+			if ($existingLoginId !== $userLoginData->getLoginEmail())
+			{
+				throw new kUserException('', kUserException::LOGIN_DATA_MISMATCH);
+			}
+		}
+
+		// Point to new login data
 		$newLoginData = UserLoginDataPeer::getByEmail($newLoginId);
-
-		if(!$currentLoginId)
-		{
-			throw new kUserException('', kUserException::LOGIN_DATA_NOT_PROVIDED);
-		}
-
-		if ($currentLoginData && $currentLoginId !== $currentLoginData->getLoginEmail())
-		{
-			throw new kUserException('', kUserException::LOGIN_DATA_MISMATCH);
-		}
-
 		if ($newLoginData && $newLoginData->getConfigPartnerId() == $this->getPartnerId())
-		{
+		{ // if login data id already in use by another user in the partner
 			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 		}
 
-		if ($currentLoginData)
+		$this->setIsAdmin(true);
+		$password = null;
+		if ($userLoginData)
 		{
+			$password = $userLoginData->getUserPassword();
 			$this->disableLogin();
 		}
-		$this->setIsAdmin(true);
 
-		return $this->enableLogin($newLoginId);
+		return $this->enableLogin($newLoginId, $password, true, true);
 	}
 	
 	/**

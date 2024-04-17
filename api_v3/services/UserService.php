@@ -637,7 +637,7 @@ class UserService extends KalturaBaseUserService
 	 *
 	 * @param string $userId The user's unique identifier in the partner's system
 	 * @param string $newLoginId The new user's email address that identifies the user for login
-	 * @param string $currentLoginId The user's email address that identifies the user for login
+	 * @param string $existingLoginId The user's email address that identifies the user for login
 	 * @return KalturaUser The user object represented by the user and login IDs
 	 * @maskedParams userId,newLoginId,currentLoginId
 	 *
@@ -652,14 +652,11 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_DISABLED
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
-	public function promoteUserAction($userId, $newLoginId, $currentLoginId = null)
+	public function promoteUserAction($userId, $newLoginId, $existingLoginId = null)
 	{
 		try
 		{
-			KalturaLog::debug('ks partner id - ' . kCurrentContext::$ks_partner_id);
-			KalturaLog::debug('master partner id - ' . kCurrentContext::$master_partner_id);
-
-			if (kCurrentContext::$master_partner_id === kCurrentContext::$ks_partner_id)
+			if (kCurrentContext::$master_partner_id != Partner::EP_PARTNER_ID)
 			{
 				throw new KalturaAPIException(KalturaErrors::ACTION_FORBIDDEN, 'promoteUser');
 			}
@@ -670,7 +667,12 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
 			}
 
-			$user->promoteUser($newLoginId, $currentLoginId);
+			if(!$existingLoginId)
+			{
+				throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_PROVIDED);
+			}
+
+			$user->promoteUser($newLoginId, $existingLoginId);
 			$user->save();
 		}
 		catch (Exception $e)
@@ -700,10 +702,6 @@ class UserService extends KalturaBaseUserService
 				case kUserException::LOGIN_ID_ALREADY_USED:
 				{
 					throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
-				}
-				case kUserException::LOGIN_DATA_NOT_PROVIDED:
-				{
-					throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_PROVIDED);
 				}
 				case kUserException::LOGIN_DATA_MISMATCH:
 				{
