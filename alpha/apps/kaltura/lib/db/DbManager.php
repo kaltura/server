@@ -150,13 +150,13 @@ class DbManager
 	/**
 	 * @return KalturaPDO
 	 */
-	public static function createSphinxConnection($sphinxServer, $port = 9312)
+	public static function createSphinxConnection($sphinxServer, $port = 9312, $userName = null, $password = null, $driver_options = array(), $config_key = null)
 	{
 		$dsn = "mysql:host=$sphinxServer;port=$port;";
 		
 		try
 		{
-			$con = new KalturaPDO($dsn);
+			$con = new KalturaPDO($dsn, $userName, $password, $driver_options, $config_key);
 			$con->setCommentsEnabled(false);
 			return $con;
 		}

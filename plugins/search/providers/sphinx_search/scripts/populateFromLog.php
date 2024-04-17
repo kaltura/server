@@ -70,13 +70,14 @@ if(isset($dbConf['sphinx_split_index']) && $dbConf['sphinx_split_index']['enable
 	$splitIndexSettings = $dbConf['sphinx_split_index'];
 }
 
-$limit = 1000; 	// The number of sphinxLog records we want to query
 $gap = 500;	// The gap from 'getLastLogId' we want to query
+$limit = 1000; 	// The number of sphinxLog records we want to query
 $maxIndexHistory = 2000; //The maximum array size to save unique object ids update and their sphinx log id
 
 $sphinxReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
-
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
+list($sphinxUser, $sphinxPassword, $dataSourceKey) = getSphinxConnParams($sphinxServer, $dbConf);
+
 $lastLogs = array();
 $handledRecords = array();
 $sphinxRtTables = array();
@@ -102,8 +103,8 @@ while(true)
 	$sphinxCon = null;
 	try
 	{
-		//TODO - need to find a way to pass user and pass when working with tls connection (Do not merge before handling this)
-		$sphinxCon = DbManager::createSphinxConnection($sphinxServer,$sphinxPort);
+		$sphinxCon = DbManager::createSphinxConnection($sphinxServer, $sphinxPort, $sphinxUser, $sphinxPassword,
+			array(KalturaPDO::KALTURA_ATTR_NAME => $dataSourceKey), $dataSourceKey);
 		if(!count($sphinxRtTables))
 		{
 			$sphinxRtTables = getSphinxRtTables($sphinxCon);
@@ -116,7 +117,7 @@ while(true)
 		sleep(5);
 		continue;
 	}
-
+	
 	foreach($sphinxLogs as $sphinxLog)
 	{
 		/* @var $sphinxLog SphinxLog */
@@ -152,7 +153,7 @@ while(true)
 		
 		$handledRecords[$dc][] = $sphinxLogId;
 		KalturaLog::log("Sphinx log id $sphinxLogId dc [$dc] executed server id [$executedServerId] Memory: [" . memory_get_usage() . "]");
-
+		
 		try
 		{
 			$objectId = $sphinxLog->getObjectId();
@@ -221,7 +222,7 @@ while(true)
 	}
 	
 	unset($sphinxCon);
-
+	
 	SphinxLogPeer::clearInstancePool();
 }
 
@@ -242,4 +243,81 @@ function getSphinxRtTables($sphinxCon)
 	}
 	
 	return $sphinxRtTables;
+}
+
+function getSphinxConnParams($sphinxServer, $dbConf)
+{
+	$sphinxDataSources = isset($dbConf['sphinx_datasources']['datasources']) ?
+		$dbConf['sphinx_datasources']['datasources'] :
+		array(DbManager::DB_CONFIG_SPHINX);
+	
+	
+	$sphinxServerIps = array();
+	$sphinxServerDnsRecords = dns_get_record($sphinxServer);
+	foreach ($sphinxServerDnsRecords as $sphinxServerDnsRecord)
+	{
+		if(trim($sphinxServerDnsRecord['ip']) == '')
+		{
+			continue;
+		}
+		
+		$sphinxServerIps[] = $sphinxServerDnsRecord['ip'];
+	}
+	
+	
+	foreach ($sphinxDataSources as $sphinxDataSource)
+	{
+		if(!isset($dbConf['datasources'][$sphinxDataSource]))
+		{
+			KalturaLog::log("Sphinx source [$sphinxDataSource] not found in datasource list");
+			continue;
+		}
+		
+		$confParams = $dbConf['datasources'][$sphinxDataSource]['connection'];
+		$sphinxDataSourceDsn = $confParams['dsn'];
+		list($mysql, $connectionStr) = explode(':', $sphinxDataSourceDsn);
+		
+		$host = null;
+		$connectionArguments = explode(';', $connectionStr);
+		foreach($connectionArguments as $connectionArgument)
+		{
+			if(trim($connectionArgument) == '')
+			{
+				continue;
+			}
+			
+			list($argumentName, $argumentValue) = explode('=', $connectionArgument);
+			if(strtolower($argumentName) == 'host')
+			{
+				$host = $argumentValue;
+			}
+		}
+		
+		if(!$host)
+		{
+			KalturaLog::log("Failed to find host for sphinx source [$sphinxDataSource]");
+			continue;
+		}
+		
+		$hostIps = array();
+		$hostRecords = dns_get_record($host);
+		foreach ($hostRecords as $hostRecord)
+		{
+			if(trim($hostRecord['ip']) == '')
+			{
+				continue;
+			}
+			
+			$hostIps[] = $hostRecord['ip'];
+		}
+		
+		if(count(array_intersect($sphinxServerIps, $hostIps)))
+		{
+			return array($confParams['user'], $confParams['password'], $sphinxDataSource);
+		}
+		
+		
+	}
+	
+	return array(null, null, null);
 }
