@@ -10,12 +10,6 @@ class KalturaListResponse extends KalturaObject
 	 * @readonly
 	 */
 	public $totalCount;
-	
-	/**
-	 * @var array
-	 * @readonly
-	 */
-	public $objects;
 
 	/* (non-PHPdoc)
 	 * @see KalturaObject::loadRelatedObjects($responseProfile)
