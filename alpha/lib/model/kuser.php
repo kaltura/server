@@ -1055,7 +1055,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	}
 
 	/**
-	 * Promote user to admin
+	 * Replace User's login data to new or different LoginData
 	 * @param string $newLoginId
 	 * @param string $existingLoginId
 	 * @throws kUserException::USER_LOGIN_ALREADY_ENABLED
@@ -1070,7 +1070,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 * @throws kUserException::LOGIN_DATA_MISMATCH
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 */
-	public function promoteUser($newLoginId, $existingLoginId)
+	public function replaceUserLoginData($newLoginId, $existingLoginId)
 	{
 		$userLoginData = UserLoginDataPeer::getByEmail($this->getEmail());
 		if ($userLoginData)
@@ -1088,7 +1088,6 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 		}
 
-		$this->setIsAdmin(true);
 		$password = null;
 		if ($userLoginData)
 		{

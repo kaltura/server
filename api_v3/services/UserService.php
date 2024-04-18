@@ -630,10 +630,10 @@ class UserService extends KalturaBaseUserService
 	}
 
 	/**
-	 * Promote a user to Admin by changing user login data without a password.
+	 * Replace a user's existing login data to a new or an existing login data on a different partner while keeping the existing password.
 	 * to only be used when admin impersonates a partner
 	 *
-	 * @action promoteUser
+	 * @action replaceUserLoginData
 	 *
 	 * @param string $userId The user's unique identifier in the partner's system
 	 * @param string $newLoginId The new user's email address that identifies the user for login
@@ -652,13 +652,13 @@ class UserService extends KalturaBaseUserService
 	 * @throws KalturaErrors::USER_LOGIN_ALREADY_DISABLED
 	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
 	 */
-	public function promoteUserAction($userId, $newLoginId, $existingLoginId = null)
+	public function replaceUserLoginDataAction($userId, $newLoginId, $existingLoginId = null)
 	{
 		try
 		{
 			if (kCurrentContext::$master_partner_id != Partner::EP_PARTNER_ID)
 			{
-				throw new KalturaAPIException(KalturaErrors::ACTION_FORBIDDEN, 'promoteUser');
+				throw new KalturaAPIException(KalturaErrors::ACTION_FORBIDDEN, 'replaceUserLoginData');
 			}
 
 			$user = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
@@ -672,7 +672,7 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_PROVIDED);
 			}
 
-			$user->promoteUser($newLoginId, $existingLoginId);
+			$user->replaceUserLoginData($newLoginId, $existingLoginId);
 			$user->save();
 		}
 		catch (Exception $e)
