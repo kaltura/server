@@ -16,8 +16,8 @@ class Partner extends BasePartner
 	const MONITORING_PARTNER_ID = -4;
 	const MEDIA_SERVER_PARTNER_ID = -5;
 	const PLAY_SERVER_PARTNER_ID = -6;
-	const SELF_SERVE_PARTNER_ID = -12;
 	const EP_PARTNER_ID = -11;
+	const SELF_SERVE_PARTNER_ID = -12;
 	const BI_PARTNER_ID = -15;
 
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;

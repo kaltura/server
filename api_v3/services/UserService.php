@@ -630,7 +630,7 @@ class UserService extends KalturaBaseUserService
 	}
 
 	/**
-	 * Replace a user's existing login data to a new or an existing login data on a different partner while keeping the existing password.
+	 * Replace a user's existing login data to a new or an existing login data
 	 * to only be used when admin impersonates a partner
 	 *
 	 * @action replaceUserLoginData
@@ -639,7 +639,6 @@ class UserService extends KalturaBaseUserService
 	 * @param string $newLoginId The new user's email address that identifies the user for login
 	 * @param string $existingLoginId The user's email address that identifies the user for login
 	 * @return KalturaUser The user object represented by the user and login IDs
-	 * @maskedParams userId,newLoginId,currentLoginId
 	 *
 	 * @throws KalturaErrors::USER_NOT_FOUND
 	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
