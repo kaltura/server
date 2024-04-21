@@ -7,7 +7,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
     const SESSION_TYPE = 'st';
     const TIMELINE_URL_PARAM = 'tl';
     const LOW_LATENCY_URL_PARAM = 'll';
-	const CONTAINER_URL_PARAM = 'container';
+    const CONTAINER_URL_PARAM = 'container';
     const EXPLICIT_LIVE_VIEWER_TYPE_URL = 'tl';
     const USER_TYPE_ADMIN = 'main';
     const USER_TYPE_USER = 'viewer';
