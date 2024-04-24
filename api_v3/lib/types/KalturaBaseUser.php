@@ -184,6 +184,10 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	 */
 	public $capabilities;
 	
+	/**
+	 * @var KalturaUserType
+	 * @filter eq,in
+	 */
 	public $type;
 
 	private static $map_between_objects = array
@@ -212,6 +216,7 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 		"statusUpdatedAt",
 		"userMode",
 		"capabilities",
+		"type",
 	);
 
 	public function getMapBetweenObjects ( )
