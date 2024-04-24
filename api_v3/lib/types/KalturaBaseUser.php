@@ -183,6 +183,8 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 	 * @var KalturaUserCapabilityArray
 	 */
 	public $capabilities;
+	
+	public $type;
 
 	private static $map_between_objects = array
 	(

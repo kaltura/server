@@ -189,12 +189,17 @@ class KalturaFrontController
 						$attributePath = explode(':', $matches[2]);
 						$valueFromObject = $this->getValueFromObject($result, $attributePath);
 						if(!$valueFromObject)
-							KalturaLog::debug("replaceMultiRequestResults: Empty value returned from object");
-						
-						if(!is_null($params[$key]))
 						{
-							$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
+							//If value is null replace with empty string to avoid calling str_replace with null
+							//(in prev php versions null was translated to ''
+							if(is_null($valueFromObject))
+							{
+								$valueFromObject = '';
+							}
+							KalturaLog::debug("replaceMultiRequestResults: Empty value returned from object");
 						}
+						
+						$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
 					}
 				}
 			}
@@ -266,7 +271,7 @@ class KalturaFrontController
 
 		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
-			$currentParams = $listOfRequests[$i];  
+			$currentParams = isset($listOfRequests[$i]) ? $listOfRequests[$i] : array();
 			
 			if (!isset($currentParams["service"]) || !isset($currentParams["action"]))
 				break;
@@ -710,7 +715,9 @@ class KalturaFrontController
 		if (!is_array($map))
 			return $apiException;
 
-		$mapKey = strtolower($service).'_'.strtolower($action);
+		$serviceToLower = !is_null($service) ? strtolower($service) : "";
+		$actionToLower = !is_null($action) ? strtolower($action) : "";
+		$mapKey = $serviceToLower.'_'.$actionToLower;
 		if (!isset($map[$mapKey]))
 			return $apiException;
 

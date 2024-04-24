@@ -78,6 +78,11 @@ class OpenSSLWrapper
     }
     public static function encrypt_aes($str, $key, $iv)
     {
+	    //If null was passed as str return empty string
+	    if(is_null($str))
+	    {
+		    return '';
+	    }
 
 	    // Pad with null byte to be compatible with mcrypt PKCS#5 padding
 	    // See http://thefsb.tumblr.com/post/110749271235/using-opensslendecrypt-in-php-instead-of as 
