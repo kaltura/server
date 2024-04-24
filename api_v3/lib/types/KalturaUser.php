@@ -9,6 +9,12 @@ class KalturaUser extends KalturaBaseUser
 	private static $names = array('firstName' => 'getFirstName', 'lastName' => 'getLastName', 'fullName' => 'getFullName', 'screenName' => 'getScreenName');
 
 	/**
+	 * @var KalturaUserType
+	 * @filter eq,in
+	 */
+	public $type;
+
+	/**
 	 * @var int
 	 * @masked
 	 */
@@ -127,6 +133,7 @@ class KalturaUser extends KalturaBaseUser
 	public $externalId;
 	
 	private static $map_between_objects = array (
+		"type",
 		"dateOfBirth",
 		"gender",
 		"firstName",
