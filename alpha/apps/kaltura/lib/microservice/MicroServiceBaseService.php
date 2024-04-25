@@ -49,7 +49,12 @@ abstract class MicroServiceBaseService
 	 */
 	public static function buildServiceUrl($hostName, $serviceName)
 	{
-		$serviceUrl = kConf::get("microservice_url");
+		$serviceUrl = kConf::get("microservice_url", 'local', null);
+		if(!$serviceUrl)
+		{
+			return null;
+		}
+		
 		$serviceUrl = str_replace(self::MICRO_SERVICE_PREFIX_PLACEHOLDER, $hostName, $serviceUrl);
 		$serviceUrl = trim($serviceUrl, "\/");
 		if ($serviceName)
