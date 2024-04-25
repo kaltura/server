@@ -125,7 +125,6 @@ class LiveClusterMediaServerNode extends MediaServerNode
 		}
 
 		$streams = $liveEntryServerNode->getStreams();
-		$this->sanitizeAndFilterStreamIdsByBitrate($streams);
 
 		foreach($streams as $stream)
 		{
