@@ -24,6 +24,20 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 	
 	public function getCmd ()
 	{
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ======================== */
+{
+	if(KFFmpegToPartnerMatch::isMatched()==true) {
+		$matchData = KFFmpegToPartnerMatch::getConf();
+KalturaLog::log("matchedBin:".$matchData[1]);
+		return $matchData[1];
+	}
+}
+/* ======================== */
 		return KBatchBase::$taskConfig->params->ffmpegCmd;
 	}
 	
@@ -32,6 +46,20 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 	 */
 	protected function getExecutionCommandAndConversionString ( KalturaConvertJobData $data )
 	{
+
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ======================== */
+{
+	$partnerId = $data->flavorParamsOutput->partnerId;
+	KFFmpegToPartnerMatch::match($partnerId);
+}
+/* ======================== */
+
+
 		$wmData = null;
 		if(isset($data->flavorParamsOutput->watermarkData)){
 			$wmData = json_decode($data->flavorParamsOutput->watermarkData);
@@ -78,7 +106,7 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
 				 */
 			if(isset($wmData)){
 				$fixedCmdLine = self::buildWatermarkedCommandLine($wmData, $data->destFileSyncLocalPath, $exec_cmd, 
-								KBatchBase::$taskConfig->params->ffmpegCmd, KBatchBase::$taskConfig->params->mediaInfoCmd);
+								$this->getCmd(), KBatchBase::$taskConfig->params->mediaInfoCmd);
 				if(isset($fixedCmdLine)) $exec_cmd = $fixedCmdLine;
 			}
 			
