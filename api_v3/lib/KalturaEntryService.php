@@ -1081,7 +1081,7 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$object_to_fill)
 			$object_to_fill = new entry();
 		/* entry $baseTo */
-		return $object_to_fill->copyTemplate(true, $templateEntry);
+		return $object_to_fill->copyTemplate($templateEntry, true);
 	}
 
 	protected function getTemplateEntry($conversionProfileId, $templateEntryId)
