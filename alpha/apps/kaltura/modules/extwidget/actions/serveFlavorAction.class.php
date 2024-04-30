@@ -99,6 +99,11 @@ class serveFlavorAction extends kalturaAction
 			$result['cache'] = false;
 		}
 
+		if ($asset && $asset instanceof flavorAsset && $asset->getSegmentDuration())
+		{
+			$result['segmentDuration'] = $asset->getSegmentDuration();
+		}
+
 		$json = str_replace('\/', '/', self::jsonEncode($result));
 
 		return new kRendererString(
