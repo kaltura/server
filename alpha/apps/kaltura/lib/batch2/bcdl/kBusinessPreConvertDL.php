@@ -650,6 +650,19 @@ class kBusinessPreConvertDL
 			self::overrideFlavorParamsWithMultistreamData($flavor, $entryId);
 		}
 
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ========================
+*/
+{
+	KFFmpegToPartnerMatch::match($partnerId);
+	$matchData = KFFmpegToPartnerMatch::getConf();
+	KalturaLog::log("matchData: partner($partnerId), ".print_r($matchData,1));
+}
+/* ======================== */
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, $flavors);
 		KalturaLog::log("Generate Target " . count($cdl->_targetList) . " Flavors returned");
 
@@ -1029,6 +1042,20 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	 */
 	protected static function validateFlavorAndMediaInfo(assetParams $flavor, mediaInfo $mediaInfo = null, &$errDescription)
 	{
+
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ======================== */
+if(isset($mediaInfo)) {
+	$asset = assetPeer::retrieveById($mediaInfo->getFlavorAssetId());
+	$partnerId = $asset->getPartnerId();
+	KFFmpegToPartnerMatch::match($partnerId);
+}
+/* ======================== */
+
 		$cdl = KDLWrap::CDLGenerateTargetFlavors($mediaInfo, array($flavor));
 
 		$errDescription = '';
@@ -1742,6 +1769,21 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			/*
 			 * Check whether there is a need for an intermediate source pre-processing
 			 */
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ======================== */
+{
+	$entry = entryPeer::retrieveByPK($entryId);
+	$partnerId = $entry->getPartnerId();
+	KFFmpegToPartnerMatch::match($partnerId);
+	$matchData = KFFmpegToPartnerMatch::getConf();
+	KalturaLog::log("matchData: partner($partnerId), ".print_r($matchData,1));
+}
+/* ======================== */
+
 			$sourceFlavorOutput = KDLWrap::GenerateIntermediateSource($mediaInfo, $flavors);
 			if(!$sourceFlavorOutput)
 				return true;
