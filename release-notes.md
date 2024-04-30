@@ -1,5 +1,5 @@
 # Tucana-20.10.0
-## Add new UHD flavor param for live  ##
+## PHP8 support  ##
 - Issue Type: Epic
 - Issue ID: VCP-15578
 
