@@ -2106,7 +2106,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$entitledUserPuserEdit = array();
 		
-		$v = trim($v);
+		$v = !is_null($v) ? trim($v) : '';
 		if($v == '')
 		{
 			$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );
