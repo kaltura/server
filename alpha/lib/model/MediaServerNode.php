@@ -140,7 +140,7 @@ abstract class MediaServerNode extends DeliveryServerNode {
     /**
      * @return string
      */
-    public function getAdditionalUrlParam(LiveStreamEntry $entry)
+    public function getAdditionalUrlParam(LiveStreamEntry $entry, LiveEntryServerNode $liveEntryServerNode)
     {
         return '';
     }
