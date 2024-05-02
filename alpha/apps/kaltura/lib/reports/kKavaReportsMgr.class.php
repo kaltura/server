@@ -4277,13 +4277,18 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		if (!$dates)
 		{
-			$result[self::METRIC_BANDWIDTH_STORAGE_MB] = array(
-				reset($result[self::METRIC_BANDWIDTH_SIZE_MB]) +
-				reset($result[self::METRIC_AVERAGE_STORAGE_MB]));
+			$METRIC_BANDWIDTH_SIZE_MB = isset($result[self::METRIC_BANDWIDTH_SIZE_MB]) ?
+				reset($result[self::METRIC_BANDWIDTH_SIZE_MB]) : 0;
+			$METRIC_AVERAGE_STORAGE_MB = isset($result[self::METRIC_AVERAGE_STORAGE_MB]) ?
+				reset($result[self::METRIC_AVERAGE_STORAGE_MB]) : 0;
+			$METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB = isset($result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB]) ?
+				reset($result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB]) : 0;
 			
+			$result[self::METRIC_BANDWIDTH_STORAGE_MB] = array(
+				$METRIC_BANDWIDTH_SIZE_MB + $METRIC_AVERAGE_STORAGE_MB);
 			$result[self::METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB] = array(
-				reset($result[self::METRIC_BANDWIDTH_SIZE_MB]) +
-				reset($result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB]));
+				$METRIC_BANDWIDTH_SIZE_MB + $METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB);
+			
 			return;
 		}
 		
@@ -4299,9 +4304,13 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		if (!$dates)
 		{
+			$METRIC_LIVE_VIEW_PERIOD_PLAY_TIME = isset($result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME]) ?
+				reset($result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME]) : 0;
+			$METRIC_MEETING_VIEW_TIME =  isset($result[self::METRIC_MEETING_VIEW_TIME]) ?
+				reset($result[self::METRIC_MEETING_VIEW_TIME]) : 0;
+			
 			$result[self::METRIC_COMBINED_LIVE_VIEW_TIME] = array(
-				reset($result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME]) +
-				reset($result[self::METRIC_MEETING_VIEW_TIME]));
+				$METRIC_LIVE_VIEW_PERIOD_PLAY_TIME + $METRIC_MEETING_VIEW_TIME );
 
 			return;
 		}
