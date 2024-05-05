@@ -359,9 +359,10 @@ class kXml
 		$proc = new XSLTProcessor;
 		foreach ($xsltParams as $key => $value)
 		{
+			$value = !is_null($value) ? $value : '';
 			$proc->setParameter( '', $key, $value);
 		}		
-	    $proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
+		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		@$proc->importStyleSheet($xsl);
 		
 		$errorHandler = new XSLTErrorCollector();
