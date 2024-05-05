@@ -93,6 +93,8 @@ class Zend_Log_Writer_Stream extends Zend_Log_Writer_Abstract
      */
     protected function _write($event)
     {
+        $success = true;
+		
         $line = $this->_formatter->format($event);
         if (false === @fwrite($this->_stream, $line)) {
             require_once 'Zend/Log/Exception.php';
@@ -100,6 +102,14 @@ class Zend_Log_Writer_Stream extends Zend_Log_Writer_Abstract
             //Example: Stream.php line 107 - fwrite(): Send of 4194304 bytes failed with errno=90 Message too long
             //throw new Zend_Log_Exception("Unable to write to stream");
             error_log("Unable to write to stream with size [" . strlen($line) . "]");
+            $success = false;
+        }
+		
+        if($success === false) {
+            $line = substr($line, 0, 200000);
+            if (false === @fwrite($this->_stream, $line)) {
+                error_log("Unable to write to stream after partial truncate with size [" . strlen($line) . "]");
+            }
         }
     }
 
