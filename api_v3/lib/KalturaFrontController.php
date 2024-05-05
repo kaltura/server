@@ -746,7 +746,7 @@ class KalturaFrontController
 			$errorStr = constant($defaultError);
 			$args = array_merge(array($errorStr), $apiException->getArgs());
 			/** @var KalturaAPIException $replacedException */
-			$replacedException = $reflectionException->newInstanceArgs($args);
+			$replacedException = $reflectionException->newInstanceArgs(array_values($args));
 			KalturaLog::debug('Replacing error code "' . $apiException->getCode() . '" with error code "' . $replacedException->getCode() . '"');
 			return $replacedException;
 		}
