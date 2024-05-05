@@ -94,12 +94,12 @@ class Zend_Log_Writer_Stream extends Zend_Log_Writer_Abstract
     protected function _write($event)
     {
         $line = $this->_formatter->format($event);
-        //PHP8: Temporary fix due to PHP Fatal error:  Uncaught Zend_Log_Exception: Unable to write to stream in
-        //Stream.php line 107 - fwrite(): Send of 4194304 bytes failed with errno=90 Message too long
-        $line = substr($line, 0, 2097152);
         if (false === @fwrite($this->_stream, $line)) {
             require_once 'Zend/Log/Exception.php';
-            throw new Zend_Log_Exception("Unable to write to stream");
+            //PHP8: Temporary disable due to PHP Fatal error:  Uncaught Zend_Log_Exception: Unable to write to stream in
+            //Example: Stream.php line 107 - fwrite(): Send of 4194304 bytes failed with errno=90 Message too long
+            //throw new Zend_Log_Exception("Unable to write to stream");
+            error_log("Unable to write to stream with size [" . strlen($line) . "]");
         }
     }
 
