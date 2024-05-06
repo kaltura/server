@@ -1,12 +1,18 @@
 <?php
 
-function createSphinxConnection($sphinxServer, $port = 9312)
+function createSphinxConnection($sphinxServer, $port = 9312, $user = null, $pass = null, $tlsEnabled = false)
 {
 	$dsn = "mysql:host=$sphinxServer;port=$port;";
+	$driver_options = array();
+	if($tlsEnabled)
+	{
+		$driver_options[PDO::MYSQL_ATTR_SSL_CA] = true;
+		$driver_options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+	}
 	
 	try
 	{
-		$con = new PDO($dsn);
+		$con = new PDO($dsn, $user, $pass, $driver_options);
 		return $con;
 	}
 	catch(PropelException $pex)
@@ -35,10 +41,10 @@ function addQuotes($str)
 }
 
 if ($argc < 3)
-	die("Usage:\n\tphp sphinxCompatCheck <sphinx1 host> <sphinx1 port> <sphinx2 host> <sphinx2 port>\n");
+	die("Usage:\n\tphp sphinxCompatCheck <sphinx1 host> <sphinx1 port> <sphinx2 host> <sphinx2 port> <sphinx user> <sphinx password> <tls enabled>\n");
 	
-$conn1 = createSphinxConnection($argv[1], $argv[2]);
-$conn2 = createSphinxConnection($argv[3], $argv[4]);
+$conn1 = createSphinxConnection($argv[1], $argv[2], $argv[5], $argv[6], $argv[7]);
+$conn2 = createSphinxConnection($argv[3], $argv[4], $argv[5], $argv[6], $argv[7]);
 $strictMode = false;
 
 $serverTime1 = 0;

@@ -315,8 +315,6 @@ function getSphinxConnParams($sphinxServer, $dbConf)
 		{
 			return array($confParams['user'], $confParams['password'], $sphinxDataSource);
 		}
-		
-		
 	}
 	
 	return array(null, null, null);
