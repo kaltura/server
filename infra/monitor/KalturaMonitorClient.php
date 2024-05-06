@@ -483,7 +483,7 @@ class KalturaMonitorClient
 			self::FIELD_TABLE			=> $indexName,
 			self::FIELD_QUERY_TYPE		=> $actionName,
 			self::FIELD_EXECUTION_TIME	=> $queryTook,
-			self::FIELD_LENGTH			=> $body ? strlen($body) : 0,
+			self::FIELD_LENGTH			=> strlen(strval($body)),
 		));
 
 		if ($errorCode)
