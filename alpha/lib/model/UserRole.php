@@ -57,7 +57,9 @@ class UserRole extends BaseUserRole implements IRelatedObject
 	{
 		// get from DB
 		$permissionNames = parent::getPermissionNames();
-		$permissionNames = array_map('trim', explode(',', $permissionNames));
+		$permissionNames = !is_null($permissionNames) ?
+			array_map('trim', explode(',', $permissionNames)) :
+			array();
 		
 		$currentPartnerId = kCurrentContext::$ks_partner_id;
 		if (is_null($currentPartnerId) || $currentPartnerId === '') {

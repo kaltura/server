@@ -369,7 +369,8 @@ KalturaLog::log ( __METHOD__ . ": " . $kshow->getId() . " plays: $v");
 				
 			$res ["entry"] = $entry;
 			// can assume $votes > 0
-			$rank = $entry->setRank ( ( $total_rank / $votes ) * 1000 );
+			$newRank = ($votes == 0) ? 0 : (( $total_rank / $votes ) * 1000);
+			$rank = $entry->setRank ($newRank);
 				
 			// if rouhcut - update the kshow's rank too
 			if ( $entry->getType() == entryType::MIX )

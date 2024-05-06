@@ -75,8 +75,12 @@ class FacebookDistributionProfile extends ConfigurableDistributionProfile
 			FacebookDistributionField::CALL_TO_ACTION_TYPE_VALID_VALUES => explode(',', self::CALL_TO_ACTION_TYPE_VALID_VALUES),
 		);
 
-		if(count($entryDistribution->getFlavorAssetIds()))
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $entryDistribution->getFlavorAssetIds()));
+		$flavorAssetIds = $entryDistribution->getFlavorAssetIds()
+			? explode(',', $entryDistribution->getFlavorAssetIds())
+			: array();
+			
+		if(count($flavorAssetIds))
+			$flavorAssets = assetPeer::retrieveByIds($flavorAssetIds);
 		else
 			$flavorAssets = assetPeer::retrieveReadyFlavorsByEntryId($entryDistribution->getEntryId());
 

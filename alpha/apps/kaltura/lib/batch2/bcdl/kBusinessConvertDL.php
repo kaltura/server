@@ -320,8 +320,8 @@ class kBusinessConvertDL
 
 	private static function isSourceFlavor(flavorParamsOutput $a, flavorParamsOutput $b)
 	{
-		$aSources = explode(',', $a->getSourceAssetParamsIds());
-		$bSources = explode(',',$b->getSourceAssetParamsIds());
+		$aSources = !is_null($a->getSourceAssetParamsIds()) ? explode(',', $a->getSourceAssetParamsIds()) : array();
+		$bSources = !is_null($b->getSourceAssetParamsIds()) ? explode(',', $b->getSourceAssetParamsIds()) : array();
 
 		if(in_array($a->getFlavorParamsId(), $bSources))
 		{

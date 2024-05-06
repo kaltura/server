@@ -18,16 +18,16 @@ askToDelete(fixPath(kConf::get('response_cache_dir')), $interactive);
 askToDelete(fixPath(kConf::get('cache_root_path')), $interactive);
 
 // clear APC cache
-if (function_exists('apc_clear_cache'))
+if (kApcWrapper::functionExists('clear_cache'))
 {
 	// clear apc system cache
-	if (!apc_clear_cache())
+	if (!kApcWrapper::apcClearCache())
 	{
 		echo 'Unable to clear APC SYSTEM cache!'.PHP_EOL;
 	} 
 	
 	// clear apc user cache
-	if (!apc_clear_cache('user'))
+	if (!kApcWrapper::apcClearCache('user'))
 	{
 		echo 'Unable to clear APC USER cache!'.PHP_EOL;
 	}

@@ -188,7 +188,7 @@ class kPlaybackContextDataHelper
 	private function getFlavorParamsIdsToFilter(kContextDataHelper $contextDataHelper)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
-		$flavorParamsIds = null;
+		$flavorParamsIds = array();
 		$flavorsParamsNotIn = false;
 
 		foreach ($actions as $action)
@@ -197,7 +197,7 @@ class kPlaybackContextDataHelper
 			if ($action->getType() == RuleActionType::LIMIT_FLAVORS)
 			{
 				/* @var $action kAccessControlLimitFlavorsAction */
-				$flavorsIds = explode(',', $action->getFlavorParamsIds());
+				$flavorParamsIds = explode(',', $action->getFlavorParamsIds());
 				$flavorsParamsNotIn = $action->getIsBlockedList();
 			}
 		}
@@ -215,7 +215,7 @@ class kPlaybackContextDataHelper
 
 		list($flavorParamsIdsToFilter, $flavorsParamsNotIn) = $this->getFlavorParamsIdsToFilter($contextDataHelper);
 
-		if($flavorParamsIdsToFilter && count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
+		if(count($flavorParamsIdsToFilter) || $flavorsParamsNotIn)
 			self::filterFlavorAssetsByFlavorParamsIds($flavorAssets, $flavorParamsIdsToFilter, $flavorsParamsNotIn);
 
 		$this->flavorAssets = $flavorAssets;
@@ -271,7 +271,7 @@ class kPlaybackContextDataHelper
 				$deliveryProfilesIds = array();
 				$ids = $storageProfile->getFromCustomData("delivery_profile_ids");
 				if(!empty($ids))
-					$deliveryProfilesIds = call_user_func_array('array_merge', $ids);
+					$deliveryProfilesIds = call_user_func_array('array_merge', array_values($ids));
 
 				foreach ($deliveryProfilesIds as $deliveryProfileId)
 					$this->remoteDcByDeliveryProfile[$deliveryProfileId] = $storageProfile->getId();
@@ -304,7 +304,7 @@ class kPlaybackContextDataHelper
 
 		$customDeliveryProfilesIds = DeliveryProfilePeer::getCustomDeliveryProfileIds($dbEntry, $dbEntry->getPartner(), $deliveryAttributes);
 		if (count($customDeliveryProfilesIds))
-			$liveDeliveryProfileIds = call_user_func_array('array_merge', $customDeliveryProfilesIds);
+			$liveDeliveryProfileIds = call_user_func_array('array_merge', array_values($customDeliveryProfilesIds));
 
 		$liveDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $liveDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
@@ -360,7 +360,7 @@ class kPlaybackContextDataHelper
 
 		$customDeliveryProfilesIds = DeliveryProfilePeer::getCustomDeliveryProfileIds($dbEntry, $dbEntry->getPartner(), $deliveryAttributes);
 		if (count($customDeliveryProfilesIds))
-			$localDeliveryProfileIds = call_user_func_array('array_merge', $customDeliveryProfilesIds);
+			$localDeliveryProfileIds = call_user_func_array('array_merge', array_values($customDeliveryProfilesIds));
 
 		$localDeliveryProfiles = DeliveryProfilePeer::getDeliveryProfilesByIds($dbEntry, $localDeliveryProfileIds, $dbEntry->getPartner(), $deliveryAttributes);
 
@@ -411,7 +411,7 @@ class kPlaybackContextDataHelper
 			$partnerDeliveryIds = $partner->getDeliveryProfileIds();
 			if (count($partnerDeliveryIds))
 			{
-				$partnerDeliveryIds = call_user_func_array('array_merge', $partnerDeliveryIds);
+				$partnerDeliveryIds = call_user_func_array('array_merge', array_values($partnerDeliveryIds));
 				$this->remoteDeliveryProfileIds = array_intersect($this->remoteDeliveryProfileIds, $partnerDeliveryIds);
 			}
 		}

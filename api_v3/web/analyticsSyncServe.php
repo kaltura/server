@@ -35,7 +35,7 @@ define('SOURCE_EXTERNAL_YOUTUBE', -20);
 define('SOURCE_MEETING', -21);
 define('SOURCE_ONEDRIVE', -22);
 define('SOURCE_WEBEX_API', -23);
-
+define('SOURCE_TEAMS_ENTRY', -24);
 
 define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
@@ -53,6 +53,7 @@ $sourceFromAdminTag = array(
 	'kalturameeting' => SOURCE_MEETING,
 	'onedrive' => SOURCE_ONEDRIVE,
 	'webexapi' => SOURCE_WEBEX_API,
+	'teamsentry' => SOURCE_TEAMS_ENTRY
 );
 
 $externalSources = array(

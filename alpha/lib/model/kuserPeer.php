@@ -70,9 +70,18 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		return self::doSelectOne($c);
 	}
 
-	private static function getValidPuserStr($puserId){
+	private static function getValidPuserStr($puserId)
+	{
+		//There are some strange cases where puserId is sent as array, in this case we will nullify it
+		if(is_array($puserId))
+		{
+			return null;
+		}
+		
 		if (!is_null($puserId))
+		{
 			$puserId = substr($puserId, 0, self::MAX_PUSER_LENGTH);
+		}
 		return $puserId;
 	}
 	
@@ -601,9 +610,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		list($userName, $creatorUserName, $publisherName, $puserId) = myKuserUtils::sanitizeFields(array($userName, $creatorUserName, $partner->getName(), $user->getPuserId()));
 
 		$roleNameToUseDynamicEmailTemplate = kEmails::getDynamicEmailUserRoleName($roleNames);
-		$dynamicLink = $roleNameToUseDynamicEmailTemplate ? kEmails::getDynamicTemplateBaseLink($roleNames) : null;
-		if ($dynamicLink || !$existingUser)
+		if (!$existingUser)
 		{
+			$dynamicLink = $roleNameToUseDynamicEmailTemplate ? kEmails::getDynamicTemplateBaseLink($roleNames) : null;
 			$loginData = $user->getLoginData();
 			$passHashKey = $loginData ? $loginData->getPasswordHashKey() : null;
 			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($passHashKey, null, $dynamicLink);
@@ -620,12 +629,12 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		
 		if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) // If new user is admin console user
 		{
-			// add google authenticator library to include path
-			require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
+			// add 2FA library to include path
+			require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/TwoFactorAuthenticator.php';
 			
 			//QR code link might contain the '|' character used as a separator by the mailer job dispatcher. 
 			$qrCodeLink = str_replace("|", "M%7C",
-			                          GoogleAuthenticator::getQRCodeGoogleUrl($user->getPuserId() . ' ' . kConf::get('www_host') . ' KAC',
+			                          TwoFactorAuthenticator::getQRCodeUrl($user->getPuserId() . ' ' . kConf::get('www_host') . ' KAC',
 			                                                                  $user->getLoginData()->getSeedFor2FactorAuth()));
 			
 			if ($existingUser)

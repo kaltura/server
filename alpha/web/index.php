@@ -9,6 +9,7 @@ if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
 }
 
 $start = microtime(true);
+require_once(dirname(__FILE__)."/../../infra/cache/kApcWrapper.php");
 require_once(dirname(__FILE__).'/../config/kConf.php');
 require_once(dirname(__FILE__)."/../../api_v3/lib/KalturaResponseCacher.php");
 
@@ -46,9 +47,9 @@ function checkCache()
 		$host = $_SERVER['HTTP_HOST'];
 	$uri = $_SERVER["REQUEST_URI"];
 	
-	if (function_exists('apc_fetch'))
+	if (kApcWrapper::functionExists('fetch'))
 	{
-		$url = apc_fetch("redirect-".$protocol.$uri);
+		$url = kApcWrapper::apcFetch("redirect-".$protocol.$uri);
 		if ($url)
 		{
 			sendCachingHeaders(60, true, time());
@@ -58,7 +59,7 @@ function checkCache()
 			die;
 		}
 		
-		$errorHeaders = apc_fetch("exterror-$protocol://$host$uri");
+		$errorHeaders = kApcWrapper::apcFetch("exterror-$protocol://$host$uri");
 		if ($errorHeaders !== false)
 		{
 			sendCachingHeaders(60, true, time());
@@ -235,7 +236,7 @@ function checkCache()
 			}
 		}
 	}
-	else if (strpos($uri, "/serveFlavor/") !== false && function_exists('apc_fetch') && $_SERVER["REQUEST_METHOD"] == "GET")
+	else if (strpos($uri, "/serveFlavor/") !== false && kApcWrapper::functionExists('fetch') && $_SERVER["REQUEST_METHOD"] == "GET")
 	{
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererDumpFile.php');
 		require_once(dirname(__FILE__) . '/../apps/kaltura/lib/renderers/kRendererString.php');
@@ -245,7 +246,7 @@ function checkCache()
 		$host = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST'];
 		$cacheKey = 'dumpFile-'.kIpAddressUtils::isInternalIp($_SERVER['REMOTE_ADDR']).'-'.$host.$uri;
 		
-		$renderer = apc_fetch($cacheKey);
+		$renderer = kApcWrapper::apcFetch($cacheKey);
 		if ($renderer)
 		{
 			KalturaMonitorClient::monitorApiStart(true, 'extwidget.serveFlavor', $renderer->partnerId);

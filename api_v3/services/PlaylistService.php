@@ -217,7 +217,7 @@ class PlaylistService extends KalturaEntryService
 			throw new KalturaAPIException (APIErrors::INVALID_PLAYLIST_TYPE);
 		}
 			
-		if ($newPlaylist->playlistType && ($newPlaylist->playlistType != $dbPlaylist->getMediaType()))
+		if ($newPlaylist && $newPlaylist->playlistType && ($newPlaylist->playlistType != $dbPlaylist->getMediaType()))
 		{
 			throw new KalturaAPIException (APIErrors::CANT_UPDATE_PARAMETER, 'playlistType');
 		}
@@ -345,30 +345,29 @@ class PlaylistService extends KalturaEntryService
 			 $detailed = true ;
 
 		if($filter || kEntitlementUtils::getEntitlementEnforcement())
-                {
-                        try
-                        {
-                                $entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $entryFilter , $detailed, $pager);
-                        }
-                        catch (kCoreException $ex)
-                        {
-                                throw $ex;
-                        }
+		{
+			try
+			{
+				$entryList = myPlaylistUtils::executePlaylist( $this->getPartnerId() , $playlist , $entryFilter , $detailed, $pager);
+			}
+			catch (kCoreException $ex)
+			{
+				throw $ex;
+			}
 
-                        myEntryUtils::updatePuserIdsForEntries ( $entryList );
-
-                        return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
-
-                }
-                else
-                {
-                        $tempPlaylist = new KalturaPlaylist();
-                        $tempPlaylist->playlistContent = $playlist->getDataContent();
-                        $tempPlaylist->playlistType = $playlist->getMediaType();
-
-                        return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, $detailed, $pager);
-                }
-
+			myEntryUtils::updatePuserIdsForEntries ( $entryList );
+			return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
+		}
+        else
+        {
+			$tempPlaylist = new KalturaPlaylist();
+			$tempPlaylist->playlistContent = $playlist->getDataContent();
+			if(!$tempPlaylist->playlistContent)
+				$tempPlaylist->playlistContent = "";
+			
+			$tempPlaylist->playlistType = $playlist->getMediaType();
+			return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, $detailed, $pager);
+        }
 	}
 	
 
@@ -386,7 +385,7 @@ class PlaylistService extends KalturaEntryService
 	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null)
 	{
 		$partnerId = $this->getPartnerId() ? $this->getPartnerId() : kCurrentContext::getCurrentPartnerId();
-	    myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
+		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
 		{
 			myPlaylistUtils::setIsAdminKs(true);
@@ -395,7 +394,7 @@ class PlaylistService extends KalturaEntryService
 		$pagerSeparateQueries = self::decideWhereHandlingPager($pager,$entryFiltersViaEsearch, $entryFiltersViaSphinx);
 		$entryList = self::handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeparateQueries, $pager, $totalResults, $playlistContent);
 		myEntryUtils::updatePuserIdsForEntries($entryList);
-		KalturaLog::debug("entry ids count: " . count($entryList));
+		KalturaLog::debug("entry ids count: " . (is_array($entryList ? count($entryList) : 0)));
 		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
 	}
 

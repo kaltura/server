@@ -172,7 +172,7 @@ class KExternalErrors
 		) {
 			infraRequestUtils::sendCachingHeaders(self::CACHE_EXPIRY, true, time());
 
-			if (function_exists('apc_store')) {
+			if (kApcWrapper::functionExists('store')) {
 				$protocol = infraRequestUtils::getProtocol();
 				$host = "";
 				if (isset($_SERVER['HTTP_X_FORWARDED_HOST']))
@@ -180,7 +180,7 @@ class KExternalErrors
 				else if (isset($_SERVER['HTTP_HOST']))
 					$host = $_SERVER['HTTP_HOST'];
 				$uri = $_SERVER["REQUEST_URI"];
-				apc_store("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
+				kApcWrapper::apcStore("exterror-$protocol://$host$uri", $headers, self::CACHE_EXPIRY);
 			}
 		}
 

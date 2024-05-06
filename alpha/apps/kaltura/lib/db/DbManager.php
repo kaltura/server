@@ -24,7 +24,7 @@ class DbManager
 	/**
 	 * @var array
 	 */
-	protected static $sphinxConnection = null;
+	protected static $sphinxConnection = array();
 	
 	/**
 	 * @var kBaseCacheWrapper 
@@ -39,12 +39,12 @@ class DbManager
 	/**
 	 * @param array
 	 */
-	protected static $cachedConnIndexes = false;
+	protected static $cachedConnIndexes = array();
 	
 	/**
 	 * @param array
 	 */
-	protected static $connIndexes = false;
+	protected static $connIndexes = array();
 	
 	/**
 	 * @param array
@@ -97,9 +97,9 @@ class DbManager
 	
 	protected static function getExtraDatabaseConfigs()
 	{
-		if (function_exists('apc_fetch'))
+		if (kApcWrapper::functionExists('fetch'))
 		{
-			$dbConfigs = apc_fetch(self::EXTRA_DB_CONFIG_KEY);
+			$dbConfigs = kApcWrapper::apcFetch(self::EXTRA_DB_CONFIG_KEY);
 			if ($dbConfigs !== false)
 			{
 				return $dbConfigs;
@@ -114,9 +114,9 @@ class DbManager
 			$dbConfigs[] = $pluginInstance->getDatabaseConfig();
 		}
 
-		if (function_exists('apc_store'))
+		if (kApcWrapper::functionExists('store'))
 		{
-			apc_store(self::EXTRA_DB_CONFIG_KEY, $dbConfigs);
+			kApcWrapper::apcStore(self::EXTRA_DB_CONFIG_KEY, $dbConfigs);
 		}
 		
 		return $dbConfigs;
@@ -406,12 +406,12 @@ class DbManager
 				$offset++;
 				$key = $dataSources[$curIndex];
 
-				if (function_exists('apc_fetch'))
+				if (kApcWrapper::functionExists('fetch'))
 				{
 					$badConnCacheKey = "badDBConn:".$key;
 					if (!$iteration) // on the second iteration reset failed connection flag
-						apc_store($badConnCacheKey, false);
-					else if (apc_fetch($badConnCacheKey)) // if connection failed to connect in the past mark it
+						kApcWrapper::apcStore($badConnCacheKey, false);
+					else if (kApcWrapper::apcFetch($badConnCacheKey)) // if connection failed to connect in the past mark it
 						continue;
 				}
 
@@ -428,9 +428,9 @@ class DbManager
 					KalturaLog::err("failed to connect to $key");
 				}
 
-				if (function_exists('apc_store'))
+				if (kApcWrapper::functionExists('store'))
 				{
-					apc_store($badConnCacheKey, true, $cacheExpiry);
+					kApcWrapper::apcStore($badConnCacheKey, true, $cacheExpiry);
 				}
 			}
 		}

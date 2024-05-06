@@ -1235,7 +1235,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("kuser:id=".strtolower($this->getId()), "kuser:partnerId=".strtolower($this->getPartnerId()).",puserid=".strtolower($this->getPuserId()), "kuser:loginDataId=".strtolower($this->getLoginDataId()));
+		return array("kuser:id=".kString::strToLow($this->getId()), "kuser:partnerId=".kString::strToLow($this->getPartnerId()).",puserid=".kString::strToLow($this->getPuserId()), "kuser:loginDataId=".kString::strToLow($this->getLoginDataId()));
 	}
 	
 	/* (non-PHPdoc)
@@ -1429,6 +1429,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'status' => $this->getStatus(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
 			'screen_name' => $this->getScreenName(),
+			'full_name' => $this->getFullName(),
 			'kuser_type' => $this->getType(),
 			'email' => $this->getEmail(),
 			'tags' => $this->getTagsArray(), //todo - check

@@ -20,6 +20,7 @@ class KDLMediaDataSet  {
 	public	$_multiStream=null;
 	public  $_errors=array(),
 			$_warnings=array();
+	public  $_contentStreams = array();
 	
 	/* ----------------------
 	 * Cont/Dtor

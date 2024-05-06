@@ -21,49 +21,49 @@ class kLockInfoData
 	}
 
 	/**
-	 * @param field_type $lockVersion
+	 * @param int $lockVersion
 	 */
 	public function setLockVersion($lockVersion) {
 		$this->lockVersion = $lockVersion;
 	}
 
 	/**
-	 * @return the $urgency
+	 * @return int $urgency
 	 */
 	public function getUrgency() {
 		return $this->urgency;
 	}
 
 	/**
-	 * @return the $estimatedEffort
+	 * @return int $estimatedEffort
 	 */
 	public function getEstimatedEffort() {
 		return $this->estimatedEffort;
 	}
 
 	/**
-	 * @param field_type $urgency
+	 * @param int $urgency
 	 */
 	public function setUrgency($urgency) {
 		$this->urgency = $urgency;
 	}
 
 	/**
-	 * @param field_type $estimatedEffort
+	 * @param int $estimatedEffort
 	 */
 	public function setEstimatedEffort($estimatedEffort) {
 		$this->estimatedEffort = $estimatedEffort;
 	}
 	
 	/**
-	 * @return the $priority
+	 * @return int $priority
 	 */
 	public function getPriority() {
 		return $this->priority;
 	}
 	
 	/**
-	 * @param field_type $priority
+	 * @param int $priority
 	 */
 	public function setPriority($priority) {
 		$this->priority = $priority;

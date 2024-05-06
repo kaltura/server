@@ -473,7 +473,7 @@ class accessControl extends BaseaccessControl implements IBaseObject
 		for($ruleNum = 0; $ruleNum < count($rules); $ruleNum++)
 		{
 			$rule = $rules[$ruleNum];
-			$conditions = $rule->getConditions();
+			$conditions = $rule->getConditions() ? $rule->getConditions() : array();
 			for($condNum = 0; $condNum < count($conditions); $condNum++)
 			{
 				$condition = $conditions[$condNum];

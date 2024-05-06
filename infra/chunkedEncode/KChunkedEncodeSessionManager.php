@@ -141,6 +141,7 @@
 		public function detectErrors($manager, $chunkedEncodeReadIdx, $chunker)
 		{
 			$this->sumJobsStates();
+			$setup = $chunker->setup;	
 
 			$maxChunks = $chunker->GetMaxChunks();
 			$chunkDurThreshInSec=$chunker->chunkDurThreshInFrames*$chunker->params->frameDuration;
@@ -153,19 +154,44 @@
 							 */
 							// Calc the generated chunk duration
 						$generatedChunkDur = $job->stat->finish-$job->stat->start;
-							// for the last chunk - no need to validate chunk dur
-						if(($job->id<$maxChunks-1) && ($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur)){
-							$msgStr = "Chunk id ($chunkData->index): too short chunk dur - $generatedChunkDur";
-							$msgStr.= ", should be ".round($chunkData->gap,4).", thresh:".round($chunkDurThreshInSec,4);
-							$msgStr.= ", delta:".round($chunkData->gap-$generatedChunkDur,4);
-							KalturaLog::log($msgStr);
+							// For the last chunk - no need to validate chunk dur
+						if($job->id==$maxChunks-1)
+							continue;
+						if($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur){
+								// Too short chunk duration mostly caused by low framerate 
+								// and missing frames at the chunk end (regular P/B, not I).
+								// Solution - gradually increase the chunk overlap, 
+								// by 1 sec on each failed attempt.
 							$job->state = $job::STATE_FAIL;
+							$overlap=$setup->chunkOverlap + 1*($job->attempt+1);
+							KalturaLog::log("Chunk job (id:$job->id) failed on too short chunk dur. Overlap increased to $overlap sec");
+								// Update the chunk duration with increased overlapping 
+							$pattern = '/-t\s+([\w.]+)/';
+							$dur = $setup->chunkDuration+$overlap;
+							$cmdLine = preg_replace_callback($pattern, function ($matches) use ($dur) {
+											return '-t '.$dur;}, $job->cmdLine[0]);
+							$job->cmdLine[0]=$cmdLine;
 							$manager->SaveJob($job);
 							$this->jobs[$idx] = $job;
 							$this->sumJobsStates();
 						}
 					}
 					continue;
+				}
+				
+				if($job->state==$job::STATE_FAIL) {
+						// The last chunk generation might be affected by improperly set source metadata.
+						// Occationally, the file ends before reaching the timing that was declared in the metadata.
+						// This results the last chunk failure,.
+						// To handle such cases, the failed job of the last chunk, forced to SUCCESS state after 
+						// few generation attempts.
+					if($job->id==$maxChunks-1 && $job->msg=="missing chunk stat"){
+						KalturaLog::log("Chunk job (id:$job->id, last) failed on missing chunk stat. Retry attempt $job->attempt");
+						if($job->attempt>1) {
+							$job->state = $job::STATE_SUCCESS;
+							$manager->SaveJob($job);
+						}
+					}
 				}
 				
 				if($job->state==$job::STATE_RETRY) {
@@ -175,7 +201,7 @@
 					$tmpKey = $job->keyIdx;
 					$manager->AddJob($job);
 					$this->jobs[$idx] = $job;
-KalturaLog::log("Retrying chunk ($job->id) - oldKeyIdx:$tmpKey, newKeyIdx:$job->keyIdx, rdIdx:$chunkedEncodeReadIdx");
+					KalturaLog::log("Retrying chunk ($job->id) - oldKeyIdx:$tmpKey, newKeyIdx:$job->keyIdx, rdIdx:$chunkedEncodeReadIdx");
 				}
 				
 				if($job->startTime==0 || $job->state==$job::STATE_RETRY){
@@ -705,7 +731,9 @@ KalturaLog::log("Retrying chunk ($job->id) - oldKeyIdx:$tmpKey, newKeyIdx:$job->
 		{
 			$params = $this->chunker->params;
 			$source = $params->resolveSourcePath();
-			$cmdLine = str_replace($params->unResolvedSourcePath,$source,$cmdLine);
+			
+			//In PHP8 sending associative array as the subject will cause the returned value to be invalid
+			$cmdLine[0] = str_replace($params->unResolvedSourcePath,$source,$cmdLine[0]);
 			$job = new KChunkedEncodeJobData($this->name, $jobIdx, $cmdLine, $this->createTime);
 			$job->maxExecTime = $maxExecutionTime;
 			if($this->storeManager->AddJob($job)===false) {

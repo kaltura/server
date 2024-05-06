@@ -549,7 +549,7 @@ class Zend_Form_Element implements Zend_Validate_Interface
      * @param  string $key
      * @return void
      */
-    protected function _filterValue(&$value, &$key)
+    protected function _filterValue(&$value)
     {
         foreach ($this->getFilters() as $filter) {
             $value = $filter->filter($value);
@@ -568,7 +568,7 @@ class Zend_Form_Element implements Zend_Validate_Interface
         if ($this->isArray() && is_array($valueFiltered)) {
             array_walk_recursive($valueFiltered, array($this, '_filterValue'));
         } else {
-            $this->_filterValue($valueFiltered, $valueFiltered);
+            $this->_filterValue($valueFiltered);
         }
 
         return $valueFiltered;

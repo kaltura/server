@@ -27,7 +27,7 @@ class kXmlConfig
 	 * @param array $files
 	 * @return kXmlConfig
 	 */
-	public function  kXmlConfig ( $base_file , $referrer_file )
+	public function __construct($base_file, $referrer_file )
 	{
 		$this->referrer_file = $referrer_file;
 		$this->referrer_xml = simplexml_load_string (file_get_contents( $referrer_file ),null,LIBXML_NOERROR );

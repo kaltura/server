@@ -160,6 +160,11 @@ class Permission extends BasePermission implements IRelatedObject
 	 */
 	public function setPermissionItems($idsString)
 	{
+		if(is_null($idsString))
+		{
+			return;
+		}
+		
 		$this->permissionItemIds = explode(',', trim($idsString));
 		$this->permissionItemIdsChanged = true;
 	}

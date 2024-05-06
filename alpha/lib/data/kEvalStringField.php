@@ -25,7 +25,15 @@ class kEvalStringField extends kStringField
 			throw new kCoreException("Evaluated code may be simple value only");
 			
 		KalturaLog::debug("Evaluating code [$this->code]" . ($this->description ? " for description [$this->description]" : ''));
-		return eval("return strval({$this->code});");
+		
+		try {
+			$retVal = eval("return @strval({$this->code});");
+		} catch (TypeError $error) {
+			KalturaLog::debug("Failed to evaluate code [{$this->code}] with error: " . print_r($error, true));
+			return $this->getTypeErrorDefaultValue($this->code);
+		}
+		
+		return $retVal;
 	}
 	
 	/**
@@ -44,6 +52,29 @@ class kEvalStringField extends kStringField
 		$this->code = $code;
 	}
 
-	
+	private function getTypeErrorDefaultValue($code)
+	{
+		if(kString::beginsWith($code, "unserialize"))
+		{
+			return false;
+		}
+		
+		if(kString::beginsWith($code, "count"))
+		{
+			return 0;
+		}
+		
+		if(kString::beginsWith($code, "explode"))
+		{
+			return array();
+		}
+		
+		if(kString::beginsWith($code, "strlen"))
+		{
+			return 0;
+		}
+		
+		return "";
+	}
 	
 }

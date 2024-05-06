@@ -491,7 +491,8 @@ class KalturaBaseUserService extends KalturaBaseService
 		$dbUser->setPartnerId($this->getPartnerId());
 		try {
 			$checkPasswordStructure = isset($user->password) ? true : false;
-			$dbUser = kuserPeer::addUser($dbUser, $user->password, $checkPasswordStructure);
+			$userPassword = isset($user->password) ? $user->password : null;
+			$dbUser = kuserPeer::addUser($dbUser, $userPassword, $checkPasswordStructure);
 		}
 
 		catch (kUserException $e) {
