@@ -200,12 +200,8 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$url = str_replace('\\', '/', $url);
 			if ($tokenizeUrl)
 			{
-				$url = '';
-				if($this->getUrl() && $this->getUrl() != '')
-				{
-					$url .= rtrim(parse_url($this->getUrl(), PHP_URL_PATH),'/');
-				}
-				$url .= '/'.ltrim($url,'/');
+				$dpUrlPath = !is_null($this->getUrl()) ? parse_url($this->getUrl(), PHP_URL_PATH) : '';
+				$url = rtrim($dpUrlPath,'/').'/'.ltrim($url,'/');
 				$tokenizer = $this->getTokenizer();
 				if ($tokenizer)
 				{
