@@ -1070,12 +1070,16 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 * @throws kUserException::LOGIN_DATA_MISMATCH
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 */
-	public function replaceUserLoginData($newLoginId, $existingLoginId)
+	public function replaceUserLoginData($newLoginId, $existingLoginId = null)
 	{
 		$userLoginData = UserLoginDataPeer::getByEmail($this->getEmail());
 		if ($userLoginData)
 		{
-			if ($existingLoginId !== $userLoginData->getLoginEmail())
+			if (!$existingLoginId)
+			{
+				throw new kUserException('', kUserException::LOGIN_DATA_NOT_PROVIDED);
+			}
+			else if ($existingLoginId !== $userLoginData->getLoginEmail())
 			{
 				throw new kUserException('', kUserException::LOGIN_DATA_MISMATCH);
 			}

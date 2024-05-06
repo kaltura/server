@@ -666,11 +666,6 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
 			}
 
-			if(!$existingLoginId)
-			{
-				throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_PROVIDED);
-			}
-
 			$user->replaceUserLoginData($newLoginId, $existingLoginId);
 			$user->save();
 		}
@@ -678,6 +673,10 @@ class UserService extends KalturaBaseUserService
 		{
 			switch ($e->getCode())
 			{
+				case kUserException::LOGIN_DATA_NOT_PROVIDED:
+				{
+					throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_PROVIDED);
+				}
 				case kUserException::USER_LOGIN_ALREADY_ENABLED:
 				{
 					throw new KalturaAPIException(KalturaErrors::USER_LOGIN_ALREADY_ENABLED);
