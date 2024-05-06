@@ -165,13 +165,13 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 			if( (trim($category->getPrivacyContexts()) == '' || $category->getPrivacyContexts() == null))
 			{
 				$categories = array();
-				if(trim($entry->getCategories()) != '')
+				if($entry->getCategories() && trim($entry->getCategories()) != '')
 					$categories = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategories());
 					
 				$categories[] = $category->getFullName();
 				
 				$categoriesIds = array();
-				if(trim($entry->getCategoriesIds()) != '')
+				if($entry->getCategoriesIds() && trim($entry->getCategoriesIds()) != '')
 					$categoriesIds = explode(entry::ENTRY_CATEGORY_SEPARATOR, $entry->getCategoriesIds());
 					
 				$categoriesIds[] = $category->getId();
@@ -454,5 +454,11 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 		}
 		
 		return $category;
+	}
+	
+	public function getPrivacyContext()
+	{
+		$privacyContext = parent::getPrivacyContext();
+		return is_null($privacyContext) ? '' : $this->privacy_context;
 	}
 } // categoryEntry

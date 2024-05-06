@@ -88,7 +88,7 @@ class KalturaLog
 	{
 		self::initLog();
 		if(!$message instanceof Exception)
-			$message = new Exception($message);
+			$message = new Exception(strval($message));
 			
 		self::$_logger->log($message, self::ERR);
 	}	

@@ -41,14 +41,14 @@ class EmailNotificationTemplate extends BatchEventNotificationTemplate implement
 
 	protected function getAllowedEmail()
 	{
-		$allowedFromEmailWhiteList = array();
+		$allowedFromEmailWhiteList = '';
 		$fromEmailNotification = $this->getFromEmail();
 		$partner = PartnerPeer::retrieveByPK($this->getPartnerId());
 		if ($partner)
 		{
 			$allowedFromEmailWhiteList = $partner->getAllowedFromEmailWhiteList();
 			if ($fromEmailNotification !== self::FROM_EMAIL
-				&& in_array($fromEmailNotification, explode(',',$allowedFromEmailWhiteList)))
+				&& $allowedFromEmailWhiteList && in_array($fromEmailNotification, explode(',',$allowedFromEmailWhiteList)))
 			{
 				return $fromEmailNotification;
 			}

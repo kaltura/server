@@ -203,7 +203,7 @@ $debug .= "property: $not_property = [$value]\n";
 
 	protected static function createNotificationData ($notification_type, $obj, $extra_notification_data = null, $partner_id = null)
 	{
-		$httpsServerVal = $_SERVER['HTTPS'];
+		$httpsServerVal = isset($_SERVER['HTTPS']) ? $_SERVER['HTTPS'] : null;
 		self::setServerHttps('on', $partner_id);
 		$notificationData = self::fillNotificationData($notification_type , $obj, $extra_notification_data);
 		self::setServerHttps($httpsServerVal, $partner_id);

@@ -53,7 +53,7 @@ abstract class AbstractRecord implements JsonSerializable
         return in_array($attr, $this->validAttributes);
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->record;
     }
