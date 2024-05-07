@@ -1,4 +1,4 @@
-# Tucana-20.10.0
+# Tucana-20.11.0
 ## Replace user's login data to new or existing login data ##
 - Issue Type: Task
 - Issue ID: PLAT-24661
