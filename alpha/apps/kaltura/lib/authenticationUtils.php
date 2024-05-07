@@ -1,13 +1,13 @@
 <?php
 
-require_once (KALTURA_ROOT_PATH .'/vendor/phpGangsta/GoogleAuthenticator.php');
+require_once (KALTURA_ROOT_PATH .'/vendor/phpGangsta/TwoFactorAuthenticator.php');
 
 class authenticationUtils
 {
 
 	public static function generateQRCodeUrl($kuser, $loginData)
 	{
-		return str_replace ("|", "M%7C", GoogleAuthenticator::getQRCodeGoogleUrl($kuser->getPuserId() . '_' . kConf::get ('www_host') . '_KMC', $loginData->getSeedFor2FactorAuth()));
+		return str_replace ("|", "M%7C", TwoFactorAuthenticator::getQRCodeUrl($kuser->getPuserId() . '_' . kConf::get ('www_host') . '_KMC', $loginData->getSeedFor2FactorAuth()));
 	}
 
 	public static function getQRImage($kuser, $loginData)
@@ -17,7 +17,7 @@ class authenticationUtils
 		$response = $curlWrapper->exec($qrUrl);
 		if (!$response || $curlWrapper->getHttpCode() !== 200 || $curlWrapper->getError())
 		{
-			KalturaLog::err("Google Authenticator Curl returned error, Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()} ");
+			KalturaLog::err("Two Factor Authenticator Curl returned error, Error code : {$curlWrapper->getHttpCode()}, Error: {$curlWrapper->getError()} ");
 			return null;
 		}
 		$encodedQr = base64_encode($response);
@@ -26,7 +26,7 @@ class authenticationUtils
 
 	public static function generateNewSeed($userLoginData)
 	{
-		$userLoginData->setSeedFor2FactorAuth(GoogleAuthenticator::createSecret());
+		$userLoginData->setSeedFor2FactorAuth(TwoFactorAuthenticator::createSecret());
 		$userLoginData->save();
 	}
 
@@ -129,7 +129,7 @@ class authenticationUtils
 	public static function verify2FACode($loginData, $otp)
 	{
 		$userSeed = $loginData->getSeedFor2FactorAuth();
-		return GoogleAuthenticator::verifyCode ($userSeed, $otp);
+		return TwoFactorAuthenticator::verifyCode ($userSeed, $otp);
 	}
 	
 	protected static function addDynamicContentAuthMailJob($partnerId, $kuser, $loginData, $userRole, $mailType)

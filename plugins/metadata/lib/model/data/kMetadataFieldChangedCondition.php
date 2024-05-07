@@ -102,7 +102,8 @@ class kMetadataFieldChangedCondition extends kCondition
 			
 		if(!$metadata)
 			return false;
-			
+		
+		$valuesA = null;
 		if($this->versionA)
 			$valuesA = kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionA);
 		$valuesB = kMetadataManager::parseMetadataValues($metadata, $this->xPath, $this->versionB);

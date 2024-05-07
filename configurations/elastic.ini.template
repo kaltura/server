@@ -6,6 +6,7 @@ disableElastic = false
 ngramPercentage = 80
 maxUserCategories = 1024
 bulkSize = 500
+elasticVersion = @ELASTIC_VERSION@
 
 [innerHits]
 captionInnerHitsSize = 5

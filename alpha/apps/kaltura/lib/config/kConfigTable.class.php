@@ -343,10 +343,10 @@ class kConfigTableChain
 	// TODO - let define default seach policy in chain
 
 	/*
-	 * the FIRST file in the array is the most impornat one and is the first to search.
+	 * the FIRST file in the array is the most important one and is the first to search.
 	 * the LAST file should always be set NOT to ignore non-existing columns
 	 */
- 	public function  kConfigTableChain ( array $file_names , $path = null)
+ 	public function  __construct(array $file_names, $path = null)
 	{
 		$this->file_names = $file_names;
 		$this->config_chain = array();

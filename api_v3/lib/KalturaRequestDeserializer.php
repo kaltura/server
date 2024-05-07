@@ -292,7 +292,7 @@ class KalturaRequestDeserializer
 	private function validateFile($fileData) 
 	{
 		if (!isset($fileData['tmp_name']) || !is_uploaded_file($fileData['tmp_name'])) {
-			$msg = "An error occured while uploading file.";
+			$msg = "An error occurred while uploading file.";
 			KalturaLog::log($msg . ' ' . print_r($fileData, true));
 			throw new KalturaAPIException(KalturaErrors::UPLOAD_ERROR);
 		}
@@ -364,8 +364,9 @@ class KalturaRequestDeserializer
 			{
 				if(strtolower($value) == 'true')
 					$value = 1;
-				if(strtolower($value) == 'false')
+				if(strtolower($value) == 'false' || ($type == 'KalturaNullableBoolean' && $value == ''))
 					$value = 0;
+				
 				if (!$property->getTypeReflector()->checkEnumValue($value))
 					throw new KalturaAPIException(KalturaErrors::INVALID_ENUM_VALUE, $value, $name, $property->getType());
 			

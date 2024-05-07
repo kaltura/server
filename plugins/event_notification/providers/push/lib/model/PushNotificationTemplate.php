@@ -108,7 +108,8 @@ class PushNotificationTemplate extends EventNotificationTemplate
         $templateId = $this->getId();
         if ($scope)
             $partnerId = $scope->getPartnerId();
-        
+	
+        $contentParametersValues = array();
         // currently contentParams contains only one param (entryId), but for further support
         foreach ($contentParameters as $contentParameter)
         {        	

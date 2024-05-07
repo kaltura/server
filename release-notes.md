@@ -1,3 +1,17 @@
+# Tucana-20.10.0
+## PHP8 support  ##
+- Issue Type: Epic
+- Issue ID: VCP-15578
+
+Please note this version of Kaltura server introduces support for PHP8.
+Be aware that due to incompatibility changes done in PHP8 this version of the Kaltura server code requires PHP version > 8.
+
+### Configuration ###
+None
+
+### Deployment Scripts ###
+None
+
 # Tucana-20.9.0
 ## Add new UHD flavor param for live  ##
 - Issue Type: Task

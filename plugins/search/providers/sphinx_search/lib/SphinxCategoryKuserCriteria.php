@@ -121,6 +121,8 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	
 	public function fixPermissionNamesListForSphinx($permissionLevel)
 	{
+		$negativePermissionNamesArr = array();
+		
 		switch ($permissionLevel)
 	    {
 	      case CategoryKuserPermissionLevel::MODERATOR:

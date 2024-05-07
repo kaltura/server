@@ -61,7 +61,7 @@ abstract class KalturaFilter extends KalturaObject
 	    $orderByMap = $this->getOrderByMap();
 	    if ($orderByMap)
 		{
-		    $orderProps = explode(",", $this->orderBy);
+		    $orderProps = !is_null($this->orderBy) ? explode(",", $this->orderBy) : array();
 		    foreach($orderProps as $prop)
 		    {
 		         if (isset($orderByMap[$prop]))
@@ -99,7 +99,7 @@ abstract class KalturaFilter extends KalturaObject
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
 				$value = kPluginableEnumsManager::apiToCore($enumType, $value);
 			}
-			elseif($propertyInfo->getDynamicType()&& strlen($value))
+			elseif($propertyInfo->getDynamicType() && strlen($value))
 			{
 				$propertyType = $propertyInfo->getDynamicType();
 				$enumType = call_user_func(array($propertyType, 'getEnumClass'));
@@ -172,7 +172,7 @@ abstract class KalturaFilter extends KalturaObject
 		
 		$newOrderBy = "";
 	    $orderByMap = $this->getOrderByMap();
-	    if ($orderByMap)
+	    if ($orderByMap && $this->orderBy)
 		{
 		    $orderProps = explode(",", $this->orderBy);
 		    foreach($orderProps as $prop)

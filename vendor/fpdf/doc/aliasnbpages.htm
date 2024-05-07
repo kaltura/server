@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>AliasNbPages</title>
 <link type="text/css" rel="stylesheet" href="../fpdf.css">
 </head>
@@ -22,23 +22,23 @@ The alias. Default value: <code>{nb}</code>.
 <div class="doc-source">
 <pre><code>class PDF extends FPDF
 {
-function Footer()
-{
-    // Go to 1.5 cm from bottom
-    $this-&gt;SetY(-15);
-    // Select Arial italic 8
-    $this-&gt;SetFont('Arial','I',8);
-    // Print current and total page numbers
-    $this-&gt;Cell(0,10,'Page '.$this-&gt;PageNo().'/{nb}',0,0,'C');
-}
+    function Footer()
+    {
+        // Go to 1.5 cm from bottom
+        $this-&gt;SetY(-15);
+        // Select Arial italic 8
+        $this-&gt;SetFont('Arial', 'I', 8);
+        // Print current and total page numbers
+        $this-&gt;Cell(0, 10, 'Page '.$this-&gt;PageNo().'/{nb}', 0, 0, 'C');
+    }
 }
 
 $pdf = new PDF();
 $pdf-&gt;AliasNbPages();</code></pre>
 </div>
 <h2>See also</h2>
-<a href="pageno.htm">PageNo()</a>,
-<a href="footer.htm">Footer()</a>.
+<a href="pageno.htm">PageNo</a>,
+<a href="footer.htm">Footer</a>
 <hr style="margin-top:1.5em">
 <div style="text-align:center"><a href="index.htm">Index</a></div>
 </body>

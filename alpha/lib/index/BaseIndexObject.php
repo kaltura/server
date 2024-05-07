@@ -259,6 +259,6 @@ abstract class BaseIndexObject
 			return null;
 		}
 		
-		return ($originalValue/10)%$splitIndexFactor;
+		return (intval($originalValue/10))%$splitIndexFactor;
 	}
 }

@@ -110,8 +110,10 @@ class kDruidBase
 
 	protected static function getIntervals($fromTime, $toTime)
 	{
-		$fromTime = gmdate('Y-m-d\\TH:i:s\\Z', $fromTime);
-		$toTime = gmdate('Y-m-d\\TH:i:s\\Z', $toTime);
+		// $fromTime|$toTime are not both required so force passing intval
+		// to avoid invalid value when transitioning to PHP8
+		$fromTime = gmdate('Y-m-d\\TH:i:s\\Z', intval($fromTime));
+		$toTime = gmdate('Y-m-d\\TH:i:s\\Z', intval($toTime));
 		return $fromTime . '/' . $toTime;
 	}
 	

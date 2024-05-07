@@ -29,7 +29,8 @@ class XSLTErrorCollector
 
 function xml_load_for_xslt($xmlStr)
 {
-	$dom = DOMDocument::loadXML($xmlStr);
+	$dom = new DOMDocument();
+	$dom->loadXML($xmlStr);
 	return $dom->documentElement;
 }
 
@@ -358,9 +359,10 @@ class kXml
 		$proc = new XSLTProcessor;
 		foreach ($xsltParams as $key => $value)
 		{
+			$value = !is_null($value) ? $value : '';
 			$proc->setParameter( '', $key, $value);
 		}		
-	    $proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
+		$proc->registerPHPFunctions(kXml::getXslEnabledPhpFunctions());
 		@$proc->importStyleSheet($xsl);
 		
 		$errorHandler = new XSLTErrorCollector();

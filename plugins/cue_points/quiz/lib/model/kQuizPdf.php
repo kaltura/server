@@ -124,8 +124,15 @@ class kQuizPdf
 	private function getStylePrefix($text)
 	{
 		$stylePrefix = self::NOTO_STYLE_PREFIX;
+		if(is_null($text))
+		{
+			return $stylePrefix;
+		}
+		
 		if(preg_match("/\p{Han}+/u", $text)) //contain chinese/japanese letters
+		{
 			$stylePrefix = self::ASIAN_STYLE_PREFIX;
+		}
 		
 		return $stylePrefix;
 	}

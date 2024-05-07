@@ -266,6 +266,8 @@ class KalturaDocCommentParser
 	 * @var int
 	 */
 	public $utf8truncate;
+	
+	public $disableRelativeTimeParams;
 
     /**
      * Parse a docComment

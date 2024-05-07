@@ -13,7 +13,7 @@ abstract class KalturaESearchItemImpl
 	public static function eSearchItemToObjectImpl(&$eSearchItem, $dynamicEnumMap, $itemFieldName, $fieldEnumMap, $object_to_fill = null, $props_to_skip = array())
 	{
 		self::validateSearchTermLength($eSearchItem);
-		$searchTerm = trim($eSearchItem->searchTerm);
+		$searchTerm = !is_null($eSearchItem->searchTerm) ? trim($eSearchItem->searchTerm) : "";
 		if(in_array($eSearchItem->itemType, array(KalturaESearchItemType::PARTIAL, KalturaESearchItemType::EXACT_MATCH)) &&
 			self::enclosedInQuotationMarks($searchTerm))
 		{
@@ -35,6 +35,11 @@ abstract class KalturaESearchItemImpl
 
 	protected static function validateSearchTermLength($eSearchItem)
 	{
+		if(is_null($eSearchItem->searchTerm))
+		{
+			return;
+		}
+		
 		if(strlen($eSearchItem->searchTerm) > self::MAX_SEARCH_TERM_LENGTH)
 		{
 			$eSearchItem->searchTerm =  mb_strcut($eSearchItem->searchTerm, 0, self::MAX_SEARCH_TERM_LENGTH, "utf-8");

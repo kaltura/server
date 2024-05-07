@@ -723,7 +723,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$currentConversionParams[self::AUDIO_DURATION] = $mediaInfoObj->getAudioDuration();
 
 			$shouldResize = $this->shouldResize($mediaInfoObj, $width, $height);
-			if(shouldResize)
+			if($shouldResize)
 			{
 				$currentConversionParams[self::WIDTH] = $width; // trigger resize
 				if($mediaInfoObj->getVideoWidth() < $mediaInfoObj->getVideoHeight())
@@ -792,7 +792,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function decideAudioChannels(array $allAudioChannels)
 	{
-		return min($allAudioChannels) > 1 ? 2 : self::DEFAULT_AUDIO_CHANNELS;
+		return (count($allAudioChannels) && min($allAudioChannels) > 1) ? 2 : self::DEFAULT_AUDIO_CHANNELS;
 	}
 
 	protected function limitByMaxProfileResolution($conversionProfileId, $aspectRatio, &$width, &$height)
