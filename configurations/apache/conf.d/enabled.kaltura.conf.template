@@ -210,6 +210,9 @@ Alias /content "@WEB_DIR@/content"
 	<IfModule mod_php7.c>
 	    php_flag engine off
 	</IfModule>
+	<IfModule mod_php.c>
+	    php_flag engine off
+	</IfModule>
 	ExpiresActive On
 	ExpiresDefault "access plus 3 month"
 	Header unset ETag
@@ -242,17 +245,19 @@ Alias /flash "@WEB_DIR@/flash"
 
 <IfModule !mod_php5.c>
   <IfModule !mod_php7.c>
-    # Enable http authorization headers
-    SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
+    <IfModule !mod_php.c> # PHP8 module is named mod_php
+      # Enable http authorization headers
+      SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
 
-    <FilesMatch \.(php|phar)$>
-        SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost"
-    </FilesMatch>
+      <FilesMatch \.(php|phar)$>
+          SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost"
+      </FilesMatch>
         <Directory "@WEB_DIR@/content">
                     <FilesMatch ".+\.*$">
                             SetHandler !
                     </FilesMatch>
         </Directory>
+    </IfModule>
   </IfModule>
 </IfModule>
 

@@ -75,7 +75,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		}
 		//Check uniqueness of new object's system name
 		$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($newDbEventNotificationTemplate->getSystemName());
-		if (count($systemNameTemplates))
+		if ($systemNameTemplates)
 			throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $newDbEventNotificationTemplate->getSystemName());
 		
 		// save the new db object
@@ -160,7 +160,7 @@ class EventNotificationTemplateService extends KalturaBaseService
 		{
 			//Check uniqueness of new object's system name
 			$systemNameTemplates = EventNotificationTemplatePeer::retrieveBySystemName($dbEventNotificationTemplate->getSystemName());
-			if (count($systemNameTemplates))
+			if ($systemNameTemplates)
 				throw new KalturaAPIException(KalturaEventNotificationErrors::EVENT_NOTIFICATION_TEMPLATE_DUPLICATE_SYSTEM_NAME, $dbEventNotificationTemplate->getSystemName());
 		}	
 		

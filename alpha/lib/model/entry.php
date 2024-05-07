@@ -166,6 +166,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 	private $archive_extension = null;
 	
+	private $copy_metadata = true;
+	
 	private static $mediaTypeNames = array(
 		self::ENTRY_MEDIA_TYPE_AUTOMATIC => 'AUTOMATIC',
 		self::ENTRY_MEDIA_TYPE_ANY => 'ANY',
@@ -1078,6 +1080,16 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		return $this->archive_extension;
 	}
+	
+	public function setCopyMetadata($v)
+	{
+		$this->copy_metadata = $v;
+	}
+	
+	public function getCopyMetadata()
+	{
+		return $this->copy_metadata;
+	}
 
 	/**
 	 * The method returns the var_dumpd_options, in case the entry was created via clone operation.
@@ -1420,7 +1432,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return;
 			
-		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats);
+		$newCats = !is_null($newCats) ? explode(self::ENTRY_CATEGORY_SEPARATOR, $newCats) : array();
 		
 		$this->trimCategories($newCats);
 		
@@ -1442,7 +1454,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return;
 		
-		$newCats = explode(self::ENTRY_CATEGORY_SEPARATOR, $v);
+		$newCats = !is_null($v) ? explode(self::ENTRY_CATEGORY_SEPARATOR, $v) : array();
 		
 		$this->trimCategories($newCats);
 		
@@ -1462,14 +1474,17 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return null;
-		return parent::getCategories();
+		$result = parent::getCategories();
+		return is_null($result) ? '' : $result;
 	}
 
 	public function getCategoriesIds()
 	{
 		if(PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 			return null;
-		return parent::getCategoriesIds();
+		
+		$result = parent::getCategoriesIds();
+		return is_null($result) ? '' : $result;
 	}
 
 	/*public function renameCategory($oldFullName, $newFullName)
@@ -1518,7 +1533,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				}
 			}
 			
-			$cat = implode($fixedCat, categoryPeer::CATEGORY_SEPARATOR);
+			$cat = implode(categoryPeer::CATEGORY_SEPARATOR, $fixedCat);
 			
 			if (strlen($cat) > 0)
 				$trimedCategories[] = $cat;
@@ -2091,7 +2106,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$entitledUserPuserEdit = array();
 		
-		$v = trim($v);
+		$v = !is_null($v) ? trim($v) : '';
 		if($v == '')
 		{
 			$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );
@@ -2147,16 +2162,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function setEntitledPusersView($v)
 	{
 		$entitledUserPuserView = array();
-		
-		$v = trim($v);
-		if($v == '')
+		if(is_null($v) || trim($v) == '')
 		{
 			$this->putInCustomData ( "entitledUserPuserView" , serialize($entitledUserPuserView) );
 			return;
 		}
 		
-		$entitledPusersView = explode(',',$v);
-				
+		$entitledPusersView = explode(',', trim($v));
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		foreach ($entitledPusersView as $puserId)
 		{
@@ -2227,15 +2239,14 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$entitledUserPuserPublish = array();
-	
-		$v = trim($v);
-		if($v == '')
+		
+		if(is_null($v) || trim($v) == '')
 		{
 			$this->putInCustomData ( "entitledUserPuserPublish" , serialize($entitledUserPuserPublish) );
 			return;
 		}
 		
-		$entitledPusersPublish = explode(',', $v);
+		$entitledPusersPublish = explode(',', trim($v));
 		if(!count($entitledPusersPublish))
 			return;
 			
@@ -3555,7 +3566,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$categories	= categoryPeer::doSelect($c);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		
-		//get all memebrs
+		//get all members
 		foreach ($categories as $category)
 		{
 			if(!count($category->getMembers()))
@@ -4119,7 +4130,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			'media_type' => $this->getMediaType(),
 			'source_type' => $this->getSourceType(),
 			'length_in_msecs' => $this->getLengthInMsecs(),
-			'admin_tags' => explode(',',$this->getAdminTags()),
+			'admin_tags' => explode(',',!is_null($this->getAdminTags()) ? $this->getAdminTags() : ""),
 			'credit' => $this->getCredit(),
 			'site_url' => $this->getSiteUrl(),
 			'start_date' => $this->getStartDate(null),
@@ -4602,7 +4613,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	 */
 	public function getAdminTagsArr()
 	{
-		$tags = explode(",", $this->getAdminTags());
+		$tags = explode(",", !is_null($this->getAdminTags()) ? $this->getAdminTags() : "");
 		$tagsToReturn = array();
 		foreach($tags as $tag)
 		{

@@ -68,13 +68,14 @@ class KalturaFrontController
 	{
 		$duration = microtime(true) - $this->requestStart;
 		
+		$kuserId = kCurrentContext::$uid ? kCurrentContext::$uid : (kCurrentContext::$ks_uid ? kCurrentContext::$ks_uid : '');
 		KalturaLog::analytics(array(
 			'request_end',
 			'partnerId' => kCurrentContext::$partner_id,
 			'masterPartnerId' => kCurrentContext::$master_partner_id,
 			'ks' => kCurrentContext::$ks,
 			'isAdmin' => intval(kCurrentContext::$is_admin_session),
-			'kuserId' => '"' . str_replace('"', '\\"', (kCurrentContext::$uid ? kCurrentContext::$uid : kCurrentContext::$ks_uid)) . '"',
+			'kuserId' => '"' . str_replace('"', '\\"', $kuserId) . '"',
 			'duration' => $duration,
 			'success' => intval($success),
 			'errorCode' => $errorCode,
@@ -181,15 +182,23 @@ class KalturaFrontController
 				{
 					$params[$key] = $this->replaceMultiRequestResults($index, $path, $params[$key], $result);
 				}
-				elseif (preg_match('/^\{([0-9]+):result:?(.*)?\}$/', $path, $matches))
+				elseif ($path && preg_match('/^\{([0-9]+):result:?(.*)?\}$/', $path, $matches))
 				{
 					if(intval($matches[1]) == $index)
 					{
 						$attributePath = explode(':', $matches[2]);
 						$valueFromObject = $this->getValueFromObject($result, $attributePath);
 						if(!$valueFromObject)
+						{
+							//If value is null replace with empty string to avoid calling str_replace with null
+							//(in prev php versions null was translated to ''
+							if(is_null($valueFromObject))
+							{
+								$valueFromObject = '';
+							}
 							KalturaLog::debug("replaceMultiRequestResults: Empty value returned from object");
-							
+						}
+						
 						$params[$key] = str_replace($path, $valueFromObject, $params[$key]);
 					}
 				}
@@ -262,7 +271,7 @@ class KalturaFrontController
 
 		for($i = $requestStartIndex; $i <= $requestEndIndex; $i++)
 		{
-			$currentParams = $listOfRequests[$i];  
+			$currentParams = isset($listOfRequests[$i]) ? $listOfRequests[$i] : array();
 			
 			if (!isset($currentParams["service"]) || !isset($currentParams["action"]))
 				break;
@@ -381,8 +390,11 @@ class KalturaFrontController
 			return null;
 		}
 		
-		if (is_array($object) && isset($object[$currentProperty]))
+		if (is_array($object))
 		{
+			if(!isset($object[$currentProperty]))
+				return null;
+			
 			return $this->getValueFromObject($object[$currentProperty], $path);
 		}
 		
@@ -703,7 +715,9 @@ class KalturaFrontController
 		if (!is_array($map))
 			return $apiException;
 
-		$mapKey = strtolower($service).'_'.strtolower($action);
+		$serviceToLower = !is_null($service) ? strtolower($service) : "";
+		$actionToLower = !is_null($action) ? strtolower($action) : "";
+		$mapKey = $serviceToLower.'_'.$actionToLower;
 		if (!isset($map[$mapKey]))
 			return $apiException;
 
@@ -732,7 +746,7 @@ class KalturaFrontController
 			$errorStr = constant($defaultError);
 			$args = array_merge(array($errorStr), $apiException->getArgs());
 			/** @var KalturaAPIException $replacedException */
-			$replacedException = $reflectionException->newInstanceArgs($args);
+			$replacedException = $reflectionException->newInstanceArgs(array_values($args));
 			KalturaLog::debug('Replacing error code "' . $apiException->getCode() . '" with error code "' . $replacedException->getCode() . '"');
 			return $replacedException;
 		}
@@ -740,7 +754,7 @@ class KalturaFrontController
 
 	public function serialize($object, $className, $serializerType, IResponseProfile $coreResponseProfile = null)
 	{
-		if (!class_exists($className)) {
+		if (is_null($className) || !class_exists($className)) {
 			KalturaLog::err("Class [$className] was not found!");
 			return null;
 		}

@@ -81,8 +81,14 @@ class KalturaTagFilter extends KalturaFilter
 	public function toObject ($object = null, $props_to_skip = array())
 	{
 		/* @var $object TagFilter */
-		$object->set ('_eq_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagEqual));
-		$object->set ('_likex_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagStartsWith));
+		if(!is_null($this->tagEqual))
+		{
+			$object->set ('_eq_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagEqual));
+		}
+		if(!is_null($this->tagStartsWith))
+		{
+			$object->set ('_likex_tag', str_replace(kTagFlowManager::$specialCharacters, kTagFlowManager::$specialCharactersReplacement, $this->tagStartsWith));
+		}
 		
 		return parent::toObject($object, $props_to_skip);
 	}

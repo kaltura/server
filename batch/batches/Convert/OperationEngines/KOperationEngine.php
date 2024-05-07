@@ -130,7 +130,7 @@ abstract class KOperationEngine
 			else 
 				throw new KOperationEngineException("return value: [$return_value]");
 		}
-		$this->logMediaInfo($this->outFilesPath);
+		$this->logMediaInfo($this->outFilesPath[0]);
 	}
 	
 	protected function operationComplete($rc, $output) {

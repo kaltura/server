@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__) . '/kApcWrapper.php');
 require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
 
 /**
@@ -13,9 +14,7 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function doInit($config)
 	{
-		if (!function_exists('apc_fetch'))
-			return false;
-		return true;
+		return kApcWrapper::apcEnabled();
 	}
 
 	/* (non-PHPdoc)
@@ -23,7 +22,7 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function doGet($key)
 	{
-		return apc_fetch($key);
+		return kApcWrapper::apcFetch($key);
 	}
 		
 	/* (non-PHPdoc)
@@ -31,7 +30,7 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function doSet($key, $var, $expiry = 0)
 	{
-		return apc_store($key, $var, $expiry);
+		return kApcWrapper::apcStore($key, $var, $expiry);
 	}
 	
 	/* (non-PHPdoc)
@@ -39,7 +38,7 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function doAdd($key, $var, $expiry = 0)
 	{
-		return apc_add($key, $var, $expiry);
+		return kApcWrapper::apcAdd($key, $var, $expiry);
 	}
 	
 	/* (non-PHPdoc)
@@ -47,7 +46,7 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function doMultiGet($keys)
 	{
-		return apc_fetch($keys);
+		return kApcWrapper::apcMultiGet($keys);
 	}
 
 
@@ -56,7 +55,7 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function doDelete($key)
 	{
-		return apc_delete($key);
+		return kApcWrapper::apcDelete($key);
 	}
 	
 	/* (non-PHPdoc)
@@ -64,7 +63,7 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	public function doIncrement($key, $delta = 1)
 	{
-		return apc_inc($key, $delta);
+		return kApcWrapper::apcInc($key, $delta);
 	}
 	
 	/* (non-PHPdoc)
@@ -72,6 +71,6 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	public function doDecrement($key, $delta = 1)
 	{
-		return apc_dec($key, $delta);
+		return kApcWrapper::apcDec($key, $delta);
 	}
 }

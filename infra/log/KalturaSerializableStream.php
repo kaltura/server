@@ -36,7 +36,7 @@ class KalturaSerializableStream extends Zend_Log_Writer_Stream
 		return array("_filters", "_formatter", "_url", "_mode");
 	}
 
-   	public function __wakeup()
+   	public function __wakeup(): void
 	{
 		$this->initStream();
 	}

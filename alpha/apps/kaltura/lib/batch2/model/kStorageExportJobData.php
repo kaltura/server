@@ -85,7 +85,7 @@ class kStorageExportJobData extends kStorageJobData
 	}
 	
 	function calculateEstimatedEffort(BatchJob $batchJob) {
-		$fileSize = filesize($this->getSrcFileSyncLocalPath());
+		$fileSize = kFile::fileSize($this->getSrcFileSyncLocalPath());
 		if($fileSize !== False)
 			return $fileSize;
 		

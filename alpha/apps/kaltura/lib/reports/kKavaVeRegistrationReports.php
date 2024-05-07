@@ -78,7 +78,7 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',

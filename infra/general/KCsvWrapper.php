@@ -53,7 +53,7 @@ class KCsvWrapper
 
 	public static function contains($needle, $str)
 	{
-		$valArray = explode(',', $str);
+		$valArray = !is_null($str) ? explode(',', $str) : array();
 		$lowerValArray = array_map('strtolower', $valArray);
 		if(in_array($needle, $lowerValArray))
 		{

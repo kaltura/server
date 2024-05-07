@@ -457,7 +457,7 @@ class PhingFile {
      * Returns the time that the file denoted by this abstract pathname was
      * last modified.
      *
-     * @return  A integer value representing the time the file was
+     * @return int integer value representing the time the file was
      *          last modified, measured in milliseconds since the epoch
      *          (00:00:00 GMT, January 1, 1970), or 0 if the
      *          file does not exist or if an I/O error occurs

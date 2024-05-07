@@ -140,7 +140,14 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
         	}
         }
         $oldTags = $object->getColumnsOldValue(self::getClassConstValue(get_class($object->getPeer()), self::TAGS_FIELD_NAME));
+        if(is_null($oldTags)) {
+		    $oldTags = '';
+        }
+        
         $newTags = $object->getTags();
+        if(is_null($newTags)) {
+		    $newTags = '';
+        }
         $tagsForDelete = implode(',', array_diff(explode(',', $oldTags), explode(',', $newTags)));
         $tagsForUpdate = implode(',', array_diff(explode(',', $newTags), explode(',', $oldTags)));
         
@@ -213,7 +220,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
     private static function getFoundTags(array $objectTags, $partnerId, $objectClass, $privacyContexts = array())
     {
         $c = self::getTagObjectsByTagStringsCriteria($objectTags, self::getObjectTypeByClassName($objectClass), $partnerId);
-        if (count($privacyContexts))
+        if (!is_null($privacyContexts) && count($privacyContexts))
         {
             $c->addAnd(TagPeer::PRIVACY_CONTEXT, $privacyContexts, Criteria::IN);
         }
@@ -373,7 +380,8 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 */
 	protected static function getClassConstValue ($className, $constString)
 	{
-	    return constant("$className::" . strtoupper($constString));
+	    $constant = "$className::" . strtoupper($constString);
+	    return defined($constant) ? constant($constant) : null;
 	}
 	
 	/**
@@ -399,7 +407,7 @@ class kTagFlowManager implements kObjectCreatedEventConsumer, kObjectDeletedEven
 	 */
 	protected static function trimObjectTags ($tagsString)
 	{
-		$tags = explode(",", $tagsString);
+		$tags = !is_null($tagsString) ? explode(",", $tagsString) : array();
 		$tagsToReturn = array();
 		foreach($tags as $tag)
 		{

@@ -11,6 +11,8 @@ abstract class KalturaObject implements IApiObject
 	 */
 	public $relatedObjects;
 	
+	private static $purifyHtml = false;
+	
 	static protected $sourceFilesCache = array();
 	static protected $classPrivatesCache = array();
 	
@@ -197,7 +199,7 @@ abstract class KalturaObject implements IApiObject
 				}
 				
 				// check for use of parent::
-				if (strpos($fieldValue, 'parent::') !== false)
+				if (!is_null($fieldValue) && strpos($fieldValue, 'parent::') !== false)
 				{
 					KalturaLog::log("{$curGetter->class}::{$curGetter->name} uses parent");
 					$fieldValue = null;		// we have to use the getter since it uses a private property
@@ -310,12 +312,12 @@ abstract class KalturaObject implements IApiObject
 		// generate final code
 		if ($usesCustomData)
 		{
-			$result .= "\t\t\$customData = unserialize(\$srcObj->custom_data);\n";
+			$result .= "\t\t\$customData = !is_null(\$srcObj->custom_data) ? unserialize(\$srcObj->custom_data) : null;\n";
 		}
 	
 		$result .= "\t\t\$get = array(\n\t\t\t'" . implode("' => true,\n\t\t\t'", array_keys($mappingFuncCode)) . "' => true\n\t\t);";
 		$result .= '
-		if($responseProfile){
+		if($responseProfile && $responseProfile->fields){
 			$fieldsArray = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
 			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS){
 				$get = array_intersect_key($get, $fieldsArray);
@@ -333,7 +335,7 @@ abstract class KalturaObject implements IApiObject
 	
 	public function shouldGet($propertyName, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		if($responseProfile)
+		if($responseProfile && $responseProfile->fields)
 		{
 			$fields = array_flip(array_map("trim", explode(",", $responseProfile->fields)));
 			if($responseProfile->type == ResponseProfileType::INCLUDE_FIELDS)
@@ -493,7 +495,7 @@ abstract class KalturaObject implements IApiObject
 		 		$this_prop = $object_prop;
 			
 			$value = $this->$this_prop;
-			if (is_null($value)) 
+			if (is_null($value))
 				continue;
 				
 			if ($props_to_skip && is_array($props_to_skip) && in_array($this_prop, $props_to_skip)) 
@@ -699,7 +701,8 @@ abstract class KalturaObject implements IApiObject
 		if ($this->$propertyName instanceof KalturaNullField)
 			return;
 		                                          
-		if (strlen($this->$propertyName) > $maxLength)
+		$propertyLen = !is_null($this->$propertyName) ? strlen($this->$propertyName) : 0;
+		if ($propertyLen > $maxLength)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_MAX_LENGTH, $this->getFormattedPropertyNameWithClassName($propertyName), $maxLength);
 	}
 	
@@ -911,21 +914,20 @@ abstract class KalturaObject implements IApiObject
 	 */
 	protected function shouldPurify()
 	{
-		return isset($this->purifyHtml) && $this->purifyHtml;
+		return KalturaObject::$purifyHtml;
 	}
 
 	protected function disablePurify()
 	{
-		$this->purifyHtml = false;
-		unset($this->purifyHtml);
+		KalturaObject::$purifyHtml = false;
 	}
 
 	protected function enablePurify()
 	{
 		if (!isset(kCurrentContext::$HTMLPurifierBehaviour) || kCurrentContext::$HTMLPurifierBehaviour == HTMLPurifierBehaviourType::IGNORE)
-			$this->purifyHtml = false;
+			KalturaObject::$purifyHtml = false;
 		else
-			$this->purifyHtml = true;
+			KalturaObject::$purifyHtml = true;
 	}
 
 	public function __debugInfo()

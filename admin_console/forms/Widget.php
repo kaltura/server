@@ -202,9 +202,9 @@ class Form_Widget extends Infra_Form
 		$configButtons[] = $openEditorButton;
 		
 		
-		$this->getElement('conf_file')->setDescription(implode($confFileButtons, ' | '));
-		$this->getElement('conf_file_features')->setDescription(implode($confFileFeaturesButtons, ' | '));
-		$this->getElement('config')->setDescription(implode($configButtons, ' | '));
+		$this->getElement('conf_file')->setDescription(implode(' | ', $confFileButtons));
+		$this->getElement('conf_file_features')->setDescription(implode(' | ', $confFileFeaturesButtons));
+		$this->getElement('config')->setDescription(implode(' | ', $configButtons));
 	}
 	
 	public function setObjTypes($array)

@@ -52,7 +52,9 @@ $start = microtime(true);
 set_time_limit(0);
 
 // check cache before loading anything
+require_once(__DIR__ . "/../../infra/cache/kApcWrapper.php");
 require_once(__DIR__ . "/../lib/KalturaResponseCacher.php");
+
 $expiry = kConf::hasParam("v3cache_getfeed_default_expiry") ? kConf::get("v3cache_getfeed_default_expiry") : 86400;
 $cache = new KalturaResponseCacher(null, kCacheManager::CACHE_TYPE_API_V3_FEED, $expiry);
 $cache->checkOrStart();
@@ -76,9 +78,9 @@ $ks = getRequestParameter('ks');
 $state = getRequestParameter('state');
 
 $feedProcessingKey = "feedProcessing_{$feedId}_{$entryId}_{$limit}";
-if (function_exists('apc_fetch'))
+if (kApcWrapper::functionExists('fetch'))
 {
-	if (apc_fetch($feedProcessingKey))
+	if (kApcWrapper::apcFetch($feedProcessingKey))
 	{
 		KExternalErrors::dieError(KExternalErrors::PROCESSING_FEED_REQUEST);
 	}

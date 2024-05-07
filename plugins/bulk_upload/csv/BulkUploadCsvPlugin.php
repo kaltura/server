@@ -172,7 +172,10 @@ class BulkUploadCsvPlugin extends KalturaPlugin implements IKalturaBulkUpload, I
 	            $values[] = $bulkUploadResult->getStatus();
 				$values[] = $bulkUploadResult->getObjectId();
 				$values[] = $bulkUploadResult->getObjectStatus();
-				$values[] = preg_replace('/[\n\r\t]/', ' ', $bulkUploadResult->getErrorDescription());
+				if($bulkUploadResult->getErrorDescription())
+				{
+					$values[] = preg_replace('/[\n\r\t]/', ' ', $bulkUploadResult->getErrorDescription());
+				}
 
 
 				KCsvWrapper::sanitizedFputCsv($STDOUT, $values);

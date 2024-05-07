@@ -5,6 +5,7 @@
  */
 
 require_once(dirname(__FILE__) . '/shared_file_system_managers/kSharedFileSystemMgr.php');
+require_once(dirname(__FILE__) . '/../cache/kApcWrapper.php');
 
 class kFile extends kFileBase
 {
@@ -507,10 +508,10 @@ class kFile extends kFileBase
 
 	public static function cacheRedirect($url)
 	{
-		if (function_exists('apc_store'))
+		if (kApcWrapper::functionExists('store'))
 		{
 			$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? "https" : "http";
-			apc_store("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
+			kApcWrapper::apcStore("redirect-".$protocol.$_SERVER["REQUEST_URI"], $url, 60);
 		}
 	}
 	
@@ -543,7 +544,7 @@ class kFile extends kFileBase
 	{
 		$mediaInfoParser = new KMediaInfoMediaParser($path);
 		$mediaInfo = $mediaInfoParser->getMediaInfo();
-		return $mediaInfo->containerFormat;
+		return $mediaInfo ? $mediaInfo->containerFormat : null;
 	}
 
 	/**

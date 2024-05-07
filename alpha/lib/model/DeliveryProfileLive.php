@@ -382,7 +382,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 
 		$livePackagerUrl .= $serverNode->getExplicitLiveUrl($livePackagerUrl, $entry);
 		$livePackagerUrl .= $serverNode->getSessionType($entryServerNode);
-		$livePackagerUrl .= $serverNode->getAdditionalUrlParam($entry);
+		$livePackagerUrl .= $serverNode->getAdditionalUrlParam($entry, $entryServerNode);
 		$secureToken = $this->generateLiveSecuredPackagerToken($livePackagerUrl);
 		$livePackagerUrl .= "t/$secureToken/";
 

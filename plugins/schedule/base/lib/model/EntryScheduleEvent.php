@@ -62,7 +62,9 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 	
 	public function getCategoryIdsForIndex()
 	{
-		$allCategories = categoryPeer::retrieveByPKs(explode(',', $this->getCategoryIds()));
+		$allCategories = !is_null($this->getCategoryIds()) ?
+			categoryPeer::retrieveByPKs(explode(',', $this->getCategoryIds())) :
+			array();
 		
 		$index = array();
 		foreach($allCategories as $category)

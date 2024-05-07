@@ -32,7 +32,7 @@
 					<?php if ($user->email == $this->myEmail) { $titles[] = $this->translate('you'); }; ?>
 					<?php if ($user->isAccountOwner) { $titles[] = $this->translate('primary'); }; ?>
 					<?php if (count($titles)): ?>
-						(<?php echo implode($titles, ', '); ?>)
+						(<?php echo implode(', ', $titles); ?>)
 					<?php endif; ?>
 				</td>
 				<td><?php echo $user->roleNames; // .' ('.$user->roleIds.')' ?></td>

@@ -37,7 +37,7 @@ class KalturaAPIException extends Exception
 		return array('code', 'message', 'args', 'codeStr');
 	}
 	
-	public function __wakeup()
+	public function __wakeup(): void
 	{
 		//When running on PHP7 the code string does not get un-serialized
 		//(This is probably due to the fact that the Exception base class has a code attribute which is of type int)

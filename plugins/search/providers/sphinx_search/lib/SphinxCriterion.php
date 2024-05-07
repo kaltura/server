@@ -379,7 +379,7 @@ class SphinxCriterion extends KalturaCriterion implements IKalturaIndexQuery
 					{
 						foreach($value as $index => $arrVal)
 						{
-							if($arrVal < 0)
+							if(is_numeric($arrVal) && $arrVal < 0)
 								$value[$index] = self::MAX_UINT_VAL + $arrVal;
 						}
 					}
