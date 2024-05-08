@@ -185,7 +185,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		if (trim($this->systemName) && !$this->isNull('systemName'))
 		{
 			$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($this->systemName, $id);
-			if (count($systemNameTemplates))
+			if ($systemNameTemplates)
 				throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME, $this->systemName);
 		}
 	}
