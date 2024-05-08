@@ -1036,7 +1036,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	}
 	
 	
-	public function getDownloadPathForFormat ( $version = NULL , $format  )
+	public function getDownloadPathForFormat ($format, $version = NULL)
 	{
 		// used by ppt-convert flow (downloadPath in addDownload response)
 		// and perhaps by other clients as name
@@ -3441,9 +3441,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->setConversionProfileId($template->getConversionProfileId());
 	}
 	
-	public function copyTemplate($copyPartnerId = false, $template)
+	public function copyTemplate($template, $copyPartnerId = false)
 	{
-		
 		if (!$template)
 			return null;
 		/* entry $template */
