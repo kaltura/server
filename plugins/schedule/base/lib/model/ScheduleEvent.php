@@ -190,7 +190,7 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	public function addAnotherLinkedBy($v)
 	{
 		$linkedByArray = !is_null($this->getLinkedBy()) ?
-			explode(',', $this->getLinkedBy()) : array();   
+			explode(',', $this->getLinkedBy()) : array();
 		
 		if (!in_array($v, $linkedByArray))
 		{
