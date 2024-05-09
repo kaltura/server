@@ -2780,7 +2780,7 @@ class kKavaReportsMgr extends kKavaBase
 			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 		}
 
-		return array_map('reset', $rows);
+		return array_map(function($v) { return reset($v); }, $rows);
 	}
 
 	protected static function getEntryKuserDimension($data_source)
@@ -2886,7 +2886,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		foreach ($field_dim_map as $field => $field_filter_def)
 		{
-			$value = $input_filter->$field;
+			$value = property_exists($input_filter, $field) ? $input_filter->$field : null;
 			if (is_null($value) || trim($value) === "")
 			{
 				continue;
@@ -6940,7 +6940,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			if (!isset($cur_report_def[self::REPORT_DIMENSION]))
 			{
-				$cur_report_def[self::REPORT_DIMENSION] = $report_def[self::REPORT_DIMENSION];
+				$cur_report_def[self::REPORT_DIMENSION] = isset($report_def[self::REPORT_DIMENSION]) ? $report_def[self::REPORT_DIMENSION] : null;
 			}
 			$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
 
@@ -6969,7 +6969,7 @@ class kKavaReportsMgr extends kKavaBase
 				(!isset($report_def[self::REPORT_DIMENSION]) && isset($report_def[self::REPORT_GRAPH_METRICS]))))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids, $response_options);
-			$result = array(array_keys($result), array_map('reset', array_values($result)));
+			$result = array(array_keys($result), array_map(function($v) { return reset($v); }, array_values($result)));
 		}
 		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{

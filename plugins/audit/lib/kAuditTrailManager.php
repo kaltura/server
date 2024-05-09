@@ -227,7 +227,8 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			
 		if(!method_exists($object, 'getPeer') || !method_exists($object, 'getId'))
 			return null;
-			
+		
+		$objectType = null;
 		$peer = $object->getPeer();
 		try
 		{

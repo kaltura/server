@@ -816,7 +816,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	protected function isAdminTagLimited(LiveEntry $entry, $limitedAdminTags)
 	{
-		return count(array_intersect(explode(',', $entry->getAdminTags()), $limitedAdminTags)) !== 0;
+		$adminTagsArray = !is_null($entry->getAdminTags()) ? explode(',', $entry->getAdminTags()) : array();
+		return count(array_intersect($adminTagsArray, $limitedAdminTags)) !== 0;
 	}
 
 

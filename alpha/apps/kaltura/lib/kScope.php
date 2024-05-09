@@ -99,7 +99,7 @@ class kScope
 	 */
 	public function getReferrer()
 	{
-		return $this->referrer;
+		return strval($this->referrer);
 	}
 	
 	/**
