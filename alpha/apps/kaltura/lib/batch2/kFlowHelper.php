@@ -3659,7 +3659,7 @@ class kFlowHelper
 		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		
-		if (self::shouldKeepSourceFlavor($sourceFlavor, $nonSourceFlavors))
+		if (self::shouldKeepSourceFlavor($sourceFlavor, !is_null($nonSourceFlavors) ? $nonSourceFlavors : array()))
 		{
 			return;
 		}
