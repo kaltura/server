@@ -456,7 +456,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getTags()
 	{
 		$tags = parent::getTags();
-		return !is_null($tags) ? tags : '';
+		return !is_null($tags) ? $tags : '';
 	}
 	
 	public function getDefaultFieldValue($fieldName)
