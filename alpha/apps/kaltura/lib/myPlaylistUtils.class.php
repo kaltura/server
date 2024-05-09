@@ -1333,7 +1333,7 @@ HTML;
     	                $getter = "get".$tokenPart;
     	                if (is_null($replaceValue) || !method_exists($replaceValue, $getter))
     	                {
-    	                	KalturaLog::err("Method [$getter] not found on class [" . $replaceValue ? get_class($replaceValue) : "NULL" . "] for token [$property]");
+    	                	KalturaLog::err("Method [$getter] not found on class [" . ($replaceValue ? get_class($replaceValue) : "NULL") . "] for token [$property]");
     	                	$replaceValue = null;
     	                	break;
     	                }
