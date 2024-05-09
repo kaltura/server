@@ -57,6 +57,9 @@ class QuizService extends KalturaBaseService
 	public function updateAction( $entryId, KalturaQuiz $quiz )
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
+		if (!$dbEntry)
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		
 		$kQuiz = QuizPlugin::validateAndGetQuiz( $dbEntry );
 		return $this->validateAndUpdateQuizData( $dbEntry, $quiz, $kQuiz->getVersion(), $kQuiz );
 	}
