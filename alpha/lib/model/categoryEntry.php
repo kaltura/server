@@ -459,6 +459,6 @@ class categoryEntry extends BasecategoryEntry implements IRelatedObject
 	public function getPrivacyContext()
 	{
 		$privacyContext = parent::getPrivacyContext();
-		return is_null($privacyContext) ? '' : $this->privacy_context;
+		return is_null($privacyContext) ? '' : $privacyContext;
 	}
 } // categoryEntry
