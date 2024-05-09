@@ -9,8 +9,8 @@ class kDrmPartnerSetup
 		$c->add ( DrmPolicyPeer::PARTNER_ID, $partnerId );
 		$c->add ( DrmPolicyPeer::STATUS, DrmPolicyStatus::ACTIVE);
 		$c->add ( DrmPolicyPeer::PROVIDER, DrmProviderType::CENC);
-		$policies = DrmPolicyPeer::doSelectOne($c);
-		if(!count($policies))
+		$policy = DrmPolicyPeer::doSelectOne($c);
+		if(!$policy)
 		{
 			KalturaLog::info("DRM setup for partner ".$partnerId);
 			list ($defaultPolicy) = self::createPartnerPolicies($partnerId);
