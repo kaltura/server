@@ -256,7 +256,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			if ((strlen($loginData->getFirstName()) > 2 && (stripos($newPassword, $loginData->getFirstName())) !== false) ||
 				(strlen($loginData->getLastName()) > 2 && (stripos($newPassword, $loginData->getLastName())) !== false) ||
-				(stripos($newPassword, $loginData->getFullName()) !== false) ||
+				(kString::kStripos($newPassword, $loginData->getFullName()) !== false) ||
 				($newPassword == $loginData->getLoginEmail()))
 			{
 				throw new kUserException('Can\'t contain your name or email', kUserException::PASSWORD_STRUCTURE_INVALID);
