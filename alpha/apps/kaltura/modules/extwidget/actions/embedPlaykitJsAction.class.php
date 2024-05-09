@@ -259,7 +259,7 @@ class embedPlaykitJsAction extends sfAction
 			return;
 		}
 		
-		if(!$uiConf->plugins)
+		if(!property_exists($uiConf, 'plugins'))
 		{
 			$uiConf->plugins = new stdClass();
 		}
