@@ -150,13 +150,13 @@ class DbManager
 	/**
 	 * @return KalturaPDO
 	 */
-	public static function createSphinxConnection($sphinxServer, $port = 9312)
+	public static function createSphinxConnection($sphinxServer, $port = 9312, $userName = null, $password = null, $driver_options = array(), $config_key = null)
 	{
 		$dsn = "mysql:host=$sphinxServer;port=$port;";
 		
 		try
 		{
-			$con = new KalturaPDO($dsn);
+			$con = new KalturaPDO($dsn, $userName, $password, $driver_options, $config_key);
 			$con->setCommentsEnabled(false);
 			return $con;
 		}
@@ -373,12 +373,15 @@ class DbManager
 
 	private static function getSphinxConnectionInternal($key, $connectTimeout, $indexName)
 	{
-		if(!isset(self::$config['datasources'][$key]['connection']['dsn']))
+		$conparams = self::$config['datasources'][$key]['connection'];
+		if(!isset($conparams['dsn']))
 			throw new Exception("DB Config [$key] not found");
-
-		$dataSource = self::$config['datasources'][$key]['connection']['dsn'];
+		
+		$dataSource = $conparams['dsn'];
+		$user = isset($conparams['user']) ? $conparams['user'] : null;
+		$password = isset($conparams['password']) ? $conparams['password'] : null;
 		self::$sphinxConnection[$indexName] =
-			new KalturaPDO($dataSource, null, null, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key), $key);
+			new KalturaPDO($dataSource, $user, $password, array(PDO::ATTR_TIMEOUT => $connectTimeout, KalturaPDO::KALTURA_ATTR_NAME => $key), $key);
 		self::$sphinxConnection[$indexName]->setCommentsEnabled(false);
 		
 		return self::$sphinxConnection[$indexName];
