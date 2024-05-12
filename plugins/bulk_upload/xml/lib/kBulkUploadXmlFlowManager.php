@@ -27,7 +27,7 @@ class kBulkUploadXmlFlowManager implements kBatchJobStatusEventConsumer
 		
 		$transformedXml = kXml::transformXmlUsingXslt($mediaInfoRawData, $mediaInfoXslt, array("entryId" => $dbBatchJob->getEntryId()));
 		$xml = new KDOMDocument();
-		if(!$xml->loadXML($transformedXml))
+		if(is_null($transformedXml) || !$xml->loadXML($transformedXml))
 		{
 			KalturaLog::err("Could not load xml string");
 			return true;

@@ -12,7 +12,7 @@ class KalturaDataEntry extends KalturaBaseEntry
 	 */
 	public $dataContent;
 	
-	/**
+	/**typeEr
 	 * indicator whether to return the object for get action with the dataContent field.
 	 * @insertonly
 	 * @var bool
