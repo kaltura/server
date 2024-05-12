@@ -45,7 +45,7 @@ class kXml
 		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt', 'myXmlUtils::kGmdate', 'myXmlUtils::kDate');
 	}
 	
-	public static function transformSafePhpFunction()
+	public static function transformSafePhpFunction($xslt)
 	{
 		$xslt = str_replace("'gmdate'", "'myXmlUtils::kGmdate'", $xslt);
 		return str_replace("'date'", "'myXmlUtils::kDate'", $xslt);
