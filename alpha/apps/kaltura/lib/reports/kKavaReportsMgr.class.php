@@ -657,7 +657,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_REACTION_CLICKED_PARTICIPATION => true,
 		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => true,
 		self::METRIC_PRIVATE_CHAT_PARTICIPATION => true,
-
 	);
 
 	protected static $multi_value_dimensions = array(
