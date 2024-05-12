@@ -42,7 +42,13 @@ class kXml
 {
 	public static function getXslEnabledPhpFunctions()
 	{
-		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt');
+		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt', 'myXmlUtils::kGmdate', 'myXmlUtils::kDate');
+	}
+	
+	public static function transformSafePhpFunction($xslt)
+	{
+		$xslt = str_replace("'gmdate'", "'myXmlUtils::kGmdate'", $xslt);
+		return str_replace("'date'", "'myXmlUtils::kDate'", $xslt);
 	}
 	
 	//check if the prop's value is valid for xml encoding.
@@ -341,7 +347,6 @@ class kXml
 	 */
 	public static function transformXmlUsingXslt($xmlStr, $xslt, $xsltParams = array(), &$xsltErrors = array())
 	{
-					
 		$xml = new KDOMDocument();
 		if(!$xml->loadXML($xmlStr))
 		{
@@ -349,6 +354,7 @@ class kXml
 			return null;
 		}
 		
+		$xslt = kXml::transformSafePhpFunction($xslt);
 		$xsl = new KDOMDocument();
 		if(!$xsl->loadXML($xslt))
 		{
