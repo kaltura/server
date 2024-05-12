@@ -246,7 +246,7 @@
         </xsl:element>
         <xsl:element name="dates">
             <xsl:variable name="sunrise" select="item/distribution/sunrise"/>
-            <xsl:variable name="sunriseFormatted" select="php:function('date' ,string($CONST_TVM_DATE_FORMAT),number($sunrise))"/>
+            <xsl:variable name="sunriseFormatted" select="php:function('date' ,string($CONST_TVM_DATE_FORMAT),string($sunrise))"/>
             <xsl:element name="catalog_start">
                 <xsl:value-of select="$sunriseFormatted"/>
             </xsl:element>
@@ -263,7 +263,7 @@
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
-            <xsl:variable name="sunsetFormatted" select="php:function('date', string($CONST_TVM_DATE_FORMAT), number($sunset))"/>
+            <xsl:variable name="sunsetFormatted" select="php:function('date', string($CONST_TVM_DATE_FORMAT), string($sunset))"/>
             <xsl:element name="catalog_end">
                 <xsl:value-of select="$sunsetFormatted"/>
             </xsl:element>

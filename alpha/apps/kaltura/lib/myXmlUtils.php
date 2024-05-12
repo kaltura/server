@@ -63,6 +63,7 @@ class myXmlUtils
 	
 	public static function kGmdate (string $format, $timestamp = null)
 	{
+		KalturaLog::debug("TTT: kGmdate format [$format] [$timestamp]");
 		if(!is_null($timestamp))
 		{
 			$timestamp = intval($timestamp);
@@ -72,6 +73,7 @@ class myXmlUtils
 	
 	public static function kDate (string $format, $timestamp = null)
 	{
+		KalturaLog::debug("TTT: kDate format [$format] [$timestamp]");
 		if(!is_null($timestamp))
 		{
 			$timestamp = intval($timestamp);
