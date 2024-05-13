@@ -39,7 +39,6 @@
 		 */
 		public function __construct(KChunkedEncodeSetup $setup, $name=null)
 		{
-			$this->chunker = new KChunkedEncode($setup);
 			KalturaLog::log(date("Y-m-d H:i:s"));
 			KalturaLog::log("sessionData:".print_r($this,1));
 			

@@ -163,7 +163,8 @@ $this->chunkDuration = self::calculateChunkDuration($params->height);
 			KalturaLog::log("duration:$duration,frames:$frames");
 /**/
 			$outputArr = array();
-			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -vsync 1 -f matroska -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
+				// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -vsync cfr -f matroska -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pts_time,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
 			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -177,7 +178,8 @@ $this->chunkDuration = self::calculateChunkDuration($params->height);
 			else {
 				$startFrom = $duration-4;
 			}
-			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -vsync 1 -f matroska -y -v quiet - | $ffprobeBin -f matroska -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail -n20";
+				// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -vsync cfr -f matroska -y -v quiet - | $ffprobeBin -f matroska -select_streams v -show_frames -show_entries frame=coded_picture_number,pts_time,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail -n20";
 			KalturaLog::log("tail:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -234,7 +236,8 @@ $this->chunkDuration = self::calculateChunkDuration($params->height);
 			KalturaLog::log("duration:$duration,frames:$frames");
 /**/
 			$outputArr = array();
-			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
+				// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+			$cmdLine = "$ffmpegBin -t 1 -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync cfr -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pts_time,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | (head -n1)";
 			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -248,7 +251,8 @@ $this->chunkDuration = self::calculateChunkDuration($params->height);
 			else {
 				$startFrom = $duration-4;
 			}
-			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail -n20";
+				// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+			$cmdLine = "$ffmpegBin -ss $startFrom -i $chunkFileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync cfr -f mpegts -y -v quiet - | $ffprobeBin -f mpegts -select_streams v -show_frames -show_entries frame=coded_picture_number,pts_time,pkt_pts_time,pict_type,pkt_size -print_format csv -v quiet - | tail -n20";
 			KalturaLog::log("tail:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -266,7 +270,7 @@ $this->chunkDuration = self::calculateChunkDuration($params->height);
 			}
 			KalturaLog::log("trimmed:output:\n".print_r($outputArr,1));
 			
-			$outputLine = array_shift($outputArr);
+			$outputLine = reset($outputArr);
 			list($stam,$pts,$size,$type,$frame) = explode(",",$outputLine);
 			$this->start = $pts;
 			$this->size = $size;
@@ -288,7 +292,8 @@ $this->chunkDuration = self::calculateChunkDuration($params->height);
 		public static function getFrameData($fileName, $startFrom, $duration, $ffprobeBin="ffprobe", $ffmpegBin="ffmpeg")
 		{
 			$outputArr = array();
-			$cmdLine = "$ffmpegBin -ss $startFrom -t $duration -i $fileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync 1 -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pkt_pts_time,pict_type -print_format csv -v quiet - ";
+				// added 'pts_time'. it is FFM6 equivalent to 'pkt_pts_time'. the old remains for backward compatability
+			$cmdLine = "$ffmpegBin -ss $startFrom -t $duration -i $fileName -c:v copy -an -copyts -mpegts_copyts 1 -vsync cfr -f mpegts -y -v quiet - | $ffprobeBin -select_streams v -show_frames -show_entries frame=coded_picture_number,pts_time,pkt_pts_time,pict_type -print_format csv -v quiet - ";
 			KalturaLog::log("head:$cmdLine");
 			$lastLine=exec($cmdLine , $outputArr, $rv);
 			if($rv!=0) {
@@ -468,5 +473,55 @@ KalturaLog::log("logLinesBuffer - fileSize($flSz), startFrom($startFrom), loaded
 		{
 			return ("chunks($this->num),lasted:$this->lasted"."s,accum(elapsed:$this->elapsedCpu,user:$this->userCpu,system:$this->systemCpu),concurrency:$this->concurrency(max:$this->concurrencyMax,".$this->concurrencyMaxTime."s,idle:$this->concurrencyIdleTime"."s)");
 		}
+	}
+
+	/* ---------------------------
+	 * ExecuteChunkedEncodeSession
+	 */
+	function ExecuteChunkedEncodeSession($host, $port, $token, $setup, $sessionName, $chunker=null)
+	{
+		KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$setup->concurrent, concurrentMin:$setup->concurrentMin, sessionName:$sessionName, cmdLine:$setup->cmdLine, sharedChunkPath:$setup->sharedChunkPath");
+		$storeManager = new KChunkedEncodeMemcacheWrap($token, $host, $port);
+		$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName, $chunker);
+
+		$rv = $session->ExecuteSession();
+		return $rv;
+	}
+
+	/* ---------------------------
+	 * BuildExecuteChunkedEncodeSessionCmdLine
+	 */
+	function BuildExecuteChunkedEncodeSessionCmdLine($host, $port, $token, $setup, $sessionName,
+				$chunkerClassName="KChunkedEncode",
+				$executeSessionFuncName="ExecuteChunkedEncodeSession")
+	{
+		$cmdLine = 'require_once "/opt/kaltura/app/batch/bootstrap.php";'.PHP_EOL;
+///// DEBUG ONLY !!!!
+//		$cmdLine.= '
+//	$TEST_FOLDER="/web/content/shared/tmp/qualityTest/TestBench.11";
+//	require_once $TEST_FOLDER."/KChunkedEncodeUtils.php";
+//	require_once $TEST_FOLDER."/KChunkedEncode.php";
+//	require_once $TEST_FOLDER."/KBaseChunkedEncodeSessionManager.php";
+//	require_once $TEST_FOLDER."/KChunkedEncodeSessionManager.php";
+//	require_once $TEST_FOLDER."/KChunkedEncodeMemcacheWrap.php";
+//	require_once $TEST_FOLDER."/KCaeMLChunkedEncode.php";'.PHP_EOL;
+/////////////////////
+		$setup->host = $host;
+		$setup->port = $port;
+		$setup->token = $token;
+		$setup->sessionName = $sessionName;
+
+		$setup->cmd = str_replace("'", "", $setup->cmd);
+		$setupStr=htmlspecialchars(serialize($setup), ENT_QUOTES, 'UTF-8');
+
+		$cmdLine.= "\$setupStr=htmlspecialchars_decode(\"$setupStr\");".PHP_EOL;
+		$cmdLine.= "\$setup=unserialize(\$setupStr);".PHP_EOL;
+		$cmdLine.= "\$chunker=new $chunkerClassName(\$setup);".PHP_EOL;
+		$cmdLine.= "\$rv=$executeSessionFuncName(\$setup->host,11211,\$setup->token,\$setup,\$setup->sessionName, \$chunker);".PHP_EOL;
+		$cmdLine.= 'if($rv==false) exit(1);';
+
+		$cmdLine = "php -r '$cmdLine';";
+		KalturaLog::log($cmdLine);
+		return $cmdLine;
 	}
 

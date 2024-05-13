@@ -99,7 +99,17 @@ class KDLWrap
 			self::ConvertMediainfoCdl2Mediadataset($cdlMediaInfo, $mediaSet);
 		}
 		KalturaLog::log( "...S-->".$mediaSet->ToString());
-		
+####################
+####################
+# DEBUG
+#$medInfSer=serialize($cdlMediaInfo); 
+#$flvSer=serialize($cdlFlavorList);
+#$filePath = "/tmp/mediaInfo".$cdlMediaInfo->getFlavorAssetId().".ser";
+#if(!file_exists($filePath)) file_put_contents($filePath,$medInfSer);
+#$filePath = "/tmp/flv".$cdlFlavorList[0]->getId().".ser";
+#if(!file_exists($filePath)) file_put_contents($filePath,$flvSer);
+####################		
+####################
 		$profile = new KDLProfile();
 			/*
 			 * TEMPORARY - Look for WV cases in order to disable duplicate GOP generation. After a while this will be the default behaviour  
@@ -113,14 +123,24 @@ class KDLWrap
 				$this->_rv = false;
 				return $this;
 			}
-			
+				// set a flag for WV specific generation - 
+				// if there is at least one WV flv in the conv-prof,
+				// all the other 'regular' flvs need to be adjsuted for WV generation
 			if(isset($kdlFlavor->_video) && preg_match('/widevine/', strtolower($kdlFlavor->_tags), $matches)){
 				$isForWideVine = true;
 			}
+				// set a flag for the Generic source generation -
+				// vid/aud streams mapping, adjusted per source features
+			if (($cdlFlavor->getId()==kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID 
+				|| $cdlFlavor->getId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
+				&& !is_null($cdlMediaInfo))
+				$kdlFlavor->_forGenericSource = true;
+
 			$profile->_flavors[] = $kdlFlavor;
 			KalturaLog::log( "...F-->".$kdlFlavor->ToString());
 		}
 
+			// adjust flvs for WV generation 
 		if($isForWideVine==true) {
 			foreach($profile->_flavors as $k=>$kdlFlavor) {
 				if(isset($profile->_flavors[$k]->_video))
@@ -181,14 +201,18 @@ class KDLWrap
 
 			$cdlFlvrOut = self::ConvertFlavorKdl2Cdl($trg);
 
-
 			// Handle audio streams for ffmpeg command in case we are handling trimming a source with flavor_params -1
 			// in case we need to handle multiple audio streams we need to remove the "-map_metadata -1" command
 			// and replace it with the language mapping for the correct audio streams
 			// if only audio streams exist without video we ignore the video mapping
 			if (($cdlFlvrOut->getFlavorParamsId() == kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID || $cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID)
 				&& !is_null($cdlMediaInfo))
-			{
+/* ================
+   ================
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+*/
+if(KFFmpegToPartnerMatch::getVersion()==4)			{
 				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
 				$command = null;
 				if ($contentStreams != null && isset($contentStreams['audio']) && count($contentStreams['audio']) > 1)
@@ -230,9 +254,49 @@ class KDLWrap
 				}
 				$cdlFlvrOut->setCommandLines($cmdLines);
 			}
+
+else
+/* ================
+   ================
+*/
+			{
+				$contentStreams = json_decode($cdlMediaInfo->getContentStreams(), true);
+				$audioLingualSetting = null;
+				if ($contentStreams!=null && isset($contentStreams['audio']) 
+					&& count($contentStreams['audio'])>1)
+				{
+					$streamIdx=0;
+					foreach ($contentStreams['audio'] as $audioStream)
+					{
+						if (isset($audioStream['id']) && isset($audioStream['audioLanguage']))
+							$audioLingualSetting .= "-metadata:s:a:$streamIdx language={$audioStream['audioLanguage']} ";
+							$streamIdx++;
+					}
+				}
+				$cmdLines = $cdlFlvrOut->getCommandLines();
+				foreach ($cmdLines as $key => $cmdLine)
+				{
+					if (($key==conversionEngineType::FFMPEG || $key==conversionEngineType::FFMPEG_AUX) 
+						&& $audioLingualSetting!=null)
+					{
+						/***
+						 * assetParamsPeer::TEMP_FLAVOR_PARAM_ID (-2 ) is a temporary flvor param id of type mpegts
+						 * we created it for clip \ concat flow only and we do not save it to the DB
+						 * in this flavor we do not have the -map_metadata -1(as it is added in KDLOperatorFfmpeg2_1_3).
+						 * the lingual settings are added according to the source aud strams layout.
+						 */
+						if ($cdlFlvrOut->getFlavorParamsId() === assetParamsPeer::TEMP_FLAVOR_PARAM_ID) {
+							$cmdLines[$key] = str_replace('-f mpegts', $audioLingualSetting.' -f mpegts', $cmdLine);
+						}
+						else {
+							$cmdLines[$key] = str_replace('-map_metadata -1', $audioLingualSetting, $cmdLine);
+						}
+					}
+				}
+				$cdlFlvrOut->setCommandLines($cmdLines);
+			}
 			$this->_targetList[] = $cdlFlvrOut;
 		}
-
 
 		return $this;
 	}

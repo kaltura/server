@@ -32,6 +32,7 @@ class KDLOperatorFfmpeg2_7_2 extends KDLOperatorFfmpeg2_2 {
 			$cmdStr = str_replace(" -y ", $str, $cmdStr);
 			KalturaLog::log("On Encryption: $cmdStr");
 		}
+
 		return $cmdStr;
 	}
 		
@@ -199,7 +200,6 @@ $rotation = null;
 		$target->_isEncrypted = $isEncrypted;
 		return $rv;
 	}
-	
 }
 
 	/**
@@ -223,21 +223,6 @@ class KDLOperatorFfmpeg4_4 extends KDLOperatorFfmpeg2_7_2 {
 		}
 		
 		return $vidCodecSpecStr;
-	}	
+	}
 }
-
-	/**
-	 * 
-	 * KDLOperatorFfmpegMain
-	 *
-	 */
-class KDLOperatorFfmpegMain extends KDLOperatorFfmpeg4_4 {}
-
-	/**
-	 * 
-	 * KDLOperatorFfmpegAux
-	 *
-	 */
-class KDLOperatorFfmpegAux extends KDLOperatorFfmpeg4_4 {}
-
 
