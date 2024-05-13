@@ -5,6 +5,19 @@
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2024_03_24_user_replaceUserLoginData_permissions.php
 
+## Load trimmed captions to file in case upload by string resource not succeed ##
+- Issue Type: Bug
+- Issue ID: SUP-41695
+### Configuration ###
+Add the following to batch.ini under KAsyncCopyCaptions worker
+
+```
+[KAsyncCopyCaptions : JobHandlerWorker]
+id													= @WORKER_ID@
+...
+params.localTempPath                                = @TMP_DIR@/copycaptions
+```
+
 # Tucana-20.10.0
 ## PHP8 support  ##
 - Issue Type: Epic
