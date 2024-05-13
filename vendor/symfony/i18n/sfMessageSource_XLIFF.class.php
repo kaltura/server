@@ -304,7 +304,8 @@ class sfMessageSource_XLIFF extends sfMessageSource
     }
 
     // create a new dom, import the existing xml
-    $dom = DOMDocument::load($filename);
+    $dom = new DOMDocument();
+    $dom->load($filename);
 
     // find the body element
     $xpath = new DomXPath($dom);
@@ -372,7 +373,8 @@ class sfMessageSource_XLIFF extends sfMessageSource
     }
 
     // create a new dom, import the existing xml
-    $dom = DOMDocument::load($filename);
+    $dom = new DOMDocument();
+    $dom->load($filename);
 
     // find the body element
     $xpath = new DomXPath($dom);

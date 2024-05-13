@@ -227,7 +227,8 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 			
 		if(!method_exists($object, 'getPeer') || !method_exists($object, 'getId'))
 			return null;
-			
+		
+		$objectType = null;
 		$peer = $object->getPeer();
 		try
 		{
@@ -235,7 +236,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[$objectType] " . $e->getMessage());
+			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[" . $objectType ? $objectType : "UNDEFINED" . "] " . $e->getMessage());
 			$auditTrail = null;
 			return null;
 		}

@@ -158,10 +158,10 @@ class KalturaFileAsset extends KalturaObject implements IRelatedFilterable
 		switch($this->fileAssetObjectType)
 		{
 			case KalturaFileAssetObjectType::UI_CONF:
-				$peerType = uiConfPeer;
+				$peerType = "uiConfPeer";
 				break;
 			case KalturaFileAssetObjectType::ENTRY:
-				$peerType = entryPeer;
+				$peerType = "entryPeer";
 				break;
 		}
 		if($peerType) {

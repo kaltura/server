@@ -1693,7 +1693,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $newEntry->getPartnerId());
 
  		if (!$copyMetaData)
-		    $newEntry->copyMetaData = false;
+		    $newEntry->setCopyMetadata(false);
 
 		$newEntry->setSourceType(self::getCloneSourceType($entry->getSourceType()),true);
 		$newEntry->setConversionProfileId(self::getCloneConversionProfile($entry->getSourceType(),$toPartner,$entry));

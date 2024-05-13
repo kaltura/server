@@ -88,7 +88,7 @@ class KalturaLog
 	{
 		self::initLog();
 		if(!$message instanceof Exception)
-			$message = new Exception($message);
+			$message = new Exception(strval($message));
 			
 		self::$_logger->log($message, self::ERR);
 	}	
@@ -122,6 +122,7 @@ class KalturaLog
 		$message = '';
 		foreach ($data as $value)
 		{
+			$value = $value ? $value : '';
 			$message .= strtr($value, ',', ' ') . ',';
 		}
 		$message = substr($message, 0, -1);

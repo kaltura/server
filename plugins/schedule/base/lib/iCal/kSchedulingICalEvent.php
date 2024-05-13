@@ -219,7 +219,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	            if (in_array($event->recurrence->timeZone, $timeZones))
 	            {
 	                $timeZoneId = $event->recurrence->timeZone;
-	                $object->setField(self::$timeZoneField, $timeZoneId);
 	            }
 	        }
 	
@@ -227,7 +226,15 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	        {
 	            if ($event->$date)
 	            {
-	                $object->setField($field, kSchedulingICal::formatDate($event->$date, $timeZoneId));
+                    	if ($timeZoneId)
+                    	{
+                        	$fieldToUpperCase = $field . kSchedulingICalComponent::getFieldSemiColonDelimiter() . self::$timeZoneField . "=" ;
+                        	$object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $timeZoneId), $timeZoneId);                    
+			}
+                    	else
+                    	{
+                        	$object->setField($field, kSchedulingICal::formatDate($event->$date));
+                    	}
 	            }
 	        }
 

@@ -353,7 +353,7 @@ class KalturaFileSync extends KalturaObject implements IFilterable
 			if($this->shouldGet('fileContent', $responseProfile))
 			{
 				$content = kFileSyncUtils::getLocalContentsByFileSync($source_object, false, null, 0, 1024);
-				if(ctype_print($content) || ctype_cntrl($content))
+				if($content && (ctype_print($content) || ctype_cntrl($content)))
 					$this->fileContent = $content;
 			}
 		}

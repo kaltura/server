@@ -4,7 +4,10 @@
 class kReplacementHelper
 {
 	const KLOCK_REPLACE_ENTRY_GRAB_TIMEOUT = 5;
-	const KLOCK_REPLACE_ENTRY_HOLD_TIMEOUT = 0.5;
+	
+	//PHP8 - Lock method uses memcache to grab the lock which receives int value as the expiry,
+	//passing float will cause:  got error from memcache [8192] [Implicit conversion from float 0.5 to int loses precision]
+	const KLOCK_REPLACE_ENTRY_HOLD_TIMEOUT = 1;
 
 	/**
 	 * creates a mapping between the new replacing entry assets paramsId and their type to the asset itself

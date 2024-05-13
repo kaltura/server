@@ -89,10 +89,10 @@ class kHtmlPurifier
 	public static function initHTMLPurifier()
 	{
 		$cacheKey = null;
-		if ( function_exists('apc_fetch') && function_exists('apc_store') )
+		if (kApcWrapper::apcEnabled())
 		{
 			$cacheKey = 'kHtmlPurifierPurifier-' . kConf::getCachedVersionId();
-			self::$purifier = apc_fetch($cacheKey);
+			self::$purifier = kApcWrapper::apcFetch($cacheKey);
 		}
 		
 		if ( ! self::$purifier )
@@ -124,7 +124,7 @@ class kHtmlPurifier
 			
 			if ( $cacheKey )
 			{
-				apc_store( $cacheKey, self::$purifier );
+				kApcWrapper::apcStore( $cacheKey, self::$purifier );
 			}
 		}
 	}
@@ -147,10 +147,10 @@ class kHtmlPurifier
 	public static function initAllowedTokenPatterns()
 	{
 		$cacheKey = null;
-		if ( function_exists('apc_fetch') && function_exists('apc_store') )
+		if (kApcWrapper::apcEnabled())
 		{
 			$cacheKey = 'kHtmlPurifierAllowedTokenPatterns-' . kConf::getCachedVersionId();
-			self::$allowedTokenPatterns = apc_fetch($cacheKey);
+			self::$allowedTokenPatterns = kApcWrapper::apcFetch($cacheKey);
 		}
 
 		if ( ! self::$allowedTokenPatterns )
@@ -160,7 +160,7 @@ class kHtmlPurifier
 
 			if ( $cacheKey )
 			{
-				apc_store( $cacheKey, self::$allowedTokenPatterns );
+				kApcWrapper::apcStore( $cacheKey, self::$allowedTokenPatterns );
 			}
 		}
 	}

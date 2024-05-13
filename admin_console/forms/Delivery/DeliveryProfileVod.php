@@ -12,7 +12,7 @@ class Form_Delivery_DeliveryProfileVod extends Form_Delivery_DeliveryProfileConf
 			'label'			=> 'Simulive support:',
 		));
 
-		return array('simuliveSupport');
+		return array_merge(parent::getAdvancedSettings(), array('simuliveSupport'));
 	}
 
 }

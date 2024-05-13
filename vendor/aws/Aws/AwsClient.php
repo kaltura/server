@@ -6,6 +6,7 @@ use Aws\Api\DocModel;
 use Aws\Api\Service;
 use Aws\EndpointDiscovery\EndpointDiscoveryMiddleware;
 use Aws\EndpointV2\EndpointProviderV2;
+use Aws\EndpointV2\EndpointV2Middleware;
 use Aws\Exception\AwsException;
 use Aws\Signature\SignatureProvider;
 use GuzzleHttp\Psr7\Uri;
@@ -240,7 +241,9 @@ class AwsClient implements AwsClientInterface
         $this->loadAliases();
         $this->addStreamRequestPayload();
         $this->addRecursionDetection();
-        $this->addRequestBuilder();
+        if ($this->isUseEndpointV2()) {
+            $this->addEndpointV2Middleware();
+        }
 
         if (!is_null($this->api->getMetadata('awsQueryCompatible'))) {
             $this->addQueryCompatibleInputMiddleware($this->api);
@@ -516,24 +519,18 @@ class AwsClient implements AwsClientInterface
         );
     }
 
-    /**
-     * Adds the `builder` middleware such that a client's endpoint
-     * provider and endpoint resolution arguments can be passed.
-     */
-    private function addRequestBuilder()
+    private function addEndpointV2Middleware()
     {
-        $handlerList = $this->getHandlerList();
-        $serializer = $this->serializer;
-        $endpointProvider = $this->endpointProvider;
+        $list = $this->getHandlerList();
         $endpointArgs = $this->getEndpointProviderArgs();
 
-        $handlerList->prependBuild(
-            Middleware::requestBuilder(
-                $serializer,
-                $endpointProvider,
+        $list->prependBuild(
+            EndpointV2Middleware::wrap(
+                $this->endpointProvider,
+                $this->getApi(),
                 $endpointArgs
             ),
-            'builderV2'
+            'endpoint-resolution'
         );
     }
 
@@ -551,7 +548,7 @@ class AwsClient implements AwsClientInterface
         if (!empty($paramDefinitions = $api->getClientContextParams())) {
             foreach($paramDefinitions as $paramName => $paramValue) {
                 if (isset($args[$paramName])) {
-                   $result[$paramName] = $args[$paramName];
+                   $resolvedParams[$paramName] = $args[$paramName];
                }
             }
         }
@@ -567,7 +564,12 @@ class AwsClient implements AwsClientInterface
         $config = $this->getConfig();
         $service = $args['service'];
 
-        $builtIns['SDK::Endpoint'] = isset($args['endpoint']) ? $args['endpoint'] : null;
+        $builtIns['SDK::Endpoint'] = null;
+        if (!empty($args['endpoint'])) {
+            $builtIns['SDK::Endpoint'] = $args['endpoint'];
+        } elseif (isset($config['configured_endpoint_url'])) {
+            $builtIns['SDK::Endpoint'] = (string) $this->getEndpoint();
+        }
         $builtIns['AWS::Region'] = $this->getRegion();
         $builtIns['AWS::UseFIPS'] = $config['use_fips_endpoint']->isUseFipsEndpoint();
         $builtIns['AWS::UseDualStack'] = $config['use_dual_stack_endpoint']->isUseDualstackEndpoint();

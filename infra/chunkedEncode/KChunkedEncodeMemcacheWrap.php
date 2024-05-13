@@ -835,8 +835,8 @@ ini_set("memory_limit","512M");
 					$rvStr = "SUCCESS -";
 				}
 			}
-
-				//When working with remote (none nfs) shared stoarge we need to move the file to shared
+			
+			//When working with remote (none nfs) shared storage we need to move the file to shared
 			if($sharedChunkPaths){
 				KalturaLog::log("Done running cmd line,moving file from [" . print_r($outFilenames, true) . "] to [" . print_r($sharedChunkPaths, true) . "]");
 				$moveToFilenames = $sharedChunkPaths;

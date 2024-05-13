@@ -405,4 +405,21 @@ class flavorAsset extends exportableAsset
 		return 'flavors';
 	}
 
+	/**
+	 * @return int|null
+	 * value is in milliseconds
+	 */
+	public function getSegmentDuration()
+	{
+		$tags = explode(',', $this->getTags());
+		foreach ($tags as $tag)
+		{
+			if (strpos($tag, 'segment_duration:') !== false)
+			{
+				return (int)explode(':', $tag)[1];
+			}
+		}
+		return null;
+	}
+
 }

@@ -205,7 +205,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 		$eSearchAdapter = ESearchAdapterFactory::getAdapter($filter);
 		list($list, $totalCount) = $eSearchAdapter->retrieveElasticQueryCoreEntries($coreFilter, $corePager);
 		$newList = KalturaBaseEntryArray::fromDbArray($list, $responseProfile);
-		$response = new KalturaListResponse();
+		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
 
@@ -216,7 +216,7 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 	{
 		$result = false;
 		$params = infraRequestUtils::getRequestParams();
-		$clientsTags = isset($params[infraRequestUtils::CLIENT_TAG]) ? $params[infraRequestUtils::CLIENT_TAG] : null;
+		$clientsTags = isset($params[infraRequestUtils::CLIENT_TAG]) ? $params[infraRequestUtils::CLIENT_TAG] : '';
 		$tagsForExecutor = kConf::get(self::FILTER_TAGS_PARAM_NAME, self::FILTER_TAGS_MAP_NAME, array());
 		foreach($tagsForExecutor as $tag)
 		{

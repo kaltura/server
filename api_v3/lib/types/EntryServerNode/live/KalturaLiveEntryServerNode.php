@@ -109,6 +109,12 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	
 	private function getPercentageDiff($newValue, $oldValue)
 	{
+		//PHP8 - Avoid dividing by 0
+		if($newValue == 0)
+		{
+			return $oldValue;
+		}
+		
 		$percentChange = (1 - $oldValue/$newValue) * 100;
 		return abs(round($percentChange, 0));
 	}

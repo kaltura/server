@@ -68,14 +68,14 @@ class kExecWrapper
 		$fd = self::openFile($resolvedFilePath);
 		if(!$fd)
 		{
-			return array(self::CANT_ACCESS_FILE_ERROR_CODE, array(), "Failed to open file [{$resolvedFilePath}]");
+			return array(self::CANT_ACCESS_FILE_ERROR_CODE, "", "Failed to open file [{$resolvedFilePath}]");
 		}
 		
 		KalturaLog::info("Executing: [$command]");
 		$process = proc_open( $command, $descriptorSpec, $pipes, "/tmp");
 		if (!is_resource($process))
 		{
-			return array(self::COMMAND_INVOKE_CANNOT_EXECUTE, array(), "Process returned by proc_open is not a valid resource");
+			return array(self::COMMAND_INVOKE_CANNOT_EXECUTE, "", "Process returned by proc_open is not a valid resource");
 		}
 		
 		if (function_exists('stream_set_chunk_size'))

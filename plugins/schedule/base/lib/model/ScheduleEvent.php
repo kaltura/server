@@ -189,7 +189,9 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	
 	public function addAnotherLinkedBy($v)
 	{
-		$linkedByArray = explode(',', $this->getLinkedBy());
+		$linkedByArray = !is_null($this->getLinkedBy()) ?
+			explode(',', $this->getLinkedBy()) : array();
+		
 		if (!in_array($v, $linkedByArray))
 		{
 			$linkedByArray[] = $v;
@@ -200,7 +202,9 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	
 	public function removeFromLinkedByArray($v)
 	{
-		$linkedByArray = explode(',', $this->getLinkedBy());
+		$linkedByArray = !is_null($this->getLinkedBy()) ?
+			explode(',', $this->getLinkedBy()) : array();
+		
 		$key = array_search($v, $linkedByArray);
 		if ($key !== false)
 		{
@@ -224,7 +228,9 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	
 	public function updateStartEndTimeOfFollowerEvents()
 	{
-		$linkedByEventIds = explode(',', $this->getLinkedBy());
+		$linkedByEventIds = !is_null($this->getLinkedBy()) ?
+			explode(',', $this->getLinkedBy()) : array();
+		
 		foreach ($linkedByEventIds as $linkedByEventId)
 		{
 		//update start & end date for all linked by events
@@ -252,7 +258,9 @@ abstract class ScheduleEvent extends BaseScheduleEvent implements IRelatedObject
 	
 	public function unlinkFollowerEvents()
 	{
-		$linkedByEventIds = explode(',', $this->getLinkedBy());
+		$linkedByEventIds = !is_null($this->getLinkedBy()) ?
+			explode(',', $this->getLinkedBy()) : array();
+		
 		foreach ($linkedByEventIds as $linkedByEventId)
 		{
 			if(trim($linkedByEventId) == '')

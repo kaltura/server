@@ -63,7 +63,7 @@ class kLiveStreamConfiguration
 	 */
 	public function getBackupUrl()
 	{
-		return $this->backupUrl;
+		return strval($this->backupUrl);
 	}
 
 	/**
@@ -92,7 +92,7 @@ class kLiveStreamConfiguration
 	 * @return string $url
 	 */
 	public function getUrl() {
-		return $this->url;
+		return strval($this->url);
 	}
 
 	/**

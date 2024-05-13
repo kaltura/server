@@ -7,6 +7,8 @@
  */
 abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObject
 {
+	public $userOrder = null;
+	
 	abstract public function buildServeFlavors();
 	
 	protected $DEFAULT_RENDERER_CLASS = 'kF4MManifestRenderer';
@@ -84,6 +86,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	 * @param DeliveryProfileDynamicAttributes $deliveryAttributes
 	 */
 	public function supportsDeliveryDynamicAttributes(DeliveryProfileDynamicAttributes $deliveryAttributes) {
+		$entry = $deliveryAttributes->getEntry();
+		$forceDeliveries = $entry ? $entry->getEnforceDeliveries() : array();
+		foreach ($forceDeliveries as $forceDelivery)
+		{
+			if (strpos($this->getEnforceDeliveriesSupport(), $forceDelivery) === false)
+			{
+				return self::DYNAMIC_ATTRIBUTES_NO_SUPPORT;
+			}
+		}
+
 		if(!$deliveryAttributes->getMediaProtocol())
 			return self::DYNAMIC_ATTRIBUTES_FULL_SUPPORT;
 
@@ -192,6 +204,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $this->getFromCustomData("simuliveSupport", null, false);
 	}
 
+	public function setEnforceDeliveriesSupport($v)
+	{
+		$this->putInCustomData("enforceDeliveriesSupport", $v);
+	}
+
+	public function getEnforceDeliveriesSupport()
+	{
+		return $this->getFromCustomData("enforceDeliveriesSupport", null, "");
+	}
+
 	/**
 	 * This function returns the tokenizer this delivery profile is working with
 	 * @return kUrlRecognizer
@@ -201,7 +223,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$serializedObject = parent::getTokenizer();
 		
 		try {
-			$object = unserialize($serializedObject);
+			$object = $serializedObject ? unserialize($serializedObject) : null;
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Error unserializing tokenizer for delivery id ['.$this->getId().']');

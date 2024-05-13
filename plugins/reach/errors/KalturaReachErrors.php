@@ -13,6 +13,8 @@ class KalturaReachErrors implements kReachErrors
 	
 	const CATALOG_ITEM_NOT_FOUND = "CATALOG_ITEM_NOT_FOUND;ID;Catalog item with id provided not found [@ID@]";
 	
+	const CATALOG_ITEM_CANNOT_BE_DELETED = "CATALOG_ITEM_CANNOT_BE_DELETED;ID;Catalog item with id [@ID@] cannot be deleted";
+	
 	const PARTNER_CATALOG_ITEM_NOT_FOUND = "PARTNER_CATALOG_ITEM_NOT_FOUND;ID;Partner catalog item with id provided not found [@ID@]";
 	
 	const VENDOR_PARTNER_ID_NOT_FOUND = "VENDOR_PARTNER_ID_NOT_FOUND;PARTNER_ID;Partner id provided [@PARTNER_ID@] not found";

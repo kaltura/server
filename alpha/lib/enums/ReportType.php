@@ -75,7 +75,6 @@ interface ReportType extends BaseEnum
    const REACH_CATALOG_USAGE = 65;
    const REACH_PROFILE_USAGE = 66;
    const SELF_SERVE_BANDWIDTH = 67;
-   const APPLICATION_EVENTS_HIGHLIGHTS = 68;
 
    //realtime reports
    const MAP_OVERLAY_COUNTRY_REALTIME = 10001;
@@ -224,4 +223,6 @@ interface ReportType extends BaseEnum
    const EP_WEBCAST_LIVE_USER_ENGAGEMENT_LEVEL = 60011;
    const EP_WEBCAST_VOD_USER_TOP_CONTENT = 60012;
    const EP_WEBCAST_VOD_LIVE_USERS_ENGAGEMENT = 60013;
+
+   const CNC_PARTICIPATION = 70001;
 }

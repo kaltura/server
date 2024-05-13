@@ -36,6 +36,11 @@ class kEntryReplacementOptions
 	 */
 	public function getPluginOptionItems() 
 	{
+		if(is_null($this->pluginOptionItems))
+		{
+			return array();
+		}
+		
 		return $this->pluginOptionItems;
 	}
 

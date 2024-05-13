@@ -259,6 +259,11 @@ class embedPlaykitJsAction extends sfAction
 			return;
 		}
 		
+		if(!property_exists($uiConf, 'plugins'))
+		{
+			$uiConf->plugins = new stdClass();
+		}
+		
 		foreach($extraModulesNames as $extraModulesName)
 		{
 			$uiConf->plugins->$extraModulesName = new stdClass();

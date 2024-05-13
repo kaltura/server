@@ -18,7 +18,6 @@ class ReportService extends KalturaBaseService
 		ReportType::REACH_PROFILE_USAGE,
 		ReportType::REACH_CATALOG_USAGE,
 		ReportType::CDN_BANDWIDTH_USAGE,
-		ReportType::APPLICATION_EVENTS_HIGHLIGHTS,
 	);
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -457,7 +456,7 @@ class ReportService extends KalturaBaseService
 			}
 		}
 
-		if (strlen($params->reportsItemsGroup) > self::MAX_EXPORT_GROUP_NAME_LENGTH)
+		if (!is_null($params->reportsItemsGroup) && strlen($params->reportsItemsGroup) > self::MAX_EXPORT_GROUP_NAME_LENGTH)
 		{
 			$params->reportsItemsGroup = substr($params->reportsItemsGroup,0, self::MAX_EXPORT_GROUP_NAME_LENGTH);
 		}

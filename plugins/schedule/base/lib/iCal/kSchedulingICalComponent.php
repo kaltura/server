@@ -158,9 +158,9 @@ abstract class kSchedulingICalComponent
 		return $this->components;
 	}
 
-	public function setField($field, $value)
+	public function setField($field, $value, $subField = null)
 	{
-		$this->fields[strtoupper($field)] = $value;
+		$this->fields[strtoupper($field) . $subField] = $value;
 	}
 
 	public function getField($field)

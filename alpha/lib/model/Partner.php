@@ -16,6 +16,7 @@ class Partner extends BasePartner
 	const MONITORING_PARTNER_ID = -4;
 	const MEDIA_SERVER_PARTNER_ID = -5;
 	const PLAY_SERVER_PARTNER_ID = -6;
+	const EP_PARTNER_ID = -11;
 	const SELF_SERVE_PARTNER_ID = -12;
 	const BI_PARTNER_ID = -15;
 
@@ -1434,7 +1435,7 @@ class Partner extends BasePartner
 		$names = $this->getFromCustomData('always_allowed_permission_names');
 		// add ALWAYS_ALLOWED_ACTIONS only when always_allowed_permission_names was not specified explicitly
 		// it's required to support the scenario where ALWAYS_ALLOWED_ACTIONS should be disabled (by specifying a "dummy" permission in always_allowed_permission_names)
-		if (!trim($names)) {
+		if (is_null($names) || !trim($names)) {
 			$names = PermissionName::ALWAYS_ALLOWED_ACTIONS.','.$names;
 		}
 		$names = trim($names, ',');
@@ -1978,6 +1979,12 @@ class Partner extends BasePartner
 		$whiteList = $this->getCdnHostWhiteListArray();
 		foreach ($whiteList as $regEx)
 		{
+			//Avoid passing "/" as pattern as it triggers preg_match(): Unknown modifier '/'
+			if(!trim($regEx, "/"))
+			{
+				continue;
+			}
+			
 			if (preg_match("/".$regEx."/", $host)===1)//Should $regEx be escaped?
 			{
 				$this->cdnWhiteListCache[$host] = true;

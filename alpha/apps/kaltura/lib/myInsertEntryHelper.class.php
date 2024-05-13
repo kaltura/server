@@ -11,6 +11,7 @@ class myInsertEntryHelper
 	private $prefix = '';
 	
 	private $partner_id = null;
+	private $subp_id = null;
 	
 	public function __construct($action, $kuser_id, $paramsArray = null)
 	{

@@ -23,7 +23,7 @@ class KOperationEngineEncodingCom  extends KOperationEngine
 	 */
 	protected $url;
 
-	protected function __construct($userId, $userKey, $url)
+	public function __construct($userId, $userKey, $url)
 	{
 		parent::__construct();
 		

@@ -86,7 +86,7 @@ function generateInvalidationKeyCode($invalidationKey)
 				$peerArrayElems[0] .= "%s";
 				$peerArrayElems[] = "self::" . strtoupper($curStr);
 				$curStrUpperCamel = str_replace(' ', '', ucwords(str_replace('_', ' ', $curStr)));
-				$objArrayElems[] = 'strtolower($this->get' . $curStrUpperCamel . '())';
+				$objArrayElems[] = 'kString::strToLow($this->get' . $curStrUpperCamel . '())';
 			}
 		}
 		

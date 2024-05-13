@@ -49,7 +49,7 @@ class kDeliveryProfileCondition extends kCondition
 		}
 
 		KalturaLog::debug("Delivery profile ids [".print_r($profileIds, true)."]");
-		$requestOrigin = @$_SERVER['HTTP_X_FORWARDED_HOST'];
+		$requestOrigin = isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : null ;
 		if(!$requestOrigin)
 			$requestOrigin = @$_SERVER['HTTP_HOST'];
 		$deliveryProfiles = DeliveryProfilePeer::retrieveByPKs($profileIds);

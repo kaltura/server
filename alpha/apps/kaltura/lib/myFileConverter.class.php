@@ -150,7 +150,7 @@ class myFileConverter
 					continue;
 				}
 
-				KalturaLog::log("FFMpeg response - \n" . print_r(implode($output),1));
+				KalturaLog::log("FFMpeg response - \n" . print_r(implode("", $output),1));
 				KalturaLog::log("The ffmpeg responded with 'first-frame-not-a-keyframe'. The fast-seek mode failed to properly get the right frame. Switching to the 'slow-mode' that is limited to th3 first 30sec only ".print_r(implode($output),1));
 				$capturesSlowCmd = kFfmpegUtils::getSlowCaptureFrameCmd($source_file, $target_file, $position, $width, $height, $frame_count, $target_type, $decryptionKey);
 				list($output, $return_value) = kFfmpegUtils::executeCmd($capturesSlowCmd);
@@ -504,10 +504,16 @@ class myFileConverter
 
 	public static function getImageDimensionsFromString($imgStr)
 	{
-		$image = imagecreatefromstring($imgStr);
-		$width = imagesx($image);
-		$height = imagesy($image);
-		imagedestroy($image);
+		$height = $width = null;
+		
+		if($imgStr)
+		{
+			$image = imagecreatefromstring($imgStr);
+			$width = imagesx($image);
+			$height = imagesy($image);
+			imagedestroy($image);
+		}
+		
 		return array($width, $height);
 	}
 }

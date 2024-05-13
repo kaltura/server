@@ -59,12 +59,11 @@ class BatchJobLog extends BaseBatchJobLog implements IBaseObject {
      */
     public function preUpdate(PropelPDO $con = null)
 	{
-		if ($this->alreadyInSave)
-		{
-			return true;
-		}	
-		$this->tempModifiedColumns = $this->modifiedColumns;
-		return true;
+		//Avoid overriding updated at value in parent method
+		$currUpdatedAt = $this->getUpdatedAt(null);
+		$ret = parent::preUpdate($con);
+		$this->setUpdatedAt($currUpdatedAt);
+		return $ret;
   	}
   	
     /* (non-PHPdoc)

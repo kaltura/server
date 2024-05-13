@@ -1036,7 +1036,9 @@ class kFlowHelper
 	private static function createNextJob(flavorParamsOutput $flavorParamsOutput, BatchJob $dbBatchJob, kConvertJobData $data, FileSyncKey $syncKey)
 	{
 		$operatorSet = new kOperatorSets();
-		$operatorSet->setSerialized(stripslashes($flavorParamsOutput->getOperators()));
+		$operators = $flavorParamsOutput->getOperators();
+		if($operators)
+			$operatorSet->setSerialized(stripslashes($operators));
 		$nextOperator = $operatorSet->getOperator($data->getCurrentOperationSet(), $data->getCurrentOperationIndex() + 1);
 
 		$nextJob = null;
@@ -3657,7 +3659,7 @@ class kFlowHelper
 		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
 		
-		if (self::shouldKeepSourceFlavor($sourceFlavor, $nonSourceFlavors))
+		if ($sourceFlavor && self::shouldKeepSourceFlavor($sourceFlavor, $nonSourceFlavors))
 		{
 			return;
 		}

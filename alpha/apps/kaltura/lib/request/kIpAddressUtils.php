@@ -47,7 +47,7 @@ class kIpAddressUtils
 	
 	public static function isIpInRange($ip, $range)
 	{
-		$ip = trim($ip);
+		$ip = !is_null($ip) ? trim($ip) : '';
 		$range = trim($range);
 		
 		$rangeType = self::getAddressType($range);
@@ -285,10 +285,13 @@ class kIpAddressUtils
 	public static function traverseIpTree($ip, $ipTree)
 	{
 		$values = array();
+		if(is_null($ip))
+		{
+			return $values;
+		}
+		
 		$ipLong = ip2long($ip);
-
 		$root = $ipTree;
-
 		$bitIndex = 32;
 		while(1)
 		{

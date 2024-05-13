@@ -206,7 +206,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	protected function validateStreamNotAlreadyExist($entryId, $hostname, $mediaServerIndex)
 	{
-		$streamAlreadyExsit = false;
+		$streamAlreadyExists = false;
 		try
 		{
 			$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
@@ -224,7 +224,7 @@ class LiveStreamService extends KalturaLiveEntryService
 
 			//currently verifying only if already streaming in another environment
 			if ($mediaServerNode && $mediaServerNode->getEnvironment() != $registeredServerNode->getEnvironment()) {
-				$streamAlreadyExsits = true;
+				$streamAlreadyExists = true;
 			}
 
 		}
@@ -234,7 +234,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			return;
 		}
 
-		if ($streamAlreadyExsits)
+		if ($streamAlreadyExists)
 		{
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $registeredServerNode->getHostName());
 		}
@@ -816,7 +816,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	protected function isAdminTagLimited(LiveEntry $entry, $limitedAdminTags)
 	{
-		return count(array_intersect(explode(',', $entry->getAdminTags()), $limitedAdminTags)) !== 0;
+		$adminTagsArray = !is_null($entry->getAdminTags()) ? explode(',', $entry->getAdminTags()) : array();
+		return count(array_intersect($adminTagsArray, $limitedAdminTags)) !== 0;
 	}
 
 

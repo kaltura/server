@@ -1727,6 +1727,11 @@ $vMax*=2;
 		public $unResolvedSourcePath = null;
 		public $pathResolveTime = null;			// Last source path resolve time
 		public $pathResolveInterval = 3600*10;	// Time interval between resolves (10hrs)
+	
+		public function __construct()
+		{
+			$this->videoFilters = new stdClass();
+		}
 		
 		public $supportedVideoFilters = null;
 		//array("scale","fade","crop","overlay","rotate","yadif","subtitles");

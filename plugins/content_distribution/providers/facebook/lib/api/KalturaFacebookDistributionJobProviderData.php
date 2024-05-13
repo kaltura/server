@@ -119,9 +119,12 @@ class KalturaFacebookDistributionJobProviderData extends KalturaConfigurableDist
 		$videoAssetFilePath = null;
 		$isValidVideo = false;
 		
-		if(count($distributionJobData->entryDistribution->flavorAssetIds))
+		$flavorAssetId = $distributionJobData->entryDistribution->flavorAssetIds
+			? explode(',', $distributionJobData->entryDistribution->flavorAssetIds)
+			: array();
+		if(count($flavorAssetId))
 		{
-			$flavorAssets = assetPeer::retrieveByIds(explode(',', $distributionJobData->entryDistribution->flavorAssetIds));
+			$flavorAssets = assetPeer::retrieveByIds($flavorAssetId);
 		}
 		else 
 		{

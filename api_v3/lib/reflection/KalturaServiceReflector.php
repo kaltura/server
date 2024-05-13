@@ -297,7 +297,7 @@ class KalturaServiceReflector extends KalturaReflector
 				
 			$parsedDocComment = new KalturaDocCommentParser( $docComment, array(
 				KalturaDocCommentParser::DOCCOMMENT_REPLACENET_PARAM_NAME => $name , ) );
-			$paramClass = $reflectionParam->getClass(); // type hinting for objects  
+			$paramClass = $reflectionParam->getType(); // type hinting for objects
 			if ($paramClass)
 			{
 				$type = $paramClass->getName();
@@ -321,7 +321,7 @@ class KalturaServiceReflector extends KalturaReflector
 				$paramInfo->setDefaultValue($reflectionParam->getDefaultValue());
 				$paramInfo->setOptional(true);
 			}
-			else if ($reflectionParam->getClass() && $reflectionParam->allowsNull()) // for object parameter
+			else if ($reflectionParam->getType() && $reflectionParam->allowsNull()) // for object parameter
 			{
 				$paramInfo->setOptional(true);
 			}

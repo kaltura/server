@@ -131,6 +131,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO = 'combined_live_engaged_users_ratio';
 	const METRIC_REACTION_CLICKED_UNIQUE_USERS = 'reaction_clicked_unique_users';
 	const METRIC_REACTION_CLICKED_USER_RATIO = 'reaction_clicked_user_ratio';
+	const METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS = 'download_attachment_unique_users';
+	const METRIC_DOWNLOAD_ATTACHMENT_USER_RATIO = 'download_attachment_user_ratio';
 	const METRIC_VOD_AVG_PLAY_TIME = 'vod_avg_play_time';
 	const METRIC_COMBINED_LIVE_AVG_PLAY_TIME = 'combined_live_avg_play_time';
 	const METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC = 'meeting_high_eng_view_period_view_time_sum';
@@ -236,6 +238,22 @@ class kKavaReportsMgr extends kKavaBase
 	// virtual-events-registration specific metrics
 	const METRIC_REGISTERED_UNIQUE_USERS = 'registered_unique_users';
 
+	// cnc specific metrics
+	const METRIC_UNIQUE_LOGGED_IN_USERS = 'unique_logged_in_users';
+	const METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS = 'unique_users_sent_group_message';
+	const METRIC_GROUP_CHAT_PARTICIPATION = 'group_participation';
+	const METRIC_MESSAGE_REPLIES_COUNT = 'message_replies_count';
+	const METRIC_Q_AND_A_THREADS_COUNT = 'q_and_a_threads_count';
+	const METRIC_UNIQUE_SENT_Q_AND_A_USERS = 'unique_users_q_and_a_thread';
+	const METRIC_Q_AND_A_PARTICIPATION = 'q_and_a_participation';
+	const METRIC_AVG_POLL_ANSWERED = 'avg_poll_answered';
+	const METRIC_UNIQUE_RECEIVED_POLL_USERS = 'unique_users_received_poll';
+	const METRIC_UNIQUE_ANSWERED_POLL_USERS = 'unique_users_answered_poll';
+	const METRIC_POLL_PARTICIPATION = 'poll_participation';
+	const METRIC_UNIQUE_REACTION_CLICKED_USERS = 'unique_users_reaction_clicked';
+	const METRIC_REACTION_CLICKED_PARTICIPATION = 'reaction_clicked_participation';
+
+
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
 	const KAVA_REPORTS_CLASS = 'kKavaReports';
@@ -245,6 +263,7 @@ class kKavaReportsMgr extends kKavaBase
 	const KAVA_WEBCAST_REPORTS_CLASS = 'kKavaWebcastReports';
 	const KAVA_VE_REGISTRATION_CLASS = 'kKavaVeRegistrationReports';
 	const KAVA_EP_REPORTS_CLASS = 'kKavaEventPlatformReports';
+	const KAVA_CNC_REPORTS_CLASS = 'kKavaCnCReports';
 
 	/// report settings
 	// report settings - common
@@ -358,7 +377,7 @@ class kKavaReportsMgr extends kKavaBase
 
 	const ENRICH_CHUNK_SIZE = 10000;
 	const ENRICH_DIM_DELIMITER = '|';
-	const ENRICH_FOREACH_KEYS_FUNC = 'self::forEachKeys';
+	const ENRICH_FOREACH_KEYS_FUNC = 'kKavaReportsMgr::forEachKeys';
 	const CLIENT_TAG_PRIORITY = 5;
 	const FLAVOR_PARAM_VIEW_COUNT_PREFIX = 'flavor_param_view_count_';
 	const MICRO_SERVICE_CHUNK_SIZE = 500;
@@ -422,8 +441,26 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_MEETING_RAISE_HAND,
 		self::EVENT_TYPE_POLL_ANSWERED,
 		self::EVENT_TYPE_MEETING_JOIN_SESSION,
-		self::EVENT_TYPE_BUTTON_CLICKED,
-		self::EVENT_TYPE_PAGE_LOAD
+		self::EVENT_TYPE_LOG_IN,
+		self::EVENT_TYPE_NOTIFICATION_SENT,
+		self::EVENT_TYPE_NOTIFICATION_BUTTON_CLICKED,
+		self::EVENT_TYPE_POLL_LAUNCHED,
+		self::EVENT_TYPE_POLL_ENDED,
+		self::EVENT_TYPE_POLL_RECEIVED,
+		self::EVENT_TYPE_GROUP_MESSAGE_SENT,
+		self::EVENT_TYPE_MESSAGE_PINNED,
+		self::EVENT_TYPE_MESSAGE_UNPINNED,
+		self::EVENT_TYPE_MESSAGE_LIKED,
+		self::EVENT_TYPE_USER_BLOCKED,
+		self::EVENT_TYPE_PRIVATE_MESSAGE_SENT,
+		self::EVENT_TYPE_Q_AND_A_MESSAGE_SENT,
+		self::EVENT_TYPE_GROUP_MESSAGE_DELETED,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_SENT,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED,
+		self::EVENT_TYPE_POLL_RECEIVED,
+		self::EVENT_TYPE_CNC_REACTION_CLICKED,
+		self::EVENT_TYPE_CNC_POLL_ANSWERED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -486,8 +523,26 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_MEETING_RAISE_HAND => 'count_raise_hand_clicked',
 		self::EVENT_TYPE_POLL_ANSWERED => 'count_poll_answered',
 		self::EVENT_TYPE_MEETING_JOIN_SESSION => 'count_meeting_join_session',
-		self::EVENT_TYPE_BUTTON_CLICKED => 'count_button_clicked',
-		self::EVENT_TYPE_PAGE_LOAD => 'count_page_load'
+		self::EVENT_TYPE_LOG_IN => 'count_cnc_logged_in',
+		self::EVENT_TYPE_NOTIFICATION_SENT => 'count_cnc_notfication_sent',
+		self::EVENT_TYPE_NOTIFICATION_BUTTON_CLICKED => 'count_cnc_notification_button_clicked',
+		self::EVENT_TYPE_POLL_LAUNCHED => 'count_cnc_poll_launced',
+		self::EVENT_TYPE_POLL_ENDED => 'count_cnc_poll_ended',
+		self::EVENT_TYPE_POLL_RECEIVED => 'count_cnc_poll_received',
+		self::EVENT_TYPE_GROUP_MESSAGE_SENT => 'count_cnc_group_message_sent',
+		self::EVENT_TYPE_MESSAGE_PINNED => 'count_cnc_message_pinned',
+		self::EVENT_TYPE_MESSAGE_UNPINNED => 'count_cnc_message_unpinned',
+		self::EVENT_TYPE_MESSAGE_LIKED => 'count_cnc_message_liked',
+		self::EVENT_TYPE_USER_BLOCKED => 'count_cnc_user_blocked',
+		self::EVENT_TYPE_PRIVATE_MESSAGE_SENT => 'count_cnc_private_message_sent',
+		self::EVENT_TYPE_Q_AND_A_MESSAGE_SENT => 'count_cnc_q_and_a_message_send',
+		self::EVENT_TYPE_GROUP_MESSAGE_DELETED => 'count_cnc_group_message_deleted',
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_SENT => 'count_cnc_chat_connection_request_sent',
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED => 'count_cnc_chat_cconnection_request_approved',
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED => 'count_cnc_chat_connection_request_canceled',
+		self::EVENT_TYPE_POLL_RECEIVED => 'count_poll_received',
+		self::EVENT_TYPE_CNC_REACTION_CLICKED => 'count_reaction_clicked',
+		self::EVENT_TYPE_CNC_POLL_ANSWERED => 'count_poll_answered'
 	);
 
 	//global transform
@@ -504,20 +559,27 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VIEW_UNIQUE_AUDIENCE_DVR => 'floor',
 		self::METRIC_UNIQUE_SESSIONS => 'floor',
 		self::METRIC_UNIQUE_VIEWERS => 'floor',
-		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'self::floorAndLimitPercentage',
+		self::METRIC_TOTAL_UNIQUE_PERCENTILES => 'kKavaReportsMgr::floorAndLimitPercentage',
 		self::METRIC_UNIQUE_OWNERS => 'floor',
 		self::METRIC_DYNAMIC_VIEWERS => 'ceil',
-		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
-		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'self::limitPercentages',
+		self::METRIC_UNIQUE_PERCENTILES_RATIO => 'kKavaReportsMgr::limitPercentages',
+		self::METRIC_NODE_UNIQUE_PERCENTILES_RATIO => 'kKavaReportsMgr::limitPercentages',
 		self::METRIC_UNIQUE_DOMAINS => 'floor',
 		self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS => 'floor',
 		self::METRIC_UNIQUE_VOD_VIEW_PERIOD_USERS => 'floor',
 		self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS => 'floor',
 		self::METRIC_REACTION_CLICKED_UNIQUE_USERS => 'floor',
+		self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS => 'floor',
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => 'floor',
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => 'floor',
 		self::METRIC_REGISTERED_UNIQUE_USERS => 'floor',
-		self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => 'floor',
+        	self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => 'floor',
+		self::METRIC_UNIQUE_LOGGED_IN_USERS => 'floor',
+		self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS => 'floor',
+		self::METRIC_UNIQUE_SENT_Q_AND_A_USERS => 'floor',
+		self::METRIC_UNIQUE_ANSWERED_POLL_USERS => 'floor',
+		self::METRIC_UNIQUE_RECEIVED_POLL_USERS => 'floor',
+		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -571,14 +633,26 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_VOD_VIEW_PERIOD_USERS => true,
 		self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS => true,
 		self::METRIC_REACTION_CLICKED_UNIQUE_USERS => true,
+		self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS => true,
 		self::METRIC_VOD_AVG_PLAY_TIME => true,
 		self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => true,
 		self::METRIC_VOD_LIVE_AVG_VIEW_TIME => true,
 		self::METRIC_REGISTERED_UNIQUE_USERS => true,
-		self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => true,
+        	self::METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS => true,
 		self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO => true,
+		self::METRIC_UNIQUE_LOGGED_IN_USERS => true,
+		self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS => true,
+		self::METRIC_UNIQUE_SENT_Q_AND_A_USERS => true,
+		self::METRIC_GROUP_CHAT_PARTICIPATION => true,
+		self::METRIC_Q_AND_A_PARTICIPATION => true,
+		self::METRIC_AVG_POLL_ANSWERED => true,
+		self::METRIC_POLL_PARTICIPATION => true,
+		self::METRIC_UNIQUE_RECEIVED_POLL_USERS => true,
+		self::METRIC_UNIQUE_ANSWERED_POLL_USERS => true,
+		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => true,
+		self::METRIC_REACTION_CLICKED_PARTICIPATION => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -587,17 +661,17 @@ class kKavaReportsMgr extends kKavaBase
 	);
 
 	protected static $dynamic_metrics = array(
-		self::METRIC_ENGAGEMENT_RANKING => 'self::getEngagementRankingDef',
-		self::METRIC_PLAYS_RANKING => 'self::getPlaysRankingDef',
-		self::METRIC_ENTRIES_RANKING => 'self::getEntriesRankingDef',
-		self::METRIC_DYNAMIC_VIEWERS => 'self::getDynamicViewersDef',
-		self::METRIC_DYNAMIC_VIEWERS_BUFFERING => 'self::getDynamicBufferingViewersDef',
-		self::METRIC_DYNAMIC_VIEWERS_DVR => 'self::getDynamicDvrViewersDef',
-		self::METRIC_DYNAMIC_VIEWERS_ENGAGEMENT => 'self::getDynamicEngagedViewersDef',
+		self::METRIC_ENGAGEMENT_RANKING => 'kKavaReportsMgr::getEngagementRankingDef',
+		self::METRIC_PLAYS_RANKING => 'kKavaReportsMgr::getPlaysRankingDef',
+		self::METRIC_ENTRIES_RANKING => 'kKavaReportsMgr::getEntriesRankingDef',
+		self::METRIC_DYNAMIC_VIEWERS => 'kKavaReportsMgr::getDynamicViewersDef',
+		self::METRIC_DYNAMIC_VIEWERS_BUFFERING => 'kKavaReportsMgr::getDynamicBufferingViewersDef',
+		self::METRIC_DYNAMIC_VIEWERS_DVR => 'kKavaReportsMgr::getDynamicDvrViewersDef',
+		self::METRIC_DYNAMIC_VIEWERS_ENGAGEMENT => 'kKavaReportsMgr::getDynamicEngagedViewersDef',
 	);
 
 	protected static $dynamic_metrics_to_aggregations = array(
-		self::METRIC_FLAVOR_PARAMS_VIEW_COUNT => 'self::getFlavorsParamsMetricsDef',
+		self::METRIC_FLAVOR_PARAMS_VIEW_COUNT => 'kKavaReportsMgr::getFlavorsParamsMetricsDef',
 	);
 
 	protected static $php_timezone_names = array(
@@ -703,6 +777,7 @@ class kKavaReportsMgr extends kKavaBase
 		4 => self::KAVA_WEBCAST_REPORTS_CLASS,
 		5 => self::KAVA_VE_REGISTRATION_CLASS,
 		6 => self::KAVA_EP_REPORTS_CLASS,
+		7 => self::KAVA_CNC_REPORTS_CLASS,
 	);
 	
 	protected static $aggregations_def = array();
@@ -1341,6 +1416,47 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VE_REGISTERED),
 			self::getHyperUniqueAggregator(self::METRIC_REGISTERED_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_LOGGED_IN_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_LOG_IN),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_GROUP_MESSAGE_SENT),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_MESSAGE_REPLIES_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_GROUP_MESSAGE_SENT),
+				self::getSelectorFilter(self::DIMENSION_EVENT_VAR1, 'True'))),
+			self::getLongSumAggregator(self::METRIC_MESSAGE_REPLIES_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_Q_AND_A_THREADS_COUNT] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_Q_AND_A_MESSAGE_SENT),
+				self::getSelectorFilter(self::DIMENSION_EVENT_VAR3, 'True'))),
+			self::getLongSumAggregator(self::METRIC_Q_AND_A_THREADS_COUNT, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_SENT_Q_AND_A_USERS] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_Q_AND_A_MESSAGE_SENT),
+				self::getSelectorFilter(self::DIMENSION_EVENT_VAR3, 'True'))),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_SENT_Q_AND_A_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_RECEIVED_POLL_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_POLL_RECEIVED),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_RECEIVED_POLL_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_ANSWERED_POLL_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_POLL_ANSWERED),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_ANSWERED_POLL_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_REACTION_CLICKED_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_REACTION_CLICKED),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_REACTION_CLICKED_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+			self::getHyperUniqueAggregator(self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -1774,12 +1890,54 @@ class kKavaReportsMgr extends kKavaBase
 					self::getConstantRatioPostAggr('subVodPlayTime', self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'))),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS))));
 
-		self::$metrics_def[self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO] = array(
+        	self::$metrics_def[self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO,
 				self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC,
 				self::METRIC_MEETING_VIEW_TIME_SEC));
+
+		self::$metrics_def[self::METRIC_GROUP_CHAT_PARTICIPATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_GROUP_CHAT_PARTICIPATION, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS, self::METRIC_UNIQUE_SENT_GROUP_MESSAGE_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
+
+		self::$metrics_def[self::METRIC_Q_AND_A_PARTICIPATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_SENT_Q_AND_A_USERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_Q_AND_A_PARTICIPATION, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_SENT_Q_AND_A_USERS, self::METRIC_UNIQUE_SENT_Q_AND_A_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
+
+		self::$metrics_def[self::METRIC_AVG_POLL_ANSWERED] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_POLL_RECEIVED, self::EVENT_TYPE_POLL_ANSWERED),
+			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
+				self::METRIC_AVG_POLL_ANSWERED,
+				self::EVENT_TYPE_POLL_ANSWERED,
+				self::EVENT_TYPE_POLL_RECEIVED));
+
+		self::$metrics_def[self::METRIC_POLL_PARTICIPATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_ANSWERED_POLL_USERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_POLL_PARTICIPATION, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_ANSWERED_POLL_USERS, self::METRIC_UNIQUE_ANSWERED_POLL_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
+
+		self::$metrics_def[self::METRIC_REACTION_CLICKED_PARTICIPATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_REACTION_CLICKED_USERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_REACTION_CLICKED_PARTICIPATION, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_REACTION_CLICKED_USERS, self::METRIC_UNIQUE_REACTION_CLICKED_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
+
+		self::$metrics_def[self::METRIC_DOWNLOAD_ATTACHMENT_USER_RATIO] = array(
+			self::DRUID_AGGR => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS, self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_DOWNLOAD_ATTACHMENT_USER_RATIO, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS, self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 
@@ -2227,7 +2385,13 @@ class kKavaReportsMgr extends kKavaBase
 	/// common query functions
 	protected static function shouldUseKava($partner_id, $report_type) 
 	{
-		if ($report_type < 0)	// kava custom reports
+		if(!is_numeric($report_type))
+		{
+			//Report type is an enum extended by quiz so in this case we shouldn't use Kava
+			return false;
+		}
+		
+		if ($report_type < 0)	//Kava custom reports
 		{
 			return true;
 		}
@@ -2616,7 +2780,7 @@ class kKavaReportsMgr extends kKavaBase
 			return array(category::CATEGORY_ID_THAT_DOES_NOT_EXIST);
 		}
 
-		return array_map('reset', $rows);
+		return array_map(function($v) { return reset($v); }, $rows);
 	}
 
 	protected static function getEntryKuserDimension($data_source)
@@ -2704,6 +2868,7 @@ class kKavaReportsMgr extends kKavaBase
 			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
 			'event_var2' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR2),
 			'event_var3' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR3),
+			'event_var4' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR4),
 			'player_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYER_VERSION),
 			'isp' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_ISP),
 			'application_versions' => array(self::DRUID_DIMENSION => self::DIMENSION_APPLICATION_VER),
@@ -2716,13 +2881,12 @@ class kKavaReportsMgr extends kKavaBase
 			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
 			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID),
 			'cue_point_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CUE_POINT_ID),
-			'partner_vertical' => array(self::DRUID_DIMENSION => self::DIMENSION_PARTNER_VERTICAL),
-			'kaltura_applications' => array(self::DRUID_DIMENSION => self::DIMENSION_KALTURA_APPLICATION),
+			'context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CONTEXT_ID)
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
 		{
-			$value = $input_filter->$field;
+			$value = property_exists($input_filter, $field) ? $input_filter->$field : null;
 			if (is_null($value) || trim($value) === "")
 			{
 				continue;
@@ -4113,13 +4277,18 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		if (!$dates)
 		{
-			$result[self::METRIC_BANDWIDTH_STORAGE_MB] = array(
-				reset($result[self::METRIC_BANDWIDTH_SIZE_MB]) +
-				reset($result[self::METRIC_AVERAGE_STORAGE_MB]));
+			$METRIC_BANDWIDTH_SIZE_MB = isset($result[self::METRIC_BANDWIDTH_SIZE_MB]) ?
+				reset($result[self::METRIC_BANDWIDTH_SIZE_MB]) : 0;
+			$METRIC_AVERAGE_STORAGE_MB = isset($result[self::METRIC_AVERAGE_STORAGE_MB]) ?
+				reset($result[self::METRIC_AVERAGE_STORAGE_MB]) : 0;
+			$METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB = isset($result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB]) ?
+				reset($result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB]) : 0;
 			
+			$result[self::METRIC_BANDWIDTH_STORAGE_MB] = array(
+				$METRIC_BANDWIDTH_SIZE_MB + $METRIC_AVERAGE_STORAGE_MB);
 			$result[self::METRIC_BANDWIDTH_STORAGE_AGGR_MONTHLY_MB] = array(
-				reset($result[self::METRIC_BANDWIDTH_SIZE_MB]) +
-				reset($result[self::METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB]));
+				$METRIC_BANDWIDTH_SIZE_MB + $METRIC_AVERAGE_STORAGE_AGGR_MONTHLY_MB);
+			
 			return;
 		}
 		
@@ -4135,9 +4304,13 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		if (!$dates)
 		{
+			$METRIC_LIVE_VIEW_PERIOD_PLAY_TIME = isset($result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME]) ?
+				reset($result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME]) : 0;
+			$METRIC_MEETING_VIEW_TIME =  isset($result[self::METRIC_MEETING_VIEW_TIME]) ?
+				reset($result[self::METRIC_MEETING_VIEW_TIME]) : 0;
+			
 			$result[self::METRIC_COMBINED_LIVE_VIEW_TIME] = array(
-				reset($result[self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME]) +
-				reset($result[self::METRIC_MEETING_VIEW_TIME]));
+				$METRIC_LIVE_VIEW_PERIOD_PLAY_TIME + $METRIC_MEETING_VIEW_TIME );
 
 			return;
 		}
@@ -4440,7 +4613,8 @@ class kKavaReportsMgr extends kKavaBase
 		$context['columns'][] = 'SOURCE';
 		$context['columns'][] = 'ADMIN_TAGS';
 		$context['columns'][] = 'CUSTOM_DATA';
-
+		
+		$result = array();
 		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
 		foreach ($enrichedResult as $id => $row)
 		{
@@ -5271,7 +5445,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		// convert the result to a table
 		$metric_headers = isset($report_def[self::REPORT_METRICS]) ? 
-			$report_def[self::REPORT_METRICS] : array_keys(call_user_func_array('array_merge', $result));
+			$report_def[self::REPORT_METRICS] : array_keys(call_user_func_array('array_merge', array_values($result)));
 		$date_headers = $input_filter->interval != self::INTERVAL_ALL ? 
 			array(self::getDateColumnName($input_filter->interval)) : 
 			array();
@@ -6766,7 +6940,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			if (!isset($cur_report_def[self::REPORT_DIMENSION]))
 			{
-				$cur_report_def[self::REPORT_DIMENSION] = $report_def[self::REPORT_DIMENSION];
+				$cur_report_def[self::REPORT_DIMENSION] = isset($report_def[self::REPORT_DIMENSION]) ? $report_def[self::REPORT_DIMENSION] : null;
 			}
 			$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
 
@@ -6795,7 +6969,7 @@ class kKavaReportsMgr extends kKavaBase
 				(!isset($report_def[self::REPORT_DIMENSION]) && isset($report_def[self::REPORT_GRAPH_METRICS]))))
 		{
 			$result = self::getGraphImpl($partner_id, $report_def, $input_filter, $object_ids, $response_options);
-			$result = array(array_keys($result), array_map('reset', array_values($result)));
+			$result = array(array_keys($result), array_map(function($v) { return reset($v); }, array_values($result)));
 		}
 		else if (isset($report_def[self::REPORT_JOIN_REPORTS]))
 		{

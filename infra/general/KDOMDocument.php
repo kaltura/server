@@ -6,7 +6,7 @@
  */
 class KDOMDocument extends DOMDocument
 {
-	public function __construct ($version = null, $encoding = null )
+	public function __construct ($version = '1.0', $encoding = '' )
 	{
 		parent::__construct($version, $encoding);
 	}
@@ -19,7 +19,7 @@ class KDOMDocument extends DOMDocument
 		return parent::loadXML(kEncryptFileUtils::getEncryptedFileContent($filename, $key, $iv), $options);
 	}
 
-	public function schemaValidate($filename, $key = null, $iv = null)
+	public function schemaValidate($filename, $key = null, $iv = null): bool
 	{
 		if(!kFile::checkFileExists($filename) || !kFile::fileSize($filename))
 			throw new Exception('Empty file supplied as input');

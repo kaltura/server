@@ -41,7 +41,7 @@ class kMetadataObjectCopiedHandler implements kObjectCopiedEventConsumer, kObjec
 			$this->copyMetadata(MetadataObjectType::PARTNER, $fromObject, $toObject);
 		}
 
-		elseif($fromObject instanceof entry && (!isset($toObject->copyMetaData) || $toObject->copyMetaData))
+		elseif($fromObject instanceof entry && ($toObject->getCopyMetadata()))
 			$this->copyMetadata(MetadataObjectType::ENTRY, $fromObject, $toObject);
 		
 		elseif($fromObject instanceof category)

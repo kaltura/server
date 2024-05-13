@@ -115,7 +115,7 @@ while ($row = $mysqli_result->fetch_assoc())
 		$result = mysqli_query($link, $insertCommand);
 
 		if (!$result) {
-			$message  = 'Invalid query: ' . mysql_error() . "\n";
+			$message  = 'Invalid query: ' . mysqli_error() . "\n";
 			$message .= 'Whole query: ' . $insertCommand;
 			die($message);
 		}

@@ -19,12 +19,11 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_VE_REGISTRATION = 'virtual-events-registration';
 	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
 	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
-	const DATASOURCE_APPLICATION_EVENTS = 'application-events';
+	const DATASOURCE_CNC_EVENTS = 'cnc-events';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
 	const DIMENSION_PARTNER_PARENT_ID = 'partnerParentId';
-	const DIMENSION_PARTNER_VERTICAL = 'partnerVertical';
 	const DIMENSION_ENTRY_ID = 'entryId';
 	const DIMENSION_LOCATION_COUNTRY = 'location.country';
 	const DIMENSION_LOCATION_REGION = 'location.region';
@@ -65,6 +64,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EVENT_VAR1 = 'eventVar1';
 	const DIMENSION_EVENT_VAR2 = 'eventVar2';
 	const DIMENSION_EVENT_VAR3 = 'eventVar3';
+	const DIMENSION_EVENT_VAR4 = 'eventVar4';
 	const DIMENSION_USER_ENGAGEMENT = 'userEngagement';
 	const DIMENSION_EVENT_PROPERTIES = 'eventProperties';
 	const DIMENSION_FLAVOR_PARAMS_ID = 'flavorParamsId';
@@ -84,7 +84,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CATALOG_ITEM_ID = 'catalogItemId';
 	const DIMENSION_REACH_PROFILE_TYPE = 'reachProfileType';
 	const DIMENSION_CUE_POINT_ID = 'cuePointId';
-	const DIMENSION_KALTURA_APPLICATION = 'kalturaApplication';
+	const DIMENSION_CONTEXT_ID = 'contextId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -162,14 +162,30 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_VE_PARTICIPATED_POST_EVENT = 'participatedPostEvent';
 	const EVENT_TYPE_VE_INVITED_PENDING_REGISTRATION = 'invitedPendingRegistration';
 
+	// event types - cnc events
+	const EVENT_TYPE_LOG_IN = 'loggedIn';
+	const EVENT_TYPE_CNC_REACTION_CLICKED = 'reactionClicked';
+	const EVENT_TYPE_CNC_POLL_ANSWERED = 'pollAnswered';
+	const EVENT_TYPE_NOTIFICATION_SENT = 'notificationSent';
+	const EVENT_TYPE_NOTIFICATION_BUTTON_CLICKED = 'notificationButtonClicked';
+	const EVENT_TYPE_POLL_LAUNCHED = 'pollLaunched';
+	const EVENT_TYPE_POLL_ENDED = 'pollEnded';
+	const EVENT_TYPE_POLL_RECEIVED = 'pollReceived';
+	const EVENT_TYPE_GROUP_MESSAGE_SENT = 'groupMessageSent';
+	const EVENT_TYPE_MESSAGE_PINNED = 'messagePinned';
+	const EVENT_TYPE_MESSAGE_UNPINNED = 'messageUnPinned';
+	const EVENT_TYPE_MESSAGE_LIKED = 'messageLiked';
+	const EVENT_TYPE_USER_BLOCKED = 'userBlocked';
+	const EVENT_TYPE_PRIVATE_MESSAGE_SENT = 'privateMessageSent';
+	const EVENT_TYPE_Q_AND_A_MESSAGE_SENT = 'questionAnswerMessageSent';
+	const EVENT_TYPE_GROUP_MESSAGE_DELETED = 'groupMessageDeleted';
+	const EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_SENT = 'privateChatConnectionRequestSent';
+	const EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED = 'privateChatConnectionRequestApproved';
+	const EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED = 'privateChatConnectionRequestCanceled';
 
 	// event types - meeting events
 	const EVENT_TYPE_MEETING_JOIN_SESSION = 'joinSession';
 	const EVENT_TYPE_MEETING_RAISE_HAND = 'raiseHand';
-
-	// event types - application events
-	const EVENT_TYPE_BUTTON_CLICKED = 'buttonClicked';
-	const EVENT_TYPE_PAGE_LOAD = 'pageLoad';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -670,28 +686,26 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_CUE_POINT_ID => 1,
 		),
-		self::DATASOURCE_APPLICATION_EVENTS => array(
+		self::DATASOURCE_CNC_EVENTS => array(
 			self::DIMENSION_EVENT_TYPE => 1,
 			self::DIMENSION_PARTNER_ID => 1,
 			self::DIMENSION_PARTNER_PARENT_ID => 1,
-			self::DIMENSION_PARTNER_VERTICAL => 1,
-			self::DIMENSION_ENTRY_ID => 1,
-			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+			self::DIMENSION_CONTEXT_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_LOCATION_COUNTRY => 1,
 			self::DIMENSION_LOCATION_REGION => 1,
 			self::DIMENSION_LOCATION_CITY => 1,
-			self::DIMENSION_LOCATION_ISP => 1,
 			self::DIMENSION_BROWSER_FAMILY => 1,
 			self::DIMENSION_BROWSER => 1,
 			self::DIMENSION_OS_FAMILY => 1,
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
-			self::DIMENSION_KALTURA_APPLICATION => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
 			self::DIMENSION_EVENT_VAR2 => 1,
 			self::DIMENSION_EVENT_VAR3 => 1,
-		),
+			self::DIMENSION_EVENT_VAR4 => 1,
+		)
 	);
 
 	protected static $datasources_hash_dimensions = array(
@@ -764,7 +778,7 @@ class kKavaBase extends kDruidBase
 	public static function getEntrySourceType($sourceType, $adminTags, $customData)
 	{
 		// check for specific admin tags
-		$adminTags = explode(',', strtolower($adminTags));
+		$adminTags = !is_null($adminTags) ? explode(',', strtolower($adminTags)) : array();
 		foreach ($adminTags as $adminTag)
 		{
 			$adminTag = trim($adminTag);

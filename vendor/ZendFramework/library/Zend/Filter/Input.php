@@ -892,7 +892,7 @@ class Zend_Filter_Input
 
                 if ($emptyFieldsFound) {
                     $this->_invalidMessages[$validatorRule[self::RULE]] = $messages;
-                    $this->_invalidErrors[$validatorRule[self::RULE]]   = array_unique(call_user_func_array('array_merge', $errorsList));
+                    $this->_invalidErrors[$validatorRule[self::RULE]]   = array_unique(call_user_func_array('array_merge', array_values($errorsList)));
                     return;
                 }
             }

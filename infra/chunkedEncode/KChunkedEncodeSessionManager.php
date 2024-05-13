@@ -687,8 +687,8 @@
 			}
 			$job->attempt++;
 			
-				// For chunk timeouts 'retry attmept' means - extend jobs maxExexutionTime
-			if($job->timeout==1) {
+				// For chunk timeouts 'retry attmept' means - extend jobs maxExecutionTime
+			if(isset($job->timeout) && $job->timeout==1) {
 				$job->maxExecTime=round($job->maxExecTime*1.15);
 				$job->timeout=0;
 				$this->storeManager->SaveJob($job);
@@ -757,7 +757,9 @@
 		{
 			$params = $this->chunker->params;
 			$source = $params->resolveSourcePath();
-			$cmdLine = str_replace($params->unResolvedSourcePath,$source,$cmdLine);
+			
+			//In PHP8 sending associative array as the subject will cause the returned value to be invalid
+			$cmdLine[0] = str_replace($params->unResolvedSourcePath,$source,$cmdLine[0]);
 			$job = new KChunkedEncodeJobData($this->name, $jobIdx, $cmdLine, $this->createTime);
 			$job->maxExecTime = $maxExecutionTime;
 			if($this->storeManager->AddJob($job)===false) {
