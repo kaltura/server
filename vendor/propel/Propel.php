@@ -638,6 +638,7 @@ class Propel
 				$startTime = microtime(true);
 				$con = new $classname($dsn, $user, $password, $driver_options);
 				$con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				$con->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, true);
 				break;
 			} catch (PDOException $e) {
 				$timeTook = microtime(true) - $startTime;
