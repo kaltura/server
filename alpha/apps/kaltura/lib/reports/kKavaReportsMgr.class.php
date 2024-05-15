@@ -252,7 +252,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_POLL_PARTICIPATION = 'poll_participation';
 	const METRIC_UNIQUE_REACTION_CLICKED_USERS = 'unique_users_reaction_clicked';
 	const METRIC_REACTION_CLICKED_PARTICIPATION = 'reaction_clicked_participation';
-
+	const METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS = 'unique_users_sent_private_message';
+	const METRIC_PRIVATE_CHAT_PARTICIPATION = 'private_chat_participation';
 
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
@@ -580,6 +581,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_ANSWERED_POLL_USERS => 'floor',
 		self::METRIC_UNIQUE_RECEIVED_POLL_USERS => 'floor',
 		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => 'floor',
+		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -653,6 +655,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_ANSWERED_POLL_USERS => true,
 		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => true,
 		self::METRIC_REACTION_CLICKED_PARTICIPATION => true,
+		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => true,
+		self::METRIC_PRIVATE_CHAT_PARTICIPATION => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1458,6 +1462,10 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
 			self::getHyperUniqueAggregator(self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PRIVATE_MESSAGE_SENT),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS, self::METRIC_UNIQUE_USER_IDS));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1938,6 +1946,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_DOWNLOAD_ATTACHMENT_USER_RATIO, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS, self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS))));
+
+		self::$metrics_def[self::METRIC_PRIVATE_CHAT_PARTICIPATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_PRIVATE_CHAT_PARTICIPATION, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS, self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 
