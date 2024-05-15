@@ -1397,7 +1397,7 @@ class KalturaEntryService extends KalturaBaseService
 		}
 		else
 		{
-			$creatorId = $entry->creatorId instanceof KalturaNullField ? null : trim($entry->creatorId);
+			$creatorId = trim($entry->creatorId);
 		}
 		$creator = kuserPeer::createKuserForPartner($this->getPartnerId(), $creatorId);
 

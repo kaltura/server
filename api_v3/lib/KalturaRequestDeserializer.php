@@ -466,6 +466,9 @@ class KalturaRequestDeserializer
 			case "string":
 				return kString::stripUtf8InvalidChars((string)$var);
 			case "bool":
+				// PHP8 - keep PHP7.2 behavior of strtolower(array(...)) === null which will go to the 'else' stmnt
+				if (is_array($var))
+					return (bool)$var;
 				if (strtolower($var) === "false")
 					return false;
 				else
