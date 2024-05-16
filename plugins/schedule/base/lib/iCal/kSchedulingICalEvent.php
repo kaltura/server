@@ -219,7 +219,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	            if (in_array($event->recurrence->timeZone, $timeZones))
 	            {
 	                $timeZoneId = $event->recurrence->timeZone;
-	                $object->setField(self::$timeZoneField, $timeZoneId);
 	            }
 	        }
 	
