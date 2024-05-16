@@ -227,7 +227,15 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	        {
 	            if ($event->$date)
 	            {
-	                $object->setField($field, kSchedulingICal::formatDate($event->$date, $timeZoneId));
+                    	if ($timeZoneId)
+                    	{
+                        	$fieldToUpperCase = $field . ";" . self::$timeZoneField . "=";
+                        	$object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $timeZoneId), $timeZoneId);
+                    	}
+                    	else
+                    	{
+                        	$object->setField($field, kSchedulingICal::formatDate($event->$date));
+                    	}
 	            }
 	        }
 
