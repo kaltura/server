@@ -40,7 +40,7 @@
 			<html5Url></html5Url>
 			<useCdn>1</useCdn>
 			<tags>autodeploy,kalturaPlayerJs,player,ovp</tags>
-			<confvars>{"kaltura-ovp-player":"{latest}", "playkit-flash":"{latest}"}</confvars>
+			<confVars>{"kaltura-ovp-player":"{latest}", "playkit-flash":"{latest}"}</confVars>
 			<creationMode>2</creationMode>
 			<config path="ui_conf/V7Player.json" />
 		</uiConf>
