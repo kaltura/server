@@ -77,6 +77,10 @@ class kSessionUtils
 			if ( $ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)
 				$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
 
+			if ($master_partner_id < 0)
+			{
+				$desired_expiry_in_seconds = max($desired_expiry_in_seconds, myPartnerUtils::MIN_INTERNAL_PARTNER_KS_EXPIRATION);
+			}
 			//	echo "startKSession: from DB: $ks_max_expiry_in_seconds | desired: $desired_expiry_in_seconds " ;
 
 			$ks_type = ks::TYPE_KS;
