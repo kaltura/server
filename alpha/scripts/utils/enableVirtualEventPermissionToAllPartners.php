@@ -4,16 +4,20 @@
  *
  *
  * Examples:
- * php enableVirtualEventPermissionToAllPartners.php
- * php enableVirtualEventPermissionToAllPartners.php realrun
+ * php enableVirtualEventPermissionToAllPartners.php 99 1000
+ * php enableVirtualEventPermissionToAllPartners.php 99 1000 realrun
  *
  * @package Deployment
  * @subpackage updates
  */
 
-$dryRun = true;
-if (in_array('realrun', $argv))
-	$dryRun = false;
+$dryRun = in_array('realrun', $argv) ? false : true;
+if ($argc < 3)
+{
+	die("Usage: php enableVirtualEventPermissionToAllPartners.php firstPartner lastPartner <realrun>\n");
+}
+$firstPartner = $argv[1];
+$lastPartner = $argv[2];
 
 $countLimitEachLoop = 500;
 $offset = $countLimitEachLoop;
@@ -30,17 +34,23 @@ KalturaStatement::setDryRun($dryRun);
 
 $c = new Criteria();
 $c->addAscendingOrderByColumn(PartnerPeer::ID);
-$c->addAnd(PartnerPeer::ID, 99, Criteria::GREATER_EQUAL);
+$c->addAnd(PartnerPeer::ID, $firstPartner, Criteria::GREATER_EQUAL);
 $c->addAnd(PartnerPeer::STATUS,1, Criteria::EQUAL);
 $c->setLimit($countLimitEachLoop);
-
 $partners = PartnerPeer::doSelect($c, $con);
 
+$isLastPartner = false;
 while (count($partners))
 {
 	foreach ($partners as $partner)
 	{
 		/* @var $partner Partner */
+		if ($partner->getId() > $lastPartner)
+		{
+			$isLastPartner = true;
+			break;
+		}
+
 		$virtualEventPermission = PermissionPeer::getByNameAndPartner(VIRTUALEVENT_PLUGIN_PERMISSION, $partner->getId());
 		if (!$virtualEventPermission)
 		{
@@ -53,9 +63,14 @@ while (count($partners))
 		{
 			continue;
 		}
-		print("Set permission [" . VIRTUALEVENT_PLUGIN_PERMISSION . "] for partner id [". $partner->getId() ."]");
+		print("Set permission [" . VIRTUALEVENT_PLUGIN_PERMISSION . "] for partner id [". $partner->getId() ."]\n");
 		$virtualEventPermission->setStatus(PermissionStatus::ACTIVE);
 		$virtualEventPermission->save();
+	}
+
+	if ($isLastPartner)
+	{
+		break;
 	}
 	
 	kMemoryManager::clearMemory();
