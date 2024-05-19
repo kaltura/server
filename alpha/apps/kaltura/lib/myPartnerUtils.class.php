@@ -20,6 +20,8 @@ class myPartnerUtils
 	const MARKETO_WRONG_PASSWORD = 'marketo_wrong_password_campaign';
 
 	const TYPE_DOWNLOAD = 'download';
+
+	const MIN_INTERNAL_PARTNER_KS_EXPIRATION = 2592000; // 30 days
 	
 	private static $s_current_partner_id = null;
 	private static $s_set_partner_id_policy  = self::PARTNER_SET_POLICY_NONE;
