@@ -126,5 +126,25 @@ class dateUtils
 		$diff = $date2->diff($date1)->format("%a");
 		return $diff;
 	}
+	
+	public static function kGmdate (string $format, $timestamp = null)
+	{
+		if(!is_null($timestamp))
+		{
+			$timestamp = intval($timestamp);
+		}
+		
+		return gmdate($format, $timestamp);
+	}
+	
+	public static function kDate (string $format, $timestamp = null)
+	{
+		if(!is_null($timestamp))
+		{
+			$timestamp = intval($timestamp);
+		}
+		
+		return date($format, $timestamp);
+	}
 }
 ?>
