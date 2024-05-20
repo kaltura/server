@@ -1,12 +1,25 @@
+# Tucana-20.12.0
+## Configure partner limit on max groups per user ##
+- Issue Type: Task
+- Issue ID: PLAT-24816
+
+### Configuration ###
+Add the following to local.ini:
+```
+[groupUserLimit]
+@PARTNER_ID@ = @MAX_GROUPS_PER_USER@
+```
+
 # Tucana-20.11.0
 ## Replace user's login data to new or existing login data ##
 - Issue Type: Task
 - Issue ID: PLAT-24661
+
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2024_03_24_user_replaceUserLoginData_permissions.php
 
 # Tucana-20.10.0
-## PHP8 support  ##
+## PHP8 support ##
 - Issue Type: Epic
 - Issue ID: VCP-15578
 
