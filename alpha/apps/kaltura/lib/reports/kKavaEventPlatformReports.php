@@ -264,6 +264,16 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO
 			),
 		),
+
+		ReportType::EP_ATTENDEES => array(
+			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL, self::DATASOURCE_APPLICATION_EVENTS),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_ATTENDEES),
+		),
+
+		ReportType::EP_LIVE_VIEWTIME => array(
+			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_LIVE_MEETING_PLAY_TIME),
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter)
