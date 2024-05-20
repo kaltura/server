@@ -129,9 +129,9 @@ class dateUtils
 	
 	public static function kGmdate (string $format, $timestamp = null)
 	{
-		if(!is_int($timestamp))
+		if(!is_null($timestamp))
 		{
-			return false;
+			$timestamp = intval($timestamp);
 		}
 		
 		return gmdate($format, $timestamp);
@@ -139,9 +139,9 @@ class dateUtils
 	
 	public static function kDate (string $format, $timestamp = null)
 	{
-		if(!is_int($timestamp))
+		if(!is_null($timestamp))
 		{
-			return false;
+			$timestamp = intval($timestamp);
 		}
 		
 		return date($format, $timestamp);
