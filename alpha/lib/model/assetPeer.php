@@ -586,7 +586,7 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 	public static function getBestFlavorByTagsAndBitrate($entryId, $tag, $excludeTag, $external, $retrieveHighestBitrate = true, $fetchFromRemote = false)
 	{
 		$flavorAssets = self::retrieveFlavorsWithTagsFiltering($entryId, $tag, $excludeTag);
-		if(!$flavorAssets)
+		if(!count($flavorAssets))
 			return null;
 
 		$ret = null;
@@ -636,14 +636,10 @@ class assetPeer extends BaseassetPeer implements IRelatedObjectPeer
 		$flavorTypes = self::retrieveAllFlavorsTypes();
 		$c->add(assetPeer::TYPE, $flavorTypes, Criteria::IN);
 		$flavorAssets = self::doSelect($c);
-		if(!count($flavorAssets))
-			return null;
-		if(!is_null($tag))
+		if(count($flavorAssets) && !is_null($tag))
 			$flavorAssets = self::filterByTag($flavorAssets, $tag);
-		if (!is_null($excludeTag))
+		if (count($flavorAssets) && !is_null($excludeTag))
 			$flavorAssets = self::excludeByTag($flavorAssets, $excludeTag);
-		if(!count($flavorAssets))
-			   return null;
 
 		return $flavorAssets;
 	}

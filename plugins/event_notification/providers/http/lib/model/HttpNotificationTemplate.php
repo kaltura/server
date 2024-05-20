@@ -82,7 +82,8 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 		
 		$jobData = new kHttpNotificationDispatchJobData();
 		$jobData->setTemplateId($this->getId());
-		$url = str_replace('{DC}',kDataCenterMgr::getCurrentDcName(), $this->getUrl());
+		$notificationUrl = !is_null($this->getUrl()) ? $this->getUrl() : '';
+		$url = str_replace('{DC}',kDataCenterMgr::getCurrentDcName(), $notificationUrl);
 		$jobData->setUrl($url);
 		$jobData->setDataObject($data);
 		$jobData->setMethod($this->getMethod());

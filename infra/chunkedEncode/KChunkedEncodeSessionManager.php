@@ -182,7 +182,7 @@
 				if($job->state==$job::STATE_FAIL) {
 						// The last chunk generation might be affected by improperly set source metadata.
 						// Occationally, the file ends before reaching the timing that was declared in the metadata.
-						// This results the last chunk failure,.
+						// This results the last chunk failure.
 						// To handle such cases, the failed job of the last chunk, forced to SUCCESS state after 
 						// few generation attempts.
 					if($job->id==$maxChunks-1 && $job->msg=="missing chunk stat"){
@@ -255,10 +255,9 @@
 					 */
 //					if(!array_key_exists($job->id, $this->failed))
 					{
-						$failedIdx = $job->keyIdx;
-						$this->retryJob($manager, $job);
-						$this->failed[$job->id] = $failedIdx;
-						KalturaLog::log("Retry chunk ($job->id) - failed on execution timeout ($elapsed sec, maxExecutionTime:$maxExecutionTime");
+						$job->timeout=1;
+						KalturaLog::log("($job->id, atm:$job->attempt)doubled the maxExecutionTime,$job->maxExecTime,elapsed:$elapsed");
+						$this->failed[$job->id] = $job->keyIdx;
 					}
 				}
 			}
@@ -270,6 +269,7 @@
 		 */
 		protected function retryJob($manager, $job)
 		{
+			KalturaLog::log("id:$job->id, keyIdx:$job->keyIdx, state:$job->state");
 			$job->state = $job::STATE_RETRY;
 			$manager->SaveJob($job);
 		}
@@ -652,9 +652,11 @@
 		 */
 		protected function processFailedJob($job)
 		{
-			if($job->state==$job::STATE_PENDING || $job->state==$job::STATE_RUNNING) {
+			if($job->state==$job::STATE_PENDING)
 				return true;
-			}
+			if($job->state==$job::STATE_RUNNING && !(isset($job->timeout) && $job->timeout==1)) 
+				return true;
+
 			KalturaLog::log("Job dump:".serialize($job));
 			if(array_key_exists($job->id, $this->audioJobs->jobs) && $this->audioJobs->jobs[$job->id]->process==$job->process)
 				$logFilename = $this->chunker->getSessionName("audio").".log";		
@@ -668,21 +670,30 @@
 				KalturaLog::log("FAILED - job id($job->id) exeeded retry limit ($job->attempt, max:$this->maxRetries)");
 				return false;
 			}
-			$failedIdx = $job->keyIdx;
-			$job->state = $job::STATE_RETRY;
-			$this->storeManager->SaveJob($job);
-	
-			$job->state = $job::STATE_PENDING;
-			
-			//Reset job time stamps to avoid exec timeout when retrying failed job
-			$job->resetParams();
-			
 			$job->attempt++;
-			if($this->storeManager->AddJob($job)===false) {
-				KalturaLog::log("FAILED to retry job($job->id)");
-				return false;
+			
+				// For chunk timeouts 'retry attmept' means - extend jobs maxExecutionTime
+			if(isset($job->timeout) && $job->timeout==1) {
+				$job->maxExecTime=round($job->maxExecTime*1.15);
+				$job->timeout=0;
+				$this->storeManager->SaveJob($job);
+				KalturaLog::log("Extend execution timeout, chunk ($job->id, maxExecTime:$job->maxExecTime, attempt:$job->attempt");
 			}
-			KalturaLog::log("Retry chunk ($job->id, failedKey:$failedIdx,newKey:$job->keyIdx, attempt:$job->attempt");
+			else {
+				$failedIdx = $job->keyIdx;
+				$job->state = $job::STATE_RETRY;
+				$this->storeManager->SaveJob($job);
+		
+					//Reset job time stamps to avoid exec timeout when retrying failed job
+				$job->resetParams();
+				$job->state = $job::STATE_PENDING;
+				
+				if($this->storeManager->AddJob($job)===false) {
+					KalturaLog::log("FAILED to retry job($job->id)");
+					return false;
+				}
+				KalturaLog::log("Retry chunk ($job->id, failedKey:$failedIdx,newKey:$job->keyIdx, attempt:$job->attempt");
+			}
 			return true;
 		}
 

@@ -112,7 +112,7 @@ class kBulkGroupUserSyncCsv
 
 	protected function isGroupAndNotProtected($key)
 	{
-		if(is_null($this->userMap[$key]))
+		if(!isset($this->userMap[$key]) || is_null($this->userMap[$key]))
 			return false;
 		
 		if(array_key_exists(self::TYPE, $this->userMap[$key]) && $this->userMap[$key][self::TYPE] == KuserType::GROUP &&

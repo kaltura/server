@@ -610,9 +610,13 @@ class MetadataService extends KalturaBaseService
 	private function validateObjectId($objectId, $objectType)
 	{
 		$metadataObjectClassName = kMetadataManager::getObjectTypeName($objectType);
-		$this->applyPartnerFilterForClass($metadataObjectClassName);
-		$objectPeer = kMetadataManager::getObjectPeer($objectType);
+		//$objectType could by dynamic which has no peer to apply partner filter for
+		if($metadataObjectClassName)
+		{
+			$this->applyPartnerFilterForClass($metadataObjectClassName);
+		}
 		
+		$objectPeer = kMetadataManager::getObjectPeer($objectType);
 		if(!$objectPeer && !kCurrentContext::$is_admin_session)
 		{
 			KalturaLog::debug("Failed to validate metadata object access for dynamic object id [$objectId]");

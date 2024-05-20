@@ -10,7 +10,7 @@ class kTime
 	public static function getRelativeTime($value)
 	{
 		// empty fields should be treated as 0 and not as the current time
-		if (strlen($value) == 0)
+		if (is_null($value) || strlen($value) == 0)
 			return 0;
 		$value = (int)$value;
 		if ($value == self::REMOVE_DATE)

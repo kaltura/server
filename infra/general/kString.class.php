@@ -587,4 +587,14 @@ class kString
 		
 		return strtolower($str);
 	}
+	
+	public static function kStripos(string $haystack, string $needle, int $offset = 0)
+	{
+		if($needle == '')
+		{
+			return false;
+		}
+		
+		return stripos($haystack, $needle, $offset);
+	}
 }

@@ -1,3 +1,10 @@
+# Tucana-20.11.0
+## Replace user's login data to new or existing login data ##
+- Issue Type: Task
+- Issue ID: PLAT-24661
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2024_03_24_user_replaceUserLoginData_permissions.php
+
 # Tucana-20.10.0
 ## PHP8 support  ##
 - Issue Type: Epic

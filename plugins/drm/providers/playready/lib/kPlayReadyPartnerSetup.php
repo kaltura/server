@@ -8,9 +8,9 @@ class kPlayReadyPartnerSetup
 		$c = new Criteria();
 		$c->add ( DrmPolicyPeer::PARTNER_ID, $partnerId );
 		$c->add ( DrmPolicyPeer::STATUS, DrmPolicyStatus::ACTIVE);
-		$c->add ( DrmPolicyPeer::PROVIDER, PlayReadyPlugin::getPlayReadyProviderCoreValue());				
-		$policies = DrmPolicyPeer::doSelectOne($c);
-		if(!count($policies))
+		$c->add ( DrmPolicyPeer::PROVIDER, PlayReadyPlugin::getPlayReadyProviderCoreValue());
+		$policy = DrmPolicyPeer::doSelectOne($c);
+		if(!$policy)
 		{
 			KalturaLog::info("playready setup for partner ".$partnerId);
 			list ($defaultPolicy) = self::createPartnerPolicies($partnerId);

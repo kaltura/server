@@ -26,7 +26,11 @@ class kCloudFrontUrlTokenizer extends kUrlTokenizer
 		$signature = "";
 		$pkeyid = openssl_get_privatekey($this->key);
 		openssl_sign($policy, $signature, $pkeyid);
-		openssl_free_key($pkeyid);
+		if (PHP_VERSION_ID < 80000)
+		{
+			//This was deprecated in php8 https://www.php.net/manual/en/function.openssl-free-key.php
+			openssl_free_key($pkeyid);
+		}
 		return $signature;
 	}
 	
