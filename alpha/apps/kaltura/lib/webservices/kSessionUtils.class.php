@@ -74,19 +74,14 @@ class kSessionUtils
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
 		if ( $result >= 0 )
 		{
-			if ( $ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)
-				$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
+			self::calculateExpiry($ks_max_expiry_in_seconds, $desired_expiry_in_seconds, $enforcePartnerKsMaxExpiry, $master_partner_id);
 
-			if ($master_partner_id < 0)
-			{
-				$desired_expiry_in_seconds = max($desired_expiry_in_seconds, myPartnerUtils::MIN_INTERNAL_PARTNER_KS_EXPIRATION);
-			}
 			//	echo "startKSession: from DB: $ks_max_expiry_in_seconds | desired: $desired_expiry_in_seconds " ;
 
 			$ks_type = ks::TYPE_KS;
 			if($admin)
 				$ks_type = $admin ; // if the admin > 1 - use it rather than automatically setting it to be 2
-				
+
 			$ks = self::createKSession($partner_id, $partner_secret, $puser_id, $desired_expiry_in_seconds, $ks_type, $privileges, $additional_data, $master_partner_id);
 			$ks_str = $ks->toSecureString();
 			return 0;
@@ -94,6 +89,27 @@ class kSessionUtils
 		else
 		{
 			return $result;
+		}
+
+	}
+
+	protected static function calculateExpiry($ks_max_expiry_in_seconds, &$desired_expiry_in_seconds, $enforcePartnerKsMaxExpiry, $master_partner_id)
+	{
+		if ($ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)
+		{
+			$desired_expiry_in_seconds = $ks_max_expiry_in_seconds;
+		}
+		if ($master_partner_id && $master_partner_id < 0)
+		{
+			$masterPartner = PartnerPeer::retrieveByPK($master_partner_id);
+			if (!$masterPartner->getKsMaxExpiryInSeconds())
+			{
+				$desired_expiry_in_seconds = dateUtils::DAY;
+			}
+			else
+			{
+				$desired_expiry_in_seconds = min ($desired_expiry_in_seconds, $masterPartner->getKsMaxExpiryInSeconds());
+			}
 		}
 
 	}
