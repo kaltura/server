@@ -20,6 +20,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
 	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
 	const DATASOURCE_CNC_EVENTS = 'cnc-events';
+	const DATASOURCE_APPLICATION_EVENTS = 'application-events';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -186,6 +187,9 @@ class kKavaBase extends kDruidBase
 	// event types - meeting events
 	const EVENT_TYPE_MEETING_JOIN_SESSION = 'joinSession';
 	const EVENT_TYPE_MEETING_RAISE_HAND = 'raiseHand';
+
+	// event types - application events
+	const EVENT_TYPE_PAGE_LOAD = 'pageLoad';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
