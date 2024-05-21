@@ -15,7 +15,6 @@
  */
 class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 {
-	const MAX_NUMBER_OF_GROUPS_PER_USER = 1024;
 	const GROUP_USER_CREATION_MODE = 'creation_mode';
 	const GROUP_USER_ROLE = 'user_role';
 
