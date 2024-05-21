@@ -6,7 +6,7 @@
 ### Configuration ###
 Add the following to local.ini:
 ```
-[groupUserLimit]
+[groupUserCountLimit]
 @PARTNER_ID@ = @MAX_GROUPS_PER_USER@
 ```
 
