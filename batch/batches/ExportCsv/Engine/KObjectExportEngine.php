@@ -4,6 +4,7 @@
  * @package Scheduler
  * @subpackage ExportCsv
  */
+require_once(__DIR__.'/../../../../alpha/apps/kaltura/lib/dateUtils.class.php');
 abstract class KObjectExportEngine
 {
 	/**
