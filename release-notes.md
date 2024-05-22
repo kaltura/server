@@ -1,9 +1,14 @@
-# Tucana-20.11.0
-## Replace user's login data to new or existing login data ##
+# Tucana-20.12.0
+## Configure partner limit on max groups per user ##
 - Issue Type: Task
-- Issue ID: PLAT-24661
-### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2024_03_24_user_replaceUserLoginData_permissions.php
+- Issue ID: PLAT-24816
+
+### Configuration ###
+Add the following to local.ini:
+```
+[groupUserCountLimit]
+@PARTNER_ID@ = @MAX_GROUPS_PER_USER@
+```
 
 ## Load trimmed captions to file in case upload by string resource not succeed ##
 - Issue Type: Bug
@@ -13,10 +18,16 @@ Add the following to batch.ini under KAsyncCopyCaptions worker
 
 ```
 [KAsyncCopyCaptions : JobHandlerWorker]
-id													= @WORKER_ID@
+id		      = @WORKER_ID@
 ...
-params.localTempPath                                = @TMP_DIR@/copycaptions
+params.localTempPath = @TMP_DIR@/copycaptions
 ```
+# Tucana-20.11.0
+## Replace user's login data to new or existing login data ##
+- Issue Type: Task
+- Issue ID: PLAT-24661
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2024_03_24_user_replaceUserLoginData_permissions.php
 
 # Tucana-20.10.0
 ## PHP8 support  ##
