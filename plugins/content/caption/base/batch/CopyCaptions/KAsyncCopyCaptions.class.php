@@ -157,60 +157,69 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 
 	protected function loadNewCaptionAssetFile($captionAsset, $contentResource)
 	{
-		$captionAssetId = $captionAsset->id;
-		if (!kXml::isXMLValidContent($contentResource->content))
-		{
-			$contentResource->content = kXml::stripXMLInvalidChars($contentResource->content);
-		}
-		try
-		{
-			$updatedCaption = $this->captionClientPlugin->captionAsset->setContent($captionAssetId, $contentResource);
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::info("Can't set content to caption asset id: [$captionAssetId]" . $e->getMessage());
-			KalturaLog::debug("Trying with uploaded file token resource");
-			$filePath = $this->getTempFilePath($captionAsset);
-			try {
-				$uploadTokenResource = $this->tryWithUploadTokenResource($filePath, $contentResource);
-				$updatedCaption = $this->captionClientPlugin->captionAsset->setContent($captionAssetId, $uploadTokenResource);
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::info("Can't set content to caption asset id: [$captionAssetId]" . $e->getMessage());
-				kFile::unlink($filePath);
-				return null;
-			}
-			kFile::unlink($filePath);
-		}
-		return $updatedCaption;
-	}
+                $captionAssetId = $captionAsset->id;
+                if (!kXml::isXMLValidContent($contentResource->content))
+                {
+                        $contentResource->content = kXml::stripXMLInvalidChars($contentResource->content);
+                }
+                try
+                {
+                        $updatedCaption = $this->captionClientPlugin->captionAsset->setContent($captionAssetId, $contentResource);
+                        return $updatedCaption;
+                }
+                catch(Exception $e)
+                {
+                        KalturaLog::info("Can't set content to caption asset id: [$captionAssetId]" . $e->getMessage());
+                }
+                $filePath = $this->getTempFilePath($captionAsset);
+                try
+                {
+                        $uploadTokenResource = $this->uploadCaptionsUsingUploadToken($filePath, $contentResource);
+                        $updatedCaption = $this->captionClientPlugin->captionAsset->setContent($captionAssetId, $uploadTokenResource);
+                        kFile::unlink($filePath);
+                }
+                catch(Exception $e)
+                {
+                        KalturaLog::info("Can't set content to caption asset id: [$captionAssetId]" . $e->getMessage());
+                        if(kFile::checkFileExists($filePath))
+                        {
+                                kFile::unlink($filePath);
+                        }
+                        return null;
+                }
+                return $updatedCaption;
+        }
 
-	protected function tryWithUploadTokenResource($filePath, $contentResource)
-	{
-		$captionsFile = fopen($filePath, "w");
-		fwrite($captionsFile, $contentResource->content);
-		fclose($captionsFile);
-		$uploadTokenResource = new KalturaUploadToken();
-		$uploadTokenResource->fileName = basename($filePath);
-		$uploadTokenResource->fileSize = filesize($filePath);
-		$createdToken = KBatchBase::$kClient->uploadToken->add($uploadTokenResource);
-		$uploadedToken = self::$kClient->uploadToken->upload($createdToken->id, $filePath);
-		$uploadedFileTokenResource = new KalturaUploadedFileTokenResource();
-		$uploadedFileTokenResource->token = $uploadedToken->id;
-		return $uploadedFileTokenResource;
+        protected function uploadCaptionsUsingUploadToken($filePath, $contentResource)
+        {
+                $captionsFile = fopen($filePath, "w");
+                fwrite($captionsFile, $contentResource->content);
+                fclose($captionsFile);
+                $uploadTokenResource = new KalturaUploadToken();
+                $uploadTokenResource->fileName = basename($filePath);
+                $uploadTokenResource->fileSize = filesize($filePath);
+                $createdToken = self::$kClient->uploadToken->add($uploadTokenResource);
+                if($createdToken)
+                {
+                        $createdToken = self::$kClient->uploadToken->upload($createdToken->id, $filePath);
+                }
+                if($createdToken)
+                {
+                        $uploadedFileTokenResource = new KalturaUploadedFileTokenResource();
+                        $uploadedFileTokenResource->token = $createdToken->id;
+                        return $uploadedFileTokenResource;
+                }
+                return $contentResource;
+        }
 
-	}
-
-	protected function getTempFilePath($captionAsset)
-	{
-		$directory = self::$taskConfig->params->localTempPath;
-		KBatchBase::createDir($directory);
-		$filePath = $directory . DIRECTORY_SEPARATOR . 'copy_captions' . '_' . $captionAsset->id . '.' . $captionAsset->fileExt;
-		KalturaLog::info("Temp file path: [$filePath]");
-		return $filePath;
-	}
-
+        protected function getTempFilePath($captionAsset)
+        {
+                $directory = self::$taskConfig->params->localTempPath;
+                self::createDir($directory);
+                $filePath = $directory . DIRECTORY_SEPARATOR . 'copy_captions' . '_' . $captionAsset->id . '.' . $captionAsset->fileExt;
+                KalturaLog::info("Temp file path: [$filePath]");
+                return $filePath;
+        }
 
 	protected function createNewCaptionsFile($captionContent, $offset, $duration , $format, $fullCopy, $globalOffset)
 	{
