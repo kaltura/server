@@ -436,7 +436,7 @@ class GroupUserService extends KalturaBaseService
 		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
 
 		$maxGroupsPerUser = GroupUserService::DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER;
-		$groupUserCountLimitMap = kConf::get('groupUserCountLimit', 'local', array());
+		$groupUserCountLimitMap = kConf::get('group_user_count_limit', 'local', array());
 		$partnersList = array_keys($groupUserCountLimitMap);
 		if (in_array($partnerId, $partnersList))
 		{
