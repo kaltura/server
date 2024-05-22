@@ -88,26 +88,14 @@ foreach ($entriesIds as $deletedEntryId)
 	
 	foreach($deletedAssets as $deletedAsset)
 	{
-		// CaptionAsset has a check for content in the 'preUpdate' at plugins/content/caption/base/lib/model/CaptionAsset.php:118
-		// due to that, before saving we try to fetch ready file_sync (but the script restore file_syncs after setting flavor_asset ready at line #102 below)
-		// this will cause caption assets to turn into error (-1) status (but the file_sync will be restored)
-		// so for CaptionAsset - skip set asset status ready (-2) before we restored the file_sync and do it after file_sync have been restored
-		
-		/* @var $deletedAsset asset */
-		if ($deletedAsset->getStatus() == asset::ASSET_STATUS_DELETED && !($deletedAsset instanceof CaptionAsset))
-		{
-			$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
-			$deletedAsset->save();
-			KalturaLog::debug('Asset id: ' . $deletedAsset->getId() . ' set to READY');
-		}
-
 		$assetSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		restoreFileSyncByKey($assetSyncKey);
 
 		$assetConvertLogSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
 		restoreFileSyncByKey($assetConvertLogSyncKey);
 		
-		if ($deletedAsset instanceof CaptionAsset)
+		/* @var $deletedAsset asset */
+		if ($deletedAsset->getStatus() == asset::ASSET_STATUS_DELETED)
 		{
 			$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
 			$deletedAsset->save();
