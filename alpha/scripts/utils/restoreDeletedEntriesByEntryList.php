@@ -89,9 +89,9 @@ foreach ($entriesIds as $deletedEntryId)
 	foreach($deletedAssets as $deletedAsset)
 	{
 		// CaptionAsset has a check for content in the 'preUpdate' at plugins/content/caption/base/lib/model/CaptionAsset.php:118
-		// due to that, before saving we try to fetch ready file_sync (but the script restore file_syncs after we at line #102 below)
+		// due to that, before saving we try to fetch ready file_sync (but the script restore file_syncs after setting flavor_asset ready at line #102 below)
 		// this will cause caption assets to turn into error (-1) status (but the file_sync will be restored)
-		// so for CaptionAsset - skip set asset status ready (-2) before we restored the file_sync
+		// so for CaptionAsset - skip set asset status ready (-2) before we restored the file_sync and do it after file_sync have been restored
 		
 		/* @var $deletedAsset asset */
 		if ($deletedAsset->getStatus() == asset::ASSET_STATUS_DELETED && !($deletedAsset instanceof CaptionAsset))
