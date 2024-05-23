@@ -18,7 +18,7 @@ Add the following to batch.ini under KAsyncCopyCaptions worker
 
 ```
 [KAsyncCopyCaptions : JobHandlerWorker]
-id		      = @WORKER_ID@
+id		     = @WORKER_ID@
 ...
 params.localTempPath = @TMP_DIR@/copycaptions
 ```
