@@ -1472,9 +1472,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		self::$aggregations_def[self::METRIC_UNIQUE_ATTENDEES] = self::getFilteredAggregator(
-			self::getAndFilter(array(
-				self::getInFilter(self::DIMENSION_EVENT_TYPE, array(self::EVENT_TYPE_VIEW_PERIOD, self::EVENT_TYPE_PAGE_LOAD)),
-				self::getNotFilter(self::getInFilter(self::DIMENSION_PLAYBACK_TYPE, array(self::PLAYBACK_TYPE_OFFLINE))))),
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$attendees_event_types),
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_ATTENDEES, self::METRIC_UNIQUE_USER_IDS));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
