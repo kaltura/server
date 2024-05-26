@@ -542,7 +542,7 @@ class embedPlaykitJsAction extends sfAction
                         <body >
                         	<div id="player_container"></div>
                             	<script type = "text/javascript" > ' . $bundleContent . '</script >
-				<script type = "text/javascript" > window.originalRequestRefferer = "' . $_SERVER['HTTP_REFERER'] . '"</script >
+				<script type = "text/javascript" > window.originalRequestReferrer = "' . $_SERVER['HTTP_REFERER'] . '"</script >
 			</body >
                     </html >';
 		return $htmlDoc;
