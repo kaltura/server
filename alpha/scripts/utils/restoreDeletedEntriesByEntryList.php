@@ -88,6 +88,12 @@ foreach ($entriesIds as $deletedEntryId)
 	
 	foreach($deletedAssets as $deletedAsset)
 	{
+		$assetSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
+		restoreFileSyncByKey($assetSyncKey);
+
+		$assetConvertLogSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
+		restoreFileSyncByKey($assetConvertLogSyncKey);
+		
 		/* @var $deletedAsset asset */
 		if ($deletedAsset->getStatus() == asset::ASSET_STATUS_DELETED)
 		{
@@ -95,13 +101,8 @@ foreach ($entriesIds as $deletedEntryId)
 			$deletedAsset->save();
 			KalturaLog::debug('Asset id: ' . $deletedAsset->getId() . ' set to READY');
 		}
-
-		$assetSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		restoreFileSyncByKey($assetSyncKey);
-
-		$assetConvertLogSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG);
-		restoreFileSyncByKey($assetConvertLogSyncKey);
 	}
+	
 	kEventsManager::flushEvents();
 	kMemoryManager::clearMemory();
 
