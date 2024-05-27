@@ -266,14 +266,15 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 		),
 
 		ReportType::EP_ATTENDEES => array(
-			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL, self::DATASOURCE_APPLICATION_EVENTS),
+			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL, self::DATASOURCE_APPLICATION_EVENTS, self::DATASOURCE_CNC_EVENTS),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNIQUE_ATTENDEES),
 		),
 
-		ReportType::EP_LIVE_VIEWTIME => array(
+		ReportType::EP_VIEWTIME => array(
 			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-			self::REPORT_GRAPH_METRICS => array(self::METRIC_LIVE_MEETING_PLAY_TIME),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_VIEW_PERIOD_PLAY_TIME),
 		),
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)
