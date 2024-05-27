@@ -255,9 +255,9 @@ abstract class LiveEntry extends entry
 		return array(array('bitrate' => 300, 'width' => 320, 'height' => 240));
 	}
 
-	public function getRecordedEntryId()
+	public function getRecordedEntryId($useDynamic=true)
 	{
-		if($this->pluginableGetter(__FUNCTION__, $output))
+		if($useDynamic && $this->pluginableGetter(__FUNCTION__, $output))
 		{
 			return $output;
 		}
