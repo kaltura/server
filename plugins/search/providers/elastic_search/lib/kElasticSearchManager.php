@@ -426,7 +426,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
                 {
                     if(strlen($value) > kElasticSearchManager::MAX_LENGTH)
                     {
-                	    $value = substr($value, 0, self::MAX_LENGTH);
+                        $value = substr($value, 0, self::MAX_LENGTH);
                         $params[$item][$key] = $value;
                     }
                 }
