@@ -339,6 +339,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				}
 			}
 			
+			$avg_frame_rate = '';
 			if(isset($value) && $value!=false && $value<120) {
 				$mediaInfo->videoFrameRate = round($value, 3);
 			}

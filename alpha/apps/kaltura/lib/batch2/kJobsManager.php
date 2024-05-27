@@ -1165,7 +1165,7 @@ class kJobsManager
 	 * @param array $conversionCommands
 	 * @return BatchJob
 	 */
-	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $shouldSort = true, $offset = null, $duration = null, $conversionCommands = null)
+	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $shouldSort = true, $offset = null, $duration = null, $conversionCommands = array())
 	{
 		$jobData = new kConcatJobData();
  		$jobData->setSrcFiles($files);

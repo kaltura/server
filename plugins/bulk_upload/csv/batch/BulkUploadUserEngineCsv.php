@@ -39,12 +39,18 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		{
 			if(!is_numeric($index))
 				continue;
-
+			
 			if ($column == 'dateOfBirth')
 			{
 			    $dateOfBirth = $values[$index];
 			}
-
+			
+			if(!isset($values[$index]))
+			{
+				KalturaLog::info("Value $column is not set");
+				continue;
+			}
+			
 			if(iconv_strlen($values[$index], 'UTF-8'))
 			{
 				$bulkUploadResult->$column = $values[$index];
