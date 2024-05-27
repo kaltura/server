@@ -36,8 +36,6 @@ class LiveStreamStatsActions
 	public function __construct()
 	{
 		$this->liveStreamStatsCacheHandler = null;
-		$this->liveStreamStatsCacheTTL = 0;
-
 		$this->liveStreamStatsCacheTTL = kConf::get(LiveStreamStatsActions::CONF_LIVE_STATS_INTERVAL,LiveStreamStatsActions::LIVE_SETTINGS, LiveStreamStatsActions::DEFAULT_TTL);
 
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
@@ -74,7 +72,6 @@ class LiveStreamStatsActions
 	public static function getLiveStreamStats($params)
 	{
 		$entryId     = $params[LiveStreamStatsActions::ENTRY_ID_ARG];
-
 		$instance   = new LiveStreamStatsActions();
 		return $instance->doGetLiveStreamStats($entryId);
 	}
@@ -83,7 +80,7 @@ class LiveStreamStatsActions
 class LiveStreamStatsCacheHandler
 {
 	const CACHE_KEY_SEPARATOR = '_';
-	const LIVE_VIEWERS_SUFFIX = 'live_viewers';
+	const LIVE_VIEWERS_PREFIX = 'live_viewers';
 
 	protected $cache;
 
@@ -115,7 +112,7 @@ class LiveStreamStatsCacheHandler
 	/* Cache keys functions */
 	protected function getLiveViewersCacheKey(): string
 	{
-		return LiveStreamStatsCacheHandler::LIVE_VIEWERS_SUFFIX . LiveStreamStatsCacheHandler::CACHE_KEY_SEPARATOR;
+		return LiveStreamStatsCacheHandler::LIVE_VIEWERS_PREFIX . LiveStreamStatsCacheHandler::CACHE_KEY_SEPARATOR;
 	}
 
 	protected function getCacheVersion($entryId)
