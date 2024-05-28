@@ -3,7 +3,7 @@
 require_once(__DIR__ . '/bootstrap.php');
 
 // parse the command line
-if($argc<2)
+if($argc<3)
 {
 	die("Usage: php " . $argv[0] . " <partner id> <user type: admin | user> <realrun | dryrun>\n");
 }
@@ -31,13 +31,13 @@ if ($userType === 'admin')
 
 
 
-function countUsers($partnerId, $isAdmin, $hasEmail = null, $email = null)
+function countUsers($partnerId, $isAdmin, $emailFieldValue)
 {
 	$emailCriteria = new Criteria();
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
 	$emailCriteria->add(kuserPeer::IS_ADMIN, $isAdmin);
-	if($hasEmail == Criteria::ISNULL) // counting users without email value
+	if($emailFieldValue == Criteria::ISNULL) // counting users without email value
 	{
 		$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNULL);
 	}
@@ -51,7 +51,7 @@ function countUsers($partnerId, $isAdmin, $hasEmail = null, $email = null)
 
 function noEmailPercentage($noEmailUsersCount, $allUsersCount)
 {
-	return (int)(($noEmailUsersCount * 100) /$allUsersCount);
+	return (int)(($noEmailUsersCount * 100)/$allUsersCount);
 }
 
 function getUsersWithEmail($partnerId, $isAdmin)
@@ -97,7 +97,6 @@ function countUsersWithDuplicatedEmail($partnerId, $isAdmin)
 
 function copyEmailToExternalId($partnerId, $isAdmin)
 {
-	KalturaLog::log('copying email to externalId.');
 	$usersWithEmail = getUsersWithEmail($partnerId, $isAdmin);
 	if (sizeof($usersWithEmail) > 0)
 	{
