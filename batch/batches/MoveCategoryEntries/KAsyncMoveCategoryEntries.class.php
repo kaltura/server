@@ -96,7 +96,8 @@ class KAsyncMoveCategoryEntries extends KJobHandlerWorker
 			$entryIds[] = $oldCategoryEntry->entryId;
 			$categoryIds[] = $oldCategoryEntry->categoryId;
 		}
-		return KBatchBase::$kClient->doMultiRequest();
+		$res = KBatchBase::$kClient->doMultiRequest();
+		return $res ? $res : array();
 	}
 	
 	/**
