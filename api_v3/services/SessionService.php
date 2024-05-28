@@ -129,12 +129,6 @@ class SessionService extends KalturaBaseService
 			$impersonatedSecret = $impersonatedPartner->getSecret();
 		}
 
-		// make sure the secret fits the one in the partner's table
-		$enforcePartnerKsMaxExpiry = false;
-		if ($partnerId < 0)
-		{
-			$enforcePartnerKsMaxExpiry = true;
-		}
 		$ks = "";
 		$result = kSessionUtils::startKSession ( $impersonatedPartner->getId() , $impersonatedSecret, $userId , $ks , $expiry , $type , "" , $privileges, $partnerId, null, $enforcePartnerKsMaxExpiry );
 

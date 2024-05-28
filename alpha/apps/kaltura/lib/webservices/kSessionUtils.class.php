@@ -67,7 +67,7 @@ class kSessionUtils
 	* In the first case, it will be considered invalid for user that are not the ones that started the session
 	*/
 	public static function startKSession ( $partner_id , $partner_secret , $puser_id , &$ks_str  ,
-		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null, $enforcePartnerKsMaxExpiry = false)
+		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null, $enforcePartnerKsMaxExpiry = true)
 	{
 		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
 		ks::validatePrivileges($privileges,  $partner_id);
@@ -95,23 +95,18 @@ class kSessionUtils
 
 	protected static function calculateExpiry($ks_max_expiry_in_seconds, &$desired_expiry_in_seconds, $enforcePartnerKsMaxExpiry, $master_partner_id)
 	{
+		if ($master_partner_id && $master_partner_id < 0)
+		{
+			$masterPartner = PartnerPeer::retrieveByPK($master_partner_id);
+			if ($masterPartner && $desired_expiry_in_seconds)
+			{
+				$ks_max_expiry_in_seconds = $desired_expiry_in_seconds;
+			}
+		}
 		if ($ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)
 		{
 			$desired_expiry_in_seconds = $ks_max_expiry_in_seconds;
 		}
-		if ($master_partner_id && $master_partner_id < 0)
-		{
-			$masterPartner = PartnerPeer::retrieveByPK($master_partner_id);
-			if (!$masterPartner->getKsMaxExpiryInSeconds())
-			{
-				$desired_expiry_in_seconds = dateUtils::DAY;
-			}
-			else
-			{
-				$desired_expiry_in_seconds = min ($desired_expiry_in_seconds, $masterPartner->getKsMaxExpiryInSeconds());
-			}
-		}
-
 	}
 
 	public static function createKSessionNoValidations ( $partner_id , $puser_id , &$ks_str  ,
