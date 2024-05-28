@@ -130,7 +130,7 @@ class SessionService extends KalturaBaseService
 		}
 
 		$ks = "";
-		$result = kSessionUtils::startKSession ( $impersonatedPartner->getId() , $impersonatedSecret, $userId , $ks , $expiry , $type , "" , $privileges, $partnerId, null, $enforcePartnerKsMaxExpiry );
+		$result = kSessionUtils::startKSession ( $impersonatedPartner->getId() , $impersonatedSecret, $userId , $ks , $expiry , $type , "" , $privileges, $partnerId);
 
 		if ( $result >= 0 )
 		{

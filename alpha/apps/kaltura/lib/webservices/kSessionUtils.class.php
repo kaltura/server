@@ -100,7 +100,7 @@ class kSessionUtils
 			$masterPartner = PartnerPeer::retrieveByPK($master_partner_id);
 			if ($masterPartner && $desired_expiry_in_seconds)
 			{
-				$ks_max_expiry_in_seconds = $desired_expiry_in_seconds;
+				return;
 			}
 		}
 		if ($ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)

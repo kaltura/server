@@ -146,7 +146,7 @@ class Partner extends BasePartner
 				$partnerKsMaxExpiryInSeconds = dateUtils::DAY;
 			}
 			
-			$ks_max_expiry_in_seconds = min($ks_max_expiry_in_seconds, $partnerKsMaxExpiryInSeconds);
+			$ks_max_expiry_in_seconds = $ks_max_expiry_in_seconds || $ks_max_expiry_in_seconds != '' ? min($ks_max_expiry_in_seconds, $partnerKsMaxExpiryInSeconds) : $partnerKsMaxExpiryInSeconds;
 			return true;
 		}
 		else
