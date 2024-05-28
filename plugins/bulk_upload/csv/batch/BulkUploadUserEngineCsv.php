@@ -39,12 +39,12 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		{
 			if(!is_numeric($index))
 				continue;
-
+			
 			if ($column == 'dateOfBirth')
 			{
 			    $dateOfBirth = $values[$index];
 			}
-
+			
 			if(iconv_strlen($values[$index], 'UTF-8'))
 			{
 				$bulkUploadResult->$column = $values[$index];
