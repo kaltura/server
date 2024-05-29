@@ -28,7 +28,7 @@ class kLiveStreamConsumer implements kObjectChangedEventConsumer,  kObjectCreate
 
 	protected function handleLiveEntryCategoryChanged(LiveEntry $liveEntry)
 	{
-		$recordedEntryId = $liveEntry->getRecordedEntryId(false);
+		$recordedEntryId = $liveEntry->getRecordedEntryId();
 		$recordedEntry = BaseentryPeer::retrieveByPK($recordedEntryId);
 		if (!$recordedEntry)
 		{
