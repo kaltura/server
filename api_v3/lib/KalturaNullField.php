@@ -5,5 +5,8 @@
  */
 class KalturaNullField
 {
-
+	public function __toString() : string
+	{
+		return '';
+	}
 }

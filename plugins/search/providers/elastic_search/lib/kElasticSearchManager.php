@@ -408,15 +408,39 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         $itemsToTrim = array('description', 'reference_id');
 
         $params = &$tempParams;
+
         // in case we are handling category we need to handle the 'doc' element.
         if(isset($tempParams['doc']))
+        {
             $params = &$tempParams['doc'];
+        }
 
         foreach ($itemsToTrim as $item)
         {
-            if (array_key_exists($item, $params) && (strlen($params[$item]) > kElasticSearchManager::MAX_LENGTH))
+            if (!array_key_exists($item, $params))
+            {
+                continue;
+            }
+
+            if (is_array($params[$item]))
+            {
+                foreach ($params[$item] as $key => $value)
+                {
+                    if (strlen($params[$item][$key]) > kElasticSearchManager::MAX_LENGTH)
+                    {
+                        $params[$item][$key] = substr($params[$item][$key], 0, self::MAX_LENGTH);
+                    }
+                }
+
+                continue;
+            }
+
+            if (strlen($params[$item]) > kElasticSearchManager::MAX_LENGTH)
+            {
                 $params[$item] = substr($params[$item], 0, self::MAX_LENGTH);
+            }
         }
+
         return $tempParams;
     }
 

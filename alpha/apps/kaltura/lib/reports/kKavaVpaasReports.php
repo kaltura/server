@@ -294,7 +294,7 @@ class kKavaVpaasReports extends kKavaReports
 		//collect all partner ids
 		foreach ($rows as $id => $row)
 		{
-			$cur_partner_id = end($row);
+			$cur_partner_id = is_array($row) ? end($row) : null;
 			$partner_ids[] = $cur_partner_id;
 		}
 		$partners_map = self::getValidEnrichedPartners($partner_id, $partner_ids);
@@ -302,7 +302,7 @@ class kKavaVpaasReports extends kKavaReports
 		//validate result
 		foreach ($rows as &$row)
 		{
-			$cur_partner_id = end($row);
+			$cur_partner_id = is_array($row) ? end($row) : null;
 			//cur partner id or parent of cur partner id == partner id
 			if ($cur_partner_id == $partner_id || in_array($cur_partner_id, $partners_map))
 			{
