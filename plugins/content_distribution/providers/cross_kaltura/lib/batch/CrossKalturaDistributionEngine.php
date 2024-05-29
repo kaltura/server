@@ -175,7 +175,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	
 	private function getTargetServiceUrl($serviceUrl)
 	{
-		if(!$this->targetServiceUrlRegex)
+		if(!$this->targetServiceUrlRegex || !$this->targetServiceUrlReplace)
 		{
 			return $serviceUrl;
 		}
