@@ -180,7 +180,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 			return $serviceUrl;
 		}
 		
-		if (!preg_match($this->targetServiceUrlRegex, $serviceUrl, $matches))
+		if (!preg_match($this->targetServiceUrlRegex, $serviceUrl))
 		{
 			return $serviceUrl;
 		}
