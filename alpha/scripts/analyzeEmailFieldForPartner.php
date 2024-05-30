@@ -5,7 +5,7 @@ require_once(__DIR__ . '/bootstrap.php');
 // parse the command line
 if($argc<3)
 {
-	die("Usage: php " . $argv[0] . " <partner id> <user type: admin | user> <realrun | dryrun>\n");
+	die("Usage: php " . $argv[0] . " <partner id> <user type: admin | user> <realRun | dryRun>\n");
 }
 
 $partnerId = $argv[1];
@@ -80,19 +80,32 @@ function countDuplicatedUsersByEmail($users, $email)
 
 function countUsersWithDuplicatedEmail($partnerId, $isAdmin)
 {
-	$duplicatedUserCounter = 0;
-	$usersWithEmail = getUsersWithEmail($partnerId, $isAdmin);
-	/* @var $user kuser */
-	foreach ($usersWithEmail as $user)
+	$emailCriteria = new Criteria();
+	$emailCriteria->clearSelectColumns()->addSelectColumn(kuserPeer::EMAIL);
+	$emailCriteria->clearSelectColumns()->addSelectColumn("COUNT(*) cnt");
+	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
+	$emailCriteria->add(kuserPeer::IS_ADMIN, $isAdmin);
+	$emailCriteria->addGroupByColumn(kuserPeer::EMAIL);
+	$arr = kuserPeer::doSelect($emailCriteria);
+	foreach ($arr as $item)
 	{
-		$usersWithSameEmail = countDuplicatedUsersByEmail($usersWithEmail, $user->getEmail());
-		if ($usersWithSameEmail > 1)
-		{
-			KalturaLog::log('User with duplicated email [' . $user->getId() . ']');
-			$duplicatedUserCounter++;
-		}
+		KalturaLog::log(print_r($item));
 	}
-	return $duplicatedUserCounter;
+
+//	$duplicatedUserCounter = 0;
+//	$usersWithEmail = getUsersWithEmail($partnerId, $isAdmin);
+//	/* @var $user kuser */
+//	foreach ($usersWithEmail as $user)
+//	{
+//		$usersWithSameEmail = countDuplicatedUsersByEmail($usersWithEmail, $user->getEmail());
+//		if ($usersWithSameEmail > 1)
+//		{
+//			KalturaLog::log('User with duplicated email [' . $user->getId() . ']');
+//			$duplicatedUserCounter++;
+//		}
+//	}
+//	return $duplicatedUserCounter;
 }
 
 function copyEmailToExternalId($partnerId, $isAdmin)
@@ -121,8 +134,9 @@ $noUserPercentage = noEmailPercentage($noEmailUsersCount, $allUsersCount);
 KalturaLog::log("[$noUserPercentage%] of the users of partner [$partnerId] do not have an email address. exact numbers: [$noEmailUsersCount/$allUsersCount]");
 KalturaLog::log("[$withEmailUsersCount] users out of a total of [$allUsersCount] users have email");
 KalturaLog::log("[$noEmailUsersCount] users out of a total of [$allUsersCount] users dont have email");
-$usersWithDuplicateEmail = countUsersWithDuplicatedEmail($partnerId, $isAdmin);
-KalturaLog::log("[$usersWithDuplicateEmail] users out of a total of [$allUsersCount] users with duplicated email");
+//$usersWithDuplicateEmail =
+	countUsersWithDuplicatedEmail($partnerId, $isAdmin);
+//KalturaLog::log("[$usersWithDuplicateEmail] users out of a total of [$allUsersCount] users with duplicated email");
 
 if ($dryRun === 'realRun')
 {
