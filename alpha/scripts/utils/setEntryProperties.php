@@ -30,13 +30,12 @@ foreach ($entryMappings as $entryMapping)
             }
             if(!method_exists('entry', "set".ucfirst($property))){
                 echo "Property $property does not have the set function \n";
-                exit;
+                continue;
             }
             $properties[] = $property;
         }
         continue;
     }
-    var_dump($properties);
     $entryValues= explode(",", $entryMapping);
 
     $z = 0;
@@ -48,6 +47,9 @@ foreach ($entryMappings as $entryMapping)
                 echo "Entry id [$entryValue] not found\n";
                 break;
             }
+            continue;
+        }
+        if(!isset($properties[$z])){
             continue;
         }
         $isDateValue = false;
