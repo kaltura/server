@@ -275,6 +275,22 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_VIEW_PERIOD_PLAY_TIME),
 		),
 
+		ReportType::EP_TOP_MOMENT => array(
+			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_DIMENSION_MAP => array(
+				'entry_id' => self::DIMENSION_ENTRY_ID,
+				'position' => self::DIMENSION_POSITION,
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_POSITION,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN, "0", "")
+				)
+			),
+			self::REPORT_METRICS => METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT
+		)
+
 	);
 
 	public static function getReportDef($report_type, $input_filter)

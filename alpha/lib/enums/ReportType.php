@@ -225,6 +225,7 @@ interface ReportType extends BaseEnum
    const EP_WEBCAST_VOD_LIVE_USERS_ENGAGEMENT = 60013;
    const EP_ATTENDEES = 60014;
    const EP_VIEWTIME = 60015;
+   const EP_TOP_MOMENT = 60016;
 
    const CNC_PARTICIPATION = 70001;
 }
