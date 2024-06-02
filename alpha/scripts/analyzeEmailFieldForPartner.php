@@ -65,47 +65,27 @@ function getUsersWithEmail($partnerId, $isAdmin)
 	return kuserPeer::doSelect($emailCriteria);
 }
 
-function countDuplicatedUsersByEmail($users, $email)
-{
-	$duplicatedUserCounter = 0;
-	foreach ($users as $user)
-	{
-		if ($user->getEmail() === $email)
-		{
-			$duplicatedUserCounter++;
-		}
-	}
-	return $duplicatedUserCounter;
-}
-
 function countUsersWithDuplicatedEmail($partnerId, $isAdmin)
 {
 	$emailCriteria = new Criteria();
-	$emailCriteria->clearSelectColumns()->addSelectColumn(kuserPeer::EMAIL);
-	$emailCriteria->clearSelectColumns()->addSelectColumn("COUNT(*) cnt");
-	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
-	$emailCriteria->add(kuserPeer::IS_ADMIN, $isAdmin);
-	$emailCriteria->addGroupByColumn(kuserPeer::EMAIL);
-	$arr = kuserPeer::doSelect($emailCriteria);
-	foreach ($arr as $item)
-	{
-		KalturaLog::log(print_r($item));
-	}
+	$dbMap = Propel::getDatabaseMap($emailCriteria->getDbName());
+	$db = Propel::getDB($emailCriteria->getDbName());
+	$params = array();
+	$con = Propel::getConnection($emailCriteria->getDbName(), Propel::CONNECTION_READ);
+	$sql = 'SELECT email, COUNT(*) cnt FROM kuser WHERE partner_id=' . $partnerId . ' AND is_admin=' . $isAdmin . ' AND status=1 GROUP BY email' ;
+	$stmt = $con->prepare($sql);
+	BasePeer::populateStmtValues($stmt, $params, $dbMap, $db);
+	$stmt->execute();
 
-//	$duplicatedUserCounter = 0;
-//	$usersWithEmail = getUsersWithEmail($partnerId, $isAdmin);
-//	/* @var $user kuser */
-//	foreach ($usersWithEmail as $user)
-//	{
-//		$usersWithSameEmail = countDuplicatedUsersByEmail($usersWithEmail, $user->getEmail());
-//		if ($usersWithSameEmail > 1)
-//		{
-//			KalturaLog::log('User with duplicated email [' . $user->getId() . ']');
-//			$duplicatedUserCounter++;
-//		}
-//	}
-//	return $duplicatedUserCounter;
+	if ($emailCriteria->isUseTransaction()) $con->commit();
+
+	foreach ($stmt as $item)
+	{
+		if ($item['cnt'] > 1)
+		{
+			KalturaLog::log("email [". $item['email']. "] is duplicated [". $item['cnt']. "] times");
+		}
+	}
 }
 
 function copyEmailToExternalId($partnerId, $isAdmin)
@@ -134,9 +114,7 @@ $noUserPercentage = noEmailPercentage($noEmailUsersCount, $allUsersCount);
 KalturaLog::log("[$noUserPercentage%] of the users of partner [$partnerId] do not have an email address. exact numbers: [$noEmailUsersCount/$allUsersCount]");
 KalturaLog::log("[$withEmailUsersCount] users out of a total of [$allUsersCount] users have email");
 KalturaLog::log("[$noEmailUsersCount] users out of a total of [$allUsersCount] users dont have email");
-//$usersWithDuplicateEmail =
-	countUsersWithDuplicatedEmail($partnerId, $isAdmin);
-//KalturaLog::log("[$usersWithDuplicateEmail] users out of a total of [$allUsersCount] users with duplicated email");
+countUsersWithDuplicatedEmail($partnerId, $isAdmin);
 
 if ($dryRun === 'realRun')
 {
