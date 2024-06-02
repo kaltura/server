@@ -25,11 +25,15 @@ class KalturaApplicationLinksPlugin extends KalturaPlugin implements IKalturaApp
      */
     public static function getApplicationPages()
     {
-        //todo take list of items from config
-        $links = array(
-            new KmsAdminAction(),
-            new SelfserveAdminAction(),
-        );
-        return $links;
+        $applicationPages = array();
+	    
+        $applicationLinks = Zend_Registry::get('config')->applicationLinks;
+        foreach ($applicationLinks as $applicationLink => $value)
+        {
+            $ctorName = $applicationLink."AdminAction";
+            $applicationPages[] = new $ctorName();
+        }
+        
+        return $applicationPages;
     }
 }

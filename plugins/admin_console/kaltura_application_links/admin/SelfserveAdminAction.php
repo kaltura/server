@@ -12,8 +12,8 @@ class SelfserveAdminAction extends KalturaApplicationPlugin
     public function doAction(Zend_Controller_Action $action)
     {
         $ks = Infra_ClientHelper::getKs();
-        $appUrl =  Zend_Registry::get('config')->applicationLinks->selfserve->appUrl;
-        $loginUrl = Zend_Registry::get('config')->applicationLinks->selfserve->loginUrl;
+        $appUrl =  Zend_Registry::get('config')->applicationLinks->Selfserve->appUrl;
+        $loginUrl = Zend_Registry::get('config')->applicationLinks->Selfserve->loginUrl;
 
         //load the application page
         $action->view->appUrl = $appUrl;
