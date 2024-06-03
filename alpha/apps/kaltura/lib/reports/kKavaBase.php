@@ -20,6 +20,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
 	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
 	const DATASOURCE_CNC_EVENTS = 'cnc-events';
+	const DATASOURCE_APPLICATION_EVENTS = 'application-events';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -186,6 +187,9 @@ class kKavaBase extends kDruidBase
 	// event types - meeting events
 	const EVENT_TYPE_MEETING_JOIN_SESSION = 'joinSession';
 	const EVENT_TYPE_MEETING_RAISE_HAND = 'raiseHand';
+
+	// event types - application events
+	const EVENT_TYPE_PAGE_LOAD = 'pageLoad';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -464,6 +468,30 @@ class kKavaBase extends kDruidBase
 		self::USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_OFF_STAGE,
 		self::USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON,
 		self::USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_OFF_STAGE,
+	);
+
+	protected static $attendees_event_types = array(
+		self::EVENT_TYPE_VIEW_PERIOD,
+		self::EVENT_TYPE_PAGE_LOAD,
+		self::EVENT_TYPE_LOG_IN,
+		self::EVENT_TYPE_CNC_REACTION_CLICKED,
+		self::EVENT_TYPE_CNC_POLL_ANSWERED,
+		self::EVENT_TYPE_NOTIFICATION_SENT,
+		self::EVENT_TYPE_NOTIFICATION_BUTTON_CLICKED,
+		self::EVENT_TYPE_POLL_LAUNCHED,
+		self::EVENT_TYPE_POLL_ENDED,
+		self::EVENT_TYPE_POLL_RECEIVED,
+		self::EVENT_TYPE_GROUP_MESSAGE_SENT,
+		self::EVENT_TYPE_MESSAGE_PINNED,
+		self::EVENT_TYPE_MESSAGE_UNPINNED,
+		self::EVENT_TYPE_MESSAGE_LIKED,
+		self::EVENT_TYPE_USER_BLOCKED,
+		self::EVENT_TYPE_PRIVATE_MESSAGE_SENT,
+		self::EVENT_TYPE_Q_AND_A_MESSAGE_SENT,
+		self::EVENT_TYPE_GROUP_MESSAGE_DELETED,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_SENT,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED,
 	);
 
 	//general values

@@ -64,7 +64,7 @@ class KUserExportEngine extends KMappedObjectExportEngine
 		}
 		else if (in_array($valueType, $dateFormatTypes))
 		{
-			return date('Y-m-d H:i:s', $value);
+			return dateUtils::kDate('Y-m-d H:i:s', $value);
 		}
 		return $value;
 	}

@@ -7,6 +7,7 @@
  */
 class GroupUserService extends KalturaBaseService
 {
+	const DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER = 1024;
 	const USER_GROUP_SYNC_THRESHOLD_DEFUALT = '50';
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -46,14 +47,7 @@ class GroupUserService extends KalturaBaseService
 
 		$this->validateKuserkGroupCoExistence($kgroup, $kuser->getId());
 
-		//verify user does not belongs to more than max allowed groups
-		$criteria = new Criteria();
-		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuser->getId());
-		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
-		if (KuserKgroupPeer::doCount($criteria) > KuserKgroup::MAX_NUMBER_OF_GROUPS_PER_USER){
-			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
-		}
-
+		$this->validateMaxGroupsPerUser($partnerId, $kuser->getId());
 
 		$dbGroupUser = $groupUser->toInsertableObject();
 		$dbGroupUser->setPartnerId($this->getPartnerId());
@@ -433,5 +427,25 @@ class GroupUserService extends KalturaBaseService
 		}
 		
 		throw new KalturaAPIException (KalturaErrors::GROUPS_CANNOT_CO_EXIST, $kuserId, $kGroup->getId(), $kuserKgroupCoExistenceConfig);
+	}
+
+	protected function validateMaxGroupsPerUser($partnerId, $kuserId)
+	{
+		$criteria = new Criteria();
+		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
+		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+
+		$maxGroupsPerUser = GroupUserService::DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER;
+		$groupUserCountLimitMap = kConf::get('group_user_count_limit', 'local', array());
+		$partnersList = array_keys($groupUserCountLimitMap);
+		if (in_array($partnerId, $partnersList))
+		{
+			$maxGroupsPerUser = $groupUserCountLimitMap[$partnerId];
+		}
+
+		if (KuserKgroupPeer::doCount($criteria) >= $maxGroupsPerUser)
+		{
+			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
+		}
 	}
 }

@@ -155,23 +155,75 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		return $newCaption;
 	}
 
-	protected function loadNewCaptionAssetFile($captionAssetId, $contentResource)
+	protected function loadNewCaptionAssetFile($captionAsset, $contentResource)
 	{
+		$captionAssetId = $captionAsset->id;
 		if (!kXml::isXMLValidContent($contentResource->content))
 		{
 			$contentResource->content = kXml::stripXMLInvalidChars($contentResource->content);
 		}
+		$updatedCaption = null;
 		try
 		{
 			$updatedCaption = $this->captionClientPlugin->captionAsset->setContent($captionAssetId, $contentResource);
+			return $updatedCaption;
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info("Failed to set content to caption asset id: [$captionAssetId] using string resource " . $e->getMessage());
+		}
+		$filePath = null;
+		try
+		{
+			$filePath = $this->getTempFilePath($captionAsset);
+			$uploadTokenResource = $this->uploadCaptionsUsingUploadToken($filePath, $contentResource);
+			$updatedCaption = $this->captionClientPlugin->captionAsset->setContent($captionAssetId, $uploadTokenResource);
+			kFile::unlink($filePath);
 		}
 		catch(Exception $e)
 		{
 			KalturaLog::info("Can't set content to caption asset id: [$captionAssetId]" . $e->getMessage());
+			if(kFile::checkFileExists($filePath))
+			{
+				kFile::unlink($filePath);
+			}
 			return null;
 		}
 		return $updatedCaption;
 	}
+
+	protected function uploadCaptionsUsingUploadToken($filePath, $contentResource)
+	{
+		$captionsFile = fopen($filePath, "w");
+		fwrite($captionsFile, $contentResource->content);
+		fclose($captionsFile);
+		$uploadTokenResource = new KalturaUploadToken();
+		$uploadTokenResource->fileName = basename($filePath);
+		$uploadTokenResource->fileSize = filesize($filePath);
+		$createdToken = self::$kClient->uploadToken->add($uploadTokenResource);
+		$updatedToken = null;
+		$uploadedFileTokenResource = null;
+		if($createdToken)
+		{
+			$updatedToken = self::$kClient->uploadToken->upload($createdToken->id, $filePath);
+		}
+		if($updatedToken)
+		{
+			$uploadedFileTokenResource = new KalturaUploadedFileTokenResource();
+			$uploadedFileTokenResource->token = $updatedToken->id;
+		}
+		return $uploadedFileTokenResource;
+	}
+
+ 
+        protected function getTempFilePath($captionAsset)
+        {
+                $directory = self::$taskConfig->params->localTempPath;
+                self::createDir($directory);
+                $filePath = $directory . DIRECTORY_SEPARATOR . 'copy_captions' . '_' . $captionAsset->id . '.' . $captionAsset->fileExt;
+                KalturaLog::info("Temp file path: [$filePath]");
+                return $filePath;
+        }
 
 	protected function createNewCaptionsFile($captionContent, $offset, $duration , $format, $fullCopy, $globalOffset)
 	{
@@ -254,7 +306,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 			$newCaptionAsset = $this->cloneCaptionAsset($data->entryId, $originalCaptionAsset);
 			$newCaptionAssetResource = new KalturaStringResource();
 			$this->clipAndConcatSub($data, $clipDescriptionArray, $originalCaptionAsset, $newCaptionAsset, $newCaptionAssetResource, $errorMsg);
-			$updatedCaption = $this->loadNewCaptionAssetFile($newCaptionAsset->id, $newCaptionAssetResource);
+			$updatedCaption = $this->loadNewCaptionAssetFile($newCaptionAsset, $newCaptionAssetResource);
 			if (!$updatedCaption)
 			{
 				throw new kApplicativeException(KalturaBatchJobAppErrors::MISSING_ASSETS, "Created caption asset with id: [$newCaptionAsset->id], but couldn't load the new captions file to it");
@@ -295,7 +347,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 				}
 				$this->clipAndConcatSub($data, array($clipDescription), $originalCaptionAsset, $newCaptionAsset, $newCaptionAssetResource, $errorMsg);
 			}
-			$updatedCaption = $this->loadNewCaptionAssetFile($newCaptionAsset->id, $newCaptionAssetResource);
+			$updatedCaption = $this->loadNewCaptionAssetFile($newCaptionAsset, $newCaptionAssetResource);
 			if (!$updatedCaption)
 			{
 				throw new kApplicativeException(KalturaBatchJobAppErrors::MISSING_ASSETS, "Created caption asset with id: [$newCaptionAsset->id], but couldn't load the new captions file to it");
