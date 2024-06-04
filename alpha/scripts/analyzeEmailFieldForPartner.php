@@ -5,72 +5,66 @@ require_once(__DIR__ . '/bootstrap.php');
 // parse the command line
 if($argc<3)
 {
-	die("Usage: php " . $argv[0] . " <partner id> <user type: admin | user> <realRun | dryRun>\n");
+	die("Usage: php " . $argv[0] . " <partner id> <realRun | dryRun>\n");
 }
-
 $partnerId = $argv[1];
-$userType = $argv[2];
-$dryRun = $argv[3] ? $argv[3] : 'dryRun';
-var_dump($partnerId, $userType, $dryRun);
+$dryRun = $argv[2];
+var_dump($partnerId, $dryRun);
 
 if (!PartnerPeer::retrieveByPK($partnerId))
 {
 	die("Please enter a valid partner Id!\n");
 }
 
-if (is_null($userType) || ($userType != 'admin' && $userType != 'user'))
+$noEmailUsers = getUsers($partnerId, false);
+$withEmailUsers = getUsers($partnerId, true);
+$totalUsers = count($noEmailUsers) + count($withEmailUsers);
+$noUserPercentage = noEmailPercentage(count($noEmailUsers), $totalUsers);
+KalturaLog::log("[$noUserPercentage%] of the users of partner [$partnerId] do not have an email address. exact numbers: [" . count($noEmailUsers) ." /$totalUsers]");
+KalturaLog::log("[" . count($withEmailUsers) . "] users out of a total of [$totalUsers] users have email");
+KalturaLog::log("[" . count($noEmailUsers) . "] users out of a total of [$totalUsers] users dont have email");
+countUsersWithDuplicatedEmail($partnerId);
+
+if ($dryRun === 'realRun')
 {
-	die("Please specify if looking for admin users (admin) or regular users (user)\n");
+	copyEmailToExternalId($withEmailUsers);
+}
+else
+{
+	KalturaLog::log('Dry run. not copying');
+}
+KalturaLog::log('Done.');
+
+
+function noEmailPercentage($noEmailUsersCount, $totalUsers)
+{
+	return (int)(($noEmailUsersCount * 100)/$totalUsers);
 }
 
-$isAdmin = 0;
-if ($userType === 'admin')
-{
-	$isAdmin = 1;
-}
-
-
-
-function countUsers($partnerId, $isAdmin, $emailFieldValue)
+function getUsers($partnerId, $hasEmail)
 {
 	$emailCriteria = new Criteria();
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
-	$emailCriteria->add(kuserPeer::IS_ADMIN, $isAdmin);
-	if($emailFieldValue == Criteria::ISNULL) // counting users without email value
-	{
-		$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNULL);
-	}
-	else
+	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
+	if($hasEmail)
 	{
 		$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNOTNULL);
 	}
-
-	return kuserPeer::doCount($emailCriteria);
-}
-
-function noEmailPercentage($noEmailUsersCount, $allUsersCount)
-{
-	return (int)(($noEmailUsersCount * 100)/$allUsersCount);
-}
-
-function getUsersWithEmail($partnerId, $isAdmin)
-{
-	$emailCriteria = new Criteria();
-	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
-	$emailCriteria->add(kuserPeer::IS_ADMIN, $isAdmin);
-	$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNOTNULL);
+	else
+	{
+		$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNULL);
+	}
 
 	return kuserPeer::doSelect($emailCriteria);
 }
 
-function countUsersWithDuplicatedEmail($partnerId, $isAdmin)
+function countUsersWithDuplicatedEmail($partnerId)
 {
 	$countField = 'COUNT(kuser.EMAIL)';
 	$emailCriteria = new Criteria();
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId);
-	$emailCriteria->add(kuserPeer::IS_ADMIN, $isAdmin, Criteria::EQUAL);
+	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
 	$emailCriteria->add(kuserPeer::STATUS, 1);
 	$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNOTNULL);
 	$emailCriteria->addGroupByColumn(kuserPeer::EMAIL);
@@ -86,9 +80,8 @@ function countUsersWithDuplicatedEmail($partnerId, $isAdmin)
 	}
 }
 
-function copyEmailToExternalId($partnerId, $isAdmin)
+function copyEmailToExternalId($usersWithEmail)
 {
-	$usersWithEmail = getUsersWithEmail($partnerId, $isAdmin);
 	if (sizeof($usersWithEmail) > 0)
 	{
 		/* @var $user kuser */
@@ -105,22 +98,3 @@ function copyEmailToExternalId($partnerId, $isAdmin)
 }
 
 
-$noEmailUsersCount = countUsers($partnerId, $isAdmin, Criteria::ISNULL);
-$withEmailUsersCount = countUsers($partnerId, $isAdmin, Criteria::ISNOTNULL);
-$allUsersCount = $noEmailUsersCount + $withEmailUsersCount;
-$noUserPercentage = noEmailPercentage($noEmailUsersCount, $allUsersCount);
-KalturaLog::log("[$noUserPercentage%] of the users of partner [$partnerId] do not have an email address. exact numbers: [$noEmailUsersCount/$allUsersCount]");
-KalturaLog::log("[$withEmailUsersCount] users out of a total of [$allUsersCount] users have email");
-KalturaLog::log("[$noEmailUsersCount] users out of a total of [$allUsersCount] users dont have email");
-countUsersWithDuplicatedEmail($partnerId, $isAdmin);
-
-if ($dryRun === 'realRun')
-{
-	copyEmailToExternalId($partnerId, $isAdmin);
-}
-else
-{
-	KalturaLog::log('Dry run. not copying');
-}
-
-KalturaLog::log('Done.');
