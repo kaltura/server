@@ -279,7 +279,12 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
 			self::REPORT_DIMENSION_MAP => array(
 				'entry_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID,
 				'position' => self::DIMENSION_POSITION,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'entry_name',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
 			self::REPORT_FILTER => array(
 				self::DRUID_TYPE => self::DRUID_NOT,
