@@ -67,24 +67,22 @@ function getUsersWithEmail($partnerId, $isAdmin)
 
 function countUsersWithDuplicatedEmail($partnerId, $isAdmin)
 {
+	$countField = 'COUNT(kuser.EMAIL)';
 	$emailCriteria = new Criteria();
-	$dbMap = Propel::getDatabaseMap($emailCriteria->getDbName());
-	$db = Propel::getDB($emailCriteria->getDbName());
-	$params = array();
-	$con = Propel::getConnection($emailCriteria->getDbName(), Propel::CONNECTION_READ);
-	$sql = 'SELECT email, COUNT(*) cnt FROM kuser WHERE partner_id=' . $partnerId . ' AND is_admin=' . $isAdmin . ' AND status=1 GROUP BY email' ;
-	$stmt = $con->prepare($sql);
-	BasePeer::populateStmtValues($stmt, $params, $dbMap, $db);
-	$stmt->execute();
+	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId);
+	$emailCriteria->add(kuserPeer::IS_ADMIN, $isAdmin, Criteria::EQUAL);
+	$emailCriteria->add(kuserPeer::STATUS, 1);
+	$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNOTNULL);
+	$emailCriteria->addGroupByColumn(kuserPeer::EMAIL);
+	$emailCriteria->addSelectColumn($countField);
+	$emailCriteria->addSelectColumn(kuserPeer::EMAIL);
+	$emailCriteria->addHaving($emailCriteria->getNewCriterion(kuserPeer::EMAIL, $countField . '>' . 1, Criteria::CUSTOM));
+	$stmt = kuserPeer::doSelectStmt($emailCriteria);
+	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	if ($emailCriteria->isUseTransaction()) $con->commit();
-
-	foreach ($stmt as $item)
+	foreach ($rows as $row)
 	{
-		if ($item['cnt'] > 1)
-		{
-			KalturaLog::log("email [". $item['email']. "] is duplicated [". $item['cnt']. "] times");
-		}
+		KalturaLog::log("email [". $row['EMAIL']. "] is duplicated [". $row['COUNT(kuser.EMAIL)']  . "] times");
 	}
 }
 
