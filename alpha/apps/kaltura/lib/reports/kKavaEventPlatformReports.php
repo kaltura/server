@@ -275,7 +275,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_VIEW_PERIOD_PLAY_TIME),
 		),
 
-		ReportType::EP_TOP_MOMENT => array(
+		ReportType::EP_TOP_MOMENTS => array(
 			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
 			self::REPORT_DIMENSION_MAP => array(
 				'entry_id' => self::DIMENSION_ENTRY_ID,
