@@ -293,7 +293,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::DRUID_VALUES => array(self::VALUE_UNKNOWN, "0", "")
 				)
 			),
-			self::REPORT_METRICS => METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT
+			self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT)
 		)
 
 	);
