@@ -205,7 +205,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 					$name = str_replace(array_keys($contentParameters), $contentParameters, $name);
 			}
 
-			if (isset($contentParameters[self::FROM_EMAIL]))
+			if ($email == self::FROM_EMAIL && isset($contentParameters[self::FROM_EMAIL]))
 			{
 				$this::$mailer->Sender = $contentParameters[self::FROM_EMAIL];
 			}
@@ -222,7 +222,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			$this::$mailer->From = $this->defaultFromMail;
 			$this::$mailer->FromName = $this->defaultFromName;
 		}
-		KalturaLog::info("Sender [{$this::$mailer->FromName}<{$this::$mailer->From}>]");
+		KalturaLog::info("Sender [{$this::$mailer->FromName}<{$this::$mailer->From}>] Sender [{$this::$mailer->Sender}]");
 		
 		$subject = $emailNotificationTemplate->subject;
 		$body = $emailNotificationTemplate->body;
