@@ -142,7 +142,7 @@ return array (
     'Kaltura_Client_Reach_Enum_CatalogItemLanguage::MN' => "Mongolian",
     'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SL' => "Slovenian",
     'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TE' => "Telugu",
-    'Kaltura_Client_Reach_Enum_CatalogItemLanguage::UG' => "Uighur",
+    'Kaltura_Client_Reach_Enum_CatalogItemLanguage::UG' => "Uyghur",
     'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AUTO_DETECT' => "Auto Detect",
 
     'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
