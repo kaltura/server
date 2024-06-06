@@ -261,12 +261,12 @@ abstract class LiveEntry extends entry
 		{
 			return $output;
 		}
-		return $this->getFromCustomData("recorded_entry_id");
+		return $this->getFromCustomData(LiveEntry::RECORDED_ENTRY_ID);
 	}
 
 	public function getRecordedEntryIdFromCustomData()
 	{
-		return $this->getFromCustomData("recorded_entry_id");
+		return $this->getFromCustomData(LiveEntry::RECORDED_ENTRY_ID);
 	}
 	
 	public function setRecordedEntryId($v)
@@ -274,7 +274,7 @@ abstract class LiveEntry extends entry
 		if($v && $v != $this->getRecordedEntryId())
 			$this->incInCustomData("recorded_entry_index");
 		
-		$this->putInCustomData("recorded_entry_id", $v);
+		$this->putInCustomData(LiveEntry::RECORDED_ENTRY_ID, $v);
 	}
 	
 	public function getRecordedEntryIndex()
