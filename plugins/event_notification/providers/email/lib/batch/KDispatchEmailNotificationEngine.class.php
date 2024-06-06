@@ -222,7 +222,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			$this::$mailer->From = $this->defaultFromMail;
 			$this::$mailer->FromName = $this->defaultFromName;
 		}
-		KalturaLog::info("Sender [{$this::$mailer->FromName}<{$this::$mailer->From}>] Sender [{$this::$mailer->Sender}]");
+		KalturaLog::info("Sender [{$this::$mailer->FromName}<{$this::$mailer->From}>]");
 		
 		$subject = $emailNotificationTemplate->subject;
 		$body = $emailNotificationTemplate->body;
