@@ -1733,6 +1733,7 @@ class kJobsManager
 			elseif($entry->getSourceType() == EntrySourceType::LECTURE_CAPTURE)
 			{
 				$profileLC = conversionProfile2Peer::retrieveByPartnerIdAndSystemName($entry->getPartnerId(), kBusinessPreConvertDL::$conditionalMapBySourceType[EntrySourceType::LECTURE_CAPTURE], ConversionProfileType::MEDIA);
+				kBusinessPreConvertDL::addDeliveryTagToEntry($profile, $entry);
 				$shouldDetectGOP = $profileLC ? $profileLC->getDetectGOP() : null;
 			}
 		}

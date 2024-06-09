@@ -399,5 +399,13 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 		$this->putInCustomData(self::CUSTOM_DATA_DEFAULT_AUDIO_LANG, $key);
 	}
 
+	public function setDeliveryTag($deliveryTag)
+	{
+		$this->putInCustomData('deliveryTag', $deliveryTag);
+	}
 
+	public function getDeliveryTag()
+	{
+		return $this->getFromCustomData('deliveryTag');
+	}
 }

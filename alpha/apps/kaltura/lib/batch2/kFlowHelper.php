@@ -3655,6 +3655,7 @@ class kFlowHelper
 		{
 			return;
 		}
+		kBusinessPreConvertDL::addDeliveryTagToEntry($profile, $entry);
 
 		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
