@@ -16,7 +16,7 @@ class LiveStreamStatsActions
 {
 	const ENTRY_ID_ARG = 'entryId';
 	const CONF_LIVE_STATS_INTERVAL = 'liveStatsInterval';
-	const LIVE_SETTINGS = 'live';
+	const LIVE_SETTINGS = kConfMapNames::LIVE_SETTINGS;
 	const DEFAULT_TTL = 20;
 
 	/**
@@ -61,7 +61,7 @@ class LiveStreamStatsActions
 
 	public static function getLiveStreamStats_validate($params)
 	{
-		if (is_null($params))
+		if (is_null($params) || !array_key_exists(LiveStreamStatsActions::ENTRY_ID_ARG, $params))
 		{
 			return 'Missing parameter for getLiveStreamStats action';
 		}
@@ -71,8 +71,8 @@ class LiveStreamStatsActions
 
 	public static function getLiveStreamStats($params)
 	{
-		$entryId     = $params[LiveStreamStatsActions::ENTRY_ID_ARG];
-		$instance   = new LiveStreamStatsActions();
+		$entryId = $params[LiveStreamStatsActions::ENTRY_ID_ARG];
+		$instance = new LiveStreamStatsActions();
 		return $instance->doGetLiveStreamStats($entryId);
 	}
 }
@@ -113,15 +113,5 @@ class LiveStreamStatsCacheHandler
 	protected function getLiveViewersCacheKey(): string
 	{
 		return LiveStreamStatsCacheHandler::LIVE_VIEWERS_PREFIX . LiveStreamStatsCacheHandler::CACHE_KEY_SEPARATOR;
-	}
-
-	protected function getCacheVersion($entryId)
-	{
-		$version = $this->cache->get($entryId);
-		if(!$version)
-		{
-			$version = 0;
-		}
-		return $version;
 	}
 }
