@@ -14,6 +14,9 @@ abstract class LiveEntry extends entry
 	const SIMULIVE_CAPABILITY = 'simulive_capability';
 	const LOW_LATENCY_TAG = 'lowlatency';
 
+	const LIVE_BACKEND_WOWZA = 0;
+	const LIVE_BACKEND_LIVE_NG = 1;
+
 	const DEFAULT_CACHE_EXPIRY = 120;
 	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
 	
@@ -27,6 +30,7 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_BROADCAST_TIME = "broadcast_time";
 	const CUSTOM_DATA_DVR_STATUS = "dvr_status";
 	const CUSTOM_DATA_DVR_WINDOW = "dvr_window";
+
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -316,7 +320,22 @@ abstract class LiveEntry extends entry
 	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
 
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
-	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, '%i' );	}
+	public function getStreamName ()
+	{
+		$broadcastConfig = kConf::getMap('broadcast');
+		$liveBackend = LiveEntry::LIVE_BACKEND_LIVE_NG;
+
+		if(isset($broadcastConfig['live_backend']))
+			$liveBackend = $broadcastConfig['live_backend'];
+
+		switch ($liveBackend)
+		{
+			case LiveEntry::LIVE_BACKEND_WOWZA:
+				return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );
+			case LiveEntry::LIVE_BACKEND_LIVE_NG:
+				return $this->getFromCustomData( "streamName", null, '%i' );
+		}
+	}
 	
 	protected function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}
