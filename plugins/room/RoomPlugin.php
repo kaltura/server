@@ -78,11 +78,17 @@ class RoomPlugin extends KalturaPlugin implements IKalturaServices, IKalturaEnum
 		return self::getPluginName() . '_' . $partnerId . 'rty' . $roomType . self::SEARCH_TEXT_SUFFIX;
 	}
 
+	public static function getBroadcastEntriIdSearchData($partnerId, $broadcastEntryId)
+	{
+		return self::getPluginName() . '_' . $partnerId . 'brdcstntryid' . $broadcastEntryId . self::SEARCH_TEXT_SUFFIX;
+	}
+
 	public static function getSearchData(BaseObject $object)
 	{
 		if ($object instanceof RoomEntry)
 		{
-			return array('plugins_data' => self::getRoomTypeSearchData($object->getPartnerId(), $object->getRoomType()));
+			$searchData = array(self::getRoomTypeSearchData($object->getPartnerId(), $object->getRoomType()), self::getBroadcastEntriIdSearchData($object->getPartnerId(), $object->getBroadcastEntryId()));
+			return array('plugins_data' => implode(' ', $searchData));
 		}
 
 		return null;

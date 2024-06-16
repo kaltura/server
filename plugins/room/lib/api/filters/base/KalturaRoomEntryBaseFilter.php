@@ -10,6 +10,7 @@ abstract class KalturaRoomEntryBaseFilter extends KalturaBaseEntryFilter
 	static private $map_between_objects = array
 	(
 		"roomTypeEqual" => "_eq_room_type",
+		"broadcastEntryIdEqual" => "_eq_broadcast_entry_id",
 	);
 
 	static private $order_by_map = array
@@ -30,4 +31,9 @@ abstract class KalturaRoomEntryBaseFilter extends KalturaBaseEntryFilter
 	 * @var KalturaRoomType
 	 */
 	public $roomTypeEqual;
+
+	/**
+	 * @var string
+	 */
+	public $broadcastEntryIdEqual;
 }
