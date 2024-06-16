@@ -2313,8 +2313,6 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			$profile = myPartnerUtils::getConversionProfile2ForEntry($entry->getId());
 		}
 
-		self::addDeliveryTagToEntry($profile, $entry);
-
 		return $profile;
 	}
 	
@@ -2369,18 +2367,5 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			return self::WEBEX_CONVERSION_KEY;
 		}
 		return null;
-	}
-
-	public static function addDeliveryTagToEntry(conversionProfile2 $profile, $entry)
-	{
-		if ($profile && $profile->getDeliveryTag())
-		{
-			/** @var entry $entry */
-			$deliveryTag = $profile->getDeliveryTag();
-			$adminTags = $entry->getAdminTags();
-			$adminTags = $adminTags ? $adminTags . ",enforce_delivery:$deliveryTag" : "enforce_delivery:$deliveryTag";
-			$entry->setAdminTags($adminTags);
-			$entry->save();
-		}
 	}
 }

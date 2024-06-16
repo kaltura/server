@@ -684,6 +684,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			kFlowHelper::handleEntryReplacement($object);
 			return true;
 		}
+
+		if ($object instanceof entry
+			&&	in_array(entryPeer::STATUS, $modifiedColumns)
+			&&	$object->getStatus() == entryStatus::READY)
+		{
+			kFlowHelper::addDeliveryTagToEntry($object);
+		}
 		
 		if ($object instanceof entry
 			&& in_array(entryPeer::DISPLAY_IN_SEARCH, $modifiedColumns)

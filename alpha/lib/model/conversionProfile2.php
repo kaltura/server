@@ -24,6 +24,7 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 
 	const CUSTOM_DATA_DEFAULT_AUDIO_LANG = "default_audio_lang";
 	const SKIP_VALIDATION = 'KALTURA_skipvalidation';
+	const DELIVERY_TAG = 'deliveryTag';
 	
 	private $xsl;
 	private $mediaInfoXsl;
@@ -401,11 +402,11 @@ class conversionProfile2 extends BaseconversionProfile2 implements ISyncableFile
 
 	public function setDeliveryTag($deliveryTag)
 	{
-		$this->putInCustomData('deliveryTag', $deliveryTag);
+		$this->putInCustomData(self::DELIVERY_TAG, $deliveryTag);
 	}
 
 	public function getDeliveryTag()
 	{
-		return $this->getFromCustomData('deliveryTag');
+		return $this->getFromCustomData(self::DELIVERY_TAG);
 	}
 }

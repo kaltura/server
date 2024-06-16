@@ -2954,6 +2954,19 @@ class kFlowHelper
 				break;
 		}
 	}
+
+	public static function addDeliveryTagToEntry(entry $entry)
+	{
+		$profile = $entry->getconversionProfile2();
+		if ($profile && $profile->getDeliveryTag())
+		{
+			$deliveryTag = $profile->getDeliveryTag();
+			$adminTags = $entry->getAdminTags();
+			$adminTags = $adminTags ? $adminTags . ",enforce_delivery:$deliveryTag" : "enforce_delivery:$deliveryTag";
+			$entry->setAdminTags($adminTags);
+			$entry->save();
+		}
+	}
 	
 	/**
 	 * @param entry $entry
@@ -3655,7 +3668,6 @@ class kFlowHelper
 		{
 			return;
 		}
-		kBusinessPreConvertDL::addDeliveryTagToEntry($profile, $entry);
 
 		$nonSourceFlavors = assetPeer::retrieveFlavorsWithTagsFiltering($entry->getId(), flavorParams::TAG_MBR, flavorParams::TAG_SOURCE);
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
