@@ -595,6 +595,13 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 		{
 			return true;
 		}
+
+		if ($object instanceof entry
+			&& in_array(entryPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == entryStatus::READY)
+		{
+			return true;
+		}
 		
 		if(
 			$object instanceof entry
@@ -673,23 +680,21 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			kSessionUtils::deleteSecretCacheKey($object->getId());
 			return true;
 		}
-		
-		if (
-			$object instanceof entry
-			&&	in_array(entryPeer::STATUS, $modifiedColumns)
-			&&	($object->getStatus() == entryStatus::READY || $object->getStatus() == entryStatus::ERROR_CONVERTING)
-			&&	$object->getReplacedEntryId()
-		)
+
+		if ($object instanceof entry
+			&& in_array(entryPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == entryStatus::READY)
 		{
-			kFlowHelper::handleEntryReplacement($object);
-			return true;
+			kFlowHelper::addDeliveryTagToEntry($object);
 		}
 
 		if ($object instanceof entry
-			&&	in_array(entryPeer::STATUS, $modifiedColumns)
-			&&	$object->getStatus() == entryStatus::READY)
+			&& in_array(entryPeer::STATUS, $modifiedColumns)
+			&& ($object->getStatus() == entryStatus::READY || $object->getStatus() == entryStatus::ERROR_CONVERTING)
+			&& $object->getReplacedEntryId())
 		{
-			kFlowHelper::addDeliveryTagToEntry($object);
+			kFlowHelper::handleEntryReplacement($object);
+			return true;
 		}
 		
 		if ($object instanceof entry
