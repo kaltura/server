@@ -27,8 +27,10 @@ class KalturaRoomEntryFilter extends KalturaRoomEntryBaseFilter
 
 		if ($this->broadcastEntryIdEqual)
 		{
-			$object_to_fill->fields['_like_plugins_data'] = RoomPlugin::getBroadcastEntriIdSearchData(kCurrentContext::getCurrentPartnerId(),
-				$this->broadcastEntryIdEqual);
+			$broadcastEntryIdSearchData = RoomPlugin::getBroadcastEntriIdSearchData(kCurrentContext::getCurrentPartnerId(), $this->broadcastEntryIdEqual);
+			$object_to_fill->fields['_like_plugins_data'] = ($object_to_fill->fields['_like_plugins_data']) ?
+				implode(' ', array($object_to_fill->fields['_like_plugins_data'],$broadcastEntryIdSearchData)) :
+				$broadcastEntryIdSearchData;
 			$this->broadcastEntryIdEqual = null;
 		}
 
