@@ -42,7 +42,7 @@ class kXml
 {
 	public static function getXslEnabledPhpFunctions()
 	{
-		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt', 'myXmlUtils::kGmdate', 'myXmlUtils::kDate');
+		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt', 'dateUtils::kGmdate', 'dateUtils::kDate');
 	}
 	
 	public static function transformSafePhpFunction($xslt)

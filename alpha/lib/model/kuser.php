@@ -1093,9 +1093,10 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 		}
 
-		if ($userLoginData)
+		if ($userLoginData) // disable the old login
 		{
-			$this->disableLogin();
+			$this->setLoginDataId(null);
+			$this->save();
 		}
 
 		return $this->enableLogin($newLoginId, null, true, true);
