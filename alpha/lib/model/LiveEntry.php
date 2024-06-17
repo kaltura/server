@@ -14,6 +14,8 @@ abstract class LiveEntry extends entry
 	const SIMULIVE_CAPABILITY = 'simulive_capability';
 	const LOW_LATENCY_TAG = 'lowlatency';
 
+	const LIVE_BACKEND_PARAM = 'live_backend';
+	const BROADCAST_MAP = 'broadcast';
 	const LIVE_BACKEND_WOWZA = 0;
 	const LIVE_BACKEND_LIVE_NG = 1;
 
@@ -322,11 +324,7 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName ()
 	{
-		$broadcastConfig = kConf::getMap('broadcast');
-		$liveBackend = LiveEntry::LIVE_BACKEND_LIVE_NG;
-
-		if(isset($broadcastConfig['live_backend']))
-			$liveBackend = $broadcastConfig['live_backend'];
+		$liveBackend = kConf::get(self::LIVE_BACKEND_PARAM, self::BROADCAST_MAP, self::LIVE_BACKEND_LIVE_NG);
 
 		switch ($liveBackend)
 		{
