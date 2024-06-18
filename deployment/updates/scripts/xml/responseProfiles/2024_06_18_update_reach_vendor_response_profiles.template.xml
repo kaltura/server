@@ -28,7 +28,7 @@
                 <type>1</type>
                 <name>reach_vendor</name>
                 <systemName>reach_vendor</systemName>
-                <fields>id,partnerId,vendorPartnerId,createdAt,entryId,status,version,reachProfileId,catalogItemId,accessKey,notes,dictionary,taskJobData,captionAssetId,jsonTranscriptAssetId,textTranscriptAssetId,price,externalTaskId </fields>
+                <fields>id,partnerId,vendorPartnerId,createdAt,entryId,status,version,reachProfileId,catalogItemId,accessKey,notes,dictionary,taskJobData,captionAssetId,jsonTranscriptAssetId,textTranscriptAssetId,price,externalTaskId</fields>
             </responseProfile>
         </request>
     </multirequest>
