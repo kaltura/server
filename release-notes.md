@@ -1,3 +1,24 @@
+# Tucana-20.14.0
+
+## Reach - update reach_vendor response profile ##
+- Issue Type: Task
+- Issue ID: KAI-62
+
+### Configuration ###
+
+None
+
+### Deployment scripts ###
+
+First replace all tokens in the XML file below and remove ".template" from the file name:
+
+                - /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2024_06_18_update_reach_vendor_response_profiles.template.xml
+
+Run deployment script:
+
+                - php /opt/kaltura/app/deployment/updates/scripts/2024_06_18_update_reach_vendor_response_profile.php
+
+
 # Tucana-20.12.0
 ## Configure partner limit on max groups per user ##
 - Issue Type: Task
