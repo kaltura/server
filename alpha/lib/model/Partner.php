@@ -1890,7 +1890,8 @@ class Partner extends BasePartner
 		if ($globalAccessLimitationsConfiguration)
 		{
 			$blockedCountriesList = $globalAccessLimitationsConfiguration['blockedCountries'];
-			if ($blockedCountriesList)
+            $allowedPartnersInBlockedCountries = $globalAccessLimitationsConfiguration['allowedPartnersInBlockedCountries'];
+			if ($blockedCountriesList && (!$allowedPartnersInBlockedCountries || !in_array($this->id, explode(",", $allowedPartnersInBlockedCountries))))
 			{
 				return myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, $this->id);
 			}

@@ -1,3 +1,14 @@
+#Tucana-20.14.0
+## Allow specific partners to acccess the API from blocked countries ##
+* Issue Type: Task
+* Issue ID: SUP-39912
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [global_access_limitations]
+    allowedPartnersInBlockedCountries = @COMMA_SEPERATED_PARTNER_ID@
+
 # Tucana-20.12.0
 ## Configure partner limit on max groups per user ##
 - Issue Type: Task
