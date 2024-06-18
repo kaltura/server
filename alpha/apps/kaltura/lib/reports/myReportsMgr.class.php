@@ -1563,6 +1563,8 @@ class reportsInputFilter
 	public $ui_conf_ids;
     	public $cue_point_ids;
 	public $context_ids;
+	public $roles;
+	public $industries;
 
 	public function getFilterBy() {
 		return "";

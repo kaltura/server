@@ -239,6 +239,8 @@ class kKavaReportsMgr extends kKavaBase
 
 	// virtual-events-registration specific metrics
 	const METRIC_REGISTERED_UNIQUE_USERS = 'registered_unique_users';
+	const METRIC_VE_ATTENDED = 'count_attended';
+	const METRIC_VE_ATTENDED_UNIQUE_USERS = 'attended_unique_users';
 
 	// cnc specific metrics
 	const METRIC_UNIQUE_LOGGED_IN_USERS = 'unique_logged_in_users';
@@ -585,6 +587,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => 'floor',
 		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => 'floor',
 		self::METRIC_UNIQUE_ATTENDEES => 'floor',
+		self::METRIC_VE_ATTENDED_UNIQUE_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -662,6 +665,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => true,
 		self::METRIC_PRIVATE_CHAT_PARTICIPATION => true,
 		self::METRIC_UNIQUE_ATTENDEES => true,
+		self::METRIC_VE_ATTENDED_UNIQUE_USERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1474,6 +1478,14 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_UNIQUE_ATTENDEES] = self::getFilteredAggregator(
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$attendees_event_types),
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_ATTENDEES, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_VE_ATTENDED] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$ve_attended_event_types),
+			self::getLongSumAggregator(self::METRIC_VE_ATTENDED, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_VE_ATTENDED_UNIQUE_USERS] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$ve_attended_event_types),
+			self::getHyperUniqueAggregator(self::METRIC_VE_ATTENDED_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -2911,7 +2923,9 @@ class kKavaReportsMgr extends kKavaBase
 			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
 			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID),
 			'cue_point_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CUE_POINT_ID),
-			'context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CONTEXT_ID)
+			'context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CONTEXT_ID),
+			'roles' => array(self::DRUID_DIMENSION => self::DIMENSION_ROLE),
+			'industries' => array(self::DRUID_DIMENSION => self::DIMENSION_INDUSTRY)
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

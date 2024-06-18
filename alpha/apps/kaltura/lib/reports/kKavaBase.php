@@ -494,6 +494,12 @@ class kKavaBase extends kDruidBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED,
 	);
 
+	protected static $ve_attended_event_types = array(
+		self::EVENT_TYPE_VE_ATTENDED,
+		self::EVENT_TYPE_VE_PARTICIPATED,
+		self::EVENT_TYPE_VE_PARTICIPATED_POST_EVENT,
+	);
+
 	//general values
 	const VALUE_UNKNOWN = 'Unknown';
 	const VALUE_ZERO = '0';
@@ -676,6 +682,8 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_ORIGIN => 1,
+			self::DIMENSION_ROLE => 1,
+			self::DIMENSION_INDUSTRY => 1,
 		),
 		self::DATASOURCE_MEETING_HISTORICAL => array(
 			self::DIMENSION_EVENT_TYPE => 1,
