@@ -197,6 +197,11 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 	 */
 	public $defaultAudioLang;
 
+	/**
+	 * @var string
+	 */
+	public $deliveryTag;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -221,6 +226,7 @@ class KalturaConversionProfile extends KalturaObject implements IRelatedFilterab
 		"detectGOP",
 		"defaultReplacementOptions",
 		"defaultAudioLang",
+		"deliveryTag",
 	);
 	
 	public function getMapBetweenObjects ( )
