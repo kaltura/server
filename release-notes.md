@@ -1,4 +1,4 @@
-#Tucana-20.14.0
+# Tucana-20.14.0
 ## Allow specific partners to acccess the API from blocked countries ##
 * Issue Type: Task
 * Issue ID: SUP-39912
