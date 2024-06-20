@@ -6,18 +6,12 @@
 
 ### Configuration ###
 
-None
+First replace all tokens in the XML file below and remove ".template" from the file name:
+- /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2024_06_18_update_reach_vendor_response_profiles.template.xml
 
 ### Deployment scripts ###
 
-First replace all tokens in the XML file below and remove ".template" from the file name:
-
-                - /opt/kaltura/app/deployment/updates/scripts/xml/responseProfiles/2024_06_18_update_reach_vendor_response_profiles.template.xml
-
-Run deployment script:
-
-                - php /opt/kaltura/app/deployment/updates/scripts/2024_06_18_update_reach_vendor_response_profile.php
-
+    - php /opt/kaltura/app/deployment/updates/scripts/2024_06_18_update_reach_vendor_response_profile.php
 
 # Tucana-20.12.0
 ## Configure partner limit on max groups per user ##
