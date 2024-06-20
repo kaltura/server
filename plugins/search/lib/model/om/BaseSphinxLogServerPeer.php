@@ -26,7 +26,7 @@ abstract class BaseSphinxLogServerPeer {
 	const TM_CLASS = 'SphinxLogServerTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 6;
+	const NUM_COLUMNS = 7;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -49,6 +49,9 @@ abstract class BaseSphinxLogServerPeer {
 	/** the column name for the UPDATED_AT field */
 	const UPDATED_AT = 'sphinx_log_server.UPDATED_AT';
 
+	/** the column name for the POPULATE_ACTIVE field */
+	const POPULATE_ACTIVE = 'sphinx_log_server.POPULATE_ACTIVE';
+
 	/**
 	 * An identiy map to hold any loaded instances of SphinxLogServer objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -65,11 +68,11 @@ abstract class BaseSphinxLogServerPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'Server', 'Dc', 'LastLogId', 'CreatedAt', 'UpdatedAt', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'server', 'dc', 'lastLogId', 'createdAt', 'updatedAt', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::SERVER, self::DC, self::LAST_LOG_ID, self::CREATED_AT, self::UPDATED_AT, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'server', 'dc', 'last_log_id', 'created_at', 'updated_at', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'Server', 'Dc', 'LastLogId', 'CreatedAt', 'UpdatedAt', 'PopulateActive', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'server', 'dc', 'lastLogId', 'createdAt', 'updatedAt', 'populateActive', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::SERVER, self::DC, self::LAST_LOG_ID, self::CREATED_AT, self::UPDATED_AT, self::POPULATE_ACTIVE, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'server', 'dc', 'last_log_id', 'created_at', 'updated_at', 'populate_active', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -79,11 +82,11 @@ abstract class BaseSphinxLogServerPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Server' => 1, 'Dc' => 2, 'LastLogId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'server' => 1, 'dc' => 2, 'lastLogId' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SERVER => 1, self::DC => 2, self::LAST_LOG_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'server' => 1, 'dc' => 2, 'last_log_id' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Server' => 1, 'Dc' => 2, 'LastLogId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'PopulateActive' => 6, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'server' => 1, 'dc' => 2, 'lastLogId' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'populateActive' => 6, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::SERVER => 1, self::DC => 2, self::LAST_LOG_ID => 3, self::CREATED_AT => 4, self::UPDATED_AT => 5, self::POPULATE_ACTIVE => 6, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'server' => 1, 'dc' => 2, 'last_log_id' => 3, 'created_at' => 4, 'updated_at' => 5, 'populate_active' => 6, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
 	);
 
 	/**
@@ -159,6 +162,7 @@ abstract class BaseSphinxLogServerPeer {
 		$criteria->addSelectColumn(SphinxLogServerPeer::LAST_LOG_ID);
 		$criteria->addSelectColumn(SphinxLogServerPeer::CREATED_AT);
 		$criteria->addSelectColumn(SphinxLogServerPeer::UPDATED_AT);
+		$criteria->addSelectColumn(SphinxLogServerPeer::POPULATE_ACTIVE);
 	}
 
 	/**
