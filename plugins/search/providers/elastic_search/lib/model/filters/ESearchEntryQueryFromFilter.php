@@ -83,7 +83,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
         ESearchEntryFilterFields::DURATION_TYPE,
         ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE,
         ESearchEntryFilterFields::ROOM_TYPE,
-	    ESearchEntryFilterFields::BROADCAST_ENTRY_ID,
+	ESearchEntryFilterFields::BROADCAST_ENTRY_ID,
     );
 
     protected static $specialFields = array(
