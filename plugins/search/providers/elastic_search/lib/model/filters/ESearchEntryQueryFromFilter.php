@@ -398,7 +398,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
             ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE => ESearchEntryFieldName::EXTERNAL_SOURCE_TYPE,
             ESearchEntryFilterFields::RECYCLED_AT => ESearchEntryOrderByFieldName::RECYCLED_AT,
             ESearchEntryFilterFields::ROOM_TYPE => ESearchEntryFieldName::ROOM_TYPE,
-	        ESearchEntryFilterFields::BROADCAST_ENTRY_ID => ESearchEntryFieldName::BROADCAST_ENTRY_ID,
+	    ESearchEntryFilterFields::BROADCAST_ENTRY_ID => ESearchEntryFieldName::BROADCAST_ENTRY_ID,
         );
 
         if (array_key_exists($field, $fieldsMap)) {
