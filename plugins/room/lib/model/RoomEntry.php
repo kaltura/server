@@ -33,6 +33,7 @@ class RoomEntry extends entry
 	{
 		$body = array(
 			'room_type' => $this->getRoomType(),
+			'broadcast_entry_id' => $this->getBroadcastEntryId(),
 		);
 		
 		elasticSearchUtils::cleanEmptyValues($body);
