@@ -306,6 +306,13 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				self::REPORT_ENRICH_OUTPUT => 'name',
 				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
 			),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_SESSION_CONTEXT_ID,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN, "0", "")
+				)
+			),
 			self::REPORT_METRICS => array(
 				self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS,
 				self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO,
