@@ -49,4 +49,5 @@ interface ESearchEntryFieldName extends BaseEnum
 	const VOTES = 'votes';
 	const RECYCLED_AT = 'recycled_at';
 	const ROOM_TYPE = 'room_type';
+	const BROADCAST_ENTRY_ID = 'broadcast_entry_id';
 }
