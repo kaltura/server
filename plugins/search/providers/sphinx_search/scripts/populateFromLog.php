@@ -81,6 +81,8 @@ $lastLogs = array();
 $handledRecords = array();
 $sphinxRtTables = array();
 $objectIdSphinxLog = array();
+$currentDcId = null;
+$shouldRefresh = null;
 
 foreach($serverLastLogs as $serverLastLog)
 {
@@ -90,6 +92,37 @@ foreach($serverLastLogs as $serverLastLog)
 
 while(true)
 {
+	// 'stop' populate script as long as 'shouldPopulateBeActiveInCurrentDc' = 0 --> populate should not execute sphinx_log queries
+	while (SphinxLogServerPeer::shouldPopulateBeActiveInCurrentDc($sphinxServer, $sphinxReadConn) === 0)
+	{
+		// not sure we want it - prevents from kConf config to take effect without restarting populate
+		if (is_null($currentDcId))
+		{
+			$currentDcId = kDataCenterMgr::getCurrentDcId();
+			$shouldRefresh = true;
+		}
+		
+		$sphinxLogServerId = $serverLastLogs[$currentDcId]->getId();
+		KalturaLog::log("Kaltura 'sphinx_log_server' id [$sphinxLogServerId] 'populate_active' is [0] - sleeping 60 sec");
+		sleep(60);
+		
+		SphinxLogServerPeer::clearInstancePool();
+	}
+	
+	// In multi DC: sphinx_log_server.server - sphinx_log_server.dc (like 'ny-nvp1-sphinx-snap1 - 1') can be stopped and  'ny-nvp1-sphinx-snap1 - 0' will continue
+	// In that case, we should get new sphinx_log_server.last_log_id for DC
+	if ($shouldRefresh)
+	{
+		$shouldRefresh = false;
+		
+		$serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
+		foreach($serverLastLogs as $serverLastLog)
+		{
+			$lastLogs[$serverLastLog->getDc()] = $serverLastLog;
+			$handledRecords[$serverLastLog->getDc()] = array();
+		}
+	}
+	
 	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxReadConn, SphinxLogType::SPHINX);
 	
 	while(!count($sphinxLogs))
@@ -222,6 +255,7 @@ while(true)
 	unset($sphinxCon);
 
 	SphinxLogPeer::clearInstancePool();
+	SphinxLogServerPeer::clearInstancePool();
 }
 
 KalturaLog::log('Done');

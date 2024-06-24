@@ -57,4 +57,22 @@ class SphinxLogServerPeer extends BaseSphinxLogServerPeer {
 		return SphinxLogServerPeer::doSelectOne($criteria, $con);
 	}
 	
+	/**
+	 * Return true or false whether populate_active is 0 (inactive) or populate_active != 0 (active)
+	 *
+	 * @param $server
+	 * @param PropelPDO|null $con
+	 * @return int
+	 * @throws PropelException
+	 */
+	public static function shouldPopulateBeActiveInCurrentDc($server, PropelPDO $con = null)
+	{
+		$criteria = new Criteria();
+		$criteria->add(SphinxLogServerPeer::SERVER, $server);
+		$criteria->add(SphinxLogServerPeer::DC, kDataCenterMgr::getCurrentDcId());
+		$res = SphinxLogServerPeer::doSelectOne($criteria, $con);
+		
+		return $res->getPopulateActive();
+	}
+	
 } // SphinxLogServerPeer
