@@ -424,13 +424,12 @@ class embedPlaykitJsAction extends sfAction
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
 		if ($iframeEmbed)
 		{
-			
+			//no cdn caching for iframeEmbed
+			$max_age = 0;
 			header("Content-Type: text/html");
 		}
 		else
 		{
-			//no cdn caching for iframeEmbed
-			$max_age = 0;
 			header("Content-Type: text/javascript");
 		}
 
