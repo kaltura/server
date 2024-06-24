@@ -92,6 +92,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $allowResubmission = false;
 
+	/**
+	 * @var string
+	 */
+	public $vendorData;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -108,6 +113,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'engineType',
 		'allowResubmission',
 		'sourceLanguage',
+		'vendorData',
 	);
 
 	abstract protected function getServiceFeature();

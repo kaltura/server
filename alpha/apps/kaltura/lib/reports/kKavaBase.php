@@ -86,6 +86,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_REACH_PROFILE_TYPE = 'reachProfileType';
 	const DIMENSION_CUE_POINT_ID = 'cuePointId';
 	const DIMENSION_CONTEXT_ID = 'contextId';
+	const DIMENSION_EVENT_SESSION_CONTEXT_ID = 'eventSessionContextId';
 
 	// metrics
 	const METRIC_COUNT = 'count';

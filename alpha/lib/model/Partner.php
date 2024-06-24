@@ -19,6 +19,7 @@ class Partner extends BasePartner
 	const EP_PARTNER_ID = -11;
 	const SELF_SERVE_PARTNER_ID = -12;
 	const BI_PARTNER_ID = -15;
+	const AUTH_BROKER_PARTNER = -17;
 
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
