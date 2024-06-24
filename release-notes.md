@@ -1,3 +1,26 @@
+# Tucana-20.14.0
+## Add configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-24868
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.eventPlatformAIEmails.enabled = true
+moduls.eventPlatformAIEmails.permissionType = 2
+moduls.eventPlatformAIEmails.label = "Enable AI in EP - Emails"
+moduls.eventPlatformAIEmails.permissionName = FEATURE_EP_AI_EMAILS_PERMISSION
+moduls.eventPlatformAIEmails.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+Change the label of moduls.eventPlatformAI:
+```
+moduls.eventPlatformAI.enabled = true
+moduls.eventPlatformAI.permissionType = 2
+moduls.eventPlatformAI.label = "Enable AI in EP - Webinar Cdreation"
+moduls.eventPlatformAI.permissionName = FEATURE_EP_AI_PERMISSION
+moduls.eventPlatformAI.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Tucana-20.12.0
 ## Configure partner limit on max groups per user ##
 - Issue Type: Task
