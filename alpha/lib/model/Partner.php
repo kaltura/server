@@ -1889,9 +1889,14 @@ class Partner extends BasePartner
 		$globalAccessLimitationsConfiguration = kConf::get(self::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, null);
 		if ($globalAccessLimitationsConfiguration)
 		{
+			$allowedPartnersInBlockedCountries = $globalAccessLimitationsConfiguration['allowedPartnersInBlockedCountries'];
+			if ($allowedPartnersInBlockedCountries && in_array($this->id, explode(",", $allowedPartnersInBlockedCountries))
+			{
+			    return true;
+			}
+		
 			$blockedCountriesList = $globalAccessLimitationsConfiguration['blockedCountries'];
-            		$allowedPartnersInBlockedCountries = $globalAccessLimitationsConfiguration['allowedPartnersInBlockedCountries'];
-			if ($blockedCountriesList && (!$allowedPartnersInBlockedCountries || !in_array($this->id, explode(",", $allowedPartnersInBlockedCountries))))
+			if ($blockedCountriesList)
 			{
 				return myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, $this->id);
 			}
