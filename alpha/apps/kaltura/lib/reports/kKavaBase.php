@@ -548,6 +548,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_POSITION => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 			self::DIMENSION_UI_CONF_ID => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -669,6 +670,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR1 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 		),
 		self::DATASOURCE_VE_REGISTRATION => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -704,6 +706,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_CUE_POINT_ID => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 		),
 		self::DATASOURCE_MEETING_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -722,6 +725,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_CUE_POINT_ID => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 		),
 		self::DATASOURCE_CNC_EVENTS => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -742,6 +746,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR2 => 1,
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_EVENT_VAR4 => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 		)
 	);
 
