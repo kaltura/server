@@ -1891,7 +1891,7 @@ class Partner extends BasePartner
 		if ($globalAccessLimitationsConfiguration)
 		{
 			$allowedPartnersInBlockedCountries = $globalAccessLimitationsConfiguration['allowedPartnersInBlockedCountries'];
-			if ($allowedPartnersInBlockedCountries && in_array($this->id, explode(",", $allowedPartnersInBlockedCountries))
+			if ($allowedPartnersInBlockedCountries && in_array($this->id, explode(",", $allowedPartnersInBlockedCountries)))
 			{
 			    return true;
 			}
