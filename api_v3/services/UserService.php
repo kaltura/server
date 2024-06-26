@@ -80,6 +80,16 @@ class UserService extends KalturaBaseUserService
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
 		}
+
+		if ($dbUser->getIsAdmin() && !is_null($user->email))
+		{
+			$allowedEmailDomainsForAdmins = PartnerPeer::getAllowedEmailDomainsForAdmins($dbUser->getPartnerId());
+			if ($allowedEmailDomainsForAdmins && kString::isEmailString($user->email) &&
+				!in_array(substr(strrchr($user->email, "@"), 1), $allowedEmailDomainsForAdmins))
+			{
+				throw new KalturaAPIException(KalturaErrors::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
+			}
+		}
 		
 		if($dbUser->getIsHashed() && $user->id)
 		{
@@ -120,7 +130,7 @@ class UserService extends KalturaBaseUserService
 				{
 					throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id);
 				}
-			}			
+			}
 			$dbUser = $user->toUpdatableObject($dbUser);
 			$dbUser->save();
 		}

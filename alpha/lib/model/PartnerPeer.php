@@ -59,6 +59,12 @@ class PartnerPeer extends BasePartnerPeer
 		$partner = PartnerPeer::retrieveByPK($partnerId);
 		return self::getPartnerPriorityFactorByPartner($partner);
 	}
+
+	public static function getAllowedEmailDomainsForAdmins($partnerId)
+	{
+		$partner = PartnerPeer::retrieveByPK($partnerId);
+		return explode(',', $partner->getAllowedEmailDomainsForAdmins());
+	}
 	
 	public static function getPartnerPriorityFactorByPartner($partner)
 	{

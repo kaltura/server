@@ -515,6 +515,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $customAnalyticsDomain;
+
+	/**
+	 * @var string
+	 */
+	public $allowedEmailDomainsForAdmins;
 	
 	
 	private static $map_between_objects = array
@@ -615,6 +620,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'eventPlatformAllowedTemplates',
 		'recycleBinRetentionPeriod',
 		'customAnalyticsDomain',
+		'allowedEmailDomainsForAdmins',
 	);
 
 	public function getMapBetweenObjects()
@@ -880,6 +886,15 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if (is_null($this->customAnalyticsDomain))
 		{
 			$object_to_fill->setCustomAnalyticsDomain('');
+		}
+
+		if (!is_null($this->allowedEmailDomainsForAdmins))
+		{
+			$object_to_fill->setAllowedEmailDomainsForAdmins($this->allowedEmailDomainsForAdmins);
+		}
+		else
+		{
+			$object_to_fill->setAllowedEmailDomainsForAdmins('');
 		}
 		
 		return $object_to_fill;

@@ -99,6 +99,8 @@ class Partner extends BasePartner
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
+
+	const ALLOWED_EMAIL_DOMAINS_FOR_ADMINS = 'allowed_email_domains_for_admins';
 	
 	const EXCLUDED_ADMIN_ROLE_NAME = 'excluded_admin_role_name';
 	
@@ -2434,5 +2436,15 @@ class Partner extends BasePartner
 	public function setCustomAnalyticsDomain($v)
 	{
 		return $this->putInCustomData(self::CUSTOM_ANALYTICS_DOMAIN, $v);
+	}
+
+	public function getAllowedEmailDomainsForAdmins()
+	{
+		return $this->getFromCustomData(self::ALLOWED_EMAIL_DOMAINS_FOR_ADMINS);
+	}
+
+	public function setAllowedEmailDomainsForAdmins($v)
+	{
+		return $this->putInCustomData(self::ALLOWED_EMAIL_DOMAINS_FOR_ADMINS, $v);
 	}
 }
