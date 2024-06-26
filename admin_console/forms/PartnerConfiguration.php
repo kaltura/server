@@ -348,6 +348,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 
+		$this->addElement('text', 'allowed_email_domains_for_admins', array(
+			'label'			=> 'Allowed email domains for admins:',
+			'filters'		=> array('StringTrim'),
+		));
+
 //--------------------------- Password Security ---------------------------
 		
 		$this->addElement('text', 'login_block_period', array(
@@ -1075,8 +1080,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));
 		
-		$this->addDisplayGroup(array_merge(array('secondary_secret_role_id',),
-		                                   array('crossLine')), 'security', array('legend' => 'Security'));
+		$this->addDisplayGroup(array('secondary_secret_role_id','allowed_email_domains_for_admins','crossLine'), 'security', array('legend' => 'Security'));
 		$this->addDisplayGroup(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'ALLOW_SSO_PER_USER',
 		                                   'two_factor_authentication_mode', 'crossLine'), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 

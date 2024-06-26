@@ -579,6 +579,8 @@ class KalturaErrors extends APIErrors
 	
 	const SETTING_SSO_PER_USER_NOT_ALLOWED = "SETTING_SSO_PER_USER_NOT_ALLOWED;;Setting SSO per user is not allowed for this partner";
 
+	const EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS = "EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS;;Email domain is not allowed for admins on this partner";
+
 	/**
 	 * categoryUser service
 	 */
