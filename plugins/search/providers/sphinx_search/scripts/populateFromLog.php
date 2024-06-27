@@ -81,7 +81,6 @@ $lastLogs = array();
 $handledRecords = array();
 $sphinxRtTables = array();
 $objectIdSphinxLog = array();
-$currentDcId = null;
 
 foreach($serverLastLogs as $serverLastLog)
 {
