@@ -7,6 +7,12 @@
  */
 class KProcessWrapper
 {
+	const NO_LOG_DIRS = [
+		'/dev/stdout',
+		'/dev/stderr',
+		'/proc/self/fd/1',
+		'/proc/self/fd/2',
+	];
 	/**
 	 * @var resource
 	 */
@@ -82,7 +88,8 @@ class KProcessWrapper
 		$cmdLine .= realpath(__DIR__ . '/../') . '/' . $this->taskConfig->scriptPath . ' ';
 		$cmdLine .= "$taskConfigStr ";
 		$cmdLine .= "'[" . mt_rand() . "]' ";
-		$cmdLine .= ">> $logFileOut 2>> $logFileErr";
+		if($logDir && !in_array($logDir, self::NO_LOG_DIRS))
+			$cmdLine .= ">> $logFileOut 2>> $logFileErr";
 		
 		
 		$descriptorspec = array(); // stdin is a pipe that the child will read from
