@@ -327,7 +327,7 @@ abstract class LiveEntry extends entry
 		if (isset($liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE]))
 			$streamNameTemplate = $liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE];
 
-		str_replace('@ENTRY_ID@', $this->getId(), $streamNameTemplate);
+		str_replace('{entryId}', $this->getId(), $streamNameTemplate);
 
 		return $this->getFromCustomData( "streamName", null, $streamNameTemplate);
 	}
