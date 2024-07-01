@@ -13,14 +13,11 @@ abstract class LiveEntry extends entry
 	const LIVE_SCHEDULE_CAPABILITY = 'live_schedule_capability';
 	const SIMULIVE_CAPABILITY = 'simulive_capability';
 	const LOW_LATENCY_TAG = 'lowlatency';
-
-	const LIVE_BACKEND_PARAM = 'live_backend';
-	const BROADCAST_MAP = 'broadcast';
-	const LIVE_BACKEND_WOWZA = 0;
-	const LIVE_BACKEND_LIVE_NG = 1;
+	const STREAM_NAME_TEMPLATE = 'stream_name_template';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
 	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
+	const DEFAULT_STREAM_NAME_TEMPLATE = '%i';
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
@@ -324,15 +321,15 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName ()
 	{
-		$liveBackend = kConf::get(self::LIVE_BACKEND_PARAM, self::BROADCAST_MAP, self::LIVE_BACKEND_LIVE_NG);
+		$streamNameTemplate = LiveEntry::DEFAULT_STREAM_NAME_TEMPLATE;
+		$liveConfiguration = $this->getPartner()->getLiveStreamBroadcastUrlConfigurations(kDataCenterMgr::getCurrentDcId());
 
-		switch ($liveBackend)
-		{
-			case LiveEntry::LIVE_BACKEND_WOWZA:
-				return $this->getFromCustomData( "streamName", null, $this->getId() . '_%i' );
-			case LiveEntry::LIVE_BACKEND_LIVE_NG:
-				return $this->getFromCustomData( "streamName", null, '%i' );
-		}
+		if (isset($liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE]))
+			$streamNameTemplate = $liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE];
+
+		str_replace('@ENTRY_ID@', $this->getId(), $streamNameTemplate);
+
+		return $this->getFromCustomData( "streamName", null, $streamNameTemplate);
 	}
 	
 	protected function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
