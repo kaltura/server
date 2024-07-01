@@ -294,6 +294,31 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				)
 			),
 			self::REPORT_METRICS => array(self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT)
+		),
+
+		ReportType::EP_TOP_SESSIONS => array(
+			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+			self::REPORT_DIMENSION_MAP => array(
+				'event_session_context_id' => self::DIMENSION_EVENT_SESSION_CONTEXT_ID,
+				'name' => self::DIMENSION_EVENT_SESSION_CONTEXT_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				self::REPORT_ENRICH_OUTPUT => 'name',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_SESSION_CONTEXT_ID,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN, "0", "")
+				)
+			),
+			self::REPORT_METRICS => array(
+				self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS,
+				self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO,
+				self::METRIC_UNIQUE_VOD_VIEW_PERIOD_USERS,
+				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO
+			)
 		)
 
 	);

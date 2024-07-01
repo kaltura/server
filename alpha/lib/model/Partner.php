@@ -19,6 +19,7 @@ class Partner extends BasePartner
 	const EP_PARTNER_ID = -11;
 	const SELF_SERVE_PARTNER_ID = -12;
 	const BI_PARTNER_ID = -15;
+	const AUTH_BROKER_PARTNER = -17;
 
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
@@ -1889,6 +1890,12 @@ class Partner extends BasePartner
 		$globalAccessLimitationsConfiguration = kConf::get(self::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, null);
 		if ($globalAccessLimitationsConfiguration)
 		{
+			$allowedPartnersInBlockedCountries = $globalAccessLimitationsConfiguration['allowedPartnersInBlockedCountries'];
+			if ($allowedPartnersInBlockedCountries && in_array($this->id, explode(",", $allowedPartnersInBlockedCountries)))
+			{
+			    return true;
+			}
+		
 			$blockedCountriesList = $globalAccessLimitationsConfiguration['blockedCountries'];
 			if ($blockedCountriesList)
 			{
