@@ -56,6 +56,13 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	protected $updated_at;
 
 	/**
+	 * The value for the populate_active field.
+	 * Note: this column has a database default value of: 1
+	 * @var        int
+	 */
+	protected $populate_active;
+
+	/**
 	 * @var        SphinxLog
 	 */
 	protected $aSphinxLog;
@@ -103,6 +110,27 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 			return $this->oldColumnsValues[$name];
 			
 		return null;
+	}
+
+	/**
+	 * Applies default values to this object.
+	 * This method should be called from the object's constructor (or
+	 * equivalent initialization method).
+	 * @see        __construct()
+	 */
+	public function applyDefaultValues()
+	{
+		$this->populate_active = 1;
+	}
+
+	/**
+	 * Initializes internal state of BaseSphinxLogServer object.
+	 * @see        applyDefaults()
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->applyDefaultValues();
 	}
 
 	/**
@@ -223,6 +251,16 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 		} else {
 			return $dt->format($format);
 		}
+	}
+
+	/**
+	 * Get the [populate_active] column value.
+	 * 
+	 * @return     int
+	 */
+	public function getPopulateActive()
+	{
+		return $this->populate_active;
 	}
 
 	/**
@@ -420,6 +458,29 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	} // setUpdatedAt()
 
 	/**
+	 * Set the value of [populate_active] column.
+	 * 
+	 * @param      int $v new value
+	 * @return     SphinxLogServer The current object (for fluent API support)
+	 */
+	public function setPopulateActive($v)
+	{
+		if(!isset($this->oldColumnsValues[SphinxLogServerPeer::POPULATE_ACTIVE]))
+			$this->oldColumnsValues[SphinxLogServerPeer::POPULATE_ACTIVE] = $this->populate_active;
+
+		if ($v !== null) {
+			$v = (int) $v;
+		}
+
+		if ($this->populate_active !== $v || $this->isNew()) {
+			$this->populate_active = $v;
+			$this->modifiedColumns[] = SphinxLogServerPeer::POPULATE_ACTIVE;
+		}
+
+		return $this;
+	} // setPopulateActive()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -429,6 +490,10 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
+			if ($this->populate_active !== 1) {
+				return false;
+			}
+
 		// otherwise, everything was equal, so return TRUE
 		return true;
 	} // hasOnlyDefaultValues()
@@ -459,6 +524,7 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 			$this->last_log_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
 			$this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
 			$this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+			$this->populate_active = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -468,7 +534,7 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 6; // 6 = SphinxLogServerPeer::NUM_COLUMNS - SphinxLogServerPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 7; // 7 = SphinxLogServerPeer::NUM_COLUMNS - SphinxLogServerPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating SphinxLogServer object", $e);
@@ -898,6 +964,9 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 			case 5:
 				return $this->getUpdatedAt();
 				break;
+			case 6:
+				return $this->getPopulateActive();
+				break;
 			default:
 				return null;
 				break;
@@ -925,6 +994,7 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 			$keys[3] => $this->getLastLogId(),
 			$keys[4] => $this->getCreatedAt(),
 			$keys[5] => $this->getUpdatedAt(),
+			$keys[6] => $this->getPopulateActive(),
 		);
 		return $result;
 	}
@@ -974,6 +1044,9 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 			case 5:
 				$this->setUpdatedAt($value);
 				break;
+			case 6:
+				$this->setPopulateActive($value);
+				break;
 		} // switch()
 	}
 
@@ -1004,6 +1077,7 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[3], $arr)) $this->setLastLogId($arr[$keys[3]]);
 		if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
 		if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+		if (array_key_exists($keys[6], $arr)) $this->setPopulateActive($arr[$keys[6]]);
 	}
 
 	/**
@@ -1021,6 +1095,7 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(SphinxLogServerPeer::LAST_LOG_ID)) $criteria->add(SphinxLogServerPeer::LAST_LOG_ID, $this->last_log_id);
 		if ($this->isColumnModified(SphinxLogServerPeer::CREATED_AT)) $criteria->add(SphinxLogServerPeer::CREATED_AT, $this->created_at);
 		if ($this->isColumnModified(SphinxLogServerPeer::UPDATED_AT)) $criteria->add(SphinxLogServerPeer::UPDATED_AT, $this->updated_at);
+		if ($this->isColumnModified(SphinxLogServerPeer::POPULATE_ACTIVE)) $criteria->add(SphinxLogServerPeer::POPULATE_ACTIVE, $this->populate_active);
 
 		return $criteria;
 	}
@@ -1100,6 +1175,7 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 
 		$copyObj->setUpdatedAt($this->updated_at);
 
+		$copyObj->setPopulateActive($this->populate_active);
 
 		$copyObj->setNew(true);
 
