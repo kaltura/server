@@ -450,12 +450,19 @@ class embedPlaykitJsAction extends sfAction
 	private function shouldDisableCache() : bool
 	{
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
+        if(!$entry_id)
+        {
+            $entry_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
+        }
 		$entry = entryPeer::retrieveByPK($entry_id);
 		$accessControl = $entry->getAccessControl();
 		if(!$accessControl)
 		{
+            KalturaLog::log("Moshe - no ACL");
 			return false;
 		}
+
+        KalturaLog::log("Moshe - ACL found");
 
 		//get access control rules
 		$rules = $accessControl->getRulesArray();
