@@ -425,7 +425,10 @@ class embedPlaykitJsAction extends sfAction
 		if ($iframeEmbed)
 		{
 			//no cdn caching for iframeEmbed
-			$max_age = 0;
+			if($this->shouldDisableCache())
+			{
+				$max_age = 0;
+			}
 			header("Content-Type: text/html");
 		}
 		else
@@ -442,6 +445,34 @@ class embedPlaykitJsAction extends sfAction
 		header('X-Robots-Tag: noindex');
 
 		infraRequestUtils::sendCachingHeaders($max_age, false, $lastModified);
+	}
+
+	private function shouldDisableCache() : bool
+	{
+		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
+		$entry = entryPeer::retrieveByPK($entry_id);
+		$accessControl = $entry->getAccessControl();
+		if(!$accessControl)
+		{
+			return false;
+		}
+
+		//get access control rules
+		$rules = $accessControl->getRulesArray();
+		foreach($rules as $rule)
+		{
+			$conditions = $rule->getConditions();
+			foreach($conditions as $condition)
+			{
+				if($condition->getType() === ConditionType::SITE)
+				{
+					//One site condition is enough
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private function getLastModified($content)
@@ -544,7 +575,7 @@ class embedPlaykitJsAction extends sfAction
                         <body >
                         	<div id="player_container"></div>
                             	<script type = "text/javascript" > ' . $bundleContent . '</script >
-				<script type = "text/javascript" > window.originalRequestReferrer = "' . $_SERVER['HTTP_REFERER'] . '"</script >
+				<script type = "text/javascript" > window.originalRequestReferrer = "' . @$_SERVER['HTTP_REFERER'] . '"</script >
 			</body >
                     </html >';
 		return $htmlDoc;
