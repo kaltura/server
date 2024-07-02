@@ -220,7 +220,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function createAuditTrail(BaseObject $object, $action) 
 	{
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
 				
 		if(!$this->traceEnabled($partnerId))
 			return null;
@@ -303,7 +303,8 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
+
 		if(($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 		
@@ -331,7 +332,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
 	{
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
 		if(($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
@@ -357,7 +358,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
 		
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
 		if(($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
@@ -382,7 +383,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
 		if(($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
@@ -480,5 +481,16 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		
 		return true;
 	}
+
+	/**
+	 * @param BaseObject $object
+	 * @return string partner id
+	 */
+	protected static function getMasterPartnerId()
+	{
+		$partnerId = kCurrentContext::$master_partner_id;
+		return $partnerId == Partner::AUTH_BROKER_PARTNER ? Partner::ADMIN_CONSOLE_PARTNER_ID : $partnerId;
+	}
+
 
 }

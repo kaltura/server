@@ -15,6 +15,7 @@ class LiveEntryServerNode extends EntryServerNode
 	const CUSTOM_DATA_IS_PLAYABLE_USER = "is_playable_user";
 	const CUSTOM_DATA_VIEW_MODE = "view_mode";
 	const CUSTOM_DATA_FEATURES_UPDATED_AT = "features_updated_at";
+	const CUSTOM_DATA_VIEW_MODE_UPDATED_AT = "view_mode_updated_at";
 
 	/* (non-PHPdoc)
 	 * @see BaseEntryServerNode::postInsert()
@@ -288,6 +289,7 @@ class LiveEntryServerNode extends EntryServerNode
 	public function setViewMode($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
+		$this->setViewModeUpdatedAt(date("Y-m-d H:i:s"));
 	}
 
 	public function getViewMode()
@@ -303,5 +305,15 @@ class LiveEntryServerNode extends EntryServerNode
 	public function getFeaturesUpdatedAt()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FEATURES_UPDATED_AT);
+	}
+
+	public function setViewModeUpdatedAt($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE_UPDATED_AT, $v);
+	}
+
+	public function getViewModeUpdatedAt()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_VIEW_MODE_UPDATED_AT);
 	}
 }

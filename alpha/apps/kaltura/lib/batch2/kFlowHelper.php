@@ -2954,6 +2954,19 @@ class kFlowHelper
 				break;
 		}
 	}
+
+	public static function addDeliveryTagToEntry(entry $entry)
+	{
+		$profile = $entry->getconversionProfile2();
+		if ($profile && $profile->getDeliveryTag())
+		{
+			$deliveryTag = $profile->getDeliveryTag();
+			$adminTags = $entry->getAdminTags();
+			$adminTags = $adminTags ? $adminTags . ",enforce_delivery:$deliveryTag" : "enforce_delivery:$deliveryTag";
+			$entry->setAdminTags($adminTags);
+			$entry->save();
+		}
+	}
 	
 	/**
 	 * @param entry $entry
