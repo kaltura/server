@@ -127,7 +127,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 			$this->targetServiceUrlRegex = KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlRegex;
 		}
 		
-		if(isset(KBatchBase::$taskConfig->params->targetServiceUrlReplace) && isset(KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlReplace))
+		if(isset(KBatchBase::$taskConfig->params->crossKaltura) && isset(KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlReplace))
 		{
 			$this->targetServiceUrlReplace = KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlReplace;
 		}
