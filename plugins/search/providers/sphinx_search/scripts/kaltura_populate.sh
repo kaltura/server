@@ -138,9 +138,9 @@ stop() {
 
 enable() {
 	echo "Enabling sphinx_log processing"
-	echo "$PHP_BIN ${SCRIPTDIR}/${SCRIPT_ENABLE_DISABLE} 1 >> $LOG_DIR/kaltura_populate.log 2>&1 &"
+	echo "$PHP_BIN ${SCRIPTDIR}/${SCRIPT_ENABLE_DISABLE} 1 >> $LOG_DIR/kaltura_populate_enabled_disabled.log 2>&1 &"
 	cd $SCRIPTDIR
-	su $OS_KALTURA_USER -c "$PHP_BIN $SCRIPT_ENABLE_DISABLE 1 >> $LOG_DIR/kaltura_populate.log 2>&1 &"
+	su $OS_KALTURA_USER -c "$PHP_BIN $SCRIPT_ENABLE_DISABLE 1 >> $LOG_DIR/kaltura_populate_enabled_disabled.log 2>&1 &"
 	if [ "$?" -eq 0 ]; then
 		echo_success
 		echo
@@ -152,9 +152,9 @@ enable() {
 
 disable() {
 	echo "Disabling sphinx_log processing"
-	echo "$PHP_BIN ${SCRIPTDIR}/${SCRIPT_ENABLE_DISABLE} 0 >> $LOG_DIR/kaltura_populate.log 2>&1 &"
+	echo "$PHP_BIN ${SCRIPTDIR}/${SCRIPT_ENABLE_DISABLE} 0 >> $LOG_DIR/kaltura_populate_enabled_disabled.log 2>&1 &"
 	cd $SCRIPTDIR
-	su $OS_KALTURA_USER -c "$PHP_BIN $SCRIPT_ENABLE_DISABLE 0 >> $LOG_DIR/kaltura_populate.log 2>&1 &"
+	su $OS_KALTURA_USER -c "$PHP_BIN $SCRIPT_ENABLE_DISABLE 0 >> $LOG_DIR/kaltura_populate_enabled_disabled.log 2>&1 &"
 	if [ "$?" -eq 0 ]; then
 		echo_success
 		echo
