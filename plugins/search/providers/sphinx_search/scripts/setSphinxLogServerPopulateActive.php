@@ -22,10 +22,6 @@ if (!is_numeric($argv[1]) || !in_array($argv[1], array(0, 1)))
 	exit(1);
 }
 
-$populateActiveValue = intval($argv[1]);
-$hostname = $argv[2] ?? ($_SERVER["HOSTNAME"] ?? gethostname());
-
-
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../../../'));
 require_once(ROOT_DIR . '/infra/KAutoloader.php');
 require_once(ROOT_DIR . '/alpha/config/kConf.php');
@@ -37,6 +33,9 @@ KAutoloader::register();
 
 error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
+
+$populateActiveValue = intval($argv[1]);
+$hostname = $argv[2] ?? ($_SERVER["HOSTNAME"] ?? gethostname());
 
 $config = kConf::get('sphinxPopulateSettings', 'sphinx_populate', array());
 if (empty($config))
