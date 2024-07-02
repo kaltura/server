@@ -90,7 +90,7 @@ foreach($serverLastLogs as $serverLastLog)
 
 while(true)
 {
-	// 'stop' populate script as long as 'shouldPopulateBeActiveInCurrentDc' = 0 --> populate should not execute sphinx_log queries
+	// stop processing sphinx_log records, sleep and check again
 	while (!SphinxLogServerPeer::isPopulateActiveByServer($sphinxServer, $sphinxReadConn))
 	{
 		KalturaLog::log("Kaltura all of sphinx_log_server.server name [$sphinxServer] sphinx_log_server.populate_active is [0] - sleeping 60 sec");
