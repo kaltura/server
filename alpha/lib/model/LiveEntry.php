@@ -321,15 +321,16 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName ()
 	{
-		$streamNameTemplate = LiveEntry::DEFAULT_STREAM_NAME_TEMPLATE;
+		$streamName = LiveEntry::DEFAULT_STREAM_NAME_TEMPLATE;
 		$liveConfiguration = $this->getPartner()->getLiveStreamBroadcastUrlConfigurations(kDataCenterMgr::getCurrentDcId());
 
 		if (isset($liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE]))
+		{
 			$streamNameTemplate = $liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE];
+			$streamName = str_replace('{entryId}', $this->getId(), $streamNameTemplate);
+		}
 
-		$streamNameTemplate = str_replace('{entryId}', $this->getId(), $streamNameTemplate);
-
-		return $this->getFromCustomData( "streamName", null, $streamNameTemplate);
+		return $this->getFromCustomData( "streamName", null, $streamName);
 	}
 	
 	protected function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
