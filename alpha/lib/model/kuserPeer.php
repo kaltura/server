@@ -472,8 +472,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		if ($existingUser) {
 			throw new kUserException('', kUserException::USER_ALREADY_EXISTS);
 		}
-		
-		if ($user->getPartner()->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $user->getPartnerId())
+		$partner = $user->getPartner();
+		if ($partner->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $user->getPartnerId())
 			&& $user->getIsSsoExcluded())
 		{
 			throw new kUserException('', kUserException::SETTING_SSO_PER_USER_NOT_ALLOWED);
@@ -482,7 +482,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		// check if roles are valid - may throw exceptions
 		if (!$user->getRoleIds() && $user->getIsAdmin()) {
 			// assign default role according to user type admin / normal
-			$userRoleId = $user->getPartner()->getAdminSessionRoleId();
+			$userRoleId = $partner->getAdminSessionRoleId();
 			$user->setRoleIds($userRoleId);
 		}
 		UserRolePeer::testValidRolesForUser($user->getRoleIds(), $user->getPartnerId());
@@ -502,10 +502,11 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		// if password is set, user should be able to login to the system - add a user_login_data record
 		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
-			$allowedEmailDomainsForAdmins = PartnerPeer::getAllowedEmailDomainsForAdmins($user->getPartnerId());
+			$allowedEmailDomainsForAdmins = explode(',', $partner->getAllowedEmailDomainsForAdmins());
+
 			if ($user->getIsAdmin() && kString::isEmailString($user->getEmail()) && $allowedEmailDomainsForAdmins)
 			{
-				if (!in_array(substr(strrchr($user->getEmail(), "@"), 1), $allowedEmailDomainsForAdmins))
+				if (!myKuserUtils::isAllowedAdminEmailDomain($user->getEmail(), $allowedEmailDomainsForAdmins))
 				{
 					throw new kUserException('', kUserException::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
 				}

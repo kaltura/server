@@ -76,6 +76,7 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 		}
 
+		$partner = $dbUser->getPartner();
 		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin)
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
@@ -83,9 +84,9 @@ class UserService extends KalturaBaseUserService
 
 		if ($dbUser->getIsAdmin() && !is_null($user->email))
 		{
-			$allowedEmailDomainsForAdmins = PartnerPeer::getAllowedEmailDomainsForAdmins($dbUser->getPartnerId());
+			$allowedEmailDomainsForAdmins = explode(',', $partner->getAllowedEmailDomainsForAdmins());
 			if ($allowedEmailDomainsForAdmins && kString::isEmailString($user->email) &&
-				!in_array(substr(strrchr($user->email, "@"), 1), $allowedEmailDomainsForAdmins))
+				!myKuserUtils::isAllowedAdminEmailDomain($user->email, $allowedEmailDomainsForAdmins))
 			{
 				throw new KalturaAPIException(KalturaErrors::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
 			}
@@ -96,7 +97,7 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::UPDATING_USER_ID_FOR_HASHED_USER_NOT_ALLOWED);
 		}
 		
-		if ($dbUser->getPartner()->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $this->getPartnerId())
+		if ($partner->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $this->getPartnerId())
 			&& $user->isSsoExcluded)
 		{
 			throw new KalturaAPIException(KalturaErrors::SETTING_SSO_PER_USER_NOT_ALLOWED);
