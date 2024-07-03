@@ -17,7 +17,7 @@ abstract class LiveEntry extends entry
 
 	const DEFAULT_CACHE_EXPIRY = 120;
 	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
-	const DEFAULT_STREAM_NAME_TEMPLATE = '%i';
+	const DEFAULT_STREAM_NAME = '%i';
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
@@ -29,7 +29,6 @@ abstract class LiveEntry extends entry
 	const CUSTOM_DATA_BROADCAST_TIME = "broadcast_time";
 	const CUSTOM_DATA_DVR_STATUS = "dvr_status";
 	const CUSTOM_DATA_DVR_WINDOW = "dvr_window";
-
 
 	static $kalturaLiveSourceTypes = array(EntrySourceType::LIVE_STREAM, EntrySourceType::LIVE_CHANNEL, EntrySourceType::LIVE_STREAM_ONTEXTDATA_CAPTIONS);
 	
@@ -321,13 +320,12 @@ abstract class LiveEntry extends entry
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
 	public function getStreamName ()
 	{
-		$streamName = LiveEntry::DEFAULT_STREAM_NAME_TEMPLATE;
+		$streamName = LiveEntry::DEFAULT_STREAM_NAME;
 		$liveConfiguration = $this->getPartner()->getLiveStreamBroadcastUrlConfigurations(kDataCenterMgr::getCurrentDcId());
 
 		if (isset($liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE]))
 		{
-			$streamNameTemplate = $liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE];
-			$streamName = str_replace('{entryId}', $this->getId(), $streamNameTemplate);
+			$streamName = str_replace('{entryId}', $this->getId(), $liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE]);
 		}
 
 		return $this->getFromCustomData( "streamName", null, $streamName);
