@@ -190,4 +190,25 @@ class kBatchUtils
 		}
 		return $configArray;
 	}
+	
+	/**
+	 * @param $serviceUrl
+	 * @param $params
+	 * @return array|mixed|string|string[]
+	 */
+	public static function translateExternalToInternalHost($serviceUrl, $params = array())
+	{
+		// the params should be under 'JobHandlerWorker' worker - so that all workers have access if needed
+		if (!isset($params->redirectExternalToInternal->targetServiceUrlRegex) || !isset($params->redirectExternalToInternal->targetServiceUrlReplace))
+		{
+			return $serviceUrl;
+		}
+		
+		// Todo need to remove - this is only to test on stg before deploying config
+//		$newServiceUrl = preg_replace("/((https?:\/\/)?[a-z]{3,}\.kaltura\.com)/", "http://back-api.nvp1.ovp.kaltura.prod", $serviceUrl);
+		$newServiceUrl = preg_replace($params->redirectExternalToInternal->targetServiceUrlRegex, $params->redirectExternalToInternal->targetServiceUrlReplace, $serviceUrl);
+		
+		// preg_replace will return null if an error occurred, in that case return the original serviceUrl
+		return $newServiceUrl ?? $serviceUrl;
+	}
 }

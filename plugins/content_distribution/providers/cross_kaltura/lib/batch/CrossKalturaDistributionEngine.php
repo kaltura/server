@@ -166,7 +166,7 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 
 		// init target client
 		$targetClientConfig = new KalturaConfiguration($distributionProfile->targetAccountId);
-		$targetClientConfig->serviceUrl = $this->getTargetServiceUrl($distributionProfile->targetServiceUrl);
+		$targetClientConfig->serviceUrl = kBatchUtils::translateExternalToInternalHost($distributionProfile->targetServiceUrl, kBatchBase::$taskConfig->params);
 		$targetClientConfig->setLogger($this);
 		$this->targetClient = new KalturaClient($targetClientConfig);
 		$ks = $this->targetClient->user->loginByLoginId($distributionProfile->targetLoginId, $distributionProfile->targetLoginPassword, $distributionProfile->targetAccountId, 86400, 'disableentitlement');
