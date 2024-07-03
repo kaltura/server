@@ -328,7 +328,7 @@ abstract class LiveEntry extends entry
 			$streamName = str_replace('{entryId}', $this->getId(), $liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE]);
 		}
 
-		return $this->getFromCustomData( "streamName", null, $streamName);
+		return $this->getFromCustomData("streamName", null, $streamName);
 	}
 	
 	protected function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
