@@ -84,9 +84,13 @@ class UserService extends KalturaBaseUserService
 
 		if ($dbUser->getIsAdmin() && !is_null($user->email))
 		{
+			if (!kString::isEmailString($user->email))
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'email');
+			}
+
 			$allowedEmailDomainsForAdmins = explode(',', $partner->getAllowedEmailDomainsForAdmins());
-			if ($allowedEmailDomainsForAdmins && kString::isEmailString($user->email) &&
-				!myKuserUtils::isAllowedAdminEmailDomain($user->email, $allowedEmailDomainsForAdmins))
+			if ($allowedEmailDomainsForAdmins && !myKuserUtils::isAllowedAdminEmailDomain($user->email, $allowedEmailDomainsForAdmins))
 			{
 				throw new KalturaAPIException(KalturaErrors::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
 			}
