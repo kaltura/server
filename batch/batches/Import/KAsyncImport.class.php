@@ -190,9 +190,9 @@ class KAsyncImport extends KJobHandlerWorker
 	 */
 	private function fetchFile(KalturaBatchJob $job, KalturaImportJobData $data)
     	{
-			// TODO: this will not work due to 'Internal not allowed url' need to add regex to security.ini
-			// TODO: coming from infra/general/KAxelWrapper.class.php:383 ---> infra/general/KCurlWrapper.class.php:722
-			$srcFileUrl = kBatchUtils::translateExternalToInternalHost($data->srcFileUrl, self::$taskConfig->params);
+        	// TODO: this will not work due to 'Internal not allowed url' need to add regex to security.ini
+        	// TODO: coming from infra/general/KAxelWrapper.class.php:383 ---> infra/general/KCurlWrapper.class.php:722
+        	$srcFileUrl = kBatchUtils::translateExternalToInternalHost($data->srcFileUrl, self::$taskConfig->params);
 			
         	$jobSubType = $job->jobSubType;
         	$urlHeadersArray = $data->urlHeaders ? $this->getUrlHeadersArray($data->urlHeaders) : $data->urlHeaders;
