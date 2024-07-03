@@ -82,6 +82,24 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'content' => '<b>Notification Handler Service  Details</b>',
 		));
 		$this->addElements(array($element));
+
+		$shaType = new Kaltura_Form_Element_EnumSelect('secure_hashing_algo', array(
+			'enum' => 'Kaltura_Client_EventNotification_Enum_SecureHashingAlgo',
+			'disabled'		=> true,
+			'label'			=> 'Secure Hashing Algorithm:',
+		));
+		$this->addElement($shaType);
+
+		$this->addElement('select', 'secureHashingAlgo', array(
+			'label'			=> 'Secure Hashing Algorithm:',
+			'filters'		=> array('StringTrim'),
+			'required'		=> true,
+			'multiOptions' 	=> array(
+				Kaltura_Client_Enum_SecureHashingAlgo::SHA_1 => 'SHA_1',
+				Kaltura_Client_Enum_SecureHashingAlgo::SHA_256 => 'SHA_256',
+				Kaltura_Client_Enum_SecureHashingAlgo::SHA_512 => 'SHA_512',
+			),
+		));
 		
 		$this->addElement('text', 'url', array(
 			'label'			=> 'URL:',
