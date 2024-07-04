@@ -204,8 +204,6 @@ class kBatchUtils
 			return $serviceUrl;
 		}
 		
-		// Todo need to remove - this is only to test on stg before deploying config
-//		$newServiceUrl = preg_replace("/((https?:\/\/)?[a-z]{3,}\.kaltura\.com)/", "http://back-api.nvp1.ovp.kaltura.prod", $serviceUrl);
 		$newServiceUrl = preg_replace($params->redirectExternalToInternal->targetServiceUrlRegex, $params->redirectExternalToInternal->targetServiceUrlReplace, $serviceUrl);
 		
 		// preg_replace will return null if an error occurred, in that case return the original serviceUrl
