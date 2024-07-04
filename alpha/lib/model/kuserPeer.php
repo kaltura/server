@@ -503,14 +503,12 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
 			$allowedEmailDomainsForAdmins = explode(',', $partner->getAllowedEmailDomainsForAdmins());
-
-			if (!kString::isEmailString($user->getEmail()))
-			{
-				throw new kUserException('', kUserException::INVALID_EMAIL);
-			}
-
 			if ($user->getIsAdmin() && $allowedEmailDomainsForAdmins)
 			{
+				if (!kString::isEmailString($user->getEmail()))
+				{
+					throw new kUserException('', kUserException::INVALID_EMAIL);
+				}
 				if (!myKuserUtils::isAllowedAdminEmailDomain($user->getEmail(), $allowedEmailDomainsForAdmins))
 				{
 					throw new kUserException('', kUserException::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
