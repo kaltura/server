@@ -529,6 +529,10 @@ class KalturaBaseUserService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(KalturaErrors::SETTING_SSO_PER_USER_NOT_ALLOWED);
 			}
+			else if ($code == kUserException::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS)
+			{
+				throw new KalturaAPIException(KalturaErrors::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
+			}
 			throw $e;
 		}
 		catch (kPermissionException $e)
