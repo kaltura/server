@@ -204,9 +204,9 @@ class kBatchUtils
 			return $serviceUrl;
 		}
 		
-		$newServiceUrl = preg_replace($params->redirectExternalToInternal->targetServiceUrlRegex, $params->redirectExternalToInternal->targetServiceUrlReplace, $serviceUrl);
+		$internalServiceUrl = preg_replace($params->redirectExternalToInternal->targetServiceUrlRegex, $params->redirectExternalToInternal->targetServiceUrlReplace, $serviceUrl);
 		
 		// preg_replace will return null if an error occurred, in that case return the original serviceUrl
-		return $newServiceUrl ?? $serviceUrl;
+		return $internalServiceUrl ?? $serviceUrl;
 	}
 }
