@@ -1,5 +1,5 @@
 # Tucana-20.14.0
-## Add 'broadcast entry id' to ESearch for kuser ##
+## Add 'broadcast entry id' to ESearch for entry ##
 - Issue Type: Task
 - Issue ID: PLAT-24812
 

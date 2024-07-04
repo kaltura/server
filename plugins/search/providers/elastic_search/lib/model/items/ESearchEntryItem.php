@@ -65,7 +65,7 @@ class ESearchEntryItem extends ESearchItem
 		'display_in_search' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
 		'recycled_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 		'room_type' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
-		'broadcast_entry_id' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS),
+		'broadcast_entry_id' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
 	);
 
 	protected static $field_boost_values = array(
