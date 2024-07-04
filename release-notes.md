@@ -1,3 +1,23 @@
+# Tucana-20.15.0
+## Sentiment Analysis - Enable AI in CnC
+* Issue Type: Task
+* Issue ID: CNC-801
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.cncAI.enabled = true
+moduls.cncAI.permissionType = 2
+moduls.cncAI.label = "Enable CNC Assistant"
+moduls.cncAI.permissionName = FEATURE_CNC_ASSISTANT_PERMISSION
+moduls.cncAI.group = GROUP_ENABLE_DISABLE_FEATURES
+
+moduls.cncAssistant.enabled = true
+moduls.cncAssistant.permissionType = 2
+moduls.cncAssistant.label = "Enable AI in CNC - Sentiment Analysis"
+moduls.cncAssistant.permissionName = FEATURE_CNC_AI_PERMISSION
+moduls.cncAssistant.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Tucana-20.14.0
 ## Allow specific partners to acccess the API from blocked countries ##
 * Issue Type: Task
