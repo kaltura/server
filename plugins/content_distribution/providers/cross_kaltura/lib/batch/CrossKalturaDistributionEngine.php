@@ -122,16 +122,6 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 		if (!$data->providerData instanceof KalturaCrossKalturaDistributionJobProviderData)
 			throw new Exception('Provider data must be of type KalturaCrossKalturaDistributionJobProviderData');
 		
-		if(isset(KBatchBase::$taskConfig->params->crossKaltura) && isset(KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlRegex))
-		{
-			$this->targetServiceUrlRegex = KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlRegex;
-		}
-		
-		if(isset(KBatchBase::$taskConfig->params->crossKaltura) && isset(KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlReplace))
-		{
-			$this->targetServiceUrlReplace = KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlReplace;
-		}
-
 		$this->distributionProfile = $data->distributionProfile;
 
 		// init target kaltura client
@@ -166,28 +156,13 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 
 		// init target client
 		$targetClientConfig = new KalturaConfiguration($distributionProfile->targetAccountId);
-		$targetClientConfig->serviceUrl = $this->getTargetServiceUrl($distributionProfile->targetServiceUrl);
+		$targetClientConfig->serviceUrl = kBatchUtils::translateExternalToInternalHost($distributionProfile->targetServiceUrl, kBatchBase::$taskConfig->params);
 		$targetClientConfig->setLogger($this);
 		$this->targetClient = new KalturaClient($targetClientConfig);
 		$ks = $this->targetClient->user->loginByLoginId($distributionProfile->targetLoginId, $distributionProfile->targetLoginPassword, $distributionProfile->targetAccountId, 86400, 'disableentitlement');
 		$this->targetClient->setKs($ks);
 	}
 	
-	private function getTargetServiceUrl($serviceUrl)
-	{
-		if(!$this->targetServiceUrlRegex || !$this->targetServiceUrlReplace)
-		{
-			return $serviceUrl;
-		}
-		
-		if (!preg_match($this->targetServiceUrlRegex, $serviceUrl))
-		{
-			return $serviceUrl;
-		}
-		
-		return $this->targetServiceUrlReplace;
-	}
-
 	/**
 	 * Check which server plugins should be used
 	 * @param KalturaCrossKalturaDistributionProfile $distributionProfile
