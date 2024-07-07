@@ -35,6 +35,11 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 	 */
 	public $featuresUpdatedAt;
 
+	/**
+	 * @var time
+	 */
+	public $viewModeUpdatedAt;
+
 	private static $map_between_objects = array
 	(
 		"streams",
@@ -42,6 +47,7 @@ class KalturaLiveEntryServerNode extends KalturaEntryServerNode
 		"isPlayableUser",
 		"viewMode",
 		"featuresUpdatedAt",
+		"viewModeUpdatedAt",
 	);
 
 	/* (non-PHPdoc)

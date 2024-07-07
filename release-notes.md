@@ -1,4 +1,4 @@
-# Tucana-20.14.0
+# Tucana-20.15.0
 ## Add 'broadcast entry id' to ESearch for entry ##
 - Issue Type: Task
 - Issue ID: PLAT-24812
@@ -10,6 +10,37 @@ Replace 'esearch_host', 'esearch_port' and execute the curl command
 
     curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"broadcast_entry_id":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
 
+## Allow specific partners to acccess the API from blocked countries ##
+* Issue Type: Task
+* Issue ID: SUP-39912
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [global_access_limitations]
+    allowedPartnersInBlockedCountries = @COMMA_SEPERATED_PARTNER_ID@
+    
+## Add configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-24868
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.eventPlatformAIEmails.enabled = true
+moduls.eventPlatformAIEmails.permissionType = 2
+moduls.eventPlatformAIEmails.label = "Enable AI in EP - Emails"
+moduls.eventPlatformAIEmails.permissionName = FEATURE_EP_AI_EMAILS_PERMISSION
+moduls.eventPlatformAIEmails.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+Change the label of moduls.eventPlatformAI:
+```
+moduls.eventPlatformAI.enabled = true
+moduls.eventPlatformAI.permissionType = 2
+moduls.eventPlatformAI.label = "Enable AI in EP - Webinar Cdreation"
+moduls.eventPlatformAI.permissionName = FEATURE_EP_AI_PERMISSION
+moduls.eventPlatformAI.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 
 # Tucana-20.12.0
 ## Configure partner limit on max groups per user ##

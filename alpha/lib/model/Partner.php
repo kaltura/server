@@ -19,6 +19,7 @@ class Partner extends BasePartner
 	const EP_PARTNER_ID = -11;
 	const SELF_SERVE_PARTNER_ID = -12;
 	const BI_PARTNER_ID = -15;
+	const AUTH_BROKER_PARTNER = -17;
 
 	const PARTNER_THAT_DOWS_NOT_EXIST = -1000;
 	
@@ -98,6 +99,8 @@ class Partner extends BasePartner
 	const ALL_PARTNERS_WILD_CHAR = "*";
 	
 	const SECONDARY_SECRET_ROLE = 'secondary_secret_role';
+
+	const ALLOWED_EMAIL_DOMAINS_FOR_ADMINS = 'allowed_email_domains_for_admins';
 	
 	const EXCLUDED_ADMIN_ROLE_NAME = 'excluded_admin_role_name';
 	
@@ -1889,6 +1892,12 @@ class Partner extends BasePartner
 		$globalAccessLimitationsConfiguration = kConf::get(self::GLOBAL_ACCESS_LIMITATIONS, kConfMapNames::RUNTIME_CONFIG, null);
 		if ($globalAccessLimitationsConfiguration)
 		{
+			$allowedPartnersInBlockedCountries = $globalAccessLimitationsConfiguration['allowedPartnersInBlockedCountries'];
+			if ($allowedPartnersInBlockedCountries && in_array($this->id, explode(",", $allowedPartnersInBlockedCountries)))
+			{
+			    return true;
+			}
+		
 			$blockedCountriesList = $globalAccessLimitationsConfiguration['blockedCountries'];
 			if ($blockedCountriesList)
 			{
@@ -2433,5 +2442,15 @@ class Partner extends BasePartner
 	public function setCustomAnalyticsDomain($v)
 	{
 		return $this->putInCustomData(self::CUSTOM_ANALYTICS_DOMAIN, $v);
+	}
+
+	public function getAllowedEmailDomainsForAdmins()
+	{
+		return $this->getFromCustomData(self::ALLOWED_EMAIL_DOMAINS_FOR_ADMINS);
+	}
+
+	public function setAllowedEmailDomainsForAdmins($v)
+	{
+		return $this->putInCustomData(self::ALLOWED_EMAIL_DOMAINS_FOR_ADMINS, $v);
 	}
 }

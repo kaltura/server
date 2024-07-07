@@ -41,6 +41,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_BULK_UPLOAD_ID = 'bulkUploadId';
 	const CUSTOM_DATA_ENGINE_TYPE = 'engineType';
 	const CUSTOM_DATA_ALLOW_RESUBMISSION = 'allowResubmission';
+	const CUSTOM_DATA_VENDOR_DATA = 'vendorData';
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -92,6 +93,20 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_ENGINE_TYPE);
 	}
+
+	public function setVendorData($vendorData)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_VENDOR_DATA, $vendorData);
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getVendorData()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_VENDOR_DATA);
+	}
+
 	
 	public function getPartnerId()
 	{
