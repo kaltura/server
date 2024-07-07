@@ -113,10 +113,13 @@ class kQuizPdf
 			$ansIdx = 0;
 			foreach ($question->getOptionalAnswers() as $optionalAnswer)
 			{
-				$text = $optionalAnswer->getText();
-				$stylePrefix = $this->getStylePrefix($text);
-				$this->pdf->addList($alphabet[$ansIdx] . '.', $text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
-				$ansIdx += 1;
+				if ($ansIdx < sizeof($alphabet))
+				{
+					$text = $optionalAnswer->getText();
+					$stylePrefix = $this->getStylePrefix($text);
+					$this->pdf->addList($alphabet[$ansIdx] . '.', $text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
+					$ansIdx += 1;
+				}
 			}
 		}
 	}
