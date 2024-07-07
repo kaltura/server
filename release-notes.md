@@ -14,7 +14,7 @@ moduls.cncAssistant.group = GROUP_ENABLE_DISABLE_FEATURES
 moduls.cncAISentimentAnalysis.enabled = true
 moduls.cncAISentimentAnalysis.permissionType = 2
 moduls.cncAISentimentAnalysis.label = "Enable AI in CNC - Sentiment Analysis"
-moduls.cncAISentimentAnalysis.permissionName = FEATURE_CNC_AI_PERMISSION
+moduls.cncAISentimentAnalysis.permissionName = FEATURE_CNC_AI_SENTIMENT_ANALYSIS_PERMISSION
 moduls.cncAISentimentAnalysis.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
