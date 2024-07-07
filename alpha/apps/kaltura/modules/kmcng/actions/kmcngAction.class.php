@@ -42,6 +42,15 @@ class kmcngAction extends kalturaAction
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
 
+		//security
+		header("Referrer-Policy: strict-origin");
+//		header("X-Content-Type-Options: nosniff");
+//		header("Cross-Origin-Embedder-Policy: unsafe-none");
+//		header("Cross-Origin-Resource-Policy: same-origin");
+//		header("Cross-Origin-Opener-Policy: unsafe-none");
+//		header("Permissions-Policy");
+
+
 		if (!isset($kmcngParams["kmcng_version"]))
 		{
 			KalturaLog::warning("kmcng_version doesn't exist in configuration.");
