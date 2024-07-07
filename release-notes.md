@@ -1,5 +1,5 @@
 # Tucana-20.15.0
-## Sentiment Analysis - Enable AI in CnC
+## Add CnC Permissions
 * Issue Type: Task
 * Issue ID: PLAT-24891
 ### Deployment ###
