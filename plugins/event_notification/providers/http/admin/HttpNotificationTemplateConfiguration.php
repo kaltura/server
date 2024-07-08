@@ -13,6 +13,11 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		if($object instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationTemplate)
 		{
+			if (isset($properties['secureHashingAlgo']))
+			{
+				$object->secureHashingAlgo = $properties['secureHashingAlgo'];
+			}
+
 			if(!isset($properties['dataType']) || !$properties['dataType'])
 				return $object;
 			
@@ -51,6 +56,8 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		
 		if(!($object instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationTemplate))
 			return;
+
+		$this->getElement('secureHashingAlgo')->setValue($object->secureHashingAlgo);
 		
 		if(!$object->data)
 			return;
@@ -83,21 +90,14 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		));
 		$this->addElements(array($element));
 
-		$shaType = new Kaltura_Form_Element_EnumSelect('secure_hashing_algo', array(
-			'enum' => 'Kaltura_Client_EventNotification_Enum_SecureHashingAlgo',
-			'disabled'		=> true,
-			'label'			=> 'Secure Hashing Algorithm:',
-		));
-		$this->addElement($shaType);
-
 		$this->addElement('select', 'secureHashingAlgo', array(
 			'label'			=> 'Secure Hashing Algorithm:',
 			'filters'		=> array('StringTrim'),
 			'required'		=> true,
 			'multiOptions' 	=> array(
-				Kaltura_Client_Enum_SecureHashingAlgo::SHA_1 => 'SHA_1',
-				Kaltura_Client_Enum_SecureHashingAlgo::SHA_256 => 'SHA_256',
-				Kaltura_Client_Enum_SecureHashingAlgo::SHA_512 => 'SHA_512',
+				Kaltura_Client_HttpNotification_Enum_SecureHashingAlgo::SHA_1 => 'SHA 1',
+				Kaltura_Client_HttpNotification_Enum_SecureHashingAlgo::SHA_256 => 'SHA 256',
+				Kaltura_Client_HttpNotification_Enum_SecureHashingAlgo::SHA_512 => 'SHA 512',
 			),
 		));
 		

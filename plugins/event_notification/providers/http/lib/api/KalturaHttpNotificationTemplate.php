@@ -132,6 +132,8 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 	public $customHeaders;
 
 	/**
+	 * The type of SHA to use.
+	 *
 	 * @var KalturaSecureHashingAlgo
 	 */
 	public $secureHashingAlgo;

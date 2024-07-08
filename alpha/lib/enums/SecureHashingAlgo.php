@@ -6,7 +6,7 @@
 
 interface SecureHashingAlgo extends BaseEnum
 {
-	const SHA_1 = 'sha1';
-	const SHA_256 = 'sha256';
-	const SHA_512 = 'sha512';
+	const SHA_1 = 1;
+	const SHA_256 = 2;
+	const SHA_512 = 3;
 }
