@@ -45,7 +45,7 @@ class kmcngAction extends kalturaAction
 		//security
 		header("Referrer-Policy: strict-origin");
 		header("X-Content-Type-Options: nosniff");
-//		header("Cross-Origin-Embedder-Policy: unsafe-none");
+		header("Cross-Origin-Embedder-Policy: unsafe-none");
 //		header("Cross-Origin-Resource-Policy: same-origin");
 //		header("Cross-Origin-Opener-Policy: unsafe-none");
 //		header("Permissions-Policy");
