@@ -502,14 +502,15 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		// if password is set, user should be able to login to the system - add a user_login_data record
 		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
-			$allowedEmailDomainsForAdmins = explode(',', $partner->getAllowedEmailDomainsForAdmins());
+			$allowedEmailDomainsForAdmins = $partner->getAllowedEmailDomainsForAdmins();
 			if ($user->getIsAdmin() && $allowedEmailDomainsForAdmins)
 			{
+				$allowedEmailDomainsForAdminsArray = explode(',', $partner->getAllowedEmailDomainsForAdmins());
 				if (!kString::isEmailString($user->getEmail()))
 				{
 					throw new kUserException('', kUserException::INVALID_EMAIL);
 				}
-				if (!myKuserUtils::isAllowedAdminEmailDomain($user->getEmail(), $allowedEmailDomainsForAdmins))
+				if (!myKuserUtils::isAllowedAdminEmailDomain($user->getEmail(), $allowedEmailDomainsForAdminsArray))
 				{
 					throw new kUserException('', kUserException::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
 				}
