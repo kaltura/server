@@ -67,8 +67,8 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			$signature = $secret . $curlData;
 			$shaType = match ($httpNotificationTemplate->secureHashingAlgo)
 			{
-				SecureHashingAlgo::SHA_256 => 'sha256',
-				SecureHashingAlgo::SHA_512 => 'sha512',
+				KalturaSecureHashingAlgo::SHA_256 => 'sha256',
+				KalturaSecureHashingAlgo::SHA_512 => 'sha512',
 				default => 'sha1',
 			};
 
