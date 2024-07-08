@@ -142,7 +142,7 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 		
 		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt ($ch, CURLOPT_HTTPHEADER, array('x-api-key: ' . $this->apiKey));
+        	curl_setopt ($ch, CURLOPT_HTTPHEADER, array('x-api-key: ' . $this->apiKey));
 
 		if (isset(KBatchBase::$taskConfig->params->mrss->curlTimeout))
 		{
