@@ -210,31 +210,23 @@ class kBatchManager
 			if(!is_null($tags))
 			{
 				$tagsArray = explode(',', $tags);
-				$keyIdx = array_search("force_tags", $tagsArray);
-				if ($keyIdx !== false)
+				
+				// support for old migrated profiles
+				if($profile->getCreationMode() == conversionProfile2::CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV)
 				{
-					unset($tagsArray[$keyIdx]);
-					$flavorAsset->addTags($tagsArray);
-				}
-				else
-				{
-					// support for old migrated profiles
-					if ($profile->getCreationMode() == conversionProfile2::CONVERSION_PROFILE_2_CREATION_MODE_AUTOMATIC_BYPASS_FLV)
+					if(!KDLWrap::CDLIsFLV($mediaInfoDb))
 					{
-						if (!KDLWrap::CDLIsFLV($mediaInfoDb))
-						{
-							$key = array_search(flavorParams::TAG_MBR, $tagsArray);
-							if ($key !== false)
-								unset($tagsArray[$key]);
-						}
+						$key = array_search(flavorParams::TAG_MBR, $tagsArray);
+						if($key !== false)
+							unset($tagsArray[$key]);
 					}
-
-					$finalTagsArray = KDLWrap::CDLMediaInfo2Tags($mediaInfoDb, $tagsArray);
-					$finalTags = join(',', array_unique($finalTagsArray));
-					KalturaLog::log("Flavor asset tags from KDL [$finalTags]");
-					//KalturaLog::log("Flavor asset tags [".print_r($flavorAsset->setTags(),1)."]");
-					$flavorAsset->addTags($finalTagsArray);
 				}
+				
+				$finalTagsArray = KDLWrap::CDLMediaInfo2Tags($mediaInfoDb, $tagsArray);
+				$finalTags = join(',', array_unique($finalTagsArray));
+				KalturaLog::log("Flavor asset tags from KDL [$finalTags]");
+//KalturaLog::log("Flavor asset tags [".print_r($flavorAsset->setTags(),1)."]");
+				$flavorAsset->addTags($finalTagsArray);
 			}
 		}
 		else 
