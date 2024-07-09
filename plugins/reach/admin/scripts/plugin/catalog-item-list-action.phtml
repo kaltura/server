@@ -58,8 +58,7 @@
                 <td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
                 <td>
-                    <select class="options"
-                            onchange="doAction(this.value, <?php echo $catalogItem->id; ?>)">
+                    <select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id; ?>)">
                         <option value=""><?php echo $this->translate('Select Action'); ?></option>
                         <option value="configureCatalogItem"><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED): ?>
@@ -107,36 +106,33 @@
 		jQuery('select.options').val('');
 	}
 
-	function enable(catalogItemId, partnerId) {
+	function enable(catalogItemId) {
 		changeStatus(
 			catalogItemId,
 			
 			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE; ?>,
-			partnerId,
 			function () {
 				alert('<?php echo $this->translate('Catalog Item enabled');?>');
 			}
 		);
 	}
 
-	function disable(catalogItemId, partnerId) {
+	function disable(catalogItemId) {
 		changeStatus(
 			catalogItemId,
 			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED; ?>,
-			partnerId,
 			function () {
 				alert('<?php echo $this->translate('Catalog Item disabled');?>');
 			}
 		);
 	}
 
-	function remove(catalogItemId, partnerId) {
+	function remove(catalogItemId) {
 		var ok = confirm('<?php echo $this->translate('Are you sure you want to remove Catalog Item ?'); ?>');
 		if (ok) {
 			changeStatus(
 				catalogItemId,
 				<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED; ?>,
-				partnerId,
 				function () {
 					alert('<?php echo $this->translate('Catalog Item removed');?>');
 				}
@@ -144,11 +140,11 @@
 		}
 	}
 
-	function changeStatus(catalogItemId, status, partnerId, callback) {
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemSetStatusAction', 'catalogItemId' => 'CATALOGITEMID', 'partnerId' => 'PARTNERID', 'catalogItemStatus' => 'STATUS')); ?>';
+	function changeStatus(catalogItemId, status, callback) {
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemSetStatusAction', 'catalogItemId' => 'CATALOGITEMID', 'catalogItemStatus' => 'STATUS')); ?>';
 		url = url.replace('STATUS', status);
 		url = url.replace('CATALOGITEMID', catalogItemId);
-		url = url.replace('PARTNERID', partnerId);
+  
 		jQuery.ajax({
 			url: url,
 			dataType: 'json',
