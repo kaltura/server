@@ -138,11 +138,12 @@ class KApFeedDropFolderEngine extends KFeedDropFolderEngine
 	 */
 	protected function fetchFeedContent ($url)
 	{
-		$ch = curl_init ($url . '&apiKey=' . $this->apiKey);
+		$ch = curl_init ($url);
 		
 		curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
 		curl_setopt ($ch, CURLOPT_RETURNTRANSFER, true);
-		
+        	curl_setopt ($ch, CURLOPT_HTTPHEADER, array('x-api-key: ' . $this->apiKey));
+
 		if (isset(KBatchBase::$taskConfig->params->mrss->curlTimeout))
 		{
 			curl_setopt($ch, CURLOPT_TIMEOUT, KBatchBase::$taskConfig->params->mrss->curlTimeout);
