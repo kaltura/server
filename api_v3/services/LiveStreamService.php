@@ -628,6 +628,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function getLiveStreamStatsAction($entryId)
 	{
+		KalturaResponseCacher::disableCache();
 		$liveStreamStatsActions = new LiveStreamStatsActions();
 		return $liveStreamStatsActions->doGetLiveStreamStats($entryId);
 	}
