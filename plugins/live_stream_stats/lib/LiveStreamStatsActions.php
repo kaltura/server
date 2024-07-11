@@ -16,7 +16,7 @@ class LiveStreamStatsActions
 {
 	const ENTRY_ID_ARG = 'entryId';
 	const CONF_LIVE_STATS_INTERVAL = 'liveStatsInterval';
-	const LIVE_SETTINGS = kConfMapNames::LIVE_SETTINGS;
+	const LIVE_SETTINGS = 'live';
 	const DEFAULT_TTL = 20;
 
 	/**
