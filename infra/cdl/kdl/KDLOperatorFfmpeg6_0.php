@@ -84,11 +84,14 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 			else $mappingStr.= "-map $generalAudMapping";
 		}
 			// only aud filters are used ==> 
-			//   add aout connection to the audio filter graph and map the 'v:0' 
+			//	add aout connection to the audio filter graph.
+			//	add vid mapping only for exiting vid stream
 		else if(isset($keyAudFilters)) {
 			$filterStr = trim($cmdValsArr[$keyAudFilters],"'");
 			$cmdStr = str_replace($filterStr, $filterStr.'[aout]', $cmdStr);
-			$mappingStr = '-map v:0 -map \'[aout]\'';
+			if(isset($target->_video))
+				$mappingStr = '-map v:0 ';
+			$mappingStr.= '-map \'[aout]\'';
 		}
 			// if no filter graphs - add multyAudioMapping if one exists
 		else if(isset($target->multyAudioMapping)) {
@@ -96,10 +99,12 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 		}
 			// generation of Generic source flv, requires mapping of ALL source streams
 		else if(isset($target->_forGenericSource) && $target->_forGenericSource==true) {
-			$mappingStr = '-map v:0 -map a';
+			if(isset($target->_video))
+				$mappingStr = '-map v:0 ';
+			if(isset($target->_audio))
+				$mappingStr.= '-map a';
 		}
 		$cmdStr = str_replace(" -y", " $mappingStr -y", $cmdStr);
-
 			// switch the vsync mode to textual name
 		$cmdStr = preg_replace('/\s+/', ' ', $cmdStr);
 		$pattern = "/-vsync\s+(\S+)/";
@@ -111,6 +116,10 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 				$cmdStr=str_replace("-vsync $vsyncMode", "-vsync ".$vsyncModeMapping[$vsyncMode],$cmdStr);
 			}
 		} 
+			// remove btrt atom. since it might cause issues on old TV sets
+		if(isset($target->_container->_id) && in_array($target->_container->_id, array('mp4','mov'))) {
+			$cmdStr = str_replace(" -y", " -write_btrt 0 -y", $cmdStr);
+		}
 		KalturaLog::log($cmdStr);
 		return $cmdStr;
 	}
