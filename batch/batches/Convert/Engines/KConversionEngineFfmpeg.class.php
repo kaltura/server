@@ -32,7 +32,7 @@ class KConversionEngineFfmpeg  extends KJobConversionEngine
    ======================== */
 {
 	if(KFFmpegToPartnerMatch::isMatched()==true) {
-		$matchData = KFFmpegToPartnerMatch::getConf();
+		$matchData = KFFmpegToPartnerMatch::getAll();
 KalturaLog::log("matchedBin:".$matchData[1]);
 		return $matchData[1];
 	}
