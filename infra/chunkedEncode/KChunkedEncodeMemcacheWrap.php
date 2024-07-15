@@ -390,11 +390,25 @@ ini_set("memory_limit","512M");
 				$setup->ffmpegBin = $ffmpegBin;
 			if(isset($ffprobeBin))
 				$setup->ffprobeBin = $ffprobeBin;
-
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ======================== */
+			if(isset($ffprobeBin)) {
+KalturaLog::log("ffprobeBin:$ffprobeBin");
+				list($part, $ffprobeBin) = 
+					KFFmpegToPartnerMatch::extractPartnerId($ffprobeBin);
+				$setup->ffprobeBin = $ffprobeBin;
+				KFFmpegToPartnerMatch::match($part);
+KalturaLog::log("patrner:$part, ffprobeBin:$ffprobeBin");
+			}
 			if(KFFmpegToPartnerMatch::getVersion()==4)
 				$chunker = new KChunkedEncode4($setup);
 			else
 				$chunker = new KChunkedEncode($setup);
+/* ======================== */
 
 			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName, $chunker);
 			
