@@ -455,7 +455,8 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 			else {
 				// 'general' mapping is needed only when there is no other (filter) mapping,
 				// otherwise duplicate streams generated (behavior chnage in FFMpeg6)
-				if(!(in_array('v:0', $params->mappings)||in_array('0:v:0', $params->mappings)))
+				if (!isset($params->mappings) 
+				|| !(in_array('v:0', $params->mappings)||in_array('0:v:0', $params->mappings)))
 					$cmdLineArr[] = "-map 0:v:0";
 			}
 
@@ -1728,11 +1729,6 @@ $vMax*=2;
 		public $pathResolveTime = null;			// Last source path resolve time
 		public $pathResolveInterval = 3600*10;	// Time interval between resolves (10hrs)
 	
-		public function __construct()
-		{
-			$this->videoFilters = new stdClass();
-		}
-		
 		public $supportedVideoFilters = null;
 		//array("scale","fade","crop","overlay","rotate","yadif","subtitles");
 		public $supportedAudioFilters = null;
@@ -1953,7 +1949,8 @@ $vMax*=2;
 				 *
 				 */
 			$formatParamsArr = array();
-			$formatParamsNamesArr = array("-movflags", "-min_frag_duration", "-encryption_scheme", "-encryption_key", "-encryption_kid");
+				// added 'write_btrt' flag
+			$formatParamsNamesArr = array("-movflags", "-min_frag_duration", "-encryption_scheme", "-encryption_key", "-encryption_kid","-write_btrt");
 			foreach($formatParamsNamesArr as $formatParamName){
 				if(($key=array_search($formatParamName, $cmdLineArr))!==false) {
 					$formatParamsArr[] = $cmdLineArr[$key];
