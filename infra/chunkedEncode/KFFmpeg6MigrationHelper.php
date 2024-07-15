@@ -1,7 +1,7 @@
 <?php
 
  /*****************************
- * Includes & Globals 111
+ * Includes & Globals
  */
 //ini_set("memory_limit","512M");
 
@@ -9,29 +9,17 @@
 		 * 
 		 */
 	class KFFmpegToPartnerMatch {
-		private static $instance = null;
+		static protected $ffmpegVersion=4;
+		static protected $ffmpegBin="ffmpeg";
+		static protected $ffprobeBin="ffprobe";
+		static protected $isMatched=false;
+		static protected $partnerId=null;
 		
-		protected $version=4;
-		protected $ffmpegBin="ffmpeg4";
-		protected $ffprobeBin="ffprobe4";
-		protected $isMatched=false;
-		
-		static public	$kConfEmulateFilename = "/opt/kaltura/var/run/emulateKConf.txt";
-
-		/**
-		 * Returns the singleton instance of this class.
-		 * @return Singleton The singleton instance.
-		 */
-		public static function getInstance(): KFFmpegToPartnerMatch
-		{
-			if (self::$instance === null) {
-				self::$instance = new static();  // Use new self() if PHP version < 5.3
-			}
-			return self::$instance;
-		}
-
+//		static public	$kConfEmulateFilename = "/web/tmp/anatol/emulateKConf.txt";
+		static public   $kConfEmulateFilename = "/tmp/emulateKConf.txt";
 		/********************
-		 * 
+		 * saveData
+		 *	for dev/debug purposes
 		 */
 		public static function saveData() {
 			$zzz4 = new stdClass();
@@ -42,7 +30,7 @@
 			$zzz4->blackList = array(11,12,3);
 			
 			$zzz6 = new stdClass();
-			$zzz6->version = 4;
+			$zzz6->version = 6;
 			$zzz6->ffmpegBin="/web/content/shared/bin/ffmpeg-6.0-ub16-bin/ffmpeg.sh";
 			$zzz6->ffprobeBin="/web/content/shared/bin/ffmpeg-6.0-ub16-bin/ffprobe.sh";
 			$zzz6->whiteList = array(1,2,3);
@@ -57,77 +45,122 @@
 		}
 		
 		/********************
-		 * 
+		 * loadData
+		 *	retrieves the migration date from kConf (or from a file on the dev/debug stage)
 		 */
-		protected function loadConf($filePath=null) {
-			if(!isset($filePath))
-				$filePath = self::$kConfEmulateFilename;
-			KalturaLog::log(print_r($filePath,1));
-			$jsonStr=@file_get_contents($filePath);
-			if(isset($jsonStr)) {
+		protected static function loadData() {
+		$data=null;
+			if(file_exists(self::$kConfEmulateFilename)) {
+				KalturaLog::log("kConfEmulateFilename:".self::$kConfEmulateFilename." exists");
+				$jsonStr=file_get_contents(self::$kConfEmulateFilename);
 				$data = json_decode($jsonStr);
-				KalturaLog::log(print_r($data,1));
-				return $data;
+				if(isset($data->emulate) && $data->emulate==0){
+					$data=null;
+					KalturaLog::log("not emulate mode !!!");
+				}
+				else KalturaLog::log("emulate mode");
 			}
-			return null;
+			else 
+				KalturaLog::log("not emulate mode");
+				
+			if(!isset($data)) {
+				$data = kconf::get('ffmpeg', 'runtime_config', array());
+				if(count($data)==0) {
+					KalturaLog::log("no kConf");
+					$data = new stdClass;
+					$ffmpegObj = new stdClass;
+					$ffmpegObj->version=4;
+					$ffmpegObj->ffmpegBin="ffmpeg";
+					$ffmpegObj->ffprobeBin="ffprobe";
+					$ffmpegObj->whiteList="";
+					$ffmpegObj->blackList="";
+					$data->ffmpeg4 = clone($ffmpegObj);
+					$ffmpegObj->version=6;
+					$data->ffmpeg6 = clone($ffmpegObj);
+				}
+
+				KalturaLog::log("raw kConf:".print_r($data,1));
+				$tmp = new stdClass;
+				foreach($data as $ver=>$ffmpegConf) {
+					$ffmpegObj = new stdClass;
+					foreach($ffmpegConf as $fld=>$val) {
+						$ffmpegObj->$fld = $val;
+					}
+					$tmp->$ver = $ffmpegObj;
+				}
+								
+				$data = $tmp;
+				KalturaLog::log("converted kConf:".print_r($data,1));
+			}
+
+			$data->ffmpeg4->whiteList = self::valueToList($data->ffmpeg4->whiteList);
+			$data->ffmpeg4->blackList = self::valueToList($data->ffmpeg4->blackList);
+			$data->ffmpeg6->whiteList = self::valueToList($data->ffmpeg6->whiteList);
+			$data->ffmpeg6->blackList = self::valueToList($data->ffmpeg6->blackList);
+
+//KalturaLog::log("final:".print_r($data,1));
+//die;
+			return $data;
 		}
 		
 		/********************
-		 * 
+		 * valueToList
+		 *	translate comma separated list of partners, into an array
+		 */
+		protected static function valueToList($val) {
+			if(isset($val) && is_string($val)) {
+//KalturaLog::log($val);
+				if(strlen($val)>0)
+					$val = explode(',',$val);
+				else $val = array();
+			}
+			return $val;
+		}
+		
+		/********************
+		 * getVersion
 		 */
 		public static function getVersion() {
-			$inst = self::getInstance();
-			KalturaLog::log("version:$inst->version");
-			return $inst->version;
+			KalturaLog::log("version:".KFFmpegToPartnerMatch::$ffmpegVersion);
+			return KFFmpegToPartnerMatch::$ffmpegVersion;
 		}
 	
 		/********************
-		 * 
+		 * getPartner
 		 */
-		public static function getConf() {
-
-			$inst = self::getInstance();
-			KalturaLog::log("version:$inst->vrsion,isMatched:$inst->isMatched - ".print_r($inst,1));
-			return array($inst->version,$inst->ffmpegBin,$inst->ffprobeBin);
+		public static function getPartner() {
+			KalturaLog::log("partnerId:".KFFmpegToPartnerMatch::$partnerId);
+			return KFFmpegToPartnerMatch::$partnerId;
 		}
 	
 		/********************
-		 * 
+		 * getAll
+		 */
+		public static function getAll() {
+			KalturaLog::log("version:".KFFmpegToPartnerMatch::$ffmpegVersion);
+			return array(KFFmpegToPartnerMatch::$ffmpegVersion, KFFmpegToPartnerMatch::$ffmpegBin, KFFmpegToPartnerMatch::$ffprobeBin);
+		}
+	
+		/********************
+		 * isMatched
 		 */
 		public static function isMatched() {
-			return self::getInstance()->isMatched;
+			return self::$isMatched;
 		}
 		
 		/********************
-		 * 
+		 * match
 		 */
-		public static function match($val, $key=null) {
-			$inst = self::getInstance();
-			
+		public static function match($val) {
 KalturaLog::log(print_r($val,1));
-			$inst->isMatched = false;
 			if(!isset($val))
-				return null;
+				return;
 
-			$partnerId = $inst->extractPartnerID($val);
-			if(!isset($partnerId))
-				return null;
-			
-			$data = $inst->loadConf($key);
-			if(!isset($data))
-				return null;
-			
-			return $inst->partner2version($partnerId, $data);
-		}
-		
-		/********************
-		 * 
-		 */
-		private function extractPartnerID($val) {
-			$partnerId = null;
 			if(is_numeric($val)) {
 				$partnerId=$val;
 			}
+/*
+	the partner id optionally could have been retrieved from various objs'
 			else if(get_class($val)=='mediaInfo') {
 				$asset = assetPeer::retrieveById($val->getFlavorAssetId());
 				$partnerId = $asset->getPartnerId();
@@ -136,45 +169,82 @@ KalturaLog::log(print_r($val,1));
 				$asset = assetPeer::retrieveById($val[0]->getFlavorAssetId());
 				$partnerId = $asset->getPartnerId();
 			}
+*/			
+			if(!isset($partnerId))
+				return;
 			
-			return $partnerId;
+			$data = self::loadData();
+			if(array_search($partnerId, $data->ffmpeg4->whiteList)!==false) {
+				self::$ffmpegVersion=$data->ffmpeg4->version;
+				self::$ffmpegBin=$data->ffmpeg4->ffmpegBin;
+				self::$ffprobeBin=$data->ffmpeg4->ffprobeBin;
+				self::$isMatched = true;
+				self::$partnerId = $partnerId;
+KalturaLog::log("partner:$partnerId, ver:".self::$ffmpegVersion);
+			}
+			else if(array_search($partnerId, $data->ffmpeg4->blackList)!==false) {
+				self::$ffmpegVersion=$data->ffmpeg6->version;
+				self::$ffmpegBin=$data->ffmpeg6->ffmpegBin;
+				self::$ffprobeBin=$data->ffmpeg6->ffprobeBin;
+				self::$isMatched = true;
+				self::$partnerId = $partnerId;
+KalturaLog::log("partner:$partnerId, ver:".self::$ffmpegVersion);
+			}
+			else if(array_search($partnerId, $data->ffmpeg6->whiteList)!==false) {
+				self::$ffmpegVersion=$data->ffmpeg6->version;
+				self::$ffmpegBin=$data->ffmpeg6->ffmpegBin;
+				self::$ffprobeBin=$data->ffmpeg6->ffprobeBin;
+				self::$isMatched = true;
+				self::$partnerId = $partnerId;
+KalturaLog::log("partner:$partnerId, ver:".self::$ffmpegVersion);
+			}
+			else if(array_search($partnerId, $data->ffmpeg6->blackList)!==false) {
+				self::$ffmpegVersion=$data->ffmpeg4->version;
+				self::$ffmpegBin=$data->ffmpeg4->ffmpegBin;
+				self::$ffprobeBin=$data->ffmpeg4->ffprobeBin;
+				self::$isMatched = true;
+				self::$partnerId = $partnerId;
+KalturaLog::log("partner:$partnerId, ver:".self::$ffmpegVersion);
+			}
+			else {
+				self::$isMatched = false;
+				self::$partnerId = null;
+				KalturaLog::log("partner:$partnerId, not in lists");
+			}
 		}
 		
 		/********************
-		 * 
+		 * embedPartnerId
 		 */
-		private function partner2version($partnerId, $data) {
-			$this->isMatched = false;
-			if(array_search($partnerId, $data->ffmpeg4->whiteList)!==false) {
-				$this->version=$data->ffmpeg4->version;
-				$this->ffmpegBin=$data->ffmpeg4->ffmpegBin;
-				$this->ffprobeBin=$data->ffmpeg4->ffprobeBin;
-				KalturaLog::log("partner($partnerId), ver($this->version) - in whitelist");
-			}
-			else if(array_search($partnerId, $data->ffmpeg4->blackList)!==false) {
-				$this->version=$data->ffmpeg6->version;
-				$this->ffmpegBin=$data->ffmpeg6->ffmpegBin;
-				$this->ffprobeBin=$data->ffmpeg6->ffprobeBin;
-				KalturaLog::log("partner($partnerId), ver(4) - in blacklist");
-			}
-			else if(array_search($partnerId, $data->ffmpeg6->whiteList)!==false) {
-				$this->version=$data->ffmpeg6->version;
-				$this->ffmpegBin=$data->ffmpeg6->ffmpegBin;
-				$this->ffprobeBin=$data->ffmpeg6->ffprobeBin;
-				KalturaLog::log("partner($partnerId), ver($this->vrsion) - in whitelist");
-			}
-			else if(array_search($partnerId, $data->ffmpeg6->blackList)!==false) {
-				$this->version=$data->ffmpeg4->version;
-				$this->ffmpegBin=$data->ffmpeg4->ffmpegBin;
-				$this->ffprobeBin=$data->ffmpeg4->ffprobeBin;
-				KalturaLog::log("partner($partnerId), ver(4) - in blacklist");
+		public static function embedPartnerId($inputString, $pattern='__partner') {
+			if(isset(KFFmpegToPartnerMatch::$partnerId)) {
+				KalturaLog::log("partner:".KFFmpegToPartnerMatch::$partnerId);
+				return $inputString."__partner".KFFmpegToPartnerMatch::$partnerId;
 			}
 			else {
-				KalturaLog::log("partner:$partnerId, not in lists");
-				return false;
+				return $inputString;
 			}
-			$this->isMatched = true;
-			return $this->isMatched;
+		}
+		
+		/********************
+		 * extractPartnerId
+		 */
+		public static function extractPartnerId($embeddedString, $pattern='__partner') 
+		{
+			$patternPos = strrpos($embeddedString, $pattern);
+			
+			if ($patternPos === false) {
+				return [null, $embeddedString];
+			}
+
+			$numberPos = $patternPos + strlen($pattern);
+			$number = substr($embeddedString, $numberPos);
+			if (!ctype_digit($number)) {
+				return [null, $embeddedString];
+			}
+			$newString = substr($embeddedString, 0, $patternPos);
+
+			return [$number, $newString];
 		}
 	}
 	
@@ -1743,6 +1813,29 @@ $vMax*=2;
 			KalturaLog::log("vMax:$vMax, aMax:$aMax");
 			return array($vMax,$aMax);
 		}
+		
+		/* ---------------------------
+		 * validateChunkDuration
+		 */
+		public function validateChunkDuration($chunkData, $start, $finish)
+		{
+			$chunkDurThreshInSec=$this->chunkDurThreshInFrames*$this->params->frameDuration;
+			{
+					/*
+					 * Validate chunk dur
+					 */
+					// Calc the generated chunk duration
+				$generatedChunkDur = $finish-$start;
+				if($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur){
+					$msgStr = "Chunk id ($chunkData->index): too short chunk dur - $generatedChunkDur";
+					$msgStr.= ", should be ".round($chunkData->gap,4).", thresh:".round($chunkDurThreshInSec,4);
+					$msgStr.= ", delta:".round($chunkData->gap-$generatedChunkDur,4);
+					KalturaLog::log($msgStr);
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 	
 	/********************
@@ -1819,9 +1912,12 @@ $vMax*=2;
 		public $pathResolveTime = null;			// Last source path resolve time
 		public $pathResolveInterval = 3600*10;	// Time interval between resolves (10hrs)
 		
-		public function __construct()
+		/********************
+		 * 
+		 */
+		public function __construct() 
 		{
-			$this->videoFilters = new stdClass();
+			$this->videoFilters =  new stdClass();
 		}
 
 		/********************
