@@ -659,7 +659,7 @@ class kBusinessPreConvertDL
 */
 {
 	KFFmpegToPartnerMatch::match($partnerId);
-	$matchData = KFFmpegToPartnerMatch::getConf();
+	$matchData = KFFmpegToPartnerMatch::getAll();
 	KalturaLog::log("matchData: partner($partnerId), ".print_r($matchData,1));
 }
 /* ======================== */
@@ -1782,7 +1782,7 @@ if(isset($mediaInfo)) {
 	$entry = entryPeer::retrieveByPK($entryId);
 	$partnerId = $entry->getPartnerId();
 	KFFmpegToPartnerMatch::match($partnerId);
-	$matchData = KFFmpegToPartnerMatch::getConf();
+	$matchData = KFFmpegToPartnerMatch::getAll();
 	KalturaLog::log("matchData: partner($partnerId), ".print_r($matchData,1));
 }
 /* ======================== */
