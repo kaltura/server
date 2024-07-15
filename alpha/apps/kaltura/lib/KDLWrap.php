@@ -33,6 +33,28 @@ class KDLWrap
 	 */
 	public static function CDLGenerateTargetFlavors($cdlMediaInfo=null, $cdlFlavorList)
 	{
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ======================== */
+{
+		if(isset($cdlMediaInfo)) {
+			if(is_numeric($cdlMediaInfo)) {
+				$partnerId = $cdlMediaInfo;
+				$cdlMediaInfo=null;
+			}
+			else {
+				$asset = assetPeer::retrieveById($cdlMediaInfo->getFlavorAssetId());
+				$partnerId = $asset->getPartnerId();
+			}
+			KFFmpegToPartnerMatch::match($partnerId);
+			$zzz = KFFmpegToPartnerMatch::getAll();
+KalturaLog::log(print_r($zzz,1));
+		}
+}
+
 		$kdlWrap = new KDLWrap();
 		if(!isset($cdlMediaInfo) || is_array($cdlMediaInfo)) {
 			return $kdlWrap->generateTargetFlavors(null, $cdlFlavorList);
