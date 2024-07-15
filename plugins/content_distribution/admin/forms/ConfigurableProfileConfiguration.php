@@ -10,8 +10,7 @@ abstract class Form_ConfigurableProfileConfiguration extends Form_ProviderProfil
 		parent::init();
 		
 		$this->addElement('checkbox', 'use_category_entries', array(
-			'label' => 'Query category entries',
-			'isArray' => true,
+			'label' => 'Query category entries'
 		));
 		
 		$this->addDisplayGroup(array ('use_category_entries'), 

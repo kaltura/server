@@ -13,6 +13,11 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		$object = parent::getObject($objectType, $properties, $add_underscore, $include_empty_fields);
 		if($object instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationTemplate)
 		{
+			if (isset($properties['secureHashingAlgo']))
+			{
+				$object->secureHashingAlgo = $properties['secureHashingAlgo'];
+			}
+
 			if(!isset($properties['dataType']) || !$properties['dataType'])
 				return $object;
 			
@@ -51,6 +56,8 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		
 		if(!($object instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationTemplate))
 			return;
+
+		$this->getElement('secureHashingAlgo')->setValue($object->secureHashingAlgo);
 		
 		if(!$object->data)
 			return;
@@ -82,6 +89,17 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'content' => '<b>Notification Handler Service  Details</b>',
 		));
 		$this->addElements(array($element));
+
+		$this->addElement('select', 'secureHashingAlgo', array(
+			'label'			=> 'Secure Hashing Algorithm:',
+			'filters'		=> array('StringTrim'),
+			'required'		=> true,
+			'multiOptions' 	=> array(
+				Kaltura_Client_HttpNotification_Enum_SecureHashingAlgo::SHA_1 => 'SHA 1',
+				Kaltura_Client_HttpNotification_Enum_SecureHashingAlgo::SHA_256 => 'SHA 256',
+				Kaltura_Client_HttpNotification_Enum_SecureHashingAlgo::SHA_512 => 'SHA 512',
+			),
+		));
 		
 		$this->addElement('text', 'url', array(
 			'label'			=> 'URL:',

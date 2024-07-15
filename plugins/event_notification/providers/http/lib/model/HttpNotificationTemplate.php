@@ -24,6 +24,7 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	const CUSTOM_DATA_SSL_KEY_PASSWORD = 'sslKeyPassword';
 	const CUSTOM_DATA_CUSTOM_HEADERS = 'customHeaders';
 	const CUSTOM_DATA_POST_FILE_VERSION = 'postFileVersion';
+	const CUSTOM_DATA_SECURE_HASHING_ALGO = 'secureHashingAlgo';
 	
 	const FILE_SYNC_POST = 1;
 
@@ -303,6 +304,11 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	public function getSslKeyPassword()							{return $this->getFromCustomData(self::CUSTOM_DATA_SSL_KEY_PASSWORD);}
 	public function getCustomHeaders()							{return $this->getFromCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, null, array());}
 
+	public function getSecureHashingAlgo()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_SECURE_HASHING_ALGO, null, SecureHashingAlgo::SHA_1);
+	}
+
 	public function incrementPostFileVersion()
 	{
 		$version = kDataCenterMgr::incrementVersion($this->getPostFileVersion());
@@ -328,4 +334,8 @@ class HttpNotificationTemplate extends BatchEventNotificationTemplate implements
 	public function setSslKeyPassword($v)						{return $this->putInCustomData(self::CUSTOM_DATA_SSL_KEY_PASSWORD, $v);}
 	public function setCustomHeaders(array $v)					{return $this->putInCustomData(self::CUSTOM_DATA_CUSTOM_HEADERS, $v);}
 
+	public function setSecureHashingAlgo($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_SECURE_HASHING_ALGO, $v);
+	}
 }
