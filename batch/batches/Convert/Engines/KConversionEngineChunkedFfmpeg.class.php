@@ -135,10 +135,11 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			else $cmdLine.= ',\'\'';
 {
 	if(KFFmpegToPartnerMatch::isMatched()==true) {
-	$matchData = KFFmpegToPartnerMatch::getConf();
-KalturaLog::log("matchedBin:$matchData->ffmpegBin");
+	$matchData = KFFmpegToPartnerMatch::getAll();
+//KalturaLog::log("matchedBin:$matchData->ffmpegBin");
 $cmdLine.= ',\''.($matchData[1]).'\'';
-$cmdLine.= ',\''.($matchData[2]).'\'';
+$tmpStr=KFFmpegToPartnerMatch::embedPartnerId($matchData[2]);
+$cmdLine.= ',\''.($tmpStr).'\'';
 	}
 }
 /* ======================== */
