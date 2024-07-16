@@ -56,6 +56,10 @@ class KAsyncExportCsv extends KJobHandlerWorker
 
 		//fill the csv with users data
 		$csvFile = fopen($filePath,"w");
+
+		// Write BOM character sequence to fix UTF-8 in Excel
+		$BOM = "\xEF\xBB\xBF";
+		fputs($csvFile, $BOM);
 		
 		$engine = KObjectExportEngine::getInstance($job->jobSubType);
 		$engine->fillCsv($csvFile, $data);

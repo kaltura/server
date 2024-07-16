@@ -18,9 +18,6 @@ class KCsvWrapper
 
 	public static function sanitizedFputCsv($file, array $fields)
 	{
-		// Write BOM character sequence to fix UTF-8 in Excel
-		fputs($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
-
 		$sanitizedFields = self::validateCsvFields($fields);
 		fputcsv($file, $sanitizedFields);
 	}
