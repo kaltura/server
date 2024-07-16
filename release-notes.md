@@ -1,3 +1,23 @@
+# Tucana-20.15.0
+## Add CnC Permissions
+* Issue Type: Task
+* Issue ID: PLAT-24891
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.cncAssistant.enabled = true
+moduls.cncAssistant.permissionType = 2
+moduls.cncAssistant.label = "Enable CNC Assistant"
+moduls.cncAssistant.permissionName = FEATURE_CNC_ASSISTANT_PERMISSION
+moduls.cncAssistant.group = GROUP_ENABLE_DISABLE_FEATURES
+
+moduls.cncAISentimentAnalysis.enabled = true
+moduls.cncAISentimentAnalysis.permissionType = 2
+moduls.cncAISentimentAnalysis.label = "Enable AI in CNC - Sentiment Analysis"
+moduls.cncAISentimentAnalysis.permissionName = FEATURE_CNC_AI_SENTIMENT_ANALYSIS_PERMISSION
+moduls.cncAISentimentAnalysis.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Tucana-20.14.0
 ## Allow specific partners to acccess the API from blocked countries ##
 * Issue Type: Task
