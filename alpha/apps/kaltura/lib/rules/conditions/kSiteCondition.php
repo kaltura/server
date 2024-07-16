@@ -63,7 +63,7 @@ class kSiteCondition extends kMatchCondition
 	protected function matches($field, $value)
 	{
 		$oldMatch = ($field === $value);
-		if($field != '')
+		if($value != '')
 		{
 			$oldMatch = $oldMatch || (strpos($field, ".".$value) !== false);
 		}
