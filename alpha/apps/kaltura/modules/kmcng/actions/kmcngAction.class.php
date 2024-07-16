@@ -9,6 +9,19 @@ class kmcngAction extends kalturaAction
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const PLAYER_V3_OVP_VERSIONS_TAG = 'playerV3OvpVersions';
 
+	public static function getDirectivesAndAllowlists()
+	{
+		$directivesToDisable = kConf::get('kmcng_permissions_policy_directives');
+		$permissionPolicyHeader = "Permissions-Policy: ";
+		$directives = [];
+		foreach ($directivesToDisable as $directive => $allowList)
+		{
+			$directives[] = $directive . '=' . $allowList;
+		}
+		$permissionPolicyHeader .= implode(',', $directives);
+		return $permissionPolicyHeader;
+	}
+
 	public function execute()
 	{
 		if (!kConf::hasParam('kmcng'))
@@ -21,6 +34,7 @@ class kmcngAction extends kalturaAction
 		$isSecuredLogin = kConf::get('kmc_secured_login');
 		$enforceSecureProtocol = isset($isSecuredLogin) && $isSecuredLogin == "1";
 		$requestSecureProtocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on');
+		$permissionsPolicyHeader = self::getDirectivesAndAllowlists();
 
 		// Check for forced HTTPS
 
@@ -48,8 +62,7 @@ class kmcngAction extends kalturaAction
 		header("Cross-Origin-Embedder-Policy: unsafe-none");
 		header("Cross-Origin-Resource-Policy: same-origin");
 		header("Cross-Origin-Opener-Policy: unsafe-none");
-//		header("Permissions-Policy");
-
+		header($permissionsPolicyHeader);
 
 		if (!isset($kmcngParams["kmcng_version"]))
 		{

@@ -1,3 +1,40 @@
+# Tucana-20.16.0
+## Add KMC Headers
+* Issue Type: Task
+* Issue ID: PLAT-24859
+### Deployment ###
+Add the following to local.ini:
+```
+[kmcng_permissions_policy_directives]
+accelerometer = "()"
+ambient-light-sensor = "()"
+display-capture = "()"
+battery = "()"
+bluetooth = "()"
+camera = "()"
+compute-pressure = "()"
+browsing-topics = "()"
+document-domain = "()"
+identity-credentials-get = "()"
+gamepad = "()"
+geolocation = "()"
+gyroscope = "()"
+hid = "()"
+local-fonts = "()"
+magnetometer = "()"
+microphone = "()"
+midi = "()"
+otp-credentials = "()"
+payment = "()"
+publickey-credentials-create = "()"
+publickey-credentials-get = "()"
+serial = "()"
+speaker-selection = "()"
+storage-access = "()"
+usb = "()"
+window-management = "()"
+xr-spatial-tracking = "()"
+```
 # Tucana-20.15.0
 ## Add CnC Permissions
 * Issue Type: Task
