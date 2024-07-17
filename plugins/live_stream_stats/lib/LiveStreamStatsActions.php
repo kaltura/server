@@ -47,8 +47,15 @@ class LiveStreamStatsActions
 		$this->liveStreamStatsCacheHandler = new LiveStreamStatsCacheHandler($this->liveStreamStatsCacheTTL, $cache);
 	}
 
+	protected function responseHandlingGetStats(): void
+	{
+		KalturaResponseCacher::setExpiry($this->liveStreamStatsCacheTTL);
+		KalturaResponseCacher::setHeadersCacheExpiry($this->liveStreamStatsCacheTTL);
+	}
+
 	public function doGetLiveStreamStats(string $entryId): int
 	{
+		$this->responseHandlingGetStats();
 		return $this->liveStreamStatsCacheHandler->getNumberOfViewers($entryId);
 	}
 
