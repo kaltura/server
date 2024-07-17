@@ -90,6 +90,15 @@ foreach($serverLastLogs as $serverLastLog)
 
 while(true)
 {
+	// stop processing sphinx_log records, sleep and check again
+	while (!SphinxLogServerPeer::isPopulateActiveByServer($sphinxServer, $sphinxReadConn))
+	{
+		KalturaLog::log("Kaltura all of sphinx_log_server.server name [$sphinxServer] sphinx_log_server.populate_active is [0] - sleeping 60 sec");
+		sleep(60);
+		
+		SphinxLogServerPeer::clearInstancePool();
+	}
+	
 	$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxReadConn, SphinxLogType::SPHINX);
 	
 	while(!count($sphinxLogs))
@@ -97,6 +106,13 @@ while(true)
 		$skipExecutedUpdates = true;
 		sleep(1);
 		$sphinxLogs = SphinxLogPeer::retrieveByLastId($lastLogs, $gap, $limit, $handledRecords, $sphinxReadConn, SphinxLogType::SPHINX);
+		
+		if (!SphinxLogServerPeer::isPopulateActiveByServer($sphinxServer, $sphinxReadConn))
+		{
+			continue 2;
+		}
+		
+		SphinxLogServerPeer::clearInstancePool();
 	}
 
 	$sphinxCon = null;
@@ -222,6 +238,7 @@ while(true)
 	unset($sphinxCon);
 
 	SphinxLogPeer::clearInstancePool();
+	SphinxLogServerPeer::clearInstancePool();
 }
 
 KalturaLog::log('Done');
