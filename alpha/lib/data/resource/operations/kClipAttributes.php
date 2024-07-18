@@ -34,6 +34,17 @@ class kClipAttributes extends kOperationAttributes
 	private $effectArray;
 
 
+	/**
+	 * @var kBurnCaptions
+	 */
+	private $burnCaptions;
+
+	/**
+	 * @var int
+	 */
+	private $cropAlignment;
+
+
 	/* (non-PHPdoc)
 	 * @see kOperationAttributes::toArray()
 	 */
@@ -44,6 +55,8 @@ class kClipAttributes extends kOperationAttributes
 			'ClipDuration' => $this->duration,
 			'globalOffsetInDestination' => $this->globalOffsetInDestination,
 			'effectArray' => $this->effectArray,
+			'cropAlignment' => $this->cropAlignment,
+			'burnCaptions' => $this->burnCaptions
 		);
 	}
 	
@@ -135,5 +148,35 @@ class kClipAttributes extends kOperationAttributes
 		$this->effectArray = $effectArray;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getCropAlignment()
+	{
+		return $this->cropAlignment;
+	}
 
+	/**
+	 * @param int $cropAlignment
+	 */
+	public function setCropAlignment($cropAlignment)
+	{
+		return $this->cropAlignment = $cropAlignment;
+	}
+
+	/**
+	 * @return kBurnCaptions
+	 */
+	public function getBurnCaptions()
+	{
+		return $this->burnCaptions;
+	}
+
+	/**
+	 * @param kBurnCaptions $burnCaptions
+	 */
+	public function setBurnCaptions($burnCaptions)
+	{
+		return $this->burnCaptions = $burnCaptions;
+	}
 }

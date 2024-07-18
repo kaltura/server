@@ -1918,7 +1918,7 @@ class KalturaEntryService extends KalturaBaseService
 
 
 	/**
-	 * @param $resources
+	 * @param kOperationResources $resources
 	 * @param entry $destEntry
 	 * @param kClipManager $clipManager
 	 * @throws KalturaAPIException
@@ -1982,6 +1982,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 
 			$resourcesData[] = array(
+//				kClipManager::ASPECT_RATIO => $resources->getAspectRatio(),
 				kClipManager::SOURCE_ENTRY => $sourceEntry,
 				kClipManager::TEMP_ENTRY => $tempEntry,
 				kClipManager::MEDIA_INFO_OBJECT => $mediaInfoObj,
@@ -1991,7 +1992,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		}
 
-		$clipManager->calculateAndEditConversionParams($resourcesData, $destEntry->getConversionProfileId());
+		$clipManager->calculateAndEditConversionParams($resourcesData, $resources->getAspectRatio(), $destEntry->getConversionProfileId());
 		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
 		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $tempEntryIds, $multiTempEntry->getId(), $destEntry->getId());
 		$rootJob = $clipManager->startMultiClipConcatBatchJob($resources, $destEntry, $multiTempEntry);
@@ -2020,7 +2021,7 @@ class KalturaEntryService extends KalturaBaseService
 				$sourceEntryId = $resourceObj->getEntry();
 				throw new APIException(KalturaErrors::ENTRY_ID_TYPE_NOT_SUPPORTED, $sourceEntryId->getId(), $sourceEntryId->getType());
 			}
-			elseif($resourceObj instanceof kFileSyncResource)
+			else
 			{
 				throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $resourceObj->getOriginEntryId());
 			}

@@ -17,6 +17,19 @@ class kOperationResources extends kContentResource
 	private $chapterNamePolicy;
 
 	/**
+	 * @var KalturaClipAspectRatio
+	 */
+	private $aspectRatio;
+
+	/**
+	 * @return KalturaClipAspectRatio
+	 */
+	public function getAspectRatio()
+	{
+		return $this->aspectRatio;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getResources()
@@ -46,5 +59,13 @@ class kOperationResources extends kContentResource
 	public function setChapterNamePolicy($chapterNamePolicy)
 	{
 		$this->chapterNamePolicy = $chapterNamePolicy;
+	}
+
+	/**
+	 * @param KalturaClipAspectRatio $aspectRatio
+	 */
+	public function setAspectRatio($aspectRatio)
+	{
+		$this->aspectRatio = $aspectRatio;
 	}
 }

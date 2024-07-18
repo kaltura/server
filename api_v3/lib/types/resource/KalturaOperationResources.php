@@ -15,10 +15,16 @@ class KalturaOperationResources extends KalturaContentResource
 	 */
 	public $chapterNamePolicy;
 
+	/**
+	 * @var KalturaClipAspectRatio
+	 */
+	public $aspectRatio;
+
 	private static $map_between_objects = array
 	(
 		'resources',
 		'chapterNamePolicy',
+		'aspectRatio'
 	);
 
 	/* (non-PHPdoc)
@@ -60,6 +66,8 @@ class KalturaOperationResources extends KalturaContentResource
 		{
 			throw new KalturaAPIException(KalturaErrors::RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT, $maxResourcesCount);
 		}
+
+		// TODO validate aspect ratio alignment
 
 		$overallDuration = 0 ;
 		foreach ($this->resources as $resource)
