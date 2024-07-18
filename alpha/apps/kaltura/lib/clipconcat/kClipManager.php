@@ -13,6 +13,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const AUDIO_CHANNELS = 'audioChannels';
 	const AUDIO_SAMPLE_RATE = 'audioSamplingRate';
 	const IMAGE_TO_VIDEO = 'imageToVideo';
+	const ASPECT_RATIO = 'aspectRatio';
 	const CONVERSION_PARAMS = 'conversionParams';
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
 	const VIDEO_DURATION = 'videoDuration';
@@ -637,7 +638,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	/**
 	 * @throws KalturaAPIException
 	 */
-	public function calculateAndEditConversionParams(&$resourcesData, $conversionProfileId)
+	public function calculateAndEditConversionParams(&$resourcesData, $decidedAspectRatio, $conversionProfileId)
 	{
 		// choose min height and min width of input dimensions and conversion profile max dimensions
 		// choose the most common of aspect ratio and audio channels
@@ -687,7 +688,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$audioChannels = $this->decideAudioChannels($allAudioChannels);
 		$audioSampleRate = $this->decideAudioSamplingRate($allAudioSampleRates);
-		$aspectRatio = $this->decideAspectRatio($aspectRatios);
+		$aspectRatio = $this->decideAspectRatio($aspectRatios, $decidedAspectRatio);
 		$this->decideResolution($conversionProfileId, $aspectRatio, $width, $height);
 
 		KalturaLog::debug("Multi Clip dimensions: width [$width], height [$height]");
@@ -832,11 +833,17 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
-	protected function decideAspectRatio($inputARs)
+	protected function decideAspectRatio($inputARs, $decidedAspectRatio)
 	{
 		if(count($inputARs) == 0)
 		{
 			throw new KalturaAPIException(KalturaErrors::INCOMPATIBLE_RESOURCES_DIMENSIONS);
+		}
+
+		// TODO should be int ?
+		if($decidedAspectRatio != ClipAspectRatio::AUTO)
+		{
+			return $decidedAspectRatio;
 		}
 		$maxDurationAspectRatio = max($inputARs);
 		return array_search($maxDurationAspectRatio, $inputARs);
@@ -1196,15 +1203,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return $this->getAddSilentAudioCommand($jobData, $operationAttribute, $effectsFilter);
 		}
 
-		return $this->getDefaultConvertCommandForFile($jobData, $effectsFilter);
+		if($effectsFilter)
+		{
+			return $this->getEffectsOnlyCommand($jobData, $effectsFilter);
+		}
+
+		return "-";
 	}
 
-	protected function getDefaultConvertCommandForFile($jobData, $effectsFilter)
+	protected function getEffectsOnlyCommand($jobData, $effectsFilter)
 	{
-		if(!$effectsFilter)
-		{
-			return "-";
-		}
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		if(!$flavorParamsObj)
 		{
@@ -1471,6 +1479,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$allowEffects = !$conversionData || (!isset($conversionData[self::IMAGE_TO_VIDEO]) && !isset($conversionData[self::WIDTH]));
 		$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParams, $isAudio, $extraParams, $allowEffects);
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
+		$flavorParamsObj->setSubtitlesData(json_encode(array("action" => "render", "filename" => "/opt/kaltura/app/example.srt", "force_style" => array("Alignment" => 1, "FontSize" => 20,"MarginL" => 65), "language" => "English")));
+		$flavorParamsObj->setSubtitlesData(json_encode(array("action" => "render", "force_style" => array("Alignment" => 1, "FontSize" => 20,"MarginL" => 65), "language" => "English", "filename" => "/opt/kaltura/app/example.srt")));
 		if($conversionData && $flavorParamsObj instanceof flavorParams)
 		{
 			$this->editConversionParams($flavorParamsObj, $conversionData);
@@ -1485,6 +1495,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		if($conversionParams)
 		{
 			$flavorParamsObj->setForceFrameToMultiplication16(0);
+			$flavorParamsObj->setSubtitlesData(json_encode('{"action": "render", "force_style": {"Alignment":1,"FontSize":20,"MarginL":65}}'));
 			$flavorParamsObj->setHeight($conversionParams[self::HEIGHT]);
 			if(isset($conversionParams[self::FRAME_RATE]))
 			{

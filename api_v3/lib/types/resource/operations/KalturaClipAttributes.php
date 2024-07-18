@@ -33,12 +33,24 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 	 */
 	public $effectArray;
 
+	/**
+	 * @var int
+	 */
+	public $cropAlignment;
+
+	/**
+	 * @var KalturaBurnCaption
+	 */
+	public $burnCaptions;
+
 	private static $map_between_objects = array
 	(
 	 	"offset" , 
 	 	"duration",
 		"globalOffsetInDestination",
-		"effectArray"
+		"effectArray",
+		"burnCaptions",
+		"cropAlignment"
 	);
 
 	public function getMapBetweenObjects ( )
