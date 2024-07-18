@@ -1982,7 +1982,7 @@ class KalturaEntryService extends KalturaBaseService
 			}
 
 			$resourcesData[] = array(
-//				kClipManager::ASPECT_RATIO => $resources->getAspectRatio(),
+//				kClipManager::ASPECT_RATIO => $resources->getAspectRatio(), 
 				kClipManager::SOURCE_ENTRY => $sourceEntry,
 				kClipManager::TEMP_ENTRY => $tempEntry,
 				kClipManager::MEDIA_INFO_OBJECT => $mediaInfoObj,
