@@ -38,10 +38,10 @@ class ApFeedDropFolder extends FeedDropFolder
 		$this->putInCustomData('apApiKey', $apApiKey);
 	}
 
-    public function getImportJobData() {
-        $importJobData = new kImportJobData();
-        $importJobData->setUrlHeaders("x-api-key: {$this->getApApiKey()}");
+	public function getImportJobData() {
+		$importJobData = new kImportJobData();
+		$importJobData->setUrlHeaders("x-api-key: {$this->getApApiKey()}");
 
-        return $importJobData;
-    }
+		return $importJobData;
+	}
 }
