@@ -1,4 +1,10 @@
 # Tucana-20.16.0
+# Add permissions for session get ##
+- Issue Type: Task
+- Issue ID: PLAT-24908
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permission.php
+
 ## Add KMC Headers
 * Issue Type: Task
 * Issue ID: PLAT-24859
