@@ -47,7 +47,6 @@ class embedIframeJsAction extends sfAction
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
 
-
 		if (array_key_exists($partner_id, $optimizedPlayback))
 		{
 			// force a specific kdp for the partner
@@ -61,6 +60,14 @@ class embedIframeJsAction extends sfAction
 		$autoEmbed = $this->getRequestParameter('autoembed');
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
+
+		//redirect the call to V7
+		if($this->getRequestParameter('v2tov7'))
+		{
+			$this->redirectToV7($uiConf->getV7Id(), $partner_id);
+		}
+
+
 		$scriptName = ($iframeEmbed) ? 'mwEmbedFrame.php' : 'mwEmbedLoader.php';
 		if($ui_conf_html5_url && $iframeEmbed) {
 			$ui_conf_html5_url = str_replace('mwEmbedLoader.php', 'mwEmbedFrame.php', $ui_conf_html5_url);
@@ -140,6 +147,23 @@ class embedIframeJsAction extends sfAction
 		requestUtils::sendCachingHeaders(60, true, time());
 
 		kFile::cacheRedirect($url);
+		header("Location:$url");
+		KExternalErrors::dieGracefully();
+	}
+
+	/*
+	 * v2 - https://cdnapisec.kaltura.com/p/1915851/sp/191585100/embedIframeJs/uiconf_id/32880931/partner_id/1915851?iframeembed=true&playerId=kaltura_player_1719900446&entry_id=1_aeg07vpv
+	 * v7 - https://cdnapisec.kaltura.com/p/1915851/embedPlaykitJs/uiconf_id/54813242?iframeembed=true&entry_id=1_aeg07vpv
+	 * Test - http://www.kaltura.local/p/102/sp/10200/embedIframeJs/uiconf_id/23448128/partner_id/102?iframeembed=true&playerId=kaltura_player_1719900446&entry_id=0_3eil6eqs
+	 */
+	private function redirectToV7($v7Id, $partnerId) : void
+	{
+		if(!$v7Id)
+		{
+			return;
+		}
+		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
+		$url = $host . "/p/" . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . "?" . $_SERVER['QUERY_STRING'];;
 		header("Location:$url");
 		KExternalErrors::dieGracefully();
 	}
