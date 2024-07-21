@@ -1,1 +1,1 @@
-<meta http-equiv="refresh" content="0; url=http://www.kaltura.local/" />
+<meta http-equiv="refresh" content="0; url=http://corp.kaltura.com" />
