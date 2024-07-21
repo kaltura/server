@@ -701,7 +701,8 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		return self::$swf_names;
 	}
 
-
+	public function getV7Id(){		return $this->getFromCustomData( "v7_id", null , null );	}
+	public function setV7Id($v){		return $this->putInCustomData( "v7_id", $v );	}
 
 	public function getAutoplay ()	{		return $this->getFromCustomData( "autoplay" , null , false );	}
 	public function setAutoplay( $v )	{		return $this->putInCustomData( "autoplay", $v );	}
