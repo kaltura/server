@@ -289,7 +289,7 @@ class LiveEntryServerNode extends EntryServerNode
 	public function setViewMode($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_VIEW_MODE, $v);
-		$this->setViewModeUpdatedAt(date("Y-m-d H:i:s"));
+		$this->setViewModeUpdatedAt(date("Y-m-dT H:i:s"));
 	}
 
 	public function getViewMode()
