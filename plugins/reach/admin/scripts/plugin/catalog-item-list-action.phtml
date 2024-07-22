@@ -20,14 +20,19 @@
             <th><?php echo $this->translate('Source Language'); ?></th>
             <th><?php echo $this->translate('Target Language'); ?></th>
             <th><?php echo $this->translate('Output Format'); ?></th>
+            <th><?php echo $this->translate('Stage'); ?></th>
+            <th><?php echo $this->translate('Contract'); ?></th>
+            <th><?php echo $this->translate('Notes'); ?></th>
             <th><?php echo $this->translate('Creation Date'); ?></th>
+            <th><?php echo $this->translate('Created By'); ?></th>
             <th><?php echo $this->translate('Last Updated Date'); ?></th>
+            <th><?php echo $this->translate('Last Bulk Update ID'); ?></th>
             <th><?php echo $this->translate('Action'); ?></th>
         </tr>
         </thead>
         <tfoot>
         <tr>
-            <td colspan="14">
+            <td colspan="19">
 				<?php echo $this->paginator; ?>
             </td>
         </tr>
@@ -55,8 +60,17 @@
 					else
 						echo null;?>
                 </td>
+                <td><?php if (isset($catalogItem->stage))
+						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStage', $catalogItem->stage);
+					else
+						echo null;?>
+                </td>
+                <td><?php echo $catalogItem->contract; ?></td>
+                <td><?php echo $catalogItem->notes; ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
+                <td><?php echo $catalogItem->createdBy; ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
+                <td><?php echo $catalogItem->bulkUpdateId; ?></td>
                 <td>
                     <select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id; ?>)">
                         <option value=""><?php echo $this->translate('Select Action'); ?></option>
