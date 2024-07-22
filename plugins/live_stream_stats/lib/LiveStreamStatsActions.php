@@ -118,11 +118,3 @@ class LiveStreamStatsCacheHandler
 		return LiveStreamStatsCacheHandler::LIVE_VIEWERS_PREFIX . LiveStreamStatsCacheHandler::CACHE_KEY_SEPARATOR;
 	}
 }
-
-class KalturaLiveStreamStats extends KalturaObject
-{
-	/**
-	 * @var int
-	 */
-	public $liveViewers = 0;
-}
