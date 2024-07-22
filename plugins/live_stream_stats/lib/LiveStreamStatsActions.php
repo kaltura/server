@@ -101,6 +101,7 @@ class LiveStreamStatsCacheHandler
 		if ($this->cache)
 		{
 			$numberOfViewers = $this->cache->get($liveViewersCacheKey . $entryId);
+			$numberOfViewers = !$numberOfViewers ? 0 : $numberOfViewers;
 		}
 
 		return $numberOfViewers;
