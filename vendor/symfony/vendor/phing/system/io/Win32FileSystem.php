@@ -48,7 +48,7 @@ class Win32FileSystem extends FileSystem {
     }
 
     function slashify($p) {
-        if ((strlen($p) > 0) && ($p{0} != $this->slash)) {
+        if ((strlen($p) > 0) && ($p[0] != $this->slash)) {
             return $this->slash.$p;
         }
         else {
@@ -81,13 +81,13 @@ class Win32FileSystem extends FileSystem {
      */
     function normalizePrefix($strPath, $len, $sb) {
         $src = 0;
-        while (($src < $len) && $this->isSlash($strPath{$src})) {
+        while (($src < $len) && $this->isSlash($strPath[$src])) {
             $src++;
         }
         $c = "";
         if (($len - $src >= 2)
-                && $this->isLetter($c = $strPath{$src})
-                && $strPath{$src + 1} === ':') {
+                && $this->isLetter($c = $strPath[$src])
+                && $strPath[$src + 1] === ':') {
             /* Remove leading slashes if followed by drive specifier.
              * This hack is necessary to support file URLs containing drive
              * specifiers (e.g., "file://c:/path").  As a side effect,
@@ -99,8 +99,8 @@ class Win32FileSystem extends FileSystem {
         else {
             $src = 0;
             if (($len >= 2)
-                    && $this->isSlash($strPath{0})
-                    && $this->isSlash($strPath{1})) {
+                    && $this->isSlash($strPath[0])
+                    && $this->isSlash($strPath[1])) {
                 /* UNC pathname: Retain first slash; leave src pointed at
                  * second slash so that further slashes will be collapsed
                  * into the second slash.  The result will be a pathname
@@ -138,15 +138,15 @@ class Win32FileSystem extends FileSystem {
         // Remove redundant slashes from the remainder of the path, forcing all
         // slashes into the preferred slash
         while ($src < $len) {
-            $c = $strPath{$src++};
+            $c = $strPath[$src++];
             if ($this->isSlash($c)) {
-                while (($src < $len) && $this->isSlash($strPath{$src})) {
+                while (($src < $len) && $this->isSlash($strPath[$src])) {
                     $src++;
                 }
                 if ($src === $len) {
                     /* Check for trailing separator */
                     $sn = (int) strlen($sb);
-                    if (($sn == 2) && ($sb{1} === ':')) {
+                    if (($sn == 2) && ($sb[1] === ':')) {
                         // "z:\\"
                         $sb .= $slash;
                         break;
@@ -156,7 +156,7 @@ class Win32FileSystem extends FileSystem {
                         $sb .= $slash;
                         break;
                     }
-                    if (($sn === 1) && ($this->isSlash($sb{0}))) {
+                    if (($sn === 1) && ($this->isSlash($sb[0]))) {
                         /* "\\\\" is not collapsed to "\\" because "\\\\" marks
                         the beginning of a UNC pathname.  Even though it is
                         not, by itself, a valid UNC pathname, we leave it as
@@ -194,7 +194,7 @@ class Win32FileSystem extends FileSystem {
         $altSlash = $this->altSlash;
         $prev = 0;
         for ($i = 0; $i < $n; $i++) {
-            $c = $strPath{$i};
+            $c = $strPath[$i];
             if ($c === $altSlash) {
                 return $this->normalizer($strPath, $n, ($prev === $slash) ? $i - 1 : $i);
             }
@@ -219,8 +219,8 @@ class Win32FileSystem extends FileSystem {
         if ($n === 0) {
             return 0;
         }
-        $c0 = $path{0};
-        $c1 = ($n > 1) ? $path{1} :
+        $c0 = $path[0];
+        $c1 = ($n > 1) ? $path[1] :
               0;
         if ($c0 === $slash) {
             if ($c1 === $slash) {
@@ -230,7 +230,7 @@ class Win32FileSystem extends FileSystem {
         }
 
         if ($this->isLetter($c0) && ($c1 === ':')) {
-            if (($n > 2) && ($path{2}) === $slash) {
+            if (($n > 2) && ($path[2]) === $slash) {
                 return 3;            // Absolute local pathname "z:\\foo" */
             }
             return 2;                // Directory-relative "z:foo"
@@ -253,8 +253,8 @@ class Win32FileSystem extends FileSystem {
         }
 
         $c = $child;
-        if (($cn > 1) && ($c{0} === $slash)) {
-            if ($c{1} === $slash) {
+        if (($cn > 1) && ($c[0] === $slash)) {
+            if ($c[1] === $slash) {
                 // drop prefix when child is a UNC pathname
                 $c = substr($c, 2);
             }
@@ -265,7 +265,7 @@ class Win32FileSystem extends FileSystem {
         }
 
         $p = $parent;
-        if ($p{$pn - 1} === $slash) {
+        if ($p[$pn - 1] === $slash) {
             $p = substr($p, 0, $pn - 1);
         }
         return $p.$this->slashify($c);
@@ -277,7 +277,7 @@ class Win32FileSystem extends FileSystem {
 
     function fromURIPath($strPath) {
         $p = (string) $strPath;
-        if ((strlen($p) > 2) && ($p{2} === ':')) {
+        if ((strlen($p) > 2) && ($p[2] === ':')) {
 
             // "/c:/foo" --> "c:/foo"
             $p = substr($p,1);
@@ -299,12 +299,12 @@ class Win32FileSystem extends FileSystem {
     function isAbsolute(PhingFile $f) {
         $pl = (int) $f->getPrefixLength();
         $p  = (string) $f->getPath();
-        return ((($pl === 2) && ($p{0} === $this->slash)) || ($pl === 3) || ($pl === 1 && $p{0} === $this->slash));
+        return ((($pl === 2) && ($p[0] === $this->slash)) || ($pl === 3) || ($pl === 1 && $p[0] === $this->slash));
     }
 
     /** private */
     function _driveIndex($d) {
-        $d = (string) $d{0};
+        $d = (string) $d[0];
         if ((ord($d) >= ord('a')) && (ord($d) <= ord('z'))) {
             return ord($d) - ord('a');
         }
@@ -316,7 +316,7 @@ class Win32FileSystem extends FileSystem {
 
     /** private */
     function _getDriveDirectory($drive) {
-        $drive = (string) $drive{0};
+        $drive = (string) $drive[0];
         $i = (int) $this->_driveIndex($drive);
         if ($i < 0) {
             return null;
@@ -348,7 +348,7 @@ class Win32FileSystem extends FileSystem {
         $path = $f->getPath();
         $pl   = (int) $f->getPrefixLength();
 
-        if (($pl === 2) && ($path{0} === $this->slash)) {
+        if (($pl === 2) && ($path[0] === $this->slash)) {
             return path;            // UNC
         }
 
@@ -375,7 +375,7 @@ class Win32FileSystem extends FileSystem {
             if (($ud !== null) && StringHelper::startsWith($ud, $path)) {
                 return (string) ($up . $this->slashify(substr($path,2)));
             }
-            $drive = (string) $path{0};
+            $drive = (string) $path[0];
             $dir   = (string) $this->_getDriveDirectory($drive);
 
             $np = (string) "";

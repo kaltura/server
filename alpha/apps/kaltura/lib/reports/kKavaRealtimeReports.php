@@ -30,7 +30,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -59,7 +59,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country', 'region'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -89,7 +89,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				array(
 					self::REPORT_ENRICH_INPUT =>  array('country', 'region', 'city'),
 					self::REPORT_ENRICH_OUTPUT => 'coordinates',
-					self::REPORT_ENRICH_FUNC => 'self::getCoordinates',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getCoordinates',
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'country',
@@ -176,7 +176,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name'),
-				self::REPORT_ENRICH_FUNC => 'self::getUserIdAndFullNameWithFallback',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUserIdAndFullNameWithFallback',
 			),
 			self::REPORT_METRICS => array(
 				self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
@@ -187,8 +187,8 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 			),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
-			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addFlavorParamColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'kKavaReportsMgr::addFlavorParamTotalColumn',
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_TABLE_MAP => array(
 				'sum_view_time_live' => self::METRIC_VIEW_LIVE_PLAY_TIME_SEC,
@@ -218,7 +218,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => array('user_id'),
-				self::REPORT_ENRICH_FUNC => 'self::getUsersInfo',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo',
 			)
 		),
 
@@ -236,8 +236,8 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				self::METRIC_VIEW_BUFFER_TIME_RATIO,
 				self::METRIC_FLAVOR_PARAMS_VIEW_COUNT,
 			),
-			self::REPORT_TABLE_FINALIZE_FUNC => 'self::addFlavorParamColumn',
-			self::REPORT_TOTAL_FINALIZE_FUNC => 'self::addFlavorParamTotalColumn',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addFlavorParamColumn',
+			self::REPORT_TOTAL_FINALIZE_FUNC => 'kKavaReportsMgr::addFlavorParamTotalColumn',
 			self::REPORT_TABLE_MAP => array(
 				'view_unique_audience' => self::METRIC_VIEW_UNIQUE_AUDIENCE,
 				'view_unique_engaged_users' => self::METRIC_VIEW_UNIQUE_ENGAGED_USERS,
@@ -319,7 +319,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			self::REPORT_ENRICH_DEF => array(
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('entry_name', 'creator_name'),
-					self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 					self::REPORT_ENRICH_CONTEXT => array(
 						'columns' => array('NAME', 'KUSER_ID'),
 						'peer' => 'entryPeer',
@@ -327,10 +327,10 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => array('creator_name'),
-					self::REPORT_ENRICH_FUNC => 'self::getUserFullNameWithFallback',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUserFullNameWithFallback',
 				),
 			),
-			self::REPORT_EDIT_FILTER_FUNC => 'self::includeOnlyLiveNowEntriesEditFilter',
+			self::REPORT_EDIT_FILTER_FUNC => 'kKavaReportsMgr::includeOnlyLiveNowEntriesEditFilter',
 			self::REPORT_METRICS => array(self::EVENT_TYPE_VIEW, self::METRIC_AVG_VIEW_ENGAGEMENT, self::METRIC_AVG_VIEW_BUFFERING, self::METRIC_AVG_VIEW_DOWNSTREAM_BANDWIDTH)
 		),
 
@@ -341,13 +341,13 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 			),
 			self::REPORT_ENRICH_DEF => array(
 				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'self::genericQueryEnrich',
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
 				self::REPORT_ENRICH_CONTEXT => array(
 					'columns' => array('NAME'),
 					'peer' => 'entryPeer',
 				)
 			),
-			self::REPORT_EDIT_FILTER_FUNC => 'self::excludeLiveNowEntriesEditFilter',
+			self::REPORT_EDIT_FILTER_FUNC => 'kKavaReportsMgr::excludeLiveNowEntriesEditFilter',
 			self::REPORT_JOIN_REPORTS => array(
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_REALTIME,
@@ -360,7 +360,7 @@ class kKavaRealtimeReports extends kKavaReportsMgr
 					self::REPORT_GRANULARITY => self::GRANULARITY_DYNAMIC,
 					self::REPORT_DIMENSION => self::DIMENSION_ENTRY_ID,
 					self::REPORT_METRICS => array(self::METRIC_DYNAMIC_VIEWERS),
-					self::REPORT_TABLE_FINALIZE_FUNC => 'self::getPeakViewers'
+					self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::getPeakViewers'
 				),
 			),
 			self::REPORT_TABLE_MAP => array(

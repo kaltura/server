@@ -866,7 +866,7 @@ class DeliveryProfilePeer extends BaseDeliveryProfilePeer {
 				}
 
 				$deliveryIds[] = $partner->getLiveDeliveryProfileIds();
-				$deliveryIds = call_user_func_array('array_merge', $deliveryIds);
+				$deliveryIds = call_user_func_array('array_merge', array_values($deliveryIds));
 			}
 		}
 		else

@@ -240,7 +240,7 @@ function executeRequest(KalturaClient $client, SimpleXMLElement $request)
 		else
 			$doing = 'Executing';
 		echo "$doing action [$serviceName.$actionName]\n";
-		$result = call_user_func_array(array($service, $actionName), $arguments);
+		$result = call_user_func_array(array($service, $actionName), array_values($arguments));
 		if (!is_null($impersonatePartner))
 		{
 			$client->setPartnerId($configPartnerId);

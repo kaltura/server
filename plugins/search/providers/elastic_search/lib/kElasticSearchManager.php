@@ -388,7 +388,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             if(in_array(entryPeer::CUSTOM_DATA, $modifiedColumns))
             {
                 $oldCustomData = $object->getCustomDataOldValues();
-                $oldCustomDataKeys = array_keys($oldCustomData[$namespace]);
+                $oldCustomDataKeys = isset($oldCustomData[$namespace])
+	                ? array_keys($oldCustomData[$namespace])
+                    : array();
+				
                 if(count(array_intersect($customDataFieldsToMonitor, $oldCustomDataKeys)) > 0)
                     return true;
             }
@@ -411,8 +414,29 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         foreach ($itemsToTrim as $item)
         {
-            if (array_key_exists($item, $params) && (strlen($params[$item]) > kElasticSearchManager::MAX_LENGTH))
+            if(!array_key_exists($item, $params) || is_null($params[$item]))
+            {
+                continue;
+            }
+
+            //Handle cases where item is array object, this can happen when multi language description is passed
+            if(is_array($params[$item]))
+            {
+                foreach ($params[$item] as $key => $value)
+                {
+                    if(strlen($value) > kElasticSearchManager::MAX_LENGTH)
+                    {
+                        $value = substr($value, 0, self::MAX_LENGTH);
+                        $params[$item][$key] = $value;
+                    }
+                }
+                continue;
+            }
+            
+            if (strlen($params[$item]) > kElasticSearchManager::MAX_LENGTH)
+            {
                 $params[$item] = substr($params[$item], 0, self::MAX_LENGTH);
+            }
         }
         return $tempParams;
     }

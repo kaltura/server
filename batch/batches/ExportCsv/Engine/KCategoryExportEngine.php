@@ -13,6 +13,10 @@ class KCategoryExportEngine extends KMappedObjectExportEngine
 
 	protected function getItemList($filter, $pager)
 	{
+		if(!$filter->statusIn && !$filter->statusEqual)
+		{
+			$filter->statusIn = KalturaCategoryStatus::UPDATING . "," . KalturaCategoryStatus::ACTIVE;
+		}
 		return KBatchBase::$kClient->category->listAction($filter, $pager);
 	}
 

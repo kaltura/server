@@ -88,10 +88,10 @@ class KalturaPluginManager
 	{
 		$pluginClassName = null;
 		$cacheKey = null;
-		if (function_exists('apc_fetch') && !$constructorArgs)
+		if (kApcWrapper::functionExists('fetch') && !$constructorArgs)
 		{
 			$cacheKey = "loadObject-$baseClass-$enumValue";
-			$pluginClassName = apc_fetch($cacheKey);
+			$pluginClassName = kApcWrapper::apcFetch($cacheKey);
 		}
 		
 		$pluginInstances = self::getPluginInstances('IKalturaObjectLoader', $pluginClassName);
@@ -103,7 +103,7 @@ class KalturaPluginManager
 			{
 				if (!$pluginClassName && $cacheKey)
 				{
-					apc_store($cacheKey, get_class($pluginInstance));
+					kApcWrapper::apcStore($cacheKey, get_class($pluginInstance));
 				}
 				
 				return $obj;
@@ -209,10 +209,10 @@ class KalturaPluginManager
 	public static function getObjectClass($baseClass, $enumValue)
 	{
 		$cacheKey = null;
-		if (function_exists('apc_fetch'))
+		if (kApcWrapper::functionExists('fetch'))
 		{
 			$cacheKey = "objectClass-$baseClass-$enumValue";
-			$cls = apc_fetch($cacheKey);
+			$cls = kApcWrapper::apcFetch($cacheKey);
 			if ($cls)
 			{
 				return $cls;
@@ -227,7 +227,7 @@ class KalturaPluginManager
 			{
 				if ($cacheKey)
 				{
-					apc_store($cacheKey, $cls);
+					kApcWrapper::apcStore($cacheKey, $cls);
 				}
 //				KalturaLog::debug("Found class[$cls] in plugin[$pluginName] for object type[$objectType] and enum value[$enumValue]");
 				return $cls;
@@ -394,10 +394,10 @@ class KalturaPluginManager
 	 */
 	public static function getPluginInstances($interface = null, $className = null)
 	{
-		if (function_exists('apc_fetch') && self::$useCache)
+		if (kApcWrapper::functionExists('fetch') && self::$useCache)
 		{
 			$cacheKey = self::$cacheNamespace . "pluginsByInterface_$interface";
-			$plugins = apc_fetch($cacheKey);
+			$plugins = kApcWrapper::apcFetch($cacheKey);
 			if ($plugins !== false)
 			{
 				if (!in_array($interface, self::$loadedInterfaces))
@@ -439,8 +439,8 @@ class KalturaPluginManager
 			$plugins[$pluginName] = self::$plugins[$pluginName];
 			$instances[strtolower($pluginName)] = $instance;
 		}
-		if (function_exists('apc_store') && self::$useCache)
-			apc_store($cacheKey, $plugins);
+		if (kApcWrapper::functionExists('store') && self::$useCache)
+			kApcWrapper::apcStore($cacheKey, $plugins);
 		return $instances;
 	}
 	

@@ -109,14 +109,17 @@ class kQuizPdf
 			$questNum +=1;
 			$stylePrefix = $this->getStylePrefix($question->getName());
 			$this->pdf->addList($questNum, $question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
-			$this->pdf->addHeadline(6, "Optional Answers:", $this->styles[self::HEADING6_STYLE]);
-			$ansNum = 0;
+			$alphabet = range('A', 'Z');
+			$ansIdx = 0;
 			foreach ($question->getOptionalAnswers() as $optionalAnswer)
 			{
-				$ansNum +=1;
-				$text = $optionalAnswer->getText();
-				$stylePrefix = $this->getStylePrefix($text);
-				$this->pdf->addList($ansNum, $text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
+				if ($ansIdx < sizeof($alphabet))
+				{
+					$text = $optionalAnswer->getText();
+					$stylePrefix = $this->getStylePrefix($text);
+					$this->pdf->addList($alphabet[$ansIdx] . '.', $text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
+					$ansIdx += 1;
+				}
 			}
 		}
 	}
@@ -124,8 +127,15 @@ class kQuizPdf
 	private function getStylePrefix($text)
 	{
 		$stylePrefix = self::NOTO_STYLE_PREFIX;
+		if(is_null($text))
+		{
+			return $stylePrefix;
+		}
+		
 		if(preg_match("/\p{Han}+/u", $text)) //contain chinese/japanese letters
+		{
 			$stylePrefix = self::ASIAN_STYLE_PREFIX;
+		}
 		
 		return $stylePrefix;
 	}

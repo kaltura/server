@@ -245,8 +245,10 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		
 		KBatchBase::unimpersonate();
 		
-		if(count($requestResults))
+		if($requestResults && count($requestResults))
+		{
 			$this->updateObjectsResults($requestResults, $bulkUploadResultChunk);
+		}
 
 		KalturaLog::info("job[{$this->job->id}] finish modifying users");
 	}

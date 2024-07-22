@@ -771,7 +771,7 @@ class DatesGenerator
 	 */
 	private function getYearDayVariants(array $dates)
 	{
-		if(!count($this->byYearDay))
+		if(!$this->byYearDay)
 		{
 			return $dates;
 		}

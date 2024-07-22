@@ -996,8 +996,11 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 			 * The flavor considered to be redundant if it's bitrate
 			 * is closer than 15% to the matched flavor,
 			 * otherwise - skip it
+			 * If video bitrate is 0 we wont skip
 			 */
-			if($diff<0 || $diff/$matchSourceHeightFlavor->getVideoBitrate()>$thresholdRatio){
+			if($diff<0 ||
+				$matchSourceHeightFlavor->getVideoBitrate() === 0 ||
+				$diff/$matchSourceHeightFlavor->getVideoBitrate()>$thresholdRatio){
 				continue;
 			}
 			KalturaLog::log("Look for redundant: diff($diff),percent(".($diff*100/$matchSourceHeightFlavor->getVideoBitrate()).")");
@@ -1534,7 +1537,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	public static function decideFlavorConvert(flavorAsset $flavorAsset, flavorParamsOutput $flavor, flavorAsset
 	$originalFlavorAsset, $conversionProfileId = null, $mediaInfoId = null, BatchJob $parentJob = null, $lastEngineType = null, $sameRoot = true, $priority = 0)
 	{
-		if(strlen(trim($flavor->getSourceAssetParamsIds())))
+		if(!is_null($flavor->getSourceAssetParamsIds()) && strlen(trim($flavor->getSourceAssetParamsIds())))
 		{
 			$readySrcFlavorAssets = self::getSourceFlavorAssets($flavorAsset, $flavor);
 			if(!$readySrcFlavorAssets)
@@ -1877,7 +1880,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 	{
 		$ingestedNeeded = false;
 		$dynamicFlavorAttributes = $entry->getDynamicFlavorAttributes();
-		$entryIngestedFlavors = explode(',', $entry->getFlavorParamsIds());
+		$entryIngestedFlavors = $entry->getFlavorParamsIds() ? explode(',', $entry->getFlavorParamsIds()) : array();
 
 		foreach($flavors as $index => $flavor)
 		{
@@ -1996,6 +1999,7 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		 * Handle replacement flow - use original entry/asset enc-key, if it is already has one.
 		 * Otherwise (non-replacement) - acquire uDRM encryptionParams
 		 */
+		$encryptionParamsKey = null;
 		if(($entry=entryPeer::retrieveByPK($flavorAsset->getEntryId()))!==null
 		&& ($replacedEntryId=$entry->getReplacedEntryId())!==null) {
 
@@ -2361,6 +2365,10 @@ KalturaLog::log("Forcing (create anyway) target $matchSourceHeightIdx");
 		elseif (in_array('webexapi', $adminTags))
 		{
 			return self::WEBEX_CONVERSION_KEY;
+		}
+		elseif (in_array('teamsentry', $adminTags))
+		{
+			return self::MS_TEAMS_CONVERSION_KEY;
 		}
 		return null;
 	}

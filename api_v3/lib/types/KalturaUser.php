@@ -214,7 +214,7 @@ class KalturaUser extends KalturaBaseUser
 
 	private function verifyMaxLength()
 	{
-		if (strlen($this->fullName) > kuser::MAX_NAME_LEN)
+		if ($this->fullName && strlen($this->fullName) > kuser::MAX_NAME_LEN)
 			$this->fullName = kString::alignUtf8String($this->fullName, kuser::MAX_NAME_LEN);
 	}
 

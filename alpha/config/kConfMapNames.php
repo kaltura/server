@@ -19,4 +19,5 @@ class kConfMapNames
 	const AVRO_SCHEMA_REGISTRY = 'schema_registry';
 	const KAFKA = 'kafka';
 	const SECURITY = 'security';
+	const BROADCAST = 'broadcast';
 }

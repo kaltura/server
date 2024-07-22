@@ -11,6 +11,7 @@ class LiveStreamService extends KalturaLiveEntryService
 {
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_NOT_LIVE = 5;
 	const ISLIVE_ACTION_CACHE_EXPIRY_WHEN_LIVE = 30;
+
 	const HLS_LIVE_STREAM_CONTENT_TYPE = 'application/vnd.apple.mpegurl';
 
 	public function initService($serviceId, $serviceName, $actionName)
@@ -205,7 +206,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	protected function validateStreamNotAlreadyExist($entryId, $hostname, $mediaServerIndex)
 	{
-		$streamAlreadyExsit = false;
+		$streamAlreadyExists = false;
 		try
 		{
 			$entryServerNode = EntryServerNodePeer::retrieveByEntryIdAndServerType($entryId, $mediaServerIndex);
@@ -223,7 +224,7 @@ class LiveStreamService extends KalturaLiveEntryService
 
 			//currently verifying only if already streaming in another environment
 			if ($mediaServerNode && $mediaServerNode->getEnvironment() != $registeredServerNode->getEnvironment()) {
-				$streamAlreadyExsits = true;
+				$streamAlreadyExists = true;
 			}
 
 		}
@@ -233,7 +234,7 @@ class LiveStreamService extends KalturaLiveEntryService
 			return;
 		}
 
-		if ($streamAlreadyExsits)
+		if ($streamAlreadyExists)
 		{
 			throw new KalturaAPIException(KalturaErrors::LIVE_STREAM_ALREADY_BROADCASTING, $entryId, $registeredServerNode->getHostName());
 		}
@@ -618,6 +619,20 @@ class LiveStreamService extends KalturaLiveEntryService
     }
 
 	/**
+	 * Deliver information about the livestream
+	 *
+	 * @action getLiveStreamStats
+	 * @param string $entryId Id of the live stream entry
+	 * @return int
+	 * @ksIgnored
+	 */
+	public function getLiveStreamStatsAction($entryId)
+	{
+		$liveStreamStatsActions = new LiveStreamStatsActions();
+		return $liveStreamStatsActions->doGetLiveStreamStats($entryId);
+	}
+
+	/**
 	 * Delivering the status of a live stream (on-air/offline) if it is possible
 	 *
 	 * @action getDetails
@@ -777,7 +792,8 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	protected function isAdminTagLimited(LiveEntry $entry, $limitedAdminTags)
 	{
-		return count(array_intersect(explode(',', $entry->getAdminTags()), $limitedAdminTags)) !== 0;
+		$adminTagsArray = !is_null($entry->getAdminTags()) ? explode(',', $entry->getAdminTags()) : array();
+		return count(array_intersect($adminTagsArray, $limitedAdminTags)) !== 0;
 	}
 
 

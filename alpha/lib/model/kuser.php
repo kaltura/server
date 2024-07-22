@@ -203,8 +203,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
 		}
-		
-		if ($this->isColumnModified(kuserPeer::IS_ADMIN) && $this->getIsAdmin())
+
+		if ($this->isColumnModified(kuserPeer::IS_ADMIN) &&
+			$this->getIsAdmin() && !is_null($this->getLoginDataId()))
 		{
 			kuserPeer::sendNewUserMail($this, true);
 		}
@@ -1053,6 +1054,54 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		
 		return true;	
 	}
+
+	/**
+	 * Replace User's login data to new or different LoginData
+	 * @param string $newLoginId
+	 * @param string $existingLoginId
+	 * @throws kUserException::USER_LOGIN_ALREADY_ENABLED
+	 * @throws kUserException::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER
+	 * @throws kUserException::USER_LOGIN_ALREADY_DISABLED
+	 * @throws kUserException::INVALID_EMAIL
+	 * @throws kUserException::INVALID_PARTNER
+	 * @throws kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
+	 * @throws kUserException::LOGIN_ID_ALREADY_USED
+	 * @throws kUserException::LOGIN_DATA_NOT_PROVIDED
+	 * @throws kUserException::LOGIN_DATA_MISMATCH
+	 * @throws kUserException::LOGIN_ID_ALREADY_USED
+	 */
+	public function replaceUserLoginData($newLoginId, $existingLoginId)
+	{
+		$userLoginData = null;
+		if ($this->getLoginDataId())
+		{
+			if (!$existingLoginId)
+			{
+				throw new kUserException('', kUserException::LOGIN_DATA_NOT_PROVIDED);
+			}
+			$userLoginData = UserLoginDataPeer::getByEmail($existingLoginId);
+			if ($userLoginData && $userLoginData->getId() !== $this->getLoginDataId())
+			{
+				throw new kUserException('', kUserException::LOGIN_DATA_MISMATCH);
+			}
+		}
+
+		// Point to new login data
+		$newLoginData = UserLoginDataPeer::getByEmail($newLoginId);
+		if ($newLoginData && $newLoginData->getConfigPartnerId() == $this->getPartnerId())
+		{ // if login data id already in use by another user in the partner
+			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
+		}
+
+		if ($userLoginData) // disable the old login
+		{
+			$this->setLoginDataId(null);
+			$this->save();
+		}
+
+		return $this->enableLogin($newLoginId, null, true, true);
+	}
 	
 	/**
 	 * Enable user login 
@@ -1235,7 +1284,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 
 	public function getCacheInvalidationKeys()
 	{
-		return array("kuser:id=".strtolower($this->getId()), "kuser:partnerId=".strtolower($this->getPartnerId()).",puserid=".strtolower($this->getPuserId()), "kuser:loginDataId=".strtolower($this->getLoginDataId()));
+		return array("kuser:id=".kString::strToLow($this->getId()), "kuser:partnerId=".kString::strToLow($this->getPartnerId()).",puserid=".kString::strToLow($this->getPuserId()), "kuser:loginDataId=".kString::strToLow($this->getLoginDataId()));
 	}
 	
 	/* (non-PHPdoc)
@@ -1429,6 +1478,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			'status' => $this->getStatus(),
 			'partner_status' => elasticSearchUtils::formatPartnerStatus($this->getPartnerId(), $this->getStatus()),
 			'screen_name' => $this->getScreenName(),
+			'full_name' => $this->getFullName(),
 			'kuser_type' => $this->getType(),
 			'email' => $this->getEmail(),
 			'tags' => $this->getTagsArray(), //todo - check

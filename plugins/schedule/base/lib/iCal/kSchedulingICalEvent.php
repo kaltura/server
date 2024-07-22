@@ -27,6 +27,8 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		'endDate' => 'dtend',
 	);
 
+    	private static $timeZoneField = 'tzid';
+
 	protected static function formatDurationString($durationStringInSeconds)
 	{
 		$duration = 'PT';
@@ -208,11 +210,33 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-		foreach (self::$dateFields as $date => $field)
-		{
-			if ($event->$date)
-				$object->setField($field, kSchedulingICal::formatDate($event->$date));
-		}
+	        $timeZoneId = null;
+	
+	        if ($event->recurrence && $event->recurrence->timeZone)
+	        {
+	            $timeZones = DateTimeZone::listIdentifiers();
+			
+	            if (in_array($event->recurrence->timeZone, $timeZones))
+	            {
+	                $timeZoneId = $event->recurrence->timeZone;
+	            }
+	        }
+	
+	        foreach (self::$dateFields as $date => $field)
+	        {
+	            if ($event->$date)
+	            {
+                    	if ($timeZoneId)
+                    	{
+                        	$fieldToUpperCase = $field . ";" . self::$timeZoneField . "=";
+                        	$object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $timeZoneId), $timeZoneId);
+                    	}
+                    	else
+                    	{
+                        	$object->setField($field, kSchedulingICal::formatDate($event->$date));
+                    	}
+	            }
+	        }
 
 		$classificationTypes = array(
 			KalturaScheduleEventClassificationType::PUBLIC_EVENT => 'PUBLIC',

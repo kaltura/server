@@ -53,9 +53,13 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
         return EntryVendorTaskPeer::doSelect($c);
     }
 
-	public static function retrieveOneTaskByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
+    public static function retrieveOneTaskByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
     {
         $tasks = self::retrieveTasksByStatus($entryId, $catalogItemId, $partnerId, $version, $statuses);
+        if(!$tasks || !count($tasks))
+        {
+            return null;
+        }
 
         return $tasks[0];
     }

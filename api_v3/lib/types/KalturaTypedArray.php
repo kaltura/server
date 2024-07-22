@@ -18,12 +18,12 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 		$this->class = $class;
 	}
 	
-	public function offsetExists($offset) 
+	public function offsetExists($offset): bool
 	{
 		return array_key_exists($offset, $this->array);
 	}
 
-	public function offsetGet($offset) 
+	public function offsetGet($offset): mixed
 	{
 		return $this->array[$offset];
 	}
@@ -34,7 +34,7 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 			throw new Exception("'".get_class($value)."' is not an instance of '".$this->class."'");
 	}
 
-	public function offsetSet($offset, $value) 
+	public function offsetSet($offset, $value): void
 	{
 		$this->validateType($value);
 		
@@ -47,32 +47,32 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 	}
 
 	
-	public function offsetUnset($offset) 
+	public function offsetUnset($offset): void
 	{
 		unset($this->array[$offset]);
 	}
 	
-	public function current() 
+	public function current(): mixed
 	{
 		return current($this->array);
 	}
 
-	public function next() 
+	public function next(): void
 	{
-		return next($this->array);
+		next($this->array);
 	}
 
-	public function key() 
+	public function key(): mixed
 	{
 		return key($this->array);
 	}
 
-	public function valid() 
+	public function valid(): bool
 	{
 		return ($this->current() !== false);
 	}
 
-	public function rewind() 
+	public function rewind(): void
 	{
 		reset($this->array);
 	}
@@ -82,7 +82,7 @@ abstract class KalturaTypedArray extends KalturaObject implements ArrayAccess, I
 		return $this->class;
 	}
 	
-	public function count()
+	public function count(): int
 	{
 		return count($this->array);
 	}

@@ -76,9 +76,27 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
 		}
 
+		$partner = $dbUser->getPartner();
 		if ($dbUser->getIsAdmin() && !is_null($user->isAdmin) && !$user->isAdmin)
 		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
+		}
+
+		if ($dbUser->getIsAdmin() && !is_null($user->email))
+		{
+			$allowedEmailDomainsForAdmins = $partner->getAllowedEmailDomainsForAdmins();
+			if ($allowedEmailDomainsForAdmins)
+			{
+				$allowedEmailDomainsForAdminsArray = explode(',', $partner->getAllowedEmailDomainsForAdmins());
+				if (!kString::isEmailString($user->email))
+				{
+					throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'email');
+				}
+				if (!myKuserUtils::isAllowedAdminEmailDomain($user->email, $allowedEmailDomainsForAdminsArray))
+				{
+					throw new KalturaAPIException(KalturaErrors::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
+				}
+			}
 		}
 		
 		if($dbUser->getIsHashed() && $user->id)
@@ -86,7 +104,7 @@ class UserService extends KalturaBaseUserService
 			throw new KalturaAPIException(KalturaErrors::UPDATING_USER_ID_FOR_HASHED_USER_NOT_ALLOWED);
 		}
 		
-		if ($dbUser->getPartner()->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $this->getPartnerId())
+		if ($partner->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $this->getPartnerId())
 			&& $user->isSsoExcluded)
 		{
 			throw new KalturaAPIException(KalturaErrors::SETTING_SSO_PER_USER_NOT_ALLOWED);
@@ -120,7 +138,7 @@ class UserService extends KalturaBaseUserService
 				{
 					throw new KalturaAPIException(KalturaErrors::DUPLICATE_USER_BY_ID, $user->id);
 				}
-			}			
+			}
 			$dbUser = $user->toUpdatableObject($dbUser);
 			$dbUser->save();
 		}
@@ -624,6 +642,100 @@ class UserService extends KalturaBaseUserService
 				throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
 			}
 			throw $e;
+		}
+
+		return $this->getResponseUserWithEncryptedSeed($user);
+	}
+
+	/**
+	 * Replace a user's existing login data to a new or an existing login data
+	 * to only be used when admin impersonates a partner
+	 *
+	 * @action replaceUserLoginData
+	 *
+	 * @param string $userId The user's unique identifier in the partner's system
+	 * @param string $newLoginId The new user's email address that identifies the user for login
+	 * @param string $existingLoginId The user's email address that identifies the user for login
+	 * @return KalturaUser The user object represented by the user and login IDs
+	 *
+	 * @throws KalturaErrors::USER_NOT_FOUND
+	 * @throws KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED
+	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
+	 * @throws KalturaErrors::USER_LOGIN_ALREADY_ENABLED
+	 * @throws KalturaErrors::USER_DATA_ERROR
+	 * @throws KalturaErrors::LOGIN_DATA_NOT_PROVIDED
+	 * @throws KalturaErrors::LOGIN_DATA_MISMATCH
+	 * @throws KalturaErrors::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER
+	 * @throws KalturaErrors::USER_LOGIN_ALREADY_DISABLED
+	 * @throws KalturaErrors::LOGIN_ID_ALREADY_USED
+	 */
+	public function replaceUserLoginDataAction($userId, $newLoginId, $existingLoginId = null)
+	{
+		try
+		{
+			if (kCurrentContext::$master_partner_id != Partner::EP_PARTNER_ID)
+			{
+				throw new KalturaAPIException(KalturaErrors::ACTION_FORBIDDEN, 'replaceUserLoginData');
+			}
+
+			$user = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
+			if (!$user)
+			{
+				throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+			}
+
+			$user->replaceUserLoginData($newLoginId, $existingLoginId);
+			$user->save();
+		}
+		catch (Exception $e)
+		{
+			switch ($e->getCode())
+			{
+				case kUserException::LOGIN_DATA_NOT_PROVIDED:
+				{
+					throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_NOT_PROVIDED);
+				}
+				case kUserException::USER_LOGIN_ALREADY_ENABLED:
+				{
+					throw new KalturaAPIException(KalturaErrors::USER_LOGIN_ALREADY_ENABLED);
+				}
+				case kUserException::INVALID_EMAIL:
+				{
+					throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+				}
+				case kUserException::INVALID_PARTNER:
+				{
+					throw new KalturaAPIException(KalturaErrors::USER_NOT_FOUND);
+				}
+				case kUserException::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED:
+				{
+					throw new KalturaAPIException(KalturaErrors::ADMIN_LOGIN_USERS_QUOTA_EXCEEDED);
+				}
+				case kUserException::PASSWORD_STRUCTURE_INVALID:
+				{
+					throw new KalturaAPIException(KalturaErrors::PASSWORD_STRUCTURE_INVALID);
+				}
+				case kUserException::LOGIN_ID_ALREADY_USED:
+				{
+					throw new KalturaAPIException(KalturaErrors::USER_DATA_ERROR);
+				}
+				case kUserException::LOGIN_DATA_MISMATCH:
+				{
+					throw new KalturaAPIException(KalturaErrors::LOGIN_DATA_MISMATCH);
+				}
+				case kUserException::USER_LOGIN_ALREADY_DISABLED:
+				{
+					throw new KalturaAPIException(KalturaErrors::USER_LOGIN_ALREADY_DISABLED);
+				}
+				case kUserException::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER:
+				{
+					throw new KalturaAPIException(KalturaErrors::CANNOT_DISABLE_LOGIN_FOR_ADMIN_USER);
+				}
+				default:
+				{
+					throw $e;
+				}
+			}
 		}
 
 		return $this->getResponseUserWithEncryptedSeed($user);

@@ -130,6 +130,13 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 	 * @var KalturaKeyValueArray
 	 */
 	public $customHeaders;
+
+	/**
+	 * The type of SHA to use.
+	 *
+	 * @var KalturaSecureHashingAlgo
+	 */
+	public $secureHashingAlgo;
 	
 	private static $map_between_objects = array
 	(
@@ -151,6 +158,7 @@ class KalturaHttpNotificationTemplate extends KalturaEventNotificationTemplate
 		'sslKey',
 		'sslKeyPassword',
 		'customHeaders',
+		'secureHashingAlgo',
 	);
 	
 	public function __construct()

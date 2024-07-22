@@ -309,7 +309,7 @@ class sfNumberFormatInfo
         // to find the groupsize 1.
         for ($i = strlen($pattern) - 1; $i >= 0; $i--)
         {
-          if ($pattern{$i} == $digit || $pattern{$i} == $hash)
+          if ($pattern[$i] == $digit || $pattern[$i] == $hash)
           {
             $groupSize1 = $i - $groupPos1;
             break;
@@ -328,11 +328,11 @@ class sfNumberFormatInfo
     {
       for ($i = strlen($pattern) - 1; $i >= 0; $i--)
       {
-        if ($pattern{$i} == $dot)
+        if ($pattern[$i] == $dot)
         {
           break;
         }
-        if ($pattern{$i} == $digit)
+        if ($pattern[$i] == $digit)
         {
           $decimalPoints = $i - $decimalPos;
           break;

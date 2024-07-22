@@ -205,7 +205,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 					$name = str_replace(array_keys($contentParameters), $contentParameters, $name);
 			}
 
-			if (isset($contentParameters[self::FROM_EMAIL]))
+			if ($email == self::FROM_EMAIL && isset($contentParameters[self::FROM_EMAIL]))
 			{
 				$this::$mailer->Sender = $contentParameters[self::FROM_EMAIL];
 			}

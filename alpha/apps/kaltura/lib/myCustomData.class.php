@@ -25,7 +25,7 @@ class myCustomData
 			$this->data = array();
 		try
 		{
-			$this->data = @unserialize( $str );
+			$this->data = $str ? @unserialize( $str ) : null;
 			if ( $this->data == null )
 			{
 				$this->data = array();

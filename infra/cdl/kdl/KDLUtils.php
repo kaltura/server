@@ -112,25 +112,30 @@ class KDLUtils
 	 */
     static function parseTranscodingDataList($dataStr, $delim)
 	{
-//		$dataStr = KDLUtils::trima($dataStr);
-
-$parsed = array();
-		//		preg_match_all("/([0-9]*),?/", $transStr, $transParse);
+		$parsed = array();
+		if(is_null($dataStr))
+		{
+			return $parsed;
+		}
+		
 		preg_match_all("/([^".$delim."]*)".$delim."?/", $dataStr, $trGrpPrs);
-//		               "/([^\|]*)\,?/"
-		foreach ($trGrpPrs[1] as $trGrp){
+		foreach ($trGrpPrs[1] as $trGrp)
+		{
 			$trGrp = trim($trGrp,"()");
-			if($trGrp==null) {
+			if($trGrp == null)
+			{
 				$parsed[] = "";
 				continue;
 			}
 			$trPrs = array();
 			preg_match_all('/([^\#]*)\#?/', $trGrp, $trPrs);
-//			preg_match_all('/([0-9]*)\#?/', $trGrp, $trPrs);
-			if(count($trPrs[1])>2){
+			
+			if(count($trPrs[1])>2)
+			{
 				$parsed[] = $trPrs[1];
 			}
-			else{
+			else
+			{
 				$parsed[] = $trGrp;
 			}
 		}

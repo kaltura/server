@@ -130,7 +130,7 @@ abstract class kBaseESearch extends kBaseSearch
 		if(!empty($elasticSplitIndexMap) && isset($elasticSplitIndexMap[$indexName]))
 		{
 			$splitFactor = $elasticSplitIndexMap[$indexName];
-			$index = abs(($partnerId / 10) % $splitFactor);
+			$index = abs(intval($partnerId / 10) % $splitFactor);
 			$indexName = $indexName .'_' . $index;
 		}
 		return $indexName;

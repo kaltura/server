@@ -469,8 +469,13 @@ class kXsd
 		$xsl = new KDOMDocument();
 		$xsl->loadXML($xslStr);
 		
-		$proc = new XSLTProcessor;
-		$proc->importStyleSheet($xsl);
+		$proc = new XSLTProcessor();
+		$importStyleSheetResult = $proc->importStyleSheet($xsl);
+		if(!$importStyleSheetResult)
+		{
+			KalturaLog::debug("Failed to import xsl stylesheet which in this case schemaValidate will always fail, returning false");
+			return false;
+		}
 		
 		$output = $proc->transformToXML($from);
 		

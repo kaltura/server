@@ -220,14 +220,15 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function createAuditTrail(BaseObject $object, $action) 
 	{
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
 				
 		if(!$this->traceEnabled($partnerId))
 			return null;
 			
 		if(!method_exists($object, 'getPeer') || !method_exists($object, 'getId'))
 			return null;
-			
+		
+		$objectType = null;
 		$peer = $object->getPeer();
 		try
 		{
@@ -235,7 +236,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		}
 		catch(Exception $e)
 		{
-			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[$objectType] " . $e->getMessage());
+			KalturaLog::err("Error creating audit trail for object id[" . $object->getId() . "] type[" . $objectType ? $objectType : "UNDEFINED" . "] " . $e->getMessage());
 			$auditTrail = null;
 			return null;
 		}
@@ -302,7 +303,8 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function shouldConsumeCreatedEvent(BaseObject $object)
 	{
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
+
 		if(($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 		
@@ -330,7 +332,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function shouldConsumeCopiedEvent(BaseObject $fromObject, BaseObject $toObject)
 	{
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
 		if(($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
@@ -356,7 +358,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
 		
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
 		if(($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
@@ -381,7 +383,7 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	 */
 	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
 	{
-		$partnerId = kCurrentContext::$master_partner_id;
+		$partnerId = self::getMasterPartnerId();
 		if(($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID || $partnerId > 0) && $this->traceEnabled($partnerId))
 			return true;
 			
@@ -479,5 +481,16 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 		
 		return true;
 	}
+
+	/**
+	 * @param BaseObject $object
+	 * @return string partner id
+	 */
+	protected static function getMasterPartnerId()
+	{
+		$partnerId = kCurrentContext::$master_partner_id;
+		return $partnerId == Partner::AUTH_BROKER_PARTNER ? Partner::ADMIN_CONSOLE_PARTNER_ID : $partnerId;
+	}
+
 
 }

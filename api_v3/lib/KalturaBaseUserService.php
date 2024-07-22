@@ -491,7 +491,8 @@ class KalturaBaseUserService extends KalturaBaseService
 		$dbUser->setPartnerId($this->getPartnerId());
 		try {
 			$checkPasswordStructure = isset($user->password) ? true : false;
-			$dbUser = kuserPeer::addUser($dbUser, $user->password, $checkPasswordStructure);
+			$userPassword = isset($user->password) ? $user->password : null;
+			$dbUser = kuserPeer::addUser($dbUser, $userPassword, $checkPasswordStructure);
 		}
 
 		catch (kUserException $e) {
@@ -527,6 +528,10 @@ class KalturaBaseUserService extends KalturaBaseService
 			else if ($code == kUserException::SETTING_SSO_PER_USER_NOT_ALLOWED)
 			{
 				throw new KalturaAPIException(KalturaErrors::SETTING_SSO_PER_USER_NOT_ALLOWED);
+			}
+			else if ($code == kUserException::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS)
+			{
+				throw new KalturaAPIException(KalturaErrors::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
 			}
 			throw $e;
 		}

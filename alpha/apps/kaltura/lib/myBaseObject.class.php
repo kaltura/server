@@ -462,39 +462,34 @@ abstract class myBaseObject implements Iterator
 
 	
 	
-	public function rewind()
+	public function rewind(): void
 	{
 		if ( $this->m_obj == null ) return;
-//		echo "rewind\n";
 		$this->verifyIterator();
 		reset($this->fields);
 	}
 
-	public function current()
+	public function current(): mixed
 	{
-		//echo "current\n";
 		$this->verifyIterator();
 		return  ( current($this->fields) );
 	}
 
-	public function key() 
+	public function key(): mixed
 	{
-//		echo "key\n";
 		$this->verifyIterator();
 		return  key($this->fields);
 	}
 
-	public function next() 
+	public function next(): void
 	{
-	//	echo "next\n";
 		$this->verifyIterator();
-		return ( next($this->fields) );
+		next($this->fields);
 	}
 
-	public function valid() 
+	public function valid(): bool
 	{
 		if ( $this->m_obj == null ) return false;
-//		echo "valid\n
 		$this->verifyIterator();
 		return current($this->fields) !== false;
 	}

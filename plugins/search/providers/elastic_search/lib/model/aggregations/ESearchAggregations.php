@@ -27,7 +27,7 @@ class ESearchAggregations extends BaseObject
 	 */
 	public function getAggregations()
 	{
-		return $this->aggregations;
+		return !is_null($this->aggregations) ? $this->aggregations : array();
 	}
 
 	/**

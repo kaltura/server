@@ -408,6 +408,17 @@ class kSessionBase
 		$requestUri = $_SERVER["REQUEST_URI"];
 		$value = implode(self::PRIVILEGES_DELIMITER, $this->parsedPrivileges[self::PRIVILEGE_URI_RESTRICTION]);
 		$uris = explode('|', $value);
+		
+		//Match internal allowed URIs
+		$internalAllowedUris = kConf::get('internal_allowed_uris', 'security', array());
+		foreach($internalAllowedUris as $internalAllowedUri)
+		{
+			if($requestUri == $internalAllowedUri || substr($requestUri, 0, strlen($internalAllowedUri) - 1) == substr($internalAllowedUri, 0, -1))
+			{
+				return true;
+			}
+		}
+		
 		foreach ($uris as $uri)
 		{
 			if ($requestUri == $uri ||			// exact match

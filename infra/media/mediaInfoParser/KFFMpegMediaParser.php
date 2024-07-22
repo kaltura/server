@@ -327,33 +327,49 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			 * use 'avg_frame_rate'
 			 */
 		{
+			$value = false;
 			$mediaInfo->videoFrameRate = null;
 			if(isset($stream->r_frame_rate)){
 				$r_frame_rate = trim($stream->r_frame_rate);
 				if(is_numeric($r_frame_rate))
 					$value = $r_frame_rate;
-				else {
-					$value=eval("return ($r_frame_rate);");
+				elseif (!kString::endsWith($r_frame_rate, "/0")) {
+					//Avoid division by 0
+					$value = eval("return ($r_frame_rate);");
 				}
 			}
-			if(isset($value) && $value!=false && $value<120) 
-				$mediaInfo->videoFrameRate = round($value,3);
+			
+			if(isset($value) && $value!=false && $value<120) {
+				$mediaInfo->videoFrameRate = round($value, 3);
+			}
 			else if(isset($stream->avg_frame_rate) && $stream->avg_frame_rate>0) {
+				$value = false;
 				$avg_frame_rate = $stream->avg_frame_rate;
-				$value=eval("return ($avg_frame_rate);");
-				if(isset($value) && $value!=false && $value<120) 
-					$mediaInfo->videoFrameRate = round($value,3);
+				//Avoid division by 0
+				if(!kString::endsWith($avg_frame_rate, "/0")) {
+					$value=eval("return ($avg_frame_rate);");
+				}
+				if(isset($value) && $value!=false && $value<120) {
+					$mediaInfo->videoFrameRate = round($value, 3);
+				}
 			}
 		}	
 		$mediaInfo->videoDar = null;
 		if(isset($stream->display_aspect_ratio)){
 			$display_aspect_ratio = trim($stream->display_aspect_ratio);
-			if(is_numeric($display_aspect_ratio))
+			if(is_numeric($display_aspect_ratio)) {
 				$mediaInfo->videoDar = $display_aspect_ratio;
+			}
 			else {
+				$value = false;
 				$darStr = str_replace(":", "/",$display_aspect_ratio);
-				$value=eval("return ($darStr);");
-				if($value!=false) $mediaInfo->videoDar = $value;
+				//Avoid division by 0
+				if(!kString::endsWith($darStr, "/0")) {
+					$value = eval("return ($darStr);");
+				}
+				if($value!=false) {
+					$mediaInfo->videoDar = $value;
+				}
 			}
 		}
 			

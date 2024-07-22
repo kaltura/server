@@ -70,9 +70,18 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		return self::doSelectOne($c);
 	}
 
-	private static function getValidPuserStr($puserId){
+	private static function getValidPuserStr($puserId)
+	{
+		//There are some strange cases where puserId is sent as array, in this case we will nullify it
+		if(is_array($puserId))
+		{
+			return null;
+		}
+		
 		if (!is_null($puserId))
+		{
 			$puserId = substr($puserId, 0, self::MAX_PUSER_LENGTH);
+		}
 		return $puserId;
 	}
 	
@@ -463,8 +472,8 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		if ($existingUser) {
 			throw new kUserException('', kUserException::USER_ALREADY_EXISTS);
 		}
-		
-		if ($user->getPartner()->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $user->getPartnerId())
+		$partner = $user->getPartner();
+		if ($partner->getUseSso() && !PermissionPeer::isValidForPartner(PermissionName::ALLOW_SSO_PER_USER, $user->getPartnerId())
 			&& $user->getIsSsoExcluded())
 		{
 			throw new kUserException('', kUserException::SETTING_SSO_PER_USER_NOT_ALLOWED);
@@ -473,7 +482,7 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		// check if roles are valid - may throw exceptions
 		if (!$user->getRoleIds() && $user->getIsAdmin()) {
 			// assign default role according to user type admin / normal
-			$userRoleId = $user->getPartner()->getAdminSessionRoleId();
+			$userRoleId = $partner->getAdminSessionRoleId();
 			$user->setRoleIds($userRoleId);
 		}
 		UserRolePeer::testValidRolesForUser($user->getRoleIds(), $user->getPartnerId());
@@ -493,6 +502,19 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		// if password is set, user should be able to login to the system - add a user_login_data record
 		if ($password || $user->getIsAdmin()) {
 			// throws an action on error
+			$allowedEmailDomainsForAdmins = $partner->getAllowedEmailDomainsForAdmins();
+			if ($user->getIsAdmin() && $allowedEmailDomainsForAdmins)
+			{
+				$allowedEmailDomainsForAdminsArray = explode(',', $partner->getAllowedEmailDomainsForAdmins());
+				if (!kString::isEmailString($user->getEmail()))
+				{
+					throw new kUserException('', kUserException::INVALID_EMAIL);
+				}
+				if (!myKuserUtils::isAllowedAdminEmailDomain($user->getEmail(), $allowedEmailDomainsForAdminsArray))
+				{
+					throw new kUserException('', kUserException::EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS);
+				}
+			}
 			$user->enableLogin($user->getEmail(), $password, $checkPasswordStructure, $sendEmail);
 		}	
 		
@@ -601,9 +623,9 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		list($userName, $creatorUserName, $publisherName, $puserId) = myKuserUtils::sanitizeFields(array($userName, $creatorUserName, $partner->getName(), $user->getPuserId()));
 
 		$roleNameToUseDynamicEmailTemplate = kEmails::getDynamicEmailUserRoleName($roleNames);
-		$dynamicLink = $roleNameToUseDynamicEmailTemplate ? kEmails::getDynamicTemplateBaseLink($roleNames) : null;
-		if ($dynamicLink || !$existingUser)
+		if (!$existingUser)
 		{
+			$dynamicLink = $roleNameToUseDynamicEmailTemplate ? kEmails::getDynamicTemplateBaseLink($roleNames) : null;
 			$loginData = $user->getLoginData();
 			$passHashKey = $loginData ? $loginData->getPasswordHashKey() : null;
 			$resetPasswordLink = UserLoginDataPeer::getPassResetLink($passHashKey, null, $dynamicLink);
@@ -620,12 +642,12 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 		
 		if ($partnerId == Partner::ADMIN_CONSOLE_PARTNER_ID) // If new user is admin console user
 		{
-			// add google authenticator library to include path
-			require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/GoogleAuthenticator.php';
+			// add 2FA library to include path
+			require_once KALTURA_ROOT_PATH . '/vendor/phpGangsta/TwoFactorAuthenticator.php';
 			
 			//QR code link might contain the '|' character used as a separator by the mailer job dispatcher. 
 			$qrCodeLink = str_replace("|", "M%7C",
-			                          GoogleAuthenticator::getQRCodeGoogleUrl($user->getPuserId() . ' ' . kConf::get('www_host') . ' KAC',
+			                          TwoFactorAuthenticator::getQRCodeUrl($user->getPuserId() . ' ' . kConf::get('www_host') . ' KAC',
 			                                                                  $user->getLoginData()->getSeedFor2FactorAuth()));
 			
 			if ($existingUser)

@@ -161,7 +161,9 @@ class KalturaBulkUploadJobData extends KalturaJobData
 	    if($this->shouldGet('objectData', $responseProfile))
 	    {
 		    $this->objectData = null;
-		    switch (get_class($source_object->getObjectData()))
+		    $objectData = $source_object->getObjectData();
+		    $objectClass = (!is_null($objectData)) ? get_class($objectData) : null;
+		    switch ($objectClass)
 		    {
 		        case 'kBulkUploadEntryData':
 		            $this->objectData = new KalturaBulkUploadEntryData();

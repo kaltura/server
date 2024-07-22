@@ -97,7 +97,7 @@ class dateUtils
 		$minutes = (int)(( $time_in_secs - $hours * 3600 ) / 60);
 		$seconds = (int)( $time_in_secs - $minutes * 60 - $hours * 3600 ) ;
 		$decimal = (int)(($time_in_msecs%1000) / 100 );
-		$str = ( $hours > 10 ? "$hours:" : $hours > 0 ? "0$hours:" : "" ) .  
+		$str = ( $hours > 10 ? "$hours:" : ($hours > 0 ? "0$hours:" : "") ) .
 			( $minutes > 10 ? $minutes : "0$minutes" ) . ":" . 
 			( $seconds > 10 ? $seconds : "0$seconds" ) . ".$decimal";
 		return $str ;
@@ -125,6 +125,26 @@ class dateUtils
 		$date2 = new DateTime($date2);
 		$diff = $date2->diff($date1)->format("%a");
 		return $diff;
+	}
+	
+	public static function kGmdate (string $format, $timestamp = null)
+	{
+		if(!is_null($timestamp))
+		{
+			$timestamp = intval($timestamp);
+		}
+		
+		return gmdate($format, $timestamp);
+	}
+	
+	public static function kDate (string $format, $timestamp = null)
+	{
+		if(!is_null($timestamp))
+		{
+			$timestamp = intval($timestamp);
+		}
+		
+		return date($format, $timestamp);
 	}
 }
 ?>

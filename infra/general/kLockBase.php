@@ -91,7 +91,7 @@ class kLockBase
 	 */
 	static public function grabLocalLock($key)
 	{ 
-		if (!function_exists('apc_add'))
+		if (!kApcWrapper::functionExists('add'))
 			return null;
 		
 		require_once(__DIR__ . '/../cache/kApcCacheWrapper.php');		// can be called before autoloader

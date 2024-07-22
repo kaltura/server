@@ -92,6 +92,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $allowResubmission = false;
 
+	/**
+	 * @var string
+	 */
+	public $vendorData;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -108,6 +113,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'engineType',
 		'allowResubmission',
 		'sourceLanguage',
+		'vendorData',
 	);
 
 	abstract protected function getServiceFeature();
@@ -184,8 +190,8 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		$id = $sourceObject ? $sourceObject->getId() : null;
 		if (trim($this->systemName) && !$this->isNull('systemName'))
 		{
-			$systemNameTemplates = VendorCatalogItemPeer::retrieveBySystemName($this->systemName, $id);
-			if (count($systemNameTemplates))
+			$systemNameTemplate = VendorCatalogItemPeer::retrieveBySystemName($this->systemName, $id);
+			if ($systemNameTemplate)
 				throw new KalturaAPIException(KalturaReachErrors::VENDOR_CATALOG_ITEM_DUPLICATE_SYSTEM_NAME, $this->systemName);
 		}
 	}

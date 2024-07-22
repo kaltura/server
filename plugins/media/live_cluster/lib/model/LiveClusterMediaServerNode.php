@@ -7,6 +7,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
     const SESSION_TYPE = 'st';
     const TIMELINE_URL_PARAM = 'tl';
     const LOW_LATENCY_URL_PARAM = 'll';
+    const CONTAINER_URL_PARAM = 'container';
     const EXPLICIT_LIVE_VIEWER_TYPE_URL = 'tl';
     const USER_TYPE_ADMIN = 'main';
     const USER_TYPE_USER = 'viewer';
@@ -115,13 +116,26 @@ class LiveClusterMediaServerNode extends MediaServerNode
 	/**
 	 * @return string
 	 */
-	public function getAdditionalUrlParam(LiveStreamEntry $entry)
+	public function getAdditionalUrlParam(LiveStreamEntry $entry, LiveEntryServerNode $liveEntryServerNode)
 	{
 		$res = '';
 		if ($entry->isLowLatencyEntry())
 		{
 			$res .= self::LOW_LATENCY_URL_PARAM . '/1/';
 		}
+
+		$streams = $liveEntryServerNode->getStreams();
+
+		foreach($streams as $stream)
+		{
+			if ($stream->getCodec() == flavorParams::VIDEO_CODEC_H265)
+			{
+				KalturaLog::debug("Stream has h265 video codec - force fmp4 container");
+				$res .= self::CONTAINER_URL_PARAM . '/fmp4/';
+				break;
+			}
+		}
+
 		return $res;
 	}
 }

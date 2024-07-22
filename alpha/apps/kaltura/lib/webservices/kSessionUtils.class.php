@@ -67,22 +67,21 @@ class kSessionUtils
 	* In the first case, it will be considered invalid for user that are not the ones that started the session
 	*/
 	public static function startKSession ( $partner_id , $partner_secret , $puser_id , &$ks_str  ,
-		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null, $enforcePartnerKsMaxExpiry = false)
+		$desired_expiry_in_seconds=86400 , $admin = false , $partner_key = "" , $privileges = "", $master_partner_id = null, $additional_data = null, $enforcePartnerKsMaxExpiry = true)
 	{
 		$ks_max_expiry_in_seconds = ""; // see if we want to use the generic setting of the partner
 		ks::validatePrivileges($privileges,  $partner_id);
 		$result =  myPartnerUtils::isValidSecret ( $partner_id , $partner_secret , $partner_key , $ks_max_expiry_in_seconds , $admin );
 		if ( $result >= 0 )
 		{
-			if ( $ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)
-				$desired_expiry_in_seconds = 	$ks_max_expiry_in_seconds;
+			self::calculateExpiry($ks_max_expiry_in_seconds, $desired_expiry_in_seconds, $enforcePartnerKsMaxExpiry, $master_partner_id);
 
 			//	echo "startKSession: from DB: $ks_max_expiry_in_seconds | desired: $desired_expiry_in_seconds " ;
 
 			$ks_type = ks::TYPE_KS;
 			if($admin)
 				$ks_type = $admin ; // if the admin > 1 - use it rather than automatically setting it to be 2
-				
+
 			$ks = self::createKSession($partner_id, $partner_secret, $puser_id, $desired_expiry_in_seconds, $ks_type, $privileges, $additional_data, $master_partner_id);
 			$ks_str = $ks->toSecureString();
 			return 0;
@@ -92,6 +91,22 @@ class kSessionUtils
 			return $result;
 		}
 
+	}
+
+	protected static function calculateExpiry($ks_max_expiry_in_seconds, &$desired_expiry_in_seconds, $enforcePartnerKsMaxExpiry, $master_partner_id)
+	{
+		if ($master_partner_id && $master_partner_id < 0)
+		{
+			$masterPartner = PartnerPeer::retrieveByPK($master_partner_id);
+			if ($masterPartner && $desired_expiry_in_seconds)
+			{
+				return;
+			}
+		}
+		if ($ks_max_expiry_in_seconds && $ks_max_expiry_in_seconds < $desired_expiry_in_seconds && $enforcePartnerKsMaxExpiry)
+		{
+			$desired_expiry_in_seconds = $ks_max_expiry_in_seconds;
+		}
 	}
 
 	public static function createKSessionNoValidations ( $partner_id , $puser_id , &$ks_str  ,
@@ -869,7 +884,8 @@ class ks extends kSessionBase
 		// allow adding privileges to app token only if they are not in use by the server and were not set on the original app token
 		foreach($appSessionPrivileges as $privilegeName => $privilegeValue)
 		{
-			if( !in_array(trim($privilegeName), $forbidenSessionPrivileges) || (in_array(self::PRIVILEGE_WILDCARD, $privilegesArray[$privilegeName])) )
+			if( !in_array(trim($privilegeName), $forbidenSessionPrivileges) ||
+				(isset($privilegesArray[$privilegeName]) && in_array(self::PRIVILEGE_WILDCARD, $privilegesArray[$privilegeName])))
 			{
 				$privilegesArray[$privilegeName] = $privilegeValue;
 			}

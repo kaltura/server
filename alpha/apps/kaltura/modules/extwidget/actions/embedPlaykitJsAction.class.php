@@ -182,13 +182,23 @@ class embedPlaykitJsAction extends sfAction
 		return $bundleContent;
 	}
 
+	private function addUiConfData($uiConfData)
+	{
+		$uiConfData->uiConfData = new stdClass();
+		$uiConfData->uiConfData->width = $this->uiConf->getWidth();
+		$uiConfData->uiConfData->height = $this->uiConf->getHeight();
+		$uiConfData->uiConfData->name = $this->uiConf->getName();
+	}
+
 	private function appendConfig($content, $i18nContent, $extraModulesNames = null)
 	{
 		$uiConf = $this->playerConfig;
 		$this->mergeEnvConfig($uiConf);
 		$this->mergeI18nConfig($uiConf, $i18nContent);
 		$this->mergeExtraModuleNames($uiConf, $extraModulesNames);
+		$this->addUiConfData($uiConf);
 		$uiConfJson = json_encode($uiConf);
+
 
 		if ($uiConfJson === false)
 		{
@@ -257,6 +267,11 @@ class embedPlaykitJsAction extends sfAction
 		if(!$extraModulesNames || !count($extraModulesNames))
 		{
 			return;
+		}
+		
+		if(!property_exists($uiConf, 'plugins'))
+		{
+			$uiConf->plugins = new stdClass();
 		}
 		
 		foreach($extraModulesNames as $extraModulesName)
@@ -409,6 +424,8 @@ class embedPlaykitJsAction extends sfAction
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
 		if ($iframeEmbed)
 		{
+			//no cdn caching for iframeEmbed
+			$max_age = 0;
 			header("Content-Type: text/html");
 		}
 		else
@@ -526,8 +543,9 @@ class embedPlaykitJsAction extends sfAction
                         </head >
                         <body >
                         	<div id="player_container"></div>
-                            <script type = "text/javascript" > ' . $bundleContent . '</script >
-                        </body >
+                            	<script type = "text/javascript" > ' . $bundleContent . '</script >
+				<script type = "text/javascript" > window.originalRequestReferrer = "' . $_SERVER['HTTP_REFERER'] . '"</script >
+			</body >
                     </html >';
 		return $htmlDoc;
 	}

@@ -736,7 +736,7 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 			}
 			else
 			{
-				$splitIndexValue = kQueryCache::getCriterionValues($criteria, $splitIndexAttr);
+				$splitIndexValue = kQueryCache::getCriterionValues($criteria, $splitIndexAttr, true);
 				if($splitIndexValue && count($splitIndexValue) > 1 )
 				{
 					KalturaLog::debug("Found multiple values for Split index attribute, will query distributed index");
@@ -909,6 +909,9 @@ abstract class SphinxCriteria extends KalturaCriteria implements IKalturaIndexQu
 					if(is_numeric($val) || strlen($val) > 0)
 					{
 						$val = SphinxUtils::escapeString($val, $fieldsEscapeType);
+						$prefix = $this->getFieldPrefix($sphinxField);
+						if($prefix)
+							$val = $prefix . " " . $val;
 						if($objectClass::isNullableField($fieldName))
 							$this->addMatch("@$sphinxField \\\"^$val $notEmpty$\\\"");
 						else							

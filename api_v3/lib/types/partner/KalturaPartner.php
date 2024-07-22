@@ -501,6 +501,11 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $customAnalyticsDomain;
+
+	/**
+	 * @var string
+	 */
+	public $allowedEmailDomainsForAdmins;
 	
 	private static $map_between_objects = array
 	(
@@ -515,7 +520,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
 		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe', 'allowedDomains',
 		'excludedAdminRoleName', 'eventPlatformAllowedTemplates', 'verticalClassificationId' => 'verticalClasiffication', 'allowDefaultPasswordRestrictions', 'recycleBinRetentionPeriod',
-		'customAnalyticsDomain',
+		'customAnalyticsDomain','allowedEmailDomainsForAdmins'
 	);
 	
 	public function getMapBetweenObjects ( )

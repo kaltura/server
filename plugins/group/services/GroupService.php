@@ -33,7 +33,6 @@ class GroupService extends KalturaBaseUserService
 	 */
 	public function addAction(KalturaGroup $group)
 	{
-		$group->type = KuserType::GROUP;
 		$lockKey = "user_add_" . $this->getPartnerId() . $group->id;
 		$ret =  kLock::runLocked($lockKey, array($this, 'adduserImpl'), array($group));
 		return $ret;

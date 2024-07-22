@@ -293,6 +293,24 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $cuePointIdIn;
 
+	/**
+	 * filter by context ids
+	 * @var string
+	 */
+	public $contextIdIn;
+
+	/**
+	 * filter by user role
+	 * @var string
+	 */
+	public $roleIn;
+
+	/**
+	 * filter by industry
+	 * @var string
+	 */
+	public $industryIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -336,7 +354,10 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'virtualEventIdIn' => 'virtual_event_ids',
 		'originIn' => 'origins',
 		'uiConfIdIn' => 'ui_conf_ids',
-		'cuePointIdIn' => 'cue_point_ids',
+  	    	'cuePointIdIn' => 'cue_point_ids',
+		'contextIdIn' => 'context_ids',
+		'roleIn' => 'roles',
+		'industryIn' => 'industries'
 	);
 
 	protected function getMapBetweenObjects()

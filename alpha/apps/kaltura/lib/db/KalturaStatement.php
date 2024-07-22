@@ -17,7 +17,7 @@ class KalturaStatement extends PDOStatement
 		self::$dryRun = $dryRun;
 	}
 	
-	public function bindValue ($parameter, $value, $data_type = null)
+	public function bindValue ($parameter, $value, $data_type = null): bool
 	{
 		$index = count($this->values) + 1;
 		if(is_null($value))
@@ -28,7 +28,7 @@ class KalturaStatement extends PDOStatement
 		return parent::bindValue ($parameter, $value, $data_type);
 	}
 
-	public function execute ($input_parameters = null) 
+	public function execute ($input_parameters = null): bool
 	{
 		if (!kQueryCache::isCurrentQueryHandled())
 			kApiCache::disableConditionalCache();
@@ -80,6 +80,8 @@ class KalturaStatement extends PDOStatement
 			KalturaLog::debug("Sql took - " . $sqlTook . " seconds");
 			KalturaMonitorClient::monitorDatabaseAccess($sql, $sqlTook);
 		}
+		
+		return true;
 	}
 	
 }
