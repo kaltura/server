@@ -2925,7 +2925,8 @@ class kKavaReportsMgr extends kKavaBase
 			'cue_point_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CUE_POINT_ID),
 			'context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CONTEXT_ID),
 			'roles' => array(self::DRUID_DIMENSION => self::DIMENSION_ROLE),
-			'industries' => array(self::DRUID_DIMENSION => self::DIMENSION_INDUSTRY)
+			'industries' => array(self::DRUID_DIMENSION => self::DIMENSION_INDUSTRY),
+			'playback_modes' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_MODE)
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
