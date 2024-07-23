@@ -12,7 +12,6 @@
 Add the following to local.ini:
 ```
 [kmcng_permissions_policy_directives]
-accelerometer = "()"
 ambient-light-sensor = "()"
 display-capture = "()"
 battery = "()"
@@ -24,7 +23,6 @@ document-domain = "()"
 identity-credentials-get = "()"
 gamepad = "()"
 geolocation = "()"
-gyroscope = "()"
 hid = "()"
 local-fonts = "()"
 magnetometer = "()"
