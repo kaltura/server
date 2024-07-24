@@ -49,7 +49,7 @@ xr-spatial-tracking = "()"
 ##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
 Replace 'esearch_host', 'esearch_port' and execute the curl command
 
-    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"broadcast_entry_id":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"broadcast_entry_id": {"type": "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
 
 ## Add CnC Permissions
 * Issue Type: Task
