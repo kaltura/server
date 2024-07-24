@@ -155,6 +155,12 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	 * @filter mlikeor, mlikeand
 	 */
 	public $partnerTags;
+
+
+	/**
+	 * @var string
+	 */
+	public $v7id;
 	
 		
 	private static $map_between_objects = array
@@ -183,6 +189,7 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 		"config",
         "version",
 		"partnerTags",
+		"v7id"
 	);
 
 	public function getMapBetweenObjects ( )

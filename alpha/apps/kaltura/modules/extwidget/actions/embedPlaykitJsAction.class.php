@@ -28,6 +28,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
+    const V2_TO_V7 = "v2tov7";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -65,6 +66,16 @@ class embedPlaykitJsAction extends sfAction
 		{
 			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
+
+        $v2ToV7 = $this->getRequestParameter(self::V2_TO_V7, false);
+        if($v2ToV7)
+        {
+            KalturaLog::log("Adding v2 to v7");
+            $v2ToV7Code = PHP_EOL . '!function(){"use strict";var e={453:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.thumbnailEmbedV2=t.embed=void 0;const i=n(593),o=window.KalturaPlayer;t.embed=e=>{console.log("## config -----\x3e",e);const t=e.hasOwnProperty("entry_id"),n=e.hasOwnProperty("playlistAPI.kpl0Id");try{const i=o.setup({log:{level:"DEBUG"},targetId:e.targetId,provider:{partnerId:e.wid.match(/\d+/g).join(""),uiConfId:e.uiconf_id}});t?i.loadMedia({entryId:e.entry_id}):n&&i.loadPlaylist({playlistId:e["playlistAPI.kpl0Id"]})}catch(e){}},t.thumbnailEmbedV2=e=>{try{const t={config:{targetId:e.targetId,provider:{partnerId:e.wid.match(/\d+/g).join(""),uiConfId:e.uiconf_id}},mediaInfo:{entryId:e.entry_id}};(0,i.thumbnailEmbed)(t)}catch(e){}}},593:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.ThumbnailEmbedComponent=t.thumbnailEmbed=void 0;const i=n(14);Object.defineProperty(t,"ThumbnailEmbedComponent",{enumerable:!0,get:function(){return i.ThumbnailEmbedComponent}});const o=n(512);Object.defineProperty(t,"thumbnailEmbed",{enumerable:!0,get:function(){return o.thumbnailEmbed}}),window.__thumbnailEmbed=o.thumbnailEmbed},14:function(e,t){Object.defineProperty(t,"__esModule",{value:!0}),t.ThumbnailEmbedComponent=void 0;const n="#000";t.ThumbnailEmbedComponent=({onClick:e,src:t,bgColor:i=n})=>{const o=window.KalturaPlayer,{Button:r,Icon:d,IconType:a}=o.ui.components,{h:l}=o.ui.preact,{useRef:u,useState:c,useCallback:m}=o.ui.preactHooks,s=m((()=>{e(),v(!1)})),b=m((()=>{g(!0)})),p=m((()=>{g(!0),E(!0)})),h=u(),[y,v]=c(!0),[f,g]=c(!1),[I,E]=c(!1);return y?l("div",{style:{width:"100%",height:"100%",position:"relative",backgroundColor:I?i:n}},I?void 0:l("img",{src:t,ref:h,onLoad:b,onError:p,style:{width:"100%",height:"100%","object-fit":"contain"}}),f?l("div",{className:o.ui.style.prePlaybackPlayOverlay,style:{width:"100%",height:"100%"}},l(r,{className:o.ui.style.prePlaybackPlayButton,tabIndex:0,onClick:s},l(d,{type:a.Play}))):void 0):void 0}},512:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.thumbnailEmbed=void 0;const i=n(14);t.thumbnailEmbed=({config:e,mediaInfo:t,mediaOptions:n={},version:o=1e4,bgColor:r})=>{if(!e||!t)return;const d=(e=>{var t,n,i,o;if(null===(t=e.provider.env)||void 0===t?void 0:t.cdnUrl)return null===(n=e.provider.env)||void 0===n?void 0:n.cdnUrl;const r=window.__kalturaplayerdata;return r?null===(o=null===(i=r.provider)||void 0===i?void 0:i.env)||void 0===o?void 0:o.cdnUrl:"https://cdnapisec.kaltura.com"})(e),{targetId:a,provider:{partnerId:l,ks:u}}=e,c=window.KalturaPlayer;var m=document.getElementById(a);if(!m||!c||c.getPlayer&&c.getPlayer(a))return;let s=1920,b=1080;m.clientWidth&&m.clientHeight&&(s=m.clientWidth,b=m.clientHeight);const p=`${d.endsWith("/")?d:d+"/"}p/${l}/sp/${l}00/thumbnail/entry_id/${t.entryId}/version/${o}/width/${s}/height/${b}`+(u?`/ks/${u}`:""),{h:h,render:y}=c.ui.preact;y(h(i.ThumbnailEmbedComponent,{src:p,bgColor:r,onClick:()=>{try{const i=c.setup(e);i.loadMedia(t,n),i.play()}catch(e){}}}),m)}}},t={};function n(i){var o=t[i];if(void 0!==o)return o.exports;var r=t[i]={exports:{}};return e[i](r,r.exports,n),r.exports}!function(){const e=n(453);window.kWidget={embed:e.embed,thumbEmbed:e.thumbnailEmbedV2}}()}();//# sourceMappingURL=kWidget-embed.js.map";' . PHP_EOL ;
+            $bundleContent = $bundleContent.$v2ToV7Code;
+        }
+
+
 
 		$lastModified = $this->getLastModified($bundleContent);
 
@@ -484,9 +495,11 @@ class embedPlaykitJsAction extends sfAction
 		}
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
+        KalturaLog::log("Autoembed:" .$config);
 		foreach ($config as $key=>$val)
 		{
 			$config[$key] = json_decode($val);
+            KalturaLog::log("Key:" .$key ." value:" . $val);
 		}
 
 		if (!isset($config["provider"]))
@@ -543,8 +556,8 @@ class embedPlaykitJsAction extends sfAction
                         </head >
                         <body >
                         	<div id="player_container"></div>
-			 	<script type = "text/javascript" > window.originalRequestReferrer = "' . $_SERVER['HTTP_REFERER'] . '"</script >
                             	<script type = "text/javascript" > ' . $bundleContent . '</script >
+				<script type = "text/javascript" > window.originalRequestReferrer = "' . $_SERVER['HTTP_REFERER'] . '"</script >
 			</body >
                     </html >';
 		return $htmlDoc;
