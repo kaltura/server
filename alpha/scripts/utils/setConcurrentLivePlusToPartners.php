@@ -47,10 +47,7 @@ while (count($partners))
 		{
 			$partner->setMaxLiveStreamOutputs(DEFAULT_MAX_OUTPUT_STREAMS);
 			print("Existing Event Platform permission on partner: [" . $partner->getId(). "] with status [" . $eventPlatformPermission->getStatus(). "] max output streams set to ". DEFAULT_MAX_OUTPUT_STREAMS . "\n");
-//			if (!$dryRun)
-//			{
-				$partner->save();
-//			}
+			$partner->save();
 		}
 	}
 
