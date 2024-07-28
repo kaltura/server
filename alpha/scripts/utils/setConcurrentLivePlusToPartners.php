@@ -45,9 +45,9 @@ while (count($partners))
 		$eventPlatformPermission = PermissionPeer::getByNameAndPartner(FEATURE_EVENT_PLATFORM_PERMISSION, $partner->getId());
 		if ($eventPlatformPermission && $eventPlatformPermission->getStatus() == PermissionStatus::ACTIVE)
 		{
-			$partner->setMaxLiveStreamOutputs(DEFAULT_MAX_OUTPUT_STREAMS);
-			print("Existing Event Platform permission on partner: [" . $partner->getId(). "] with status [" . $eventPlatformPermission->getStatus(). "] max output streams set to ". DEFAULT_MAX_OUTPUT_STREAMS . "\n");
-			$partner->save();
+			updateMaxLiveStreamOutputs($partner, $eventPlatformPermission->getStatus());
+
+			addLiveFlavorsToLiveTranscodingProfile($partner->getId(), $con);
 		}
 	}
 
@@ -61,6 +61,56 @@ while (count($partners))
 
 	$partners = PartnerPeer::doSelect($c, $con);
 	$offset +=  $countLimitEachLoop;
+}
+
+function updateMaxLiveStreamOutputs($partner, $eventPlatformPermissionStatus): void
+{
+	$partner->setMaxLiveStreamOutputs(DEFAULT_MAX_OUTPUT_STREAMS);
+	print("Existing Event Platform permission on partner: [" . $partner->getId(). "] with status [" . $eventPlatformPermissionStatus. "] max output streams set to ". DEFAULT_MAX_OUTPUT_STREAMS . "\n");
+	$partner->save();
+}
+
+function addLiveFlavorsToLiveTranscodingProfile($partnerId, $con)
+{
+		$conversionProfileCriteria = new Criteria();
+		$conversionProfileCriteria->add(conversionProfile2Peer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+		$conversionProfileCriteria->add(conversionProfile2Peer::SYSTEM_NAME, 'Default_Live', Criteria::EQUAL);
+		$conversionProfile = conversionProfile2Peer::doSelectOne($conversionProfileCriteria, $con);
+
+		if ($conversionProfile)
+		{
+			$flavorParamsConversionProfileCriteria = new Criteria();
+			$flavorParamsConversionProfileCriteria->add(flavorParamsConversionProfilePeer::CONVERSION_PROFILE_ID, $conversionProfile->getId(), Criteria::EQUAL);
+			$flavorParamsConversionProfileCriteria->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, 42, Criteria::EQUAL);
+			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::doSelectOne($flavorParamsConversionProfileCriteria, $con);
+
+			if(!$flavorParamsConversionProfile)
+			{
+				$flavorParamsConversionProfile42 = new flavorParamsConversionProfile;
+				/** @var $flavorParamsConversionProfile $flavorParamsConversionProfile42 */
+				$flavorParamsConversionProfile42->setConversionProfileId($conversionProfile->getId());
+				$flavorParamsConversionProfile42->setFlavorParamsId(42);
+				$flavorParamsConversionProfile42->setSystemName('HD/720 - WEB/MBL (H264/1700)');
+				$flavorParamsConversionProfile42->save();
+				print("flavor 42 added to Conversion Profile 'Cloud transcode' for partner [" . $partnerId . "]\n");
+			}
+
+			$flavorParamsConversionProfileCriteria->add(flavorParamsConversionProfilePeer::FLAVOR_PARAMS_ID, 43, Criteria::EQUAL);
+			$flavorParamsConversionProfile = flavorParamsConversionProfilePeer::doSelectOne($flavorParamsConversionProfileCriteria, $con);
+			if(!$flavorParamsConversionProfile)
+			{
+				$flavorParamsConversionProfile43 = new flavorParamsConversionProfile;
+				/** @var $flavorParamsConversionProfile $flavorParamsConversionProfile43 */
+				$flavorParamsConversionProfile43->setConversionProfileId($conversionProfile->getId());
+				$flavorParamsConversionProfile43->setFlavorParamsId(43);
+				$flavorParamsConversionProfile43->setSystemName('HD/720 - WEB/MBL (H264/2600)');
+				$flavorParamsConversionProfile43->save();
+			}
+		}
+		else
+		{
+			print("Conversion Profile 'Cloud transcode' for partner [" . $partnerId . "] was not found\n");
+		}
 }
 
 print("Done\n");
