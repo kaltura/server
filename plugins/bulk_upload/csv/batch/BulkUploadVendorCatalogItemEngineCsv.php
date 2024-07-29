@@ -18,7 +18,18 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	const PRICING_FUNCTION = 'pricing:priceFunction';
 	const UTF = 'UTF-8';
 
+	private $columnToEnum = array(
+		'serviceFeature' => 'KalturaVendorServiceFeature',
+		'serviceType' => 'KalturaVendorServiceType',
+		'turnAroundTime' => 'KalturaVendorServiceTurnAroundTime',
+		'outputFormat' => 'KalturaVendorCatalogItemOutputFormat',
+		'stage' => 'KalturaVendorCatalogItemStage',
+	);
 
+	private $bulkUploadResultParams = array(
+		'vendorPartnerId', 'name', 'systemName', 'serviceType', 'turnAroundTime',
+		'sourceLanguage', 'targetLanguage', 'outputFormat', 'enableSpeakerId', 'fixedPriceAddons',
+		'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission', 'stage', 'contract', 'notes', 'createdBy');
 
 	/**
 	 * (non-PHPdoc)
@@ -58,7 +69,6 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 	protected function setResultValues($columns, $values, &$bulkUploadResult)
 	{
-		$shouldConvertValueToEnum = array('serviceFeature', 'serviceType', 'turnAroundTime', 'outputFormat');
 		$pricing = null;
 
 		foreach($columns as $index => $column)
@@ -67,7 +77,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			{
 				continue;
 			}
-			if (in_array($column, $shouldConvertValueToEnum) && isset($values[$index]))
+			if (in_array($column, array_keys($this->columnToEnum)) && isset($values[$index]))
 			{
 				$this->handleEnumColumns($values[$index], $column, $bulkUploadResult);
 			}
@@ -108,27 +118,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 	protected function handleEnumColumns($value, $column, $bulkUploadResult)
 	{
-		switch($column)
-		{
-			case 'serviceFeature':
-				$enumValue = self::getEnumValue('KalturaVendorServiceFeature', $value);
-				break;
-
-			case 'serviceType':
-				$enumValue = self::getEnumValue('KalturaVendorServiceType', $value);
-				break;
-
-			case 'turnAroundTime':
-				$enumValue = self::getEnumValue('KalturaVendorServiceTurnAroundTime', $value);
-				break;
-
-			case 'outputFormat':
-				$enumValue = self::getEnumValue('KalturaVendorCatalogItemOutputFormat', $value);
-				break;
-
-			default:
-				$enumValue = null;
-		}
+		$enumValue = self::getEnumValue($this->columnToEnum[$column] ,$value);
 		if ($enumValue === null || $enumValue === '')
 		{
 			$this->handleResultError($bulkUploadResult, KalturaBatchJobErrorTypes::APP, self::ENUM_VALUE_NOT_FOUND . $column . ':' . $value);
@@ -257,6 +247,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 				case KalturaBulkUploadAction::UPDATE:
 					$bulkUploadResultChunk[] = $bulkUploadResult;
 					$vendorCatalogItem = $this->createVendorCatalogItemFromResult($bulkUploadResult);
+					$vendorCatalogItem->bulkUpdateId = $this->job->id;
 					KBatchBase::$kClient->vendorCatalogItem->update($bulkUploadResult->vendorCatalogItemId, $vendorCatalogItem);
 					break;
 
@@ -345,13 +336,9 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	 */
 	protected function createVendorCatalogItemFromResult (KalturaBulkUploadResultVendorCatalogItem $bulkUploadResult)
 	{
-		$bulkUploadResultParams = array('vendorPartnerId', 'name', 'systemName', 'serviceType', 'turnAroundTime',
-			'sourceLanguage', 'targetLanguage', 'outputFormat', 'enableSpeakerId', 'fixedPriceAddons',
-			'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission');
-
 		$kalturaVendorCatalogItem = self::getObjectByServiceFeature($bulkUploadResult->serviceFeature);
 
-		foreach ($bulkUploadResultParams as $param)
+		foreach ($this->bulkUploadResultParams as $param)
 		{
 			if (isset($bulkUploadResult->$param))
 			{
@@ -401,10 +388,6 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 		return $object;
 	}
 
-	/**
-	 *
-	 * Gets the columns for V1 csv file
-	 */
 	protected function getColumns()
 	{
 		return array(
@@ -426,6 +409,11 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			'flavorParamsId',
 			'clearAudioFlavorParamsId',
 			'allowResubmission',
+			'requireSource',
+			'stage',
+			'contract',
+			'notes',
+			'createdBy',
 		);
 	}
 
