@@ -62,7 +62,12 @@ class kSiteCondition extends kMatchCondition
 	 */
 	protected function matches($field, $value)
 	{
-		$oldMatch = ($field === $value) || (strpos($field, ".".$value) !== false);
+		$oldMatch = ($field === $value);
+		if($value != '')
+		{
+			$oldMatch = $oldMatch || (strpos($field, ".".$value) !== false);
+		}
+		
 		$newMatch = ($field === $value) || (kString::endsWith($field, ".".$value) !== false);
 		KalturaLog::debug("kSiteCondition check match condition [$field] [$oldMatch] [$newMatch]");
 		Return $oldMatch;

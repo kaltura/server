@@ -1565,6 +1565,7 @@ class reportsInputFilter
 	public $context_ids;
 	public $roles;
 	public $industries;
+	public $playback_modes;
 
 	public function getFilterBy() {
 		return "";

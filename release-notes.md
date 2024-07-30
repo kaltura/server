@@ -1,4 +1,56 @@
+# Tucana-20.16.0
+# Add permissions for session get ##
+- Issue Type: Task
+- Issue ID: PLAT-24908
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permission.php
+
+## Add KMC Headers
+* Issue Type: Task
+* Issue ID: PLAT-24859
+### Deployment ###
+Add the following to local.ini:
+```
+[kmcng_permissions_policy_directives]
+ambient-light-sensor = "()"
+display-capture = "()"
+battery = "()"
+bluetooth = "()"
+camera = "()"
+compute-pressure = "()"
+browsing-topics = "()"
+document-domain = "()"
+identity-credentials-get = "()"
+gamepad = "()"
+geolocation = "()"
+hid = "()"
+local-fonts = "()"
+magnetometer = "()"
+microphone = "()"
+midi = "()"
+otp-credentials = "()"
+payment = "()"
+publickey-credentials-create = "()"
+publickey-credentials-get = "()"
+serial = "()"
+speaker-selection = "()"
+storage-access = "()"
+usb = "()"
+window-management = "()"
+xr-spatial-tracking = "()"
+```
 # Tucana-20.15.0
+## Add 'broadcast entry id' to ESearch for entry ##
+- Issue Type: Task
+- Issue ID: PLAT-24812
+
+### Deployment Scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"broadcast_entry_id": {"type": "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
+
 ## Add CnC Permissions
 * Issue Type: Task
 * Issue ID: PLAT-24891

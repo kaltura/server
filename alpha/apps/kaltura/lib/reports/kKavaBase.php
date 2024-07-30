@@ -87,6 +87,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CUE_POINT_ID = 'cuePointId';
 	const DIMENSION_CONTEXT_ID = 'contextId';
 	const DIMENSION_EVENT_SESSION_CONTEXT_ID = 'eventSessionContextId';
+	const DIMENSION_PLAYBACK_MODE = 'playbackMode';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -549,6 +550,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 			self::DIMENSION_UI_CONF_ID => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_PLAYBACK_MODE => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -671,6 +673,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_PLAYBACK_MODE => 1,
 		),
 		self::DATASOURCE_VE_REGISTRATION => array(
 			self::DIMENSION_EVENT_TYPE => 1,
