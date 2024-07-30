@@ -3,7 +3,7 @@
 - Issue Type: Task
 - Issue ID: PLAT-24908
 ### Deployment Scripts ###
-	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permission.php
+	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permissions.php
 
 ## Add KMC Headers
 * Issue Type: Task
