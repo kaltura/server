@@ -217,11 +217,40 @@ class kKavaWebcastReports extends kKavaReportsMgr
 		ReportType::ENGAGEMENT_TOOLS_WEBCAST => array(
 			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
+				self::EVENT_TYPE_REACTION_CLICKED
+			)
+		),
+
+		ReportType::CNC_ENGAGEMENT_TOOLS_WEBCAST => array(
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_METRICS => array(self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED),
+				),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
+					self::REPORT_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED),
+				),
+			)
+		),
+
+		ReportType::REACTIONS_BREAKDOWN_WEBCAST => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'reaction' => self::DIMENSION_EVENT_VAR1,
+			),
+			self::REPORT_FILTER => array(
+				array(
+					self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+					self::DRUID_VALUES => array(self::EVENT_TYPE_REACTION_CLICKED)
+				)
+			),
+			self::REPORT_METRICS => array(
 				self::EVENT_TYPE_REACTION_CLICKED,
 			),
 		),
 
-		ReportType::REACTIONS_BREAKDOWN_WEBCAST => array(
+		ReportType::CNC_REACTIONS_BREAKDOWN_WEBCAST => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
 			self::REPORT_DIMENSION_MAP => array(
 				'reaction' => self::DIMENSION_EVENT_VAR1,
 			),
@@ -246,7 +275,11 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			return null;
 		}
 
-		$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_HISTORICAL;
+		if (!isset($report_def[self::REPORT_DATA_SOURCE] ))
+		{
+			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_HISTORICAL;
+		}
+
 		if (!isset($report_def[self::REPORT_PLAYBACK_TYPES]))
 		{
 			$report_def[self::REPORT_PLAYBACK_TYPES] = array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR);

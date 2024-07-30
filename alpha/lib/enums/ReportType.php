@@ -185,7 +185,7 @@ interface ReportType extends BaseEnum
    const QOE_STREAM_QUALITY_APPLICATION_VERSION = 30063;
    const QOE_ERROR_TRACKING_APPLICATION_VERSION = 30064;
 
-	//webcast
+   //webcast
    const HIGHLIGHTS_WEBCAST = 40001;
    const ENGAGEMENT_WEBCAST = 40002;
    const QUALITY_WEBCAST = 40003;
@@ -199,6 +199,8 @@ interface ReportType extends BaseEnum
    const ENGAGMENT_TIMELINE_WEBCAST = 40011;
    const ENGAGEMENT_TOOLS_WEBCAST = 40012;
    const REACTIONS_BREAKDOWN_WEBCAST = 40013;
+   const CNC_REACTIONS_BREAKDOWN_WEBCAST = 40014;
+   const CNC_ENGAGEMENT_TOOLS_WEBCAST = 40015;
 
    // virtual event registration
    const VE_HIGHLIGHTS = 50000;
@@ -228,6 +230,9 @@ interface ReportType extends BaseEnum
    const EP_VIEWTIME = 60015;
    const EP_TOP_MOMENTS = 60016;
    const EP_TOP_SESSIONS = 60017;
+   const EP_WEBCAST_CNC_ENGAGEMENT_TIMELINE = 60018;
+   const EP_WEBCAST_CNC_VOD_LIVE_USERS_ENGAGEMENT = 60019;
+   const EP_WEBCAST_CNC_ENGAGEMENT = 60020;
 
    const CNC_PARTICIPATION = 70001;
 }
