@@ -88,6 +88,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CONTEXT_ID = 'contextId';
 	const DIMENSION_EVENT_SESSION_CONTEXT_ID = 'eventSessionContextId';
 	const DIMENSION_PLAYBACK_MODE = 'playbackMode';
+	const DIMENSION_COMPANY = 'company';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -690,6 +691,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_ORIGIN => 1,
 			self::DIMENSION_ROLE => 1,
 			self::DIMENSION_INDUSTRY => 1,
+			self::DIMENSION_COMPANY => 1,
 		),
 		self::DATASOURCE_MEETING_HISTORICAL => array(
 			self::DIMENSION_EVENT_TYPE => 1,

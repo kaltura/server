@@ -1566,6 +1566,8 @@ class reportsInputFilter
 	public $roles;
 	public $industries;
 	public $playback_modes;
+	public $companies;
+
 
 	public function getFilterBy() {
 		return "";
