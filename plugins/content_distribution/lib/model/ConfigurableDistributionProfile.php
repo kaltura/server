@@ -581,7 +581,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	}
 	
 	/**
-	 * @return the $extendedFeatures
+	 * @return array $extendedFeatures
 	 */
 	public function getExtendedFeatures() {
 		return $this->getFromCustomData('extended_features', null, array());
