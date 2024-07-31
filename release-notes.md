@@ -1,3 +1,12 @@
+# Tucana-20.17.0
+## New KME user reset password link  ##
+- Issue Type: Bug
+- Issue ID: NR2-8250
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links' (with the service url of the required KME environment):
+kme_nr = @KME_NR_SERVICE_URL@/u/#/forgotPassword/
+
 # Tucana-20.16.0
 # Add permissions for session get ##
 - Issue Type: Task
