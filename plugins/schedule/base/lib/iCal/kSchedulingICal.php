@@ -3,7 +3,6 @@
 class kSchedulingICal
 {
 	const TIME_FORMAT = 'Ymd\THis\Z';
-        const TIME_FORMAT_NO_TIME_ZONE = 'Ymd\THis';
 	const TIME_PARSE = '%Y%m%dT%H%i%sZ';
 	const TIME_PARSE_NO_TIME_ZONE = '%Y%m%dT%H%i%s';
 
@@ -57,21 +56,11 @@ class kSchedulingICal
 		return $component;
 	}
 
-	public static function formatDate($time, $timeZoneId = null)
+	public static function formatDate($time)
 	{
 		$original = date_default_timezone_get();
-		
-		if ($timeZoneId)
-		{
-		    date_default_timezone_set($timeZoneId);
-		    $date = date(kSchedulingICal::TIME_FORMAT_NO_TIME_ZONE, $time);
-		}
-		else
-		{
-		    date_default_timezone_set('UTC');
-		    $date = date(kSchedulingICal::TIME_FORMAT, $time);
-		}
-		
+        date_default_timezone_set('UTC');
+        $date = date(kSchedulingICal::TIME_FORMAT, $time);
 		date_default_timezone_set($original);
 		return $date;
 	}
