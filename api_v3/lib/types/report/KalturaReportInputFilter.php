@@ -317,6 +317,12 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $playbackModeIn;
 
+	/**
+	 * filter by company
+	 * @var string
+	 */
+	public $companyIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -364,7 +370,8 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'contextIdIn' => 'context_ids',
 		'roleIn' => 'roles',
 		'industryIn' => 'industries',
-		'playbackModeIn' => 'playback_modes'
+		'playbackModeIn' => 'playback_modes',
+		'companyIn' => 'companies'
 	);
 
 	protected function getMapBetweenObjects()
