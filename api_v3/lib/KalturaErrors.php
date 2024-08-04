@@ -52,7 +52,7 @@ class KalturaErrors extends APIErrors
 	// PARAM_NAME - parameter name
 	const MISSING_MANDATORY_PARAMETER = "MISSING_MANDATORY_PARAMETER;PARAM_NAME;Missing parameter \"@PARAM_NAME@\"";
 	const INVALID_PARAMETER_VALUE = "INVALID_PARAMETER_VALUE;PARAM_NAME;invalid value for parameter \"@PARAM_NAME@\"";
-	const PARAMETER_OUT_OF_RANGE = "PARAMETER_OUT_OF_RANGE;PARAM_NAME,MIN,MAX;Parameter \"@PARAM_NAME@\" if out of range (@MIN@ - @MAX@)";
+	const PARAMETER_VALUE_OUT_OF_RANGE = "PARAMETER_VALUE_OUT_OF_RANGE;PARAM_NAME,MIN,MAX;Parameter \"@PARAM_NAME@\" value is out of range (@MIN@ - @MAX@)";
 
 	// INVALID_OBJ_TYPE - invalid object type
 	const INVALID_OBJECT_TYPE = "INVALID_OBJECT_TYPE;INVALID_OBJ_TYPE;Invalid object type \"@INVALID_OBJ_TYPE@\"";

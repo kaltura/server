@@ -68,7 +68,7 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 		$cropAlignment = $this->cropAlignment;
 		if ($cropAlignment && ($cropAlignment > $maxCropAlignment || $cropAlignment < $minCropAlignment))
 		{
-			throw new KalturaAPIException(KalturaErrors::PARAMETER_OUT_OF_RANGE, 'cropAlignment', $minCropAlignment, $maxCropAlignment);
+			throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, 'cropAlignment', $minCropAlignment, $maxCropAlignment);
 		}
 
 		$captionsOptions = $this->captionsOptions;
