@@ -2130,10 +2130,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			if (!$kuser)
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 
-            	if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserEdit($kuser->getId()))
-            	{
-                	throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
-            	}
+		if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserEdit($kuser->getId()))
+		{
+				throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
+		}
 
 			$entitledUserPuserEdit[$kuser->getId()] = $kuser->getPuserId();
 		}
@@ -2189,10 +2189,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			if (!$kuser)
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 
-            	if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserView($kuser->getId()))
-            	{
-                	throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
-            	}
+		if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserView($kuser->getId()))
+		{
+				throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
+		}
 			
 			$entitledUserPuserView[$kuser->getId()] = $kuser->getPuserId();
 		}
@@ -2274,10 +2274,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			if (!$kuser)
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 
-            	if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserPublish($kuser->getId()))
-            	{
-                	throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
-            	}
+		if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserPublish($kuser->getId()))
+		{
+				throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
+		}
 			
 			$entitledUserPuserPublish[$kuser->getId()] = $kuser->getPuserId();
 		}
