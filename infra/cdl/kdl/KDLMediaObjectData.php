@@ -213,8 +213,8 @@
 									 *  3: force 16/9 for everything that is not 16:9
 									 *  4: force '-aspect' option
 									 *  5: force perciese source AR
-									 *  6: force perciese source AR
 									 *  7: cropping
+	 								 *  8: inverted cropping
 									 */
 		public $_forceMult16 = 1;
 		public $_cbr=0;		// Constant bit rate, when set - -b 50M -minrate 50M -maxrate 50M -bt 5M -bufsize 10M 
