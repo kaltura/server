@@ -32,7 +32,7 @@ class KalturaMultiClipConcatJobData extends KalturaJobData
 	public $chapterNamePolicy;
 
 	/**
-	 * @var KalturaClipAspectRatio
+	 * @var KalturaCropAspectRatio
 	 */
 	public $aspectRatio;
 

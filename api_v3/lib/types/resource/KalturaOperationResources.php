@@ -16,15 +16,15 @@ class KalturaOperationResources extends KalturaContentResource
 	public $chapterNamePolicy;
 
 	/**
-	 * @var KalturaClipAspectRatio
+	 * @var KalturaCropAspectRatio
 	 */
-	public $aspectRatio;
+	public $cropAspectRatio;
 
 	private static $map_between_objects = array
 	(
 		'resources',
 		'chapterNamePolicy',
-		'aspectRatio'
+		'cropAspectRatio'
 	);
 
 	/* (non-PHPdoc)
@@ -67,9 +67,8 @@ class KalturaOperationResources extends KalturaContentResource
 			throw new KalturaAPIException(KalturaErrors::RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT, $maxResourcesCount);
 		}
 
-		// TODO validate aspect ratio alignment
-
-		$overallDuration = 0 ;
+		$this->validateCropAspectRatio();
+		$overallDuration = 0;
 		foreach ($this->resources as $resource)
 		{
 			if(!($resource instanceof KalturaOperationResource))
@@ -95,6 +94,22 @@ class KalturaOperationResources extends KalturaContentResource
 		if ($overallDuration / 1000 > $maxDurationSeconds)
 		{
 			throw new KalturaAPIException(KalturaErrors::CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION, $maxDurationSeconds);
+		}
+	}
+
+	protected function validateCropAspectRatio()
+	{
+		$cropAspectRatio = $this->cropAspectRatio;
+		if($cropAspectRatio)
+		{
+			if(!$cropAspectRatio->aspectRatio)
+			{
+				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "aspectRatio");
+			}
+			if($cropAspectRatio->aspectRatio <= 0)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_VALUE, "aspectRatio");
+			}
 		}
 	}
 
