@@ -61,6 +61,13 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'readonly' => $this->disableAttributes,
 		));
 
+		$this->addElement('text', 'createdBy', array(
+			'label' => 'Created By:',
+			'required' => true,
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+		));
+
 		$catalogItemForView = new Kaltura_Form_Element_EnumSelect('serviceFeature', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceFeature'));
 		$catalogItemForView->setLabel('Service Feature:');
 		if ($this->catalogItemType)
@@ -82,8 +89,10 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$serviceTypeForView->setValue($this->catalogItemServiceType);
 		else
 			$serviceTypeForView->setValue(Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN);
-
 		$this->addElement($serviceTypeForView);
+
+		$stage = new Kaltura_Form_Element_EnumSelect('stage', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemStage', 'label' => 'Stage:'));
+		$this->addElement($stage);
 
 		$turnAroundTimeForView = new Kaltura_Form_Element_EnumSelect('turnAroundTime', array('enum' => 'Kaltura_Client_Reach_Enum_VendorServiceTurnAroundTime'));
 		$turnAroundTimeForView->setLabel('Turn Around Time:');
@@ -170,6 +179,20 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$allowResubmission->setRequired(true);
 		$allowResubmission->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
 		$this->addElement($allowResubmission);
+
+		$this->addElement('text', 'contract', array(
+			'label' => 'Contract:',
+			'required' => true,
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+		));
+
+		$this->addElement('text', 'notes', array(
+			'label' => 'Notes:',
+			'required' => true,
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+		));
 
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION)
 		{

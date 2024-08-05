@@ -97,6 +97,31 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $vendorData;
 
+	/**
+	 * @var KalturaVendorCatalogItemStage
+	 */
+	public $stage;
+
+	/**
+	 * @var int
+	 */
+	public $lastBulkUpdateId;
+
+	/**
+	 * @var string
+	 */
+	public $contract;
+
+	/**
+	 * @var string
+	 */
+	public $createdBy;
+
+	/**
+	 * @var string
+	 */
+	public $notes;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -114,6 +139,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'allowResubmission',
 		'sourceLanguage',
 		'vendorData',
+		'stage',
+		'lastBulkUpdateId',
+		'contract',
+		'createdBy',
+		'notes',
 	);
 
 	abstract protected function getServiceFeature();
@@ -220,23 +250,23 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			case VendorServiceFeature::TRANSLATION:
 				$object = new KalturaVendorTranslationCatalogItem();
 				break;
-				
+
 			case VendorServiceFeature::ALIGNMENT:
 				$object = new KalturaVendorAlignmentCatalogItem();
 				break;
-			
+
 			case VendorServiceFeature::AUDIO_DESCRIPTION:
 				$object = new KalturaVendorAudioDescriptionCatalogItem();
 				break;
-			
+
 			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
 				$object = new KalturaVendorExtendedAudioDescriptionCatalogItem();
 				break;
-			
+
 			case VendorServiceFeature::CHAPTERING:
 				$object = new KalturaVendorChapteringCatalogItem();
 				break;
-			
+
 			case VendorServiceFeature::DUBBING:
 				$object = new KalturaVendorDubbingCatalogItem();
 				break;

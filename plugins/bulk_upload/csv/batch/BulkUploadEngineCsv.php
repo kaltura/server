@@ -80,7 +80,6 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
                 $values = fgetcsv($fileHandle);
                 continue;
             }
-
 			// use version 3 (dynamic columns cassiopeia) identified by * in first char
 			if(substr(trim($values[0]), 0, 1) == '*') // is a remark
 			{
@@ -233,8 +232,12 @@ abstract class BulkUploadEngineCsv extends KBulkUploadEngine
 	{
 		
 	}
-	
-	abstract protected function getColumns ();
+
+	/**
+	 *
+	 * Gets the columns for V3 csv file
+	 */
+	abstract protected function getColumns();
 
 	
 	/**
