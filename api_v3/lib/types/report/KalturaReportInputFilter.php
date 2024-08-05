@@ -323,6 +323,12 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $companyIn;
 
+	/**
+	 * filter by event session context id
+	 * @var string
+	 */
+	public $eventSessionContextIdIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -371,7 +377,8 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'roleIn' => 'roles',
 		'industryIn' => 'industries',
 		'playbackModeIn' => 'playback_modes',
-		'companyIn' => 'companies'
+		'companyIn' => 'companies',
+		'eventSessionContextIdIn' => 'event_session_context_ids'
 	);
 
 	protected function getMapBetweenObjects()
