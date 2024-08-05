@@ -82,7 +82,7 @@ class Partner extends BasePartner
 
 	const PARTNER_MAX_LIVE_STREAM_INPUTS_DEFAULT = 10;
 
-	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 10;
+	const PARTNER_MAX_LIVE_STREAM_OUTPUTS_DEFAULT = 15;
 
 	const CUSTOMER_DATA_RTC_ENV = 'rtc_env_name';
 
