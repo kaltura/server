@@ -105,7 +105,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	/**
 	 * @var int
 	 */
-	public $bulkUpdateId;
+	public $lastBulkUpdateId;
 
 	/**
 	 * @var string
@@ -140,7 +140,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'sourceLanguage',
 		'vendorData',
 		'stage',
-		'bulkUpdateId',
+		'lastBulkUpdateId',
 		'contract',
 		'createdBy',
 		'notes',

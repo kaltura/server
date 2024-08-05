@@ -247,7 +247,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 				case KalturaBulkUploadAction::UPDATE:
 					$bulkUploadResultChunk[] = $bulkUploadResult;
 					$vendorCatalogItem = $this->createVendorCatalogItemFromResult($bulkUploadResult);
-					$vendorCatalogItem->bulkUpdateId = $this->job->id;
+					$vendorCatalogItem->lastBulkUpdateId = $this->job->id;
 					KBatchBase::$kClient->vendorCatalogItem->update($bulkUploadResult->vendorCatalogItemId, $vendorCatalogItem);
 					break;
 

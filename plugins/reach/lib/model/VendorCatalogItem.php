@@ -39,7 +39,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	
 	const CUSTOM_DATA_PRICING = 'pricing';
 	const CUSTOM_DATA_BULK_UPLOAD_ID = 'bulkUploadId';
-	const CUSTOM_DATA_BULK_UPDATE_ID = 'bulkUpdateId';
+	const CUSTOM_DATA_LAST_BULK_UPDATE_ID = 'lastBulkUpdateId';
 	const CUSTOM_DATA_ENGINE_TYPE = 'engineType';
 	const CUSTOM_DATA_ALLOW_RESUBMISSION = 'allowResubmission';
 	const CUSTOM_DATA_VENDOR_DATA = 'vendorData';
@@ -89,14 +89,14 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return $this->getFromCustomData(self::CUSTOM_DATA_BULK_UPLOAD_ID);
 	}
 
-	public function setBulkUpdateId($v)
+	public function setLastBulkUpdateId($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_BULK_UPDATE_ID ,$v);
+		$this->putInCustomData(self::CUSTOM_DATA_LAST_BULK_UPDATE_ID ,$v);
 	}
 
-	public function getBulkUpdateId()
+	public function getLastBulkUpdateId()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_BULK_UPDATE_ID);
+		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_BULK_UPDATE_ID);
 	}
 
 	public function setEngineType($engineType)
@@ -261,7 +261,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 	public function getContract()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_CONTRACT, null, VendorCatalogItemStage::PRODUCTION);
+		return $this->getFromCustomData(self::CUSTOM_DATA_CONTRACT);
 	}
 
 	public function setCreatedBy($v)
@@ -271,7 +271,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 	public function getCreatedBy()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_CREATED_BY, null, VendorCatalogItemStage::PRODUCTION);
+		return $this->getFromCustomData(self::CUSTOM_DATA_CREATED_BY);
 	}
 
 	public function setNotes($v)
@@ -281,6 +281,6 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 	public function getNotes()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_NOTES, null, VendorCatalogItemStage::PRODUCTION);
+		return $this->getFromCustomData(self::CUSTOM_DATA_NOTES);
 	}
 } // VendorCatalogItem
