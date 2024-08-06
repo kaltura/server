@@ -1614,7 +1614,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
 		$conversionExtraParams = $originalConversionEnginesExtraParams ? explode('|', $originalConversionEnginesExtraParams) : null;
-		// do not apply effects if: 1.image to video conversion, 2.resizing (already using filter complex), 3. cropping
 		$allowEffects = $this->allowEffectsOnConvert($conversionData, $singleAttributeIndex);
 		$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParams, $isAudio, $extraParams, $allowEffects);
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
@@ -1931,6 +1930,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function allowEffectsOnConvert($conversionData, $singleAttributeIndex)
 	{
+		// do not apply effects if already using filter complex
 		if(!$conversionData)
 		{
 			return true;
