@@ -3,14 +3,16 @@
  * @package api
  * @subpackage objects
  */
-class KalturaOperationAttributesArray extends KalturaTypedArray
+class KalturaCaptionAttributesArray extends KalturaTypedArray
 {
 	public static function fromDbArray(array $arr = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$newArr = new KalturaOperationAttributesArray();
+		$newArr = new KalturaCaptionAttributesArray();
 		if(is_null($arr))
+		{
 			return $newArr;
-			
+		}
+
 		foreach($arr as $obj)
 		{
 			$class = $obj->getApiType();
@@ -18,12 +20,12 @@ class KalturaOperationAttributesArray extends KalturaTypedArray
 			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
-		
+
 		return $newArr;
 	}
-	
+
 	public function __construct()
 	{
-		parent::__construct("KalturaOperationAttributes");	
+		parent::__construct("KalturaCaptionAttributes");
 	}
 }

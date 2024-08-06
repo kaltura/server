@@ -32,6 +32,11 @@ class KalturaMultiClipConcatJobData extends KalturaJobData
 	public $chapterNamePolicy;
 
 	/**
+	 * @var KalturaCropAspectRatio
+	 */
+	public $aspectRatio;
+
+	/**
 	 * @var KalturaOperationResourceArray
 	 */
 	public $operationResources;
@@ -44,7 +49,8 @@ class KalturaMultiClipConcatJobData extends KalturaJobData
 		'partnerId',
 		'priority',
 		'operationResources',
-		'chapterNamePolicy'
+		'chapterNamePolicy',
+		'aspectRatio'
 	);
 
 	/* (non-PHPdoc)

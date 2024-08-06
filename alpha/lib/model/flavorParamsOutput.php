@@ -81,6 +81,9 @@ class flavorParamsOutput extends assetParamsOutput
 	public function setSubtitlesData($v){ $this->putInCustomData('SubtitlesData', $v);}
 	public function getSubtitlesData(){return $this->getFromCustomData('SubtitlesData', null, null);}
 
+	public function setCropData($v){ $this->putInCustomData('CropData', $v);}
+	public function getCropData(){return $this->getFromCustomData('CropData', null, null);}
+
 	public function setContentAwareness($v){ $this->putInCustomData('ContentAwareness', $v);}
 	public function getContentAwareness(){return $this->getFromCustomData('ContentAwareness', null, null);}
 

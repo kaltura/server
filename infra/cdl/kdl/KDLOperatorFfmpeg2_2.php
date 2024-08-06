@@ -41,7 +41,7 @@ class KDLOperatorFfmpeg2_2 extends KDLOperatorFfmpeg2_1_3 {
 				}
 			}
 				// 9:16 to 16:9
-			if($vid->_arProcessingMode==6){
+			if($vid->_arProcessingMode==6 || $vid->_arProcessingMode==8){
 				$cmdValsArr = explode(' ', $cmdStr);
 				if(($key=array_search('-s', $cmdValsArr))!==false) {
 					$dims = explode('x', $cmdValsArr[$key+1]);

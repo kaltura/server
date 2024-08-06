@@ -125,7 +125,7 @@ class MediaService extends KalturaEntryService
 			    $this->handleErrorDuringSetResource($entryId, $e);
 		    }
 		    $this->validateContent($dbEntry);
-		       $resource->entryHandled($dbEntry);
+			$resource->entryHandled($dbEntry);
 	    }
 	    return $this->getEntry($entryId);
     }

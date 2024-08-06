@@ -1868,7 +1868,7 @@ class KalturaEntryService extends KalturaBaseService
 		return $response;
 	}
 	
-	protected function anonymousRankEntry($entryId, $entryType = null, $rank)
+	protected function anonymousRankEntry($entryId, $entryType, $rank)
 	{
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry || ($entryType !== null && $dbEntry->getType() != $entryType))
@@ -1918,7 +1918,7 @@ class KalturaEntryService extends KalturaBaseService
 
 
 	/**
-	 * @param $resources
+	 * @param kOperationResources $resources
 	 * @param entry $destEntry
 	 * @param kClipManager $clipManager
 	 * @throws KalturaAPIException
@@ -1930,7 +1930,7 @@ class KalturaEntryService extends KalturaBaseService
 
 		$sourceEntryIds = array();
 		$tempEntryIds = array();
-		$resourcesData = array();
+		$entryResourcesData = array();
 
 		// for each resource: 1.set sourceEntryId on resource 2.create temp entry for clip 3. retrieve media info object
 		foreach ($resources->getResources() as $ind => $resource)
@@ -1945,10 +1945,13 @@ class KalturaEntryService extends KalturaBaseService
 			$tempEntryIds[] = $tempEntry->getId();
 
 			$duration = 0;
+			$operationAttributesArray = array();
 			foreach ($resource->getOperationAttributes() as $operationAttribute)
 			{
 				/* @var $operationAttribute kClipAttributes **/
 				$duration += $operationAttribute->getDuration();
+				$this->setCaptionAssetsUrls($operationAttribute);
+				$operationAttributesArray[] = $operationAttribute;
 			}
 
 			if($sourceEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -1981,29 +1984,57 @@ class KalturaEntryService extends KalturaBaseService
 				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
 			}
 
-			$resourcesData[] = array(
+			$entryResourcesData[] = array(
+				kClipManager::OPERATION_ATTRIBUTES_ARRAY => $operationAttributesArray,
 				kClipManager::SOURCE_ENTRY => $sourceEntry,
 				kClipManager::TEMP_ENTRY => $tempEntry,
 				kClipManager::MEDIA_INFO_OBJECT => $mediaInfoObj,
-				kClipManager::VIDEO_DURATION => $duration,
+				kClipManager::CLIPS_DURATION => $duration,
 				kClipManager::IMAGE_TO_VIDEO => $imageToVideo
 			);
-
 		}
 
-		$clipManager->calculateAndEditConversionParams($resourcesData, $destEntry->getConversionProfileId());
+		$clipManager->calculateAndEditConversionParams($entryResourcesData, $resources, $destEntry->getConversionProfileId());
 		$multiTempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), 'MULTI_TEMP_');
 		$clipManager->addMultiClipTrackEntries($sourceEntryIds, $tempEntryIds, $multiTempEntry->getId(), $destEntry->getId());
 		$rootJob = $clipManager->startMultiClipConcatBatchJob($resources, $destEntry, $multiTempEntry);
 		foreach ($resources->getResources() as $key => $resource)
 		{
-			$tempEntry = $resourcesData[$key][kClipManager::TEMP_ENTRY];
-			$conversionParams = $resourcesData[$key][kClipManager::CONVERSION_PARAMS];
+			$tempEntry = $entryResourcesData[$key][kClipManager::TEMP_ENTRY];
+			$conversionParams = $entryResourcesData[$key][kClipManager::CONVERSION_PARAMS];
 			$this->handleMultiClipRequest($resource, $destEntry, $clipManager, $tempEntry, $rootJob->getId(), $key, $conversionParams);
 		}
 		$destEntry->setStatus(entryStatus::PENDING);
 		$destEntry->save();
 		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
+	}
+
+	protected function setCaptionAssetsUrls(&$operationAttribute)
+	{
+		$editedCaptionAttributes = array();
+		$captionAttributes = $operationAttribute->getCaptionAttributes();
+		foreach ($captionAttributes as $captionAttribute)
+		{
+			if(!($captionAttribute instanceof kRenderCaptionAttributes) || !$captionAttribute->getCaptionAssetId())
+			{
+				continue;
+			}
+
+			$captionAssetId = $captionAttribute->getCaptionAssetId();
+			$captionAsset = assetPeer::retrieveById($captionAssetId);
+			if (!($captionAsset instanceof CaptionAsset))
+			{
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+			}
+			if ($captionAsset->getStatus() != asset::ASSET_STATUS_READY)
+			{
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
+			}
+			$captionAttribute->setCaptionFileUrl($captionAsset->getDownloadUrl(true));
+			$editedCaptionAttributes[] = $captionAttribute;
+		}
+		$operationAttribute->setCaptionAttributes($editedCaptionAttributes);
+
 	}
 
 	/***
@@ -2020,7 +2051,7 @@ class KalturaEntryService extends KalturaBaseService
 				$sourceEntryId = $resourceObj->getEntry();
 				throw new APIException(KalturaErrors::ENTRY_ID_TYPE_NOT_SUPPORTED, $sourceEntryId->getId(), $sourceEntryId->getType());
 			}
-			elseif($resourceObj instanceof kFileSyncResource)
+			else
 			{
 				throw new APIException(APIErrors::ENTRY_ID_NOT_FOUND, $resourceObj->getOriginEntryId());
 			}

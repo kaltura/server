@@ -14,7 +14,7 @@ class KDLOperatorFfmpeg0_10 extends KDLOperatorFfmpeg {
 		$cmdStr = $this->processTwoPass($target, $cmdStr);
 		return $cmdStr;
 	}
-	
+
 	/* ---------------------------
 	 * generateSinglePassCommandLine
 	 */
@@ -130,6 +130,20 @@ $fltStr = null;
 					break;
 			}
 		}
+
+		// cropping
+		if(isset($vid->_arProcessingMode) && ($vid->_arProcessingMode==7 || $vid->_arProcessingMode==8))
+		{
+			if(isset($vid->_cropData) && $vid->_cropData->outWidth && $vid->_cropData->outHeight)
+			{
+				$outWidth = $vid->_cropData->outWidth;
+				$outHeight = $vid->_cropData->outHeight;
+				$widthPosition = isset($vid->_cropData->widthPosition) ? $vid->_cropData->widthPosition : 0;
+				$heightPosition = isset($vid->_cropData->heightPosition) ? $vid->_cropData->heightPosition : 0;
+				$filters[] = "crop=$outWidth:$outHeight:$widthPosition:$heightPosition";
+			}
+		}
+
 		// Letterboxing
 		if(isset($vid->_arProcessingMode) && $vid->_arProcessingMode==2){
 			$str ='scale=iw*sar*min('.$vid->_width.'/(iw*sar)\,';

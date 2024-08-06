@@ -461,28 +461,42 @@ $stub=null;
 		 * (this option is irrelevant for rendering)
 		 */
 		KalturaLog::log("subtitlesData:".json_encode($subtitlesData));
-		$captionsArr = self::fetchEntryCaptionList($data, $jobMsg);
-		if(!isset($captionsArr) || count($captionsArr)==0){
-			KalturaLog::log("No captions for that entry!!!");
-			$cmdLine=KDLOperatorFfmpeg::RemoveFilter($cmdLine, 'subtitles');
-			return $cmdLine;
+		$language = $subtitlesData->language ? $subtitlesData->language : "default";
+		$tmpCaptionFilePath = $data->destFileSyncLocalPath.".temp.$language.srt";
+		if(isset(KBatchBase::$taskConfig->params->sharedTempPath))
+		{
+			$tmpCaptionFilePath = KBatchBase::$taskConfig->params->sharedTempPath . "/" . basename($tmpCaptionFilePath);
 		}
+
 		$captionFilePath = null;
-		foreach($captionsArr as $lang=>$captionFileUrl){
-			if($subtitlesData->language==$lang){
-				KalturaLog::log("Found required language($lang)");
-				$tmpCaptionFilePath = $data->destFileSyncLocalPath.".temp.$lang.srt";
-				if(isset(KBatchBase::$taskConfig->params->sharedTempPath)){
-					$tmpCaptionFilePath = KBatchBase::$taskConfig->params->sharedTempPath . "/" . basename($tmpCaptionFilePath);
+		if($subtitlesData->captionFileUrl)
+		{
+			$captionFilePath = self::fetchCaptionFile($subtitlesData->captionFileUrl, $tmpCaptionFilePath);
+		}
+		else
+		{
+			$captionsArr = self::fetchEntryCaptionList($data, $jobMsg);
+			if(!isset($captionsArr) || count($captionsArr)==0)
+			{
+				KalturaLog::log("No captions for that entry!!!");
+				$cmdLine = KDLOperatorFfmpeg::RemoveFilter($cmdLine, 'subtitles');
+				return $cmdLine;
+			}
+			foreach($captionsArr as $lang=>$captionFileUrl)
+			{
+				if($subtitlesData->language==$lang)
+				{
+					KalturaLog::log("Found required language ($lang)");
+					$captionFilePath = self::fetchCaptionFile($captionFileUrl, $tmpCaptionFilePath);
+					break;
 				}
-				
-				$captionFilePath = self::fetchCaptionFile($captionFileUrl, $tmpCaptionFilePath);
-				break;
 			}
 		}
-		if(!isset($captionFilePath)){
-			KalturaLog::notice("No captions for ($subtitlesData->language)");
-			$cmdLine=KDLOperatorFfmpeg::RemoveFilter($cmdLine, 'subtitles');
+
+		if(!$captionFilePath)
+		{
+			KalturaLog::notice("No captions for subtitlesData: ".json_encode($subtitlesData));
+			$cmdLine = KDLOperatorFfmpeg::RemoveFilter($cmdLine, 'subtitles');
 			return $cmdLine;
 		}
 		$cmdLine = str_replace(KDLCmdlinePlaceholders::SubTitlesFileName, $captionFilePath, $cmdLine);

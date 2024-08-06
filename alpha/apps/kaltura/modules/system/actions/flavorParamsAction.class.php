@@ -50,6 +50,7 @@ class flavorParamsAction extends kalturaSystemAction
 				$newFalvorParams->setMaxFrameRate($this->editFlavorParam->getMaxFrameRate());
 				$newFalvorParams->setWatermarkData($this->editFlavorParam->getWatermarkData());
 				$newFalvorParams->setSubtitlesData($this->editFlavorParam->getSubtitlesData());
+				$newFalvorParams->setCropData($this->editFlavorParam->getCropData());
 				$newFalvorParams->setIsDefault(false);
 				$newFalvorParams->setPartnerId(-1);
 				$newFalvorParams->save();
