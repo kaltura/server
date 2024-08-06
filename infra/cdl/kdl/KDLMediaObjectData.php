@@ -212,7 +212,7 @@
 									 *  2: letterbox mode
 									 *  3: force 16/9 for everything that is not 16:9
 									 *  4: force '-aspect' option
-									 *  5: force perciese source AR
+									 *  5: force precise source AR
 									 *  7: cropping
 	 								 *  8: inverted cropping
 									 */
