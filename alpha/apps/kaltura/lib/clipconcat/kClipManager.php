@@ -797,47 +797,59 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$subtitlesDataArray = array();
 		foreach ($operationAttributes as $operationAttribute)
 		{
-			$subtitlesDataArray[] = $this->getSubtitlesData($operationAttribute->getCaptionsOptions());
+			$subtitlesDataArray[] = $this->getSubtitlesData($operationAttribute->getCaptionAttributes());
 		}
 		return $subtitlesDataArray;
 	}
 
-	protected function getSubtitlesData($captionsOptions)
+	protected function getRenderCaptionAttribute($captionAttributes)
 	{
-		$subtitlesData = array();
-		if(!($captionsOptions instanceOf kCaptionsOptions) || !$captionsOptions->getCaptionFileUrl())
+		$renderCaptionAttribute = null;
+		foreach ($captionAttributes as $captionAttribute)
 		{
-			return $subtitlesData;
-		}
-
-		$forceStyle = array();
-		$forceStyle["FontName"] = $captionsOptions->getFontName();
-		$forceStyle["Fontsize"] = $captionsOptions->getFontSize();
-		$forceStyle["Bold"] = $captionsOptions->getBold() ? 1 : null;
-		$forceStyle["Italic"] = $captionsOptions->getItalic() ? 1 : null;
-		$forceStyle["Underline"] = $captionsOptions->getUnderline() ? 1 : null;
-		$forceStyle["PrimaryColour"] = $captionsOptions->getPrimaryColour();
-		$forceStyle["Alignment"] = $captionsOptions->getAlignment();
-		$forceStyle["BorderStyle"] = $captionsOptions->getBorderStyle();
-		$forceStyle["BackColour"] = $captionsOptions->getBackColour();
-		$forceStyle["OutlineColour"] = $captionsOptions->getOutlineColour();
-
-		foreach ($forceStyle as $key => $value)
-		{
-			if($value === null)
+			if($captionAttribute instanceOf kRenderCaptionAttributes && $captionAttribute->getCaptionFileUrl())
 			{
-				unset($forceStyle[$key]);
+				$renderCaptionAttribute = $captionAttribute;
+				break;
 			}
 		}
+		return $renderCaptionAttribute;
+	}
 
-		// set subtitles data
-		$subtitlesData["action"] = $captionsOptions->getAction();
-		$subtitlesData["captionFileUrl"] = $captionsOptions->getCaptionFileUrl();
-		if(count($forceStyle) > 0)
+	protected function getSubtitlesData($captionAttributes)
+	{
+		$subtitlesData = array();
+		$renderCaptionAttribute = $this->getRenderCaptionAttribute($captionAttributes);
+		if($renderCaptionAttribute)
 		{
-			$subtitlesData["force_style"] = $forceStyle;
-		}
+			$forceStyle = array();
+			$forceStyle["FontName"] = $renderCaptionAttribute->getFontName();
+			$forceStyle["Fontsize"] = $renderCaptionAttribute->getFontSize();
+			$forceStyle["Bold"] = $renderCaptionAttribute->getBold() ? 1 : null;
+			$forceStyle["Italic"] = $renderCaptionAttribute->getItalic() ? 1 : null;
+			$forceStyle["Underline"] = $renderCaptionAttribute->getUnderline() ? 1 : null;
+			$forceStyle["PrimaryColour"] = $renderCaptionAttribute->getPrimaryColour();
+			$forceStyle["Alignment"] = $renderCaptionAttribute->getAlignment();
+			$forceStyle["BorderStyle"] = $renderCaptionAttribute->getBorderStyle();
+			$forceStyle["BackColour"] = $renderCaptionAttribute->getBackColour();
+			$forceStyle["OutlineColour"] = $renderCaptionAttribute->getOutlineColour();
 
+			foreach ($forceStyle as $key => $value)
+			{
+				if($value === null)
+				{
+					unset($forceStyle[$key]);
+				}
+			}
+
+			// set subtitles data
+			$subtitlesData["action"] = "render";
+			$subtitlesData["captionFileUrl"] = $renderCaptionAttribute->getCaptionFileUrl();
+			if(count($forceStyle) > 0)
+			{
+				$subtitlesData["force_style"] = $forceStyle;
+			}
+		}
 		return $subtitlesData;
 	}
 
@@ -922,7 +934,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		else
 		{
-			// if we do not scale the clipped asset, then add stream mapping, because applying only audio filter_complex, changes the streams order and concat fails
+			// if we do not use video filter complex, then add stream mapping, because applying only audio filter_complex, changes the streams order and concat fails
 			return " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0[a]' -map v -map [\"a\"] ";
 		}
 	}

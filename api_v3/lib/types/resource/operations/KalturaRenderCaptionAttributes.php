@@ -3,13 +3,8 @@
  * @package api
  * @subpackage objects
  */
-class KalturaCaptionsOptions extends KalturaObject
+class KalturaRenderCaptionAttributes extends KalturaCaptionAttributes
 {
-	/**
-	 * @var string
-	 */
-	public $action;
-
 	/**
 	 * @var string
 	 */
@@ -78,7 +73,6 @@ class KalturaCaptionsOptions extends KalturaObject
 
 	private static $map_between_objects = array
 	(
-		"action",
 		"fontName",
 		"fontSize" ,
 		"fontStyle",
@@ -99,11 +93,33 @@ class KalturaCaptionsOptions extends KalturaObject
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
 
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+
+		if(!$this->captionAssetId)
+		{
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "captionAssetId");
+		}
+		$this->validateColorFormat($this->primaryColour, "primaryColour");
+		$this->validateColorFormat($this->outlineColour, "outlineColour");
+		$this->validateColorFormat($this->backColour, "backColour");
+	}
+
+	protected function validateColorFormat($color, $paramName)
+	{
+		if($color && !preg_match('/^\&[H|h]([0-9]|[A-F]|[a-f]){6}\&$/', $color))
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_VALUE, $paramName);
+		}
+	}
+
+
 	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		if(is_null($object_to_fill))
 		{
-			$object_to_fill = new kCaptionsOptions();
+			$object_to_fill = new kRenderCaptionAttributes();
 		}
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}

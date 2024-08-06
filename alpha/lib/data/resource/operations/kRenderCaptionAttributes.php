@@ -3,13 +3,8 @@
  * @package Core
  * @subpackage model.data
  */
-class kCaptionsOptions
+class kRenderCaptionAttributes extends kCaptionAttributes
 {
-	/**
-	 * @var string
-	 */
-	private $action;
-
 	/**
 	 * @var string
 	 */
@@ -79,22 +74,6 @@ class kCaptionsOptions
 	 * @var string
 	 */
 	private $captionAssetId;
-
-	/**
-	 * @return string
-	 */
-	public function getAction()
-	{
-		return $this->action;
-	}
-
-	/**
-	 * @param string $action
-	 */
-	public function setAction($action)
-	{
-		$this->action = $action;
-	}
 
 	/**
 	 * @return string
@@ -318,5 +297,29 @@ class kCaptionsOptions
 	public function setCaptionFileUrl($captionFileUrl)
 	{
 		$this->captionFileUrl = $captionFileUrl;
+	}
+
+	public function toArray()
+	{
+		return array(
+			'fontName' => $this->fontName,
+			'fontSize' => $this->fontSize,
+			'fontStyle' => $this->fontStyle,
+			'primaryColour' => $this->primaryColour,
+			'borderStyle' => $this->borderStyle,
+			'backColour' => $this->backColour,
+			'outlineColour' => $this->outlineColour,
+			'shadow' => $this->shadow,
+			'bold' => $this->bold,
+			'italic' => $this->italic,
+			'underline' => $this->underline,
+			'alignment' => $this->alignment,
+			'captionAssetId' => $this->captionAssetId
+		);
+	}
+
+	public function getApiType()
+	{
+		return 'KalturaRenderCaptionAttributes';
 	}
 }

@@ -34,9 +34,9 @@ class kClipAttributes extends kOperationAttributes
 	private $effectArray;
 
 	/**
-	 * @var kCaptionsOptions
+	 * @var array<kCaptionAttributes>
 	 */
-	private $captionsOptions;
+	private $captionAttributes;
 
 	/**
 	 * @var int
@@ -55,7 +55,7 @@ class kClipAttributes extends kOperationAttributes
 			'globalOffsetInDestination' => $this->globalOffsetInDestination,
 			'effectArray' => $this->effectArray,
 			'cropAlignment' => $this->cropAlignment,
-			'captionsOptions' => $this->captionsOptions
+			'captionAttributes' => $this->captionAttributes
 		);
 	}
 	
@@ -164,18 +164,18 @@ class kClipAttributes extends kOperationAttributes
 	}
 
 	/**
-	 * @return kCaptionsOptions
+	 * @return array
 	 */
-	public function getCaptionsOptions()
+	public function getCaptionAttributes()
 	{
-		return $this->captionsOptions;
+		return $this->captionAttributes;
 	}
 
 	/**
-	 * @param kCaptionsOptions $captionsOptions
+	 * @param array $captionAttributes
 	 */
-	public function setCaptionsOptions($captionsOptions)
+	public function setCaptionAttributes($captionAttributes)
 	{
-		return $this->captionsOptions = $captionsOptions;
+		return $this->captionAttributes = $captionAttributes;
 	}
 }

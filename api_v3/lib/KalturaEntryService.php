@@ -2011,24 +2011,30 @@ class KalturaEntryService extends KalturaBaseService
 
 	protected function setCaptionAssetsUrls(&$operationAttribute)
 	{
-		$captionsOptions = $operationAttribute->getCaptionsOptions();
-		if(!$captionsOptions || !$captionsOptions->getCaptionAssetId())
+		$editedCaptionAttributes = array();
+		$captionAttributes = $operationAttribute->getCaptionAttributes();
+		foreach ($captionAttributes as $captionAttribute)
 		{
-			return;
-		}
+			if(!($captionAttribute instanceof kRenderCaptionAttributes) || !$captionAttribute->getCaptionAssetId())
+			{
+				continue;
+			}
 
-		$captionAssetId = $captionsOptions->getCaptionAssetId();
-		$captionAsset = assetPeer::retrieveById($captionAssetId);
-		if (!($captionAsset instanceof CaptionAsset))
-		{
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+			$captionAssetId = $captionAttribute->getCaptionAssetId();
+			$captionAsset = assetPeer::retrieveById($captionAssetId);
+			if (!($captionAsset instanceof CaptionAsset))
+			{
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_ID_NOT_FOUND, $captionAssetId);
+			}
+			if ($captionAsset->getStatus() != asset::ASSET_STATUS_READY)
+			{
+				throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
+			}
+			$captionAttribute->setCaptionFileUrl($captionAsset->getDownloadUrl(true));
+			$editedCaptionAttributes[] = $captionAttribute;
 		}
-		if ($captionAsset->getStatus() != asset::ASSET_STATUS_READY)
-		{
-			throw new KalturaAPIException(KalturaCaptionErrors::CAPTION_ASSET_IS_NOT_READY);
-		}
-		$captionsOptions->setCaptionFileUrl($captionAsset->getDownloadUrl(true));
-		$operationAttribute->setCaptionsOptions($captionsOptions);
+		$operationAttribute->setCaptionAttributes($editedCaptionAttributes);
+
 	}
 
 	/***
