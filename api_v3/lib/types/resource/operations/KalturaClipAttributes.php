@@ -39,9 +39,9 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 	public $cropAlignment;
 
 	/**
-	 * @var KalturaCaptionsOptions
+	 * @var KalturaCaptionAttributesArray
 	 */
-	public $captionsOptions;
+	public $captionAttributes;
 
 
 	private static $map_between_objects = array
@@ -50,7 +50,7 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 	 	"duration",
 		"globalOffsetInDestination",
 		"effectArray",
-		"captionsOptions",
+		"captionAttributes",
 		"cropAlignment"
 	);
 
@@ -71,36 +71,34 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 			throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, 'cropAlignment', $minCropAlignment, $maxCropAlignment);
 		}
 
-		$captionsOptions = $this->captionsOptions;
-		if($captionsOptions instanceof KalturaCaptionsOptions)
+		$renderCaptionAttribute = null;
+		foreach ($this->captionAttributes as $captionAttribute)
 		{
-			if(is_null($captionsOptions->action))
+			if($captionAttribute instanceOf kRenderCaptionAttributes)
 			{
-				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "action");
+				if($renderCaptionAttribute)
+				{
+					throw new KalturaAPIException(KalturaErrors::MULTIPLE_PARAMETER_NOT_SUPPORTED, 'renderCaptionAttributes');
+				}
+				$renderCaptionAttribute = $captionAttribute;
 			}
-			if(!$captionsOptions->captionAssetId)
-			{
-				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "captionAssetId");
-			}
-			$this->validateColorFormat($captionsOptions->primaryColour, "primaryColour");
-			$this->validateColorFormat($captionsOptions->outlineColour, "outlineColour");
-			$this->validateColorFormat($captionsOptions->backColour, "backColour");
 		}
 	}
 
-	protected function validateColorFormat($color, $paramName)
-	{
-		if($color && !preg_match('/^\&[H|h]([0-9]|[A-F]|[a-f]){6}\&$/', $color))
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_PARAMETER_VALUE, $paramName);
-		}
-	}
-
-	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
+	public function toObject ($object_to_fill = null, $props_to_skip = array())
 	{
 		if(is_null($object_to_fill))
+		{
 			$object_to_fill = new kClipAttributes();
-			
+		}
+
+		$captionAttributes = array();
+		foreach($this->captionAttributes as $captionAttribute)
+		{
+			$captionAttributes[] = $captionAttribute->toObject();
+		}
+		$object_to_fill->setCaptionAttributes($captionAttributes);
+
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
