@@ -23,11 +23,6 @@ class kRenderCaptionAttributes extends kCaptionAttributes
 	/**
 	 * @var string
 	 */
-	private $fontStyle;
-
-	/**
-	 * @var string
-	 */
 	private $primaryColour;
 
 	/**
@@ -105,22 +100,6 @@ class kRenderCaptionAttributes extends kCaptionAttributes
 	public function setFontSize($fontSize)
 	{
 		$this->fontSize = $fontSize;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getFontStyle()
-	{
-		return $this->fontStyle;
-	}
-
-	/**
-	 * @param $fontStyle string
-	 */
-	public function setFontStyle($fontStyle)
-	{
-		$this->fontStyle = $fontStyle;
 	}
 
 	/**
@@ -304,7 +283,6 @@ class kRenderCaptionAttributes extends kCaptionAttributes
 		return array(
 			'fontName' => $this->fontName,
 			'fontSize' => $this->fontSize,
-			'fontStyle' => $this->fontStyle,
 			'primaryColour' => $this->primaryColour,
 			'borderStyle' => $this->borderStyle,
 			'backColour' => $this->backColour,

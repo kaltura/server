@@ -18,11 +18,6 @@ class KalturaRenderCaptionAttributes extends KalturaCaptionAttributes
 	/**
 	 * @var string
 	 */
-	public $fontStyle;
-
-	/**
-	 * @var string
-	 */
 	public $primaryColour;
 
 	/**
@@ -75,7 +70,6 @@ class KalturaRenderCaptionAttributes extends KalturaCaptionAttributes
 	(
 		"fontName",
 		"fontSize" ,
-		"fontStyle",
 		"primaryColour",
 		"borderStyle",
 		"backColour",
