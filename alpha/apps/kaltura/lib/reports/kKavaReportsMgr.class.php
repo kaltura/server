@@ -2319,8 +2319,11 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function timestampToHourId($timestamp, $tz = null)
 	{
-		// hours are returned from druid query with the right offset so no need to change it
 		$date = new DateTime($timestamp);
+		if (isset($tz))
+		{
+			$date->setTimezone($tz);
+		}
 		return $date->format('YmdH');
 	}
 
