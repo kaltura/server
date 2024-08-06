@@ -178,6 +178,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				case Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION:
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItem', $formData, false, true);
 					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorClipsCatalogItem', $formData, false, true);
+					break;
 			}
 
 			$form->resetUnUpdatebleAttributes($catalogItem);
