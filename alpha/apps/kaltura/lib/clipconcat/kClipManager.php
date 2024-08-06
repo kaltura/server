@@ -747,9 +747,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return array();
 		}
 
-		$inHeight -= 1;
-		$inWidth -= 1;
-
 		$outWidth = $inWidth;
 		$outHeight = $inHeight;
 		$widthPosition = 0;
@@ -761,25 +758,22 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		// crop height
 		if($inWidth / $inHeight < $targetAspectRatio)
 		{
-			$outHeight = min($outWidth / $targetAspectRatio, $inHeight);
-			$cropLength = $inHeight - $outHeight;
-			$heightPosition = $alignment * $cropLength;
+			$outHeight = min(floor($outWidth / $targetAspectRatio), $inHeight);
+			$this->adjustResolutionDivisionByValue($outWidth, $outHeight);
+			$croppedLength = $inHeight - $outHeight;
+			$heightPosition = floor($alignment * $croppedLength);
 		}
 
 		// crop width
 		else if($inWidth / $inHeight > $targetAspectRatio)
 		{
-			$outWidth = min($targetAspectRatio * $outHeight, $inWidth);
-			$cropLength = $inWidth - $outWidth;
-			$widthPosition = $alignment * $cropLength;
+			$outWidth = min(floor($targetAspectRatio * $outHeight), $inWidth);
+			$this->adjustResolutionDivisionByValue($outWidth, $outHeight);
+			$croppedLength = $inWidth - $outWidth;
+			$widthPosition = floor($alignment * $croppedLength);
 		}
 
-		return array(
-			"outWidth" => floor($outWidth),
-			"outHeight" => floor($outHeight),
-			"widthPosition" => floor($widthPosition),
-			"heightPosition" => floor($heightPosition)
-		);
+		return array("outWidth" => $outWidth, "outHeight" => $outHeight, "widthPosition" => $widthPosition, "heightPosition" => $heightPosition);
 	}
 
 	protected function getCropDataArray($targetAspectRatio, $inWidth, $inHeight, $operationAttributes)
@@ -1661,6 +1655,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$processingMode = $invertedResource ? 8 : 7;
 				$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
 				$flavorParamsObj->setCropData(json_encode($cropData));
+				$flavorParamsObj->setHeight($conversionParams[self::CROP_HEIGHT]);
+				$flavorParamsObj->setWidth($conversionParams[self::CROP_WIDTH]);
 			}
 			else if($invertedResource)
 			{
