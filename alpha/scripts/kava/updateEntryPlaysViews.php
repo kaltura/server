@@ -9,7 +9,7 @@ $lock = kLock::create($lockName);
 if ($lock && !$lock->lock($lockTimeout, $lockDuration)) 
 {
 	KalturaLog::err('Failed to acquire script lock, aborting script.');
-	die('Failed to acquire script lock, aborting script.');
+	die('Failed to acquire script lock, aborting script.' . PHP_EOL);
 }
 
 $f = fopen("php://stdin", "r");
