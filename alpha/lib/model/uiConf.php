@@ -113,6 +113,11 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 
 	const CUSTOM_DATA_CON_FILE_VERSION = 'conf_file_version';
 	const CUSTOM_DATA_CONF_FILE_FEATURES_VERSION = 'conf_file_features_version';
+
+    //v2 to b7
+    const CUSTOM_DATA_V2V7_ID = "v2v7_id";
+    const CUSTOM_DATA_V2V7_APPROVED = "v2v7_approved";
+    const CUSTOM_DATA_V2V7_TRANSLATE_PLUGINS = "v2v7_trnanslate_plugins";
 	
 	public function save(PropelPDO $con = null)
 	{
@@ -701,8 +706,10 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		return self::$swf_names;
 	}
 
-	public function getV7Id(){		return $this->getFromCustomData( "v7_id", null , null );	}
-	public function setV7Id($v){		return $this->putInCustomData( "v7_id", $v );	}
+
+
+
+
 
 	public function getAutoplay ()	{		return $this->getFromCustomData( "autoplay" , null , false );	}
 	public function setAutoplay( $v )	{		return $this->putInCustomData( "autoplay", $v );	}
@@ -810,4 +817,12 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		
 		return parent::setVersion($v);
 	}
+
+    //v2 to v7
+    public function getV2tov7id(){		return $this->getFromCustomData( self::CUSTOM_DATA_V2V7_ID, null , null );	}
+    public function setV2tov7id($v){		return $this->putInCustomData( self::CUSTOM_DATA_V2V7_ID, $v );	}
+    public function getV2tov7Approved(){		return $this->getFromCustomData( self::CUSTOM_DATA_V2V7_APPROVED, null, false , null );	}
+    public function setV2tov7Approved($v){		return $this->putInCustomData( self::CUSTOM_DATA_V2V7_APPROVED, $v );	}
+    public function getShouldTranslatePluginsToV7(){		return $this->getFromCustomData( self::CUSTOM_DATA_V2V7_TRANSLATE_PLUGINS, null,false , null );	}
+    public function setShouldTranslatePluginsToV7($v){		return $this->putInCustomData( self::CUSTOM_DATA_V2V7_TRANSLATE_PLUGINS, $v );	}
 }
