@@ -67,7 +67,7 @@ class embedIframeJsAction extends sfAction
 		//redirect the call to V7
 		if($uiConf->getV2tov7id() && ($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) || $uiConf->getV2tov7Approved()) )
 		{
-			$this->redirectToV7($uiConf->getV2tov7id(), $uiconf_id, $partner_id, $uiConf->getShouldTranslatePluginsToV7() );
+			$this->redirectToV7($uiConf->getV2tov7id(), $uiconf_id, $partner_id, $uiConf->getV2tov7ShouldTranslatePlugins() );
 		}
 
 

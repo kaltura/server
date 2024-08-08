@@ -815,12 +815,12 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	{
 		return $this->putInCustomData(self::CUSTOM_DATA_V2V7_APPROVED, $v);
 	}
-	public function getShouldTranslatePluginsToV7()
+	public function getV2tov7ShouldTranslatePlugins()
 	{
 		$val = $this->getFromCustomData(self::CUSTOM_DATA_V2V7_TRANSLATE_PLUGINS, null, false, null);
 		return ($val === 1 || $val === true || $val === "true");
 	}
-	public function setShouldTranslatePluginsToV7($v)
+	public function setV2tov7ShouldTranslatePlugins($v)
 	{
 		return $this->putInCustomData( self::CUSTOM_DATA_V2V7_TRANSLATE_PLUGINS, $v );
 	}
