@@ -164,28 +164,30 @@ class embedIframeJsAction extends sfAction
 		try
 		{
 			$config = array();
-			$config["bundleConfig"] = null;
-			$config["playerConfig"] = new stdClass();
+			$config['bundleConfig'] = null;
+			$config['playerConfig'] = new stdClass();
 			$config = v2Tov7Utils::addV2toV7config($config,$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$v7Id);
 			if($shouldTranslatePlugins)
 			{
 				v2Tov7Utils::addV2toV7plugins(
 					$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),
-					$config["bundleConfig"],
-					$config["playerConfig"]);
+					$config['bundleConfig'],
+					$config['playerConfig']);
 			}
 		}
 		catch(Exception $e)
 		{
 			//if we failed, then should not redirect!
-			KalturaLog::log("V2toV7 was rejected because: " . $e->getMessage() . " v2 id:" .  $v2UiConfId.  " v7 dd:" . $v2UiConfId);
+			KalturaLog::log('V2toV7 was rejected because: ' . $e->getMessage() . ' v2 id:' .  $v2UiConfId.  ' v7 id:' . $v2UiConfId);
 			return;
 		}
 
+		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2Tov7Utils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
 		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
-		$url = $host . "/p/" . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . "?" . $_SERVER['QUERY_STRING'] . "&"
-				. v2Tov7Utils::FLASHVARS_PARAM_NAME
-				. v2Tov7Utils::SHOULD_TRANSLATE_PLUGINS . "=true"  ;;
+		$url = $host . '/p/' . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . '?'
+				. $_SERVER['QUERY_STRING'] . "&"
+				. v2Tov7Utils::V2TOV7_PARAM_NAME .'=true'
+				. $shouldTranslatePluginsQueryParam;
 		header("Location:$url");
 		KExternalErrors::dieGracefully();
 	}
