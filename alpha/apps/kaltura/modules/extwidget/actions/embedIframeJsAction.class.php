@@ -1,4 +1,7 @@
 <?php
+
+require_once dirname(__FILE__)."/../../../lib/v2ToV7Utils.class.php";
+
 /**
  * @package Core
  * @subpackage externalWidgets
@@ -47,7 +50,6 @@ class embedIframeJsAction extends sfAction
 
 		$ui_conf_html5_url = $uiConf->getHtml5Url();
 
-
 		if (array_key_exists($partner_id, $optimizedPlayback))
 		{
 			// force a specific kdp for the partner
@@ -61,6 +63,14 @@ class embedIframeJsAction extends sfAction
 		$autoEmbed = $this->getRequestParameter('autoembed');
 
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
+
+		//redirect the call to V7
+		if($uiConf->getV2tov7id() && ($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) || $uiConf->getV2tov7Approved()) )
+		{
+			$this->redirectToV7($uiConf->getV2tov7id(), $uiconf_id, $partner_id, $uiConf->getV2tov7ShouldTranslatePlugins() );
+		}
+
+
 		$scriptName = ($iframeEmbed) ? 'mwEmbedFrame.php' : 'mwEmbedLoader.php';
 		if($ui_conf_html5_url && $iframeEmbed) {
 			$ui_conf_html5_url = str_replace('mwEmbedLoader.php', 'mwEmbedFrame.php', $ui_conf_html5_url);
@@ -140,6 +150,44 @@ class embedIframeJsAction extends sfAction
 		requestUtils::sendCachingHeaders(60, true, time());
 
 		kFile::cacheRedirect($url);
+		header("Location:$url");
+		KExternalErrors::dieGracefully();
+	}
+
+	/*
+	 * v2 - https://cdnapisec.kaltura.com/p/1915851/sp/191585100/embedIframeJs/uiconf_id/32880931/partner_id/1915851?iframeembed=true&playerId=kaltura_player_1719900446&entry_id=1_aeg07vpv
+	 * v7 - https://cdnapisec.kaltura.com/p/1915851/embedPlaykitJs/uiconf_id/54813242?iframeembed=true&entry_id=1_aeg07vpv
+	 */
+	private function redirectToV7($v7Id, $v2UiConfId, $partnerId, $shouldTranslatePlugins) : void
+	{
+		//validate all the params are handled
+		try
+		{
+			$config = array();
+			$config['bundleConfig'] = null;
+			$config['playerConfig'] = new stdClass();
+			$config = v2Tov7Utils::addV2toV7config($config,$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$v7Id);
+			if($shouldTranslatePlugins)
+			{
+				v2Tov7Utils::addV2toV7plugins(
+					$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),
+					$config['bundleConfig'],
+					$config['playerConfig']);
+			}
+		}
+		catch(Exception $e)
+		{
+			//if we failed, then should not redirect!
+			KalturaLog::log('V2toV7 was rejected because: ' . $e->getMessage() . ' v2 id:' .  $v2UiConfId.  ' v7 id:' . $v2UiConfId);
+			return;
+		}
+
+		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2Tov7Utils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
+		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
+		$url = $host . '/p/' . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . '?'
+				. $_SERVER['QUERY_STRING'] . "&"
+				. v2Tov7Utils::V2TOV7_PARAM_NAME .'=true'
+				. $shouldTranslatePluginsQueryParam;
 		header("Location:$url");
 		KExternalErrors::dieGracefully();
 	}
