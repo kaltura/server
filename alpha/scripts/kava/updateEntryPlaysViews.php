@@ -2,6 +2,16 @@
 
 require_once (dirname(__FILE__).'/../bootstrap.php');
 
+$lockTimeout = 5;
+$lockDuration = 4 * 60 * 60  - 10; // a bit under 4 Hours
+$lockName = basename(__FILE__, '.php');
+$lock = kLock::create($lockName);
+if ( ! $lock->lock($lockName, $lockDuration)) 
+{
+	KalturaLog::err('Failed to acquire script lock, aborting script.');
+	die('Failed to acquire script lock, aborting script.');
+}
+
 $f = fopen("php://stdin", "r");
 $count = 0;
 KalturaLog::log('Script Started');
@@ -191,4 +201,5 @@ while($s = trim(fgets($f)))
 		entryPeer::clearInstancePool();
 	}
 }
+$lock->unlock();
 KalturaLog::log('Script Finished, Handled ' . $count . ' entries');
