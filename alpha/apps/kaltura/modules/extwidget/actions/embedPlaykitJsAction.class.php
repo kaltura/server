@@ -1,5 +1,5 @@
 <?php
-
+require_once dirname(__FILE__)."/../../../lib/v2ToV7Utils.class.php";
 /**
  * @package Core
  * @subpackage externalWidgets
@@ -28,6 +28,8 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
+    const V2TOV7_PARAM_NAME = "v2tov7";
+    const FLASHVARS_PARAM_NAME = 'flashvars';
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -66,10 +68,19 @@ class embedPlaykitJsAction extends sfAction
 			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
 
+
+
 		$lastModified = $this->getLastModified($bundleContent);
 
 		//Format bundle content
 		$bundleContent = $this->formatBundleContent($bundleContent, $i18nContent, $extraModulesNames);
+        if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
+        {
+            KalturaLog::log("Adding v2 to v7");
+           // $v2ToV7Code = PHP_EOL . '!function(){"use strict";var e={453:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.thumbnailEmbedV2=t.embed=void 0;const i=n(593),o=window.KalturaPlayer;t.embed=e=>{console.log("## config -----\x3e",e);const t=e.hasOwnProperty("entry_id"),n=e.hasOwnProperty("playlistAPI.kpl0Id");try{const i=o.setup({log:{level:"DEBUG"},targetId:e.targetId,provider:{partnerId:e.wid.match(/\d+/g).join(""),uiConfId:e.uiconf_id}});t?i.loadMedia({entryId:e.entry_id}):n&&i.loadPlaylist({playlistId:e["playlistAPI.kpl0Id"]})}catch(e){}},t.thumbnailEmbedV2=e=>{try{const t={config:{targetId:e.targetId,provider:{partnerId:e.wid.match(/\d+/g).join(""),uiConfId:e.uiconf_id}},mediaInfo:{entryId:e.entry_id}};(0,i.thumbnailEmbed)(t)}catch(e){}}},593:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.ThumbnailEmbedComponent=t.thumbnailEmbed=void 0;const i=n(14);Object.defineProperty(t,"ThumbnailEmbedComponent",{enumerable:!0,get:function(){return i.ThumbnailEmbedComponent}});const o=n(512);Object.defineProperty(t,"thumbnailEmbed",{enumerable:!0,get:function(){return o.thumbnailEmbed}}),window.__thumbnailEmbed=o.thumbnailEmbed},14:function(e,t){Object.defineProperty(t,"__esModule",{value:!0}),t.ThumbnailEmbedComponent=void 0;const n="#000";t.ThumbnailEmbedComponent=({onClick:e,src:t,bgColor:i=n})=>{const o=window.KalturaPlayer,{Button:r,Icon:d,IconType:a}=o.ui.components,{h:l}=o.ui.preact,{useRef:u,useState:c,useCallback:m}=o.ui.preactHooks,s=m((()=>{e(),v(!1)})),b=m((()=>{g(!0)})),p=m((()=>{g(!0),E(!0)})),h=u(),[y,v]=c(!0),[f,g]=c(!1),[I,E]=c(!1);return y?l("div",{style:{width:"100%",height:"100%",position:"relative",backgroundColor:I?i:n}},I?void 0:l("img",{src:t,ref:h,onLoad:b,onError:p,style:{width:"100%",height:"100%","object-fit":"contain"}}),f?l("div",{className:o.ui.style.prePlaybackPlayOverlay,style:{width:"100%",height:"100%"}},l(r,{className:o.ui.style.prePlaybackPlayButton,tabIndex:0,onClick:s},l(d,{type:a.Play}))):void 0):void 0}},512:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.thumbnailEmbed=void 0;const i=n(14);t.thumbnailEmbed=({config:e,mediaInfo:t,mediaOptions:n={},version:o=1e4,bgColor:r})=>{if(!e||!t)return;const d=(e=>{var t,n,i,o;if(null===(t=e.provider.env)||void 0===t?void 0:t.cdnUrl)return null===(n=e.provider.env)||void 0===n?void 0:n.cdnUrl;const r=window.__kalturaplayerdata;return r?null===(o=null===(i=r.provider)||void 0===i?void 0:i.env)||void 0===o?void 0:o.cdnUrl:"https://cdnapisec.kaltura.com"})(e),{targetId:a,provider:{partnerId:l,ks:u}}=e,c=window.KalturaPlayer;var m=document.getElementById(a);if(!m||!c||c.getPlayer&&c.getPlayer(a))return;let s=1920,b=1080;m.clientWidth&&m.clientHeight&&(s=m.clientWidth,b=m.clientHeight);const p=`${d.endsWith("/")?d:d+"/"}p/${l}/sp/${l}00/thumbnail/entry_id/${t.entryId}/version/${o}/width/${s}/height/${b}`+(u?`/ks/${u}`:""),{h:h,render:y}=c.ui.preact;y(h(i.ThumbnailEmbedComponent,{src:p,bgColor:r,onClick:()=>{try{const i=c.setup(e);i.loadMedia(t,n),i.play()}catch(e){}}}),m)}}},t={};function n(i){var o=t[i];if(void 0!==o)return o.exports;var r=t[i]={exports:{}};return e[i](r,r.exports,n),r.exports}!function(){const e=n(453);window.kWidget={embed:e.embed,thumbEmbed:e.thumbnailEmbedV2}}()}();//# sourceMappingURL=kWidget-embed.js.map";' . PHP_EOL;
+            $v2ToV7Code =  PHP_EOL . PHP_EOL . '!function(){"use strict";var e={593:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.ThumbnailEmbedComponent=t.thumbnailEmbed=void 0;const o=n(14);Object.defineProperty(t,"ThumbnailEmbedComponent",{enumerable:!0,get:function(){return o.ThumbnailEmbedComponent}});const i=n(512);Object.defineProperty(t,"thumbnailEmbed",{enumerable:!0,get:function(){return i.thumbnailEmbed}}),window.__thumbnailEmbed=i.thumbnailEmbed},14:function(e,t){Object.defineProperty(t,"__esModule",{value:!0}),t.ThumbnailEmbedComponent=void 0;const n="#000";t.ThumbnailEmbedComponent=({onClick:e,src:t,bgColor:o=n})=>{const i=window.KalturaPlayer,{Button:r,Icon:d,IconType:a}=i.ui.components,{h:l}=i.ui.preact,{useRef:s,useState:u,useCallback:c}=i.ui.preactHooks,m=c((()=>{e(),h(!1)})),b=c((()=>{g(!0)})),p=c((()=>{g(!0),P(!0)})),y=s(),[f,h]=u(!0),[v,g]=u(!1),[I,P]=u(!1);return f?l("div",{style:{width:"100%",height:"100%",position:"relative",backgroundColor:I?o:n}},I?void 0:l("img",{src:t,ref:y,onLoad:b,onError:p,style:{width:"100%",height:"100%","object-fit":"contain"}}),v?l("div",{className:i.ui.style.prePlaybackPlayOverlay,style:{width:"100%",height:"100%"}},l(r,{className:i.ui.style.prePlaybackPlayButton,tabIndex:0,onClick:m},l(d,{type:a.Play}))):void 0):void 0}},512:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.thumbnailEmbed=void 0;const o=n(14);t.thumbnailEmbed=({config:e,mediaInfo:t,mediaOptions:n={},version:i=1e4,bgColor:r})=>{if(!e||!t)return;const d=(e=>{var t,n,o,i;if(null===(t=e.provider.env)||void 0===t?void 0:t.cdnUrl)return null===(n=e.provider.env)||void 0===n?void 0:n.cdnUrl;const r=window.__kalturaplayerdata;return r?null===(i=null===(o=r.provider)||void 0===o?void 0:o.env)||void 0===i?void 0:i.cdnUrl:"https://cdnapisec.kaltura.com"})(e),{targetId:a,provider:{partnerId:l,ks:s}}=e,u=window.KalturaPlayer;var c=document.getElementById(a);if(!c||!u||u.getPlayer&&u.getPlayer(a))return;let m=1920,b=1080;c.clientWidth&&c.clientHeight&&(m=c.clientWidth,b=c.clientHeight);const p=`${d.endsWith("/")?d:d+"/"}p/${l}/sp/${l}00/thumbnail/entry_id/${t.entryId}/version/${i}/width/${m}/height/${b}`+(s?`/ks/${s}`:""),{h:y,render:f}=u.ui.preact;f(y(o.ThumbnailEmbedComponent,{src:p,bgColor:r,onClick:()=>{try{const o=u.setup(e);o.loadMedia(t,n),o.play()}catch(e){}}}),c)}},371:function(e,t,n){Object.defineProperty(t,"__esModule",{value:!0}),t.thumbEmbed=t.embed=void 0;const o=n(593),i=n(890),r=window.KalturaPlayer;t.embed=e=>{console.log("## v2Config -----\x3e",e);const{targetId:t,partnerId:n,uiConfId:o,mediaInfo:d}=(0,i.getInfoFromV2Config)(e);let a={log:{level:"DEBUG"},targetId:t,provider:{partnerId:n}};const l=(0,i.buildConfigFromFlashvars)(e),s=Object.assign({},a,l);try{const e=r.setup(s),n=document.getElementById(t);n&&(n.addJsListener=(t,n)=>{"mediaLoaded"===t&&e.addEventListener("medialoaded",(()=>{n()}))});const o=d.id;d.isPlaylist?e.loadPlaylist({playlistId:o}):e.loadMedia({entryId:o})}catch(e){}},t.thumbEmbed=e=>{const{targetId:t,partnerId:n,uiConfId:r,mediaInfo:d}=(0,i.getInfoFromV2Config)(e);try{const e={config:{targetId:t,provider:{partnerId:n}},mediaInfo:{entryId:d.id}};(0,o.thumbnailEmbed)(e)}catch(e){}}},890:function(e,t){Object.defineProperty(t,"__esModule",{value:!0}),t.buildConfigFromFlashvars=t.getMediaInfo=t.getInfoFromV2Config=void 0,t.getInfoFromV2Config=e=>({targetId:e.targetId,partnerId:e.wid.match(/\d+/g).join(""),uiConfId:e.uiconf_id,mediaInfo:(0,t.getMediaInfo)(e)}),t.getMediaInfo=e=>{if(e.entry_id)return{id:e.entry_id,isPlaylist:!1};let t="";const n=e.flashvars;return n.hasOwnProperty("playlistAPI.kpl0Id")?t=n["playlistAPI.kpl0Id"]:n.hasOwnProperty("playlistAPI")&&n.playlistAPI.hasOwnProperty("kpl0Id")&&(t=n.playlistAPI.kpl0Id),{id:t,isPlaylist:!0}},t.buildConfigFromFlashvars=e=>{let t={text:{},playback:{},streaming:{},abr:{},drm:{},network:{},plugins:{}};if(e.hasOwnProperty("flashvars")){const n=e.flashvars;n.hasOwnProperty("autoPlay")&&(t.playback.autoplay=n.autoPlay)}return t}}},t={};function n(o){var i=t[o];if(void 0!==i)return i.exports;var r=t[o]={exports:{}};return e[o](r,r.exports,n),r.exports}!function(){const e=n(371);window.kWidget={embed:e.embed,thumbEmbed:e.thumbEmbed}}()}();';
+            $bundleContent = $bundleContent . $v2ToV7Code;
+        }
 
 		// send cache headers
 		$this->sendHeaders($bundleContent, $lastModified);
@@ -484,9 +495,11 @@ class embedPlaykitJsAction extends sfAction
 		}
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
+        //KalturaLog::log("Autoembed:" .$config);
 		foreach ($config as $key=>$val)
 		{
 			$config[$key] = json_decode($val);
+            KalturaLog::log("Key:" .$key ." value:" . $val);
 		}
 
 		if (!isset($config["provider"]))
@@ -498,13 +511,18 @@ class embedPlaykitJsAction extends sfAction
 		$config["provider"]->uiConfId = $this->uiconfId;
 
 		$ks = $this->getRequestParameter(self::KS_PARAM_NAME);
-
 		if ($ks)
 		{
 			$config["provider"]->ks = $ks;
 		}
 
 		$config["targetId"] = $targetId;
+
+        //Add v2 to v7 config
+        if($this->uiConf->getV2tov7id() && ($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) || $this->uiConf->getV2tov7Approved()) )
+        {
+            $config = v2Tov7Utils::addV2toV7config($config,$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$this->uiconfId);
+        }
 
 		$config = json_encode($config);
 		if ($config === false)
@@ -543,7 +561,7 @@ class embedPlaykitJsAction extends sfAction
                         </head >
                         <body >
                         	<div id="player_container"></div>
-			 	<script type = "text/javascript" > window.originalRequestReferrer = "' . $_SERVER['HTTP_REFERER'] . '"</script >
+			 	<script type = "text/javascript" > window.originalRequestReferrer = "' . @$_SERVER['HTTP_REFERER'] . '"</script >
                             	<script type = "text/javascript" > ' . $bundleContent . '</script >
 			</body >
                     </html >';
@@ -576,6 +594,7 @@ class embedPlaykitJsAction extends sfAction
 				if (!$this->bundleConfig) {
 					$this->bundleConfig = array();
 				}
+                KalturaLog::log("versionsArr" . print_r($versionsArr,true));
 				$this->bundleConfig = array_merge($this->bundleConfig, $versionsArr);
 			}
 		}
@@ -813,6 +832,15 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$this->mergeVersionsParamIntoConfig();
+
+        if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) && $this->getRequestParameter(v2Tov7Utils::SHOULD_TRANSLATE_PLUGINS))
+        {
+            v2Tov7Utils::addV2toV7plugins(
+                $this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),
+                $this->bundleConfig,
+                $this->playerConfig);
+        }
+
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
@@ -821,6 +849,8 @@ class embedPlaykitJsAction extends sfAction
 		$this->setFixVersionsNumber();
 		$this->setBundleName();
 	}
+
+
 
 	private function setBundleName()
 	{
@@ -843,5 +873,77 @@ class embedPlaykitJsAction extends sfAction
 		$returnValue = parent::getRequestParameter($name, $default);
 		return $returnValue ? $returnValue : $default;
 	}
+
+//    private function getTranslatedPluginName($v2PluginName)
+//    {
+//        KalturaLog::log("Searching for " . $v2PluginName. " " . strlen($v2PluginName));
+//        $translation = ["info" => ["playkit-info","playkit-js-info"],
+//            "quiz" => ["playkit-ivq","ivq"],
+//            "moderation" => ["playkit-moderation","playkit-js-moderation" ],
+//            "playlist" => ["playkit-playlist","playlist"]];
+//        $v7PluginName =  $translation[$v2PluginName];
+//        KalturaLog::log("Found " . print_r($v7PluginName,true));
+//        return $v7PluginName;
+//    }
+//
+//
+//    private function addV2toV7plugins(){
+//        //Merge v7 config
+//        if($this->getRequestParameter(self::V2TOV7_PARAM_NAME, false)) {
+//            $flashvars = $this->getRequestParameter(self::FLASHVARS_PARAM_NAME);
+//            foreach ($flashvars as $key => $value) {
+//                if (strpos($key, ".plugin") !== false) {
+//                    //get plugin name
+//                    KalturaLog::log("V2 to V7 adding plugin: " . $key);
+//                    if ($value) {
+//                        if (!$this->bundleConfig) {
+//                            $this->bundleConfig = array();
+//                        }
+//                        $key = trim(trim($key, '"'), "'");
+//                        $v2PluginName = explode(".", $key);
+//                        $v7PluginName = $this->getTranslatedPluginName($v2PluginName[0]);
+//                        KalturaLog::log("v7PluginName: " . $v7PluginName[0] . " configName: " .  $v7PluginName[1]);
+//                        $this->bundleConfig = array_merge($this->bundleConfig, [$v7PluginName[0] => "{latest}"]);
+//                        KalturaLog::log("bundleConfig" . print_r($this->bundleConfig, true));
+//                        $v7PluginConfig = $v7PluginName[1];
+//                        if(!isset($this->playerConfig->plugins->$v7PluginConfig))
+//                        {
+//                            if(!isset($this->playerConfig->plugins))
+//                            {
+//                                $this->playerConfig->plugins = new stdClass();
+//                            }
+//
+//                            $this->playerConfig->plugins->$v7PluginConfig = new stdClass();
+//                            KalturaLog::log("adding plugin config :" . print_r(  $this->playerConfig->plugins,true));
+//                        }
+//
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    private function addV2toV7config($config){
+//        //Merge v7 config
+//        if($this->getRequestParameter(self::V2TOV7_PARAM_NAME, false)) {
+//            if (!isset($config["provider"])) {
+//                $config["provider"] = new stdClass();
+//            }
+//            $config["uiconf_id"] = $this->uiconfId;
+//            $flashvars = $this->getRequestParameter("flashvars");
+//            foreach ($flashvars as $key => $value) {
+//
+//                $key = trim(trim($key, '"'), "'");
+//                $providerParams = ["partnerId","uiconf_id","entry_id","cache_st","wid","ks","autoPlay","playlistAPI.autoContinue"];
+//                if (in_array($key,$providerParams)) {
+//                    if ($value) {
+//                        KalturaLog::log("V2 to V7 adding ks: " . $value);
+//                        $config["provider"]->$key = $value;
+//                    }
+//                }
+//            }
+//        }
+//        return $config;
+//    }
 
 }
