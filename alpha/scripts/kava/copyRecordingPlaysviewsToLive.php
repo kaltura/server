@@ -4,6 +4,16 @@ require_once (dirname(__FILE__).'/../bootstrap.php');
 ini_set("memory_limit", "1024M");
 define('ENTRIES_CHUNK', 500);
 
+$lockTimeout = 5;
+$lockDuration = 1 * 60 * 60; // one hour
+$lockName = 'kava_plays_views_sync';
+$lock = kLock::create($lockName);
+if ($lock && !$lock->lock($lockTimeout, $lockDuration)) 
+{
+	KalturaLog::err('Failed to acquire script lock, aborting script.');
+	die('Failed to acquire script lock, aborting script.');
+}
+
 function handleChunk($currIdsMap)
 {
 	global $fp, $map;
@@ -118,3 +128,8 @@ foreach ($map as $entryId => $values)
 	fwrite($fp, implode("\t", $entryValues) . "\n");
 }
 fclose($fp);
+
+if ($lock)
+{
+	$lock->unlock();
+}
