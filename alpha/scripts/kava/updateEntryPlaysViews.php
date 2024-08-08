@@ -3,7 +3,7 @@
 require_once (dirname(__FILE__).'/../bootstrap.php');
 
 $lockTimeout = 5;
-$lockDuration = 4 * 60 * 60 - 10; // a bit under 4 Hours
+$lockDuration = 24 * 60 * 60 - 10; // a bit under 24 Hours
 $lockName = basename(__FILE__, '.php');
 $lock = kLock::create($lockName);
 if ($lock && !$lock->lock($lockTimeout, $lockDuration)) 
