@@ -173,7 +173,7 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	public $v2tov7ShouldTranslatePlugins;
 
 
-    private static $map_between_objects = array
+	private static $map_between_objects = array
 	(
 		"id" ,
 		"creationMode" , 
@@ -197,11 +197,11 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 		"updatedAt", 
 		"html5Url",
 		"config",
-        "version",
+		"version",
 		"partnerTags",
 		"v2tov7id",
-        "v2tov7Approved",
-        "v2tov7ShouldTranslatePlugins"
+		"v2tov7Approved",
+		"v2tov7ShouldTranslatePlugins"
 	);
 
 	public function getMapBetweenObjects ( )
