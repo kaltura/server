@@ -17,16 +17,16 @@ class kOperationResources extends kContentResource
 	private $chapterNamePolicy;
 
 	/**
-	 * @var KalturaCropAspectRatio
+	 * @var array<kDimensionsAttributes>
 	 */
-	private $cropAspectRatio;
+	private $dimensionsAttributes;
 
 	/**
-	 * @return KalturaCropAspectRatio
+	 * @return array<kDimensionsAttributes>
 	 */
-	public function getCropAspectRatio()
+	public function getDimensionsAttributes()
 	{
-		return $this->cropAspectRatio;
+		return $this->dimensionsAttributes;
 	}
 
 	/**
@@ -62,10 +62,10 @@ class kOperationResources extends kContentResource
 	}
 
 	/**
-	 * @param KalturaCropAspectRatio $cropAspectRatio
+	 * @param array<kDimensionsAttributes> $dimensionsAttributes
 	 */
-	public function setCropAspectRatio($cropAspectRatio)
+	public function setDimensionsAttributes($dimensionsAttributes)
 	{
-		$this->cropAspectRatio = $cropAspectRatio;
+		$this->dimensionsAttributes = $dimensionsAttributes;
 	}
 }

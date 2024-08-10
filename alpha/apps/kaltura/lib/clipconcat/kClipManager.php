@@ -658,9 +658,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$aspectRatios = array();
 		$allAudioChannels = array();
 		$allAudioSampleRates = array();
-		$cropAspectRatio = $resources->getCropAspectRatio();
-		$crop = $cropAspectRatio ? $cropAspectRatio->getCrop() : false;
-		$aspectRatio = $cropAspectRatio ? $cropAspectRatio->getAspectRatio() : null;
+		$dimensionsAttributes = $resources->getDimensionsAttributes();
+		$crop = $this->getResourcesCropMode($dimensionsAttributes);
+		$aspectRatio = $this->getResourcesAspectRatio($dimensionsAttributes);
 
 		foreach ($resourcesData as $key => $resourceData)
 		{
@@ -685,9 +685,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$resourcesData[$key][self::CROP_DATA_ARRAY] = $this->getCropDataArray($aspectRatio, $currentWidth, $currentHeight, $resourceData[self::OPERATION_ATTRIBUTES_ARRAY]);
 				if(count($resourcesData[$key][self::CROP_DATA_ARRAY]) > 0)
 				{
-					// consider the dimensions after cropping to calculate target dimensions
-					$currentWidth = $resourcesData[$key][self::CROP_DATA_ARRAY][0]["outWidth"];
-					$currentHeight = $resourcesData[$key][self::CROP_DATA_ARRAY][0]["outHeight"];
+					foreach ($resourcesData[$key][self::CROP_DATA_ARRAY] as $cropDataArray)
+					{
+						// consider the dimensions after cropping to calculate target dimensions
+						$outWidth = isset($cropDataArray["outWidth"]) ? $cropDataArray["outWidth"] : null;
+						$outHeight = isset($cropDataArray["outHeight"]) ? $cropDataArray["outHeight"] : null;
+						if($outWidth && $outHeight)
+						{
+							$currentWidth = $outWidth;
+							$currentHeight = $outHeight;
+							break;
+						}
+					}
 				}
 			}
 
@@ -739,8 +748,38 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$this->setConversionParamsOnResourcesData($resourcesData, $generalConversionParams);
 	}
 
+	protected function getResourcesCropMode($dimensionsAttributes)
+	{
+		foreach ($dimensionsAttributes as $dimensionsAttribute)
+		{
+			if($dimensionsAttribute instanceof kAspectRatioCropAttributes)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected function getResourcesAspectRatio($dimensionsAttributes)
+	{
+		foreach ($dimensionsAttributes as $dimensionsAttribute)
+		{
+			if($dimensionsAttribute instanceof kAspectRatioCropAttributes || $dimensionsAttribute instanceof kAspectRatioScaleAttributes)
+			{
+				return $dimensionsAttribute->getAspectRatio();
+			}
+		}
+		return null;
+	}
+
 	protected function getCropData($targetAspectRatio, $inWidth, $inHeight, $cropAlignmentPercent = null)
 	{
+		// missing dimensions
+		if(!$targetAspectRatio || !$inWidth || !$inHeight)
+		{
+			return array();
+		}
+
 		// no cropping
 		if($inWidth / $inHeight == $targetAspectRatio)
 		{
@@ -876,10 +915,20 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($croppingMode)
 			{
 				$currentConversionParams[self::CROP_DATA_ARRAY] = $resourceData[self::CROP_DATA_ARRAY];
-				$outHeight = $resourceData[self::CROP_DATA_ARRAY][0]["outHeight"];
-				$outWidth = $resourceData[self::CROP_DATA_ARRAY][0]["outWidth"];
-				$currentConversionParams[self::CROP_HEIGHT] = $outHeight;
-				$currentConversionParams[self::CROP_WIDTH] = $outWidth;
+				$outWidth = null;
+				$outHeight = null;
+				foreach ($resourceData[self::CROP_DATA_ARRAY] as $cropDataArray)
+				{
+					// consider the dimensions after cropping to calculate target dimensions
+					$outWidth = isset($cropDataArray["outWidth"]) ? $cropDataArray["outWidth"] : null;
+					$outHeight = isset($cropDataArray["outHeight"]) ? $cropDataArray["outHeight"] : null;
+					if($outWidth && $outHeight)
+					{
+						$currentConversionParams[self::CROP_HEIGHT] = $outHeight;
+						$currentConversionParams[self::CROP_WIDTH] = $outWidth;
+						break;
+					}
+				}
 
 				$shouldScale = $outHeight != $targetHeight || $outWidth != $targetWidth;
 				if($shouldScale)
@@ -937,6 +986,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		$inputWidth = $inputMediaInfo->getVideoWidth();
 		$inputHeight = $inputMediaInfo->getVideoHeight();
+
+		// missing dimensions
+		if(!$inputHeight || !$outputHeight)
+		{
+			return false;
+		}
 
 		$inputRatio = $inputWidth / $inputHeight;
 		$outputRatio = $outputWidth / $outputHeight;
@@ -1964,15 +2019,30 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function getScaleFilter($ow, $oh, $iw = "iw", $ih = "ih")
 	{
+		// missing dimensions
+		if(!$ow || !$oh || !$iw || !$ih)
+		{
+			return null;
+		}
 		return "scale=$iw*min($ow/$iw\,$oh/$ih):$ih*min($ow/$iw\,$oh/$ih)";
 	}
 	protected function getPadFilter($ow, $oh, $iw = "iw", $ih = "ih")
 	{
+		// missing dimensions
+		if(!$ow || !$oh || !$iw || !$ih)
+		{
+			return null;
+		}
 		return "pad=$ow:$oh:($ow-$iw)/2:($oh-$ih)/2";
 	}
 
 	protected function getCropFilter($ow, $oh, $wp, $hp)
 	{
+		// missing dimensions
+		if(!$ow || !$oh)
+		{
+			return null;
+		}
 		return "crop=$ow:$oh:$wp:$hp";
 	}
 
