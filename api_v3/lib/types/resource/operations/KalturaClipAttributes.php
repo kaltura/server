@@ -91,14 +91,6 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 		{
 			$object_to_fill = new kClipAttributes();
 		}
-
-		$captionAttributes = array();
-		foreach($this->captionAttributes as $captionAttribute)
-		{
-			$captionAttributes[] = $captionAttribute->toObject();
-		}
-		$object_to_fill->setCaptionAttributes($captionAttributes);
-
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
