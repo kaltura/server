@@ -67,4 +67,18 @@ class KalturaMultiLingualStringArray extends KalturaTypedArray
 		
 		return $ret;
 	}
+
+	public function toObjectsArrayPurified($objectClass, $objectProp, $thisProp)
+	{
+		$ret = array();
+		foreach ($this->toArray() as $multiLingualStringObject)
+		{
+			/* @var $multiLingualStringObject KalturaMultiLingualString */
+			$value = $multiLingualStringObject->value;
+			$value = $this->purifyObject($objectClass, $objectProp, $thisProp, $value);
+
+			$ret[$multiLingualStringObject->language] = $value;
+		}
+		return $ret;
+	}
 }
