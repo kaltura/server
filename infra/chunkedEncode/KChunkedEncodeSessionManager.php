@@ -250,7 +250,7 @@
 //					if(!array_key_exists($job->id, $this->failed))
 					{
 						$job->timeout=1;
-						KalturaLog::log("($job->id, atm:$job->attempt)doubled the maxExecutionTime,$job->maxExecTime,elapsed:$elapsed");
+						KalturaLog::log("($job->id, attm:$job->attempt) increase the maxExecutionTime,$job->maxExecTime,elapsed:$elapsed");
 						$this->failed[$job->id] = $job->keyIdx;
 					}
 				}
@@ -691,10 +691,23 @@
 			if(isset($job->timeout) && $job->timeout==1) {
 				$job->maxExecTime=round($job->maxExecTime*1.15);
 				$job->timeout=0;
-				$this->storeManager->SaveJob($job);
-				KalturaLog::log("Extend execution timeout, chunk ($job->id, maxExecTime:$job->maxExecTime, attempt:$job->attempt");
+				// After 1/2 of the timeout retries (w/out retrying the chunk job),
+				// retry the chunk job afterall.
+				// It's needed to handle dying/crashing pods cases.
+				if($job->attempt<$this->maxRetries/2 
+				|| (isset($job->changedJobOnTimeout) && $job->changedJobOnTimeout==1)) {
+					$this->storeManager->SaveJob($job);
+					KalturaLog::log("Extend execution timeout: chunk ($job->id, maxExecTime:$job->maxExecTime, attempt:$job->attempt)");
+					return true;
+				}
+				else {
+					$job->changedJobOnTimeout=1;
+					KalturaLog::log("On timeout half attempts count - start new chunk job: chunk ($job->id, maxExecTime:$job->maxExecTime, attempt:$job->attempt)");
+					KalturaLog::log("Extend execution timeout: chunk ($job->id, maxExecTime:$job->maxExecTime, attempt:$job->attempt)");
+				}
 			}
-			else {
+
+			{
 				$failedIdx = $job->keyIdx;
 				$job->state = $job::STATE_RETRY;
 				$this->storeManager->SaveJob($job);
