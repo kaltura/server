@@ -174,6 +174,8 @@ class embedIframeJsAction extends sfAction
 					$config['bundleConfig'],
 					$config['playerConfig']);
 			}
+			//validate that the facade is reachable
+			v2Tov7Utils::getBundledFacade();
 		}
 		catch(Exception $e)
 		{

@@ -125,4 +125,35 @@ class v2Tov7Utils
 			"bumper"        => [ "playkit-bumper" , "bumper" ],
 			"infoScreen" => ["playkit-info", "playkit-js-info"]];
 	}
+
+	public static function getBundledFacade()
+	{
+		//build key based on version
+		$facadeVersion = kConf::getArrayValue('v2tov7FacadeVersion','playkit-js');
+		$facadeVersion .= "/v2tov7Facade.js";
+
+		//try get value from local memcache
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS);
+		$bundledFacade = $cacheStore->get($facadeVersion);
+		if(strlen($bundledFacade))
+		{
+			return $bundledFacade;
+		}
+
+		//if not local - get it from remote location
+		$remoteUrl = kConf::getArrayValue('v2tov7FacadeRemoteUrl','playkit-js');
+		$remoteUrl .= '/' . $facadeVersion;
+
+		$curlWrapper = new KCurlWrapper();
+
+		$content = $curlWrapper->exec($remoteUrl,null, null, true);
+		if(KCurlHeaderResponse::isError($curlWrapper->getHttpCode()))
+		{
+			throw new Exception ('Cannot find V2 to V7 facade in the following URL: ' . $remoteUrl . "Error code:" . $curlWrapper->getHttpCode());
+		}
+
+		//store in local cache for next time
+		$cacheStore->set($facadeVersion,$content);
+		return $content;
+	}
 }
