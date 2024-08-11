@@ -898,6 +898,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		{
 			$imageToVideo = $resourceData[self::IMAGE_TO_VIDEO];
 			$mediaInfoObj = $resourceData[self::MEDIA_INFO_OBJECT];
+			$subtitles = isset($resourceData[self::SUBTITLES_DATA_ARRAY]) && count($resourceData[self::SUBTITLES_DATA_ARRAY]) > 0;
 
 			$currentConversionParams = array();
 			$currentConversionParams[self::TARGET_HEIGHT] = $targetHeight;
@@ -963,6 +964,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				{
 					$currentConversionParams[self::TARGET_WIDTH] = $targetWidth; // trigger scale
 				}
+			}
+			if($subtitles)
+			{
+				$prevParams = isset($currentConversionParams[self::EXTRA_CONVERSION_PARAMS]) ? $currentConversionParams[self::EXTRA_CONVERSION_PARAMS] : "";
+				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = $prevParams . " -copyts";
 			}
 
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
@@ -1399,7 +1405,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					// assume concatenated assets have the same actualFlavorParamsId and take the last
 					$lastAssetId = $flavorAssetId ? $flavorAssetId : $lastAssetId;
 				}
-				$this->deleteEntry($jobData->getTempEntryId());
+//				$this->deleteEntry($jobData->getTempEntryId());
 			}
 
 			// use no filter because we delete the entry
