@@ -552,7 +552,7 @@ abstract class KalturaObject implements IApiObject
 	 	    else 
             	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "] defined as property [$this_prop] on api class [$class]");
 		}
-		KalturaLog::debug('Ending toObject - ' . print_r($object_to_fill, true));
+
 		return $object_to_fill;		
 	}
 	
