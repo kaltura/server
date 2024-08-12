@@ -1,9 +1,18 @@
+# Tucana-20.17.0
+## New KME user reset password link  ##
+- Issue Type: Bug
+- Issue ID: NR2-8250
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links' (with the service url of the required KME environment):
+kme_nr = @KME_NR_SERVICE_URL@/u/#/forgotPassword/
+
 # Tucana-20.16.0
 # Add permissions for session get ##
 - Issue Type: Task
 - Issue ID: PLAT-24908
 ### Deployment Scripts ###
-	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permission.php
+	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permissions.php
 
 ## Add KMC Headers
 * Issue Type: Task

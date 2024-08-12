@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaBooleanNotificationTemplate">
+                <name>Transcript Asset Data Changed</name>
+                <systemName>TRANSCRIPT_ASSET_DATA_CHANGED</systemName>
+                <description>Boolean notification template to be sent when transcript asset data has changed</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>6</eventType>
+                <!-- EventNotificationEventType::OBJECT_DATA_CHANGED -->
+                <eventObjectType>transcriptAssetEventNotifications.TranscriptAsset</eventObjectType>
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Transcript asset status changed to ready</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject() instanceof TranscriptAsset &amp;&amp; $scope->getObject()->getStatus() == asset::ASSET_STATUS_READY</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Format JSON</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getContainerFormat() == AttachmentType::JSON</code>
+                        </field>
+                    </item>
+                </eventConditions>
+            </template>
+        </request>
+    </multirequest>
+</xml>

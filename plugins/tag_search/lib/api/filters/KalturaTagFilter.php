@@ -13,6 +13,13 @@ class KalturaTagFilter extends KalturaFilter
 	public $objectTypeEqual;
 
 	/**
+	 *
+	 *
+	 * @var string
+	 */
+	public $objectTypeIn;
+
+	/**
 	 * 
 	 * 
 	 * @var string
@@ -38,7 +45,8 @@ class KalturaTagFilter extends KalturaFilter
     
  	static private $map_between_objects = array
 	(
-		"objectTypeEqual" => "_eq_object_type",
+	    "objectTypeEqual" => "_eq_object_type",
+	    "objectTypeIn" => "_in_object_type",
 	    "instanceCountEqual" => "_eq_instance_count",
 	    "instanceCountIn" => "_in_instance_count", 
 	);
