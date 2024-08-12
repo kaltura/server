@@ -1,7 +1,4 @@
 <?php
-
-require_once dirname(__FILE__)."/../../../lib/v2ToV7Utils.class.php";
-
 /**
  * @package Core
  * @subpackage externalWidgets
