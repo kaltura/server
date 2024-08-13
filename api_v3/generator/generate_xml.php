@@ -53,8 +53,6 @@ $xmlGenerator = new XmlClientGenerator();
 $xmlGenerator->generate();
 
 $files = $xmlGenerator->getOutputFiles();
-KalturaLog::log(print_r($files["KalturaClient.xml"], true));
-
 file_put_contents($xmlFileName, $files["KalturaClient.xml"]);
 
 KalturaLog::info("XML generated: $xmlFileName");
