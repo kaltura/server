@@ -461,7 +461,7 @@ $stub=null;
 		 * (this option is irrelevant for rendering)
 		 */
 		KalturaLog::log("subtitlesData:".json_encode($subtitlesData));
-		$language = $subtitlesData->language ? $subtitlesData->language : "default";
+		$language = isset($subtitlesData->language) && $subtitlesData->language ? $subtitlesData->language : "default";
 		$tmpCaptionFilePath = $data->destFileSyncLocalPath.".temp.$language.srt";
 		if(isset(KBatchBase::$taskConfig->params->sharedTempPath))
 		{
@@ -469,7 +469,7 @@ $stub=null;
 		}
 
 		$captionFilePath = null;
-		if($subtitlesData->captionFileUrl)
+		if(isset($subtitlesData->captionFileUrl) && $subtitlesData->captionFileUrl)
 		{
 			$captionFilePath = self::fetchCaptionFile($subtitlesData->captionFileUrl, $tmpCaptionFilePath);
 		}
