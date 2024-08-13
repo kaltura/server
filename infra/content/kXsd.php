@@ -465,10 +465,12 @@ class kXsd
 	{
 		$from = new KDOMDocument();
 		$from->loadXML($xml);
-		
+		KalturaLog::log("========== here it is1: $xslStr");
+		KalturaLog::log("========== here it is2: $xml");
+
 		$xsl = new KDOMDocument();
 		$xsl->loadXML($xslStr);
-		
+
 		$proc = new XSLTProcessor();
 		$importStyleSheetResult = $proc->importStyleSheet($xsl);
 		if(!$importStyleSheetResult)

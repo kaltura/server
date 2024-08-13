@@ -217,6 +217,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 	public $subtitlesData;
 
 	/**
+	 * @var string
+	 */
+	public $cropData;
+
+	/**
 	 * @var int
 	 */
 	public $isEncrypted;
@@ -278,6 +283,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"videoBitrateTolerance",
 		"watermarkData",
 		"subtitlesData",
+		"cropData",
 		"isEncrypted",
 		"contentAwareness",
 		"chunkedEncodeMode",
