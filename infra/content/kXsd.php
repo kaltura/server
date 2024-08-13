@@ -465,10 +465,8 @@ class kXsd
 	{
 		$from = new KDOMDocument();
 		$from->loadXML($xml);
-		
 		$xsl = new KDOMDocument();
 		$xsl->loadXML($xslStr);
-		
 		$proc = new XSLTProcessor();
 		$importStyleSheetResult = $proc->importStyleSheet($xsl);
 		if(!$importStyleSheetResult)

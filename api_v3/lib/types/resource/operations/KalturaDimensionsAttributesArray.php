@@ -3,11 +3,11 @@
  * @package api
  * @subpackage objects
  */
-class KalturaOperationAttributesArray extends KalturaTypedArray
+class KalturaDimensionsAttributesArray extends KalturaTypedArray
 {
 	public static function fromDbArray(array $arr = null, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$newArr = new KalturaOperationAttributesArray();
+		$newArr = new KalturaDimensionsAttributesArray();
 		if(is_null($arr))
 			return $newArr;
 			
@@ -24,6 +24,6 @@ class KalturaOperationAttributesArray extends KalturaTypedArray
 	
 	public function __construct()
 	{
-		parent::__construct("KalturaOperationAttributes");	
+		parent::__construct("KalturaDimensionsAttributes");
 	}
 }

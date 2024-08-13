@@ -17,6 +17,19 @@ class kOperationResources extends kContentResource
 	private $chapterNamePolicy;
 
 	/**
+	 * @var array<kDimensionsAttributes>
+	 */
+	private $dimensionsAttributes;
+
+	/**
+	 * @return array<kDimensionsAttributes>
+	 */
+	public function getDimensionsAttributes()
+	{
+		return $this->dimensionsAttributes;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getResources()
@@ -46,5 +59,13 @@ class kOperationResources extends kContentResource
 	public function setChapterNamePolicy($chapterNamePolicy)
 	{
 		$this->chapterNamePolicy = $chapterNamePolicy;
+	}
+
+	/**
+	 * @param array<kDimensionsAttributes> $dimensionsAttributes
+	 */
+	public function setDimensionsAttributes($dimensionsAttributes)
+	{
+		$this->dimensionsAttributes = $dimensionsAttributes;
 	}
 }
