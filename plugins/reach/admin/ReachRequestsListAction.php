@@ -38,6 +38,8 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		$entryVendorTaskFilterForm = self::getFilterForm($request, $action);
 		$action->view->filterForm = $entryVendorTaskFilterForm;
 		$action->view->paginator = $paginator;
+
+		$this->addCreatedAtParamsToFilter($request, $action, $entryVendorTaskFilter);
 	}
 
 	protected function initFilter($request)
@@ -106,7 +108,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		}
 		else
 		{
-			$entryVendorTaskFilter->statusIn = EntryVendorTaskStatus::PENDING . ',' . EntryVendorTaskStatus::PROCESSING . ',' . EntryVendorTaskStatus::ERROR . ',' . EntryVendorTaskStatus::SCHEDULED;
+			$entryVendorTaskFilter->statusIn = EntryVendorTaskStatus::READY . ',' . EntryVendorTaskStatus::PENDING . ',' . EntryVendorTaskStatus::PROCESSING . ',' . EntryVendorTaskStatus::ERROR . ',' . EntryVendorTaskStatus::SCHEDULED;
 		}
 	}
 
@@ -130,5 +132,45 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 
 		$isAllowed = ($result->totalCount > 0) && ($result->objects[0]->status == Kaltura_Client_Enum_PermissionStatus::ACTIVE);
 		return $isAllowed;
+	}
+
+	private function addCreatedAtParamsToFilter($request, $action, &$entryVendorTaskFilter)
+	{
+		if ($request->getParam('createdAtFrom', false))
+		{
+			$createdAtFrom = new Zend_Date($this->_getParam('createdAtFrom', $this->getDefaultFromDate()));
+			$entryVendorTaskFilter->createdAtGreaterThanOrEqual = $createdAtFrom->toString(Zend_Date::TIMESTAMP);
+		}
+		else
+		{
+			$createdAtFrom = $action->view->filterForm->getElement('createdAtFrom');
+			$createdAtFrom->setValue(date('m/d/Y', $this->getDefaultFromDate()));
+
+			$entryVendorTaskFilter->createdAtGreaterThanOrEqual = $this->getDefaultFromDate();
+		}
+
+		if ($request->getParam('createdAtTo', false))
+		{
+			$createdAtTo = new Zend_Date($this->_getParam('createdAtTo', $this->getDefaultToDate()));
+			$createdAtTo->addDay(1);
+			$entryVendorTaskFilter->createdAtLessThanOrEqual = $createdAtTo->toString(Zend_Date::TIMESTAMP);
+		}
+		else
+		{
+			$createdAtTo = $action->view->filterForm->getElement('createdAtTo');
+			$createdAtTo->setValue(date('m/d/Y', $this->getDefaultToDate()));
+
+			$entryVendorTaskFilter->createdAtLessThanOrEqual = $this->getDefaultToDate();
+		}
+	}
+
+	private function getDefaultFromDate()
+	{
+		return time() - (60 * 60 * 12);
+	}
+
+	private function getDefaultToDate()
+	{
+		return time() + (60 * 60 * 12);
 	}
 }
