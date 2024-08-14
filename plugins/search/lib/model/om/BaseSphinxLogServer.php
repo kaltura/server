@@ -490,9 +490,9 @@ abstract class BaseSphinxLogServer extends BaseObject  implements Persistent {
 	 */
 	public function hasOnlyDefaultValues()
 	{
-			if ($this->populate_active !== 1) {
-				return false;
-			}
+		if ($this->populate_active !== 1) {
+			return false;
+		}
 
 		// otherwise, everything was equal, so return TRUE
 		return true;
