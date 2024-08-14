@@ -77,6 +77,7 @@ class embedPlaykitJsAction extends sfAction
 			$v2ToV7Code = v2Tov7Utils::getBundledFacade();
 			$v2ToV7Code =  PHP_EOL . PHP_EOL . $v2ToV7Code;
 			$bundleContent = $bundleContent . $v2ToV7Code;
+
 		}
 
 		// send cache headers
@@ -171,6 +172,13 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = $this->appendConfig($bundleContentParts[1], $i18nContent, $extraModulesNames);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
+
+		//Add v2 to v7 config
+		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
+		{
+			$v2ToV7config = v2Tov7Utils::addV2toV7config($this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$this->uiconfId);
+			$bundleContent .= $v2ToV7config;
+		}
 
 		//if auto embed selected add embed script to bundle content
 		if ($autoEmbed)
@@ -514,13 +522,6 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$config["targetId"] = $targetId;
-
-		//Add v2 to v7 config
-		if($this->uiConf->getV2tov7id() && ($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) || $this->uiConf->getV2tov7Approved()) )
-		{
-			$config = v2Tov7Utils::addV2toV7config($config,$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$this->uiconfId);
-		}
-
 		$config = json_encode($config);
 		if ($config === false)
 		{

@@ -163,7 +163,7 @@ class embedIframeJsAction extends sfAction
 			$config = array();
 			$config['bundleConfig'] = null;
 			$config['playerConfig'] = new stdClass();
-			$config = v2Tov7Utils::addV2toV7config($config,$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$v7Id);
+			v2Tov7Utils::addV2toV7config($this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$v7Id);
 			if($shouldTranslatePlugins)
 			{
 				v2Tov7Utils::addV2toV7plugins(

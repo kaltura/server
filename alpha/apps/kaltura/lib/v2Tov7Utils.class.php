@@ -67,40 +67,23 @@ class v2Tov7Utils
 		}
 	}
 
-	static function addV2toV7config($config, $flashvars, $uiconfId)
+	static function addV2toV7config($flashvars, $uiconfId)
 	{
+		$config = [];
 		//Merge v7 config
-		if (!isset($config["provider"])) {
-			$config["provider"] = new stdClass();
-		}
-		$unHandledVars = array();
 		$config["uiconf_id"] = $uiconfId;
 		if($flashvars)
 		{
+			$config["flashvars"] = [];
 			foreach ($flashvars as $key => $value) {
-				if(self::isVarPlugin($key))
-				{
-					continue;
-				}
 				$key = trim(trim($key, '"'), "'");
-				$providerParams = ["partnerId", "uiconf_id", "entry_id", "cache_st", "wid", "ks", "autoPlay", "playlistAPI.autoContinue"];
-				if (in_array($key, $providerParams)) {
-					if ($value) {
-						KalturaLog::log("V2toV7 adding {$key}: " . $value);
-						$config["provider"]->$key = $value;
-					}
-				}
-				else{
-					$unHandledVars[] = $key;
-				}
-			}
-			if(sizeof($unHandledVars))
-			{
-				throw new Exception("UnHandled params:" . implode(",",$unHandledVars));
+				//$providerParams = ["partnerId", "uiconf_id", "entry_id", "cache_st", "wid", "ks", "autoPlay", "playlistAPI.autoContinue"];
+				$config['flashvars'][$key] = $value;
 			}
 		}
-
-		return $config;
+		$ret = PHP_EOL.'window.__kalturaplayerdataV2toV7=' . json_encode($config);
+		KalturaLog::log("Adding config code:" . $ret);
+		return $ret;
 	}
 
 	private static function isVarPlugin($varKeyName)
