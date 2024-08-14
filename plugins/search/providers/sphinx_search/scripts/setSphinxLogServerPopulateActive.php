@@ -100,21 +100,22 @@ foreach ($sphinxLogServers as $sphinxLogServer)
 }
 
 KalturaLog::log("Successfully updated all sphinx_log_server.server [$sphinxServer] sphinx_log_server.populate_active to [$populateActiveValue]");
-KalturaLog::log("Sleeping for 5 seconds to wait for 'populateFromLog.php' to identify the change to sphinx_log_server for [$sphinxServer]");
-sleep(5);
-
-// verify last_log_id progress or not progress
-SphinxLogServerPeer::clearInstancePool();
-$sphinxLogServers = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
-foreach ($sphinxLogServers as $sphinxLogServer)
-{
-	$lastLogId[$sphinxLogServer->getDc()] = $sphinxLogServer->getLastLogId();
-}
 
 // if we disabled populate_active - verify last_log_id stopped progressing
-// we do not if we enabled populate_active because in low traffic system it will not necessarily progress
+// we do not check "$populateActiveValue === 1" last_log_id is progressing because in low traffic environment it will not necessarily progress
 if ($populateActiveValue === 0)
 {
+	KalturaLog::log("Sleeping for 5 seconds to wait for 'populateFromLog.php' to identify the change to sphinx_log_server for [$sphinxServer]");
+	sleep(5);
+
+	// verify last_log_id stopped progress
+	SphinxLogServerPeer::clearInstancePool();
+	$sphinxLogServers = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
+	foreach ($sphinxLogServers as $sphinxLogServer)
+	{
+		$lastLogId[$sphinxLogServer->getDc()] = $sphinxLogServer->getLastLogId();
+	}
+	
 	while ($keepChecking && $retry < $retryAttempts)
 	{
 		SphinxLogServerPeer::clearInstancePool();
