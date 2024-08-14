@@ -251,6 +251,11 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 					KBatchBase::$kClient->vendorCatalogItem->update($bulkUploadResult->vendorCatalogItemId, $vendorCatalogItem);
 					break;
 
+				case KalturaBulkUploadAction::DELETE:
+					$bulkUploadResultChunk[] = $bulkUploadResult;
+					KBatchBase::$kClient->vendorCatalogItem->delete($bulkUploadResult->vendorCatalogItemId);
+					break;
+
 				case KalturaBulkUploadAction::UPDATE_STATUS:
 					$bulkUploadResultChunk[] = $bulkUploadResult;
 					KBatchBase::$kClient->vendorCatalogItem->updateStatus($bulkUploadResult->vendorCatalogItemId, KalturaVendorCatalogItemStatus::DEPRECATED);

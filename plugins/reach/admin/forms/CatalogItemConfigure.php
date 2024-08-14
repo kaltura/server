@@ -63,7 +63,6 @@ class Form_CatalogItemConfigure extends ConfigureForm
 
 		$this->addElement('text', 'createdBy', array(
 			'label' => 'Created By:',
-			'required' => true,
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
 		));
@@ -182,14 +181,12 @@ class Form_CatalogItemConfigure extends ConfigureForm
 
 		$this->addElement('text', 'contract', array(
 			'label' => 'Contract:',
-			'required' => true,
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
 		));
 
 		$this->addElement('text', 'notes', array(
 			'label' => 'Notes:',
-			'required' => true,
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
 		));

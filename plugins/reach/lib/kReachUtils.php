@@ -5,7 +5,7 @@
 class kReachUtils
 {
 	static private $catalogItemDateFields = array('createdAt', 'updatedAt');
-	static private $catalogItemTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime','outputFormat');
+	static private $catalogItemTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime','outputFormat','stage');
 
 	static private $entryVendorTaskDateFields = array('createdAt', 'expectedFinishTime');
 	static private $entryVendorTaskTranslateableFields = array('status','serviceType','serviceFeature','turnAroundTime');
@@ -16,7 +16,8 @@ class kReachUtils
 		'outputFormatEnumTranslate'	=> 'VendorCatalogItemOutputFormat',
 		'turnAroundTimeEnumTranslate'	=> 'VendorServiceTurnAroundTime',
 		'serviceFeatureEnumTranslate'	=> 'VendorServiceFeature',
-		'serviceTypeEnumTranslate'	=> 'VendorServiceType'
+		'serviceTypeEnumTranslate'	=> 'VendorServiceType',
+		'stageEnumTranslate' => 'VendorCatalogItemStage',
 	);
 
 	/**
@@ -224,7 +225,7 @@ class kReachUtils
 	 */
 	public static function getVendorCatalogItemsCsvHeaders()
 	{
-		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId','allowResubmission');
+		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId','allowResubmission','requireSource','stage','contract','notes','createdBy');
 	}
 
 
