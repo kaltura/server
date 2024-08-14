@@ -35,18 +35,24 @@ error_reporting(E_ALL);
 KalturaLog::setLogger(new KalturaStdoutLogger());
 
 $populateActiveValue = intval($argv[1]);
-$hostname = $argv[2] ?? ($_SERVER["HOSTNAME"] ?? gethostname());
+$hostname = isset($argv[2]) ? $argv[2] : (isset($_SERVER["HOSTNAME"]) ? $_SERVER["HOSTNAME"] : gethostname());
 
-$config = kConf::get('sphinxPopulateSettings', 'sphinx_populate', array());
-if (empty($config))
+// if we manually passed '$argv[2]' (sphinx_log_server.server) it means we want to control the value and not get it from hosting machine or from config file
+// even if the hostname does not exist, we will fail at line 72
+if (!isset($argv[2]))
 {
-	$configFile = ROOT_DIR . "/configurations/sphinx/populate/$hostname.ini";
-	if(!file_exists($configFile))
+	$config = kConf::get('sphinxPopulateSettings', 'sphinx_populate', array());
+	if (empty($config))
 	{
-		KalturaLog::err("Configuration file [$configFile] not found.");
-		exit(1);
+		$configFile = ROOT_DIR . "/configurations/sphinx/populate/$hostname.ini";
+		
+		if(!file_exists($configFile))
+		{
+			KalturaLog::err("Configuration file [$configFile] not found.");
+			exit(1);
+		}
+		$config = parse_ini_file($configFile);
 	}
-	$config = parse_ini_file($configFile);
 }
 
 $sphinxServer = $config['sphinxServer'] ?? $hostname;
