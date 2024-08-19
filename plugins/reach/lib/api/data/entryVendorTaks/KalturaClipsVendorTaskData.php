@@ -16,6 +16,14 @@ class KalturaClipsVendorTaskData extends KalturaVendorTaskData
 	public $clipsDuration;
 
 	/**
+	 * Event session context ID used to enhance clip results.
+	 *
+	 * @insertonly
+	 * @var string
+	 */
+	public $eventSessionContextId;
+
+	/**
 	 * Instruction describing the moments to capture or the objectives to achieve with the clips.
 	 *
 	 * @insertonly
@@ -34,6 +42,7 @@ class KalturaClipsVendorTaskData extends KalturaVendorTaskData
 	private static $map_between_objects = array
 	(
 		'clipsDuration',
+		'eventSessionContextId',
 		'instruction',
 		'clipsOutputJson',
 	);
