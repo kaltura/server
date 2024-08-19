@@ -65,20 +65,15 @@ class embedPlaykitJsAction extends sfAction
 			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this));
 		}
 
-
-
 		$lastModified = $this->getLastModified($bundleContent);
+
+		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
+		{
+			$bundleContent .= PHP_EOL . v2Tov7Utils::getBundledFacade();
+		}
 
 		//Format bundle content
 		$bundleContent = $this->formatBundleContent($bundleContent, $i18nContent, $extraModulesNames);
-		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
-		{
-			//Will be replaced with URL to remote player code
-			$v2ToV7Code = v2Tov7Utils::getBundledFacade();
-			$v2ToV7Code =  PHP_EOL . PHP_EOL . $v2ToV7Code;
-			$bundleContent = $bundleContent . $v2ToV7Code;
-
-		}
 
 		// send cache headers
 		$this->sendHeaders($bundleContent, $lastModified);
@@ -172,13 +167,6 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = $this->appendConfig($bundleContentParts[1], $i18nContent, $extraModulesNames);
 		$autoEmbed = $this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME);
 		$iframeEmbed = $this->getRequestParameter(self::IFRAME_EMBED_PARAM_NAME);
-
-		//Add v2 to v7 config
-		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
-		{
-			$v2ToV7config = v2Tov7Utils::addV2toV7config($this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$this->uiconfId);
-			$bundleContent .= $v2ToV7config;
-		}
 
 		//if auto embed selected add embed script to bundle content
 		if ($autoEmbed)
@@ -528,9 +516,19 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
 
+		$v2tov7ConfigJs="";
+		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
+		{
+			$v2ToV7config = v2Tov7Utils::addV2toV7config($this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME), $this->uiconfId);
+			$v2tov7ConfigJs = "var v2toV7Config =  window.v2tov7_buildConfigFromFlashvars(" . JSON_encode($v2ToV7config) . ");
+							config = {...config,...v2toV7Config};";
+		}
+
 		$autoEmbedCode = "
 		try {
-			var kalturaPlayer = KalturaPlayer.setup($config);
+			var config=$config;
+			$v2tov7ConfigJs
+			var kalturaPlayer = KalturaPlayer.setup(config);
 			$loadContentMethod
 		} catch (e) {
 			console.error(e.message);

@@ -77,13 +77,10 @@ class v2Tov7Utils
 			$config["flashvars"] = [];
 			foreach ($flashvars as $key => $value) {
 				$key = trim(trim($key, '"'), "'");
-				//$providerParams = ["partnerId", "uiconf_id", "entry_id", "cache_st", "wid", "ks", "autoPlay", "playlistAPI.autoContinue"];
-				$config['flashvars'][$key] = $value;
+				$config['flashvars'][$key] = json_decode($value);
 			}
 		}
-		$ret = PHP_EOL.'window.__kalturaplayerdataV2toV7=' . json_encode($config);
-		KalturaLog::log("Adding config code:" . $ret);
-		return $ret;
+		return $config;
 	}
 
 	private static function isVarPlugin($varKeyName)
