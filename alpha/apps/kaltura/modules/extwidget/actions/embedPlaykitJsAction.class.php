@@ -488,7 +488,6 @@ class embedPlaykitJsAction extends sfAction
 		}
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
-        //KalturaLog::log("Autoembed:" .$config);
 		foreach ($config as $key=>$val)
 		{
 			$config[$key] = json_decode($val);
