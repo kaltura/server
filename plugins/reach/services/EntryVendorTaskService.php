@@ -39,21 +39,21 @@ class EntryVendorTaskService extends KalturaBaseService
 	public function addAction(KalturaEntryVendorTask $entryVendorTask)
 	{
 		$entryVendorTask->validateForInsert();
-		
+
 		$dbEntry = entryPeer::retrieveByPK($entryVendorTask->entryId);
-		if(!$dbEntry)
+		if (!$dbEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryVendorTask->entryId);
 		}
 
 		$dbReachProfile = ReachProfilePeer::retrieveActiveByPk($entryVendorTask->reachProfileId);
-		if(!$dbReachProfile)
+		if (!$dbReachProfile)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $entryVendorTask->reachProfileId);
 		}
 
 		$partnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId());
-		if(!$partnerCatalogItem)
+		if (!$partnerCatalogItem)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_ENABLED_FOR_ACCOUNT, $entryVendorTask->catalogItemId);
 		}
@@ -63,9 +63,17 @@ class EntryVendorTaskService extends KalturaBaseService
 		$taskVersion = $dbVendorCatalogItem->getTaskVersion($dbEntry->getId(), $dbTaskData);
 		$taskDuration = $dbTaskData ? $dbTaskData->getEntryDuration() : null;
 		$featureType = $dbVendorCatalogItem->getServiceFeature();
-		if(!kReachUtils::isFeatureTypeSupportedForEntry($dbEntry, $featureType))
+		if (!kReachUtils::isFeatureTypeSupportedForEntry($dbEntry, $featureType))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY, $featureType, $entryVendorTask->entryId);
+		}
+
+		if ($dbVendorCatalogItem instanceof VendorTranslationCatalogItem && $dbVendorCatalogItem->getRequireSource())
+		{
+			if (!$dbTaskData instanceof kTranslationVendorTaskData || !$dbTaskData->getCaptionAssetId())
+			{
+				throw new KalturaAPIException(KalturaReachErrors::REQUIRE_CAPTION, $dbVendorCatalogItem->getId());
+			}
 		}
 
 		//check if credit has expired
