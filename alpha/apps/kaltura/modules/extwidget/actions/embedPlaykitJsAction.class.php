@@ -492,7 +492,6 @@ class embedPlaykitJsAction extends sfAction
 		foreach ($config as $key=>$val)
 		{
 			$config[$key] = json_decode($val);
-            KalturaLog::log("Key:" .$key ." value:" . $val);
 		}
 
 		if (!isset($config["provider"]))
@@ -516,12 +515,12 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
 
-		$v2tov7ConfigJs="";
+		$v2tov7ConfigJs='';
 		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
 		{
 			$v2ToV7config = v2Tov7Utils::addV2toV7config($this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME), $this->uiconfId);
-			$v2tov7ConfigJs = "var v2toV7Config =  window.v2tov7_buildConfigFromFlashvars(" . JSON_encode($v2ToV7config) . ");
-							config = {...config,...v2toV7Config};";
+			$v2tov7ConfigJs = 'var v2toV7Config =  window.v2tov7_buildConfigFromFlashvars(' . JSON_encode($v2ToV7config) . ');
+							config = {...config,...v2toV7Config};';
 		}
 
 		$autoEmbedCode = "
