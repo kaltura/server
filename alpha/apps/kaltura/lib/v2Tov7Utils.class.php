@@ -71,15 +71,14 @@ class v2Tov7Utils
 	{
 		$config = [];
 		//Merge v7 config
-		$config["uiconf_id"] = $uiconfId;
+
 		if($flashvars)
-		{
-			$config["flashvars"] = [];
-			foreach ($flashvars as $key => $value) {
+		{   foreach ($flashvars as $key => $value) {
 				$key = trim(trim($key, '"'), "'");
-				$config['flashvars'][$key] = json_decode($value);
+				$config[$key] = json_decode($value);
 			}
 		}
+        $config["uiconf_id"] = $uiconfId;
 		return $config;
 	}
 
