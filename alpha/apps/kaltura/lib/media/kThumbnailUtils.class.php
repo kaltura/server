@@ -77,7 +77,7 @@ class kThumbnailUtils
 		if($fileSync)
 		{
 			list($thumbWidth, $thumbHeight, $type, $attr) = kImageUtils::getImageSize($fileSync);
-			$chosenThumbnailDescriptor = kThumbnailDescriptor::fromParams($thumbWidth, $thumbHeight, $defaultThumbnailPath, true);
+			$chosenThumbnailDescriptor = kThumbnailDescriptor::fromParams($thumbWidth, $thumbHeight, $defaultThumbnailPath, true, $fileSync);
 		}
 
 		if ( empty( $thumbAssets ) )

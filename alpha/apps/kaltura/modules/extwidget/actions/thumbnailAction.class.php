@@ -322,6 +322,7 @@ class thumbnailAction extends sfAction
 
 		myPartnerUtils::blockInactivePartner($entry->getPartnerId(), array(Partner::PARTNER_STATUS_ACTIVE, Partner::PARTNER_STATUS_READ_ONLY));
 		
+		$selectedThumbnailDescriptor = null;
 		if ( $nearest_aspect_ratio )
 		{
 			// Get the file path of the thumbnail with the nearest  
@@ -592,6 +593,12 @@ class thumbnailAction extends sfAction
 			$cacheAge = 3600;
 				
 			$cache = new myCache("thumb", 2592000); // 30 days, the max memcache allows
+		}
+		
+		//In case thumbnail descriptor chosen was encrypted delete clear file used for process
+		if ( $selectedThumbnailDescriptor )
+		{
+			$selectedThumbnailDescriptor->deleteTempClearFileIfNeeded();
 		}
 
 		$entryKey = kFileUtils::isFileEncrypt($tempThumbPath) ? $entry->getGeneralEncryptionKey() : null;
