@@ -898,7 +898,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		{
 			$imageToVideo = $resourceData[self::IMAGE_TO_VIDEO];
 			$mediaInfoObj = $resourceData[self::MEDIA_INFO_OBJECT];
-			$subtitles = isset($resourceData[self::SUBTITLES_DATA_ARRAY]) && count($resourceData[self::SUBTITLES_DATA_ARRAY]) > 0;
+			$subtitles = false;
+			if(isset($resourceData[self::SUBTITLES_DATA_ARRAY]))
+			{
+				foreach ($resourceData[self::SUBTITLES_DATA_ARRAY] as $subtitlesArray)
+				{
+					$subtitles = $subtitles || count($subtitlesArray) > 0;
+				}
+			}
 
 			$currentConversionParams = array();
 			$currentConversionParams[self::TARGET_HEIGHT] = $targetHeight;
