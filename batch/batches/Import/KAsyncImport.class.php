@@ -606,6 +606,12 @@ class KAsyncImport extends KJobHandlerWorker
 		$rootPath = self::$taskConfig->params->localTempPath;
 		$fileSizeThreshold = isset(self::$taskConfig->params->fileSizeThreshold) ? self::$taskConfig->params->fileSizeThreshold : null;
 		$shardTempPath = isset(self::$taskConfig->params->sharedTempPath) ? self::$taskConfig->params->sharedTempPath : null;
+		
+		if (!$fileSize && $shardTempPath)
+		{
+			$rootPath = $shardTempPath;
+		}
+		
 		if ($fileSize && $fileSizeThreshold && $shardTempPath && $fileSize > $fileSizeThreshold )
 		{
 			$rootPath = $shardTempPath;
