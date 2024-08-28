@@ -510,9 +510,9 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$v2tov7ConfigJs='';
-		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
+		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
-			$v2ToV7config = v2Tov7Utils::addV2toV7config($this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME), $this->uiconfId);
+			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
 
 		}
@@ -822,16 +822,18 @@ class embedPlaykitJsAction extends sfAction
 
 		$this->mergeVersionsParamIntoConfig();
 
-		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
-        {
-            $this->bundleConfig[v2Tov7Utils::SCRIPT_PLUGIN_NAME] = v2Tov7Utils::SCRIPT_PLUGIN_VERSION;
-            if($this->getRequestParameter(v2Tov7Utils::SHOULD_TRANSLATE_PLUGINS))
-            {
-                v2Tov7Utils::addV2toV7plugins(
-                    $this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),
-                    $this->bundleConfig,
-                    $this->playerConfig);
-            }
+	if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
+		{
+			$this->bundleConfig[v2RedirectUtils::SCRIPT_PLUGIN_NAME] =
+				kConf::getArrayValue('v2RedirectPluginVersion',
+					'playkit-js', 'local', v2RedirectUtils::SCRIPT_PLUGIN_VERSION);
+			if($this->getRequestParameter(v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS))
+			{
+				v2RedirectUtils::addV2toV7plugins(
+					$this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME),
+					$this->bundleConfig,
+					$this->playerConfig);
+			}
 		}
 
 		if (!$this->bundleConfig) {

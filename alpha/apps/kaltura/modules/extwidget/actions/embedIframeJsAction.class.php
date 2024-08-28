@@ -64,7 +64,7 @@ class embedIframeJsAction extends sfAction
 		//redirect the call to V7
 		if( $uiConf->getV2Redirect() &&
 			$uiConf->getV2Redirect()->getV7id() &&
-			( $uiConf->getV2Redirect()->getIsApproved() || $this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) )
+			( $uiConf->getV2Redirect()->getIsApproved() || $this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME) )
 			)
 		{
 			$this->redirectToV7($uiConf->getV2Redirect()->getV7id(), $uiconf_id, $partner_id, $uiConf->getV2Redirect()->getTranslatePlugins() );
@@ -166,11 +166,11 @@ class embedIframeJsAction extends sfAction
 			$config = array();
 			$config['bundleConfig'] = null;
 			$config['playerConfig'] = new stdClass();
-			v2Tov7Utils::addV2toV7config($this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),$v7Id);
+			v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME),$v7Id);
 			if($shouldTranslatePlugins)
 			{
-				v2Tov7Utils::addV2toV7plugins(
-					$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),
+				v2RedirectUtils::addV2toV7plugins(
+					$this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME),
 					$config['bundleConfig'],
 					$config['playerConfig']);
 			}
@@ -182,11 +182,11 @@ class embedIframeJsAction extends sfAction
 			return;
 		}
 
-		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2Tov7Utils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
+		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
 		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
 		$url = $host . '/p/' . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . '?'
 				. $_SERVER['QUERY_STRING'] . "&"
-				. v2Tov7Utils::V2TOV7_PARAM_NAME .'=true'
+				. v2RedirectUtils::V2REDIRECT_PARAM_NAME .'=true'
 				. $shouldTranslatePluginsQueryParam;
 		header("Location:$url");
 		KExternalErrors::dieGracefully();

@@ -1,16 +1,29 @@
 <?php
 
-class v2Tov7Utils
+class v2RedirectUtils
 {
-	const V2TOV7_PARAM_NAME = 'v2tov7';
+	const V2REDIRECT_PARAM_NAME = 'v2Redirect';
 	const FLASHVARS_PARAM_NAME = 'flashvars';
-	const SHOULD_TRANSLATE_PLUGINS = self::V2TOV7_PARAM_NAME ."translate";
-    const SCRIPT_PLUGIN_NAME = "playkit-player-scripts";
-    const SCRIPT_PLUGIN_VERSION = "1.0.1-canary.0-f456898";
+	const SHOULD_TRANSLATE_PLUGINS = self::V2REDIRECT_PARAM_NAME .'translate';
+	const SCRIPT_PLUGIN_NAME = 'playkit-player-scripts';
+	const SCRIPT_PLUGIN_VERSION = '{latest}';
 
 	static private function getV7PluginInfo($v2PluginName): array
 	{
-		$translation = self::v2toV7PluginMap();
+		$translation = ["info" => ["playkitscreen", "playkit-js-info"],
+						"quiz"          => ["playkit-ivq", "ivq"],
+						"moderation"    => ["playkit-moderation", "playkit-js-moderation"],
+						"playlistAPI"   => ["playkit-playlist", "playlist"],
+						"liveStatus"    => ["playkit-kaltura-live","kaltura-live"],
+						"related"       => ["playkit-related", "related"],
+						"dualScreen"    => ["playkit-dual-screen", "dualscreen"],
+						"video360"      => ["playkit-vr" ,"vr"],
+						"raptMedia"     => ["rapt", "rapt"],
+						"transcript"    => ["playkit-transcript", "playkit-js-transcript"],
+						"qna"           => ["playkit-qna", "qna"],
+						"bumper"        => [ "playkit-bumper" , "bumper" ],
+						"infoScreen" => ["playkit-info", "playkit-js-info"]];
+
 		if(isset($translation[$v2PluginName]))
 		{
 			$v7PluginInfo = $translation[$v2PluginName];
@@ -79,7 +92,7 @@ class v2Tov7Utils
 				$config[$key] = json_decode($value);
 			}
 		}
-        $config["uiconf_id"] = $uiconfId;
+		$config["uiconf_id"] = $uiconfId;
 		return $config;
 	}
 
