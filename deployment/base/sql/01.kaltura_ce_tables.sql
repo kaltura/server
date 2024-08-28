@@ -1440,7 +1440,8 @@ CREATE TABLE IF NOT EXISTS  `kuser_kgroup` (
   PRIMARY KEY (`id`),
   KEY `partner_kuser_index` (`kuser_id`,`status`),
   KEY `partner_kgroup_index` (`kgroup_id`,`status`),
-  KEY `partner_index` (`partner_id`,`status`)
+  KEY `partner_index` (`partner_id`,`status`),
+  KEY `updated_at` (`updated_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
 
 CREATE TABLE IF NOT EXISTS `kuser_to_user_role` (
