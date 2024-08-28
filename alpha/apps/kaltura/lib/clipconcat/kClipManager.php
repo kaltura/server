@@ -968,7 +968,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($subtitles)
 			{
 				$prevParams = isset($currentConversionParams[self::EXTRA_CONVERSION_PARAMS]) ? $currentConversionParams[self::EXTRA_CONVERSION_PARAMS] : "";
-				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = $prevParams . " -copyts";
+				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = "$prevParams -copyts ";
 			}
 
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
