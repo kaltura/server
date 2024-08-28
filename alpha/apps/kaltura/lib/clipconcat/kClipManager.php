@@ -7,20 +7,26 @@
 class kClipManager implements kBatchJobStatusEventConsumer
 {
 	const CLIP_NUMBER = 'clipNumber';
-	const HEIGHT = 'height';
-	const WIDTH = 'width';
+	const CROP_HEIGHT = 'cropHeight';
+	const CROP_WIDTH = 'cropWidth';
+	const TARGET_HEIGHT = 'targetHeight';
+	const TARGET_WIDTH = 'targetWidth';
 	const FRAME_RATE = 'frameRate';
 	const AUDIO_CHANNELS = 'audioChannels';
 	const AUDIO_SAMPLE_RATE = 'audioSamplingRate';
 	const IMAGE_TO_VIDEO = 'imageToVideo';
+	const CROP = 'crop';
+	const CROP_DATA_ARRAY = 'cropDataArray';
+	const SUBTITLES_DATA_ARRAY = 'subtitlesDataArray';
 	const CONVERSION_PARAMS = 'conversionParams';
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
-	const VIDEO_DURATION = 'videoDuration';
+	const CLIPS_DURATION = 'clipsDuration';
 	const AUDIO_DURATION = 'audioDuration';
 	const INVERTED_SOURCE = 'invertedSource';
 	const EXTRA_CONVERSION_PARAMS = 'extraConversionParams';
 	const TEMP_ENTRY = 'tempEntry';
 	const SOURCE_ENTRY = 'sourceEntry';
+	const OPERATION_ATTRIBUTES_ARRAY = 'operationAttributesArray';
 	const MIN_FRAME_RATE = 10;
 	const MAX_FRAME_RATE = 30;
 	const DEFAULT_SAMPLE_RATE = 44100;
@@ -412,11 +418,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @throws kCoreException
 	 * @throws KalturaAPIException
 	 */
-	protected function cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey = null, $isAudio = false, $conversionData = null)
+	protected function cloneFlavorParam($singleAttribute, $singleAttributeIndex, $originalConversionEnginesExtraParams, $encryptionKey = null, $isAudio = false, $conversionData = null)
 	{
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		$flavorParamsObj->setFormat(flavorParams::CONTAINER_FORMAT_MPEGTS);
-		$this->fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams, $isAudio, $conversionData);
+		$this->fixConversionParam($flavorParamsObj, $singleAttribute, $singleAttributeIndex, $originalConversionEnginesExtraParams, $isAudio, $conversionData);
 		if ($encryptionKey)
 		{
 			$flavorParamsObj->setIsEncrypted(true);
@@ -637,21 +643,26 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	/**
 	 * @throws KalturaAPIException
 	 */
-	public function calculateAndEditConversionParams(&$resourcesData, $conversionProfileId)
+	public function calculateAndEditConversionParams(&$resourcesData, $resources, $conversionProfileId)
 	{
 		// choose min height and min width of input dimensions and conversion profile max dimensions
-		// choose the most common of aspect ratio and audio channels
+		// if aspect ratio is not passed, choose the most common of aspect ratio and audio channels
 		// choose sampling rate of 44.1 kHz
 		// scale chosen height and width by chosen aspect ratio
 		// choose max frame rate of all input frame rates, limit 10<=frameRate<=30
-		$height = 0;
-		$width = 0;
+		// if cropping, base the above dimensions calculation on the cropped output
+
+		$targetHeight = 0;
+		$targetWidth = 0;
 		$frameRate = self::MIN_FRAME_RATE;
 		$aspectRatios = array();
 		$allAudioChannels = array();
 		$allAudioSampleRates = array();
+		$dimensionsAttributes = $resources->getDimensionsAttributes();
+		$crop = $this->getResourcesCropMode($dimensionsAttributes);
+		$aspectRatio = $this->getResourcesAspectRatio($dimensionsAttributes);
 
-		foreach ($resourcesData as $resourceData)
+		foreach ($resourcesData as $key => $resourceData)
 		{
 			$entryId = $resourceData[self::SOURCE_ENTRY] ? $resourceData[self::SOURCE_ENTRY]->getId() : null;
 
@@ -661,16 +672,50 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $entryId);
 			}
+
 			$currentWidth = $mediaInfoObj->getVideoWidth();
 			$currentHeight = $mediaInfoObj->getVideoHeight();
 			if($currentWidth * $currentHeight == 0)
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $entryId);
 			}
-			$width = $width == 0 ? $currentWidth : min($currentWidth, $width);
-			$height = $height == 0 ? $currentHeight : min($currentHeight, $height);
-			$duration = $resourceData[self::VIDEO_DURATION];
-			$this->updateKeyFrequency($aspectRatios, $currentWidth/$currentHeight, $duration);
+
+			if($crop && $aspectRatio)
+			{
+				$resourcesData[$key][self::CROP_DATA_ARRAY] = $this->getCropDataArray($aspectRatio, $currentWidth, $currentHeight, $resourceData[self::OPERATION_ATTRIBUTES_ARRAY]);
+				if(count($resourcesData[$key][self::CROP_DATA_ARRAY]) > 0)
+				{
+					foreach ($resourcesData[$key][self::CROP_DATA_ARRAY] as $cropDataArray)
+					{
+						// consider the dimensions after cropping to calculate target dimensions
+						$outWidth = isset($cropDataArray["outWidth"]) ? $cropDataArray["outWidth"] : null;
+						$outHeight = isset($cropDataArray["outHeight"]) ? $cropDataArray["outHeight"] : null;
+						if($outWidth && $outHeight)
+						{
+							$currentWidth = $outWidth;
+							$currentHeight = $outHeight;
+							break;
+						}
+					}
+				}
+			}
+
+			if(!$aspectRatio)
+			{
+				// calculate aspect ratio by frequency
+				$duration = $resourceData[self::CLIPS_DURATION];
+				$this->updateKeyFrequency($aspectRatios, $currentWidth/$currentHeight, $duration);
+			}
+
+			$targetWidth = $targetWidth == 0 ? $currentWidth : min($currentWidth, $targetWidth);
+			$targetHeight = $targetHeight == 0 ? $currentHeight : min($currentHeight, $targetHeight);
+
+			$subtitlesArray = $this->getSubtitlesDataArray($resourceData[self::OPERATION_ATTRIBUTES_ARRAY]);
+			if(count($subtitlesArray) > 0)
+			{
+				$resourcesData[$key][self::SUBTITLES_DATA_ARRAY] = $subtitlesArray;
+			}
+
 			if($mediaInfoObj->getAudioChannels())
 			{
 				$allAudioChannels[] = $mediaInfoObj->getAudioChannels();
@@ -684,86 +729,280 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$frameRate = max($frameRate, $mediaInfoObj->getVideoFrameRate());
 			}
 		}
-
 		$audioChannels = $this->decideAudioChannels($allAudioChannels);
 		$audioSampleRate = $this->decideAudioSamplingRate($allAudioSampleRates);
-		$aspectRatio = $this->decideAspectRatio($aspectRatios);
-		$this->decideResolution($conversionProfileId, $aspectRatio, $width, $height);
+		$targetAspectRatio = $aspectRatio ? $aspectRatio : $this->decideAspectRatio($aspectRatios);
+		$this->decideResolution($conversionProfileId, $targetAspectRatio, $targetWidth, $targetHeight);
 
-		KalturaLog::debug("Multi Clip dimensions: width [$width], height [$height]");
+		KalturaLog::debug("Multi Clip target dimensions: width [$targetWidth], height [$targetHeight], aspect ratio [$targetAspectRatio]");
 
-		$conversionParams = array(
-			self::WIDTH => $width,
-			self::HEIGHT => $height,
+		$generalConversionParams = array(
+			self::CROP => $crop,
+			self::TARGET_WIDTH => $targetWidth,
+			self::TARGET_HEIGHT => $targetHeight,
 			self::AUDIO_CHANNELS => $audioChannels,
 			self::AUDIO_SAMPLE_RATE => $audioSampleRate,
 			self::FRAME_RATE => min($frameRate, self::MAX_FRAME_RATE)
 		);
 
-		$this->setConversionParamsForResources($resourcesData, $conversionParams);
+		$this->setConversionParamsOnResourcesData($resourcesData, $generalConversionParams);
 	}
 
-	protected function setConversionParamsForResources(&$resourcesData, $conversionParams)
+	protected function getResourcesCropMode($dimensionsAttributes)
 	{
-		$width = $conversionParams[self::WIDTH];
-		$height = $conversionParams[self::HEIGHT];
+		foreach ($dimensionsAttributes as $dimensionsAttribute)
+		{
+			if($dimensionsAttribute instanceof kAspectRatioCropAttributes)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected function getResourcesAspectRatio($dimensionsAttributes)
+	{
+		foreach ($dimensionsAttributes as $dimensionsAttribute)
+		{
+			if($dimensionsAttribute instanceof kAspectRatioCropAttributes || $dimensionsAttribute instanceof kAspectRatioScaleAttributes)
+			{
+				return $dimensionsAttribute->getAspectRatio();
+			}
+		}
+		return null;
+	}
+
+	protected function getCropData($targetAspectRatio, $inWidth, $inHeight, $cropAlignmentPercent = null)
+	{
+		// missing dimensions
+		if(!$targetAspectRatio || !$inWidth || !$inHeight)
+		{
+			return array();
+		}
+
+		// no cropping
+		if($inWidth / $inHeight == $targetAspectRatio)
+		{
+			return array();
+		}
+
+		$outWidth = $inWidth;
+		$outHeight = $inHeight;
+		$widthPosition = 0;
+		$heightPosition = 0;
+
+		// $alignment (0 - 1) which is (top - bottom) or (left - right), default is 0.5 (middle)
+		$alignment = $cropAlignmentPercent !== null ? $cropAlignmentPercent / 100 : 0.5;
+
+		// crop height
+		if($inWidth / $inHeight < $targetAspectRatio)
+		{
+			$outHeight = min(floor($outWidth / $targetAspectRatio), $inHeight);
+			$this->adjustResolutionDivisionByValue($outWidth, $outHeight);
+			$croppedLength = $inHeight - $outHeight;
+			$heightPosition = floor($alignment * $croppedLength);
+		}
+
+		// crop width
+		else if($inWidth / $inHeight > $targetAspectRatio)
+		{
+			$outWidth = min(floor($targetAspectRatio * $outHeight), $inWidth);
+			$this->adjustResolutionDivisionByValue($outWidth, $outHeight);
+			$croppedLength = $inWidth - $outWidth;
+			$widthPosition = floor($alignment * $croppedLength);
+		}
+
+		return array("outWidth" => $outWidth, "outHeight" => $outHeight, "widthPosition" => $widthPosition, "heightPosition" => $heightPosition);
+	}
+
+	protected function getCropDataArray($targetAspectRatio, $inWidth, $inHeight, $operationAttributes)
+	{
+		$cropDataArray = array();
+		foreach ($operationAttributes as $operationAttribute)
+		{
+			$cropDataArray[] = $this->getCropData($targetAspectRatio, $inWidth, $inHeight, $operationAttribute->getCropAlignment());
+		}
+		return $cropDataArray;
+	}
+
+	protected function getSubtitlesDataArray($operationAttributes)
+	{
+		$subtitlesDataArray = array();
+		foreach ($operationAttributes as $operationAttribute)
+		{
+			$subtitlesDataArray[] = $this->getSubtitlesData($operationAttribute->getCaptionAttributes());
+		}
+		return $subtitlesDataArray;
+	}
+
+	protected function getRenderCaptionAttribute($captionAttributes)
+	{
+		$renderCaptionAttribute = null;
+		foreach ($captionAttributes as $captionAttribute)
+		{
+			if($captionAttribute instanceOf kRenderCaptionAttributes && $captionAttribute->getCaptionFileUrl())
+			{
+				$renderCaptionAttribute = $captionAttribute;
+				break;
+			}
+		}
+		return $renderCaptionAttribute;
+	}
+
+	protected function getSubtitlesData($captionAttributes)
+	{
+		$subtitlesData = array();
+		$renderCaptionAttribute = $this->getRenderCaptionAttribute($captionAttributes);
+		if($renderCaptionAttribute)
+		{
+			$forceStyle = array();
+			$forceStyle["FontName"] = $renderCaptionAttribute->getFontName();
+			$forceStyle["Fontsize"] = $renderCaptionAttribute->getFontSize();
+			$forceStyle["Bold"] = $renderCaptionAttribute->getBold() ? 1 : null;
+			$forceStyle["Italic"] = $renderCaptionAttribute->getItalic() ? 1 : null;
+			$forceStyle["Underline"] = $renderCaptionAttribute->getUnderline() ? 1 : null;
+			$forceStyle["PrimaryColour"] = $renderCaptionAttribute->getPrimaryColour();
+			$forceStyle["Alignment"] = $renderCaptionAttribute->getAlignment();
+			$forceStyle["BorderStyle"] = $renderCaptionAttribute->getBorderStyle();
+			$forceStyle["BackColour"] = $renderCaptionAttribute->getBackColour();
+			$forceStyle["OutlineColour"] = $renderCaptionAttribute->getOutlineColour();
+
+			foreach ($forceStyle as $key => $value)
+			{
+				if($value === null)
+				{
+					unset($forceStyle[$key]);
+				}
+			}
+
+			// set subtitles data
+			$subtitlesData["action"] = "render";
+			$subtitlesData["captionFileUrl"] = $renderCaptionAttribute->getCaptionFileUrl();
+			if(count($forceStyle) > 0)
+			{
+				$subtitlesData["force_style"] = $forceStyle;
+			}
+		}
+		return $subtitlesData;
+	}
+
+	protected function setConversionParamsOnResourcesData(&$resourcesData, $conversionParams)
+	{
+		$targetWidth = $conversionParams[self::TARGET_WIDTH];
+		$targetHeight = $conversionParams[self::TARGET_HEIGHT];
 		$audioChannels = $conversionParams[self::AUDIO_CHANNELS];
 		$audioSampleRate = $conversionParams[self::AUDIO_SAMPLE_RATE];
+		$crop = $conversionParams[self::CROP];
 
 		foreach ($resourcesData as $key => $resourceData)
 		{
 			$imageToVideo = $resourceData[self::IMAGE_TO_VIDEO];
 			$mediaInfoObj = $resourceData[self::MEDIA_INFO_OBJECT];
+			$subtitles = isset($resourceData[self::SUBTITLES_DATA_ARRAY]) && count($resourceData[self::SUBTITLES_DATA_ARRAY]) > 0;
 
 			$currentConversionParams = array();
-			$currentConversionParams[self::HEIGHT] = $height;
+			$currentConversionParams[self::TARGET_HEIGHT] = $targetHeight;
 			$currentConversionParams[self::AUDIO_CHANNELS] = $audioChannels;
 			$currentConversionParams[self::AUDIO_SAMPLE_RATE] = $audioSampleRate;
-			$currentConversionParams[self::VIDEO_DURATION] = $mediaInfoObj->getVideoDuration();
 			$currentConversionParams[self::AUDIO_DURATION] = $mediaInfoObj->getAudioDuration();
 
-			$shouldResize = $this->shouldResize($mediaInfoObj, $width, $height);
-			if($shouldResize)
+			if(isset($resourceData[self::SUBTITLES_DATA_ARRAY]))
 			{
-				$currentConversionParams[self::WIDTH] = $width; // trigger resize
-				if($mediaInfoObj->getVideoWidth() < $mediaInfoObj->getVideoHeight())
+				$currentConversionParams[self::SUBTITLES_DATA_ARRAY] = $resourceData[self::SUBTITLES_DATA_ARRAY];
+			}
+
+			$croppingMode = $crop && isset($resourceData[self::CROP_DATA_ARRAY]) && count($resourceData[self::CROP_DATA_ARRAY]) > 0;
+			$currentConversionParams[self::CROP] = $croppingMode;
+			if($croppingMode)
+			{
+				$currentConversionParams[self::CROP_DATA_ARRAY] = $resourceData[self::CROP_DATA_ARRAY];
+				$outWidth = null;
+				$outHeight = null;
+				foreach ($resourceData[self::CROP_DATA_ARRAY] as $cropDataArray)
 				{
-					$currentConversionParams[self::INVERTED_SOURCE] = true;
+					// consider the dimensions after cropping to calculate target dimensions
+					$outWidth = isset($cropDataArray["outWidth"]) ? $cropDataArray["outWidth"] : null;
+					$outHeight = isset($cropDataArray["outHeight"]) ? $cropDataArray["outHeight"] : null;
+					if($outWidth && $outHeight)
+					{
+						$currentConversionParams[self::CROP_HEIGHT] = $outHeight;
+						$currentConversionParams[self::CROP_WIDTH] = $outWidth;
+						break;
+					}
 				}
+
+				$shouldScale = $outHeight != $targetHeight || $outWidth != $targetWidth;
+				if($shouldScale)
+				{
+					$currentConversionParams[self::TARGET_WIDTH] = $targetWidth;
+				}
+			}
+			else
+			{
+				if($this->shouldScaleNoCropping($mediaInfoObj, $targetWidth, $targetHeight))
+				{
+					$currentConversionParams[self::TARGET_WIDTH] = $targetWidth; // trigger scale
+				}
+			}
+
+			if($mediaInfoObj->getVideoWidth() < $mediaInfoObj->getVideoHeight())
+			{
+				$currentConversionParams[self::INVERTED_SOURCE] = true;
+				$currentConversionParams[self::TARGET_WIDTH] = $targetWidth;
+			}
+
+			$audioVideoDurationDiff = $mediaInfoObj->getAudioDuration() ? abs($mediaInfoObj->getAudioDuration() - $mediaInfoObj->getVideoDuration()) : 0;
+			if($audioVideoDurationDiff > self::AUDIO_VIDEO_DIFF_MS)
+			{
+				$usingFilterComplex = $currentConversionParams[self::TARGET_WIDTH] || $croppingMode || $currentConversionParams[self::SUBTITLES_DATA_ARRAY];
+				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = $this->getSilentAudioPaddingCommand($usingFilterComplex);
 			}
 			if($imageToVideo)
 			{
 				$currentConversionParams[self::IMAGE_TO_VIDEO] = $imageToVideo;
+				if($this->shouldScaleNoCropping($mediaInfoObj, $targetWidth, $targetHeight))
+				{
+					$currentConversionParams[self::TARGET_WIDTH] = $targetWidth; // trigger scale
+				}
 			}
-			else if($mediaInfoObj->getAudioDuration() && abs($mediaInfoObj->getAudioDuration() - $mediaInfoObj->getVideoDuration()) > self::AUDIO_VIDEO_DIFF_MS)
+			if($subtitles)
 			{
-				if($shouldResize)
-				{
-					$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0' ";
-				}
-				else
-				{
-					// if we do not scale the clipped asset, then add stream mapping, because applying only audio filter_complex, changes the streams order and concat fails
-					$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0[a]' -map v -map [\"a\"] ";
-				}
+				$prevParams = isset($currentConversionParams[self::EXTRA_CONVERSION_PARAMS]) ? $currentConversionParams[self::EXTRA_CONVERSION_PARAMS] : "";
+				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = $prevParams . " -copyts";
 			}
+
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
 		}
 	}
 
-	protected function shouldResize($inputMediaInfo, $outputWidth, $outputHeight)
+	protected function getSilentAudioPaddingCommand($usingFilterComplex)
 	{
-		   $inputWidth = $inputMediaInfo->getVideoWidth();
-		   $inputHeight = $inputMediaInfo->getVideoHeight();
+		if($usingFilterComplex)
+		{
+			return " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0' ";
+		}
+		else
+		{
+			// if we do not use video filter complex, then add stream mapping, because applying only audio filter_complex, changes the streams order and concat fails
+			return " -filter_complex 'aresample=async=1:min_hard_comp=0.100000:first_pts=0[a]' -map v -map [\"a\"] ";
+		}
+	}
 
-		   $inputRatio = $inputWidth / $inputHeight;
-		   $outputRatio = $outputWidth / $outputHeight;
+	protected function shouldScaleNoCropping($inputMediaInfo, $outputWidth, $outputHeight)
+	{
+		$inputWidth = $inputMediaInfo->getVideoWidth();
+		$inputHeight = $inputMediaInfo->getVideoHeight();
 
-		   if($inputRatio != $outputRatio || $inputWidth < $inputHeight)
-		   {
-			   return true;
-		   }
-		   return false;
+		// missing dimensions
+		if(!$inputHeight || !$outputHeight)
+		{
+			return false;
+		}
+
+		$inputRatio = $inputWidth / $inputHeight;
+		$outputRatio = $outputWidth / $outputHeight;
+
+		return $inputRatio != $outputRatio;
 	}
 
 	protected function decideResolution($conversionProfileId, $aspectRatio, &$width, &$height)
@@ -900,7 +1139,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$conversionData = $this->getJobDataConversionParams($parentJob->getData());
 
 		/* @var $singleAttribute kClipAttributes */
-		foreach($operationAttributes as $singleAttribute)
+		foreach($operationAttributes as $index => $singleAttribute)
 		{
 			KalturaLog::info("Going To create Flavor for entry Id [$entryId] for clip: " . print_r($singleAttribute, true));
 			if($singleAttribute->getDuration() <= 0)
@@ -909,7 +1148,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				continue;
 			}
 
-			$clonedID = $this->cloneFlavorParam($singleAttribute, $originalConversionEnginesExtraParams, $encryptionKey, $isAudio, $conversionData);
+			$clonedID = $this->cloneFlavorParam($singleAttribute, $index, $originalConversionEnginesExtraParams, $encryptionKey, $isAudio, $conversionData);
 			$flavorAsset = $this->createTempClipFlavorAsset($partnerId, $entryId, $clonedID, $order);
 			$flavorAsset->setActualSourceAssetParamsIds($asset->getId());
 
@@ -1054,7 +1293,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	protected function addDestinationEntryAsset($entryId, $concatAsset)
 	{
 		$concatSyncKey = $concatAsset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
-		$dbAsset = assetPeer::retrieveOriginalByEntryId($entryId);
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		$isNewAsset = false;
 		if(!$dbEntry)
@@ -1161,7 +1399,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					foreach ($relatedFiles as $key => $relatedFile)
 					{
 						$allRelatedFiles[] = $relatedFile;
-						$convertCommands[] = $this->getConvertCommandForFile($jobData, $operationAttributesSorted[$key]);
+						$convertCommands[] = $this->getConvertCommandForFile($jobData, $operationAttributesSorted, $key);
 					}
 					KalturaLog::debug("Asset Id: [$flavorAssetId], Related file : " . print_r($relatedFiles, true));
 					// assume concatenated assets have the same actualFlavorParamsId and take the last
@@ -1180,45 +1418,62 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
-	protected function getConvertCommandForFile($jobData, $operationAttribute)
+	protected function getConvertCommandForFile($jobData, $operationAttributesSorted, $clipIndex)
 	{
 		/** @var kClipConcatJobData $jobData */
-		$effectsFilter = $this->getEffectsFilter($jobData, $operationAttribute);
+		$operationAttribute = $operationAttributesSorted[$clipIndex];
+		$sortedFilters = $this->getSortedFiltersComplexForConcat($jobData, $operationAttributesSorted, $clipIndex);
 		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
 		if($imageToVideo)
 		{
-			return $this->getConvertImageToVideoCommand($jobData, $operationAttribute, $effectsFilter);
+			return $this->getConvertImageToVideoCommand($jobData, $operationAttribute, $sortedFilters);
 		}
 
 		$audioDuration = $this->getJobDataConversionParams($jobData, self::AUDIO_DURATION);
 		if(!$audioDuration)
 		{
-			return $this->getAddSilentAudioCommand($jobData, $operationAttribute, $effectsFilter);
+			return $this->getAddSilentAudioCommand($jobData, $operationAttribute, $sortedFilters);
 		}
 
-		return $this->getDefaultConvertCommandForFile($jobData, $effectsFilter);
+		return $this->getGeneralCommand($jobData, $sortedFilters);
 	}
 
-	protected function getDefaultConvertCommandForFile($jobData, $effectsFilter)
+	protected function getAspectCommand($conversionParams, $sortedFilters)
 	{
-		if(!$effectsFilter)
+		$cmdStr = "";
+		if(isset($sortedFilters["scale"]))
 		{
-			return "-";
+			$width = $conversionParams[self::TARGET_WIDTH];
+			$height = $conversionParams[self::TARGET_HEIGHT];
+			$frameSize = "$width:$height";
+			$cmdStr .= " -s " . str_replace(':', 'x', $frameSize);
+			$cmdStr .= " -aspect $frameSize";
 		}
+		return $cmdStr;
+	}
+
+	protected function getGeneralCommand($jobData, $sortedFilters)
+	{
+		$filterComplex = $this->getMappedSortedFiltersComplex($sortedFilters);
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
-		if(!$flavorParamsObj)
+
+		if(!$flavorParamsObj || $filterComplex == "")
 		{
 			return "-";
 		}
-		$bitrate = $flavorParamsObj->getVideoBitRate();
+
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+
 		$cmdStr = " -i __inFileName__";
-		$cmdStr .= " -filter_complex '$effectsFilter'";
+		$cmdStr .= $this->getAspectCommand($conversionParams, $sortedFilters);
+		$cmdStr .= " -filter_complex '$filterComplex'";
 		$cmdStr .= " -c:v libx264 -subq 5 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4";
 		$cmdStr .= " -coder 1 -refs 2 -x264opts stitchable -vprofile main -force_key_frames expr:'gte(t,n_forced*2)'";
+
+		$bitrate = $flavorParamsObj->getVideoBitRate();
 		$cmdStr .= " -pix_fmt yuv420p -b:v $bitrate" . "k";
 		$cmdStr .= " -c:a libfdk_aac -b:a 192k";
 
-		$conversionParams = $this->getJobDataConversionParams($jobData);
 		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
 		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
 
@@ -1230,25 +1485,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return $cmdStr;
 	}
 
-	protected function getEffectsFilter($jobData, $operationAttribute)
-	{
-		/** @var kClipConcatJobData $jobData */
-		if($this->shouldApplyEffectsOnConcat($jobData))
-		{
-			$effectsManager = new kEffectsManager();
-			return $effectsManager->addVideoEffects($operationAttribute);
-		}
-		return "";
-	}
-
-	protected function shouldApplyEffectsOnConcat($jobData)
-	{
-		$width = $this->getJobDataConversionParams($jobData, self::WIDTH);
-		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
-		return $width || $imageToVideo;
-	}
-
-	protected function getAddSilentAudioCommand($jobData, $operationAttribute, $effectsFilter)
+	protected function getAddSilentAudioCommand($jobData, $operationAttribute, $sortedFilters)
 	{
 		/** @var kClipConcatJobData $jobData */
 		$cmdStr = " -i __inFileName__";
@@ -1256,9 +1493,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$cmdStr .= " -ac " . $conversionParams[self::AUDIO_CHANNELS];
 		$cmdStr .= " -ar " . $conversionParams[self::AUDIO_SAMPLE_RATE];
 		$cmdStr .= " -f s16le -i /dev/zero";
-		if($effectsFilter != "")
+
+		$filterComplex = $this->getMappedSortedFiltersComplex($sortedFilters);
+		if($filterComplex != "")
 		{
-			$cmdStr .= " -filter_complex '[0:v]$effectsFilter'";
+			$cmdStr .= $this->getAspectCommand($conversionParams, $sortedFilters);
+			$cmdStr .= " -filter_complex '$filterComplex'";
 			$cmdStr .= " -c:v libx264 -pix_fmt yuv420p";
 		}
 		else
@@ -1270,7 +1510,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return $cmdStr;
 	}
 
-	protected function getConvertImageToVideoCommand($jobData, $operationAttribute, $effectsFilter)
+	protected function getConvertImageToVideoCommand($jobData, $operationAttribute, $sortedFilters)
 	{
 		/** @var kClipConcatJobData $jobData */
 		$cmdStr = " -loop 1 -i __inFileName__";
@@ -1285,36 +1525,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$cmdStr.= " -r " . $conversionParams[self::FRAME_RATE];
 		}
 		$cmdStr .= " -c:v libx264 -pix_fmt yuv420p";
-		// add white background to the video to handle transparency, transparent pixels shows the background color
-		$whiteBackgroundFilter = "split=2[bg][fg];[bg]drawbox=c=white@1:replace=1:t=fill[bg];[bg][fg]overlay=format=auto";
-		if(isset($conversionParams[self::WIDTH]) && isset($conversionParams[self::HEIGHT]))
-		{
-			$width = $conversionParams[self::WIDTH];
-			$height = $conversionParams[self::HEIGHT];
-			$frameSize = "$width:$height";
-			$cmdStr .= " -s " . str_replace(':', 'x', $frameSize);
-			$scalingFilter = "scale=iw*min($width/iw\,$height/ih):ih*min($width/iw\,$height/ih)";
-			$paddingFilter = "pad=$width:$height:(ow-iw)/2:(oh-ih)/2";
-			if($effectsFilter != "")
-			{
-				$filter = "[0:v]" . $effectsFilter . "[vflt0];[vflt0]" . $scalingFilter . "[vflt1];[vflt1]" . $paddingFilter;
-			}
-			else
-			{
-				$filter = "[0:v]" . $scalingFilter . "[vflt1];[vflt1]" . $paddingFilter . "[out];[out]" . $whiteBackgroundFilter;
-			}
-			$cmdStr .= " -aspect $frameSize";
-		}
-		else if($effectsFilter != "")
-		{
-			$filter = "[0:v]$effectsFilter";
-		}
-		else
-		{
-			$filter ="[0]$whiteBackgroundFilter";
-		}
 
-		$cmdStr .= " -filter_complex '$filter'";
+		$filterComplex = $this->getMappedSortedFiltersComplex($sortedFilters);
+		$cmdStr .= $this->getAspectCommand($conversionParams, $sortedFilters);
+		$cmdStr .= " -filter_complex '$filterComplex'";
 
 		// image should have only one clipAttribute
 		$duration = $operationAttribute->getDuration()/1000;
@@ -1452,7 +1666,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @param array $conversionData
 	 * @throws KalturaAPIException
 	 */
-	protected function fixConversionParam($flavorParamsObj, $singleAttribute, $originalConversionEnginesExtraParams, $isAudio, $conversionData = null)
+	protected function fixConversionParam($flavorParamsObj, $singleAttribute, $singleAttributeIndex, $originalConversionEnginesExtraParams, $isAudio, $conversionData = null)
 	{
 		$extraParams = '';
 		if($conversionData)
@@ -1467,40 +1681,72 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
 		$conversionExtraParams = $originalConversionEnginesExtraParams ? explode('|', $originalConversionEnginesExtraParams) : null;
-		// do not apply effects if: 1.image to video conversion, 2.resizing (already using filter complex)
-		$allowEffects = !$conversionData || (!isset($conversionData[self::IMAGE_TO_VIDEO]) && !isset($conversionData[self::WIDTH]));
+		$allowEffects = $this->allowEffectsOnConvert($conversionData, $singleAttributeIndex);
 		$newExtraConversionParams = $this->editConversionEngineExtraParam($conversionEngines, $singleAttribute, $conversionExtraParams, $isAudio, $extraParams, $allowEffects);
 		$flavorParamsObj->setConversionEnginesExtraParams($newExtraConversionParams);
 		if($conversionData && $flavorParamsObj instanceof flavorParams)
 		{
-			$this->editConversionParams($flavorParamsObj, $conversionData);
+			$this->editConversionParams($flavorParamsObj, $conversionData, $singleAttributeIndex);
 		}
 	}
 
 	/**
 	 * @throws KalturaAPIException
 	 */
-	protected function editConversionParams(&$flavorParamsObj, $conversionParams)
+	protected function editConversionParams(&$flavorParamsObj, $conversionParams, $index)
 	{
 		if($conversionParams)
 		{
 			$flavorParamsObj->setForceFrameToMultiplication16(0);
-			$flavorParamsObj->setHeight($conversionParams[self::HEIGHT]);
-			if(isset($conversionParams[self::FRAME_RATE]))
+			$flavorParamsObj->setIsAvoidVideoShrinkFramesizeToSource(1);
+			$flavorParamsObj->setHeight($conversionParams[self::TARGET_HEIGHT]);
+
+			$invertedResource = isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE];
+
+			$croppingMode = false;
+			if(isset($conversionParams[self::CROP_DATA_ARRAY]) && isset($conversionParams[self::CROP_DATA_ARRAY][$index]))
 			{
-				$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
+				$cropData = $conversionParams[self::CROP_DATA_ARRAY][$index];
+				$croppingMode = is_array($cropData) && count($cropData) > 0;
 			}
-			if(isset($conversionParams[self::WIDTH]))
+
+			if($croppingMode)
 			{
-				$flavorParamsObj->setWidth($conversionParams[self::WIDTH]);
-				$flavorParamsObj->setAspectRatioProcessingMode(2);
-				$flavorParamsObj->setIsAvoidVideoShrinkFramesizeToSource(1);
+				// crop
+				$processingMode = $invertedResource ? 8 : 7;
+				$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
+				$flavorParamsObj->setCropData(json_encode($cropData));
+				$flavorParamsObj->setHeight($conversionParams[self::CROP_HEIGHT]);
+				$flavorParamsObj->setWidth($conversionParams[self::CROP_WIDTH]);
 			}
-			if(isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE])
+			else if($invertedResource)
 			{
 				// for inverted source calculation, the output flavor is inverted
 				// _arProcessingMode = 6, inverts back the output flavor
 				$flavorParamsObj->setAspectRatioProcessingMode(6);
+			}
+			else if(isset($conversionParams[self::TARGET_WIDTH]))
+			{
+				// scale
+				$flavorParamsObj->setAspectRatioProcessingMode(2);
+			}
+
+			if(isset($conversionParams[self::TARGET_WIDTH]))
+			{
+				$flavorParamsObj->setWidth($conversionParams[self::TARGET_WIDTH]);
+			}
+
+			if(isset($conversionParams[self::FRAME_RATE]))
+			{
+				$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
+			}
+			if(isset($conversionParams[self::SUBTITLES_DATA_ARRAY]) && isset($conversionParams[self::SUBTITLES_DATA_ARRAY][$index]))
+			{
+				$subtitlesData = $conversionParams[self::SUBTITLES_DATA_ARRAY][$index];
+				if(is_array($subtitlesData) && count($subtitlesData) > 0)
+				{
+					$flavorParamsObj->setSubtitlesData(json_encode($subtitlesData));
+				}
 			}
 			if(isset($conversionParams[self::AUDIO_CHANNELS]))
 			{
@@ -1520,6 +1766,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		$flavorParamsObj->setAspectRatioProcessingMode(0);
 		$flavorParamsObj->setIsAvoidVideoShrinkFramesizeToSource(0);
+		$flavorParamsObj->setSubtitlesData(null);
+		$flavorParamsObj->setCropData(null);
 
 		/** @var flavorParams $flavorParamsObj*/
 		if($flavorParamsObj->getColumnsOldValue(assetParamsPeer::FRAME_RATE))
@@ -1588,5 +1836,224 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 		}
 		return null;
+	}
+
+	protected function getSortedFiltersComplexForConcat($jobData, $operationAttributesSorted, $clipIndex)
+	{
+		/** @var kClipConcatJobData $jobData */
+
+		$filters = array();
+		$filters["crop"] = $this->getCropFilterForConcat($jobData, $clipIndex);
+		$filters["effects"] = $this->getEffectsFilterForConcat($jobData, $operationAttributesSorted, $clipIndex);
+		$filters["scale"] = $this->getPaddedScaleFiltersForConcat($jobData, $clipIndex);
+
+		if(!$filters["effects"] || $filters["effects"] == "")
+		{
+			$filters["whiteBackground"] = $this->getWhiteBackgroundForConcat($jobData);
+		}
+
+		foreach ($filters as $ind => $value)
+		{
+			if(!$value || $value == "")
+			{
+				unset($filters[$ind]);
+			}
+		}
+
+		return $filters;
+	}
+
+	protected function getMappedSortedFiltersComplex($sortedFilters)
+	{
+		$mappedFilters = "";
+		if(count($sortedFilters) == 1 && isset($sortedFilters["whiteBackground"]))
+		{
+			return "[0]" . $sortedFilters[0];
+		}
+		if(count($sortedFilters) > 0)
+		{
+			$sortedFilterTypes = array_keys($sortedFilters);
+			$filterType = $sortedFilterTypes[0];
+			$mappedFilters .= "[0:v]" . $sortedFilters[$filterType];
+
+			for ($i = 0; $i < count($sortedFilterTypes) - 1; $i++)
+			{
+				$filterType = $sortedFilterTypes[$i+1];
+				$mappedFilters .= "[vflt$i];[vflt$i]" . $sortedFilters[$filterType];
+			}
+		}
+		return $mappedFilters;
+	}
+
+	protected function getPaddedScaleFiltersForConcat($jobData, $clipIndex)
+	{
+		$filter = "";
+		if($this->shouldScaleOnConcat($jobData, $clipIndex))
+		{
+			$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+			$cropped = $this->getJobDataConversionParams($jobData, self::CROP);
+
+			$oh = $this->getJobDataConversionParams($jobData, self::TARGET_HEIGHT);
+			$ow = $this->getJobDataConversionParams($jobData, self::TARGET_WIDTH);
+			$ih = $imageToVideo || !$cropped ? "ih" : $this->getJobDataConversionParams($jobData, self::CROP_HEIGHT);
+			$iw = $imageToVideo || !$cropped ? "iw" : $this->getJobDataConversionParams($jobData, self::CROP_WIDTH);
+
+			$scaleFilter = $this->getScaleFilter($ow, $oh, $iw, $ih);
+			$padFilter = $this->getPadFilter($ow, $oh, $iw, $ih);
+			$filter = $scaleFilter. "[vscale];[vscale]" . $padFilter;
+		}
+		return $filter;
+	}
+
+	protected function getCropFilterForConcat($jobData, $clipIndex)
+	{
+		$filter = "";
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$cropData = $this->getCropDataFromConversionParams($conversionParams, $clipIndex);
+
+		if($this->shouldCropOnConcat($jobData, $clipIndex))
+		{
+			$widthPosition = $cropData["widthPosition"];
+			$heightPosition = $cropData["heightPosition"];
+			$outWidth = $cropData["outWidth"];
+			$outHeight = $cropData["outHeight"];
+			$filter = $this->getCropFilter($outWidth, $outHeight, $widthPosition, $heightPosition);
+		}
+
+		return $filter;
+	}
+
+	protected function getWhiteBackgroundForConcat($jobData)
+	{
+		/** @var kClipConcatJobData $jobData */
+
+		$whiteBackgroundFilter = null;
+		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+		if($imageToVideo)
+		{
+			// add white background to the video to handle transparency, transparent pixels shows the background color
+			$whiteBackgroundFilter = $this->getWhiteBackgroundFilter();
+		}
+		return $whiteBackgroundFilter;
+	}
+
+	protected function getEffectsFilterForConcat($jobData, $operationAttributes, $clipIndex)
+	{
+		/** @var kClipConcatJobData $jobData */
+
+		$effectsFilter = null;
+		if($this->shouldApplyEffectsOnConcat($jobData, $clipIndex))
+		{
+			$effectsManager = new kEffectsManager();
+			$effectsFilter = $effectsManager->addVideoEffects($operationAttributes[$clipIndex]);
+		}
+		return $effectsFilter;
+	}
+
+	protected function shouldApplyEffectsOnConcat($jobData, $clipIndex)
+	{
+		/** @var kClipConcatJobData $jobData */
+
+		// check if we already used filter_complex on clipping
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$cropped = $this->isCroppedClip($conversionParams, $clipIndex);
+		$scaled = $this->getJobDataConversionParams($jobData, self::TARGET_WIDTH);
+		$subtitles = $this->isSubtitledClip($conversionParams, $clipIndex);
+		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+		return $scaled || $cropped || $imageToVideo || $subtitles;
+	}
+
+	protected function shouldScaleOnConcat($jobData, $clipIndex)
+	{
+		/** @var kClipConcatJobData $jobData */
+
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$cropped = $this->isCroppedClip($conversionParams, $clipIndex);
+		$scaled = $this->getJobDataConversionParams($jobData, self::TARGET_WIDTH);
+		$subtitles = $this->isSubtitledClip($conversionParams, $clipIndex);
+		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+		return $scaled && ($cropped || $imageToVideo || $subtitles);
+	}
+
+	protected function shouldCropOnConcat($jobData, $clipIndex)
+	{
+		/** @var kClipConcatJobData $jobData */
+
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$cropped = $this->isCroppedClip($conversionParams, $clipIndex);
+		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
+		return $imageToVideo && $cropped;
+	}
+
+	protected function isCroppedClip($conversionParams, $clipIndex)
+	{
+		$cropData = $this->getCropDataFromConversionParams($conversionParams, $clipIndex);
+		return count($cropData) > 0;
+	}
+
+	protected function isSubtitledClip($conversionParams, $clipIndex)
+	{
+		$subtitleData = $this->getSubtitlesDataFromConversionParams($conversionParams, $clipIndex);
+		return count($subtitleData) > 0;
+	}
+
+	protected function allowEffectsOnConvert($conversionData, $singleAttributeIndex)
+	{
+		// do not apply effects if already using filter complex
+		if(!$conversionData)
+		{
+			return true;
+		}
+		$cropped = $this->isCroppedClip($conversionData, $singleAttributeIndex);
+		$subtitles = $this->isSubtitledClip($conversionData, $singleAttributeIndex);
+		$imageToVideo = isset($conversionData[self::IMAGE_TO_VIDEO]);
+		$scale = isset($conversionData[self::TARGET_WIDTH]);
+		return !$imageToVideo && !$scale && !$cropped && !$subtitles;
+	}
+
+	protected function getCropDataFromConversionParams($conversionParams, $clipIndex)
+	{
+		$cropDataArray = isset($conversionParams[self::CROP_DATA_ARRAY]) ? $conversionParams[self::CROP_DATA_ARRAY] : array();
+		return isset($cropDataArray[$clipIndex]) ? $cropDataArray[$clipIndex] : array();
+	}
+
+	protected function getSubtitlesDataFromConversionParams($conversionParams, $clipIndex)
+	{
+		$subtitleDataArray = isset($conversionParams[self::SUBTITLES_DATA_ARRAY]) ? $conversionParams[self::SUBTITLES_DATA_ARRAY] : array();
+		return isset($subtitleDataArray[$clipIndex]) ? $subtitleDataArray[$clipIndex] : array();
+	}
+
+	protected function getScaleFilter($ow, $oh, $iw = "iw", $ih = "ih")
+	{
+		// missing dimensions
+		if(!$ow || !$oh || !$iw || !$ih)
+		{
+			return null;
+		}
+		return "scale=$iw*min($ow/$iw\,$oh/$ih):$ih*min($ow/$iw\,$oh/$ih)";
+	}
+	protected function getPadFilter($ow, $oh, $iw = "iw", $ih = "ih")
+	{
+		// missing dimensions
+		if(!$ow || !$oh || !$iw || !$ih)
+		{
+			return null;
+		}
+		return "pad=$ow:$oh:($ow-$iw)/2:($oh-$ih)/2";
+	}
+
+	protected function getCropFilter($ow, $oh, $wp, $hp)
+	{
+		// missing dimensions
+		if(!$ow || !$oh)
+		{
+			return null;
+		}
+		return "crop=$ow:$oh:$wp:$hp";
+	}
+
+	protected function getWhiteBackgroundFilter()
+	{
+		return "split=2[bg][fg];[bg]drawbox=c=white@1:replace=1:t=fill[bg];[bg][fg]overlay=format=auto";
 	}
 }
