@@ -62,9 +62,12 @@ class embedIframeJsAction extends sfAction
 		$iframeEmbed = $this->getRequestParameter('iframeembed');
 
 		//redirect the call to V7
-		if($uiConf->getV2tov7id() && ($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) || $uiConf->getV2tov7Approved()) )
+		if( $uiConf->getV2Redirect() &&
+			$uiConf->getV2Redirect()->getV7id() &&
+			( $uiConf->getV2Redirect()->getIsApproved() || $this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) )
+			)
 		{
-			$this->redirectToV7($uiConf->getV2tov7id(), $uiconf_id, $partner_id, $uiConf->getV2tov7ShouldTranslatePlugins() );
+			$this->redirectToV7($uiConf->getV2Redirect()->getV7id(), $uiconf_id, $partner_id, $uiConf->getV2Redirect()->getTranslatePlugins() );
 		}
 
 
@@ -171,8 +174,6 @@ class embedIframeJsAction extends sfAction
 					$config['bundleConfig'],
 					$config['playerConfig']);
 			}
-			//validate that the facade is reachable
-			v2Tov7Utils::getBundledFacade();
 		}
 		catch(Exception $e)
 		{

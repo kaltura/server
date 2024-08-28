@@ -67,11 +67,6 @@ class embedPlaykitJsAction extends sfAction
 
 		$lastModified = $this->getLastModified($bundleContent);
 
-		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
-		{
-			$bundleContent .= PHP_EOL . v2Tov7Utils::getBundledFacade();
-		}
-
 		//Format bundle content
 		$bundleContent = $this->formatBundleContent($bundleContent, $i18nContent, $extraModulesNames);
 
@@ -518,8 +513,8 @@ class embedPlaykitJsAction extends sfAction
 		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
 		{
 			$v2ToV7config = v2Tov7Utils::addV2toV7config($this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME), $this->uiconfId);
-			$v2tov7ConfigJs = 'var v2toV7Config =  window.v2tov7_buildConfigFromFlashvars(' . JSON_encode($v2ToV7config) . ');
-							config = {...config,...v2toV7Config};';
+			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
+
 		}
 
 		$autoEmbedCode = "
@@ -827,12 +822,16 @@ class embedPlaykitJsAction extends sfAction
 
 		$this->mergeVersionsParamIntoConfig();
 
-		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME) && $this->getRequestParameter(v2Tov7Utils::SHOULD_TRANSLATE_PLUGINS))
-		{
-			v2Tov7Utils::addV2toV7plugins(
-				$this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),
-				$this->bundleConfig,
-				$this->playerConfig);
+		if($this->getRequestParameter(v2Tov7Utils::V2TOV7_PARAM_NAME))
+        {
+            $this->bundleConfig[v2Tov7Utils::SCRIPT_PLUGIN_NAME] = v2Tov7Utils::SCRIPT_PLUGIN_VERSION;
+            if($this->getRequestParameter(v2Tov7Utils::SHOULD_TRANSLATE_PLUGINS))
+            {
+                v2Tov7Utils::addV2toV7plugins(
+                    $this->getRequestParameter(v2Tov7Utils::FLASHVARS_PARAM_NAME),
+                    $this->bundleConfig,
+                    $this->playerConfig);
+            }
 		}
 
 		if (!$this->bundleConfig) {

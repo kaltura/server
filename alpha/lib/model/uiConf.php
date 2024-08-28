@@ -114,9 +114,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	const CUSTOM_DATA_CON_FILE_VERSION = 'conf_file_version';
 	const CUSTOM_DATA_CONF_FILE_FEATURES_VERSION = 'conf_file_features_version';
 
-	const CUSTOM_DATA_V2V7_ID = "v2v7_id";
-	const CUSTOM_DATA_V2V7_APPROVED = "v2v7_approved";
-	const CUSTOM_DATA_V2V7_TRANSLATE_PLUGINS = "v2v7_translate_plugins";
+	const CUSTOM_DATA_V2REDIRECT = "v2redirect";
 
     public function save(PropelPDO $con = null)
 	{
@@ -815,30 +813,14 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	}
 
 	//v2 to v7
-	public function getV2tov7id()
+	public function getV2Redirect()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_V2V7_ID, null, null);
+		return $this->getFromCustomData( self::CUSTOM_DATA_V2REDIRECT);
 	}
-	public function setV2tov7id($v)
+
+	public function setV2Redirect($v)
 	{
-		return $this->putInCustomData(self::CUSTOM_DATA_V2V7_ID, $v);
-	}
-	public function getV2tov7Approved()
-	{
-		$val = $this->getFromCustomData(self::CUSTOM_DATA_V2V7_APPROVED, null, false, null);
-		return ($val === 1 || $val === true || $val === "true");
-	}
-	public function setV2tov7Approved($v)
-	{
-		return $this->putInCustomData(self::CUSTOM_DATA_V2V7_APPROVED, $v);
-	}
-	public function getV2tov7ShouldTranslatePlugins()
-	{
-		$val = $this->getFromCustomData(self::CUSTOM_DATA_V2V7_TRANSLATE_PLUGINS, null, false, null);
-		return ($val === 1 || $val === true || $val === "true");
-	}
-	public function setV2tov7ShouldTranslatePlugins($v)
-	{
-		return $this->putInCustomData( self::CUSTOM_DATA_V2V7_TRANSLATE_PLUGINS, $v );
+		KalturaLog::log(JSON_encode($v));
+		return $this->putInCustomData(self::CUSTOM_DATA_V2REDIRECT, $v);
 	}
 }

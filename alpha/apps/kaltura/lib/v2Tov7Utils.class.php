@@ -5,10 +5,11 @@ class v2Tov7Utils
 	const V2TOV7_PARAM_NAME = 'v2tov7';
 	const FLASHVARS_PARAM_NAME = 'flashvars';
 	const SHOULD_TRANSLATE_PLUGINS = self::V2TOV7_PARAM_NAME ."translate";
+    const SCRIPT_PLUGIN_NAME = "playkit-player-scripts";
+    const SCRIPT_PLUGIN_VERSION = "1.0.1-canary.0-f456898";
 
 	static private function getV7PluginInfo($v2PluginName): array
 	{
-		KalturaLog::log("Searching for " . $v2PluginName . " " . strlen($v2PluginName));
 		$translation = self::v2toV7PluginMap();
 		if(isset($translation[$v2PluginName]))
 		{
@@ -103,36 +104,5 @@ class v2Tov7Utils
 			"qna"           => ["playkit-qna", "qna"],
 			"bumper"        => [ "playkit-bumper" , "bumper" ],
 			"infoScreen" => ["playkit-info", "playkit-js-info"]];
-	}
-
-	public static function getBundledFacade()
-	{
-		//build key based on version
-		$facadeVersion = kConf::getArrayValue('v2tov7FacadeVersion','playkit-js');
-		$facadeVersion .= "/v2tov7Facade.js";
-
-		//try get value from local memcache
-		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYKIT_JS);
-		$bundledFacade = $cacheStore->get($facadeVersion);
-		if(strlen($bundledFacade))
-		{
-			return $bundledFacade;
-		}
-
-		//if not local - get it from remote location
-		$remoteUrl = kConf::getArrayValue('v2tov7FacadeRemoteUrl','playkit-js');
-		$remoteUrl .= '/' . $facadeVersion;
-
-		$curlWrapper = new KCurlWrapper();
-
-		$content = $curlWrapper->exec($remoteUrl,null, null, true);
-		if(KCurlHeaderResponse::isError($curlWrapper->getHttpCode()))
-		{
-			throw new Exception ('Cannot find V2 to V7 facade in the following URL: ' . $remoteUrl . "Error code:" . $curlWrapper->getHttpCode());
-		}
-
-		//store in local cache for next time
-		$cacheStore->set($facadeVersion,$content);
-		return $content;
 	}
 }
