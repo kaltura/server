@@ -1015,7 +1015,7 @@ class myEntryUtils
 
 						if (!$success)
 						{
-							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId, $fileToDelete);
+							$success = self::captureLocalThumb($entry, $capturedThumbPath, $calc_vid_sec, $cache, $cacheLockKey, $cacheLockKeyProcessing, $flavorAssetId, -1, -1, $fileToDelete);
 						}
 					}
 
