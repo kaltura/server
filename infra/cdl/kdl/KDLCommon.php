@@ -62,7 +62,7 @@
 				$ratioTrg = self::BitrateH264Factor;
 			else if(in_array($targetCodec, self::$BitrateFactorCategory5))
 				$ratioTrg = self::BitrateH265Factor;
-			else if(in_array($targetCodec, self::$BitrateFactorCategory6)) 
+			else if(in_array($targetCodec, self::$BitrateFactorCategory6))
 				$ratioTrg = self::BitrateAV1Factor;
 
 			$ratioSrc = self::BitrateOthersRatio;
@@ -78,7 +78,7 @@
 				$ratioSrc = self::BitrateH265Factor;
 			else if(in_array($sourceCodec, self::$BitrateFactorCategory6))
 				$ratioSrc = self::BitrateAV1Factor;
-	
+
 			$brSrcNorm = $sourceBitrate*($ratioSrc/$ratioTrg)*$transcodingFactor;
 			return round($brSrcNorm, 0);								   		}
 		}
@@ -140,6 +140,17 @@
 			KDLTranscoders::MENCODER => array(
 				KDLConstants::ContainerIndex=>array(KDLContainerTarget::ISMV, KDLContainerTarget::ISMA)),
 		);
+		
+				/*
+				 * SupportedVideoFilters
+				 */
+		static $SupportedVideoFilters = array("scale","fade","crop", "overlay",
+					"rotate","yadif","subtitles","setsar");
+				/*
+				 * SupportedAudioFilters
+				 */
+		static $SupportedAudioFilters = array("aresample","amerge","amix","pan",
+					"loudnorm","volume","channelsplit");
 		
 		const MaxFramerate = 30.0;
 		const DefaultGOP = 60;

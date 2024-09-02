@@ -144,20 +144,14 @@
 			$setup = $chunker->setup;	
 
 			$maxChunks = $chunker->GetMaxChunks();
-			$chunkDurThreshInSec=$chunker->chunkDurThreshInFrames*$chunker->params->frameDuration;
 			foreach($this->jobs as $idx=>$job) {
 				if($job->state==$job::STATE_SUCCESS) {			
 					$chunkData = $chunker->GetChunk($job->id);
 					if(isset($job->stat)){
-							/*
-							 * Validate chunk dur
-							 */
-							// Calc the generated chunk duration
-						$generatedChunkDur = $job->stat->finish-$job->stat->start;
 							// For the last chunk - no need to validate chunk dur
 						if($job->id==$maxChunks-1)
 							continue;
-						if($chunkData->gap-$chunkDurThreshInSec > $generatedChunkDur){
+						if($chunker->validateChunkDuration($chunkData,$job->stat->start,$job->stat->finish)===false) {
 								// Too short chunk duration mostly caused by low framerate 
 								// and missing frames at the chunk end (regular P/B, not I).
 								// Solution - gradually increase the chunk overlap, 
@@ -291,13 +285,20 @@
 		protected $audioJobs = null;
 		
 		protected $storeManager = null;
+		public $chunker = null;
 
 		/* ---------------------------
 		 * C'tor
 		 */
-		public function __construct(KChunkedEncodeSetup $setup, $storeManager, $name=null)
+		public function __construct(KChunkedEncodeSetup $setup, $storeManager, $name=null, $chunker=null)
 		{
-			parent::__construct($setup, $name);
+                        parent::__construct($setup, $name);
+			if(isset($chunker)){
+				$this->chunker = $chunker;
+			}
+			else
+				$this->chunker = new KChunkedEncode($setup);
+
 			if(!isset($this->chunker->setup->concurrent))
 				$this->chunker->setup->concurrent = 20;
 			
@@ -339,6 +340,20 @@
 		 */
 		public function getElapsed() { 
 			return (time()-$this->createTime);
+		}
+
+		/* ---------------------------
+		 * ExecuteSession
+		 */
+		public function ExecuteSession()
+		{
+			if(($rv=$this->Initialize())!=true) {
+				$this->Report();
+				return $rv;
+			}
+			$rv = $this->Generate();
+			$this->Report();
+			return $rv;
 		}
 
 		/* ---------------------------
@@ -676,8 +691,7 @@
 			if(isset($job->timeout) && $job->timeout==1) {
 				$job->maxExecTime=round($job->maxExecTime*1.15);
 				$job->timeout=0;
-
-				// After 1/2 of the timeout retries (w/out retrying the chunk job),
+        // After 1/2 of the timeout retries (w/out retrying the chunk job),
 				// retry the chunk job afterall.
 				// It's needed to handle dying/crashing pods cases.
 				if($job->attempt<$this->maxRetries/2 
@@ -779,9 +793,63 @@
 			return parent::executeCmdline($cmdLine);
 		}
 
+		/********************
+		 * getSessionReportStats
+		 */
+		public function getSessionReportStats() 		
+		{
+			$chunker = $this->chunker;
+			$sessionStats = new KChunkedEncodeSessionReportStats();
+			$sessionStats->num = $chunker->GetMaxChunks();
+			$sessionStats->lasted = $this->finishTime - $this->createTime;
+			{
+				KalturaLog::log("CSV,idx,startedAt,user,system,elapsed,cpu");
+				foreach($this->chunkExecutionDataArr as $idx=>$execData){
+					$sessionStats->userCpu +=    $execData->user;
+					$sessionStats->systemCpu +=  $execData->system;
+					$sessionStats->elapsedCpu += $execData->elapsed;
+					
+					KalturaLog::log("CSV,$idx,$execData->startedAt,$execData->user,$execData->system,$execData->elapsed,$execData->cpu");
+				}
+				$cnt = $chunker->GetMaxChunks();
 
+			}
+			
+//			KalturaLog::log("LogFile: ".$chunker->getSessionName("log"));
+
+			if(isset($this->concurrencyHistogram) && count($this->concurrencyHistogram)>0){
+				ksort($this->concurrencyHistogram);
+				$ttlStr = "Concurrency";
+				$tmStr = "Concurrency";
+				$concurSum = 0;
+				$tmSum = 0;
+				foreach($this->concurrencyHistogram as $concur=>$tm){
+					$ttlStr.=",$concur";
+					$tmStr.= ",$tm";
+					$concurSum+= ($concur*$tm);
+					$tmSum+= $tm;
+				}
+				KalturaLog::log($ttlStr);
+				KalturaLog::log($tmStr);
+				$concurrencyLevel = (round(($concurSum/$tmSum),2));
+			}
+
+			KalturaLog::log("***********************************************************");
+			KalturaLog::log("* Session Summary (".date("Y-m-d H:i:s").")");
+			KalturaLog::log("* ");
+			if(isset($concurrencyLevel)) {
+				$val = round(end($this->concurrencyHistogram)/1000,2);
+				$idle = round($this->concurrencyHistogram[0]/1000,2);
+				$sessionStats->concurrency = $concurrencyLevel;
+				$sessionStats->concurrencyMax = key($this->concurrencyHistogram);
+				$sessionStats->concurrencyMaxTime = $val;
+				$sessionStats->concurrencyIdleTime = $idle;
+			}
+
+			KalturaLog::log("SessionStats:".$sessionStats->ToString());
+			return $sessionStats;
+		}
 	}
 	/*****************************
 	 * End of KChunkedEncodeSessionManager
 	 *****************************/
-	
