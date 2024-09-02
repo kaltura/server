@@ -1130,11 +1130,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 
 	protected static function enableRequiredPluginsPermissions($partnerId, $permissionName)
 	{
-		$scheduledTaskPluginPermission = PermissionPeer::getByNameAndPartner($permissionName, array($partnerId));
-		if ($scheduledTaskPluginPermission->getStatus() != PermissionStatus::ACTIVE)
+		$requiredPluginPermission = PermissionPeer::getByNameAndPartner($permissionName, array($partnerId));
+		if ($requiredPluginPermission->getStatus() != PermissionStatus::ACTIVE)
 		{
-			$scheduledTaskPluginPermission->setStatus(PermissionStatus::ACTIVE);
-			$scheduledTaskPluginPermission->save();
+			$requiredPluginPermission->setStatus(PermissionStatus::ACTIVE);
+			$requiredPluginPermission->save();
 		}
 	}
 	
