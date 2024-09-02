@@ -676,7 +676,7 @@
 			if(isset($job->timeout) && $job->timeout==1) {
 				$job->maxExecTime=round($job->maxExecTime*1.15);
 				$job->timeout=0;
-				$this->storeManager->SaveJob($job);
+
 				// After 1/2 of the timeout retries (w/out retrying the chunk job),
 				// retry the chunk job afterall.
 				// It's needed to handle dying/crashing pods cases.
