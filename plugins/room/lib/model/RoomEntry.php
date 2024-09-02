@@ -20,10 +20,10 @@ class RoomEntry extends entry
 		return $this->getFromCustomData(self::CUSTOM_DATA_BROADCAST_ENTRY_ID);
 	}
 
-    public function getTemplateRoomEntryId()
-    {
-        return $this->getFromCustomData(self::CUSTOM_DATA_TEMPLATE_ROOM_ENTRY_ID);
-    }
+	public function getTemplateRoomEntryId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_TEMPLATE_ROOM_ENTRY_ID);
+	}
 
 	public function setRoomType($v)
 	{

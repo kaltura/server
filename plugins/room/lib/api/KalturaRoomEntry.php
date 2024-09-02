@@ -66,7 +66,7 @@ class KalturaRoomEntry extends KalturaBaseEntry
 
 	public function validateTemplateRoomEntry()
 	{
-		if (!isset($this->templateRoomEntryId))
+		if (!isset($this->templateRoomEntryId) || $this->templateRoomEntryId === '')
 		{
 			return;
 		}
