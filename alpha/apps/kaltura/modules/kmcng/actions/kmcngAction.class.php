@@ -9,6 +9,18 @@ class kmcngAction extends kalturaAction
 	const PLAYER_V3_VERSIONS_TAG = 'playerV3Versions';
 	const PLAYER_V3_OVP_VERSIONS_TAG = 'playerV3OvpVersions';
 
+	public static function getDirectivesAndAllowlists($directivesToDisable): string
+	{
+		$permissionPolicyHeader = "";
+		$directives = [];
+		foreach ($directivesToDisable as $directive => $allowList)
+		{
+			$directives[] = $directive . '=' . $allowList;
+		}
+		$permissionPolicyHeader .= implode(',', $directives);
+		return $permissionPolicyHeader;
+	}
+
 	public function execute()
 	{
 		if (!kConf::hasParam('kmcng'))
@@ -41,6 +53,19 @@ class kmcngAction extends kalturaAction
 		header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
+
+		//security
+		header("Referrer-Policy: strict-origin");
+		header("X-Content-Type-Options: nosniff");
+		header("Cross-Origin-Embedder-Policy: unsafe-none");
+		header("Cross-Origin-Resource-Policy: same-origin");
+		header("Cross-Origin-Opener-Policy: unsafe-none");
+
+		if (kConf::hasParam('kmcng_permissions_policy_directives'))
+		{
+			$directivesToDisable = kConf::get('kmcng_permissions_policy_directives');
+			header("Permissions-Policy: " . self::getDirectivesAndAllowlists($directivesToDisable));
+		}
 
 		if (!isset($kmcngParams["kmcng_version"]))
 		{

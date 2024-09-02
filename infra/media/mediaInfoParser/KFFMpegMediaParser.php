@@ -364,7 +364,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 				$value = false;
 				$darStr = str_replace(":", "/",$display_aspect_ratio);
 				//Avoid division by 0
-				if(!kString::endsWith($avg_frame_rate, "/0")) {
+				if(!kString::endsWith($darStr, "/0")) {
 					$value = eval("return ($darStr);");
 				}
 				if($value!=false) {

@@ -1528,11 +1528,14 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			}
 			
 			$response = KBatchBase::$kClient->doMultiRequest();
-			foreach ($response as $singleResponse)
+			if($response)
 			{
-				if (is_array($singleResponse) && isset($singleResponse['code']) && isset($singleResponse['message']))
+				foreach ($response as $singleResponse)
 				{
-					$bulkuploadResult->errorDescription .= $singleResponse['message'];
+					if (is_array($singleResponse) && isset($singleResponse['code']) && isset($singleResponse['message']))
+					{
+						$bulkuploadResult->errorDescription .= $singleResponse['message'];
+					}
 				}
 			}
 		}

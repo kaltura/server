@@ -20,14 +20,19 @@
             <th><?php echo $this->translate('Source Language'); ?></th>
             <th><?php echo $this->translate('Target Language'); ?></th>
             <th><?php echo $this->translate('Output Format'); ?></th>
+            <th><?php echo $this->translate('Stage'); ?></th>
+            <th><?php echo $this->translate('Contract'); ?></th>
+            <th><?php echo $this->translate('Notes'); ?></th>
             <th><?php echo $this->translate('Creation Date'); ?></th>
+            <th><?php echo $this->translate('Created By'); ?></th>
             <th><?php echo $this->translate('Last Updated Date'); ?></th>
+            <th><?php echo $this->translate('Last Bulk Update ID'); ?></th>
             <th><?php echo $this->translate('Action'); ?></th>
         </tr>
         </thead>
         <tfoot>
         <tr>
-            <td colspan="14">
+            <td colspan="19">
 				<?php echo $this->paginator; ?>
             </td>
         </tr>
@@ -55,11 +60,19 @@
 					else
 						echo null;?>
                 </td>
+                <td><?php if (isset($catalogItem->stage))
+						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStage', $catalogItem->stage);
+					else
+						echo null;?>
+                </td>
+                <td><?php echo $catalogItem->contract; ?></td>
+                <td><?php echo $catalogItem->notes; ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->createdAt); ?></td>
+                <td><?php echo $catalogItem->createdBy; ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
+                <td><?php echo $catalogItem->lastBulkUpdateId; ?></td>
                 <td>
-                    <select class="options"
-                            onchange="doAction(this.value, <?php echo $catalogItem->id; ?>)">
+                    <select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id; ?>)">
                         <option value=""><?php echo $this->translate('Select Action'); ?></option>
                         <option value="configureCatalogItem"><?php echo $this->translate('Configure'); ?></option>
 						<?php if ($catalogItem->status === Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED): ?>
@@ -107,36 +120,33 @@
 		jQuery('select.options').val('');
 	}
 
-	function enable(catalogItemId, partnerId) {
+	function enable(catalogItemId) {
 		changeStatus(
 			catalogItemId,
 			
 			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE; ?>,
-			partnerId,
 			function () {
 				alert('<?php echo $this->translate('Catalog Item enabled');?>');
 			}
 		);
 	}
 
-	function disable(catalogItemId, partnerId) {
+	function disable(catalogItemId) {
 		changeStatus(
 			catalogItemId,
 			<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DEPRECATED; ?>,
-			partnerId,
 			function () {
 				alert('<?php echo $this->translate('Catalog Item disabled');?>');
 			}
 		);
 	}
 
-	function remove(catalogItemId, partnerId) {
+	function remove(catalogItemId) {
 		var ok = confirm('<?php echo $this->translate('Are you sure you want to remove Catalog Item ?'); ?>');
 		if (ok) {
 			changeStatus(
 				catalogItemId,
 				<?php echo Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED; ?>,
-				partnerId,
 				function () {
 					alert('<?php echo $this->translate('Catalog Item removed');?>');
 				}
@@ -144,11 +154,11 @@
 		}
 	}
 
-	function changeStatus(catalogItemId, status, partnerId, callback) {
-		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemSetStatusAction', 'catalogItemId' => 'CATALOGITEMID', 'partnerId' => 'PARTNERID', 'catalogItemStatus' => 'STATUS')); ?>';
+	function changeStatus(catalogItemId, status, callback) {
+		var url = '<?php echo $this->url(array('controller' => 'plugin', 'action' => 'CatalogItemSetStatusAction', 'catalogItemId' => 'CATALOGITEMID', 'catalogItemStatus' => 'STATUS')); ?>';
 		url = url.replace('STATUS', status);
 		url = url.replace('CATALOGITEMID', catalogItemId);
-		url = url.replace('PARTNERID', partnerId);
+  
 		jQuery.ajax({
 			url: url,
 			dataType: 'json',

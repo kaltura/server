@@ -203,8 +203,9 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 		if ($this->isColumnModified(kuserPeer::LOGIN_DATA_ID)) {
 			$oldLoginDataId = $this->oldColumnsValues[kuserPeer::LOGIN_DATA_ID];
 		}
-		
-		if ($this->isColumnModified(kuserPeer::IS_ADMIN) && $this->getIsAdmin())
+
+		if ($this->isColumnModified(kuserPeer::IS_ADMIN) &&
+			$this->getIsAdmin() && !is_null($this->getLoginDataId()))
 		{
 			kuserPeer::sendNewUserMail($this, true);
 		}
@@ -1070,16 +1071,17 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 * @throws kUserException::LOGIN_DATA_MISMATCH
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 */
-	public function replaceUserLoginData($newLoginId, $existingLoginId = null)
+	public function replaceUserLoginData($newLoginId, $existingLoginId)
 	{
-		$userLoginData = UserLoginDataPeer::getByEmail($this->getEmail());
-		if ($userLoginData)
+		$userLoginData = null;
+		if ($this->getLoginDataId())
 		{
 			if (!$existingLoginId)
 			{
 				throw new kUserException('', kUserException::LOGIN_DATA_NOT_PROVIDED);
 			}
-			else if ($existingLoginId !== $userLoginData->getLoginEmail())
+			$userLoginData = UserLoginDataPeer::getByEmail($existingLoginId);
+			if ($userLoginData && $userLoginData->getId() !== $this->getLoginDataId())
 			{
 				throw new kUserException('', kUserException::LOGIN_DATA_MISMATCH);
 			}
@@ -1092,14 +1094,13 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 			throw new kUserException('', kUserException::LOGIN_ID_ALREADY_USED);
 		}
 
-		$password = null;
-		if ($userLoginData)
+		if ($userLoginData) // disable the old login
 		{
-			$password = $userLoginData->getUserPassword();
-			$this->disableLogin();
+			$this->setLoginDataId(null);
+			$this->save();
 		}
 
-		return $this->enableLogin($newLoginId, $password, true, true);
+		return $this->enableLogin($newLoginId, null, true, true);
 	}
 	
 	/**

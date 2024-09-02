@@ -51,6 +51,9 @@ class KalturaErrors extends APIErrors
 
 	// PARAM_NAME - parameter name
 	const MISSING_MANDATORY_PARAMETER = "MISSING_MANDATORY_PARAMETER;PARAM_NAME;Missing parameter \"@PARAM_NAME@\"";
+	const INVALID_PARAMETER_VALUE = "INVALID_PARAMETER_VALUE;PARAM_NAME;invalid value for parameter \"@PARAM_NAME@\"";
+	const PARAMETER_VALUE_OUT_OF_RANGE = "PARAMETER_VALUE_OUT_OF_RANGE;PARAM_NAME,MIN,MAX;Parameter \"@PARAM_NAME@\" value is out of range (@MIN@ - @MAX@)";
+	const MULTIPLE_PARAMETER_NOT_SUPPORTED = "MULTIPLE_PARAMETER_NOT_SUPPORTED;PARAM_NAME;Multiple parameters \"@PARAM_NAME@\" is not supported";
 
 	// INVALID_OBJ_TYPE - invalid object type
 	const INVALID_OBJECT_TYPE = "INVALID_OBJECT_TYPE;INVALID_OBJ_TYPE;Invalid object type \"@INVALID_OBJ_TYPE@\"";
@@ -578,6 +581,8 @@ class KalturaErrors extends APIErrors
 	const INVALID_ID = "INVALID_ID;ID;Id \"@ID@\" contains invalid chars";
 	
 	const SETTING_SSO_PER_USER_NOT_ALLOWED = "SETTING_SSO_PER_USER_NOT_ALLOWED;;Setting SSO per user is not allowed for this partner";
+
+	const EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS = "EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS;;Email domain is not allowed for admins on this partner";
 
 	/**
 	 * categoryUser service

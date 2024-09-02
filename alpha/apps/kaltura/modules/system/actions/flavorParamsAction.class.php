@@ -50,6 +50,7 @@ class flavorParamsAction extends kalturaSystemAction
 				$newFalvorParams->setMaxFrameRate($this->editFlavorParam->getMaxFrameRate());
 				$newFalvorParams->setWatermarkData($this->editFlavorParam->getWatermarkData());
 				$newFalvorParams->setSubtitlesData($this->editFlavorParam->getSubtitlesData());
+				$newFalvorParams->setCropData($this->editFlavorParam->getCropData());
 				$newFalvorParams->setIsDefault(false);
 				$newFalvorParams->setPartnerId(-1);
 				$newFalvorParams->save();
@@ -109,6 +110,7 @@ class flavorParamsAction extends kalturaSystemAction
 						$this->editFlavorParam->setVideoBitrate($this->getRequestParameter("video-bitrate"));
 						$this->editFlavorParam->setWatermarkData($this->getRequestParameter("watermarkData",0));
 						$this->editFlavorParam->setSubtitlesData($this->getRequestParameter("subtitlesData",0));
+						$this->editFlavorParam->setCropData($this->getRequestParameter("cropData",0));
 						$this->editFlavorParam->setFrameRate($this->getRequestParameter("frame-rate"));
 						$this->editFlavorParam->setMaxFrameRate($this->getRequestParameter("max-frame-rate"));
 						$this->editFlavorParam->setGopSize($this->getRequestParameter("gop-size"));

@@ -106,6 +106,27 @@ class kKavaVeRegistrationReports extends kKavaReportsMgr
 				self::METRIC_REGISTERED_UNIQUE_USERS,
 			)
 		),
+
+		ReportType::VE_ATTENDANCE_HIGHLIGHTS => array(
+			self::REPORT_METRICS => array(
+				self::METRIC_VE_ATTENDED,
+				self::METRIC_VE_ATTENDED_UNIQUE_USERS,
+			),
+			self::REPORT_GRAPH_METRICS => array(
+				self::METRIC_VE_ATTENDED,
+				self::METRIC_VE_ATTENDED_UNIQUE_USERS,
+			)
+		),
+
+		ReportType::VE_REGISTERED_COMPANIES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'company' => self::DIMENSION_COMPANY,
+			),
+			self::REPORT_METRICS => array(
+				self::EVENT_TYPE_VE_REGISTERED,
+				self::METRIC_REGISTERED_UNIQUE_USERS,
+			),
+		),
 	);
 
 	protected static function initQueryCache()

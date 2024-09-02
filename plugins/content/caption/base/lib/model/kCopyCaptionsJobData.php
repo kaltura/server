@@ -15,7 +15,7 @@ class kCopyCaptionsJobData extends kJobData
 	 * the sources start time and duration
 	 * @var array
 	 */
-	private $clipsDescriptionArray;
+	private $clipsDescriptionArray = array();
 
 
 	/**

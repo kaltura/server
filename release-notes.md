@@ -1,12 +1,152 @@
+# Tucana-20.17.0
+## New KME user reset password link  ##
+- Issue Type: Bug
+- Issue ID: NR2-8250
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links' (with the service url of the required KME environment):
+kme_nr = @KME_NR_SERVICE_URL@/u/#/forgotPassword/
+
+# Tucana-20.16.0
+# Add permissions for session get ##
+- Issue Type: Task
+- Issue ID: PLAT-24908
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permissions.php
+
+## Add KMC Headers
+* Issue Type: Task
+* Issue ID: PLAT-24859
+### Deployment ###
+Add the following to local.ini:
+```
+[kmcng_permissions_policy_directives]
+ambient-light-sensor = "()"
+display-capture = "()"
+battery = "()"
+bluetooth = "()"
+camera = "()"
+compute-pressure = "()"
+browsing-topics = "()"
+document-domain = "()"
+identity-credentials-get = "()"
+gamepad = "()"
+geolocation = "()"
+hid = "()"
+local-fonts = "()"
+magnetometer = "()"
+microphone = "()"
+midi = "()"
+otp-credentials = "()"
+payment = "()"
+publickey-credentials-create = "()"
+publickey-credentials-get = "()"
+serial = "()"
+speaker-selection = "()"
+storage-access = "()"
+usb = "()"
+window-management = "()"
+xr-spatial-tracking = "()"
+```
+# Tucana-20.15.0
+## Add 'broadcast entry id' to ESearch for entry ##
+- Issue Type: Task
+- Issue ID: PLAT-24812
+
+### Deployment Scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"broadcast_entry_id": {"type": "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
+
+## Add CnC Permissions
+* Issue Type: Task
+* Issue ID: PLAT-24891
+### Deployment ###
+Add the following to admin.ini:
+```
+moduls.cncAssistant.enabled = true
+moduls.cncAssistant.permissionType = 2
+moduls.cncAssistant.label = "Enable CNC Assistant"
+moduls.cncAssistant.permissionName = FEATURE_CNC_ASSISTANT_PERMISSION
+moduls.cncAssistant.group = GROUP_ENABLE_DISABLE_FEATURES
+
+moduls.cncAISentimentAnalysis.enabled = true
+moduls.cncAISentimentAnalysis.permissionType = 2
+moduls.cncAISentimentAnalysis.label = "Enable AI in CNC - Sentiment Analysis"
+moduls.cncAISentimentAnalysis.permissionName = FEATURE_CNC_AI_SENTIMENT_ANALYSIS_PERMISSION
+moduls.cncAISentimentAnalysis.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Tucana-20.14.0
+## Allow specific partners to acccess the API from blocked countries ##
+* Issue Type: Task
+* Issue ID: SUP-39912
+
+### Configuration ###
+Add/Update a configuration map called 'runtime_config' with following config:
+
+    [global_access_limitations]
+    allowedPartnersInBlockedCountries = @COMMA_SEPERATED_PARTNER_ID@
+    
+## Add configuration ##
+- Issue Type: Task
+- Issue ID: PLAT-24868
+
+### Configuration ###
+Add the following to admin.ini:
+```
+moduls.eventPlatformAIEmails.enabled = true
+moduls.eventPlatformAIEmails.permissionType = 2
+moduls.eventPlatformAIEmails.label = "Enable AI in EP - Emails"
+moduls.eventPlatformAIEmails.permissionName = FEATURE_EP_AI_EMAILS_PERMISSION
+moduls.eventPlatformAIEmails.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+Change the label of moduls.eventPlatformAI:
+```
+moduls.eventPlatformAI.enabled = true
+moduls.eventPlatformAI.permissionType = 2
+moduls.eventPlatformAI.label = "Enable AI in EP - Webinar Cdreation"
+moduls.eventPlatformAI.permissionName = FEATURE_EP_AI_PERMISSION
+moduls.eventPlatformAI.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Tucana-20.12.0
+## Configure partner limit on max groups per user ##
+- Issue Type: Task
+- Issue ID: PLAT-24816
+
+### Configuration ###
+Add the following to local.ini:
+```
+[group_user_count_limit]
+@PARTNER_ID@ = @MAX_GROUPS_PER_USER@
+```
+
+## Load trimmed captions to file in case upload by string resource not succeed ##
+- Issue Type: Bug
+- Issue ID: SUP-41695
+### Configuration ###
+Add the following to batch.ini under KAsyncCopyCaptions worker
+
+```
+[KAsyncCopyCaptions : JobHandlerWorker]
+id		     = @WORKER_ID@
+...
+params.localTempPath = @TMP_DIR@/copycaptions
+```
+
 # Tucana-20.11.0
 ## Replace user's login data to new or existing login data ##
 - Issue Type: Task
 - Issue ID: PLAT-24661
+
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2024_03_24_user_replaceUserLoginData_permissions.php
 
 # Tucana-20.10.0
-## PHP8 support  ##
+## PHP8 support ##
 - Issue Type: Epic
 - Issue ID: VCP-15578
 

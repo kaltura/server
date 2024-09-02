@@ -42,13 +42,13 @@ class kXml
 {
 	public static function getXslEnabledPhpFunctions()
 	{
-		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt', 'myXmlUtils::kGmdate', 'myXmlUtils::kDate');
+		return array('date', 'gmdate', 'strtotime','urlencode','xml_load_for_xslt', 'dateUtils::kGmdate', 'dateUtils::kDate');
 	}
 	
 	public static function transformSafePhpFunction($xslt)
 	{
-		$xslt = str_replace("'gmdate'", "'myXmlUtils::kGmdate'", $xslt);
-		return str_replace("'date'", "'myXmlUtils::kDate'", $xslt);
+		$xslt = str_replace("'gmdate'", "'dateUtils::kGmdate'", $xslt);
+		return str_replace("'date'", "'dateUtils::kDate'", $xslt);
 	}
 	
 	//check if the prop's value is valid for xml encoding.

@@ -496,6 +496,15 @@ else
 				$toJson = json_encode($target->_video->_subtitlesData);
 				$flavor->setSubtitlesData($toJson);
 			}
+
+			/*
+ 			* Cropped
+ 			*/
+			if(isset($target->_video->_cropData))
+			{
+				$toJson = json_encode($target->_video->_cropData);
+				$flavor->setCropData($toJson);
+			}
 		}
 
 		if($target->_audio) {
@@ -688,6 +697,22 @@ else
 					}
 					else{
 						$kdlFlavor->_video->_subtitlesData = null;
+					}
+				}
+
+				/*
+ 				* cropping
+ 				*/
+				$cropData = $cdlFlavor->getCropData();
+				if(isset($cropData))
+				{
+					$fromJson = json_decode($cropData);
+					if(isset($fromJson))
+					{
+						$kdlFlavor->_video->_cropData = $fromJson;
+					}
+					else{
+						$kdlFlavor->_video->_cropData = null;
 					}
 				}
 			}

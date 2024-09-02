@@ -58,4 +58,9 @@ class myKuserUtils
 	{
 		return str_replace(' ', '', trim(strtolower($userId)));
 	}
+
+	public static function isAllowedAdminEmailDomain($email, $emailDomains)
+	{
+		return in_array(substr(strrchr($email, "@"), 1), $emailDomains);
+	}
 }

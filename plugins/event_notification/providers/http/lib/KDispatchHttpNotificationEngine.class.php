@@ -7,23 +7,23 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 {
 	/**
 	 * Folder to save uploaded files.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $tempFolderPath;
 	const MAX_BODY_SIZE = 1000;
-	
+
 	/* (non-PHPdoc)
 	 * @see KDispatchEventNotificationEngine::__construct()
 	 */
 	public function __construct()
 	{
 		$this->tempFolderPath = sys_get_temp_dir();
-		
+
 		if(isset(KBatchBase::$taskConfig->params->tempFolderPath) && KBatchBase::$taskConfig->params->tempFolderPath)
 			$this->tempFolderPath = KBatchBase::$taskConfig->params->tempFolderPath;
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KDispatchEventNotificationEngine::dispatch()
 	 */
@@ -41,12 +41,12 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 	{
 		/**
 		 * TODO
-		 * 
+		 *
 		 * add headers:
 		 * job id
 		 * scheduler id, worker id, session
 		 */
-		
+
 		$contentParameters = array();
 		$postParameters = array();
 		if(is_array($data->contentParameters) && count($data->contentParameters))
@@ -56,17 +56,27 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 				/* @var $contentParameter KalturaKeyValue */
 				$postParameters[$contentParameter->key] = $contentParameter->value;
 				$contentParameters['{' . $contentParameter->key . '}'] = $contentParameter->value;
-			}		
+			}
 		}
-		
+
 		$headers = array();
 		$curlData = $data->data;
 		$secret = $data->signSecret;
-		if(!is_null($secret)) { 
-			$dataSig = sha1($secret . $curlData);
+		if (!is_null($secret))
+		{
+			$signature = $secret . $curlData;
+			$shaType = match ($httpNotificationTemplate->secureHashingAlgo)
+			{
+				KalturaSecureHashingAlgo::SHA_256 => 'sha256',
+				KalturaSecureHashingAlgo::SHA_512 => 'sha512',
+				default => 'sha1',
+			};
+
+			$dataSig = hash($shaType, $signature);
 			$headers[] = "X-KALTURA-SIGNATURE: $dataSig";
+			$headers[] = "X-KALTURA-HASH-ALGO: $shaType";
 		}
-		
+
 		if(is_array($data->customHeaders) && count($data->customHeaders))
 		{
 			foreach($data->customHeaders as $customHeader)
@@ -120,7 +130,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 				if ($curlData)
 					$curlWrapper->setOpt( CURLOPT_POSTFIELDS, $curlData);
 				break;
-				
+
 			case KalturaHttpNotificationMethod::GET:
 			default:
 				if($curlData)
@@ -167,7 +177,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 				$curlWrapper->setOpt( CURLOPT_SSL_VERIFYPEER, true);
 			}
 		}
-		
+
 		if($data->username || $data->password)
 			$curlWrapper->setOpt( CURLOPT_USERPWD, $data->username . ':' . $data->password);
 
@@ -198,7 +208,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			throw new kTemporaryException("Sending HTTP request failed [$errCode] httpCode [$httpCode]
 			    			    \n url: [$url] \n $errMessage \n Headers:\n [$headers] \n Body:\n [$body]", $httpCode);
 		}
-		
+
 		return true;
 	}
 }

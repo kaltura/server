@@ -52,7 +52,7 @@ class KAsyncTransformMetadata extends KJobHandlerWorker
 	{
 		self::$kClient->startMultiRequest();
 		foreach($results as $index => $result){
-        	if(is_array($result) && isset($result['code']) && isset($result['message'])){
+        	if(is_array($result) && isset($result['code']) && isset($result['message']) && isset($transformObjectIds[$index])){
               	KalturaLog::err('error in object id['.$transformObjectIds[$index] .'] with code: '. $result['code']."\n".$result['message']." going to invalidate it");
               	self::$kClient->metadata->invalidate($transformObjectIds[$index]);
         	}

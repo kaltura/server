@@ -2408,6 +2408,10 @@ if(isset($mediaInfo)) {
 		{
 			return self::WEBEX_CONVERSION_KEY;
 		}
+		elseif (in_array('teamsentry', $adminTags))
+		{
+			return self::MS_TEAMS_CONVERSION_KEY;
+		}
 		return null;
 	}
 }

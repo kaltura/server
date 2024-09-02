@@ -12,7 +12,7 @@ class KmsAdminAction extends KalturaApplicationPlugin
     public function doAction(Zend_Controller_Action $action)
     {
         $ks = Infra_ClientHelper::getKs();
-        $loginUrl = Zend_Registry::get('config')->applicationLinks->kmsadmin->loginUrl;
+        $loginUrl = Zend_Registry::get('config')->applicationLinks->Kms->loginUrl;
         $action->view->loginUrl =  $loginUrl.$ks;
     }
 

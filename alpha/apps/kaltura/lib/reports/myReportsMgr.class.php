@@ -1563,6 +1563,12 @@ class reportsInputFilter
 	public $ui_conf_ids;
     	public $cue_point_ids;
 	public $context_ids;
+	public $roles;
+	public $industries;
+	public $playback_modes;
+	public $companies;
+	public $event_session_context_ids;
+
 
 	public function getFilterBy() {
 		return "";

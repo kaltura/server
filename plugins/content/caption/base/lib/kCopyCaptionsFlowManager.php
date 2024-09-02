@@ -136,12 +136,15 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 				KalturaLog::debug("No captions found on source entry [" . $sourceEntryId . "], no need to run copy captions job");
 				return;
 			}
-			$kClipDescriptionArray = array();
-			$kClipDescription = new kClipDescription();
-			$kClipDescription->setSourceEntryId($sourceEntryId);
-			$kClipDescription->setStartTime(0);
-			$kClipDescription->setDuration($sourceEntry->getLengthInMsecs());
-			$kClipDescriptionArray[] = $kClipDescription;
+			
+			//TODO - The creation of the copy captions job should probably not even need to be created when in replace flow
+			//Consider removing the creation of the job entirely
+			//$kClipDescriptionArray = array();
+			//$kClipDescription = new kClipDescription();
+			//$kClipDescription->setSourceEntryId($sourceEntryId);
+			//$kClipDescription->setStartTime(0);
+			//$kClipDescription->setDuration($sourceEntry->getLengthInMsecs());
+			//$kClipDescriptionArray[] = $kClipDescription;
 			$jobData->setFullCopy(true);
 		}
 		else { //trim or clip

@@ -501,6 +501,10 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			return $resetLinksArray['kme'];
 		}
+		else if($linkType == resetPassLinkType::KME_NR)
+		{
+			return $resetLinksArray['kme_nr'];
+		}
 		else
 		{
 			return $resetLinksArray['default'];

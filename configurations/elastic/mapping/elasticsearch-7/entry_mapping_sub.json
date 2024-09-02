@@ -664,6 +664,10 @@
 				"type" : "keyword",
 				"normalizer" : "kaltura_keyword_normalizer"
 			},
+			"broadcast_entry_id": {
+				"type": "keyword",
+				"normalizer": "kaltura_keyword_normalizer"
+			},
 			"parent_entry": {
 				"properties": {
 					"entry_id": {

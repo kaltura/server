@@ -13,9 +13,11 @@ abstract class LiveEntry extends entry
 	const LIVE_SCHEDULE_CAPABILITY = 'live_schedule_capability';
 	const SIMULIVE_CAPABILITY = 'simulive_capability';
 	const LOW_LATENCY_TAG = 'lowlatency';
+	const STREAM_NAME_TEMPLATE = 'stream_name_template';
 
 	const DEFAULT_CACHE_EXPIRY = 120;
 	const DEFAULT_SEGMENT_DURATION_MILLISECONDS = 6000;
+	const DEFAULT_STREAM_NAME = '%i';
 	
 	const CUSTOM_DATA_NAMESPACE_MEDIA_SERVERS = 'mediaServers';
 	const CUSTOM_DATA_RECORD_STATUS = 'record_status';
@@ -261,7 +263,12 @@ abstract class LiveEntry extends entry
 		{
 			return $output;
 		}
-		return $this->getFromCustomData("recorded_entry_id");
+		return $this->getFromCustomData(LiveEntry::RECORDED_ENTRY_ID);
+	}
+
+	public function getRecordedEntryIdFromCustomData()
+	{
+		return $this->getFromCustomData(LiveEntry::RECORDED_ENTRY_ID);
 	}
 	
 	public function setRecordedEntryId($v)
@@ -269,7 +276,7 @@ abstract class LiveEntry extends entry
 		if($v && $v != $this->getRecordedEntryId())
 			$this->incInCustomData("recorded_entry_index");
 		
-		$this->putInCustomData("recorded_entry_id", $v);
+		$this->putInCustomData(LiveEntry::RECORDED_ENTRY_ID, $v);
 	}
 	
 	public function getRecordedEntryIndex()
@@ -311,7 +318,18 @@ abstract class LiveEntry extends entry
 	public function setLastElapsedRecordingTime( $v )	{ $this->putInCustomData( "lastElapsedRecordingTime" , $v ); }
 
 	public function setStreamName ( $v )	{	$this->putInCustomData ( "streamName" , $v );	}
-	public function getStreamName (  )	{	return $this->getFromCustomData( "streamName", null, '%i' );	}
+	public function getStreamName ()
+	{
+		$streamName = LiveEntry::DEFAULT_STREAM_NAME;
+		$liveConfiguration = $this->getPartner()->getLiveStreamBroadcastUrlConfigurations(kDataCenterMgr::getCurrentDcId());
+
+		if (isset($liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE]))
+		{
+			$streamName = str_replace('{entryId}', $this->getId(), $liveConfiguration[LiveEntry::STREAM_NAME_TEMPLATE]);
+		}
+
+		return $this->getFromCustomData("streamName", null, $streamName);
+	}
 	
 	protected function setFirstBroadcast ( $v )	{	$this->putInCustomData ( "first_broadcast" , $v );	}
 	public function getFirstBroadcast (  )	{	return $this->getFromCustomData( "first_broadcast");	}

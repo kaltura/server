@@ -293,11 +293,41 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $cuePointIdIn;
 
-    	/**
+	/**
 	 * filter by context ids
 	 * @var string
 	 */
 	public $contextIdIn;
+
+	/**
+	 * filter by user role
+	 * @var string
+	 */
+	public $roleIn;
+
+	/**
+	 * filter by industry
+	 * @var string
+	 */
+	public $industryIn;
+
+	/**
+	 * filter by playback mode
+	 * @var string
+	 */
+	public $playbackModeIn;
+
+	/**
+	 * filter by company
+	 * @var string
+	 */
+	public $companyIn;
+
+	/**
+	 * filter by event session context id
+	 * @var string
+	 */
+	public $eventSessionContextIdIn;
 
 	private static $map_between_objects = array
 	(
@@ -343,7 +373,12 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'originIn' => 'origins',
 		'uiConfIdIn' => 'ui_conf_ids',
   	    	'cuePointIdIn' => 'cue_point_ids',
-		'contextIdIn' => 'context_ids'
+		'contextIdIn' => 'context_ids',
+		'roleIn' => 'roles',
+		'industryIn' => 'industries',
+		'playbackModeIn' => 'playback_modes',
+		'companyIn' => 'companies',
+		'eventSessionContextIdIn' => 'event_session_context_ids'
 	);
 
 	protected function getMapBetweenObjects()

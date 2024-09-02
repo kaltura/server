@@ -143,6 +143,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS = 'unique_vod_live_viewers';
 	const METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS = 'meeting_view_period_unique_users';
 	const METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO = 'meeting_engaged_play_time_ratio';
+	const METRIC_LIVE_MEETING_PLAY_TIME = 'live_meeting_play_time';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -234,9 +235,12 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_DYNAMIC_VIEWERS_BUFFERING = 'viewers_buffering';
 	const METRIC_DYNAMIC_VIEWERS_DVR = 'viewers_dvr';
 	const METRIC_DYNAMIC_VIEWERS_ENGAGEMENT = 'viewers_engagement';
+	const METRIC_UNIQUE_ATTENDEES = 'unique_event_attendees';
 
 	// virtual-events-registration specific metrics
 	const METRIC_REGISTERED_UNIQUE_USERS = 'registered_unique_users';
+	const METRIC_VE_ATTENDED = 'count_attended';
+	const METRIC_VE_ATTENDED_UNIQUE_USERS = 'attended_unique_users';
 
 	// cnc specific metrics
 	const METRIC_UNIQUE_LOGGED_IN_USERS = 'unique_logged_in_users';
@@ -252,7 +256,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_POLL_PARTICIPATION = 'poll_participation';
 	const METRIC_UNIQUE_REACTION_CLICKED_USERS = 'unique_users_reaction_clicked';
 	const METRIC_REACTION_CLICKED_PARTICIPATION = 'reaction_clicked_participation';
-
+	const METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS = 'unique_users_sent_private_message';
+	const METRIC_PRIVATE_CHAT_PARTICIPATION = 'private_chat_participation';
 
 	//report classes
 	const CUSTOM_REPORTS_CLASS = 'kKavaCustomReports';
@@ -580,6 +585,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_ANSWERED_POLL_USERS => 'floor',
 		self::METRIC_UNIQUE_RECEIVED_POLL_USERS => 'floor',
 		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => 'floor',
+		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => 'floor',
+		self::METRIC_UNIQUE_ATTENDEES => 'floor',
+		self::METRIC_VE_ATTENDED_UNIQUE_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -636,6 +644,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS => true,
 		self::METRIC_VOD_AVG_PLAY_TIME => true,
 		self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME => true,
+		self::METRIC_LIVE_MEETING_PLAY_TIME => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => true,
 		self::METRIC_VOD_LIVE_AVG_VIEW_TIME => true,
@@ -653,6 +662,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_ANSWERED_POLL_USERS => true,
 		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => true,
 		self::METRIC_REACTION_CLICKED_PARTICIPATION => true,
+		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => true,
+		self::METRIC_PRIVATE_CHAT_PARTICIPATION => true,
+		self::METRIC_UNIQUE_ATTENDEES => true,
+		self::METRIC_VE_ATTENDED_UNIQUE_USERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1458,6 +1471,22 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
 			self::getHyperUniqueAggregator(self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
+		self::$aggregations_def[self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PRIVATE_MESSAGE_SENT),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_UNIQUE_ATTENDEES] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$attendees_event_types),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_ATTENDEES, self::METRIC_UNIQUE_USER_IDS));
+
+		self::$aggregations_def[self::METRIC_VE_ATTENDED] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$ve_attended_event_types),
+			self::getLongSumAggregator(self::METRIC_VE_ATTENDED, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_VE_ATTENDED_UNIQUE_USERS] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$ve_attended_event_types),
+			self::getHyperUniqueAggregator(self::METRIC_VE_ATTENDED_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1867,6 +1896,12 @@ class kKavaReportsMgr extends kKavaBase
 					self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'))),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS))));
 
+		self::$metrics_def[self::METRIC_LIVE_MEETING_PLAY_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(self::METRIC_LIVE_MEETING_PLAY_TIME, "+", array(
+				self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+				self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'))));
+
 		self::$metrics_def[self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC,
 				self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC),
@@ -1938,6 +1973,13 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_DOWNLOAD_ATTACHMENT_USER_RATIO, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS, self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS))));
+
+		self::$metrics_def[self::METRIC_PRIVATE_CHAT_PARTICIPATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_PRIVATE_CHAT_PARTICIPATION, '/', array(
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS, self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 
@@ -2277,8 +2319,11 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function timestampToHourId($timestamp, $tz = null)
 	{
-		// hours are returned from druid query with the right offset so no need to change it
 		$date = new DateTime($timestamp);
+		if (isset($tz))
+		{
+			$date->setTimezone($tz);
+		}
 		return $date->format('YmdH');
 	}
 
@@ -2881,7 +2926,12 @@ class kKavaReportsMgr extends kKavaBase
 			'origins' => array(self::DRUID_DIMENSION => self::DIMENSION_ORIGIN),
 			'ui_conf_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_UI_CONF_ID),
 			'cue_point_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CUE_POINT_ID),
-			'context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CONTEXT_ID)
+			'context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_CONTEXT_ID),
+			'roles' => array(self::DRUID_DIMENSION => self::DIMENSION_ROLE),
+			'industries' => array(self::DRUID_DIMENSION => self::DIMENSION_INDUSTRY),
+			'playback_modes' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_MODE),
+			'companies' => array(self::DRUID_DIMENSION => self::DIMENSION_COMPANY),
+			'event_session_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_SESSION_CONTEXT_ID)
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

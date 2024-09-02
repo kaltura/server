@@ -20,6 +20,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_MEETING_HISTORICAL = 'meeting-events-historical';
 	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
 	const DATASOURCE_CNC_EVENTS = 'cnc-events';
+	const DATASOURCE_APPLICATION_EVENTS = 'application-events';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -85,6 +86,9 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_REACH_PROFILE_TYPE = 'reachProfileType';
 	const DIMENSION_CUE_POINT_ID = 'cuePointId';
 	const DIMENSION_CONTEXT_ID = 'contextId';
+	const DIMENSION_EVENT_SESSION_CONTEXT_ID = 'eventSessionContextId';
+	const DIMENSION_PLAYBACK_MODE = 'playbackMode';
+	const DIMENSION_COMPANY = 'company';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -186,6 +190,9 @@ class kKavaBase extends kDruidBase
 	// event types - meeting events
 	const EVENT_TYPE_MEETING_JOIN_SESSION = 'joinSession';
 	const EVENT_TYPE_MEETING_RAISE_HAND = 'raiseHand';
+
+	// event types - application events
+	const EVENT_TYPE_PAGE_LOAD = 'pageLoad';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -466,6 +473,36 @@ class kKavaBase extends kDruidBase
 		self::USER_TAB_NOT_FOCUSED_MIC_UNMUTED_FULL_SCREEN_OFF_CAMERA_OFF_SOUND_ON_OFF_STAGE,
 	);
 
+	protected static $attendees_event_types = array(
+		self::EVENT_TYPE_VIEW_PERIOD,
+		self::EVENT_TYPE_PAGE_LOAD,
+		self::EVENT_TYPE_LOG_IN,
+		self::EVENT_TYPE_CNC_REACTION_CLICKED,
+		self::EVENT_TYPE_CNC_POLL_ANSWERED,
+		self::EVENT_TYPE_NOTIFICATION_SENT,
+		self::EVENT_TYPE_NOTIFICATION_BUTTON_CLICKED,
+		self::EVENT_TYPE_POLL_LAUNCHED,
+		self::EVENT_TYPE_POLL_ENDED,
+		self::EVENT_TYPE_POLL_RECEIVED,
+		self::EVENT_TYPE_GROUP_MESSAGE_SENT,
+		self::EVENT_TYPE_MESSAGE_PINNED,
+		self::EVENT_TYPE_MESSAGE_UNPINNED,
+		self::EVENT_TYPE_MESSAGE_LIKED,
+		self::EVENT_TYPE_USER_BLOCKED,
+		self::EVENT_TYPE_PRIVATE_MESSAGE_SENT,
+		self::EVENT_TYPE_Q_AND_A_MESSAGE_SENT,
+		self::EVENT_TYPE_GROUP_MESSAGE_DELETED,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_SENT,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED,
+		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED,
+	);
+
+	protected static $ve_attended_event_types = array(
+		self::EVENT_TYPE_VE_ATTENDED,
+		self::EVENT_TYPE_VE_PARTICIPATED,
+		self::EVENT_TYPE_VE_PARTICIPATED_POST_EVENT,
+	);
+
 	//general values
 	const VALUE_UNKNOWN = 'Unknown';
 	const VALUE_ZERO = '0';
@@ -513,6 +550,8 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_POSITION => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 			self::DIMENSION_UI_CONF_ID => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_PLAYBACK_MODE => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -634,6 +673,8 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR1 => 1,
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_PLAYBACK_MODE => 1,
 		),
 		self::DATASOURCE_VE_REGISTRATION => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -648,6 +689,9 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_OS => 1,
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_ORIGIN => 1,
+			self::DIMENSION_ROLE => 1,
+			self::DIMENSION_INDUSTRY => 1,
+			self::DIMENSION_COMPANY => 1,
 		),
 		self::DATASOURCE_MEETING_HISTORICAL => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -667,6 +711,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_CUE_POINT_ID => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 		),
 		self::DATASOURCE_MEETING_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -685,6 +730,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_DEVICE => 1,
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_CUE_POINT_ID => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 		),
 		self::DATASOURCE_CNC_EVENTS => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -705,6 +751,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR2 => 1,
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_EVENT_VAR4 => 1,
+			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 		)
 	);
 

@@ -208,6 +208,8 @@ interface ReportType extends BaseEnum
    const VE_REGISTERED_COUNTRIES = 50004;
    const VE_REGISTERED_WORLD_REGIONS = 50005;
    const VE_USER_HIGHLIGHTS = 50006;
+   const VE_ATTENDANCE_HIGHLIGHTS = 50007;
+   const VE_REGISTERED_COMPANIES = 50008;
 
    // event platform reports
    const EP_WEBCAST_HIGHLIGHTS = 60001;
@@ -223,6 +225,10 @@ interface ReportType extends BaseEnum
    const EP_WEBCAST_LIVE_USER_ENGAGEMENT_LEVEL = 60011;
    const EP_WEBCAST_VOD_USER_TOP_CONTENT = 60012;
    const EP_WEBCAST_VOD_LIVE_USERS_ENGAGEMENT = 60013;
+   const EP_ATTENDEES = 60014;
+   const EP_VIEWTIME = 60015;
+   const EP_TOP_MOMENTS = 60016;
+   const EP_TOP_SESSIONS = 60017;
 
    const CNC_PARTICIPATION = 70001;
 }

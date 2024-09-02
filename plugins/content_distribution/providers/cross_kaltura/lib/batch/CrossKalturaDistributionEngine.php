@@ -25,6 +25,20 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 	 * @var KalturaClient
 	 */
 	protected $sourceClient = null;
+	
+	/**
+	 * Will be set in case the application needs to convert external domain urls into internal domains
+	 * This will contain the regext to match
+	 * @var strng
+	 */
+	protected $targetServiceUrlRegex = null;
+	
+	/**
+	 * Will be set in case the application needs to convert external domain urls into internal domains
+	 * This will contain the internal domain url
+	 * @var strng
+	 */
+	protected $targetServiceUrlReplace = null;
 
 	/**
 	 * @var KalturaCrossKalturaDistributionProfile
@@ -107,6 +121,16 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 
 		if (!$data->providerData instanceof KalturaCrossKalturaDistributionJobProviderData)
 			throw new Exception('Provider data must be of type KalturaCrossKalturaDistributionJobProviderData');
+		
+		if(isset(KBatchBase::$taskConfig->params->crossKaltura) && isset(KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlRegex))
+		{
+			$this->targetServiceUrlRegex = KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlRegex;
+		}
+		
+		if(isset(KBatchBase::$taskConfig->params->crossKaltura) && isset(KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlReplace))
+		{
+			$this->targetServiceUrlReplace = KBatchBase::$taskConfig->params->crossKaltura->targetServiceUrlReplace;
+		}
 
 		$this->distributionProfile = $data->distributionProfile;
 
@@ -142,11 +166,26 @@ class CrossKalturaDistributionEngine extends DistributionEngine implements
 
 		// init target client
 		$targetClientConfig = new KalturaConfiguration($distributionProfile->targetAccountId);
-		$targetClientConfig->serviceUrl = $distributionProfile->targetServiceUrl;
+		$targetClientConfig->serviceUrl = $this->getTargetServiceUrl($distributionProfile->targetServiceUrl);
 		$targetClientConfig->setLogger($this);
 		$this->targetClient = new KalturaClient($targetClientConfig);
 		$ks = $this->targetClient->user->loginByLoginId($distributionProfile->targetLoginId, $distributionProfile->targetLoginPassword, $distributionProfile->targetAccountId, 86400, 'disableentitlement');
 		$this->targetClient->setKs($ks);
+	}
+	
+	private function getTargetServiceUrl($serviceUrl)
+	{
+		if(!$this->targetServiceUrlRegex || !$this->targetServiceUrlReplace)
+		{
+			return $serviceUrl;
+		}
+		
+		if (!preg_match($this->targetServiceUrlRegex, $serviceUrl))
+		{
+			return $serviceUrl;
+		}
+		
+		return $this->targetServiceUrlReplace;
 	}
 
 	/**
