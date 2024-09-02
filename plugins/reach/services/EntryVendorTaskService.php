@@ -68,12 +68,9 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY, $featureType, $entryVendorTask->entryId);
 		}
 
-		if ($dbVendorCatalogItem instanceof VendorTranslationCatalogItem && $dbVendorCatalogItem->getRequireSource())
+		if (!kReachUtils::isTranslationWithRequiredSource($dbVendorCatalogItem, $dbTaskData))
 		{
-			if (!$dbTaskData instanceof kTranslationVendorTaskData || !$dbTaskData->getCaptionAssetId())
-			{
-				throw new KalturaAPIException(KalturaReachErrors::REQUIRE_CAPTION, $dbVendorCatalogItem->getId());
-			}
+			throw new KalturaAPIException(KalturaReachErrors::REQUIRE_CAPTION, $dbVendorCatalogItem->getId());
 		}
 
 		//check if credit has expired
