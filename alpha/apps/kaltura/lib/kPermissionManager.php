@@ -1120,16 +1120,21 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		if ($permission->getStatus() == PermissionStatus::ACTIVE)
 		{
 			self::enableRecycleBinScheduledTaskProfile($permission->getPartnerId());
-			$scheduledTaskPluginPermission = PermissionPeer::getByNameAndPartner('SCHEDULEDTASK_PLUGIN_PERMISSION', array($permission->getPartnerId()));
-			if ($scheduledTaskPluginPermission->getStatus() != PermissionStatus::ACTIVE)
-			{
-				$scheduledTaskPluginPermission->setStatus(PermissionStatus::ACTIVE);
-				$scheduledTaskPluginPermission->save();
-			}
+			self::enableRequiredPluginsPermissions($permission->getPartnerId(), PermissionName::SCHEDULEDTASK_PLUGIN_PERMISSION);
 		}
 		elseif ($permission->getStatus() == PermissionStatus::BLOCKED)
 		{
 			self::disableRecycleBinScheduledTaskProfile($permission->getPartnerId());
+		}
+	}
+
+	protected static function enableRequiredPluginsPermissions($partnerId, $permissionName)
+	{
+		$scheduledTaskPluginPermission = PermissionPeer::getByNameAndPartner($permissionName, array($partnerId));
+		if ($scheduledTaskPluginPermission->getStatus() != PermissionStatus::ACTIVE)
+		{
+			$scheduledTaskPluginPermission->setStatus(PermissionStatus::ACTIVE);
+			$scheduledTaskPluginPermission->save();
 		}
 	}
 	
