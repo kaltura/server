@@ -45,7 +45,7 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 	protected function initFilter($request)
 	{
 		$entryVendorTaskFilter = $this->getEntryVendorTaskFilter($request);
-		$this->setCreatedAtFilter($entryVendorTaskFilter);
+		$entryVendorTaskFilter->orderBy = '-createdAt';
 		$this->setStatusFilter($request, $entryVendorTaskFilter);
 		kReachUtils::setSelectedRelativeTime($request->getParam('from_time'), $entryVendorTaskFilter);
 		return $entryVendorTaskFilter;
@@ -93,12 +93,6 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		return $filter;
 	}
 
-	protected function setCreatedAtFilter($entryVendorTaskFilter)
-	{
-		$entryVendorTaskFilter->updatedAtGreaterThanOrEqual = time() - (VendorServiceTurnAroundTime::TEN_DAYS + VendorServiceTurnAroundTime::TWENTY_FOUR_HOURS);
-		$entryVendorTaskFilter->orderBy = '-createdAt';
-	}
-
 	protected function setStatusFilter($request, $entryVendorTaskFilter)
 	{
 		$filterStatusInput = $request->getParam('filter_status');
@@ -138,20 +132,19 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 	{
 		if ($request->getParam('createdAtFrom', false))
 		{
-			$createdAtFrom = new Zend_Date($this->_getParam('createdAtFrom', $this->getDefaultFromDate()));
+			$createdAtFrom = new Zend_Date($this->_getParam('createdAtFrom'), 'MM/DD/YYYY');
 			$entryVendorTaskFilter->createdAtGreaterThanOrEqual = $createdAtFrom->toString(Zend_Date::TIMESTAMP);
 		}
 		else
 		{
 			$createdAtFrom = $action->view->filterForm->getElement('createdAtFrom');
 			$createdAtFrom->setValue(date('m/d/Y', $this->getDefaultFromDate()));
-
 			$entryVendorTaskFilter->createdAtGreaterThanOrEqual = $this->getDefaultFromDate();
 		}
 
 		if ($request->getParam('createdAtTo', false))
 		{
-			$createdAtTo = new Zend_Date($this->_getParam('createdAtTo', $this->getDefaultToDate()));
+			$createdAtTo = new Zend_Date($this->_getParam('createdAtTo'), 'MM/DD/YYYY');
 			$createdAtTo->addDay(1);
 			$entryVendorTaskFilter->createdAtLessThanOrEqual = $createdAtTo->toString(Zend_Date::TIMESTAMP);
 		}
@@ -159,7 +152,6 @@ class ReachRequestsListAction extends KalturaApplicationPlugin
 		{
 			$createdAtTo = $action->view->filterForm->getElement('createdAtTo');
 			$createdAtTo->setValue(date('m/d/Y', $this->getDefaultToDate()));
-
 			$entryVendorTaskFilter->createdAtLessThanOrEqual = $this->getDefaultToDate();
 		}
 	}
