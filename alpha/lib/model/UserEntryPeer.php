@@ -70,11 +70,8 @@ class UserEntryPeer extends BaseUserEntryPeer {
 	public static function getEntryIdsByFilter($limit, $offset = 0, $filter = null, $entryIds = array())
 	{
 		$userEntryCriteria = new Criteria();
-		
-		$userEntryCriteria->addSelectColumn(self::ENTRY_ID);
 		if($filter)
 			$filter->attachToCriteria($userEntryCriteria);
-		
 		if(count ($entryIds))
 		{
 			$userEntryCriteria->add(self::ENTRY_ID, $entryIds, Criteria::IN);
@@ -84,8 +81,12 @@ class UserEntryPeer extends BaseUserEntryPeer {
 		$userEntryCriteria->setLimit($limit);
 		$userEntryCriteria->setOffset($offset);
 		
-		$stmt = self::doSelectStmt($userEntryCriteria);
-		$ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+		$result = UserEntryPeer::doSelect($userEntryCriteria);
+		
+		$ids = array();
+		foreach ($result as $res) {
+			$ids[] = $res->getEntryId();
+		}
 		
 		return $ids;
 	}
