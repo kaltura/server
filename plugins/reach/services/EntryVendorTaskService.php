@@ -68,7 +68,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY, $featureType, $entryVendorTask->entryId);
 		}
 
-		if (!kReachUtils::isTranslationWithRequiredSource($dbVendorCatalogItem, $dbTaskData))
+		if (!kReachUtils::verifyRequiredSource($dbVendorCatalogItem, $dbTaskData))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::REQUIRE_CAPTION, $dbVendorCatalogItem->getId());
 		}

@@ -203,7 +203,7 @@ class kReachUtils
 		return true;
 	}
 
-	public static function isTranslationWithRequiredSource($dbVendorCatalogItem, $dbTaskData)
+	public static function verifyRequiredSource($dbVendorCatalogItem, $dbTaskData)
 	{
 		if ($dbVendorCatalogItem instanceof VendorTranslationCatalogItem && $dbVendorCatalogItem->getRequireSource())
 		{
