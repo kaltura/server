@@ -90,6 +90,8 @@ class KalturaReachErrors implements kReachErrors
 	const TOO_LATE_ORDER = "TOO_LATE_ORDER;EVENT_ID,CATALOG_ITEM_ID,MINIMAL_ORDER_TIME;Task created too late for event [@EVENT_ID@], minimal order time for catalog item [@CATALOG_ITEM_ID@] is [@MINIMAL_ORDER_TIME@ min]";
 
 	const TOO_LONG_SCHEDULED_TASK = "TOO_LONG_SCHEDULED_TASK;TASK_DURATION,DURATION_LIMIT,CATALOG_ITEM_ID;The task duration [@TASK_DURATION@] is exceeding the limit [@DURATION_LIMIT@] defined in catalogItem [@CATALOG_ITEM_ID@]";
+
+	const REQUIRE_CAPTION = "REQUIRE_CAPTION;CATALOG_ITEM_ID;Caption Asset must be provided for catalog item [@CATALOG_ITEM_ID@]";
 	
 	/* Credit */
 	
