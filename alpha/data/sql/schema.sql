@@ -2387,6 +2387,7 @@ CREATE TABLE `kuser_kgroup`
 	KEY `partner_kuser_index`(`kuser_id`, `status`),
 	KEY `partner_kgroup_index`(`kgroup_id`, `status`),
 	KEY `partner_index`(`partner_id`, `status`),
+	KEY `updated_at`(`updated_at`),
 	CONSTRAINT `kuser_kgroup_FK_1`
 		FOREIGN KEY (`kgroup_id`)
 		REFERENCES `kuser` (`id`),
