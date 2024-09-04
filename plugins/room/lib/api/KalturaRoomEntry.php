@@ -89,8 +89,8 @@ class KalturaRoomEntry extends KalturaBaseEntry
 		// allow setting entry of the "global" partner
 		$allowedPids = array($partnerId, Partner::KME_PARTNER_ID);
 		$c->addAnd(entryPeer::PARTNER_ID, $allowedPids, Criteria::IN);
-		$c->addAnd (entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
-		$c->addAnd (entryPeer::ID, $entryId, Criteria::EQUAL);
+		$c->addAnd(entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd(entryPeer::ID, $entryId, Criteria::EQUAL);
 		$entry = entryPeer::doSelectOne($c);
 		entryPeer::setUseCriteriaFilter (true);
 		return $entry;
