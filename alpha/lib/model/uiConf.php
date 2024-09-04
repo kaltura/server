@@ -116,7 +116,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 
 	const CUSTOM_DATA_V2REDIRECT = "v2redirect";
 
-    public function save(PropelPDO $con = null)
+	public function save(PropelPDO $con = null)
 	{
 		try
 		{

@@ -822,7 +822,7 @@ class embedPlaykitJsAction extends sfAction
 
 		$this->mergeVersionsParamIntoConfig();
 
-	if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
+		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
 			$this->bundleConfig[v2RedirectUtils::SCRIPT_PLUGIN_NAME] =
 				kConf::getArrayValue('v2RedirectPluginVersion',
