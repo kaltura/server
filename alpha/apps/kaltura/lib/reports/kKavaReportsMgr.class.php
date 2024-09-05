@@ -143,7 +143,10 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS = 'unique_vod_live_viewers';
 	const METRIC_MEETING_VIEW_PERIOD_UNIQUE_USERS = 'meeting_view_period_unique_users';
 	const METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO = 'meeting_engaged_play_time_ratio';
-	const METRIC_LIVE_MEETING_PLAY_TIME = 'live_meeting_play_time';
+	const METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC = 'meeting_mic_unmuted_view_time_sec';
+	const METRIC_MEETING_MIC_UNMUTED_VIEW_TIME = 'meeting_mic_unmuted_view_time';
+	const METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC = 'meeting_camera_on_view_time_sec';
+	const METRIC_MEETING_CAMERA_ON_VIEW_TIME = 'meeting_camera_on_view_time';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -162,6 +165,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_ORIGIN_BANDWIDTH_SIZE_BYTES = 'origin_bandwidth_size';
 	const METRIC_TOTAL_JOBS = 'total_jobs';
 	const METRIC_MEETING_VIEW_TIME_SEC = 'meeting_view_time_sec';
+	const METRIC_UNION_LIVE_MEETING_VIEW_TIME = 'union_live_meeting_view_time';
+	const METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME = 'union_live_meeting_vod_view_time';
 
 	// non druid metrics
 	const METRIC_BANDWIDTH_STORAGE_MB = 'combined_bandwidth_storage';
@@ -644,7 +649,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS => true,
 		self::METRIC_VOD_AVG_PLAY_TIME => true,
 		self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME => true,
-		self::METRIC_LIVE_MEETING_PLAY_TIME => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_AUDIENCE => true,
 		self::METRIC_VIEW_UNIQUE_COMBINED_LIVE_ENGAGED_USERS => true,
 		self::METRIC_VOD_LIVE_AVG_VIEW_TIME => true,
@@ -1487,6 +1491,18 @@ class kKavaReportsMgr extends kKavaBase
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$ve_attended_event_types),
 			self::getHyperUniqueAggregator(self::METRIC_VE_ATTENDED_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
+		self::$aggregations_def[self::METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getLikeFilter(self::DIMENSION_USER_ENGAGEMENT, "%CameraOn%"))),
+			self::getLongSumAggregator(self::METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
+				self::getLikeFilter(self::DIMENSION_USER_ENGAGEMENT, "%MicUnmuted%"))),
+			self::getLongSumAggregator(self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
+
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
 		
@@ -1585,6 +1601,16 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_MEETING_RECORDING_SECS_ADDED),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_MEETING_RECORDING_HOURS_ADDED, self::METRIC_MEETING_RECORDING_SECS_ADDED, '3600'));
+
+		self::$metrics_def[self::METRIC_MEETING_CAMERA_ON_VIEW_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_MEETING_CAMERA_ON_VIEW_TIME, self::METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC, '60'));
+
+		self::$metrics_def[self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME, self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC, '60'));
 
 		// field ratio metrics
 		self::$metrics_def[self::METRIC_PLAYTHROUGH_RATIO] = array(
@@ -1866,6 +1892,19 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_MEETING_VIEW_TIME, self::METRIC_MEETING_VIEW_TIME_SEC, '60'));
 
+		self::$metrics_def[self::METRIC_UNION_LIVE_MEETING_VIEW_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, "+", array(
+				self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+				self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'))));
+
+		self::$metrics_def[self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME] = array(
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, "+", array(
+				self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+				self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'),
+				self::getConstantRatioPostAggr('subVodPlayTime', self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'))));
+
 		self::$metrics_def[self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO] = array(
 			self::DRUID_AGGR => array(self::METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT, self::METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
@@ -1891,16 +1930,10 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_COMBINED_LIVE_AVG_PLAY_TIME, "/", array(
-				self::getArithmeticPostAggregator("sumLiveAndMeeting", "+", array(
-					self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
-					self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'))),
+					self::getArithmeticPostAggregator("sumLiveAndMeeting", "+", array(
+						self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+						self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'))),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS))));
-
-		self::$metrics_def[self::METRIC_LIVE_MEETING_PLAY_TIME] = array(
-			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC),
-			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(self::METRIC_LIVE_MEETING_PLAY_TIME, "+", array(
-				self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
-				self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'))));
 
 		self::$metrics_def[self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC,
@@ -1911,21 +1944,22 @@ class kKavaReportsMgr extends kKavaBase
 					self::getFieldAccessPostAggregator(self::METRIC_LIVE_HIGH_ENGAGEMENT_PLAY_TIME_SEC),
 					self::getFieldAccessPostAggregator(self::METRIC_LIVE_GOOD_ENGAGEMENT_PLAY_TIME_SEC),
 					self::getFieldAccessPostAggregator(self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC))),
-			    self::getArithmeticPostAggregator("subLiveAndMeeting", "+", array(
+				self::getArithmeticPostAggregator("subLiveAndMeeting", "+", array(
 					self::getFieldAccessPostAggregator(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC),
-				    self::getFieldAccessPostAggregator(self::METRIC_MEETING_VIEW_TIME_SEC))))));
+					self::getFieldAccessPostAggregator(self::METRIC_MEETING_VIEW_TIME_SEC))))));
 
 		self::$metrics_def[self::METRIC_VOD_LIVE_AVG_VIEW_TIME] = array(
-			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS),
+			self::DRUID_AGGR => array(self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC,
+				self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_VOD_LIVE_AVG_VIEW_TIME, '/', array(
-				self::getArithmeticPostAggregator('sumVodLiveMeetingPlayTime', '+', array(
-					self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
-					self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'),
-					self::getConstantRatioPostAggr('subVodPlayTime', self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'))),
-				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS))));
+					self::getArithmeticPostAggregator('sumVodLiveMeetingPlayTime', '+', array(
+						self::getConstantRatioPostAggr('subLivePlayTime', self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME_SEC, '60'),
+						self::getConstantRatioPostAggr('subMeetingPlayTime', self::METRIC_MEETING_VIEW_TIME_SEC, '60'),
+						self::getConstantRatioPostAggr('subVodPlayTime', self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME_SEC, '60'))),
+					self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS, self::METRIC_UNIQUE_VOD_LIVE_VIEW_PERIOD_USERS))));
 
-        	self::$metrics_def[self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO] = array(
+		self::$metrics_def[self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO] = array(
 			self::DRUID_AGGR => array(self::METRIC_MEETING_VIEW_TIME_SEC, self::METRIC_MEETING_HIGH_ENGAGEMENT_VIEW_TIME_SEC),
 			self::DRUID_POST_AGGR => self::getFieldRatioPostAggr(
 				self::METRIC_MEETING_ENGAGED_PLAY_TIME_RATIO,

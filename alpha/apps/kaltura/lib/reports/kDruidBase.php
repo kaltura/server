@@ -11,6 +11,7 @@ class kDruidBase
 	const DRUID_SELECTOR_FILTER = 'selector';
 	const DRUID_IN_FILTER = 'in';
 	const DRUID_BOUND_FILTER = 'bound';
+	const DRUID_LIKE_FILTER = 'like';
 	const DRUID_AND = 'and';
 	const DRUID_OR = 'or';
 	const DRUID_NOT = 'not';
@@ -83,6 +84,7 @@ class kDruidBase
 	const DRUID_EXTRACTION_FUNC = 'extractionFn';
 	const DRUID_TIME_FORMAT = 'timeFormat';
 	const DRUID_UNION = 'union';
+	const DRUID_PATTERN = 'pattern';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
@@ -194,7 +196,16 @@ class kDruidBase
 			self::DRUID_FIELD => $filter,
 		);
 	}
-	
+
+	protected static function getLikeFilter($dimension, $pattern)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_LIKE_FILTER,
+			self::DRUID_DIMENSION => $dimension,
+			self::DRUID_PATTERN => $pattern
+		);
+	}
+
 	protected static function getGranularityAll()
 	{
 		return array(
