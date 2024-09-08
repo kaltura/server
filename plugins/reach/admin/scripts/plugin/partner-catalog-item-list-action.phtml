@@ -299,6 +299,11 @@
 			jQuery('#filterSourceLanguage').removeAttr('hidden');
 			jQuery('#filterTargetLanguage').removeAttr('hidden');
 		}
+
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+			jQuery('#filterTargetLanguage').removeAttr('hidden');
+		}
 	}
 
 	function clonePartnerCatalogItems(fromPartnerId, toPartnerId)

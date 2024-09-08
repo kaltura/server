@@ -283,6 +283,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				$object = new KalturaVendorClipsCatalogItem();
 				break;
 
+			case VendorServiceFeature::LIVE_TRANSLATION:
+				$object = new KalturaVendorLiveTranslationCatalogItem();
+				break;
+
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();
 				break;

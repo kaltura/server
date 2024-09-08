@@ -15,4 +15,5 @@ interface VendorServiceFeature extends BaseEnum
 	const LIVE_CAPTION                  = 8;
 	const EXTENDED_AUDIO_DESCRIPTION    = 9;
 	const CLIPS                         = 10;
+	const LIVE_TRANSLATION              = 11;
 }
