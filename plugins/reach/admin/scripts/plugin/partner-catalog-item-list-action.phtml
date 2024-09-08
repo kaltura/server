@@ -24,12 +24,15 @@
 			<th><?php echo $this->translate('Source Language'); ?></th>
 			<th><?php echo $this->translate('Target Language'); ?></th>
 			<th><?php echo $this->translate('Output Format'); ?></th>
+            <th><?php echo $this->translate('Stage'); ?></th>
+            <th><?php echo $this->translate('Contract'); ?></th>
+            <th><?php echo $this->translate('Notes'); ?></th>
 			<th><?php echo $this->translate('Action'); ?></th>
 		</tr>
 		</thead>
 		<tfoot>
 		<tr>
-			<td colspan="14">
+			<td colspan="17">
 				<?php echo $this->paginator; ?>
 			</td>
 		</tr>
@@ -59,6 +62,13 @@
 				else
 				    echo null;?>
 				</td>
+                <td><?php if (isset($catalogItem->stage))
+						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStage', $catalogItem->stage);
+					else
+						echo null;?>
+                </td>
+                <td><?php echo $catalogItem->contract; ?></td>
+                <td><?php echo $catalogItem->notes; ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $this->filterForm->getElement('filter_input')->getValue(); ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
