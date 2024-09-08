@@ -3,7 +3,7 @@
 * Issue Type: Story
 * Issue ID: PLAT-24930
 ### Configuration ###
-Add the following to admin.template.ini:
+Add the following to admin.ini:
 
     settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::REELS
 
