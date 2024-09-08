@@ -5,7 +5,7 @@ class myEntryUtils
 
 	const TEMP_FILE_POSTFIX = "temp_1.jpg";
 	const DEFAULT_THUMB_SEC_LIVE = 1;
-	const ENTRY_ID_REGEX = "/\d_[A-Za-z0-9]{8}/";
+	const ENTRY_ID_REGEX = "/^\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
 	const CACHED_THUMB_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
 
