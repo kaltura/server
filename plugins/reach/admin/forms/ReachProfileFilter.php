@@ -10,7 +10,7 @@ class Form_ReachProfileFilter extends Form_PartnerIdFilter
 		parent::init();
 		$filterType = $this->getElement('filter_type');
 		$filterType->setMultiOptions(array(
-			'partnerIdEqual' => 'Publisher ID',
+			'partnerIdEqual' => 'Partner ID',
 		));
 	}
 }
