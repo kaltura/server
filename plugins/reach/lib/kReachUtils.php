@@ -68,6 +68,11 @@ class kReachUtils
 	{
 		return ceil($durationMsec/1000/dateUtils::MINUTE) * $pricePerUnit;
 	}
+
+	public static function calcPricePerHour($durationMsec, $pricePerUnit)
+	{
+		return ceil($durationMsec/1000/dateUtils::HOUR) * $pricePerUnit;
+	}
 	
 	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem, $taskDuration = null)
 	{
