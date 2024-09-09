@@ -20,6 +20,7 @@ use Doctrine\Common\Cache\FilesystemCache;
 
 use Aws\S3\Exception\S3Exception;
 use Aws\Exception\AwsException;
+use Aws\S3\Exception\S3MultipartUploadException;
 
 class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 {
@@ -46,6 +47,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 	protected $concurrency;
 	protected $userAgentRegex;
 	protected $userAgentPartner;
+	protected $multiPartUploadState;
 	
 	/* @var S3Client $s3Client */
 	protected $s3Client;
@@ -76,7 +78,6 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
 			$this->accessKeySecret = isset($options['accessKeySecret']) ? $options['accessKeySecret'] : null;
 			$this->accessKeyId = isset($options['accessKeyId']) ? $options['accessKeyId'] : null;
-			$this->endPoint = isset($options['endPoint']) ? $options['endPoint'] : null;
 			$this->s3Arn = isset($options['arnRole']) ? $options['arnRole'] : $arnRole;
 			$this->userAgentRegex = isset($options['userAgentRegex']) ? $options['userAgentRegex'] : null;
 		}
@@ -242,7 +243,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 				$filePath,
 				$fileContent,
 				$this->filesAcl,
-				array('params' => $params)
+				array('params' => $params) + (isset($this->multiPartUploadState) ? array('state' => $this->multiPartUploadState) : array())
 			);
 			
 			KalturaLog::debug("File uploaded to s3, info: " . print_r($res, true));
@@ -251,6 +252,20 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		catch (Exception $e)
 		{
 			KalturaLog::warning("Failed to uploaded to s3, info with message: " . $e->getMessage());
+			
+			if ($e instanceof S3MultipartUploadException)
+			{
+				KalturaLog::debug("S3MultiPartUpload exception - attempting to resume failed parts");
+				$this->multiPartUploadState = $e->getState();
+				
+				// To resume S3MultiPartUpload, if the 'body' ($fileContent) is a resource of type 'stream'
+				// Need to rewind the pointer (https://docs.aws.amazon.com/en_us/aws-sdk-php/guide/latest/service/s3-multipart-upload.html)
+				if (is_resource($fileContent) && get_resource_type($fileContent) === 'stream')
+				{
+					rewind($fileContent);
+				}
+			}
+			
 			return array(false, $e->getMessage());
 		}
 	}

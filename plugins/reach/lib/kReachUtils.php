@@ -203,6 +203,19 @@ class kReachUtils
 		return true;
 	}
 
+	public static function verifyRequiredSource($dbVendorCatalogItem, $dbTaskData)
+	{
+		if ($dbVendorCatalogItem instanceof VendorTranslationCatalogItem && $dbVendorCatalogItem->getRequireSource())
+		{
+			if (!$dbTaskData instanceof kTranslationVendorTaskData || !$dbTaskData->getCaptionAssetId())
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	public static function reachStrToTime($offset , $value)
 	{
 		$original = date_default_timezone_get();

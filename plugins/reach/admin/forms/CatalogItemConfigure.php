@@ -50,7 +50,6 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'required' => true,
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
-			'readonly' => $this->disableAttributes,
 		));
 
 		$this->addElement('text', 'systemName', array(

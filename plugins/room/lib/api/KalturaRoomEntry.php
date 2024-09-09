@@ -19,9 +19,16 @@ class KalturaRoomEntry extends KalturaBaseEntry
 	 */
 	public $broadcastEntryId;
 
+	/**
+	 * The entryId of the room where settings will be taken from
+	 * @var string
+	 */
+	public $templateRoomEntryId;
+
 	private static $map_between_objects = array(
 		'roomType',
-		'broadcastEntryId'
+		'broadcastEntryId',
+		'templateRoomEntryId'
 	);
 
 	public function __construct()
@@ -47,8 +54,33 @@ class KalturaRoomEntry extends KalturaBaseEntry
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull('roomType');
-
+		$this->validateTemplateRoomEntry();
 		return parent::validateForInsert($propertiesToSkip);
 	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validateTemplateRoomEntry();
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+
+	public function validateTemplateRoomEntry()
+	{
+		if (!isset($this->templateRoomEntryId) || $this->templateRoomEntryId === '')
+		{
+			return;
+		}
+		$entry = entryPeer::retrieveByPK($this->templateRoomEntryId);
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->templateRoomEntryId);
+		}
+		if ($entry->getType() !== RoomPlugin::getEntryTypeCoreValue(RoomEntryType::ROOM))
+		{
+			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'templateRoomEntryId');
+		}
+	}
+
+
 
 }
