@@ -331,7 +331,6 @@ class myPlaylistUtils
 	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true, $pager = null)
 	{
 		$entry_id_list = self::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
-
 		if($entry_id_list)
 		{
             		if(kEntitlementUtils::getEntitlementEnforcement() && kCurrentContext::$ks_object && kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlist->getEntryId())
