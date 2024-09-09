@@ -344,7 +344,7 @@ class PlaylistService extends KalturaEntryService
 		if (is_null($detailed))
 			 $detailed = true ;
 
-		if($filter || kEntitlementUtils::getEntitlementEnforcement())
+		if($filter)
 		{
 			try
 			{
