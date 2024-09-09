@@ -2833,6 +2833,12 @@ class kKavaReportsMgr extends kKavaBase
 		return in_array($data_source, array(self::DATASOURCE_ENTRY_LIFECYCLE, self::DATASOURCE_STORAGE_USAGE)) ? self::DIMENSION_KUSER_ID : self::DIMENSION_ENTRY_OWNER_ID;
 	}
 
+	protected static function getEntryIdDimension($data_source)
+	{
+		return $data_source === self::DATASOURCE_CNC_EVENTS ? self::DIMENSION_CONTEXT_ID : self::DIMENSION_ENTRY_ID;
+	}
+
+
 	protected static function getDruidFilter($partner_id, $report_def, $input_filter, $object_ids, $response_options)
 	{
 		$druid_filter = array();
@@ -2888,6 +2894,7 @@ class kKavaReportsMgr extends kKavaBase
 			);
 		}
 
+		$entry_id_dimension = self::getEntryIdDimension($data_source);
 		$field_dim_map = array(
 			'categoriesIds' => array(self::DRUID_DIMENSION => self::DIMENSION_CATEGORIES),
 			'countries' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_COUNTRY),
@@ -2906,8 +2913,8 @@ class kKavaReportsMgr extends kKavaBase
 			'cities' => array(self::DRUID_DIMENSION => self::DIMENSION_LOCATION_CITY),
 			'media_types' => array(self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE),
 			'source_types' => array(self::DRUID_DIMENSION => self::DIMENSION_SOURCE_TYPE),
-			'entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID),
-			'entries_ids_not_in' => array(self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID, self::DRUID_TYPE => self::DRUID_NOT),
+			'entries_ids' => array(self::DRUID_DIMENSION => $entry_id_dimension),
+			'entries_ids_not_in' => array(self::DRUID_DIMENSION => $entry_id_dimension, self::DRUID_TYPE => self::DRUID_NOT),
 			'playback_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_CONTEXT),
 			'root_entries_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_ROOT_ENTRY_ID),
 			'event_var1' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR1),
@@ -3066,7 +3073,7 @@ class kKavaReportsMgr extends kKavaBase
 		if (count($entry_ids_from_db))
 		{
 			$druid_filter[] = array(
-				self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
+				self::DRUID_DIMENSION => $entry_id_dimension,
 				self::DRUID_VALUES => array_values(array_unique($entry_ids_from_db))
 			);
 		}
