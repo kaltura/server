@@ -206,7 +206,7 @@ class myPlaylistUtils
 				break;
 			case PlaylistType::STATIC_LIST:
 			case PlaylistType::PATH:
-                $entry_id_list_str = $playlist->getDataContent();
+                		$entry_id_list_str = $playlist->getDataContent();
 				$entryObjectsArray = self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
 			default:
 				break;
@@ -334,22 +334,20 @@ class myPlaylistUtils
 
 		if($entry_id_list)
 		{
-            if(kEntitlementUtils::getEntitlementEnforcement() &&
-                kCurrentContext::$ks_object &&
-                kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlist->getEntryId())
-            {
-                kEntitlementUtils::initEntitlementEnforcement(null, false);
-                entryPeer::setDefaultCriteriaFilter();
-                $result =  self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
-                kEntitlementUtils::initEntitlementEnforcement();
-                entryPeer::setDefaultCriteriaFilter();
-                return $result;
-            }
-            else
-            {
-                return self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
-            }
-        }
+            		if(kEntitlementUtils::getEntitlementEnforcement() && kCurrentContext::$ks_object && kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlist->getEntryId())
+            		{
+                		kEntitlementUtils::initEntitlementEnforcement(null, false);
+                		entryPeer::setDefaultCriteriaFilter();
+                		$result =  self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+                		kEntitlementUtils::initEntitlementEnforcement();
+                		entryPeer::setDefaultCriteriaFilter();
+                		return $result;
+            		}
+            		else
+            		{
+                		return self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+            		}
+        	}
 
 		return null;
 	}
