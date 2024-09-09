@@ -53,6 +53,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::DELETED' => "Deleted",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE' => "Enabled",
 
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_HOUR' => "Price Per Hour",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE' => "Price Per Minute",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_SECOND' => "Price Per Second",
 
