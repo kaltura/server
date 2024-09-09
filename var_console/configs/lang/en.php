@@ -333,6 +333,7 @@ return array(
 	'Kaltura_Client_Enum_UiConfObjType::KMC_GENERAL' => 'KMC General',
 	'Kaltura_Client_Enum_UiConfObjType::KMC_ROLES_AND_PERMISSIONS' => 'KMC Roles and Permissions',
 	'KalturaUiConfObjType::SAP' => 'Slim Audio Player',
+	'KalturaUiConfObjType::REELS' => 'Reels Player',
 	'KalturaUiConfObjType::PLAYER_SL' => 'Player Silverlight',
 	'KalturaUiConfObjType::CLIENTSIDE_ENCODER' => 'Client Side Encoder',
 	 
