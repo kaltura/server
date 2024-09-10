@@ -15,7 +15,7 @@ class RoomService extends KalturaEntryService
 	function addAction(KalturaRoomEntry $entry)
 	{
 
-		$dbEntry = parent::add($entry);
+		$dbEntry = parent::add($entry, conversionProfile2::CONVERSION_PROFILE_NONE);
 		$dbEntry->setStatus(entryStatus::NO_CONTENT);
 		$dbEntry->save();
 

@@ -70,7 +70,7 @@ class KalturaRoomEntry extends KalturaBaseEntry
 		{
 			return;
 		}
-		$entry = entryPeer::retrieveByPK($this->templateRoomEntryId);
+		$entry = $this->retrieveTemplateRoomEntry($this->templateRoomEntryId);
 		if (!$entry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->templateRoomEntryId);
@@ -81,6 +81,20 @@ class KalturaRoomEntry extends KalturaBaseEntry
 		}
 	}
 
+	private function retrieveTemplateRoomEntry($entryId)
+	{
+		$c = new Criteria();
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id :  kCurrentContext::$ks_partner_id;
+		entryPeer::setUseCriteriaFilter (false);
+		// allow setting entry of the "global" partner
+		$allowedPids = array($partnerId, Partner::KME_PARTNER_ID);
+		$c->addAnd(entryPeer::PARTNER_ID, $allowedPids, Criteria::IN);
+		$c->addAnd(entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd(entryPeer::ID, $entryId, Criteria::EQUAL);
+		$entry = entryPeer::doSelectOne($c);
+		entryPeer::setUseCriteriaFilter (true);
+		return $entry;
+	}
 
 
 }
