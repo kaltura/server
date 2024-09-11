@@ -27,4 +27,5 @@ class KalturaUiConfObjType extends KalturaEnum
 	const KUPLOAD = 20;
 	const WEBCASTING = 21;
 	const SAP = 22;
+	const REELS = 23;
 }

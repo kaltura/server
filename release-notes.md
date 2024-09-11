@@ -1,3 +1,24 @@
+# Tucana-20.20.0
+## Enable Content Lab ##
+* Issue Type: Task
+* Issue ID: PLAT-24940
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.contentLab.enabled = true
+moduls.contentLab.permissionType = 2
+moduls.contentLab.label = "Enable Content Lab"
+moduls.contentLab.permissionName = FEATURE_CONTENT_LAB
+moduls.contentLab.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add Reels Player ##
+* Issue Type: Story
+* Issue ID: PLAT-24930
+### Configuration ###
+Add the following to admin.ini:
+
+    settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::REELS
+
 # Tucana-20.17.0
 ## New KME user reset password link  ##
 - Issue Type: Bug

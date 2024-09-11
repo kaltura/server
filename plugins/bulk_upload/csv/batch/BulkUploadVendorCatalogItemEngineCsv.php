@@ -29,7 +29,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	private $bulkUploadResultParams = array(
 		'vendorPartnerId', 'name', 'systemName', 'serviceType', 'turnAroundTime',
 		'sourceLanguage', 'targetLanguage', 'outputFormat', 'enableSpeakerId', 'fixedPriceAddons',
-		'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission', 'stage', 'contract', 'notes', 'createdBy');
+		'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission', 'requireSource', 'stage', 'contract', 'notes', 'createdBy');
 
 	/**
 	 * (non-PHPdoc)

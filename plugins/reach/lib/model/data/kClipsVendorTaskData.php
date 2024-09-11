@@ -8,6 +8,8 @@ class kClipsVendorTaskData extends kVendorTaskData
 {
 	public int $clipsDuration = 0;
 
+	public ?string $eventSessionContextId = null;
+
 	public string $instruction = "";
 
 	public ?string $clipsOutputJson = null;
@@ -15,6 +17,16 @@ class kClipsVendorTaskData extends kVendorTaskData
 	public function getClipsDuration(): int
 	{
 		return $this->clipsDuration;
+	}
+
+	public function getEventSessionContextId(): ?string
+	{
+		return $this->eventSessionContextId;
+	}
+
+	public function setEventSessionContextId(?string $eventSessionContextId): void
+	{
+		$this->eventSessionContextId = $eventSessionContextId;
 	}
 
 	public function setClipsDuration(int $clipsDuration): void
