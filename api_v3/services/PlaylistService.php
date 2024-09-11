@@ -382,7 +382,7 @@ class PlaylistService extends KalturaEntryService
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaBaseEntryArray
 	 */
-	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null, $playlistId =null)
+	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null, $playlistId = null)
 	{
 		$partnerId = $this->getPartnerId() ? $this->getPartnerId() : kCurrentContext::getCurrentPartnerId();
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
