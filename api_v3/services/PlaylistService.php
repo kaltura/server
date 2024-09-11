@@ -366,7 +366,7 @@ class PlaylistService extends KalturaEntryService
 				$tempPlaylist->playlistContent = "";
 			
 			$tempPlaylist->playlistType = $playlist->getMediaType();
-			return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, $detailed, $pager);
+			return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, $detailed, $pager, $playlist->getEntryId());
         }
 	}
 	
@@ -382,7 +382,7 @@ class PlaylistService extends KalturaEntryService
 	 * @param KalturaFilterPager $pager
 	 * @return KalturaBaseEntryArray
 	 */
-	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null)
+	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null, $playlistId =null)
 	{
 		$partnerId = $this->getPartnerId() ? $this->getPartnerId() : kCurrentContext::getCurrentPartnerId();
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
@@ -392,13 +392,13 @@ class PlaylistService extends KalturaEntryService
 		}
 		list($entryFiltersViaEsearch,  $entryFiltersViaSphinx, $totalResults) = myPlaylistUtils::splitEntryFilters($playlistContent);
 		$pagerSeparateQueries = self::decideWhereHandlingPager($pager,$entryFiltersViaEsearch, $entryFiltersViaSphinx);
-		$entryList = self::handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeparateQueries, $pager, $totalResults, $playlistContent);
+		$entryList = self::handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeparateQueries, $pager, $totalResults, $playlistContent, $playlistId);
 		myEntryUtils::updatePuserIdsForEntries($entryList);
 		KalturaLog::debug("entry ids count: " . (is_array($entryList ? count($entryList) : 0)));
 		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
 	}
 
-	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent)
+	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent, $playlistId = null)
 	{
 		$entryList = null;
 		switch($playlistType)
@@ -408,7 +408,7 @@ class PlaylistService extends KalturaEntryService
 				break;
 			case KalturaPlaylistType::STATIC_LIST:
 			case KalturaPlaylistType::PATH:
-				$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager);
+				$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager, $playlistId);
 				break;
 		}
 
