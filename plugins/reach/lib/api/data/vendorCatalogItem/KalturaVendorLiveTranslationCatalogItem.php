@@ -16,6 +16,11 @@ class KalturaVendorLiveTranslationCatalogItem extends KalturaVendorLiveCatalogIt
 		'targetLanguage'
 	);
 
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
 	protected function getServiceFeature()
 	{
 		return KalturaVendorServiceFeature::LIVE_TRANSLATION;
@@ -25,10 +30,14 @@ class KalturaVendorLiveTranslationCatalogItem extends KalturaVendorLiveCatalogIt
 	{
 		// In case this is update and vendor partner id was not sent don't run validation
 		if ($sourceObject && !$this->isNull('targetLanguage') && $sourceObject->getTargetLanguage() == $this->targetLanguage)
+		{
 			return;
+		}
 
-		if ($sourceObject->getTargetLanguage() == 'Auto Detect')
+		if ($this->targetLanguage == 'Auto Detect')
+		{
 			throw new KalturaAPIException(KalturaReachErrors::TARGET_LANGUAGE_NOT_SUPPORTED, $this->targetLanguage);
+		}
 	}
 
 	protected function validate(VendorCatalogItem $sourceObject = null)
@@ -45,7 +54,7 @@ class KalturaVendorLiveTranslationCatalogItem extends KalturaVendorLiveCatalogIt
 	{
 		if (is_null($object_to_fill))
 		{
-			$object_to_fill = new KalturaVendorLiveTranslationCatalogItem();
+			$object_to_fill = new VendorLiveTranslationCatalogItem();
 		}
 
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
