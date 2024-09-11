@@ -3,11 +3,39 @@
  * @package plugins.reach
  * @subpackage api.objects
  */
-class KalturaVendorLiveTranslationCatalogItem extends KalturaVendorLiveCaptionCatalogItem
+class KalturaVendorLiveTranslationCatalogItem extends KalturaVendorLiveCatalogItem
 {
+	/**
+	 * @var KalturaCatalogItemLanguage
+	 * @filter eq,in
+	 */
+	public $targetLanguage;
+
+	private static $map_between_objects = array
+	(
+		'targetLanguage'
+	);
+
 	protected function getServiceFeature()
 	{
 		return KalturaVendorServiceFeature::LIVE_TRANSLATION;
+	}
+
+	protected function validateTargetLanguage(VendorCatalogItem $sourceObject = null)
+	{
+		// In case this is update and vendor partner id was not sent don't run validation
+		if ($sourceObject && !$this->isNull('targetLanguage') && $sourceObject->getTargetLanguage() == $this->targetLanguage)
+			return;
+
+		if ($sourceObject->getTargetLanguage() == 'Auto Detect')
+			throw new KalturaAPIException(KalturaReachErrors::TARGET_LANGUAGE_NOT_SUPPORTED, $this->targetLanguage);
+	}
+
+	protected function validate(VendorCatalogItem $sourceObject = null)
+	{
+		$this->validateTargetLanguage($sourceObject);
+
+		return parent::validate($sourceObject);
 	}
 
 	/* (non-PHPdoc)

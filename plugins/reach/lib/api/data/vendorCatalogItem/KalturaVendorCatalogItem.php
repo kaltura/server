@@ -179,7 +179,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
-	private function validate(VendorCatalogItem $sourceObject = null)
+	protected function validate(VendorCatalogItem $sourceObject = null)
 	{
 		if (!$sourceObject) //Source object will be null on insert
 			$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "turnAroundTime", "pricing"));
