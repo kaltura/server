@@ -154,10 +154,6 @@ class embedIframeJsAction extends sfAction
 		KExternalErrors::dieGracefully();
 	}
 
-	/*
-	 * v2 - https://cdnapisec.kaltura.com/p/1915851/sp/191585100/embedIframeJs/uiconf_id/32880931/partner_id/1915851?iframeembed=true&playerId=kaltura_player_1719900446&entry_id=1_aeg07vpv
-	 * v7 - https://cdnapisec.kaltura.com/p/1915851/embedPlaykitJs/uiconf_id/54813242?iframeembed=true&entry_id=1_aeg07vpv
-	 */
 	private function redirectToV7($v7Id, $v2UiConfId, $partnerId, $shouldTranslatePlugins) : void
 	{
 		//validate all the params are handled
