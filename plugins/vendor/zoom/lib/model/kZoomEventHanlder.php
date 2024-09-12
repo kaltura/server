@@ -388,7 +388,20 @@ class kZoomEventHanlder
 	
 	protected static function createEntry($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId)
 	{
+		$templateEntry = null;
+		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+		$defaultEntryId = $conversionProfile->getDefaultEntryId();
+		if($defaultEntryId)
+		{
+			$templateEntry = entryPeer::retrieveByPKNoFilter($defaultEntryId, null, false);
+		}
+		
 		$newEntry = new entry();
+		if($templateEntry)
+		{
+			$newEntry->copyTemplate($templateEntry, true);
+		}
+
 		$newEntry->setType(entryType::MEDIA_CLIP);
 		$newEntry->setSourceType(EntrySourceType::URL);
 		$newEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
