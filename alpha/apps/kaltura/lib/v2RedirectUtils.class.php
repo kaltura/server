@@ -98,22 +98,4 @@ class v2RedirectUtils
 	{
 		return str_contains($varKeyName, ".plugin");
 	}
-
-	private static function v2toV7PluginMap()
-	{
-		return
-			["info" => ["playkitscreen", "playkit-js-info"],
-			"quiz"          => ["playkit-ivq", "ivq"],
-			"moderation"    => ["playkit-moderation", "playkit-js-moderation"],
-			"playlistAPI"   => ["playkit-playlist", "playlist"],
-			"liveStatus"    => ["playkit-kaltura-live","kaltura-live"],
-			"related"       => ["playkit-related", "related"],
-			"dualScreen"    => ["playkit-dual-screen", "dualscreen"],
-			"video360"      => ["playkit-vr" ,"vr"],
-			"raptMedia"     => ["rapt", "rapt"],
-			"transcript"    => ["playkit-transcript", "playkit-js-transcript"],
-			"qna"           => ["playkit-qna", "qna"],
-			"bumper"        => [ "playkit-bumper" , "bumper" ],
-			"infoScreen" => ["playkit-info", "playkit-js-info"]];
-	}
 }
