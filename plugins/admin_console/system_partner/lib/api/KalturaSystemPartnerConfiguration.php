@@ -224,7 +224,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public $crmLink;
 	
 	/**
-	 * @var string
+	 * @var int
 	 */
 	public $verticalClasiffication;
 	
