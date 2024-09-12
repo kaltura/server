@@ -546,6 +546,9 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		$this->describeYourself = kString::stripUtf8InvalidChars($this->describeYourself);
 		$this->additionalParams = KalturaKeyValueArray::fromKeyValueArray($partner->getAdditionalParams());
 		$this->allowDefaultPasswordRestrictions = !$partner->getEnabledService(PermissionName::FEATURE_DISABLE_PASSWORD_RESTRICTION);
+		
+		//Cast old partner values that were created when the system partner config object exposed this field as string
+		$this->verticalClassificationId = intval($this->verticalClassificationId);
 		if (!$this->host){
 			$this->host = null;
 		}
