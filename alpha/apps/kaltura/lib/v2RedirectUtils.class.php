@@ -84,8 +84,6 @@ class v2RedirectUtils
 	static function addV2toV7config($flashvars, $uiconfId)
 	{
 		$config = [];
-		//Merge v7 config
-
 		if($flashvars)
 		{   foreach ($flashvars as $key => $value) {
 				$key = trim(trim($key, '"'), "'");
