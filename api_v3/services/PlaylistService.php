@@ -415,7 +415,7 @@ class PlaylistService extends KalturaEntryService
 		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
 	}
 
-	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent, $playlistId)
+	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent, $playlistId = null)
 	{
 		$entryList = null;
 		switch($playlistType)
