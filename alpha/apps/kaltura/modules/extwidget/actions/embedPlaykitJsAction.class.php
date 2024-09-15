@@ -583,7 +583,6 @@ class embedPlaykitJsAction extends sfAction
 				if (!$this->bundleConfig) {
 					$this->bundleConfig = array();
 				}
-                KalturaLog::log("versionsArr" . print_r($versionsArr,true));
 				$this->bundleConfig = array_merge($this->bundleConfig, $versionsArr);
 			}
 		}
