@@ -5,11 +5,6 @@
  */
 class KalturaPartnerCatalogItemFilter extends KalturaPartnerCatalogItemBaseFilter
 {
-	/**
-	 * @var int
-	 */
-	public $partnerIdEqual;
-
 	protected function getCoreFilter()
 	{
 		return new PartnerCatalogItemFilter();
