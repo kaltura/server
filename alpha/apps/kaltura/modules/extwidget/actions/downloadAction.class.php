@@ -218,6 +218,7 @@ class downloadAction extends sfAction
 			kFile::cacheRedirect($url);
 
 			header("Location: {$url}");
+			header("Access-Control-Allow-Origin:*");
 			KExternalErrors::dieGracefully();
 		}
 		else
