@@ -845,8 +845,6 @@ class embedPlaykitJsAction extends sfAction
 		$this->setBundleName();
 	}
 
-
-
 	private function setBundleName()
 	{
 		//sort bundle config by key
