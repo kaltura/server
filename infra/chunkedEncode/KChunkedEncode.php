@@ -388,8 +388,7 @@ if($this->sourceFileDt->containerFormat=="mxf" && isset($params->unResolvedSourc
 				// Disable audio processing for cmdLines that miss aud settings
 				// that have excplicit '-an' notation
 			if(($key=array_search("-c:a", $cmdLineArr))!==false
-			|| ($key=array_search("-acodec", $cmdLineArr))!==false
-			|| ($key=array_search("-an", $cmdLineArr))!==false) {
+			|| ($key=array_search("-acodec", $cmdLineArr))!==false) {
 				unset($cmdLineArr[$key+1]);
 				$cmdLineArr[$key]='-an';
 			}
