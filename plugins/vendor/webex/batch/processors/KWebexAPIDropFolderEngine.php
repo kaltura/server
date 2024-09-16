@@ -143,9 +143,9 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			$createTime = strtotime($recordingInfo['createTime']);
 			if ($createTime > $this->lastFileTimestamp)
 			{
-                $secondsToWatchBack = KBatchBase::$taskConfig->params->secondsToWatchBack;
-                $secondsToWatchBack = (int)$secondsToWatchBack;
-                $this->lastFileTimestamp = $createTime - $secondsToWatchBack;
+				$secondsToWatchBack = KBatchBase::$taskConfig->params->secondsToWatchBack;
+				$secondsToWatchBack = intval($secondsToWatchBack);
+				$this->lastFileTimestamp = $createTime - $secondsToWatchBack;
 			}
 			
 			$dropFolderFilesMap = $this->loadDropFolderFiles($recordingFileName);
@@ -232,13 +232,13 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		{
 			$this->lastFileTimestamp = $this->lastFileTimestamp + kTimeConversion::DAY;
 		}
-        if ($this->dropFolder->lastFileTimestamp != $this->lastFileTimestamp)
-        {
-            $updateDropFolder = new KalturaWebexAPIDropFolder();
-            $updateDropFolder->lastFileTimestamp = $this->lastFileTimestamp;
-            $this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
-            KalturaLog::debug("Last handled meeting time is: {$this->lastFileTimestamp}");
-        }
+		if ($this->dropFolder->lastFileTimestamp != $this->lastFileTimestamp)
+		{
+			$updateDropFolder = new KalturaWebexAPIDropFolder();
+			$updateDropFolder->lastFileTimestamp = $this->lastFileTimestamp;
+			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
+			KalturaLog::debug("Last handled meeting time is: {$this->lastFileTimestamp}");
+		}
 	}
 	
 	protected function handleDropFolderFiles()
