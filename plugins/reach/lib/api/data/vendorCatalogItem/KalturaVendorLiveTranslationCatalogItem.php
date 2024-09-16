@@ -28,12 +28,6 @@ class KalturaVendorLiveTranslationCatalogItem extends KalturaVendorLiveCatalogIt
 
 	protected function validateTargetLanguage(VendorCatalogItem $sourceObject = null)
 	{
-		// In case this is update and vendor partner id was not sent don't run validation
-		if ($sourceObject && !$this->isNull('targetLanguage') && $sourceObject->getTargetLanguage() == $this->targetLanguage)
-		{
-			return;
-		}
-
 		if ($this->targetLanguage == 'Auto Detect')
 		{
 			throw new KalturaAPIException(KalturaReachErrors::TARGET_LANGUAGE_NOT_SUPPORTED, $this->targetLanguage);
