@@ -1,4 +1,4 @@
-# Tucana-20.16.0
+# Tucana-20.20.0
 ## Add kafka event notification for room entry updates ##
 - Issue Type: Task
 - Issue ID: FOUN-1370
@@ -9,12 +9,42 @@
 
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/2024_03_03_deploy_kafka_room_events.php
-  
+
+## Enable Content Lab ##
+* Issue Type: Task
+* Issue ID: PLAT-24940
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.contentLab.enabled = true
+moduls.contentLab.permissionType = 2
+moduls.contentLab.label = "Enable Content Lab"
+moduls.contentLab.permissionName = FEATURE_CONTENT_LAB
+moduls.contentLab.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add Reels Player ##
+* Issue Type: Story
+* Issue ID: PLAT-24930
+### Configuration ###
+Add the following to admin.ini:
+
+    settings.uiConfTypes[] = Kaltura_Client_Enum_UiConfObjType::REELS
+
+# Tucana-20.17.0
+## New KME user reset password link  ##
+- Issue Type: Bug
+- Issue ID: NR2-8250
+
+### Configuration ###
+add the following to 'local.ini' under 'password_reset_links' (with the service url of the required KME environment):
+kme_nr = @KME_NR_SERVICE_URL@/u/#/forgotPassword/
+
+# Tucana-20.16.0
 # Add permissions for session get ##
 - Issue Type: Task
 - Issue ID: PLAT-24908
 ### Deployment Scripts ###
-	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permission.php
+	php deployment/updates/scripts/add_permissions/2024_07_21_session_get_read_permissions.php
 
 ## Add KMC Headers
 * Issue Type: Task
@@ -23,7 +53,6 @@
 Add the following to local.ini:
 ```
 [kmcng_permissions_policy_directives]
-accelerometer = "()"
 ambient-light-sensor = "()"
 display-capture = "()"
 battery = "()"
@@ -35,7 +64,6 @@ document-domain = "()"
 identity-credentials-get = "()"
 gamepad = "()"
 geolocation = "()"
-gyroscope = "()"
 hid = "()"
 local-fonts = "()"
 magnetometer = "()"
@@ -62,7 +90,7 @@ xr-spatial-tracking = "()"
 ##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
 Replace 'esearch_host', 'esearch_port' and execute the curl command
 
-    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"broadcast_entry_id":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"broadcast_entry_id": {"type": "keyword", "normalizer": "kaltura_keyword_normalizer"}}}'
 
 ## Add CnC Permissions
 * Issue Type: Task
