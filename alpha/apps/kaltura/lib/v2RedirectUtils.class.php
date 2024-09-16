@@ -89,7 +89,8 @@ class v2RedirectUtils
 	{
 		$config = [];
 		if($flashvars)
-		{   foreach ($flashvars as $key => $value) {
+		{   foreach ($flashvars as $key => $value) 
+			{
 				$key = trim(trim($key, '"'), "'");
 				$config[$key] = json_decode($value);
 			}
