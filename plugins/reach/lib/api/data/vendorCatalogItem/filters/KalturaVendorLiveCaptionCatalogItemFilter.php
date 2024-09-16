@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.filters
  */
-class KalturaVendorLiveCaptionCatalogItemFilter extends KalturaVendorLiveCatalogItemBaseFilter
+class KalturaVendorLiveCaptionCatalogItemFilter extends KalturaVendorLiveCaptionCatalogItemBaseFilter
 {
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{

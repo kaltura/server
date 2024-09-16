@@ -3,7 +3,7 @@
  * @package plugins.reach
  * @subpackage api.filters
  */
-class KalturaVendorLiveTranslationCatalogItemFilter extends KalturaVendorLiveCatalogItemBaseFilter
+class KalturaVendorLiveTranslationCatalogItemFilter extends KalturaVendorLiveTranslationCatalogItemBaseFilter
 {
 	/**
 	 * @var KalturaCatalogItemLanguage

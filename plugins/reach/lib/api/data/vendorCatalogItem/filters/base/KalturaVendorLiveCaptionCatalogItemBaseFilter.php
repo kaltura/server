@@ -5,7 +5,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaVendorLiveCatalogItemBaseFilter extends KalturaVendorCaptionsCatalogItemFilter
+abstract class KalturaVendorLiveCaptionCatalogItemBaseFilter extends KalturaVendorLiveCatalogItemFilter
 {
 	static private $map_between_objects = array
 	(
