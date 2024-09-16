@@ -64,10 +64,12 @@ class v2RedirectUtils
 						$v7PluginName = self::getV7PluginInfo($v2PluginName[0]);
 						$bundleConfig = array_merge($bundleConfig, [$v7PluginName[0] => "{latest}"]);
 						$v7PluginConfig = $v7PluginName[1];
-						if (!isset($playerConfig->plugins)) {
+						if (!isset($playerConfig->plugins)) 
+						{
 							$playerConfig->plugins = new stdClass();
 						}
-						if (!isset($playerConfig->plugins->$v7PluginConfig)) {
+						if (!isset($playerConfig->plugins->$v7PluginConfig)) 
+						{
 							$playerConfig->plugins->$v7PluginConfig = new stdClass();
 						}
 					}
