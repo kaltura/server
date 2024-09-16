@@ -144,6 +144,10 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			if ($createTime > $this->lastFileTimestamp)
 			{
 				$secondsToWatchBack = KBatchBase::$taskConfig->params->secondsToWatchBack;
+				if ($secondsToWatchBack === null)
+				{
+				    $secondsToWatchBack = 0;
+				}
 				$secondsToWatchBack = intval($secondsToWatchBack);
 				$this->lastFileTimestamp = $createTime - $secondsToWatchBack;
 			}
