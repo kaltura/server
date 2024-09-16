@@ -48,6 +48,16 @@ abstract class KalturaConfigurableDistributionProfile extends KalturaDistributio
 			$features[] = ObjectFeatureType::CATEGORY_ENTRIES;
 			$dbObject->setExtendedFeatures(array_unique($features));
 		}
+		else
+		{
+			$features = $dbObject->getExtendedFeatures();
+			if (($key = array_search(ObjectFeatureType::CATEGORY_ENTRIES, $features)) !== false)
+			{
+				unset($features[$key]);
+				$features = array_values($features);
+				$dbObject->setExtendedFeatures(array_unique($features));
+			}
+		}
 		
 		return $dbObject;
 	}

@@ -125,7 +125,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			}
 			
 			$recordingInfo = $this->webexClient->getRecording($recordingItem['id'], $hostEmail);
-			
+			KalturaLog::debug('recording info: ' . print_r($recordingInfo, true));
+
 			if (!isset($recordingInfo['topic']))
 			{
 				KalturaLog::warning('Error getting recording name from Webex, recording id: ' . $recordingItem['id'], ', response: ' . print_r($recordingItem, true));

@@ -319,6 +319,29 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				self::METRIC_UNIQUE_VOD_VIEW_PERIOD_USERS,
 				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO
 			)
+		),
+
+		ReportType::EP_WEBCAST_ENGAGEMENT_OVER_TIME => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'position' => self::DIMENSION_POSITION
+			),
+			self::REPORT_FILTER => array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_POSITION,
+					self::DRUID_VALUES => array(self::VALUE_UNKNOWN, "0", "")
+				)
+			),
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
+					self::REPORT_METRICS => array(self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO)
+				),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
+					self::REPORT_METRICS => array(self::EVENT_TYPE_MESSAGE_LIKED, self::EVENT_TYPE_REACTION_CLICKED, self::EVENT_TYPE_GROUP_MESSAGE_SENT)
+				)
+			)
 		)
 
 	);

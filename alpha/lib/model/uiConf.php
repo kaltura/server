@@ -35,6 +35,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	const UI_CONF_TYPE_KUPLOAD = 20;
 	const UI_CONF_TYPE_WEBCASTING = 21;
 	const UI_CONF_TYPE_SAP = 22;
+	const UI_CONF_TYPE_REELS = 23;
 
 
 	const UI_CONF_CREATION_MODE_MANUAL = 1;
@@ -84,6 +85,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 										self::UI_CONF_TYPE_KUPLOAD => "KUpload.swf",
 										self::UI_CONF_TYPE_WEBCASTING => "",
 										self::UI_CONF_TYPE_SAP => "",
+										self::UI_CONF_TYPE_REELS => "",
 									);
 
 	private static $swf_directory_map = array (
@@ -109,11 +111,14 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		self::UI_CONF_TYPE_KUPLOAD => "kupload",
 		self::UI_CONF_TYPE_WEBCASTING => "",
 		self::UI_CONF_TYPE_SAP => "",
+		self::UI_CONF_TYPE_REELS => "",
 	);
 
 	const CUSTOM_DATA_CON_FILE_VERSION = 'conf_file_version';
 	const CUSTOM_DATA_CONF_FILE_FEATURES_VERSION = 'conf_file_features_version';
-	
+
+	const CUSTOM_DATA_V2REDIRECT = "v2redirect";
+
 	public function save(PropelPDO $con = null)
 	{
 		try
@@ -212,6 +217,7 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 				self::UI_CONF_TYPE_KUPLOAD => "Kaltura Simple Uploader",
 				self::UI_CONF_TYPE_WEBCASTING => "Kaltura Webcasting Studio",
 				self::UI_CONF_TYPE_SAP => "Slim Audio Player",
+				self::UI_CONF_TYPE_REELS => "Reels Player",
 			);
 		}
 	}
@@ -808,5 +814,17 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		}
 		
 		return parent::setVersion($v);
+	}
+
+	//v2 to v7
+	public function getV2Redirect()
+	{
+		return $this->getFromCustomData( self::CUSTOM_DATA_V2REDIRECT);
+	}
+
+	public function setV2Redirect($v)
+	{
+		KalturaLog::log(JSON_encode($v));
+		return $this->putInCustomData(self::CUSTOM_DATA_V2REDIRECT, $v);
 	}
 }

@@ -4,6 +4,7 @@
  */
 class elasticClusterProvisioning
 {
+	const DEFAULT_SERVER_ROOT_DIRECTORY = '/opt/kaltura/app';
 	const DEFAULT_DESIRED_VERSION = 7;
 	const DEFAULT_SERVER_VERSION = 'master';
 	const DEFAULT_TABLE_SPLIT = 0;
@@ -29,6 +30,9 @@ class elasticClusterProvisioning
 	private $createSubIndexes;
 	private $replicationFactor;
 	private $refreshInterval;
+	private $unattended;
+	private $getMappingsFromLocal;
+	private $serverRootDirectory;
 	
 	// arrays
 	private $tables;
@@ -53,17 +57,21 @@ class elasticClusterProvisioning
 			logLine("\033[31mNOTICE:\033[39m unexpected temp directory path or name [$this->tmpDirectory]");
 			logLine("Not going to delete anything");
 			logLine("Script finished");
-			exit();
+			exit(0);
 		}
 		
-		do
+		$answer = null;
+		if (!$this->unattended)
 		{
-			$time = '[' . strftime("%F %T", time()) . ']';
-			$answer = readline($time . " Delete directory at [$this->tmpDirectory] and all files inside? [y/n]");
+			do
+			{
+				$time = '[' . strftime("%F %T", time()) . ']';
+				$answer = readline($time . " Delete directory at [$this->tmpDirectory] and all files inside? [y/n]");
+			}
+			while (!in_array($answer, array('y', 'n')));
 		}
-		while (!in_array($answer, array('y', 'n')));
 		
-		if ($answer == 'y')
+		if ($this->unattended || $answer == 'y')
 		{
 			foreach (glob($this->tmpDirectory . '*') as $file)
 			{
@@ -98,20 +106,23 @@ class elasticClusterProvisioning
 	
 	private function setProperties($elasticHost, $options)
 	{
+		$this->unattended = isset($options['unattended']);
+		logLine("\033[31mNOTICE:\033[39m Setting unattended mode to [$this->unattended]");
+		
 		$this->verbose = isset($options['verbose']);
-		logLine("\033[31mNOTICE:\033[39m setting verbose mode to [$this->verbose]");
+		logLine("\033[31mNOTICE:\033[39m Setting verbose mode to [$this->verbose]");
 		
 		$this->testRun = isset($options['testRun']);
 		logLine("\033[31mNOTICE:\033[39m Setting test run to [$this->testRun]");
 		
 		$this->elasticHost = $elasticHost;
-		logLine("\033[31mNOTICE:\033[39m setting elastic host to [$this->elasticHost]");
+		logLine("\033[31mNOTICE:\033[39m Setting elastic host to [$this->elasticHost]");
 		
 		$this->elasticCurlHost = "curl -s -H 'Content-Type: application/json' $this->elasticHost:9200";
-		logLine("\033[31mNOTICE:\033[39m setting elastic curl host to [$this->elasticCurlHost]");
+		logLine("\033[31mNOTICE:\033[39m Setting elastic curl host to [$this->elasticCurlHost]");
 		
 		$this->elasticDesiredVersion = isset($options['elasticVersion']) ? $options['elasticVersion'] : self::DEFAULT_DESIRED_VERSION;
-		logLine("\033[31mNOTICE:\033[39m setting desired elastic version to [$this->elasticDesiredVersion]");
+		logLine("\033[31mNOTICE:\033[39m Setting desired elastic version to [$this->elasticDesiredVersion]");
 		
 		if ($this->elasticDesiredVersion == self::DEFAULT_DESIRED_VERSION)
 		{
@@ -126,12 +137,30 @@ class elasticClusterProvisioning
 			logLine("\033[31mERROR:\033[39m elastic desired version is [$this->elasticDesiredVersion] but no server directory passed");
 			logLine("Please pass option '--elasticServerDirectoryName=[directory_name]' to sub dir from 'configurations/elastic/mapping/[directory_name]' when executing script");
 			logLine("Terminating script");
+			exit(1);
 		}
-		logLine("\033[31mNOTICE:\033[39m setting elastic server directory name to [$this->elasticServerDirectoryName]");
+		
+		logLine("\033[31mNOTICE:\033[39m Setting elastic server directory name to [$this->elasticServerDirectoryName]");
 		$this->elasticServerDirectoryName .= '/';
 		
+		$this->getMappingsFromLocal = isset($options['getMappingsFromLocal']);
+		logLine("\033[31mNOTICE:\033[39m Setting get mappings from local to [$this->getMappingsFromLocal]");
+		
+		$this->serverRootDirectory = isset($options['serverRootDirectory']) ? $options['serverRootDirectory'] : self::DEFAULT_SERVER_ROOT_DIRECTORY;
+		$this->serverRootDirectory = rtrim($this->serverRootDirectory,'/') . '/';
+		
+		if (!file_exists($this->serverRootDirectory . 'VERSION.txt'))
+		{
+			logLine("\033[31mERROR:\033[39m server root directory is [$this->serverRootDirectory] but [{$this->serverRootDirectory}VERSION.txt] was not found - are you sure this is a valid path for kaltura 'server' repository?");
+			logLine("Please pass option '--serverRootDirectory=[/path/to/server]' to the root dir of kaltura 'server' repository");
+			logLine("Terminating script");
+			exit(1);
+		}
+		
+		logLine("\033[31mNOTICE:\033[39m Setting server root directory to [$this->serverRootDirectory]");
+		
 		$this->serverVersion = isset($options['serverVersion']) ? $options['serverVersion'] : self::DEFAULT_SERVER_VERSION;
-		logLine("\033[31mNOTICE:\033[39m setting server version to [$this->serverVersion]");
+		logLine("\033[31mNOTICE:\033[39m Setting server version to [$this->serverVersion]");
 		
 		if ($options['clusterType'] == self::BEACON_CLUSTER_TYPE)
 		{
@@ -169,13 +198,13 @@ class elasticClusterProvisioning
 			);
 			
 			isset($options['entrySplit']) ? $this->splitFactorTable['kaltura_entry'] = $options['entrySplit'] : null;
-			logLine("\033[31mNOTICE:\033[39m setting kaltura_entry table split factor to [{$this->splitFactorTable['kaltura_entry']}]");
+			logLine("\033[31mNOTICE:\033[39m Setting kaltura_entry table split factor to [{$this->splitFactorTable['kaltura_entry']}]");
 			
 			isset($options['categorySplit']) ? $this->splitFactorTable['kaltura_category'] = $options['categorySplit'] : null;
-			logLine("\033[31mNOTICE:\033[39m setting kaltura_category table split factor to [{$this->splitFactorTable['kaltura_category']}]");
+			logLine("\033[31mNOTICE:\033[39m Setting kaltura_category table split factor to [{$this->splitFactorTable['kaltura_category']}]");
 			
 			isset($options['kuserSplit']) ? $this->splitFactorTable['kaltura_kuser'] = $options['kuserSplit'] : null;
-			logLine("\033[31mNOTICE:\033[39m setting kaltura_kuser table split factor to [{$this->splitFactorTable['kaltura_kuser']}]");
+			logLine("\033[31mNOTICE:\033[39m Setting kaltura_kuser table split factor to [{$this->splitFactorTable['kaltura_kuser']}]");
 		}
 		else
 		{
@@ -183,7 +212,7 @@ class elasticClusterProvisioning
 			logLine("Terminating script");
 			exit(-1);
 		}
-		logLine("\033[31mNOTICE:\033[39m setting cluster type to [$this->clusterType]");
+		logLine("\033[31mNOTICE:\033[39m Setting cluster type to [$this->clusterType]");
 		
 		$this->replicationFactor = isset($options['replicationFactor']) ? $options['replicationFactor'] : self::DEFAULT_REPLICATION_FACTOR;
 		logLine("\033[31mNOTICE:\033[39m Setting replication factor to [$this->replicationFactor]");
@@ -215,7 +244,7 @@ class elasticClusterProvisioning
 			{
 				logLine("\033[31mNOTICE:\033[39m fail to create temp directory for script files at [$this->tmpDirectory]");
 				logLine("Terminating script");
-				exit();
+				exit(1);
 			}
 			logLine("\033[31mNOTICE:\033[39m temp directory for script file was created at [$this->tmpDirectory]");
 		}
@@ -241,7 +270,7 @@ class elasticClusterProvisioning
 			logLine("Executing command result status = '$resultCode'");
 			logLine("Executing command result output: " . print_r($output));
 			logLine("Executed command '$cmdLine' bad result - terminating script");
-			exit();
+			exit(1);
 		}
 		
 		if ($returnValues)
@@ -270,7 +299,7 @@ class elasticClusterProvisioning
 			logLine("Bad response from Elastic");
 			logLine("Response is: " . print_r($output,1));
 			logLine("Terminating script");
-			exit();
+			exit(1);
 		}
 		
 		logLine("Elastic '$this->elasticHost' is running");
@@ -291,7 +320,7 @@ class elasticClusterProvisioning
 		{
 			logLine("Elastic version [$this->elasticVersion] does not match the desired major version [$this->elasticDesiredVersion]");
 			logLine("Terminating script");
-			exit();
+			exit(1);
 		}
 		
 		logLine("Elastic version [$this->elasticVersion] is OK");
@@ -301,6 +330,12 @@ class elasticClusterProvisioning
 	private function fetchElasticTableMaps()
 	{
 		$basePath = "https://raw.githubusercontent.com/kaltura/server/$this->serverVersion/";
+		
+		if ($this->getMappingsFromLocal)
+		{
+			$basePath = $this->serverRootDirectory;
+		}
+		
 		if ($this->clusterType == self::ESEARCH_CLUSTER_TYPE)
 		{
 			$basePath .= "configurations/elastic/";
@@ -310,13 +345,23 @@ class elasticClusterProvisioning
 			$basePath .= "plugins/beacon/config/";
 		}
 		
-		$cmd = "wget -q -P $this->tmpDirectory ";
 		foreach ($this->tables as $tableName => $table)
 		{
 			list($objectName, $elasticIndexName, $subDir, $mapName) = $this->tables[$tableName];
-			$url = $basePath . $subDir . $this->elasticServerDirectoryName . $mapName;
-			$str = "Downloading [$url] to [$this->tmpDirectory] - ";
-			if ($this->execCmd("$cmd $url"))
+			$fullFileName = $basePath . $subDir . $this->elasticServerDirectoryName . $mapName;
+			$str = "Downloading [$fullFileName] to [$this->tmpDirectory] - ";
+			
+			if ($this->getMappingsFromLocal)
+			{
+				$cmd = str_replace('@FROM@', $fullFileName, "cp -p @FROM@ $this->tmpDirectory");
+				$str = "Copying [$fullFileName] to [$this->tmpDirectory] - ";
+			}
+			else
+			{
+				$cmd = "wget -q -P $this->tmpDirectory $fullFileName";
+			}
+			
+			if ($this->execCmd($cmd))
 			{
 				$str .= 'success';
 			}
@@ -598,19 +643,22 @@ function logLine($s)
 
 $shortOptions = '';
 $longOptions = array(
-	'verbose',
+	'getMappingsFromLocal',
+	'createSubIndexes',
+	'unattended',
 	'testRun',
+	'verbose',
 	'host::',
+	'clusterType::',
 	'elasticVersion::',
 	'serverVersion::',
 	'entrySplit::',
 	'categorySplit::',
 	'kuserSplit::',
-	'clusterType::',
 	'elasticServerDirectoryName::',
 	'replicationFactor::',
 	'refreshInterval::',
-	'createSubIndexes'
+	'serverRootDirectory::',
 );
 $options = getopt($shortOptions, $longOptions);
 
@@ -620,22 +668,29 @@ if (!isset($options['host']) || !isset($options['clusterType']))
 Missing required parameters - host and cluster type are required
 To execute: $argv[0] --host=[elasticClusterHost] --clusterType=[(esearch)||(beacon)]
 
+Required options:
+	--host=[elasticClusterHost] - the elastic cluster host
+	--clusterType=[(esearch) || (beacon)] - which cluster to generate
+	
 Available options:
-	--verbose - more output logs
-	--testRun - set all indices with a prefix of 'test_'
+	--getMappingsFromLocal - will take elastic index mappings from local 'server' directory (default is 'false')
 	--createSubIndexes - created index with mapping type '*_sub.json' like 'kaltura_entry_dedicated'
+	--unattended - will not ask for user input to delete tmp directory used to save '*_mapping.json'
+	--testRun - set all indices with a prefix of 'test_'
+	--verbose - more output logs
+	
 	--elasticVersion=[num] - the major elastic desired version (default is '7')
-	--elasticServerDirectoryName=[dir name] - if 'elasticVersion' option was changed, you can change directory name for the mapping.json files
+	--elasticServerDirectoryName=[directory_name] - if 'elasticVersion' option was changed, you can change directory name for the mapping.json files
 	--serverVersion=[version] - the server version from which to pull mapping.json files (default is 'master')
 	--entrySplit=[num] - split kaltura_entry index to multiple tables (default is '0')
 	--categorySplit=[num] - split kaltura_category index to multiple tables (default is '0')
 	--kuserSplit=[num] - split kaltura_kuser index to multiple tables (default is '0')
-	--clusterType=[(esearch) || (beacon)] - which cluster to generate (default is 'esearch')
 	--replicationFactor=[num] - number of shards to replicate (default is '1')
 	--refreshInterval=[num_of_seconds] - when to clear buffer to see cluster changes in seconds (default is '1' second, set 'null' for elastic default value)
+	--serverRootDirectory=[/path/to/server] - if 'getMappingsFromLocal' option is set, you can change the root directory location (default is '/opt/kaltura/app')
 
 EOL;
-	exit();
+	exit(1);
 }
 $elasticHost = $options['host'];
 main($elasticHost, $options);

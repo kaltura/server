@@ -87,6 +87,8 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_CUE_POINT_ID = 'cuePointId';
 	const DIMENSION_CONTEXT_ID = 'contextId';
 	const DIMENSION_EVENT_SESSION_CONTEXT_ID = 'eventSessionContextId';
+	const DIMENSION_PLAYBACK_MODE = 'playbackMode';
+	const DIMENSION_COMPANY = 'company';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -549,6 +551,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 			self::DIMENSION_UI_CONF_ID => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_PLAYBACK_MODE => 1,
 		),
 		self::DATASOURCE_ENTRY_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -671,6 +674,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_APPLICATION_VER => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_PLAYBACK_MODE => 1,
 		),
 		self::DATASOURCE_VE_REGISTRATION => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -687,6 +691,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_ORIGIN => 1,
 			self::DIMENSION_ROLE => 1,
 			self::DIMENSION_INDUSTRY => 1,
+			self::DIMENSION_COMPANY => 1,
 		),
 		self::DATASOURCE_MEETING_HISTORICAL => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -707,6 +712,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_CUE_POINT_ID => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_POSITION => 1,
 		),
 		self::DATASOURCE_MEETING_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -747,6 +753,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_EVENT_VAR4 => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_POSITION => 1,
 		)
 	);
 

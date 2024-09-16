@@ -623,7 +623,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 *
 	 * @action getLiveStreamStats
 	 * @param string $entryId Id of the live stream entry
-	 * @return int
+	 * @return KalturaLiveStreamStats
 	 * @ksIgnored
 	 */
 	public function getLiveStreamStatsAction($entryId)

@@ -13,7 +13,7 @@ class Form_CatalogItemFilter extends Form_PartnerIdFilter
 		$filterType = $this->getElement('filter_type');
 		$filterType->setMultiOptions(array(
 			'vendorPartnerIdEqual' => 'Vendor Partner ID',
-//			'idEqual' => 'Catalog Item ID',
+			'idEqual' => 'Catalog Item ID',
 		));
 
 		$filterServiceFeature = new Kaltura_Form_Element_EnumSelect('filterServiceFeature', array(

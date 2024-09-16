@@ -941,6 +941,17 @@ class entryPeer extends BaseentryPeer
 		return $entry;
 	}
 
+	public static function retrieveByIdAndPartnerIds($id, $partnerIds)
+	{
+		$c = new Criteria();
+		entryPeer::setUseCriteriaFilter (false);
+		$c->addAnd(entryPeer::PARTNER_ID, $partnerIds, Criteria::IN);
+		$c->addAnd(entryPeer::STATUS, entryStatus::DELETED, Criteria::NOT_EQUAL);
+		$c->addAnd(entryPeer::ID, $id, Criteria::EQUAL);
+		$entry = entryPeer::doSelectOne($c);
+		entryPeer::setUseCriteriaFilter (true);
+		return $entry;
+	}
 }
 
 class entryPool

@@ -15,10 +15,16 @@ class KalturaOperationResources extends KalturaContentResource
 	 */
 	public $chapterNamePolicy;
 
+	/**
+	 * @var KalturaDimensionsAttributesArray
+	 */
+	public $dimensionsAttributes;
+
 	private static $map_between_objects = array
 	(
 		'resources',
 		'chapterNamePolicy',
+		'dimensionsAttributes'
 	);
 
 	/* (non-PHPdoc)
@@ -55,13 +61,18 @@ class KalturaOperationResources extends KalturaContentResource
 		parent::validateForUsage($sourceObject, $propertiesToSkip);
 		$this->validatePropertyNotNull('resources');
 
+		if($this->dimensionsAttributes && count($this->dimensionsAttributes) > 1)
+		{
+			throw new KalturaAPIException(KalturaErrors::MULTIPLE_PARAMETER_NOT_SUPPORTED, "dimensionsAttributes");
+		}
+
 		$maxResourcesCount = kConf::get("maxOperationResourcesCount", kConfMapNames::RUNTIME_CONFIG, 5);
 		if (count($this->resources) > $maxResourcesCount)
 		{
 			throw new KalturaAPIException(KalturaErrors::RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT, $maxResourcesCount);
 		}
 
-		$overallDuration = 0 ;
+		$overallDuration = 0;
 		foreach ($this->resources as $resource)
 		{
 			if(!($resource instanceof KalturaOperationResource))
@@ -83,6 +94,7 @@ class KalturaOperationResources extends KalturaContentResource
 				$overallDuration += $operationAttribute->duration;
 			}
 		}
+
 		$maxDurationSeconds = kConf::get("maxMultiClipsDurationSeconds", kConfMapNames::RUNTIME_CONFIG, 5 * 60 * 60);
 		if ($overallDuration / 1000 > $maxDurationSeconds)
 		{

@@ -53,10 +53,12 @@ class LiveStreamStatsActions
 		KalturaResponseCacher::setHeadersCacheExpiry($this->liveStreamStatsCacheTTL);
 	}
 
-	public function doGetLiveStreamStats(string $entryId): int
+	public function doGetLiveStreamStats(string $entryId): KalturaLiveStreamStats
 	{
 		$this->responseHandlingGetStats();
-		return $this->liveStreamStatsCacheHandler->getNumberOfViewers($entryId);
+		$liveStreamInfo = new KalturaLiveStreamStats();
+		$liveStreamInfo->liveViewers = $this->liveStreamStatsCacheHandler->getNumberOfViewers($entryId);
+		return $liveStreamInfo;
 	}
 
 	public static function getLiveStreamStats_validate($params)
@@ -99,6 +101,7 @@ class LiveStreamStatsCacheHandler
 		if ($this->cache)
 		{
 			$numberOfViewers = $this->cache->get($liveViewersCacheKey . $entryId);
+			$numberOfViewers = !$numberOfViewers ? 0 : $numberOfViewers;
 		}
 
 		return $numberOfViewers;

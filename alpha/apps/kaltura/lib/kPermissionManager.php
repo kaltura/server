@@ -1093,17 +1093,29 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return true;
 	}
 
-	protected static function handlePermissions($object)
+	protected static function handlePermissions($permission)
 	{
-		switch ($object->getName())
+		switch ($permission->getName())
 		{
 			case PermissionName::FEATURE_RECYCLE_BIN:
-				self::handleRecycleBinPermission($object);
+				self::handleRecycleBinPermission($permission);
 				return;
 
 			case PermissionName::GAME_PLUGIN_PERMISSION:
-				self::handleGamePluginPermission($object);
+				self::handleGamePluginPermission($permission);
 				return;
+
+			case PermissionName::FEATURE_MEDIA_REPURPOSING_NG_PERMISSION:
+				self::handleMediaRepurposingNGPermission($permission);
+				return;
+		}
+	}
+
+	protected static function handleMediaRepurposingNGPermission($permission)
+	{
+		if ($permission->getStatus() == PermissionStatus::ACTIVE)
+		{
+			MediaRepurposingHandler::enableMrPermission($permission->getPartnerId());
 		}
 	}
 
@@ -1120,10 +1132,21 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		if ($permission->getStatus() == PermissionStatus::ACTIVE)
 		{
 			self::enableRecycleBinScheduledTaskProfile($permission->getPartnerId());
+			self::enableRequiredPluginsPermissions($permission->getPartnerId(), PermissionName::SCHEDULEDTASK_PLUGIN_PERMISSION);
 		}
 		elseif ($permission->getStatus() == PermissionStatus::BLOCKED)
 		{
 			self::disableRecycleBinScheduledTaskProfile($permission->getPartnerId());
+		}
+	}
+
+	protected static function enableRequiredPluginsPermissions($partnerId, $permissionName)
+	{
+		$requiredPluginPermission = PermissionPeer::getByNameAndPartner($permissionName, array($partnerId));
+		if ($requiredPluginPermission->getStatus() != PermissionStatus::ACTIVE)
+		{
+			$requiredPluginPermission->setStatus(PermissionStatus::ACTIVE);
+			$requiredPluginPermission->save();
 		}
 	}
 	

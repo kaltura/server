@@ -55,6 +55,10 @@ function checkCache()
 			sendCachingHeaders(60, true, time());
 
 			header("X-Kaltura:cached-dispatcher-redirect");
+			if (strpos($uri, "/download") !== false)
+			{
+				header("Access-Control-Allow-Origin:*");
+			}
 			header("Location:$url");
 			die;
 		}

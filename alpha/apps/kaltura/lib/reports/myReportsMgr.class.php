@@ -1565,6 +1565,10 @@ class reportsInputFilter
 	public $context_ids;
 	public $roles;
 	public $industries;
+	public $playback_modes;
+	public $companies;
+	public $event_session_context_ids;
+
 
 	public function getFilterBy() {
 		return "";

@@ -267,6 +267,4 @@ class VendorCatalogItemService extends KalturaBaseService
 
 		return $bulkUpload;
 	}
-
-
 }

@@ -47,7 +47,7 @@ abstract class MicroServiceBaseService
 	 * @return string
 	 * @throws Exception
 	 */
-	public static function buildServiceUrl($hostName, $serviceName)
+	public static function buildServiceUrl($hostName, $serviceName, $isApi = true)
 	{
 		$serviceUrl = kConf::get("microservice_url", 'local', null);
 		if(!$serviceUrl)
@@ -60,6 +60,10 @@ abstract class MicroServiceBaseService
 		if ($serviceName)
 		{
 			$serviceUrl = $serviceUrl . '/' . trim($serviceName, "\/");
+		}
+		if(!$isApi)
+		{
+			return str_replace('/api', '', $serviceUrl);
 		}
 		return $serviceUrl;
 	}

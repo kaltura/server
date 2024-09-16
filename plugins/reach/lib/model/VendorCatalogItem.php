@@ -39,9 +39,14 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	
 	const CUSTOM_DATA_PRICING = 'pricing';
 	const CUSTOM_DATA_BULK_UPLOAD_ID = 'bulkUploadId';
+	const CUSTOM_DATA_LAST_BULK_UPDATE_ID = 'lastBulkUpdateId';
 	const CUSTOM_DATA_ENGINE_TYPE = 'engineType';
 	const CUSTOM_DATA_ALLOW_RESUBMISSION = 'allowResubmission';
 	const CUSTOM_DATA_VENDOR_DATA = 'vendorData';
+	const CUSTOM_DATA_STAGE = 'stage';
+	const CUSTOM_DATA_CONTRACT = 'contract';
+	const CUSTOM_DATA_CREATED_BY = 'createdBy';
+	const CUSTOM_DATA_NOTES = 'notes';
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -82,6 +87,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	public function getBulkUploadId()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_BULK_UPLOAD_ID);
+	}
+
+	public function setLastBulkUpdateId($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_LAST_BULK_UPDATE_ID ,$v);
+	}
+
+	public function getLastBulkUpdateId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_LAST_BULK_UPDATE_ID);
 	}
 
 	public function setEngineType($engineType)
@@ -175,6 +190,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$serviceFeatureName = 'live caption';
 				break;
 
+			case VendorServiceFeature::CLIPS:
+				$serviceFeatureName = 'clips';
+				break;
+
 			default:
 				$serviceFeatureName = '';
 		}
@@ -229,5 +248,43 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return true;
 	}
 
+	public function setStage($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_STAGE, $v);
+	}
 
+	public function getStage()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_STAGE, null, VendorCatalogItemStage::PRODUCTION);
+	}
+
+	public function setContract($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_CONTRACT, $v);
+	}
+
+	public function getContract()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_CONTRACT);
+	}
+
+	public function setCreatedBy($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_CREATED_BY, $v);
+	}
+
+	public function getCreatedBy()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_CREATED_BY);
+	}
+
+	public function setNotes($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_NOTES, $v);
+	}
+
+	public function getNotes()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_NOTES);
+	}
 } // VendorCatalogItem

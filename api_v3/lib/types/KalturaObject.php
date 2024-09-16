@@ -512,6 +512,10 @@ abstract class KalturaObject implements IApiObject
 			{
 				$value = null;
 			}
+			elseif ($value instanceof KalturaMultiLingualStringArray)
+			{
+				$value = $value->toObjectsArrayPurified(get_class($object_to_fill), $object_prop, $this_prop);
+			}
 			elseif ($value instanceof KalturaTypedArray)
 			{
 				$value = $value->toObjectsArray();
@@ -539,27 +543,16 @@ abstract class KalturaObject implements IApiObject
 			}
 			elseif (is_string($value))
 			{
-				if (! kXml::isXMLValidContent($value))
-					throw new KalturaAPIException ( KalturaErrors::INVALID_PARAMETER_CHAR, $this_prop );
-				else if($this->shouldPurify())
-				{
-					try
-					{
-						$value = kHtmlPurifier::purify(get_class($object_to_fill), $object_prop, $value);
-					}
-					catch (Exception $e)
-					{
-						throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, get_class($object_to_fill), $object_prop);
-					}
-				}
+				$value = $this->purifyObject(get_class($object_to_fill), $object_prop, $this_prop, $value);
 			}
-			
+
 			$setter_callback = array ( $object_to_fill ,"set{$object_prop}");
 			if (is_callable($setter_callback))
 		 	    call_user_func_array( $setter_callback , array ($value ) );
 	 	    else 
             	KalturaLog::alert("setter for property [$object_prop] was not found on object class [" . get_class($object_to_fill) . "] defined as property [$this_prop] on api class [$class]");
 		}
+
 		return $object_to_fill;		
 	}
 	
@@ -928,6 +921,27 @@ abstract class KalturaObject implements IApiObject
 			KalturaObject::$purifyHtml = false;
 		else
 			KalturaObject::$purifyHtml = true;
+	}
+
+	protected function purifyObject($objectClass, $objectProp, $thisProp, $value)
+	{
+		if (!kXml::isXMLValidContent($value))
+		{
+			throw new KalturaAPIException (KalturaErrors::INVALID_PARAMETER_CHAR, $thisProp);
+		}
+		if (!$this->shouldPurify())
+		{
+			return $value;
+		}
+
+		try
+		{
+			return kHtmlPurifier::purify($objectClass, $objectProp, $value);
+		}
+		catch (Exception $e)
+		{
+			throw new KalturaAPIException(KalturaErrors::UNSAFE_HTML_TAGS, $objectClass, $objectProp);
+		}
 	}
 
 	public function __debugInfo()
