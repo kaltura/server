@@ -538,6 +538,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					$c->addAnd(assetPeer::ENTRY_ID, $entryId);
 				}
 				$c->addAnd(assetPeer::TYPE, CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION));
+				$c->addAnd(assetPeer::STATUS, array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING), Criteria::IN);
 				$captionAssets = assetPeer::doSelect($c);
 
 				if (!count($captionAssets))
