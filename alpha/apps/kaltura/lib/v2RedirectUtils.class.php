@@ -51,8 +51,10 @@ class v2RedirectUtils
 			{
 				//get plugin name
 				KalturaLog::log("V2 to V7 adding plugin: " . $key. " value:" . $value);
-				if ($value) {
-					if (!$bundleConfig) {
+				if ($value) 
+				{
+					if (!$bundleConfig) 
+					{
 						$bundleConfig = [];
 					}
 					$key = trim(trim($key, '"'), "'");
