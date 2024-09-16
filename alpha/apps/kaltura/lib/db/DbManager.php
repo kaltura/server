@@ -233,6 +233,12 @@ class DbManager
 		}
 
 		list($hostToLag, $hostToIndex) = self::filterLagsAndHosts($dataSources, $lastUpdatedAtPerSphinx);
+		if(!count($hostToLag))
+		{
+			KalturaLog::debug("failed to map sphinx host to sphinx lag data, no sphinx index will be chosen by updatedAt");
+			return false;
+		}
+		
 		return self::getPreferredSphinxIndexByWeight($hostToLag, $hostToIndex);
 	}
 

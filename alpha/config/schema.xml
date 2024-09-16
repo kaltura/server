@@ -2103,6 +2103,9 @@
             <index-column name="partner_id" />
             <index-column name="status" />
         </index>
+        <index name="updated_at">
+            <index-column name="updated_at" />
+        </index>
     </table>
 	<table skipSql="false" abstract="false" name="user_entry" description="Describes the relationship between a specific user and a specific entry">
 		<column name="id" type="integer" required="true" autoIncrement="true" primaryKey="true"/>

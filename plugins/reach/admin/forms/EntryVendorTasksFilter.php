@@ -14,6 +14,7 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 
 		$filterType = $this->getElement('filter_type');
 		$filterType->setMultiOptions(array(
+			'idEqual' => 'Task ID',
 			'vendorPartnerIdEqual' => 'Vendor Partner ID',
 			'partnerIdEqual' => 'Partner ID'
 		));
@@ -24,6 +25,7 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 			'decorators' => array('ViewHelper'),
 			'multiOptions' => array(
 				'' => 'Status',
+				EntryVendorTaskStatus::READY => 'READY',
 				EntryVendorTaskStatus::PENDING => 'PENDING',
 				EntryVendorTaskStatus::SCHEDULED => 'SCHEDULED',
 				EntryVendorTaskStatus::PROCESSING => 'PROCESSING',
@@ -49,6 +51,26 @@ class Form_EntryVendorTasksFilter extends Form_PartnerIdFilter
 			'label' => 'Export to CSV',
 			'onclick' => "exportToCsv($('#filter_type').val(), $('#filter_input').val(), $('#filter_status').val(), $('#from_time').val())",
 			'decorators' => array('ViewHelper'),
+		));
+
+		$this->addElement('hidden', 'newLine1', array(
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'br', 'class' => 'newLine')))
+		));
+
+		$this->addElement('hidden', 'newLine2', array(
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'br', 'class' => 'newLine')))
+		));
+
+		$this->addElement('text', 'createdAtFrom', array(
+			'label' => 'From Date:',
+		));
+
+		$this->addElement('hidden', 'newLine3', array(
+			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'br', 'class' => 'newLine')))
+		));
+
+		$this->addElement('text', 'createdAtTo', array(
+			'label' => 'To Date:',
 		));
 
 		$this->addElement('hidden', 'crossLine', array(

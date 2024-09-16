@@ -18,6 +18,7 @@ class Partner extends BasePartner
 	const PLAY_SERVER_PARTNER_ID = -6;
 	const EP_PARTNER_ID = -11;
 	const SELF_SERVE_PARTNER_ID = -12;
+	const KME_PARTNER_ID = -13;
 	const BI_PARTNER_ID = -15;
 	const AUTH_BROKER_PARTNER = -17;
 

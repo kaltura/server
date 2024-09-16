@@ -163,7 +163,7 @@ class ScheduledTaskPlugin extends KalturaPlugin implements IKalturaVersion, IKal
 	*/
 	public static function permissionEnabled($partnerId, $permissionName)
 	{
-		if ($permissionName == 'SCHEDULEDTASK_PLUGIN_PERMISSION')
+		if ($permissionName == PermissionName::SCHEDULEDTASK_PLUGIN_PERMISSION)
 		{
 			MediaRepurposingHandler::enableMrPermission($partnerId);
 		}

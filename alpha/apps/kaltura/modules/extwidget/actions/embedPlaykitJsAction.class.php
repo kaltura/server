@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package Core
  * @subpackage externalWidgets
@@ -498,23 +497,31 @@ class embedPlaykitJsAction extends sfAction
 		$config["provider"]->uiConfId = $this->uiconfId;
 
 		$ks = $this->getRequestParameter(self::KS_PARAM_NAME);
-
 		if ($ks)
 		{
 			$config["provider"]->ks = $ks;
 		}
 
 		$config["targetId"] = $targetId;
-
 		$config = json_encode($config);
 		if ($config === false)
 		{
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
 
+		$v2tov7ConfigJs='';
+		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
+		{
+			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
+			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
+
+		}
+
 		$autoEmbedCode = "
 		try {
-			var kalturaPlayer = KalturaPlayer.setup($config);
+			var config=$config;
+			$v2tov7ConfigJs
+			var kalturaPlayer = KalturaPlayer.setup(config);
 			$loadContentMethod
 		} catch (e) {
 			console.error(e.message);
@@ -543,7 +550,7 @@ class embedPlaykitJsAction extends sfAction
                         </head >
                         <body >
                         	<div id="player_container"></div>
-			 	<script type = "text/javascript" > window.originalRequestReferrer = "' . $_SERVER['HTTP_REFERER'] . '"</script >
+			 	<script type = "text/javascript" > window.originalRequestReferrer = "' . @$_SERVER['HTTP_REFERER'] . '"</script >
                             	<script type = "text/javascript" > ' . $bundleContent . '</script >
 			</body >
                     </html >';
@@ -813,6 +820,21 @@ class embedPlaykitJsAction extends sfAction
 		}
 
 		$this->mergeVersionsParamIntoConfig();
+
+		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
+		{
+			$this->bundleConfig[v2RedirectUtils::SCRIPT_PLUGIN_NAME] =
+				kConf::getArrayValue('v2RedirectPluginVersion',
+					'playkit-js', 'local', v2RedirectUtils::SCRIPT_PLUGIN_VERSION);
+			if($this->getRequestParameter(v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS))
+			{
+				v2RedirectUtils::addV2toV7plugins(
+					$this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME),
+					$this->bundleConfig,
+					$this->playerConfig);
+			}
+		}
+
 		if (!$this->bundleConfig) {
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "unable to resolve bundle config");
 		}
@@ -843,5 +865,4 @@ class embedPlaykitJsAction extends sfAction
 		$returnValue = parent::getRequestParameter($name, $default);
 		return $returnValue ? $returnValue : $default;
 	}
-
 }
