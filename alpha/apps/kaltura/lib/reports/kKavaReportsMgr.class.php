@@ -6101,6 +6101,11 @@ class kKavaReportsMgr extends kKavaBase
 			$cur_report_def[self::REPORT_DIMENSION] = $report_def[self::REPORT_DIMENSION];
 		}
 		$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
+
+		if (!isset($cur_report_def[self::REPORT_FILTER]) && isset($report_def[self::REPORT_FILTER]))
+		{
+			$cur_report_def[self::REPORT_FILTER] = $report_def[self::REPORT_FILTER];
+		}
 		
 		$result = self::getTableImpl($partner_id, $cur_report_def, $input_filter,
 			$page_size * $page_index, 1, $order_by, $object_ids, $flags, $response_options);
@@ -6134,7 +6139,12 @@ class kKavaReportsMgr extends kKavaBase
 				$cur_report_def[self::REPORT_DIMENSION] = $report_def[self::REPORT_DIMENSION];
 			}
 			$cur_report_def[self::REPORT_DIMENSION_HEADERS] = array('dimension');
-				
+
+			if (!isset($cur_report_def[self::REPORT_FILTER]) && isset($report_def[self::REPORT_FILTER]))
+			{
+				$cur_report_def[self::REPORT_FILTER] = $report_def[self::REPORT_FILTER];
+			}
+
 			if (count($rows) < $page_size)
 			{				
 				// using a single topN - the metrics of this query are not used
