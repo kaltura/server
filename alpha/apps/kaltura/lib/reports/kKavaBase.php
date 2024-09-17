@@ -712,6 +712,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_USER_ENGAGEMENT => 1,
 			self::DIMENSION_CUE_POINT_ID => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_POSITION => 1,
 		),
 		self::DATASOURCE_MEETING_REALTIME => array(
 			self::DIMENSION_EVENT_TYPE => 1,
@@ -752,6 +753,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_EVENT_VAR4 => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
+			self::DIMENSION_POSITION => 1,
 		)
 	);
 

@@ -116,7 +116,9 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 
 	const CUSTOM_DATA_CON_FILE_VERSION = 'conf_file_version';
 	const CUSTOM_DATA_CONF_FILE_FEATURES_VERSION = 'conf_file_features_version';
-	
+
+	const CUSTOM_DATA_V2REDIRECT = "v2redirect";
+
 	public function save(PropelPDO $con = null)
 	{
 		try
@@ -812,5 +814,17 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 		}
 		
 		return parent::setVersion($v);
+	}
+
+	//v2 to v7
+	public function getV2Redirect()
+	{
+		return $this->getFromCustomData( self::CUSTOM_DATA_V2REDIRECT);
+	}
+
+	public function setV2Redirect($v)
+	{
+		KalturaLog::log(JSON_encode($v));
+		return $this->putInCustomData(self::CUSTOM_DATA_V2REDIRECT, $v);
 	}
 }
