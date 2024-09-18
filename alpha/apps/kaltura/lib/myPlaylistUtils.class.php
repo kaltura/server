@@ -206,8 +206,7 @@ class myPlaylistUtils
 				break;
 			case PlaylistType::STATIC_LIST:
 			case PlaylistType::PATH:
-                		$entryIdListStr = $playlist->getDataContent();
-				$entryObjectsArray = self::executeStaticPlaylistFromEntryIdsString($entryIdListStr, $filter, $detailed, $pager, $playlist->getEntryId());
+				$entryObjectsArray = self::executeStaticPlaylist ( $playlist , $filter , $detailed, $pager );
 			default:
 				break;
 		}
@@ -328,25 +327,34 @@ class myPlaylistUtils
 		return array($filter);
 	}
 	
-	public static function executeStaticPlaylistFromEntryIdsString($entryIdListStr, $filter = null, $detailed = true, $pager = null, $playlistId = null)
+	public static function executeStaticPlaylist ( entry $playlist , $filter  = null, $detailed = true, $pager = null )
 	{
-		$entryIdList = self::getEntryIdsFromStaticPlaylistString($entryIdListStr);
-		if($entryIdList)
+		$entry_id_list_str = $playlist->getDataContent();
+		if(kEntitlementUtils::getEntitlementEnforcement() &&
+			kCurrentContext::$ks_object &&
+			kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlist->getEntryId())
 		{
-            		if(kEntitlementUtils::getEntitlementEnforcement() && kCurrentContext::$ks_object && kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlistId)
-            		{
-                		kEntitlementUtils::initEntitlementEnforcement(null, false);
-                		entryPeer::setDefaultCriteriaFilter();
-                		$result =  self::executeStaticPlaylistFromEntryIds($entryIdList, $filter, $detailed, $pager);
-                		kEntitlementUtils::initEntitlementEnforcement();
-                		entryPeer::setDefaultCriteriaFilter();
-                		return $result;
-            		}
-            		else
-            		{
-                		return self::executeStaticPlaylistFromEntryIds($entryIdList, $filter, $detailed, $pager);
-            		}
-        	}
+			kEntitlementUtils::initEntitlementEnforcement(null, false);
+			entryPeer::setDefaultCriteriaFilter();
+			$result =  self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+			kEntitlementUtils::initEntitlementEnforcement();
+			entryPeer::setDefaultCriteriaFilter();
+		}
+		else
+		{
+			$result = self::executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter, $detailed, $pager);
+		}
+
+		return $result;
+	}
+	
+	public static function executeStaticPlaylistFromEntryIdsString($entry_id_list_str, $filter = null, $detailed = true, $pager = null)
+	{
+		$entry_id_list = self::getEntryIdsFromStaticPlaylistString($entry_id_list_str);
+		if($entry_id_list)
+		{
+			return self::executeStaticPlaylistFromEntryIds($entry_id_list, $filter, $detailed, $pager);
+		}
 
 		return null;
 	}

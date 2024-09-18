@@ -344,7 +344,7 @@ class PlaylistService extends KalturaEntryService
 		if (is_null($detailed))
 			 $detailed = true ;
 
-		if($filter)
+		if($filter || kEntitlementUtils::getEntitlementEnforcement())
 		{
 			try
 			{
@@ -366,8 +366,7 @@ class PlaylistService extends KalturaEntryService
 				$tempPlaylist->playlistContent = "";
 			
 			$tempPlaylist->playlistType = $playlist->getMediaType();
-
-			return $this->executeFromContentLogic($tempPlaylist->playlistType, $tempPlaylist->playlistContent, $detailed, $pager, $playlist->getEntryId());
+			return $this->executeFromContentAction($tempPlaylist->playlistType, $tempPlaylist->playlistContent, $detailed, $pager);
         }
 	}
 	
@@ -385,11 +384,6 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null)
 	{
-		return executeFromContentLogic($playlistType, $playlistContent, $detailed, $pager);
-	}
-
-	function executeFromContentLogic($playlistType, $playlistContent, $detailed = false, $pager = null, $playlistId = null)
-	{
 		$partnerId = $this->getPartnerId() ? $this->getPartnerId() : kCurrentContext::getCurrentPartnerId();
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
 		if ($this->getKs() && is_object($this->getKs()) && $this->getKs()->isAdmin())
@@ -398,13 +392,13 @@ class PlaylistService extends KalturaEntryService
 		}
 		list($entryFiltersViaEsearch,  $entryFiltersViaSphinx, $totalResults) = myPlaylistUtils::splitEntryFilters($playlistContent);
 		$pagerSeparateQueries = self::decideWhereHandlingPager($pager,$entryFiltersViaEsearch, $entryFiltersViaSphinx);
-		$entryList = self::handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeparateQueries, $pager, $totalResults, $playlistContent, $playlistId);
+		$entryList = self::handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeparateQueries, $pager, $totalResults, $playlistContent);
 		myEntryUtils::updatePuserIdsForEntries($entryList);
 		KalturaLog::debug("entry ids count: " . (is_array($entryList ? count($entryList) : 0)));
 		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
 	}
 
-	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent, $playlistId = null)
+	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent)
 	{
 		$entryList = null;
 		switch($playlistType)
@@ -414,7 +408,7 @@ class PlaylistService extends KalturaEntryService
 				break;
 			case KalturaPlaylistType::STATIC_LIST:
 			case KalturaPlaylistType::PATH:
-				$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager, $playlistId);
+				$entryList = myPlaylistUtils::executeStaticPlaylistFromEntryIdsString($playlistContent, null, true, $pager);
 				break;
 		}
 
