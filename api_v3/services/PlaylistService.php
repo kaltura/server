@@ -366,6 +366,7 @@ class PlaylistService extends KalturaEntryService
 				$tempPlaylist->playlistContent = "";
 			
 			$tempPlaylist->playlistType = $playlist->getMediaType();
+
 			return $this->executeFromContentLogic($tempPlaylist->playlistType, $tempPlaylist->playlistContent, $detailed, $pager, $playlist->getEntryId());
         }
 	}
@@ -384,7 +385,7 @@ class PlaylistService extends KalturaEntryService
 	 */
 	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null)
 	{
-		return $this->executeFromContentLogic($playlistType, $playlistContent, $detailed, $pager);
+		return executeFromContentLogic($playlistType, $playlistContent, $detailed, $pager);
 	}
 
 	function executeFromContentLogic($playlistType, $playlistContent, $detailed = false, $pager = null, $playlistId = null)
@@ -402,7 +403,7 @@ class PlaylistService extends KalturaEntryService
 		KalturaLog::debug("entry ids count: " . (is_array($entryList ? count($entryList) : 0)));
 		return KalturaBaseEntryArray::fromDbArray($entryList, $this->getResponseProfile());
 	}
-  
+
 	protected static function handlePlaylistByType($playlistType, $entryFiltersViaEsearch, $entryFiltersViaSphinx, $partnerId, $pagerSeperateQueries, $pager, $totalResults, $playlistContent, $playlistId = null)
 	{
 		$entryList = null;
