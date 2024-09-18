@@ -99,6 +99,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$catalogItemFilter->serviceTypeEqual = $serviceType;
 		$catalogItemFilter->turnAroundTimeEqual = $turnAroundTime;
 		$catalogItemFilter->sourceLanguageEqual = $sourceLanguage;
+		$catalogItemFilter->targetLanguageEqual = $targetLanguage;
 
 		$filterInput = $request->getParam('filter_input');
 		if (strlen($filterInput))
