@@ -77,7 +77,5 @@ class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 			'onclick' => "configureCatalogItems($('#filter_input').val(), $('#filterServiceFeature').val(), $('#filterServiceType').val(), $('#filterTurnAroundTime').val(), $('#filterSourceLanguage').val(), $('#filterTargetLanguage').val(),$('#vendorPartnerId').val())",
 			'decorators' => array('ViewHelper'),
 		));
-
-
 	}
 }

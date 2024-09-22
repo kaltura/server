@@ -15,6 +15,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
 
+		KalturaLog::debug("I am partner {$this->getPartnerId()}");
 		if (!ReachPlugin::isAllowedPartner($this->getPartnerId()))
 			throw new KalturaAPIException(KalturaErrors::FEATURE_FORBIDDEN, ReachPlugin::PLUGIN_NAME);
 
@@ -82,5 +83,28 @@ class PartnerCatalogItemService extends KalturaBaseService
 
 		$dbPartnerCatalogItem->setStatus(VendorCatalogItemStatus::DELETED);
 		$dbPartnerCatalogItem->save();
+	}
+
+	/**
+	 * List KalturaPartnerCatalogItem objects
+	 *
+	 * @action list
+	 * @param KalturaPartnerCatalogItemFilter $filter
+	 * @param KalturaFilterPager $pager
+	 * @return KalturaPartnerCatalogItemListResponse
+	 */
+	public function listAction(KalturaPartnerCatalogItemFilter $filter = null, KalturaFilterPager $pager = null)
+	{
+		if (!$filter)
+		{
+			$filter = new KalturaPartnerCatalogItemFilter();
+		}
+
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+
+		return $filter->getTypeListResponse($pager, $this->getResponseProfile());
 	}
 }

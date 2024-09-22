@@ -175,6 +175,7 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$pages[] = new ReachRequestsListAction();
 		$pages[] = new ReachRequestsExportAction();
 		$pages[] = new ReachRequestsAbortAction();
+		$pages[] = new PartnersByCatalogItemAction();
 
 		return $pages;
 	}

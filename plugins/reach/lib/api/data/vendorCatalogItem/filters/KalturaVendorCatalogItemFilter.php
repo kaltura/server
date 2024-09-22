@@ -52,7 +52,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 			$c->add(PartnerCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE);
 			$c->addJoin(PartnerCatalogItemPeer::CATALOG_ITEM_ID, VendorCatalogItemPeer::ID, Criteria::INNER_JOIN);
 		}
-		
+
 		$list = VendorCatalogItemPeer::doSelect($c);
 		
 		$resultCount = count($list);
