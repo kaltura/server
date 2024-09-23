@@ -1,4 +1,4 @@
-# Tucana-20.20.0
+# Ursa-21.0.0
 ## Add kafka event notification for room entry updates ##
 - Issue Type: Task
 - Issue ID: FOUN-1370
@@ -10,6 +10,7 @@
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/2024_03_03_deploy_kafka_room_events.php
 
+# Tucana-20.20.0
 ## Enable Content Lab ##
 * Issue Type: Task
 * Issue ID: PLAT-24940
