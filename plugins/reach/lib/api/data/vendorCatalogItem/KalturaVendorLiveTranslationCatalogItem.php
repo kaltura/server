@@ -28,7 +28,7 @@ class KalturaVendorLiveTranslationCatalogItem extends KalturaVendorLiveCatalogIt
 
 	protected function validateTargetLanguage(VendorCatalogItem $sourceObject = null)
 	{
-		if ($this->targetLanguage == 'Auto Detect')
+		if ($this->targetLanguage == KalturaCatalogItemLanguage::AUTO_DETECT)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::TARGET_LANGUAGE_NOT_SUPPORTED, $this->targetLanguage);
 		}
