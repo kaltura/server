@@ -194,6 +194,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$serviceFeatureName = 'clips';
 				break;
 
+			case VendorServiceFeature::QUIZ:
+				$serviceFeatureName = 'quiz';
+				break;
+
 			default:
 				$serviceFeatureName = '';
 		}
