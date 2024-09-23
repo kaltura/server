@@ -28,6 +28,13 @@ class KalturaQuizVendorTaskData extends KalturaVendorTaskData
 	 */
 	public $context;
 
+	/**
+	 * Quiz entry Id
+	 *
+	 * @var string
+	 */
+	public $quizOutput;
+
 	private static $map_between_objects = array
 	(
 		'numberOfQuestion',
