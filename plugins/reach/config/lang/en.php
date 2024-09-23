@@ -12,6 +12,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING' => 'DUBBING',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING' => 'INTELLIGENT_TAGGING',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION' => 'LIVE_CAPTION',
+	'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION' => 'LIVE_TRANSLATION',
 
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',

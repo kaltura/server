@@ -1,3 +1,15 @@
+# Ursa-21.0.0
+## Add kafka event notification for room entry updates ##
+- Issue Type: Task
+- Issue ID: FOUN-1370
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2024_03_03_add_kafka_room_entry_notifications.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2024_03_03_deploy_kafka_room_events.php
+
 # Tucana-20.20.0
 ## Enable Content Lab ##
 * Issue Type: Task

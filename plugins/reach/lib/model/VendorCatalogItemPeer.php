@@ -25,6 +25,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const INTELLIGENT_TAGGING_OM_CLASS = 'VendorIntelligentTaggingCatalogItem';
 	const LIVE_CAPTION_OM_CLASS = 'VendorLiveCaptionCatalogItem';
 	const CLIPS_OM_CLASS = 'VendorClipsCatalogItem';
+	const LIVE_TRANSLATION_OM_CLASS = 'VendorLiveTranslationCatalogItem';
 	const QUIZ_OM_CLASS = 'VendorQuizCatalogItem';
 
 	// cache classes by their type
@@ -39,6 +40,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::INTELLIGENT_TAGGING => self::INTELLIGENT_TAGGING_OM_CLASS,
 		VendorServiceFeature::LIVE_CAPTION => self::LIVE_CAPTION_OM_CLASS,
 		VendorServiceFeature::CLIPS => self::CLIPS_OM_CLASS,
+		VendorServiceFeature::LIVE_TRANSLATION => self::LIVE_TRANSLATION_OM_CLASS,
 		VendorServiceFeature::QUIZ => self::QUIZ_OM_CLASS,
 	);
 	
