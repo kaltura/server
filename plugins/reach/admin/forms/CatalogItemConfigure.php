@@ -107,7 +107,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		$sourceLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
 		$this->addElement($sourceLanguage);
 		
-		if(in_array($this->catalogItemType, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
+		if(in_array($this->catalogItemType, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING, Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION)))
 		{
 			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemLanguage'));
 			$targetLanguage->setLabel('Target Language:');
@@ -190,7 +190,8 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'placement' => 'prepend',
 		));
 
-		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION)
+		$liveCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION, Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION);
+		if (in_array($this->catalogItemType, $liveCatalogItemTypesArray))
 		{
 			$this->addElement('text', 'minimalRefundTime', array(
 				'label' => 'Minimal Refund Time:',
