@@ -40,6 +40,7 @@ class KalturaQuizVendorTaskData extends KalturaVendorTaskData
 		'numberOfQuestion',
 		'questionsType',
 		'context',
+		'quizOutput',
 	);
 
 	public function getMapBetweenObjects()
