@@ -321,15 +321,12 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 	protected function buildHttpFlavorsArray()
 	{
 		$flavors = array();
-		$assetsRequireFMP4layback = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
 		foreach($this->params->getflavorAssets() as $flavorAsset)
 		{
 			/* @var $flavorAsset asset */
 			$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
 			if ($httpUrl)
 			{
-				$httpUrl['url'] = ($assetsRequireFMP4layback && isset($httpUrl['urlPrefix']))
-					? 'fmp4/' . $httpUrl['url'] : $httpUrl['urlPrefix'];
 				$flavors[] = $httpUrl;
 			}
 		}
