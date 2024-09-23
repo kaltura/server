@@ -216,7 +216,12 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	 */
 	protected function createEntryFromRecording($recording, $owner)
 	{
+		list($conversionProfileId, $templateEntry) = $this->getZoomConversionProfileData($owner);
 		$entry = new entry();
+		if($templateEntry)
+		{
+			$entry->copyTemplate($templateEntry, true);
+		}
 		$entry->setType(entryType::MEDIA_CLIP);
 		$entry->setSourceType(EntrySourceType::URL);
 		$entry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
@@ -226,15 +231,30 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$entry->setStatus(entryStatus::NO_CONTENT);
 		$entry->setPuserId($owner->getPuserId());
 		$entry->setKuserId($owner->getKuserId());
-		$entry->setConversionProfileId(myPartnerUtils::getConversionProfile2ForPartner($owner->getPartnerId())->getId());
+		$entry->setConversionProfileId($conversionProfileId);
 		$entry->setAdminTags(self::ADMIN_TAG_ZOOM);
 		$entry->setReferenceID(self::ZOOM_PREFIX . $recording->uuid);
-		if($this->zoomIntegration->getConversionProfileId())
-		{
-			$entry->setConversionProfileId($this->zoomIntegration->getConversionProfileId());
-		}
-
+		
 		return $entry;
+	}
+	
+	private function getZoomConversionProfileData($owner)
+	{
+		$templateEntry = null;
+		$conversionProfileId = $this->zoomIntegration->getConversionProfileId();
+		if(!$conversionProfileId)
+		{
+			$conversionProfileId = myPartnerUtils::getConversionProfile2ForPartner($owner->getPartnerId())->getId();
+		}
+		
+		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+		$defaultEntryId = $conversionProfile->getDefaultEntryId();
+		if($defaultEntryId)
+		{
+			$templateEntry = entryPeer::retrieveByPKNoFilter($defaultEntryId, null, false);
+		}
+		
+		return array($conversionProfileId, $templateEntry);
 	}
 
 	/**

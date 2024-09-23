@@ -70,7 +70,7 @@ class KalturaRoomEntry extends KalturaBaseEntry
 		{
 			return;
 		}
-		$entry = entryPeer::retrieveByPK($this->templateRoomEntryId);
+		$entry = $this->retrieveTemplateRoomEntry($this->templateRoomEntryId);
 		if (!$entry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->templateRoomEntryId);
@@ -81,6 +81,13 @@ class KalturaRoomEntry extends KalturaBaseEntry
 		}
 	}
 
+	private function retrieveTemplateRoomEntry($entryId)
+	{
+		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id :  kCurrentContext::$ks_partner_id;
+		// allow setting entry of the "global" partner
+		$allowedPids = array($partnerId, Partner::KME_PARTNER_ID);
+		return entryPeer::retrieveByIdAndPartnerIds($entryId, $allowedPids);
+	}
 
 
 }
