@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage scorpius.roles_and_permissions
+ * @subpackage tucana.roles_and_permissions
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';

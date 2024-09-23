@@ -122,6 +122,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $notes;
 
+	/**
+	 * @var int
+	 */
+	public $partnerId;
+
 	private static $map_between_objects = array
 	(
 		'id',
