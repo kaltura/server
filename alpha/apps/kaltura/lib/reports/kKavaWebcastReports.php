@@ -215,13 +215,20 @@ class kKavaWebcastReports extends kKavaReportsMgr
 		),
 
 		ReportType::ENGAGEMENT_TOOLS_WEBCAST => array(
-			self::REPORT_METRICS => array(
-				self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED,
-				self::EVENT_TYPE_REACTION_CLICKED,
+			self::REPORT_JOIN_REPORTS => array(
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_METRICS => array(self::EVENT_TYPE_ADD_TO_CALENDAR_CLICKED),
+				),
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
+					self::REPORT_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED),
+				)
 			),
 		),
 
 		ReportType::REACTIONS_BREAKDOWN_WEBCAST => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
 			self::REPORT_DIMENSION_MAP => array(
 				'reaction' => self::DIMENSION_EVENT_VAR1,
 			),

@@ -168,8 +168,6 @@ class kKavaBase extends kDruidBase
 
 	// event types - cnc events
 	const EVENT_TYPE_LOG_IN = 'loggedIn';
-	const EVENT_TYPE_CNC_REACTION_CLICKED = 'reactionClicked';
-	const EVENT_TYPE_CNC_POLL_ANSWERED = 'pollAnswered';
 	const EVENT_TYPE_NOTIFICATION_SENT = 'notificationSent';
 	const EVENT_TYPE_NOTIFICATION_BUTTON_CLICKED = 'notificationButtonClicked';
 	const EVENT_TYPE_POLL_LAUNCHED = 'pollLaunched';
@@ -477,8 +475,8 @@ class kKavaBase extends kDruidBase
 		self::EVENT_TYPE_VIEW_PERIOD,
 		self::EVENT_TYPE_PAGE_LOAD,
 		self::EVENT_TYPE_LOG_IN,
-		self::EVENT_TYPE_CNC_REACTION_CLICKED,
-		self::EVENT_TYPE_CNC_POLL_ANSWERED,
+		self::EVENT_TYPE_REACTION_CLICKED,
+		self::EVENT_TYPE_POLL_ANSWERED,
 		self::EVENT_TYPE_NOTIFICATION_SENT,
 		self::EVENT_TYPE_NOTIFICATION_BUTTON_CLICKED,
 		self::EVENT_TYPE_POLL_LAUNCHED,
