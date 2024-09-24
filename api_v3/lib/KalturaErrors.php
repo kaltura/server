@@ -523,6 +523,10 @@ class KalturaErrors extends APIErrors
 	const PROPERTY_IS_NOT_DEFINED = "PROPERTY_IS_NOT_DEFINED;PROP,TYPE;The property \"@PROP@\" is not defined on type \"@TYPE@\"";
 	
 	const GROUPS_CANNOT_CO_EXIST = "GROUPS_CANNOT_CO_EXIST;userId,group,blockedCoExist;Cannot add user [@userId@] to group [@group@], User is already member of a group with coexistence enforcement [@blockedCoExist@]";
+	
+	const CAN_ONLY_BE_UPDATED_BY_ACCOUNT_OWNER = "CAN_ONLY_BE_CHANGED_BY_ACCOUNT_OWNER;;Support access mode can only be updated by the account owner";
+	
+	const SUPPORT_ACCESS_CANNOT_BE_ENABLED = "SUPPORT_ACCESS_CANNOT_BE_ENABLED;;Support access cannot be enabled, please contact you account admin to change support access mode to be set to user_controlled";
 
 	/*
 	 * syndication service
