@@ -36,7 +36,7 @@ class KalturaReachErrors implements kReachErrors
 	const REACH_PROFILE_NOT_FOUND = "REACH_PROFILE_NOT_FOUND;ID;Reach profile with id provided not found [@ID@]";
 
 	const DICTIONARY_LANGUAGE_DUPLICATION = "DICTIONARY_LANGUAGE_DUPLICATION;LANGUAGE;Vendor profile configuration error - not allowed duplicate dictionaries for language [@LANGUAGE@] ";
-
+	const TARGET_LANGUAGE_NOT_SUPPORTED = "TARGET_LANGUAGE_NOT_SUPPORTED;LANGUAGE;Cannot set [@LANGUAGE@] as target language";
 	const MAX_DICTIONARY_LENGTH_EXCEEDED = "MAX_DICTIONARY_LENGTH_EXCEEDED;LANGUAGE,LENGTH;Vendor profile configuration error - Dictionary for language [@LANGUAGE@] exceeded maximum length of  [@LENGTH@] characters";
 
 	const INVALID_CREDIT_DATES = "INVALID_CREDIT_DATES;FROM,TO;Vendor profile configuration error - Invalid credit Dates - from:[@FROM@] to:[@TO@]";

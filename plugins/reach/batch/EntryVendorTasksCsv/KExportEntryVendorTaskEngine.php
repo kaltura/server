@@ -29,6 +29,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		7 => "DUBBING",
 		9 => "EXTENDED_AUDIO_DESCRIPTION",
 		10 => "CLIPS",
+		11 => "LIVE_TRANSLATION",
 		"N/A" => "N/A",
 	);
 	
