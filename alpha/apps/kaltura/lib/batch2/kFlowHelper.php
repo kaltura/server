@@ -2755,6 +2755,7 @@ class kFlowHelper
 			if ($freshUploadToken->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD && $freshUploadToken->getObjectType() && $freshUploadToken->getObjectId())
 			{
 				// we do this to avoid loosing the modified and temp modified columns set on $uploadToken
+				// these properties are updated by updateContent flow where uploadToken is not status 2 (finished)
 				$uploadToken->setObjectType($freshUploadToken->getObjectType());
 				$uploadToken->setObjectId($freshUploadToken->getObjectId());
 				
