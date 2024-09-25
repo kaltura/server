@@ -69,7 +69,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		$totalCount = $this->countResultsFromListAndCriteria($list, $c, $pager);
 
 		$responseObjects = KalturaVendorCatalogItemArray::fromDbArray($list, $responseProfile);
-		if ($partnerIdEqual)
+		if ($this->partnerIdEqual && kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
 		{
 			foreach ($responseObjects as $responseObject)
 			{
