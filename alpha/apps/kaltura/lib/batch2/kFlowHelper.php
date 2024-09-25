@@ -2737,6 +2737,31 @@ class kFlowHelper
 	 */
 	public static function handleUploadFinished(UploadToken $uploadToken)
 	{
+		KalturaLog::log("AAAAAAA uploadToken is " . print_r($uploadToken, true));
+		
+		// prevent a case of race-condition when uploadToken->upload finished and updateContent occurs at 1 sec diff or less
+		// in this case, updateContent flow will see uploadToken status != 2 (finished) and will not process further
+		// so this flow should process the source asset, otherwise neither updateContent nor handleUploadFinished will process the source asset
+		// causing the asset to remain at 'importing'
+		if (is_null($uploadToken->getObjectType()) && $uploadToken->getUpdatedAt(null) - $uploadToken->getCreatedAt(null) <= 1)
+		{
+			// sleep for 3/4 of a second to reduce lagged object response chance
+			usleep(750000);
+			KalturaLog::info("Refreshing Upload Token ID [" . $uploadToken->getId() . "] from DB");
+			UploadTokenPeer::clearInstancePool();
+			$freshUploadToken = UploadTokenPeer::retrieveByPK($uploadToken->getId());
+			KalturaLog::log("AAAAAAA Fresh uploadToken is " . print_r($freshUploadToken, true));
+			
+			if ($freshUploadToken->getStatus() == UploadToken::UPLOAD_TOKEN_FULL_UPLOAD && $freshUploadToken->getObjectType() && $freshUploadToken->getObjectId())
+			{
+				// we do this to avoid loosing the modified and temp modified columns set on $uploadToken
+				$uploadToken->setObjectType($freshUploadToken->getObjectType());
+				$uploadToken->setObjectId($freshUploadToken->getObjectId());
+				
+				KalturaLog::log("AAAAAAA Fresh new uploadToken is " . print_r($freshUploadToken, true));
+			}
+		}
+		
 		if(!is_subclass_of($uploadToken->getObjectType(), assetPeer::OM_CLASS) && $uploadToken->getObjectType() != FileAssetPeer::OM_CLASS && $uploadToken->getObjectType() != entryPeer::OM_CLASS)
 		{
 			KalturaLog::info("Class [" . $uploadToken->getObjectType() . "] not supported");
