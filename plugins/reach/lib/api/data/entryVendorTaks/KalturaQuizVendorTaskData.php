@@ -12,7 +12,7 @@ class KalturaQuizVendorTaskData extends KalturaVendorTaskData
 	 *
 	 * @var int
 	 */
-	public $numberOfQuestion;
+	public $numberOfQuestions;
 
 	/**
 	 * Questions Type.
@@ -37,7 +37,7 @@ class KalturaQuizVendorTaskData extends KalturaVendorTaskData
 
 	private static $map_between_objects = array
 	(
-		'numberOfQuestion',
+		'numberOfQuestions',
 		'questionsType',
 		'context',
 		'quizOutput',

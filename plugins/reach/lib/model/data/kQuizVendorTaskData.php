@@ -6,19 +6,19 @@
  */
 class kQuizVendorTaskData extends kVendorTaskData
 {
-	public int $numberOfQuestion= 0;
+	public int $numberOfQuestions = 0;
 	public string $questionsType = null;
 	public string $context = "";
 	public ?string $quizOutput = null;
 
-	public function getNumberOfQuestion(): int
+	public function getNumberOfQuestions(): int
 	{
-		return $this->numberOfQuestion;
+		return $this->numberOfQuestions;
 	}
 
-	public function setNumberOfQuestion(int $numberOfQuestion): void
+	public function setNumberOfQuestions(int $numberOfQuestions): void
 	{
-		$this->numberOfQuestion = $numberOfQuestion;
+		$this->numberOfQuestions = $numberOfQuestions;
 	}
 
 	public function getQuestionsType(): string
