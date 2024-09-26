@@ -704,6 +704,15 @@ class KalturaResponseCacher extends kApiCache
 		$cache->increment(self::$rateLimitKey);
 	}
 
+	protected static function getNotValueKeys($rateLimitRule)
+	{
+		if(isset($rateLimitRule["_notValueKey"]))
+		{
+			return explode(",", trim($rateLimitRule["_notValueKey"]));
+		}
+		return array();
+	}
+
 	protected static function getApiParamValue($params, $key)
 	{
 		if (isset($params[$key]))
@@ -755,6 +764,8 @@ class KalturaResponseCacher extends kApiCache
 			{
 				continue;
 			}
+
+			$notValueKeys = self::getNotValueKeys($rateLimitRule);
 			foreach ($rateLimitRule as $key => $value)
 			{
 				if ($key[0] == '_')
@@ -772,7 +783,8 @@ class KalturaResponseCacher extends kApiCache
 					continue;
 				}
 
-				if (self::getApiParamValue($params, $key) != $value)
+				$paramValue = self::getApiParamValue($params, $key);
+				if ($paramValue != $value xor in_array($key, $notValueKeys))
 				{
 					$matches = false;
 					break;
