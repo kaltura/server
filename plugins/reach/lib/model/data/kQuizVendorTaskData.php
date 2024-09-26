@@ -7,7 +7,7 @@
 class kQuizVendorTaskData extends kVendorTaskData
 {
 	public int $numberOfQuestions = 0;
-	public string $questionsType = null;
+	public ?string $questionsType = null;
 	public string $context = "";
 	public ?string $quizOutput = null;
 
