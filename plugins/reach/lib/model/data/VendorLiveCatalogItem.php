@@ -38,4 +38,12 @@ class VendorLiveCatalogItem extends VendorCaptionsCatalogItem implements IVendor
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_DURATION_LIMIT);
 	}
+
+	public function isEntryTypeSupported($type, $mediaType = null) : bool
+	{
+		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
+		$supportedTypes[] = entryType::LIVE_STREAM;
+
+		return in_array($type, $supportedTypes);
+	}
 }
