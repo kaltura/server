@@ -704,29 +704,11 @@ class KalturaResponseCacher extends kApiCache
 		$cache->increment(self::$rateLimitKey);
 	}
 
-	protected static function getNotValueKeys($rateLimitRule)
+	protected static function getSeparatedKeys($rateLimitRule, $key)
 	{
-		if(isset($rateLimitRule["_notValueKey"]))
+		if(isset($rateLimitRule[$key]))
 		{
-			return explode(",", trim($rateLimitRule["_notValueKey"]));
-		}
-		return array();
-	}
-
-	protected static function getRegexKeys($rateLimitRule)
-	{
-		if(isset($rateLimitRule["_regexKey"]))
-		{
-			return explode(",", trim($rateLimitRule["_regexKey"]));
-		}
-		return array();
-	}
-
-	protected static function getCommaSeparatedValuesKeys($rateLimitRule)
-	{
-		if(isset($rateLimitRule["_commaSeparatedKey"]))
-		{
-			return explode(",", trim($rateLimitRule["_commaSeparatedKey"]));
+			return explode(",", trim($rateLimitRule[$key]));
 		}
 		return array();
 	}
@@ -783,9 +765,9 @@ class KalturaResponseCacher extends kApiCache
 				continue;
 			}
 
-			$notValueKeys = self::getNotValueKeys($rateLimitRule);
-			$regexKeys = self::getRegexKeys($rateLimitRule);
-			$commaSeparatedKeys = self::getCommaSeparatedValuesKeys($rateLimitRule);
+			$notValueKeys = self::getSeparatedKeys($rateLimitRule, "_notValueKey");
+			$regexKeys = self::getSeparatedKeys($rateLimitRule, "_regexKey");
+			$commaSeparatedKeys = self::getSeparatedKeys($rateLimitRule, "_commaSeparatedKey");
 
 			foreach ($rateLimitRule as $key => $value)
 			{
