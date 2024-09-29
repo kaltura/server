@@ -76,6 +76,9 @@ $maxIndexHistory = 2000; //The maximum array size to save unique object ids upda
 
 $sphinxReadConn = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_SPHINX_LOG_READ);
 
+// set timeout to db query of 5 minutes
+$sphinxReadConn->setAttribute(PDO::ATTR_TIMEOUT, 300);
+
 $serverLastLogs = SphinxLogServerPeer::retrieveByServer($sphinxServer, $sphinxReadConn);
 $lastLogs = array();
 $handledRecords = array();
