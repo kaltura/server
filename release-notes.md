@@ -10,6 +10,20 @@
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/2024_03_03_deploy_kafka_room_events.php
 
+## Kava - redirect non internal client tags to dedicated druid url ##
+- Issue Type: Story
+- Issue ID: AN-23399
+
+### configuration ###
+Add the following to 'local.ini' under 'kava' section:
+
+    external_calls_druid_url = @DRUID_EXTERNAL_CALLS_BROKER_URL@/druid/v2/
+
+Add the following section to local.ini:
+
+    [kava_internal_client_tags]
+    0 = @CLIENT_TAG@
+
 # Tucana-20.20.0
 ## Enable Content Lab ##
 * Issue Type: Task
