@@ -498,7 +498,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			if (!$dbVendorCatalogItem)
 			{
 				KalturaLog::log("Catalog item  [$pendingEntryReadyTask->getCatalogItemId()] don't exist");
-				return false;
+				continue;
 			}
 			$pendingEntryReadyTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
 			if($pendingEntryReadyTask->getPrice() == 0)
