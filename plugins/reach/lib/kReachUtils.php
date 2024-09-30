@@ -20,45 +20,6 @@ class kReachUtils
 		'stageEnumTranslate' => 'VendorCatalogItemStage',
 	);
 
-	/**
-	 * @param $entryId
-	 * @param $shouldModerateOutput
-	 * @param $turnaroundTime
-	 * @return string
-	 * @throws Exception
-	 */
-	public static function generateReachVendorKs($entryId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $disableDefaultEntryFilter = false)
-	{
-		$entry = $disableDefaultEntryFilter ? entryPeer::retrieveByPKNoFilter($entryId) : entryPeer::retrieveByPK($entryId);
-		if (!$entry)
-			throw new Exception("Entry Id [$entryId] not Found to create REACH Vendor limited session");
-
-		$partner = $entry->getPartner();
-
-		// Limit the KS to edit access a specific entry
-		$privileges = kSessionBase::PRIVILEGE_EDIT . ':' . $entryId;
-
-		// Limit the KS to use only the Vendor Role
-		$privileges .= ',' . kSessionBase::PRIVILEGE_SET_ROLE . ':' . UserRoleId::REACH_VENDOR_ROLE;
-
-		// Disable entitlement to avoid entitlement validation when accessing an entry
-		$privileges .= ',' . kSessionBase::PRIVILEGE_DISABLE_ENTITLEMENT_FOR_ENTRY. ':' . $entryId;
-		
-		$privileges .= ',' . kSessionBase::PRIVILEGE_VIEW . ':' . $entryId;
-		
-		$privileges .= ',' . kSessionBase::PRIVILEGE_DOWNLOAD . ':' . $entryId;
-
-		if($shouldModerateOutput)
-			$privileges .= ',' . kSessionBase::PRIVILEGE_ENABLE_CAPTION_MODERATION;
-
-		$limitedKs = '';
-		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), $entry->getPuserId(), $limitedKs, $turnaroundTime, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null, false);
-		if ($result < 0)
-			throw new Exception('Failed to create REACH Vendor limited session for partner '.$partner->getId());
-
-		return $limitedKs;
-	}
-	
 	public static function calcPricePerSecond($durationMsec, $pricePerUnit)
 	{
 		return ceil($durationMsec/1000) * $pricePerUnit;

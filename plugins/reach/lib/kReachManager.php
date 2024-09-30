@@ -494,7 +494,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			/* @var $pendingEntryReadyTask EntryVendorTask */
 			$newStatus = $pendingEntryReadyTask->getIsRequestModerated() ? EntryVendorTaskStatus::PENDING_MODERATION : EntryVendorTaskStatus::PENDING;
 			$pendingEntryReadyTask->setStatus($newStatus);
-			$pendingEntryReadyTask->setAccessKey(kReachUtils::generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
+			$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($pendingEntryReadyTask->getCatalogItemId());
+			if (!$dbVendorCatalogItem)
+			{
+				KalturaLog::log("Catalog item  [$pendingEntryReadyTask->getCatalogItemId()] don't exist");
+				return false;
+			}
+			$pendingEntryReadyTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
 			if($pendingEntryReadyTask->getPrice() == 0)
 			{
 				$taskDuration = $pendingEntryReadyTask->getTaskJobData() ? $pendingEntryReadyTask->getTaskJobData()->getEntryDuration() : null;
@@ -752,7 +758,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$accessKeyExpiry = $vendorCatalogItem->getKsExpiry();
 		$entryVendorTask->setIsOutputModerated($shouldModerateOutput);
 		$entryVendorTask->setAccessKeyExpiry($accessKeyExpiry);
-		$entryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry));
+		$entryVendorTask->setAccessKey($vendorCatalogItem->generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry));
 		$entryVendorTask->setPrice(kReachUtils::calculateTaskPrice($entry, $vendorCatalogItem, $taskDuration));
 		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
