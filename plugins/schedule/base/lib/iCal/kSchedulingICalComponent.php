@@ -158,9 +158,9 @@ abstract class kSchedulingICalComponent
 		return $this->components;
 	}
 
-	public function setField($field, $value)
+	public function setField($field, $value, $subField = null)
 	{
-		$this->fields[strtoupper($field)] = $value;
+		$this->fields[strtoupper($field) . $subField] = $value;
 	}
 
 	public function getField($field)
@@ -255,6 +255,10 @@ abstract class kSchedulingICalComponent
 		$ret .= $this->begin();
 		$ret .= $this->writeBody();
 		$ret .= $this->end();
+		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId())
+		{
+			$ret .= $this->addVtimeZoneBlock();
+		}
 
 		return $ret;
 	}

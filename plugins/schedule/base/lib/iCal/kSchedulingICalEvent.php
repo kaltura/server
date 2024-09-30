@@ -27,6 +27,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		'endDate' => 'dtend',
 	);
 
+	protected static $timeZoneField = 'tzid';
+	protected $timeZoneId = '';
+
 	protected static function formatDurationString($durationStringInSeconds)
 	{
 		$duration = 'PT';
@@ -195,6 +198,16 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		if ($event->referenceId)
 			$object->setField('uid', $event->referenceId);
 
+		if ($event->recurrence && $event->recurrence->timeZone)
+		{
+			$timeZones = DateTimeZone::listIdentifiers();
+
+			if (in_array($event->recurrence->timeZone, $timeZones))
+			{
+				$object->timeZoneId = $event->recurrence->timeZone;
+			}
+		}
+
 		foreach (self::$stringFields as $string)
 		{
 			if ($event->$string)
@@ -208,13 +221,21 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-	        foreach (self::$dateFields as $date => $field)
-	        {
-	            if ($event->$date)
+        foreach (self::$dateFields as $date => $field)
+        {
+            if ($event->$date)
+            {
+	            if ($object->timeZoneId !== '')
 	            {
-                        	$object->setField($field, kSchedulingICal::formatDate($event->$date));
+		            $fieldToUpperCase = $field . ";" . self::$timeZoneField . "=";
+		            $object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $object->timeZoneId), $object->timeZoneId);
 	            }
-	        }
+	            else
+	            {
+		            $object->setField($field, kSchedulingICal::formatDate($event->$date));
+	            }
+            }
+        }
 
 		$classificationTypes = array(
 			KalturaScheduleEventClassificationType::PUBLIC_EVENT => 'PUBLIC',
@@ -332,5 +353,102 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			$duration = $datetime->format('U');
 		}
 		return $duration;
+	}
+
+	public function getTimeZoneId()
+	{
+		if ($this->timeZoneId)
+		{
+			return $this->timeZoneId;
+		}
+		return null;
+	}
+
+	public function addVtimeZoneBlock()
+	{
+		$vTimeZoneStr = '';
+		try
+		{
+			$dateTimeZone = new DateTimeZone($this->timeZoneId);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err('Error while processing the time zone: ' . $e->getMessage());
+			return $vTimeZoneStr;
+		}
+		$transitions = $dateTimeZone->getTransitions();
+
+		// Find the first transition and initialize the block
+		$standardTransition = null;
+		$daylightTransition = null;
+
+		foreach ($transitions as $transition)
+		{
+			// If it's standard time
+			if (!$transition['isdst'])
+			{
+				$standardTransition = $transition;
+			}
+			else
+			{
+				$daylightTransition = $transition;
+			}
+
+			// Exit once both transitions are found
+			if ($standardTransition && $daylightTransition)
+			{
+				break;
+			}
+		}
+
+		// Fallback in case transitions are missing
+		$standardTransition = $standardTransition ?: end($transitions);
+		$daylightTransition = $daylightTransition ?: end($transitions);
+
+		// Create VTIMEZONE block
+		$vTimeZoneStr .= $this->writeField('BEGIN', 'VTIMEZONE');
+		$vTimeZoneStr .= $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
+		$vTimeZoneStr .= $this->writeField('X-LIC-LOCATION', $this->timeZoneId);
+
+		// Add STANDARD block
+		$vTimeZoneStr .= $this->writeField('BEGIN','STANDARD');
+		$vTimeZoneStr .= $this->writeField('TZOFFSETFROM', self::formatOffset($daylightTransition['offset']));
+		$vTimeZoneStr .= $this->writeField('TZOFFSETTO', self::formatOffset($standardTransition['offset']));
+		$vTimeZoneStr .= $this->writeField('TZNAME', $standardTransition['abbr']);
+		$vTimeZoneStr .= $this->writeField('DTSTART', self::formatTransitionDate($standardTransition['ts']));
+		$vTimeZoneStr .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $standardTransition['ts']) . ";BYDAY=" . self::convertWeekDay(date('w', $standardTransition['ts'])));
+		$vTimeZoneStr .= $this->writeField('END', 'STANDARD');
+
+		// Add DAYLIGHT block
+		$vTimeZoneStr .= $this->writeField('BEGIN','DAYLIGHT');
+		$vTimeZoneStr .= $this->writeField('TZOFFSETFROM', self::formatOffset($standardTransition['offset']));
+		$vTimeZoneStr .= $this->writeField('TZOFFSETTO', self::formatOffset($daylightTransition['offset']));
+		$vTimeZoneStr .= $this->writeField('TZNAME', $daylightTransition['abbr']);
+		$vTimeZoneStr .= $this->writeField('DTSTART', self::formatTransitionDate($daylightTransition['ts']));
+		$vTimeZoneStr .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $daylightTransition['ts']) . ";BYDAY=" . self::convertWeekDay(date('w', $daylightTransition['ts'])));
+		$vTimeZoneStr .= $this->writeField('END', 'DAYLIGHT');
+
+		$vTimeZoneStr .= $this->writeField('END', 'VTIMEZONE');
+
+		return $vTimeZoneStr;
+	}
+
+	protected function formatOffset(int $offset): string
+	{
+		$hours = floor($offset / 3600);
+		$minutes = floor(abs($offset) % 3600 / 60);
+		return sprintf('%+03d%02d', $hours, $minutes);
+	}
+
+	protected function convertWeekDay(int $dayOfWeek): string
+	{
+		$weekDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+		return $weekDays[$dayOfWeek];
+	}
+
+	// Prepare date format for ICS (e.g. 20240925T115352Z)
+	protected static function formatTransitionDate($time)
+	{
+		return gmdate(kSchedulingICal::TIME_FORMAT, $time);
 	}
 }
