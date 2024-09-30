@@ -804,6 +804,7 @@ class KalturaResponseCacher extends kApiCache
 				if($skipRule)
 				{
 					KalturaLog::warning("skipping rule: " . print_r($rateLimitRule, true));
+					$matches = false;
 					break;
 				}
 
