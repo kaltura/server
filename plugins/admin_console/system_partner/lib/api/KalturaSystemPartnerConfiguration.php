@@ -678,9 +678,26 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if($templatePartner)
 			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, true);
 	}
-	
+
+	protected function isPermissionStatus($permissionName, $status)
+	{
+		foreach ($this->permissions as $permission)
+		{
+			if ($permission->name && $permission->status)
+			{
+				return ($permission->name == $permissionName && $permission->status == $status);
+			}
+		}
+		return false;
+	}
+
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		if ($this->isPermissionStatus(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, PermissionStatus::ACTIVE))
+		{
+			KalturaLog::notice('#### testing2');
+			categoryPeer::
+		}
 		$audioThumbEntryId = $this->audioThumbEntryId;
 		if ($audioThumbEntryId)
 		{
