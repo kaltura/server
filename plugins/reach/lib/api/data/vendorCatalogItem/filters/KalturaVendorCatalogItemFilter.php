@@ -128,7 +128,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		else
 		{
 			KalturaFilterPager::detachFromCriteria($criteria);
-			$totalCount = PartnerCatalogItemPeer::doCount($criteria);
+			$totalCount = VendorCatalogItemPeer::doCount($criteria);
 		}
 		return $totalCount;
 	}
