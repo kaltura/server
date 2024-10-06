@@ -66,7 +66,16 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 
 		$list = VendorCatalogItemPeer::doSelect($c);
 
-		$totalCount = $this->countResultsFromListAndCriteria($list, $c, $pager);
+		$resultCount = count($list);
+		if ($resultCount && $resultCount < $pager->pageSize)
+		{
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		}
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($c);
+			$totalCount = VendorCatalogItemPeer::doCount($c);
+		}
 
 		$responseObjects = KalturaVendorCatalogItemArray::fromDbArray($list, $responseProfile);
 		if ($this->partnerIdEqual && kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
@@ -99,7 +108,16 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		$pager->attachToCriteria($partnerCatalogItemCriteria);
 		$partnerCatalogItemList = PartnerCatalogItemPeer::doSelect($partnerCatalogItemCriteria);
 
-		$totalCount = $this->countResultsFromListAndCriteria($partnerCatalogItemList, $partnerCatalogItemCriteria, $pager);
+		$resultCount = count($partnerCatalogItemList);
+		if ($resultCount && $resultCount < $pager->pageSize)
+		{
+			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
+		}
+		else
+		{
+			KalturaFilterPager::detachFromCriteria($partnerCatalogItemCriteria);
+			$totalCount = PartnerCatalogItemPeer::doCount($partnerCatalogItemCriteria);
+		}
 
 		$vendorCatalogItemCriteria->add(VendorCatalogItemPeer::ID, $this->catalogItemIdEqual);
 		$catalogItem = VendorCatalogItemPeer::doSelectOne($vendorCatalogItemCriteria);
@@ -116,20 +134,5 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		$response->objects = $catalogItemsList;
 		$response->totalCount = $totalCount;
 		return $response;
-	}
-
-	protected function countResultsFromListAndCriteria($resultsList, $criteria, $pager)
-	{
-		$resultCount = count($resultsList);
-		if ($resultCount && $resultCount < $pager->pageSize)
-		{
-			$totalCount = ($pager->pageIndex - 1) * $pager->pageSize + $resultCount;
-		}
-		else
-		{
-			KalturaFilterPager::detachFromCriteria($criteria);
-			$totalCount = PartnerCatalogItemPeer::doCount($criteria);
-		}
-		return $totalCount;
 	}
 }
