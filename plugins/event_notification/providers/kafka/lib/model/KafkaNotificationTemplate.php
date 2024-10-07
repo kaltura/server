@@ -114,7 +114,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 		}
 
 		$requiredPermissions = explode(",", $this->getRequiresPermissions());
-		if(count($requiredPermissions))
+		if(count(array_filter($requiredPermissions, 'strlen')))
 		{
 			KalturaLog::debug("Checking if partner has permissions required to dispatch [{$this->getRequiresPermissions()}]");
 			$found = false;

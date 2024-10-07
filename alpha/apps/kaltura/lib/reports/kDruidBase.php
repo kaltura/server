@@ -96,6 +96,8 @@ class kDruidBase
 
 	// kConf params
 	const DRUID_URL = "druid_url";
+	const EXTERNAL_CALLS_DRUID_URL = "external_calls_druid_url";
+	const KAVA_INTERNAL_CLIENT_TAGS = "kava_internal_client_tags";
 	const DRUID_QUERY_TIMEOUT = 'druid_timeout';
 
 	const COMMENT_MARKER = '@COMMENT@';
@@ -327,6 +329,22 @@ class kDruidBase
 			self::DRUID_COLUMNS => $orderBys,
 		);
 	}
+
+	protected static function startsWithAny($haystack, $needles)
+	{
+		if(!$haystack)
+		{
+			return false;
+		}
+		foreach ($needles as $needle)
+		{
+			if(strpos($haystack, $needle) === 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	protected static function runQuery($content)
 	{
@@ -377,6 +395,16 @@ class kDruidBase
 		KalturaLog::log($post);
 			
 		$url = kConf::get(self::DRUID_URL);
+		$externalCallsUrl = kConf::get(self::EXTERNAL_CALLS_DRUID_URL, 'local', null);
+		$internalClientTags = kConf::get(self::KAVA_INTERNAL_CLIENT_TAGS, 'local', array());
+
+		if ($externalCallsUrl && $internalClientTags)
+		{
+			if(!self::startsWithAny($clientTag, $internalClientTags))
+			{
+				$url = $externalCallsUrl;
+			}
+		}
 
 		if (!self::$curl_handle)
 		{

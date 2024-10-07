@@ -122,6 +122,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $notes;
 
+	/**
+	 * @var int
+	 */
+	public $partnerId;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -179,7 +184,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
-	private function validate(VendorCatalogItem $sourceObject = null)
+	protected function validate(VendorCatalogItem $sourceObject = null)
 	{
 		if (!$sourceObject) //Source object will be null on insert
 			$this->validatePropertyNotNull(array("vendorPartnerId", "serviceType", "turnAroundTime", "pricing"));
@@ -282,6 +287,14 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			case VendorServiceFeature::CLIPS:
 				$object = new KalturaVendorClipsCatalogItem();
 				break;
+
+			case VendorServiceFeature::LIVE_TRANSLATION:
+				$object = new KalturaVendorLiveTranslationCatalogItem();
+				break;
+        
+			case VendorServiceFeature::QUIZ:
+				$object = new KalturaVendorQuizCatalogItem();
+        break;
 
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();

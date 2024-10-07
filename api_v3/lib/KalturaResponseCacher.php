@@ -704,6 +704,15 @@ class KalturaResponseCacher extends kApiCache
 		$cache->increment(self::$rateLimitKey);
 	}
 
+	protected static function getSeparatedKeys($rateLimitRule, $key)
+	{
+		if(isset($rateLimitRule[$key]))
+		{
+			return explode(",", trim($rateLimitRule[$key]));
+		}
+		return array();
+	}
+
 	protected static function getApiParamValue($params, $key)
 	{
 		if (isset($params[$key]))
@@ -755,6 +764,11 @@ class KalturaResponseCacher extends kApiCache
 			{
 				continue;
 			}
+
+			$notValueKeys = self::getSeparatedKeys($rateLimitRule, "_notValueKey");
+			$regexKeys = self::getSeparatedKeys($rateLimitRule, "_regexKey");
+			$commaSeparatedKeys = self::getSeparatedKeys($rateLimitRule, "_commaSeparatedKey");
+
 			foreach ($rateLimitRule as $key => $value)
 			{
 				if ($key[0] == '_')
@@ -772,7 +786,38 @@ class KalturaResponseCacher extends kApiCache
 					continue;
 				}
 
-				if (self::getApiParamValue($params, $key) != $value)
+				$ruleValues = in_array($key, $commaSeparatedKeys) ? explode(',', $value) : array($value);
+
+				$skipRule = false;
+				if(in_array($key, $regexKeys))
+				{
+					foreach ($ruleValues as $ruleValue)
+					{
+						if(preg_match($ruleValue, '') === false)
+						{
+							KalturaLog::warning("Invalid regex pattern [$ruleValue] for key [$key]");
+							$skipRule = true;
+						}
+					}
+				}
+
+				if($skipRule)
+				{
+					KalturaLog::warning("skipping rule: " . print_r($rateLimitRule, true));
+					$matches = false;
+					break;
+				}
+
+				$paramValue = self::getApiParamValue($params, $key);
+				if(in_array($key, $regexKeys))
+				{
+					foreach ($ruleValues as $ruleValue)
+					{
+						$paramValue = preg_match($ruleValue, $paramValue) ? $ruleValue : $paramValue;
+					}
+				}
+
+				if(!in_array($paramValue, $ruleValues) xor in_array($key, $notValueKeys))
 				{
 					$matches = false;
 					break;

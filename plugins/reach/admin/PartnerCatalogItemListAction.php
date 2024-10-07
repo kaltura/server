@@ -27,7 +27,22 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$request = $action->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-		$partnerId = $this->_getParam('filter_input') ? $this->_getParam('filter_input') : $request->getParam('partnerId');
+
+		$partnerId = null;
+		$catalogItemId = null;
+		if ($this->_getParam('filter_input'))
+		{
+			$filterType = $this->_getParam('filter_type');
+			if ($filterType === 'partnerIdEqual')
+			{
+				$partnerId = $this->_getParam('filter_input');
+			}
+			elseif ($filterType === 'catalogItemIdEqual')
+			{
+				$catalogItemId = $this->_getParam('filter_input');
+			}
+		}
+
 		$serviceFeature = $this->_getParam('filterServiceFeature') != "" ? $this->_getParam('filterServiceFeature') : null;
 		$serviceType = $this->_getParam('filterServiceType') != "" ? $this->_getParam('filterServiceType') : null;
 		$turnAroundTime = $this->_getParam('filterTurnAroundTime') != "" ? $this->_getParam('filterTurnAroundTime') : null;
@@ -36,7 +51,7 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$vendorPartnerId = $this->_getParam('vendorPartnerId') != "" ? $this->_getParam('vendorPartnerId') : null;
 
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
-		if ($partnerId)
+		if ($partnerId || $catalogItemId)
 		{
 			$vendorCatalogItemFilter = $this->getCatalogItemFilter($serviceFeature);
 			$vendorCatalogItemFilter->orderBy = "-createdAt";
@@ -45,6 +60,7 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
 			$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
 			$vendorCatalogItemFilter->vendorPartnerIdEqual = $vendorPartnerId;
+			$vendorCatalogItemFilter->catalogItemIdEqual = $catalogItemId;
 
 			if(in_array($serviceFeature, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
 			{
@@ -105,8 +121,12 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 			return new Kaltura_Client_Reach_Type_VendorDubbingCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION)
 			return new Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION)
+			return new Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS)
 			return new Kaltura_Client_Reach_Type_VendorClipsCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ)
+			return new Kaltura_Client_Reach_Type_VendorQuizCatalogItemFilter();
 		else
 			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}

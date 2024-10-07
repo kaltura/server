@@ -55,6 +55,8 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorDubbingCatalogItem', $formData, false, true);
 				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItem', $formData, false, true);
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION)
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItem', $formData, false, true);
 			}
 		}
 		$action->view->form = $form;
@@ -178,8 +180,14 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				case Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION:
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItem', $formData, false, true);
 					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItem', $formData, false, true);
+					break;
 				case Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS:
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorClipsCatalogItem', $formData, false, true);
+					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorQuizCatalogItem', $formData, false, true);
 					break;
 			}
 

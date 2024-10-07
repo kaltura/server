@@ -190,8 +190,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$serviceFeatureName = 'live caption';
 				break;
 
+			case VendorServiceFeature::LIVE_TRANSLATION:
+				$serviceFeatureName = 'live translation';
+				break;
+
 			case VendorServiceFeature::CLIPS:
 				$serviceFeatureName = 'clips';
+				break;
+
+			case VendorServiceFeature::QUIZ:
+				$serviceFeatureName = 'quiz';
 				break;
 
 			default:
