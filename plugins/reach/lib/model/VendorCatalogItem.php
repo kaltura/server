@@ -149,7 +149,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return $privileges;
 	}
 
-	protected  function getPuserId($entry)
+	protected function getPuserId($entry)
 	{
 		return '';
 	}

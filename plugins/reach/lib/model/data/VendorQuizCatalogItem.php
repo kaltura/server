@@ -21,7 +21,7 @@ class VendorQuizCatalogItem extends VendorCatalogItem
         return $type === entryType::MEDIA_CLIP && in_array($mediaType, $supportedMediaTypes);
     }
 
-	protected  function getPuserId($entry)
+	protected function getPuserId($entry)
 	{
 		return $entry->getPuserId();
 	}
