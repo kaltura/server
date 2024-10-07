@@ -76,7 +76,7 @@ class Zend_Log_Formatter_Simple implements Zend_Log_Formatter_Interface
 
                 $value = gettype($value);
             }
-			$value = is_null($value) ? '' : $value;
+
             $output = str_replace("%$name%", $value, $output);
         }
         return $output;
