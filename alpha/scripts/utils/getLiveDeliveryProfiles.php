@@ -31,8 +31,12 @@ while($partners_exists)
             $pid = $partner->getId();
             KalturaLog::debug("$count_pid Currently processing PID $pid");
             $live_delivery_profile_ids = $partner->getFromCustomData('live_delivery_profile_ids');
-            $live_delivery_profile_ids_string = implode(',', $live_delivery_profile_ids);
-            fputcsv($output_handle, [$pid, $live_delivery_profile_ids_string]);
+            // Add to the output file only if the PID has a live delivery profile
+            if (!empty($live_delivery_profile_ids)) 
+            {
+                $live_delivery_profile_ids_string = implode(',', $live_delivery_profile_ids);
+                fputcsv($output_handle, [$pid, $live_delivery_profile_ids_string]);
+            }
         }
     }
     $partner = end($partners);
