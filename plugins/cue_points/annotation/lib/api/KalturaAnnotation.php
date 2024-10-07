@@ -149,13 +149,6 @@ class KalturaAnnotation extends KalturaCuePoint
 			$this->validateEndTimeAndDuration($this->endTime, $this->duration);
 		}
 
-		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		if (!kEntitlementUtils::isEntitledForEditEntry($dbEntry))
-		{
-			KalturaLog::debug("User is not allowed to insert Annotation on entry [$this->entryId]");
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
-		}
-
 		if (!isset($this->isPublic) || is_null($this->isPublic))
 		{
 			$this->isPublic = false;
@@ -186,13 +179,6 @@ class KalturaAnnotation extends KalturaCuePoint
 		if ($this->parentId || $sourceObject->getParentId())
 		{
 			$this->validateEndTimeAndDuration($this->endTime, $this->duration, $sourceObject);
-		}
-
-		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		if (!kEntitlementUtils::isEntitledForEditEntry($dbEntry))
-		{
-			KalturaLog::debug("User is not allowed to update Annotation on entry [$this->entryId]");
-			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
