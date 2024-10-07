@@ -214,10 +214,17 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			{
 				if ($string == 'duration')
 				{
+					if (!is_null($event->endDate))
+					{
+						continue;
+					}
 					$duration = self::formatDurationString($event->$string);
 					$object->setField($string, $duration);
-				} else
+				}
+				else
+				{
 					$object->setField($string, $event->$string);
+				}
 			}
 		}
 
@@ -364,7 +371,15 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		return null;
 	}
 
-	public function addVtimeZoneBlock()
+	protected function aYearBefore($timestamp)
+	{
+		$date = new DateTime();
+		$date->setTimestamp($timestamp);
+		$date->modify('-1 year');
+		return $date->getTimestamp();
+	}
+
+	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null)
 	{
 		$vTimeZoneStr = '';
 		try
@@ -376,61 +391,73 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			KalturaLog::err('Error while processing the time zone: ' . $e->getMessage());
 			return $vTimeZoneStr;
 		}
-		$transitions = $dateTimeZone->getTransitions();
 
-		// Find the first transition and initialize the block
-		$standardTransition = null;
-		$daylightTransition = null;
+		// In order to reduce the size of the transitions to analyze, we start querying from a year before the start of the event until the last occurrence
+		$transitions = $dateTimeZone->getTransitions($this->aYearBefore($event->startDate), $event->recurrence->until);
+		$relevantTransitions = array();
+		$initialTransition = null;
+		$daylightOffset = null;
+		$standardOffset = null;
 
+		// This loop filters the list of transitions to only the ones that are relevant to the recurring event,
+		// from the transition right before the start to the last transition during the event
 		foreach ($transitions as $transition)
 		{
-			// If it's standard time
-			if (!$transition['isdst'])
+			// Saving the daylight and standard offsets
+			if ($transition['isdst'])
 			{
-				$standardTransition = $transition;
+				$daylightOffset = $transition['offset'];
 			}
 			else
 			{
-				$daylightTransition = $transition;
+				$standardOffset = $transition['offset'];
 			}
 
-			// Exit once both transitions are found
-			if ($standardTransition && $daylightTransition)
+			if ($transition['ts'] <= $event->startDate)
 			{
-				break;
+				$initialTransition = $transition;
+			}
+			if ($event->startDate <= $transition['ts'] && $transition['ts'] <= $event->recurrence->until)
+			{
+				$relevantTransitions[] = $transition;
 			}
 		}
-
-		// Fallback in case transitions are missing
-		$standardTransition = $standardTransition ?: end($transitions);
-		$daylightTransition = $daylightTransition ?: end($transitions);
+		array_unshift($relevantTransitions, $initialTransition);
 
 		// Create VTIMEZONE block
 		$vTimeZoneStr .= $this->writeField('BEGIN', 'VTIMEZONE');
 		$vTimeZoneStr .= $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
-		$vTimeZoneStr .= $this->writeField('X-LIC-LOCATION', $this->timeZoneId);
 
-		// Add STANDARD block
-		$vTimeZoneStr .= $this->writeField('BEGIN','STANDARD');
-		$vTimeZoneStr .= $this->writeField('TZOFFSETFROM', self::formatOffset($daylightTransition['offset']));
-		$vTimeZoneStr .= $this->writeField('TZOFFSETTO', self::formatOffset($standardTransition['offset']));
-		$vTimeZoneStr .= $this->writeField('TZNAME', $standardTransition['abbr']);
-		$vTimeZoneStr .= $this->writeField('DTSTART', self::formatTransitionDate($standardTransition['ts']));
-		$vTimeZoneStr .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $standardTransition['ts']) . ";BYDAY=" . self::convertWeekDay(date('w', $standardTransition['ts'])));
-		$vTimeZoneStr .= $this->writeField('END', 'STANDARD');
-
-		// Add DAYLIGHT block
-		$vTimeZoneStr .= $this->writeField('BEGIN','DAYLIGHT');
-		$vTimeZoneStr .= $this->writeField('TZOFFSETFROM', self::formatOffset($standardTransition['offset']));
-		$vTimeZoneStr .= $this->writeField('TZOFFSETTO', self::formatOffset($daylightTransition['offset']));
-		$vTimeZoneStr .= $this->writeField('TZNAME', $daylightTransition['abbr']);
-		$vTimeZoneStr .= $this->writeField('DTSTART', self::formatTransitionDate($daylightTransition['ts']));
-		$vTimeZoneStr .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $daylightTransition['ts']) . ";BYDAY=" . self::convertWeekDay(date('w', $daylightTransition['ts'])));
-		$vTimeZoneStr .= $this->writeField('END', 'DAYLIGHT');
+		// Create internal Standard/Daylight blocks
+		for ($i = 0; $i < count($relevantTransitions); $i++)
+		{
+			$vTimeZoneStr .= $this->buildTimeBlock($relevantTransitions[$i], $daylightOffset, $standardOffset);
+		}
 
 		$vTimeZoneStr .= $this->writeField('END', 'VTIMEZONE');
 
 		return $vTimeZoneStr;
+	}
+
+	protected function buildTimeBlock($transition, $daylightOffset, $standardOffset)
+	{
+		KalturaLog::notice('$daylightOffset: ' . $daylightOffset);
+		KalturaLog::notice('$standardOffset: ' . $standardOffset);
+		KalturaLog::notice('transition: ' . print_r($transition, true));
+		$transitionTimeBlock = '';
+		$timeType = ($transition['isdst']) ? 'DAYLIGHT' : 'STANDARD';
+		$offsetFrom = ($timeType === 'STANDARD') ? self::formatOffset($daylightOffset) : self::formatOffset($standardOffset);
+		$offsetTo = ($timeType === 'STANDARD') ? self::formatOffset($standardOffset) : self::formatOffset($daylightOffset);
+
+		$transitionTimeBlock .= $this->writeField('BEGIN',$timeType);
+		$transitionTimeBlock .= $this->writeField('TZOFFSETFROM', $offsetFrom);
+		$transitionTimeBlock .= $this->writeField('TZOFFSETTO', $offsetTo);
+		$transitionTimeBlock .= $this->writeField('TZNAME', $transition['abbr']);
+		$transitionTimeBlock .= $this->writeField('DTSTART', self::formatTransitionDate($transition['ts']));
+		$transitionTimeBlock .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $transition['ts']) . ";BYDAY=" . self::convertWeekDay($transition['ts']));
+		$transitionTimeBlock .= $this->writeField('END', $timeType);
+
+		return $transitionTimeBlock;
 	}
 
 	protected function formatOffset(int $offset): string
@@ -440,15 +467,35 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		return sprintf('%+03d%02d', $hours, $minutes);
 	}
 
-	protected function convertWeekDay(int $dayOfWeek): string
+	protected function convertWeekDay(int $timestamp): string
 	{
+		$date = new DateTime('@' . $timestamp);
+		$dayOfWeek = $date->format('w'); // Get the day of the week (0 for Sunday, 6 for Saturday)
+		$dayOfMonth = (int) $date->format('j'); // Get the day of the month
+
+		// Find the first day of the month
+		$firstDayOfMonth = new DateTime($date->format('Y-m-01'));
+
+		// Count how many times the same weekday has occurred up to the given day
+		$occurrence = 0;
+		for ($day = 1; $day <= $dayOfMonth; $day++) {
+			$currentDayOfWeek = $firstDayOfMonth->format('w');
+			if ($currentDayOfWeek == $dayOfWeek) {
+				$occurrence++;
+			}
+			$firstDayOfMonth->modify('+1 day');
+		}
+
+		// Weekday abbreviations
 		$weekDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-		return $weekDays[$dayOfWeek];
+
+		// Return the occurrence and the weekday abbreviation, e.g., "1MO" for first Monday
+		return $occurrence . $weekDays[$dayOfWeek];
 	}
 
 	// Prepare date format for ICS (e.g. 20240925T115352Z)
 	protected static function formatTransitionDate($time)
 	{
-		return gmdate(kSchedulingICal::TIME_FORMAT, $time);
+		return gmdate(kSchedulingICal::TIME_FORMAT_NO_TIME_ZONE, $time);
 	}
 }

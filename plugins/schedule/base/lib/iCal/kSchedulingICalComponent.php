@@ -248,18 +248,24 @@ abstract class kSchedulingICalComponent
 		return $this->writeField('END', $this->getType());
 	}
 
-	public function write()
+	public function write($object = null)
 	{
 		$ret = '';
 
+		$ret .= $this->addVtimeZoneBlockIfApplicable($object);
 		$ret .= $this->begin();
 		$ret .= $this->writeBody();
 		$ret .= $this->end();
-		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId())
-		{
-			$ret .= $this->addVtimeZoneBlock();
-		}
 
 		return $ret;
+	}
+
+	protected function addVtimeZoneBlockIfApplicable($object = null)
+	{
+		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId())
+		{
+			return  $this->addVtimeZoneBlock($object);
+		}
+		return '';
 	}
 }
