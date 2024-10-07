@@ -441,9 +441,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 	protected function buildTimeBlock($transition, $daylightOffset, $standardOffset)
 	{
-		KalturaLog::notice('$daylightOffset: ' . $daylightOffset);
-		KalturaLog::notice('$standardOffset: ' . $standardOffset);
-		KalturaLog::notice('transition: ' . print_r($transition, true));
 		$transitionTimeBlock = '';
 		$timeType = ($transition['isdst']) ? 'DAYLIGHT' : 'STANDARD';
 		$offsetFrom = ($timeType === 'STANDARD') ? self::formatOffset($daylightOffset) : self::formatOffset($standardOffset);
