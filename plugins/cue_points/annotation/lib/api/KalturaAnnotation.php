@@ -139,17 +139,25 @@ class KalturaAnnotation extends KalturaCuePoint
 	{
 		parent::validateForInsert($propertiesToSkip);
 		
-		if($this->text != null)
+		if ($this->text != null)
+		{
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
+		}
 		$this->validateParentId();
-		if($this->parentId)
+		if ($this->parentId)
+		{
 			$this->validateEndTimeAndDuration($this->endTime, $this->duration);
+		}
 
-		if(!isset($this->isPublic) || is_null($this->isPublic))
-		    $this->isPublic = false;
-		
-		if(!isset($this->searchableOnEntry) || is_null($this->searchableOnEntry))
-		    $this->searchableOnEntry=true;
+		if (!isset($this->isPublic) || is_null($this->isPublic))
+		{
+			$this->isPublic = false;
+		}
+
+		if (!isset($this->searchableOnEntry) || is_null($this->searchableOnEntry))
+		{
+			$this->searchableOnEntry=true;
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -158,14 +166,20 @@ class KalturaAnnotation extends KalturaCuePoint
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		/* @var $sourceObject Annotation */
-		if(!$this->isNull('text'))
+		if (!$this->isNull('text'))
+		{
 			$this->validatePropertyMaxLength("text", CuePointPeer::MAX_TEXT_LENGTH);
-		
-		if($this->parentId)
+		}
+
+		if ($this->parentId)
+		{
 			$this->validateParentId($sourceObject->getId());
-			
-		if($this->parentId || $sourceObject->getParentId())
+		}
+
+		if ($this->parentId || $sourceObject->getParentId())
+		{
 			$this->validateEndTimeAndDuration($this->endTime, $this->duration, $sourceObject);
+		}
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
