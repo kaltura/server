@@ -3,13 +3,12 @@ require_once(__DIR__ . '/../bootstrap.php');
 
 $output_csv_file = '/output.csv';
 $output_handle = fopen($output_csv_file, 'w');
-fputcsv($output_handle, ['PID', 'Live Delivery Profile']);
+fputcsv($output_handle, ['PID', 'Live Delivery Profiles']);
 
 $partners_exists = true;
 $bulk_size = 500;
 $lowest_partner_id = 100;
 $count_pid = 0;
-$count_queries= 0;
 while($partners_exists)
 {
     $c = new Criteria();
@@ -18,7 +17,6 @@ while($partners_exists)
     $c->addAscendingOrderByColumn(PartnerPeer::ID);
     $c->setLimit($bulk_size);
     $partners = PartnerPeer::doSelect($c);
-    $count_queries++;
     if (!$partners)
     {
         KalturaLog::debug( "No more partners." );
