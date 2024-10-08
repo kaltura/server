@@ -228,21 +228,21 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-        foreach (self::$dateFields as $date => $field)
-        {
-            if ($event->$date)
-            {
-	            if ($object->timeZoneId !== '')
-	            {
-		            $fieldToUpperCase = $field . ";" . self::$timeZoneField . "=";
-		            $object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $object->timeZoneId), $object->timeZoneId);
-	            }
-	            else
-	            {
-		            $object->setField($field, kSchedulingICal::formatDate($event->$date));
-	            }
-            }
-        }
+		foreach (self::$dateFields as $date => $field)
+		{
+			if ($event->$date)
+			{
+				if ($object->timeZoneId !== '')
+				{
+					$fieldToUpperCase = $field . ";" . self::$timeZoneField . "=";
+					$object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $object->timeZoneId), $object->timeZoneId);
+				}
+				else
+				{
+					$object->setField($field, kSchedulingICal::formatDate($event->$date));
+				}
+			}
+		}
 
 		$classificationTypes = array(
 			KalturaScheduleEventClassificationType::PUBLIC_EVENT => 'PUBLIC',
@@ -364,19 +364,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 	public function getTimeZoneId()
 	{
-		if ($this->timeZoneId)
-		{
-			return $this->timeZoneId;
-		}
-		return null;
-	}
-
-	protected function aYearBefore($timestamp)
-	{
-		$date = new DateTime();
-		$date->setTimestamp($timestamp);
-		$date->modify('-1 year');
-		return $date->getTimestamp();
+		return $this->timeZoneId;
 	}
 
 	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null)
@@ -393,7 +381,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 
 		// In order to reduce the size of the transitions to analyze, we start querying from a year before the start of the event until the last occurrence
-		$transitions = $dateTimeZone->getTransitions($this->aYearBefore($event->startDate), $event->recurrence->until);
+		$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $event->recurrence->until);
 		$relevantTransitions = array();
 		$initialTransition = null;
 		$daylightOffset = null;
@@ -443,56 +431,17 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	{
 		$transitionTimeBlock = '';
 		$timeType = ($transition['isdst']) ? 'DAYLIGHT' : 'STANDARD';
-		$offsetFrom = ($timeType === 'STANDARD') ? self::formatOffset($daylightOffset) : self::formatOffset($standardOffset);
-		$offsetTo = ($timeType === 'STANDARD') ? self::formatOffset($standardOffset) : self::formatOffset($daylightOffset);
+		$offsetFrom = ($timeType === 'STANDARD') ? dateUtils::formatOffset($daylightOffset) : dateUtils::formatOffset($standardOffset);
+		$offsetTo = ($timeType === 'STANDARD') ? dateUtils::formatOffset($standardOffset) : dateUtils::formatOffset($daylightOffset);
 
 		$transitionTimeBlock .= $this->writeField('BEGIN',$timeType);
 		$transitionTimeBlock .= $this->writeField('TZOFFSETFROM', $offsetFrom);
 		$transitionTimeBlock .= $this->writeField('TZOFFSETTO', $offsetTo);
 		$transitionTimeBlock .= $this->writeField('TZNAME', $transition['abbr']);
-		$transitionTimeBlock .= $this->writeField('DTSTART', self::formatTransitionDate($transition['ts']));
-		$transitionTimeBlock .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $transition['ts']) . ";BYDAY=" . self::convertWeekDay($transition['ts']));
+		$transitionTimeBlock .= $this->writeField('DTSTART', dateUtils::formatTransitionDate($transition['ts']));
+		$transitionTimeBlock .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $transition['ts']) . ";BYDAY=" . dateUtils::convertWeekDay($transition['ts']));
 		$transitionTimeBlock .= $this->writeField('END', $timeType);
 
 		return $transitionTimeBlock;
-	}
-
-	protected function formatOffset(int $offset): string
-	{
-		$hours = floor($offset / 3600);
-		$minutes = floor(abs($offset) % 3600 / 60);
-		return sprintf('%+03d%02d', $hours, $minutes);
-	}
-
-	protected function convertWeekDay(int $timestamp): string
-	{
-		$date = new DateTime('@' . $timestamp);
-		$dayOfWeek = $date->format('w'); // Get the day of the week (0 for Sunday, 6 for Saturday)
-		$dayOfMonth = (int) $date->format('j'); // Get the day of the month
-
-		// Find the first day of the month
-		$firstDayOfMonth = new DateTime($date->format('Y-m-01'));
-
-		// Count how many times the same weekday has occurred up to the given day
-		$occurrence = 0;
-		for ($day = 1; $day <= $dayOfMonth; $day++) {
-			$currentDayOfWeek = $firstDayOfMonth->format('w');
-			if ($currentDayOfWeek == $dayOfWeek) {
-				$occurrence++;
-			}
-			$firstDayOfMonth->modify('+1 day');
-		}
-
-		// Weekday abbreviations
-		$weekDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-
-		// Return the occurrence and the weekday abbreviation, e.g., "1MO" for first Monday
-		return $occurrence . $weekDays[$dayOfWeek];
-	}
-
-	// Prepare date format for ICS (e.g. 20240925T115352Z)
-	protected static function formatTransitionDate($time)
-	{
-		return gmdate(kSchedulingICal::TIME_FORMAT_NO_TIME_ZONE, $time);
 	}
 }

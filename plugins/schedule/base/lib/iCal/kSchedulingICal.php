@@ -72,7 +72,6 @@ class kSchedulingICal
 			$date = date(kSchedulingICal::TIME_FORMAT, $time);
 		}
 
-        date_default_timezone_set('UTC');
 		date_default_timezone_set($original);
 		return $date;
 	}

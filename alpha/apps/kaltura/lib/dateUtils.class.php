@@ -146,5 +146,53 @@ class dateUtils
 		
 		return date($format, $timestamp);
 	}
+
+	// Format the offset from secs to +hhmm format
+	public static function formatOffset(int $offset): string
+	{
+		$hours = floor($offset / 3600);
+		$minutes = floor(abs($offset) % 3600 / 60);
+		return sprintf('%+03d%02d', $hours, $minutes);
+	}
+
+	public static function convertWeekDay(int $timestamp): string
+	{
+		$date = new DateTime('@' . $timestamp);
+		$dayOfWeek = $date->format('w'); // Get the day of the week (0 for Sunday, 6 for Saturday)
+		$dayOfMonth = (int) $date->format('j'); // Get the day of the month
+
+		// Find the first day of the month
+		$firstDayOfMonth = new DateTime($date->format('Y-m-01'));
+
+		// Count how many times the same weekday has occurred up to the given day
+		$occurrence = 0;
+		for ($day = 1; $day <= $dayOfMonth; $day++) {
+			$currentDayOfWeek = $firstDayOfMonth->format('w');
+			if ($currentDayOfWeek == $dayOfWeek) {
+				$occurrence++;
+			}
+			$firstDayOfMonth->modify('+1 day');
+		}
+
+		// Weekday abbreviations
+		$weekDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+		// Return the occurrence and the weekday abbreviation, e.g., "1MO" for first Monday
+		return $occurrence . $weekDays[$dayOfWeek];
+	}
+
+	// Prepare date format for ICS (e.g. 20240925T115352Z)
+	public static function formatTransitionDate($time)
+	{
+		return gmdate(kSchedulingICal::TIME_FORMAT_NO_TIME_ZONE, $time);
+	}
+
+	public static function getDateOnPreviousYear($timestamp)
+	{
+		$date = new DateTime();
+		$date->setTimestamp($timestamp);
+		$date->modify('-1 year');
+		return $date->getTimestamp();
+	}
 }
 ?>
