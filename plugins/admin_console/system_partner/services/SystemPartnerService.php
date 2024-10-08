@@ -210,6 +210,10 @@ class SystemPartnerService extends KalturaBaseService
 			$userId = $dbPartner->getAdminUserId();
 		}
 		
+		if(!$dbPartner->isSupportAccessAllowed()) {
+			throw new KalturaAPIException(KalturaErrors::PARTNER_LOGIN_FORBIDDEN, kCurrentContext::getCurrentPartnerId(), $pId);
+		}
+		
 		$kuser = kuserPeer::getKuserByPartnerAndUid($pId, $userId);
 		if (!$kuser) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
@@ -219,7 +223,7 @@ class SystemPartnerService extends KalturaBaseService
 		}
 			
 		$ks = "";
-		kSessionUtils::createKSessionNoValidations($dbPartner->getId(), $userId, $ks, 86400, 2, "", '*,' . ks::PRIVILEGE_DISABLE_ENTITLEMENT);
+		kSessionUtils::createKSessionNoValidations($dbPartner->getId(), $userId, $ks, $dbPartner->getSupportAccessMaxKsExpiry(), 2, "", '*,' . ks::PRIVILEGE_DISABLE_ENTITLEMENT);
 		return $ks;
 	}
 	

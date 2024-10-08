@@ -507,6 +507,16 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public $allowedEmailDomainsForAdmins;
 	
+	/**
+	 * @var time
+	 */
+	public $supportAccessAllowedUntil;
+	
+	/**
+	 * @var KalturaSupportAccessMode
+	 */
+	public $supportAccessMode;
+	
 	private static $map_between_objects = array
 	(
 		'id' , 'name', 'website' => 'url1' , 'notificationUrl' => 'url2' , 'appearInSearch' , 'createdAt' , 'adminName' , 'adminEmail' , 'useTwoFactorAuthentication', 'useSso', 'blockDirectLogin',
@@ -520,7 +530,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		'extendedFreeTrail', 'extendedFreeTrailEndsWarning', 'eightyPercentWarning', 'usageLimitWarning', 'lastFreeTrialNotificationDay','monitorUsage', 'additionalParams',
 		'passwordStructureValidations', 'passReplaceFreq', 'maxLoginAttempts', 'loginBlockPeriod', 'numPrevPassToKeep', 'twoFactorAuthenticationMode', 'isSelfServe', 'allowedDomains',
 		'excludedAdminRoleName', 'eventPlatformAllowedTemplates', 'verticalClassificationId' => 'verticalClasiffication', 'allowDefaultPasswordRestrictions', 'recycleBinRetentionPeriod',
-		'customAnalyticsDomain','allowedEmailDomainsForAdmins'
+		'customAnalyticsDomain','allowedEmailDomainsForAdmins', 'supportAccessAllowedUntil', 'supportAccessMode'
 	);
 	
 	public function getMapBetweenObjects ( )
@@ -613,6 +623,59 @@ class KalturaPartner extends KalturaObject implements IFilterable
 
 		$partner = new Partner();
 		return $this->toObject($partner);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if(isset($this->supportAccessMode) && !$this->isApiDoneByAccountOwner())
+		{
+			throw new KalturaAPIException(KalturaErrors::CAN_ONLY_BE_UPDATED_BY_ACCOUNT_OWNER);
+		}
+		
+		if(isset($this->supportAccessAllowedUntil) && !kCurrentContext::$is_admin_session)
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ADMIN_PROPERTY, 'supportAccessAllowedUntil');
+		}
+		
+		if(isset($this->supportAccessAllowedUntil) && isset($this->supportAccessMode) == KalturaSupportAccessMode::NEVER_ALLOWED)
+		{
+			throw new KalturaAPIException(KalturaErrors::SUPPORT_ACCESS_CANNOT_BE_ENABLED);
+		}
+		
+		return parent::validateForInsert($propertiesToSkip);
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUpdate()
+	 */
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		if(isset($this->supportAccessMode) && $this->supportAccessMode != $sourceObject->getSupportAccessMode()
+			&& !$this->isApiDoneByAccountOwner())
+		{
+			throw new KalturaAPIException(KalturaErrors::CAN_ONLY_BE_UPDATED_BY_ACCOUNT_OWNER);
+		}
+		
+		if(isset($this->supportAccessAllowedUntil) && $this->supportAccessAllowedUntil != $sourceObject->getSupportAccessAllowedUntil()
+			&& !kCurrentContext::$is_admin_session)
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ADMIN_PROPERTY, 'supportAccessAllowedUntil');
+		}
+		
+		if(isset($this->supportAccessAllowedUntil) && $sourceObject->getSupportAccessAllowedUntil() == KalturaSupportAccessMode::NEVER_ALLOWED)
+		{
+			throw new KalturaAPIException(KalturaErrors::SUPPORT_ACCESS_CANNOT_BE_ENABLED);
+		}
+		
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+	
+	private function isApiDoneByAccountOwner()
+	{
+		return kCurrentContext::getCurrentKsKuserId() !=  $sourceObject->getAccountOwnerKuserId();
 	}
 	
 	public function toObject($dbObject = null, $propsToSkip = array())
