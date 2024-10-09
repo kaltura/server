@@ -36,7 +36,7 @@ class KalturaICalSerializer extends KalturaSerializer
 		if($object instanceof KalturaScheduleEvent)
 		{
 			$event = kSchedulingICalEvent::fromObject($object);
-			return $event->write();
+			return $event->write($object);
 		}
 		elseif($object instanceof KalturaScheduleEventArray)
 		{

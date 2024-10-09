@@ -130,7 +130,7 @@ class kSchedulingICalRule extends kSchedulingICalComponent
 	 * {@inheritDoc}
 	 * @see kSchedulingICalComponent::write()
 	 */
-	public function write()
+	public function write($object = null)
 	{
 		return $this->writeBody();
 	}

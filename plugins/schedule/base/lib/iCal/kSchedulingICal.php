@@ -3,6 +3,7 @@
 class kSchedulingICal
 {
 	const TIME_FORMAT = 'Ymd\THis\Z';
+	const TIME_FORMAT_NO_TIME_ZONE = 'Ymd\THis';
 	const TIME_PARSE = '%Y%m%dT%H%i%sZ';
 	const TIME_PARSE_NO_TIME_ZONE = '%Y%m%dT%H%i%s';
 
@@ -56,11 +57,21 @@ class kSchedulingICal
 		return $component;
 	}
 
-	public static function formatDate($time)
+	public static function formatDate($time, $timeZoneId = null)
 	{
 		$original = date_default_timezone_get();
-        	date_default_timezone_set('UTC');
-        	$date = date(kSchedulingICal::TIME_FORMAT, $time);
+
+		if ($timeZoneId)
+		{
+			date_default_timezone_set($timeZoneId);
+			$date = date(kSchedulingICal::TIME_FORMAT_NO_TIME_ZONE, $time);
+		}
+		else
+		{
+			date_default_timezone_set('UTC');
+			$date = date(kSchedulingICal::TIME_FORMAT, $time);
+		}
+
 		date_default_timezone_set($original);
 		return $date;
 	}
@@ -206,5 +217,11 @@ class kSchedulingICal
 	{
 		self::$timezoneMap = array_merge(
 			include __DIR__ . '/../../../../../infra/general/timezones/' . $timezoneMapName . '.php');
+	}
+
+	// Prepare date format for ICS (e.g. 20240925T115352Z)
+	public static function formatTransitionDate($time)
+	{
+		return gmdate(self::TIME_FORMAT_NO_TIME_ZONE, $time);
 	}
 }
