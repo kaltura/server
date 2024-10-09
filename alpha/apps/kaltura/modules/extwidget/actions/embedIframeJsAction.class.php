@@ -67,7 +67,7 @@ class embedIframeJsAction extends sfAction
 			( $uiConf->getV2Redirect()->getIsApproved() || $this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME) )
 			)
 		{
-			$this->redirectToV7($uiConf->getV2Redirect()->getV7id(), $uiconf_id, $partner_id, $uiConf->getV2Redirect()->getTranslatePlugins() );
+			$this->redirectToV7($uiConf->getV2Redirect()->getV7id(), $uiconf_id, $partner_id, $uiConf->getV2Redirect()->getTranslatePlugins());
 		}
 
 
@@ -177,6 +177,8 @@ class embedIframeJsAction extends sfAction
 			KalturaLog::log('V2toV7 was rejected because: ' . $e->getMessage() . ' v2 id:' .  $v2UiConfId.  ' v7 id:' . $v2UiConfId);
 			return;
 		}
+
+		requestUtils::sendCachingHeaders(600, false, time());
 
 		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
 		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
