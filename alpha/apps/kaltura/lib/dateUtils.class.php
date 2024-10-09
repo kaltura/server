@@ -181,12 +181,6 @@ class dateUtils
 		return $occurrence . $weekDays[$dayOfWeek];
 	}
 
-	// Prepare date format for ICS (e.g. 20240925T115352Z)
-	public static function formatTransitionDate($time)
-	{
-		return gmdate(kSchedulingICal::TIME_FORMAT_NO_TIME_ZONE, $time);
-	}
-
 	public static function getDateOnPreviousYear($timestamp)
 	{
 		$date = new DateTime();

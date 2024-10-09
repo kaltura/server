@@ -218,4 +218,10 @@ class kSchedulingICal
 		self::$timezoneMap = array_merge(
 			include __DIR__ . '/../../../../../infra/general/timezones/' . $timezoneMapName . '.php');
 	}
+
+	// Prepare date format for ICS (e.g. 20240925T115352Z)
+	public static function formatTransitionDate($time)
+	{
+		return gmdate(self::TIME_FORMAT_NO_TIME_ZONE, $time);
+	}
 }

@@ -438,7 +438,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$transitionTimeBlock .= $this->writeField('TZOFFSETFROM', $offsetFrom);
 		$transitionTimeBlock .= $this->writeField('TZOFFSETTO', $offsetTo);
 		$transitionTimeBlock .= $this->writeField('TZNAME', $transition['abbr']);
-		$transitionTimeBlock .= $this->writeField('DTSTART', dateUtils::formatTransitionDate($transition['ts']));
+		$transitionTimeBlock .= $this->writeField('DTSTART', kSchedulingICal::formatTransitionDate($transition['ts']));
 		$transitionTimeBlock .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $transition['ts']) . ";BYDAY=" . dateUtils::convertWeekDay($transition['ts']));
 		$transitionTimeBlock .= $this->writeField('END', $timeType);
 
