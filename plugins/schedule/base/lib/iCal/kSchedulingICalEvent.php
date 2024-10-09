@@ -367,45 +367,45 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		return $this->timeZoneId;
 	}
 
-public function addVtimeZoneBlock(KalturaScheduleEvent $event = null)
-{
-	$vTimeZoneStr = '';
-	try
+	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null)
 	{
-		$dateTimeZone = new DateTimeZone($this->timeZoneId);
-	}
-	catch (Exception $e)
-	{
-		KalturaLog::err('Error while processing the time zone: ' . $e->getMessage());
-		return $vTimeZoneStr;
-	}
-
-	// In order to reduce the size of the transitions to analyze, we start querying from a year before the start of the event until the last occurrence
-	$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $event->recurrence->until);
-	$relevantTransitions = array();
-	$initialTransition = null;
-	$daylightOffset = null;
-	$standardOffset = null;
-
-	// This loop filters the list of transitions to only the ones that are relevant to the recurring event,
-	// from the transition right before the start to the last transition during the event
-	foreach ($transitions as $transition)
-	{
-		// Saving the daylight and standard offsets
-		if ($transition['isdst'])
+		$vTimeZoneStr = '';
+		try
 		{
-			$daylightOffset = $transition['offset'];
+			$dateTimeZone = new DateTimeZone($this->timeZoneId);
 		}
-		else
+		catch (Exception $e)
 		{
-			$standardOffset = $transition['offset'];
+			KalturaLog::err('Error while processing the time zone: ' . $e->getMessage());
+			return $vTimeZoneStr;
 		}
 
-		if ($transition['ts'] <= $event->startDate)
+		// In order to reduce the size of the transitions to analyze, we start querying from a year before the start of the event until the last occurrence
+		$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $event->recurrence->until);
+		$relevantTransitions = array();
+		$initialTransition = null;
+		$daylightOffset = null;
+		$standardOffset = null;
+
+		// This loop filters the list of transitions to only the ones that are relevant to the recurring event,
+		// from the transition right before the start to the last transition during the event
+		foreach ($transitions as $transition)
 		{
-			$initialTransition = $transition;
-		}
-		if ($event->startDate <= $transition['ts'] && $transition['ts'] <= $event->recurrence->until)
+			// Saving the daylight and standard offsets
+			if ($transition['isdst'])
+			{
+				$daylightOffset = $transition['offset'];
+			}
+			else
+			{
+				$standardOffset = $transition['offset'];
+			}
+
+			if ($transition['ts'] <= $event->startDate)
+			{
+				$initialTransition = $transition;
+			}
+			if ($event->startDate <= $transition['ts'] && $transition['ts'] <= $event->recurrence->until)
 			{
 				$relevantTransitions[] = $transition;
 			}
