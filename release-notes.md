@@ -1,5 +1,5 @@
 # Ursa-21.1.0
-## Enable V2_V7 Redirect ##
+## Enable player calls redirection from V2 to V7 ##
 * Issue Type: Task
 * Issue ID: PLAT-24983
 ### Deployment ###
