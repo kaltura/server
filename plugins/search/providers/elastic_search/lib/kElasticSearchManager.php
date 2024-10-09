@@ -15,7 +15,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     const METADATA_MAX_LENGTH = 256;
     const EVENT_PLATFORM_METADATA_MAX_LENGTH = 1024;
 
-    private array|null $skipObjects = null;
+    private $skipObjects = null;
 
     /**
      * Add a multidimensional assoc array where key is plugin name and value is array of objects ids, like:

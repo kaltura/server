@@ -15,7 +15,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 
 	const MAX_SIZE_FOR_PLUGIN_SEARCH_DATA = 800000; // 1MB * 0.8. In bytes
 	
-	private array|null $skipObjects = null;
+	private $skipObjects = null;
 	
 	/**
 	 * Add a multidimensional assoc array where key is plugin name and value is array of objects ids, like:
