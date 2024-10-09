@@ -696,7 +696,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if ($this->isPermissionStatus(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, PermissionStatus::ACTIVE))
 		{
 			KalturaLog::notice('#### testing2');
-			categoryPeer::
+			//TODO get number of privacy contexts on partner
 		}
 		$audioThumbEntryId = $this->audioThumbEntryId;
 		if ($audioThumbEntryId)
