@@ -16,6 +16,7 @@ class kThumbnailDescriptor
 	private $height;
 	private $imageFilePath;
 	private $isDefault;
+	private $fileSync;
 
 	public static function initDimensions( $requiredWidth, $requiredHeight )
 	{
@@ -25,7 +26,7 @@ class kThumbnailDescriptor
 		self::$initialized = true;
 	}
 
-	public static function fromParams( $thumbWidth, $thumbHeight, $thumbPath = null, $isDefault = false )
+	public static function fromParams( $thumbWidth, $thumbHeight, $thumbPath = null, $isDefault = false, $fileSync = null )
 	{
 		if ( ! self::$initialized )
 		{
@@ -39,8 +40,11 @@ class kThumbnailDescriptor
 		$descriptor->deltaFromOrigAspectRatio = abs( self::$requiredAspectRatio - $thumbAspectRatio );
 		$descriptor->width = $thumbWidth;
 		$descriptor->height = $thumbHeight;
-		$descriptor->imageFilePath = $thumbPath;
 		$descriptor->isDefault = $isDefault ? 1 : 0;
+		$descriptor->fileSync = $fileSync;
+		
+		$descriptor->isEncrypted = $fileSync ? $fileSync->isEncrypted() : false;
+		$descriptor->imageFilePath = ($fileSync && $fileSync->isEncrypted()) ? $fileSync->createTempClear() : $thumbPath;
 
 		return $descriptor;
 	}
@@ -66,4 +70,19 @@ class kThumbnailDescriptor
 	public function getHeight() { return $this->height; }
 	public function getImageFilePath() { return $this->imageFilePath; }
 	public function getIsDefault() { return $this->isDefault; }
+	
+	public function deleteTempClearFileIfNeeded()
+	{
+		if(!$this->fileSync)
+		{
+			return;
+		}
+		
+		if(!$this->fileSync->isEncrypted())
+		{
+			return;
+		}
+		
+		$this->fileSync->deleteTempClear();
+	}
 }
