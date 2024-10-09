@@ -178,7 +178,6 @@ class embedIframeJsAction extends sfAction
 			return;
 		}
 
-		requestUtils::sendCachingHeaders(600, false, time());
 
 		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
 		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
@@ -186,7 +185,11 @@ class embedIframeJsAction extends sfAction
 				. $_SERVER['QUERY_STRING'] . "&"
 				. v2RedirectUtils::V2REDIRECT_PARAM_NAME .'=true'
 				. $shouldTranslatePluginsQueryParam;
+
+		requestUtils::sendCachingHeaders(600, false, time());
+		kFile::cacheRedirect($url);
 		header("Location:$url");
+		header("Pragma: cache" );
 		KExternalErrors::dieGracefully();
 	}
 }
