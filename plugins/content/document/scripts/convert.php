@@ -5,7 +5,7 @@ $output = null;
 $src = implode(" ", array_slice($argv, 1));
 
 $patterns = array('/-geometry (\d+x?\d*)/', '/-colorspace RGB/');
-$replace = array('-resize $1 -extent $1', '-colorspace RGB -gravity center -regard-warnings -density 300');
+$replace = array('-thumbnail $1 -extent $1', '-colorspace RGB -gravity center -regard-warnings -density 300');
 
 $dest = preg_replace($patterns, $replace, $src);
 print "Executing " . $dest . "\n";
