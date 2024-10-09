@@ -1,3 +1,17 @@
+# Ursa-21.1.0
+## Enable V2_V7 Redirect ##
+* Issue Type: Task
+* Issue ID: PLAT-24983
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.contentLab.enabled = true
+moduls.contentLab.permissionType = 2
+moduls.contentLab.label = "V2_V7 Redirect"
+moduls.contentLab.permissionName = FEATURE_V2_V7_REDIRECT
+moduls.contentLab.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Ursa-21.0.0
 ## Add kafka event notification for room entry updates ##
 - Issue Type: Task
