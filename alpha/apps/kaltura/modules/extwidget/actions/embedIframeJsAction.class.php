@@ -189,7 +189,6 @@ class embedIframeJsAction extends sfAction
 		requestUtils::sendCachingHeaders(600, false, time());
 		kFile::cacheRedirect($url);
 		header("Location:$url");
-		header("Pragma: cache" );
 		KExternalErrors::dieGracefully();
 	}
 }
