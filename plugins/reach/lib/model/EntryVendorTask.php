@@ -453,23 +453,27 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 
 	public function addSchedulingData()
 	{
+		$language = '';
+		$feature = null;
+		/* @var $taskData kScheduledVendorTaskData */
+		$taskData = $this->getTaskJobData();
+		/* @var $connectedEvent LiveStreamScheduleEvent */
+		$connectedEvent = $taskData->getScheduleEvent();
+		/* @var $vendorCatalogItem VendorCatalogItem */
+		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
+
 		switch ($this->getServiceFeature())
 		{
+			case KalturaVendorServiceFeature::LIVE_TRANSLATION:
+				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getTargetLanguage());
+				$feature = new LiveTranslationFeature();
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
-				/* @var $taskData kScheduledVendorTaskData */
-				$taskData = $this->getTaskJobData();
-				/* @var $connectedEvent LiveStreamScheduleEvent */
-				$connectedEvent = $taskData->getScheduleEvent();
-				/* @var $vendorCatalogItem VendorCatalogItem */
-				$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
-				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getSourceLanguage());
-
-				$feature = new LiveCaptionFeature();
+				$language = $language !== '' ? $language : languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getSourceLanguage());
+				$feature = !is_null($feature) ? $feature : new LiveCaptionFeature();
 				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
 				$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
 				$feature->setLanguage($language);
-
 				$connectedEvent->addFeature($feature, true);
 				$connectedEvent->save();
 				break;
@@ -478,9 +482,13 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 
 	public function removeSchedulingData()
 	{
+		$liveFeatureName = '';
 		switch ($this->getServiceFeature())
 		{
+			case KalturaVendorServiceFeature::LIVE_TRANSLATION:
+				$liveFeatureName = LiveTranslationFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}");
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
+				$liveFeatureName = $liveFeatureName !== '' ?: LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}");
 				/* @var $taskData kScheduledVendorTaskData */
 				$taskData = $this->getTaskJobData();
 				/* @var $connectedEvent LiveStreamScheduleEvent */
@@ -490,7 +498,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 					break;
 				}
 
-				$connectedEvent->removeFeature(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}"));
+				$connectedEvent->removeFeature($liveFeatureName);
 				$connectedEvent->save();
 				break;
 		}
