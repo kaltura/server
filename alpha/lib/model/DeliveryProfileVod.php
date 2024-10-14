@@ -326,7 +326,9 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			/* @var $flavorAsset asset */
 			$httpUrl = $this->getFlavorHttpUrl($flavorAsset);
 			if ($httpUrl)
+			{
 				$flavors[] = $httpUrl;
+			}
 		}
 		return $flavors;
 	}
