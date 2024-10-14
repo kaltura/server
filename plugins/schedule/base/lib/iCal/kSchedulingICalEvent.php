@@ -242,7 +242,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			/* @var $resource ScheduleEventResource */
 			$resourceIds[] = $resource->getResourceId();
 		}
-		$resourceIds = array_diff($resourceIds, array(0));
+		$resourceIds = array_diff($resourceIds, array(0)); //resource 0 should not be exported outside of kaltura BE.
 
 		foreach (self::$stringFields as $string)
 		{
@@ -273,12 +273,12 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 					{
 						/* @var $resource ScheduleResource */
 						$c->add(ScheduleResourcePeer::ID, $resourceId);
-						$resource = ScheduleResourcePeer::doSelect($c);
+						$resource = ScheduleResourcePeer::doSelectOne($c);
 						$resourcesNames[] = $resource->getName();
 						$c->remove(ScheduleResourcePeer::ID);
 					}
+					$object->setField($string, implode(',', $resourcesNames));
 				}
-				$object->setField($string, implode(',', $resourcesNames));
 			}
 		}
 
@@ -341,7 +341,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-		$resourceIds = array_diff($resourceIds, array(0)); //resource 0 should not be exported outside of kaltura BE.
 		if (count($resourceIds))
 			$object->setField('x-kaltura-resource-ids', implode(',', $resourceIds));
 

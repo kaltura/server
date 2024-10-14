@@ -139,7 +139,6 @@ class dateUtils
 		$date = new DateTime('@' . $timestamp);
 		$dayOfWeek = $date->format('w'); // Get the day of the week (0 for Sunday, 6 for Saturday)
 		$dayOfMonth = (int) $date->format('j'); // Get the day of the month
-		$totalDaysInMonth = $date->format('t'); // Total number of days in the month
 		$occurrenceOfSpecificDay = ceil($dayOfMonth / 7);
 
 		// Find the first day of the month
