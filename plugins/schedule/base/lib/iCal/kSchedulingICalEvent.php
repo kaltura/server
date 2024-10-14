@@ -236,7 +236,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-		$resources = ScheduleEventResourcePeer::retrieveByEventId($event->id);
+		$resources = ScheduleEventResourcePeer::retrieveByEventIdOrItsParentId($event->id);
 		foreach ($resources as $resource)
 		{
 			/* @var $resource ScheduleEventResource */
@@ -331,7 +331,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 				if (!count($resourceIds))
 				{
-					$resources = ScheduleEventResourcePeer::retrieveByEventIdOrItsParentId($event->parentId);
+					$resources = ScheduleEventResourcePeer::retrieveByEventId($event->parentId);
 					foreach ($resources as $resource)
 					{
 						/* @var $resource ScheduleEventResource */
