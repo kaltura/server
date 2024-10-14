@@ -331,7 +331,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 				if (!count($resourceIds))
 				{
-					$resources = ScheduleEventResourcePeer::retrieveByEventId($event->parentId);
+					$resources = ScheduleEventResourcePeer::retrieveByEventIdOrItsParentId($event->parentId);
 					foreach ($resources as $resource)
 					{
 						/* @var $resource ScheduleEventResource */
