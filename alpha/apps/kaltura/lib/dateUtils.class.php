@@ -139,16 +139,20 @@ class dateUtils
 		$date = new DateTime('@' . $timestamp);
 		$dayOfWeek = $date->format('w'); // Get the day of the week (0 for Sunday, 6 for Saturday)
 		$dayOfMonth = (int) $date->format('j'); // Get the day of the month
+		$totalDaysInMonth = $date->format('t'); // Total number of days in the month
+		$occurrenceOfSpecificDay = ceil($dayOfMonth / 7);
 
 		// Find the first day of the month
 		$firstDayOfMonth = new DateTime($date->format('Y-m-01'));
 
 		// Count how many times the same weekday has occurred up to the given day
-		$occurrence = 0;
-		for ($day = 1; $day <= $dayOfMonth; $day++) {
+		$occurrenceOfWeekDay = 0;
+		for ($day = 1; $day <= $dayOfMonth; $day++)
+		{
 			$currentDayOfWeek = $firstDayOfMonth->format('w');
-			if ($currentDayOfWeek == $dayOfWeek) {
-				$occurrence++;
+			if ($currentDayOfWeek == $dayOfWeek)
+			{
+				$occurrenceOfWeekDay++;
 			}
 			$firstDayOfMonth->modify('+1 day');
 		}
@@ -157,7 +161,8 @@ class dateUtils
 		$weekDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
 		// Return the occurrence and the weekday abbreviation, e.g., "1MO" for first Monday
-		return $occurrence . $weekDays[$dayOfWeek];
+		$occurrenceOfSpecificDay = ($occurrenceOfSpecificDay == $occurrenceOfWeekDay) ? -1 : $occurrenceOfSpecificDay;
+		return $occurrenceOfSpecificDay . $weekDays[$dayOfWeek];
 	}
 
 	public static function getDateOnPreviousYear($timestamp)

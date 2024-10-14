@@ -54,6 +54,28 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		return kSchedulingICal::TYPE_EVENT;
 	}
 
+	protected static function getUidFromEventId($id)
+	{
+		$hash = sha1($id);
+
+		// Format the hash as a UUID
+		$uuid = sprintf(
+			'%08s-%04s-%04x-%04x-%12s',
+			// 32 bits for "time_low"
+			substr($hash, 0, 8),
+			// 16 bits for "time_mid"
+			substr($hash, 8, 4),
+			// 16 bits for "time_hi_and_version", with version 4 UUID
+			(hexdec(substr($hash, 12, 4)) & 0x0fff) | 0x4000,
+			// 16 bits for "clk_seq_hi_res", with variant UUID
+			(hexdec(substr($hash, 16, 4)) & 0x3fff) | 0x8000,
+			// 48 bits for "node"
+			substr($hash, 20, 12)
+		);
+
+		return $uuid;
+	}
+
 	public function getUid()
 	{
 		return $this->getField('uid');
@@ -196,7 +218,13 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$resourceIds = array();
 
 		if ($event->referenceId)
+		{
 			$object->setField('uid', $event->referenceId);
+		}
+		else
+		{
+			$object->setField('uid', self::getUidFromEventId($event->id));
+		}
 
 		if ($event->recurrence && $event->recurrence->timeZone)
 		{
@@ -207,6 +235,14 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 				$object->timeZoneId = $event->recurrence->timeZone;
 			}
 		}
+
+		$resources = ScheduleEventResourcePeer::retrieveByEventId($event->id);
+		foreach ($resources as $resource)
+		{
+			/* @var $resource ScheduleEventResource */
+			$resourceIds[] = $resource->getResourceId();
+		}
+		$resourceIds = array_diff($resourceIds, array(0));
 
 		foreach (self::$stringFields as $string)
 		{
@@ -225,6 +261,24 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 				{
 					$object->setField($string, $event->$string);
 				}
+			}
+			elseif ($string == 'location')
+			{
+				if ($resourceIds)
+				{
+					$resourcesNames = array();
+					$c = new Criteria();
+					$c->add(ScheduleResourcePeer::PARTNER_ID, $event->partnerId);
+					foreach ($resourceIds as $resourceId)
+					{
+						/* @var $resource ScheduleResource */
+						$c->add(ScheduleResourcePeer::ID, $resourceId);
+						$resource = ScheduleResourcePeer::doSelect($c);
+						$resourcesNames[] = $resource->getName();
+						$c->remove(ScheduleResourcePeer::ID);
+					}
+				}
+				$object->setField($string, implode(',', $resourcesNames));
 			}
 		}
 
@@ -265,14 +319,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$object->setField('x-kaltura-partner-id', $event->partnerId);
 		$object->setField('x-kaltura-status', $event->status);
 		$object->setField('x-kaltura-owner-id', $event->ownerId);
-
-
-		$resources = ScheduleEventResourcePeer::retrieveByEventId($event->id);
-		foreach ($resources as $resource)
-		{
-			/* @var $resource ScheduleEventResource */
-			$resourceIds[] = $resource->getResourceId();
-		}
 
 		if ($event->parentId)
 		{
