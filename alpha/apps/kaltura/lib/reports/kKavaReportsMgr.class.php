@@ -1483,13 +1483,13 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-				self::getLikeFilter(self::DIMENSION_USER_ENGAGEMENT, "%CameraOn%"))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$camera_on_engagement))),
 			self::getLongSumAggregator(self::METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
 
 		self::$aggregations_def[self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-				self::getLikeFilter(self::DIMENSION_USER_ENGAGEMENT, "%MicUnmuted%"))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$mic_unmuted_engagement))),
 			self::getLongSumAggregator(self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
