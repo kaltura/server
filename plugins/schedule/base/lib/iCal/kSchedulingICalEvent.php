@@ -257,6 +257,17 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 					$duration = self::formatDurationString($event->$string);
 					$object->setField($string, $duration);
 				}
+				elseif ($string == 'status')
+				{
+					if ($event->$string == ScheduleEventStatus::ACTIVE)
+					{
+						$object->setField($string, 'CONFIRMED');
+					}
+					else
+					{
+						$object->setField($string, 'CANCELLED');
+					}
+				}
 				else
 				{
 					$object->setField($string, $event->$string);
