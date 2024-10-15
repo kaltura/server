@@ -483,7 +483,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		return $vTimeZoneStr;
 	}
 
-	public function buildTimeBlock($transition, $daylightOffset, $standardOffset)
+	protected function buildTimeBlock($transition, $daylightOffset, $standardOffset)
 	{
 		$transitionTimeBlock = '';
 		$timeType = ($transition['isdst']) ? 'DAYLIGHT' : 'STANDARD';
