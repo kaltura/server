@@ -147,7 +147,6 @@ class BulkUploadSchedulePlugin extends KalturaPlugin implements IKalturaBulkUplo
 		
 		kSchedulingICalComponent::setWriteToStdout(true);
 		$calendar = new kSchedulingICalCalendar();
-		KalturaLog::notice('&&&& bulk');
 		$calendar->begin();
 		
 		$handledResults = 0;
