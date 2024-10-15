@@ -30,7 +30,7 @@ class KalturaICalSerializer extends KalturaSerializer
 
 	protected function injectTimeZoneBlocks($iCalString)
 	{
-		$position = strpos($iCalString, kSchedulingICal::TYPE_EVENT);
+		$position = strpos($iCalString, 'BEGIN:' . kSchedulingICal::TYPE_EVENT);
 
 		if ($position !== false)
 		{
