@@ -197,7 +197,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	
-	private static function getPermissions($roleId)
+	private static function getPermissions($roleId, $limitPermissions = false)
 	{
 		$map = self::initEmptyMap();
 		
@@ -233,7 +233,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			}
 		}
 		
-		$map = self::getPermissionsFromDb($dbRole);
+		$map = self::getPermissionsFromDb($dbRole, $limitPermissions);
 		
 		// update cache
 		$cacheRole = array(
@@ -249,7 +249,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * Init permission items map from DB for the given role
 	 * @param UserRole $dbRole
 	 */
-	private static function getPermissionsFromDb($dbRole)
+	private static function getPermissionsFromDb($dbRole, $limitPermissions)
 	{
 		$map = self::initEmptyMap();
 		
@@ -271,11 +271,15 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		else {
 			$alwaysAllowed = array(PermissionName::ALWAYS_ALLOWED_ACTIONS);
 		}
-		$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowed);
-		
+
+		if (!$limitPermissions)
+		{
+			$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowed);
+		}
+
 		// if the request sent from the internal server set additional permission allowing access without KS
 		// from internal servers
-		if (kIpAddressUtils::isInternalIp())
+		if (kIpAddressUtils::isInternalIp() && !$limitPermissions)
 		{
 			KalturaLog::debug('IP in range, adding ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS permission');
 			$alwaysAllowedInternal = array(PermissionName::ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS);
@@ -702,6 +706,102 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				// merge current role map to the global map
 				self::$map = array_merge_recursive(self::$map, $roleMap);
 			}
+
+			self::removeLimitedPermissions();
+		}
+	}
+
+	private static function removeLimitedPermissions()
+	{
+		KalturaLog::debug("Permissions Map Before = " . print_r(self::$map, true));
+
+		$ks = ks::fromSecureString(kCurrentContext::$ks);
+		if (!$ks)
+		{
+			return;
+		}
+		$limitingRole = $ks->getLimitingRole();
+		if (!$limitingRole)
+		{
+			return;
+		}
+
+		KalturaLog::debug("Removing permissions according to limiting role [$limitingRole]");
+		$roleMap = self::getPermissions($limitingRole, true);
+
+		KalturaLog::debug("Role Map = " . print_r($roleMap, true));
+
+		self::removeApiActionPermission($roleMap[self::API_ACTIONS_ARRAY_NAME]);
+		self::removeApiParametersPermissions($roleMap[self::API_PARAMETERS_ARRAY_NAME]);
+		self::removePermissionNames($roleMap[self::PERMISSION_NAMES_ARRAY]);
+
+		KalturaLog::debug("Permissions Map After = " . print_r(self::$map, true));
+	}
+
+	private static function removeApiActionPermission($apiActions)
+	{
+		foreach ($apiActions as $service => $actionsArray)
+		{
+			if (!isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]))
+			{
+				continue;
+			}
+			foreach ($actionsArray as $actionName => $actionEmptyArray)
+			{
+				KalturaLog::debug("Removing permission for service [$service] action [$actionName]");
+				if (isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$actionName]))
+				{
+					unset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$actionName]);
+				}
+			}
+			if (count(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]) == 0)
+			{
+				KalturaLog::debug("Removed all permissions for service [$service]");
+				unset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]);
+			}
+		}
+	}
+
+	private static function removeApiParametersPermissions($apiParameters)
+	{
+		foreach ($apiParameters as $itemAction => $itemObjectsArray)
+		{
+			foreach ($itemObjectsArray as $itemObjectName => $itemParametersArray)
+			{
+				if (!isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]))
+				{
+					continue;
+				}
+
+				foreach ($itemParametersArray as $itemParameterName => $itemParameterValue)
+				{
+					KalturaLog::debug("Removing parameter [$itemParameterName] from action [$itemAction] and object [$itemObjectName]");
+					if (isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName][$itemParameterName]))
+					{
+						unset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName][$itemParameterName]);
+					}
+				}
+
+				if (count(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName] == 0))
+				{
+					KalturaLog::debug("Removed all parameters for object [$itemObjectName]");
+					unset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]);
+				}
+			}
+		}
+	}
+
+	private static function removePermissionNames($permissionNames)
+	{
+		foreach ($permissionNames as $permissionName)
+		{
+			if (!isset(self::$map[self::PERMISSION_NAMES_ARRAY][$permissionName]))
+			{
+				continue;
+			}
+
+			KalturaLog::debug("Removing permission name [$permissionName]");
+			unset(self::$map[self::PERMISSION_NAMES_ARRAY][$permissionName]);
 		}
 	}
 	

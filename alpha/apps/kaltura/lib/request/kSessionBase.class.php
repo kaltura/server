@@ -34,6 +34,7 @@ class kSessionBase
 	const PRIVILEGE_VIEW_ENTRY_OF_PLAYLIST = "sviewplaylist";
 	const PRIVILEGE_ACTIONS_LIMIT = "actionslimit";
 	const PRIVILEGE_SET_ROLE = "setrole";
+	const PRIVILEGE_LIMIT_ROLE = "limitrole";
 	const PRIVILEGE_LIMIT_ENTRY = "limitentry";
 	const PRIVILEGE_IP_RESTRICTION = "iprestrict";
 	const PRIVILEGE_URI_RESTRICTION = "urirestrict";
