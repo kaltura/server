@@ -325,15 +325,26 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if($this->tags !== null)
+		if ($this->tags !== null)
+		{
 			$this->validatePropertyMaxLength("tags", CuePointPeer::MAX_TAGS_LENGTH);
-		
-		if($this->entryId !== null)
+		}
+
+		if ($this->entryId !== null)
+		{
 			$this->validateEntryId($sourceObject->getId());
-		
-		if($this->startTime !== null)
+		}
+		else
+		{
+			$dbEntry = entryPeer::retrieveByPK($this->entryId);
+			$this->validateEntryEntitlement($dbEntry);
+		}
+
+		if ($this->startTime !== null)
+		{
 			$this->validateStartTime($sourceObject->getId());
-					
+		}
+
 		$propertiesToSkip[] = 'cuePointType';
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
