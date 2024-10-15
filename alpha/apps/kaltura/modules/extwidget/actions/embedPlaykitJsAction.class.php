@@ -62,7 +62,7 @@ class embedPlaykitJsAction extends sfAction
 
 		if (!$bundleContent || $this->regenerate)
 		{
-			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 20);
+			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 30);
 		}
 
 		$lastModified = $this->getLastModified($bundleContent);
