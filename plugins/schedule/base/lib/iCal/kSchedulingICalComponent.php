@@ -252,8 +252,8 @@ abstract class kSchedulingICalComponent
 	{
 		$ret = '';
 
-		$ret .= $this->begin();
 		$ret .= $this->addVtimeZoneBlockIfApplicable($object, $timeZoneBlockArray);
+		$ret .= $this->begin();
 		$ret .= $this->writeBody();
 		$ret .= $this->end();
 
@@ -264,7 +264,7 @@ abstract class kSchedulingICalComponent
 	{
 		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId())
 		{
-			$timeZoneBlockArray[] =  $this->addVtimeZoneBlock($object);
+			$timeZoneBlockArray[] =  $this->addVtimeZoneBlock($object, $timeZoneBlockArray);
 		}
 		return '';
 	}

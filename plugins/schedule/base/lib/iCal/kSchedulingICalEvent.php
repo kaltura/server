@@ -423,7 +423,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		return $this->timeZoneId;
 	}
 
-	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null)
+	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null, &$timeZoneBlockArray = null)
 	{
 		$vTimeZoneStr = '';
 		try
@@ -469,21 +469,21 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		array_unshift($relevantTransitions, $initialTransition);
 
 		// Create VTIMEZONE block
-		$vTimeZoneStr .= $this->writeField('BEGIN', 'VTIMEZONE');
-		$vTimeZoneStr .= $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
+		$timeZoneBlockArray[] = $this->writeField('BEGIN', 'VTIMEZONE');
+		$timeZoneBlockArray[] = $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
 
 		// Create internal Standard/Daylight blocks
 		for ($i = 0; $i < count($relevantTransitions); $i++)
 		{
-			$vTimeZoneStr .= $this->buildTimeBlock($relevantTransitions[$i], $daylightOffset, $standardOffset);
+			$timeZoneBlockArray[] = $this->buildTimeBlock($relevantTransitions[$i], $daylightOffset, $standardOffset);
 		}
 
-		$vTimeZoneStr .= $this->writeField('END', 'VTIMEZONE');
+		$timeZoneBlockArray[] = $this->writeField('END', 'VTIMEZONE');
 
 		return $vTimeZoneStr;
 	}
 
-	protected function buildTimeBlock($transition, $daylightOffset, $standardOffset)
+	public function buildTimeBlock($transition, $daylightOffset, $standardOffset)
 	{
 		$transitionTimeBlock = '';
 		$timeType = ($transition['isdst']) ? 'DAYLIGHT' : 'STANDARD';
