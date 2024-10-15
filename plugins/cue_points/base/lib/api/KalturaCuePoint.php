@@ -336,7 +336,8 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 		}
 		else
 		{
-			$dbEntry = entryPeer::retrieveByPK($this->entryId);
+			$cuePoint = CuePointPeer::retrieveByPK($sourceObject->getId());
+			$dbEntry = entryPeer::retrieveByPK($cuePoint->getEntryId());
 			$this->validateEntryEntitlement($dbEntry);
 		}
 
