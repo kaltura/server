@@ -2,6 +2,13 @@
 
 class kSchedulingICalEvent extends kSchedulingICalComponent
 {
+	const SEC_IN_WEEK = 604800;
+	const SEC_IN_MONTH = 2678400;
+	const SEC_IN_YEAR = 31556926;
+	const SEC_IN_DAY = 86400;
+	const SEC_IN_HOUR = 3600;
+	const SEC_IN_MINUTE = 60;
+
 	/**
 	 * @var kSchedulingICalRule
 	 */
@@ -113,7 +120,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$ret = parent::writeBody();
 
 		if ($this->rule)
+		{
 			$ret .= $this->writeField('RRULE', $this->rule->getBody());
+		}
 
 		return $ret;
 	}
@@ -150,7 +159,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			$event->$string = $this->getField($string);
 			if ( $string == 'duration')
-			  $event->$string = $this->formatDuration($event->$string);
+			{
+				$event->$string = $this->formatDuration($event->$string);
+			}
 		}
 
 		foreach (self::$dateFields as $date => $field)
@@ -162,12 +173,16 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 				if (preg_match('/"([^"]+)"/', $configurationField, $matches))
 				{
 					if (isset($matches[1]))
+					{
 						$timezoneFormat = $matches[1];
-
-				} elseif (preg_match('/=([^"]+)/', $configurationField, $matches))
+					}
+				}
+				elseif (preg_match('/=([^"]+)/', $configurationField, $matches))
 				{
 					if (isset($matches[1]))
+					{
 						$timezoneFormat = $matches[1];
+					}
 				}
 			}
 			$val = kSchedulingICal::parseDate($this->getField($field), $timezoneFormat);
@@ -182,14 +197,17 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 		$classificationType = $this->getField('class');
 		if (isset($classificationTypes[$classificationType]))
+		{
 			$event->classificationType = $classificationTypes[$classificationType];
+		}
 
 		$rule = $this->getRule();
 		if ($rule)
 		{
 			$event->recurrenceType = KalturaScheduleEventRecurrenceType::RECURRING;
 			$event->recurrence = $rule->toObject();
-		} else
+		}
+		else
 		{
 			$event->recurrenceType = KalturaScheduleEventRecurrenceType::NONE;
 		}
@@ -221,10 +239,10 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			$object->setField('uid', $event->referenceId);
 		}
-		// else
-		// {
-		// 	$object->setField('uid', self::getUidFromEventId($event->id));
-		// }
+//		else
+//		{
+//	        $object->setField('uid', self::getUidFromEventId($event->id));
+//		}
 
 		if ($event->recurrence && $event->recurrence->timeZone)
 		{
@@ -316,7 +334,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		);
 
 		if ($event->classificationType && isset($classificationTypes[$event->classificationType]))
+		{
 			$classificationType = $object->setField('class', $classificationTypes[$event->classificationType]);
+		}
 
 		if ($event->recurrence)
 		{
@@ -338,7 +358,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			{
 				$object->setField('x-kaltura-parent-id', $event->parentId);
 				if ($parent->getReferenceId())
+				{
 					$object->setField('x-kaltura-parent-uid', $parent->getReferenceId());
+				}
 
 				if (!count($resourceIds))
 				{
@@ -353,18 +375,26 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 
 		if (count($resourceIds))
+		{
 			$object->setField('x-kaltura-resource-ids', implode(',', $resourceIds));
+		}
 
 		if ($event->tags)
+		{
 			$object->setField('x-kaltura-tags', $event->tags);
+		}
 
 		if ($event instanceof KalturaEntryScheduleEvent)
 		{
 			if ($event->templateEntryId)
+			{
 				$object->setField('x-kaltura-template-entry-id', $event->templateEntryId);
+			}
 
 			if ($event->entryIds)
+			{
 				$object->setField('x-kaltura-entry-ids', $event->entryIds);
+			}
 
 			if ($event->categoryIds)
 			{
@@ -380,7 +410,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 					$fullIds[] = $category->getFullIds();
 				}
 				if (count($fullIds))
+				{
 					$object->setField('related-to', implode(';', $fullIds));
+				}
 			}
 		}
 
@@ -436,8 +468,11 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			return $vTimeZoneStr;
 		}
 
+		// Calculating until. Frequency is mandatory and also until or count
+		$until = (!$event->recurrence->until) ? $this->getUntilFromCount($event->recurrence->count, $event->recurrence->frequency, $event->startDate) : $event->recurrence->until;
+
 		// In order to reduce the size of the transitions to analyze, we start querying from a year before the start of the event until the last occurrence
-		$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $event->recurrence->until);
+		$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $until);
 		$relevantTransitions = array();
 		$initialTransition = null;
 		$daylightOffset = null;
@@ -461,7 +496,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			{
 				$initialTransition = $transition;
 			}
-			if ($event->startDate <= $transition['ts'] && $transition['ts'] <= $event->recurrence->until)
+			if ($event->startDate <= $transition['ts'] && $transition['ts'] <= $until)
 			{
 				$relevantTransitions[] = $transition;
 			}
@@ -481,6 +516,43 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$timeZoneBlockArray[] = $this->writeField('END', 'VTIMEZONE');
 
 		return $vTimeZoneStr;
+	}
+
+	protected function getUntilFromCount($count, $frequency, $startDate)
+	{
+		switch ($frequency)
+		{
+			case DatesGenerator::SECONDLY:
+			{
+				return $startDate + $count;
+			}
+			case DatesGenerator::DAILY:
+			{
+				return $startDate + ($count * self::SEC_IN_DAY);
+			}
+			case DatesGenerator::MINUTELY:
+			{
+				return $startDate + ($count * self::SEC_IN_MINUTE);
+			}
+			case DatesGenerator::WEEKLY:
+			{
+				return $startDate + ($count * self::SEC_IN_WEEK);
+			}
+			case DatesGenerator::HOURLY:
+			{
+				return $startDate + ($count * self::SEC_IN_HOUR);
+			}
+			case DatesGenerator::MONTHLY:
+			{
+				return $startDate + ($count * self::SEC_IN_MONTH);
+			}
+			case DatesGenerator::YEARLY:
+			{
+				return $startDate + ($count * self::SEC_IN_YEAR);
+			}
+			default:
+				return $startDate;
+		}
 	}
 
 	protected function buildTimeBlock($transition, $daylightOffset, $standardOffset)
