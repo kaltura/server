@@ -221,10 +221,10 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			$object->setField('uid', $event->referenceId);
 		}
-		else
-		{
-			$object->setField('uid', self::getUidFromEventId($event->id));
-		}
+		// else
+		// {
+		// 	$object->setField('uid', self::getUidFromEventId($event->id));
+		// }
 
 		if ($event->recurrence && $event->recurrence->timeZone)
 		{
