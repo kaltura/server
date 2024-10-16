@@ -126,5 +126,50 @@ class dateUtils
 		$diff = $date2->diff($date1)->format("%a");
 		return $diff;
 	}
+// Format the offset from secs to +hhmm format
+	public static function formatOffset(int $offset)
+	{
+		$hours = floor($offset / 3600);
+		$minutes = floor(abs($offset) % 3600 / 60);
+		return sprintf('%+03d%02d', $hours, $minutes);
+	}
+
+	public static function convertWeekDay(int $timestamp)
+	{
+		$date = new DateTime('@' . $timestamp);
+		$dayOfWeek = $date->format('w'); // Get the day of the week (0 for Sunday, 6 for Saturday)
+		$dayOfMonth = (int) $date->format('j'); // Get the day of the month
+		$occurrenceOfSpecificDay = ceil($dayOfMonth / 7);
+
+		// Find the first day of the month
+		$firstDayOfMonth = new DateTime($date->format('Y-m-01'));
+
+		// Count how many times the same weekday has occurred up to the given day
+		$occurrenceOfWeekDay = 0;
+		for ($day = 1; $day <= $dayOfMonth; $day++)
+		{
+			$currentDayOfWeek = $firstDayOfMonth->format('w');
+			if ($currentDayOfWeek == $dayOfWeek)
+			{
+				$occurrenceOfWeekDay++;
+			}
+			$firstDayOfMonth->modify('+1 day');
+		}
+
+		// Weekday abbreviations
+		$weekDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+		// Return the occurrence and the weekday abbreviation, e.g., "1MO" for first Monday
+		$occurrenceOfSpecificDay = ($occurrenceOfSpecificDay == $occurrenceOfWeekDay) ? -1 : $occurrenceOfSpecificDay;
+		return $occurrenceOfSpecificDay . $weekDays[$dayOfWeek];
+	}
+
+	public static function getDateOnPreviousYear($timestamp)
+	{
+		$date = new DateTime();
+		$date->setTimestamp($timestamp);
+		$date->modify('-1 year');
+		return $date->getTimestamp();
+	}
 }
 ?>
