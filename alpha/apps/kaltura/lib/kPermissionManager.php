@@ -713,29 +713,23 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 
 	private static function removeLimitedPermissions()
 	{
-		KalturaLog::debug("Permissions Map Before = " . print_r(self::$map, true));
-
 		$ks = ks::fromSecureString(kCurrentContext::$ks);
 		if (!$ks)
 		{
 			return;
 		}
-		$limitingRole = $ks->getLimitingRole();
-		if (!$limitingRole)
+		$limitRole = $ks->getRole(kSessionBase::PRIVILEGE_LIMIT_ROLE);
+		if (!$limitRole)
 		{
 			return;
 		}
 
-		KalturaLog::debug("Removing permissions according to limiting role [$limitingRole]");
-		$roleMap = self::getPermissions($limitingRole, true);
-
-		KalturaLog::debug("Role Map = " . print_r($roleMap, true));
+		KalturaLog::debug("Removing permissions according to limit role [$limitRole]");
+		$roleMap = self::getPermissions($limitRole, true);
 
 		self::removeApiActionPermission($roleMap[self::API_ACTIONS_ARRAY_NAME]);
 		self::removeApiParametersPermissions($roleMap[self::API_PARAMETERS_ARRAY_NAME]);
 		self::removePermissionNames($roleMap[self::PERMISSION_NAMES_ARRAY]);
-
-		KalturaLog::debug("Permissions Map After = " . print_r(self::$map, true));
 	}
 
 	private static function removeApiActionPermission($apiActions)
@@ -782,7 +776,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 					}
 				}
 
-				if (count(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName] == 0))
+				if (count(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]) == 0)
 				{
 					KalturaLog::debug("Removed all parameters for object [$itemObjectName]");
 					unset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]);
