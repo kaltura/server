@@ -466,10 +466,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		{
 			case KalturaVendorServiceFeature::LIVE_TRANSLATION:
 				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getTargetLanguage());
-				$feature = new LiveTranslationFeature();
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
 				$language = $language !== '' ? $language : languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getSourceLanguage());
-				$feature = !is_null($feature) ? $feature : new LiveCaptionFeature();
+				$feature = new LiveCaptionFeature();//
 				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
 				$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
