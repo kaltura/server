@@ -464,6 +464,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		catch (Exception $e)
 		{
 			KalturaLog::err('Error while processing the time zone: ' . $e->getMessage());
+			throw new KalturaAPIException('Error while processing the time zone: ' . $e->getMessage());
 		}
 
 		// Calculating until. Frequency is mandatory and also until or count
