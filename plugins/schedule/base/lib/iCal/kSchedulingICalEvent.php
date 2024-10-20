@@ -457,7 +457,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null, &$timeZoneBlockArray = null)
 	{
-		$vTimeZoneStr = '';
 		try
 		{
 			$dateTimeZone = new DateTimeZone($this->timeZoneId);
@@ -465,7 +464,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		catch (Exception $e)
 		{
 			KalturaLog::err('Error while processing the time zone: ' . $e->getMessage());
-			return $vTimeZoneStr;
 		}
 
 		// Calculating until. Frequency is mandatory and also until or count
@@ -503,8 +501,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 		array_unshift($relevantTransitions, $initialTransition);
 
-		// Create VTIMEZONE block
-		$timeZoneBlockArray[] = $this->writeField('BEGIN', 'VTIMEZONE');
+		// Create VTIMEZONE block content
 		$timeZoneBlockArray[] = $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
 
 		// Create internal Standard/Daylight blocks
@@ -512,10 +509,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			$timeZoneBlockArray[] = $this->buildTimeBlock($relevantTransitions[$i], $daylightOffset, $standardOffset);
 		}
-
-		$timeZoneBlockArray[] = $this->writeField('END', 'VTIMEZONE');
-
-		return $vTimeZoneStr;
 	}
 
 	protected function getUntilFromCount($count, $frequency, $startDate)

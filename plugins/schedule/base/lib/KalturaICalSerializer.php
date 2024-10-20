@@ -37,7 +37,12 @@ class KalturaICalSerializer extends KalturaSerializer
 		{
 			$iCalBeforeEvents = substr($iCalString, 0, $position);
 			$iCalWithEvents = substr($iCalString, $position);
+			// Clean array from duplicated transitions
 			$this->timeZoneBlockArray = array_unique($this->timeZoneBlockArray);
+			// Add BEGIN/END timezone tags
+			array_unshift($this->timeZoneBlockArray, "BEGIN:VTIMEZONE\r\n");
+			$this->timeZoneBlockArray[] = "END:VTIMEZONE\r\n";
+			//Inject to the iCal
 			$timeZoneBlocksCollection = implode('', $this->timeZoneBlockArray);
 			return $iCalBeforeEvents . $timeZoneBlocksCollection . $iCalWithEvents;
 		}
