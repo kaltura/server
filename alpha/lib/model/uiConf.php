@@ -116,8 +116,8 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 
 	const CUSTOM_DATA_CON_FILE_VERSION = 'conf_file_version';
 	const CUSTOM_DATA_CONF_FILE_FEATURES_VERSION = 'conf_file_features_version';
-
 	const CUSTOM_DATA_V2REDIRECT = "v2redirect";
+	const CUSTOM_DATA_CURRENT_CACHE_KEY = 'current_cache_key';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -826,5 +826,15 @@ class uiConf extends BaseuiConf implements ISyncableFile, IRelatedObject
 	{
 		KalturaLog::log(JSON_encode($v));
 		return $this->putInCustomData(self::CUSTOM_DATA_V2REDIRECT, $v);
+	}
+	
+	public function getCurrentCacheKey()
+	{
+		return $this->getFromCustomData( self::CUSTOM_DATA_CURRENT_CACHE_KEY);
+	}
+	
+	public function setCurrentCacheKey($v)
+	{
+		return $this->putInCustomData(self::CUSTOM_DATA_CURRENT_CACHE_KEY, $v);
 	}
 }

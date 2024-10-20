@@ -16,6 +16,7 @@ class embedPlaykitJsAction extends sfAction
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
+	const INCLUDE_SOURCE_MAP_PARAM_NAME = 'includeSourceMap';
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
 	const CANARY = "{canary}";
@@ -47,6 +48,7 @@ class embedPlaykitJsAction extends sfAction
 	private $playerConfig = null;
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
+	private $includeSourceMap = "false";
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
 
 	public function execute()
@@ -56,16 +58,41 @@ class embedPlaykitJsAction extends sfAction
 
 		$this->initMembers();
 
+		$updateUiConfBundleCacheKey = true;
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
 		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
 		$extraModulesNames = unserialize($this->bundleCache->get($this->bundle_extra_modules_names));
 
 		if (!$bundleContent || $this->regenerate)
 		{
-			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 30);
+			try
+			{
+				list($bundleContent, $i18nContent, $extraModulesNames, $updateUiConfBundleCacheKey) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 30);
+			}
+			catch (kCoreException $ex)
+			{
+				switch ($ex->getCode())
+				{
+					case kCoreException::LOCK_TIMED_OUT:
+						list($bundleContent, $i18nContent, $extraModulesNames, $updateUiConfBundleCacheKey) = $this->tryServingExistingCacheVersion($this, KExternalErrors::BUNDLE_CREATION_FAILED, "Failed to build bundle in allocated time");
+						if(!$bundleContent)
+						{
+							KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "Failed to serve bundle content");
+						}
+						break;
+					default:
+						KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, "Failed to serve bundle content with unknown error");
+				}
+			}
 		}
 
 		$lastModified = $this->getLastModified($bundleContent);
+		
+		//Try saving bundle content cache key if needed for serving old version in case of an error while generating new one
+		if($updateUiConfBundleCacheKey)
+		{
+			$this->saveCurrentBundleCacheKey($this);
+		}
 
 		//Format bundle content
 		$bundleContent = $this->formatBundleContent($bundleContent, $i18nContent, $extraModulesNames);
@@ -88,7 +115,7 @@ class embedPlaykitJsAction extends sfAction
 			{
 				$i18nContent = $context->bundleCache->get($context->bundle_i18n_name);
 				$extraModulesNames = unserialize($context->bundleCache->get($context->bundle_extra_modules_names));
-				return array($bundleContent, $i18nContent, $extraModulesNames);
+				return array($bundleContent, $i18nContent, $extraModulesNames, false);
 			}
 		}
 
@@ -99,25 +126,31 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " wrong config object");
 		}
 
-		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
+		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath) . "&includeSourceMap=" . $context->includeSourceMap;
 		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'), true);
-
 		if (!$content)
 		{
-			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " failed to get content from bundle builder");
+			return $context->tryServingExistingCacheVersion($context, KExternalErrors::BUNDLE_CREATION_FAILED, $config . " failed to get content from bundle builder");
 		}
 
 		$content = json_decode($content, true);
-        if (isset($content['status'])) {
-            if ($content['status'] != 0) {
+        if (isset($content['status']))
+		{
+            if ($content['status'] != 0)
+			{
                 $message = $content['message'];
-                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . ". " . $message);
-            } else {
+				return $context->tryServingExistingCacheVersion($context, KExternalErrors::BUNDLE_CREATION_FAILED, $config . ". " . $message);
+            }
+			else
+			{
                 $content = $content['payload'];
             }
-        } else {
-            if (!$content || !$content['bundle']) {
-                KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
+        }
+		else
+		{
+            if (!$content || !$content['bundle'])
+			{
+				return $context->tryServingExistingCacheVersion($context, KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
             }
         }
 		
@@ -137,8 +170,8 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
 		}
-
-		return array($bundleContent, $i18nContent, $extraModulesNames);
+		
+		return array($bundleContent, $i18nContent, $extraModulesNames, true);
 	}
 	
 	private static function getExtraModuleNames($extraModules = array())
@@ -777,8 +810,11 @@ class embedPlaykitJsAction extends sfAction
 		if (!$this->partner)
 			KExternalErrors::dieError(KExternalErrors::PARTNER_NOT_FOUND);
 
-		//Get should force regenration
+		//Get should force regeneration
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
+		
+		//Should we include player source map in the request result
+		$this->includeSourceMap = $this->getRequestParameter(self::INCLUDE_SOURCE_MAP_PARAM_NAME, "false");
 
 		//Get the list of partner 0 uiconf tags for uiconfs that contain {latest} and {beta} lists
 		$embedPlaykitConf = kConf::getMap(kConfMapNames::EMBED_PLAYKIT);
@@ -864,5 +900,55 @@ class embedPlaykitJsAction extends sfAction
 	{
 		$returnValue = parent::getRequestParameter($name, $default);
 		return $returnValue ? $returnValue : $default;
+	}
+	
+	protected function saveCurrentBundleCacheKey($context)
+	{
+		//Avoid updating current cache hash on the ui conf if dynamic params affecting the result are being sent
+		$versions = $this->getRequestParameter(self::VERSIONS_PARAM_NAME);
+		if($versions)
+		{
+			return;
+		}
+		
+		if($context->bundle_name != $context->uiConf->getCurrentCacheKey())
+		{
+			//Avoid system load by controlling the percentage of ui confs how will get this update
+			if(rand(0, 100) < kConf::get("current_version_save_ration", kConfMapNames::EMBED_PLAYKIT, 30))
+			{
+				$context->uiConf->setCurrentCacheKey($context->bundle_name);
+				$context->uiConf->save();
+			}
+			else
+			{
+				KalturaLog::debug("Skipping ui conf update to avoid unnecessary system load");
+			}
+		}
+	}
+	
+	protected function tryServingExistingCacheVersion($context, $errCode, $message = null)
+	{
+		$existingCacheVersion = $context->uiConf->getCurrentCacheKey();
+		KalturaLog::debug("TTT: existingCacheVersion [$existingCacheVersion]");
+		if(!$existingCacheVersion)
+		{
+			KExternalErrors::dieError($errCode, $message);
+		}
+		
+		$i18nContent = null;
+		$extraModulesNames = null;
+		$bundleContent = $context->bundleCache->get($existingCacheVersion);
+		if ($bundleContent)
+		{
+			$i18nContent = $context->bundleCache->get($existingCacheVersion . "_i18n");
+			$extraModulesNames = unserialize($context->bundleCache->get($existingCacheVersion . "_extramodules"));
+		}
+		
+		if(!$bundleContent)
+		{
+			KExternalErrors::dieError($errCode, $message);
+		}
+		
+		return array($bundleContent, $i18nContent, $extraModulesNames, false);
 	}
 }
