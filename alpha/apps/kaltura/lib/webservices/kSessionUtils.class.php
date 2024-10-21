@@ -743,7 +743,7 @@ class ks extends kSessionBase
 		return $this->getPrivilegeValue(self::PRIVILEGE_LIMIT_ENTRY, null);
 	}
 
-	public function getRole()
+	public function getRole($privilegeName = self::PRIVILEGE_SET_ROLE)
 	{
 		// break all privileges to their pairs - this is to support same "multi-priv" method expected for
 		// edit privilege (edit:XX,edit:YYY,...)
@@ -753,7 +753,7 @@ class ks extends kSessionBase
 		{
 			// extract RoleID from pair
 			$exPrivileges = explode(':', $priv);
-			if ($exPrivileges[0] == self::PRIVILEGE_SET_ROLE)
+			if ($exPrivileges[0] == $privilegeName)
 			{
 				$roleId = isset($exPrivileges[1]) ? $exPrivileges[1] : null; 
 				if ($roleId && (is_numeric($roleId)) && ($roleId < 0))
