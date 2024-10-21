@@ -201,9 +201,18 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 			if($this->entryId !== null && $this->entryId != $dbCuePoint->getEntryId())
 				throw new KalturaAPIException(KalturaCuePointErrors::CANNOT_UPDATE_ENTRY_ID);
 		}
+
+		$this->validateEntryEntitlement($dbEntry);
 	}
 	
-
+	protected function validateEntryEntitlement(entry $dbEntry)
+	{
+		if (!kEntitlementUtils::isEntitledForEditEntry($dbEntry))
+		{
+			KalturaLog::debug("User is not allowed to edit " . get_class($this) . " on entry [$this->entryId]");
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+		}
+	}
 	
 	/**
 	 * @param int $endTime

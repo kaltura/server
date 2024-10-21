@@ -809,7 +809,7 @@ class KalturaResponseCacher extends kApiCache
 				}
 
 				$paramValue = self::getApiParamValue($params, $key);
-				if(in_array($key, $regexKeys))
+				if($paramValue && in_array($key, $regexKeys))
 				{
 					foreach ($ruleValues as $ruleValue)
 					{

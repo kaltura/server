@@ -1,3 +1,17 @@
+# Ursa-21.1.0
+## Enable player calls redirection from V2 to V7 ##
+* Issue Type: Task
+* Issue ID: PLAT-24983
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.v2v7Redirect.enabled = true
+moduls.v2v7Redirect.permissionType = 2
+moduls.v2v7Redirect.label = "Enable player calls redirection from V2 to V7"
+moduls.v2v7Redirect.permissionName = FEATURE_V2_V7_REDIRECT
+moduls.v2v7Redirect.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Ursa-21.0.0
 ## Add kafka event notification for room entry updates ##
 - Issue Type: Task

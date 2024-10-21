@@ -24,10 +24,10 @@ ini_set("memory_limit","512M");
 	}
 
 	/********************
-	 * KBaseFFmpegFilterObject
+	 * KFFmpegFilter
 	 */
 	class KFFmpegFilter extends KBaseFFmpegFilterObject{
-		public $delim 	= null;
+		public $delim 	= null;		// Filter fields/params delimiter
 		
 		public $_chain = null;
 		
@@ -110,17 +110,51 @@ ini_set("memory_limit","512M");
 					}
 				}
 			}
-
 			return true;
 		}
 	
-
+		/********************
+		 * CompoundString
+		 */
+		public function CompoundString(&$lastLabelOut)
+		{
+			$compoundStr = null;
+			if(isset($this->labelIn)){
+				foreach($this->labelIn as $labelIn) {
+					$compoundStr.="[$labelIn]";
+				}
+			}
+			$compoundStr.= $this->name;
+			$auxStr = $this->name;
+			if(isset($this->$auxStr)){
+				$compoundStr.= ("=".$this->$auxStr);
+			}
+			$fieldArr = array();
+			foreach($this as $key=>$val) {
+				if(in_array($key,array("name","delim","labelIn","labelOut","_string","_paramStr","_chain","id",$this->name)))
+					continue;
+				$fieldArr[] = "$key=$val";
+			}
+			if($this->delim=="")
+				$compoundStr.= "=".$this->_paramStr;
+			else if(count($fieldArr)>0)
+				$compoundStr.= "=".implode($this->delim,$fieldArr);
+			
+			if(isset($this->labelOut)){
+				$lastLabelOut ="[$this->labelOut]";
+				$compoundStr.= $lastLabelOut;
+			}
+			else
+				$lastLabelOut = "";
+			KalturaLog::log("filter string:$compoundStr");
+			return $compoundStr;
+		}
 	}
 	
 	/********************
 	 * KFFmpegFilterChain
 	 */
-	class KFFmpegFilterChain extends KBaseFFmpegFilterObject{
+	class KFFmpegFilterChain extends KFFmpegFilter{
 		public $entities  = array();
 		
 		/********************
@@ -159,6 +193,25 @@ ini_set("memory_limit","512M");
 			return true;
 		}
 
+		/********************
+		 * FindEntityByName
+		 */
+		public function FindEntityByName($filterName)
+		{
+			KalturaLog::log("filterName:$filterName,".count($this->entities));
+			foreach($this->entities as $entity) {
+				KalturaLog::log("entity:$entity->name, $entity->id");
+				if($entity->name==$filterName)
+					return $entity;
+				else if(isset($entity->entities)) {
+					$found= $entity->FindEntityByName($filterName);
+					if(isset($found))
+						return $found;
+				}
+			}
+			return null;
+		}
+		
 		/********************
 		 * FindEntityByLabelIn
 		 */
@@ -199,6 +252,59 @@ ini_set("memory_limit","512M");
 			}
 			return null;
 		}
+		
+		/********************
+		 * RemoveEntity
+		 */
+		public function RemoveEntity($entity)
+		{
+			KalturaLog::log("entity: id:$entity->id), name:$entity->name");
+
+			$chain = $entity->_chain;
+				// If there is prev entity in the chain,
+				//  adjust it (labelOut and entity string), 
+			if($entity->id>0){
+				$prev = $chain->entities[$entity->id-1];
+				$prev->labelOut = $entity->labelOut;
+				$chain->entities[$entity->id-1]->_string = $prev->CompoundString($stam);
+			}
+				// Remove the entity from the chain and update the chain string
+			unset($chain->entities[$entity->id]);
+			$chain->_string = $chain->CompoundString($stam);
+				// If there are no more entities in the chain, remove it from the graph
+			if(count($this->entities[$chain->id]->entities)==0) {
+					// If there is prev chain in the graph,
+					//  adjust it (labelOut and chain string), 
+				if($chain->id>0){
+					$prev = $this->entities[$chain->id-1];
+					$prev->labelOut = $entity->labelOut;
+					$lastFilter = end($prev->entities);
+					$lastFilter->labelOut = $entity->labelOut;
+					$lastFilter->_string = $lastFilter->CompoundString($stam);
+					$prev->_string = $prev->CompoundString($stam);
+				}
+				unset($this->entities[$chain->id]);
+			}
+				// Adjust the filter graph string
+			$this->_string = $this->CompoundString($stam);
+			KalturaLog::log($this->_string);
+			return true;
+		}
+		
+		/********************
+		 * CompoundString
+		 */
+		public function CompoundString(&$lastLabelOut)
+		{
+			$filterArr = array();
+			foreach($this->entities as $filter){
+				$filterStr = $filter->CompoundString($lastLabelOut);
+				$filterArr[] = $filterStr;
+			}
+			$compoundStr = implode(',',$filterArr);
+			KalturaLog::log("filterChain string:$compoundStr");
+			return $compoundStr;
+		}
 	}
 	
 	/********************
@@ -220,6 +326,10 @@ ini_set("memory_limit","512M");
 				$filterChain->id = count($this->entities);
 				$this->entities[] = $filterChain;
 			}
+			if(count($this->entities)>0) {
+				$this->labelIn = $this->entities[0]->labelIn;
+				$this->labelOut = $filterChain->labelOut;
+			}
 			return true;
 		}
 		
@@ -228,48 +338,16 @@ ini_set("memory_limit","512M");
 		 */
 		public function CompoundString(&$lastLabelOut)
 		{
-			$str = null;
 			$chainArr = array();
 			foreach($this->entities as $chain) {
 				$chainStr = null;
 				$filterArr = array();
-				foreach($chain->entities as $filter){
-					$filterStr = null;
-					if(isset($filter->labelIn)){
-						foreach($filter->labelIn as $labelIn) {
-							$filterStr.="[$labelIn]";
-						}
-					}
-					$filterStr.= $filter->name;
-					$auxStr = $filter->name;
-					if(isset($filter->$auxStr)){
-						$filterStr.= ("=".$filter->$auxStr);
-					}
-					$fieldArr = array();
-					foreach($filter as $key=>$val) {
-						if(in_array($key,array("name","delim","labelIn","labelOut","_string","_paramStr","_chain","id",$filter->name)))
-							continue;
-						$fieldArr[] = "$key=$val";
-					}
-					if($filter->delim=="")
-						$filterStr.= "=".$filter->_paramStr;
-					else if(count($fieldArr)>0)
-						$filterStr.= "=".implode($filter->delim,$fieldArr);
-					
-					if(isset($filter->labelOut)){
-						$lastLabelOut ="[$filter->labelOut]";
-						$filterStr.= $lastLabelOut;
-					}
-					else
-						$lastLabelOut = "";
-					$filterArr[] = $filterStr;
-				}
-				$chainStr.= implode(',',$filterArr);
+				$chainStr = $chain->CompoundString($lastLabelOut);
 				$chainArr[] = $chainStr;
 			}
-			$str = implode(';',$chainArr);
-			KalturaLog::log("filterGraph string:$str");
-			return $str;
+			$compoundStr = implode(';',$chainArr);
+			KalturaLog::log("filterGraph string:$compoundStr");
+			return $compoundStr;
 		}
 		
 		/********************
@@ -364,7 +442,7 @@ ini_set("memory_limit","512M");
 		}
 		
 		/********************
-		 * LoopFilters
+		 * iterFuncClone
 		 */
 		public static function iterFuncClone($chain, $obj)
 		{

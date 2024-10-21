@@ -208,13 +208,13 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-	        foreach (self::$dateFields as $date => $field)
-	        {
-	            if ($event->$date)
-	            {
-                        	$object->setField($field, kSchedulingICal::formatDate($event->$date));
-	            }
-	        }
+		foreach (self::$dateFields as $date => $field)
+		{
+			if ($event->$date)
+			{
+				$object->setField($field, kSchedulingICal::formatDate($event->$date));
+			}
+		}
 
 		$classificationTypes = array(
 			KalturaScheduleEventClassificationType::PUBLIC_EVENT => 'PUBLIC',

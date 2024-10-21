@@ -20,4 +20,9 @@ class VendorQuizCatalogItem extends VendorCatalogItem
         $supportedMediaTypes = [entry::ENTRY_MEDIA_TYPE_VIDEO, entry::ENTRY_MEDIA_TYPE_AUDIO];
         return $type === entryType::MEDIA_CLIP && in_array($mediaType, $supportedMediaTypes);
     }
+
+	protected function getPuserId($entry)
+	{
+		return $entry->getPuserId();
+	}
 }
