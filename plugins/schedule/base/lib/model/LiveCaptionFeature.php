@@ -36,6 +36,7 @@ class LiveCaptionFeature extends LiveFeature
 	protected $inputDelay;
 
 	/**
+	 * Target language
 	 * @var string
 	 */
 	protected $language;
