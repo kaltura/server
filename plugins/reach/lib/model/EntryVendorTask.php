@@ -465,18 +465,27 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		switch ($this->getServiceFeature())
 		{
 			case KalturaVendorServiceFeature::LIVE_TRANSLATION:
+			{
 				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getTargetLanguage());
+				$this->addLanguageToFeature('LiveCaptionFeature', $connectedEvent, $taskData, $language);
+				break;
+			}
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
-				$language = $language !== '' ? $language : languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getSourceLanguage());
-				$feature = new LiveCaptionFeature();//
-				$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
-				$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
-				$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
-				$feature->setLanguage($language);
-				$connectedEvent->addFeature($feature, true);
-				$connectedEvent->save();
+				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getSourceLanguage());
+				$this->addLanguageToFeature('LiveCaptionFeature', $connectedEvent, $taskData, $language);
 				break;
 		}
+	}
+
+	protected function addLanguageToFeature($featureType, &$connectedEvent, $taskData, $language,)
+	{
+		$feature = new $featureType();
+		$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
+		$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
+		$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
+		$feature->setLanguage($language);
+		$connectedEvent->addFeature($feature, true);
+		$connectedEvent->save();
 	}
 
 	public function removeSchedulingData()
@@ -485,22 +494,25 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		switch ($this->getServiceFeature())
 		{
 			case KalturaVendorServiceFeature::LIVE_TRANSLATION:
-				$liveFeatureName = LiveTranslationFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}");
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
-				$liveFeatureName = $liveFeatureName !== '' ?: LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}");
-				/* @var $taskData kScheduledVendorTaskData */
-				$taskData = $this->getTaskJobData();
-				/* @var $connectedEvent LiveStreamScheduleEvent */
-				$connectedEvent = $taskData->getScheduleEvent();
-				if (!$connectedEvent)
-				{
-					break;
-				}
-
-				$connectedEvent->removeFeature($liveFeatureName);
-				$connectedEvent->save();
+				$this->removeFeature(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX. "-{$this->getId()}"));
 				break;
 		}
+	}
+
+	protected function removeFeature($liveFeatureName)
+	{
+		/* @var $taskData kScheduledVendorTaskData */
+		$taskData = $this->getTaskJobData();
+		/* @var $connectedEvent LiveStreamScheduleEvent */
+		$connectedEvent = $taskData->getScheduleEvent();
+		if (!$connectedEvent)
+		{
+			return;
+		}
+
+		$connectedEvent->removeFeature($liveFeatureName);
+		$connectedEvent->save();
 	}
 
 	public function save(PropelPDO $con = null)
