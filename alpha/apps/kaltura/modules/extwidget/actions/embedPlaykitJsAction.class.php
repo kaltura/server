@@ -929,7 +929,6 @@ class embedPlaykitJsAction extends sfAction
 	protected function tryServingExistingCacheVersion($context, $errCode, $message = null)
 	{
 		$existingCacheVersion = $context->uiConf->getCurrentCacheKey();
-		KalturaLog::debug("TTT: existingCacheVersion [$existingCacheVersion]");
 		if(!$existingCacheVersion)
 		{
 			KExternalErrors::dieError($errCode, $message);
