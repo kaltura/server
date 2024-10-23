@@ -11,6 +11,7 @@ class embedPlaykitJsAction extends sfAction
 	const LANGS_PARAM_NAME = "langs";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const PLAYLIST_ID_PARAM_NAME = "playlist_id";
+	const EXTERNAL_SOURCE_PARAM_NAME = "external_source";
 	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";
 	const REGENERATE_PARAM_NAME = "regenerate";
@@ -473,13 +474,17 @@ class embedPlaykitJsAction extends sfAction
 
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
 		$playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
+		$external_source = $this->getRequestParameter(self::EXTERNAL_SOURCE_PARAM_NAME);
 		$loadContentMethod = "";
 		if (!is_null($entry_id)) {
 		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
 		} elseif (!is_null($playlist_id)) {
 		    $loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
-		} else {
-		    KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry and Playlist ID not defined");
+		} elseif (!is_null($external_source)) {
+			$loadContentMethod = "kalturaPlayer.setMedia({\"sources\":$external_source});";
+		}
+		else {
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry and Playlist ID not defined");
 		}
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
