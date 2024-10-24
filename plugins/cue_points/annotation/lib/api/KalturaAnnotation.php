@@ -230,9 +230,4 @@ class KalturaAnnotation extends KalturaCuePoint
             }
         }
     }
-	
-    protected function validateEntryEntitlement(entry $dbEntry)
-    {
-        return true;
-    }
 }
