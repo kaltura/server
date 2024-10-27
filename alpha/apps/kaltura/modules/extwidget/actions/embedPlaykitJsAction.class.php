@@ -484,7 +484,7 @@ class embedPlaykitJsAction extends sfAction
 			$loadContentMethod = "kalturaPlayer.setMedia({\"sources\":$external_source});";
 		}
 		else {
-			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry and Playlist ID not defined");
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "One of the following params must be defined: entry_id, playlist_id, external_source");
 		}
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
@@ -810,7 +810,7 @@ class embedPlaykitJsAction extends sfAction
 
 
 		}
-		catch (Exception $ex)
+		catch (ion $ex)
 		{
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
