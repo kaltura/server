@@ -67,7 +67,7 @@ class embedIframeJsAction extends sfAction
 			( $uiConf->getV2Redirect()->getIsApproved() || $this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME) )
 			)
 		{
-			$this->redirectToV7($uiConf->getV2Redirect()->getV7id(), $uiconf_id, $partner_id, $uiConf->getV2Redirect()->getTranslatePlugins() );
+			$this->redirectToV7($uiConf->getV2Redirect()->getV7id(), $uiconf_id, $partner_id, $uiConf->getV2Redirect()->getTranslatePlugins());
 		}
 
 
@@ -178,13 +178,18 @@ class embedIframeJsAction extends sfAction
 			return;
 		}
 
+
 		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
 		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
 		$url = $host . '/p/' . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . '?'
 				. $_SERVER['QUERY_STRING'] . "&"
 				. v2RedirectUtils::V2REDIRECT_PARAM_NAME .'=true'
 				. $shouldTranslatePluginsQueryParam;
+
+		requestUtils::sendCachingHeaders(600, false, time());
+		kFile::cacheRedirect($url);
 		header("Location:$url");
+		header("pragma:");
 		KExternalErrors::dieGracefully();
 	}
 }

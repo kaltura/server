@@ -30,9 +30,13 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * C'tor
 		 */
-		public function __construct($storeToken=null)
+		public function __construct($storeToken=null, $host=null, $port=null, $flags=1)
 		{
 			$this->storeToken = $storeToken;
+				// 'flags=1' stands for 'compress stored data'
+			if(isset($host) && isset($port) && isset($flags)){
+				$this->Setup(array('host'=>$host, 'port'=>$port, 'flags'=>$flags));
+			}
 		}
 
 		/* ---------------------------
@@ -82,7 +86,8 @@ ini_set("memory_limit","512M");
 			}
 				// Just to remove non printables from the log msg
 			$str = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $str);
-			KalturaLog::log("Session($job->session) - Set job $key($str)");
+			KalturaLog::log("Job:$str");
+			KalturaLog::log("Session($job->session) - Set job key:$key, state:$job->state");
 			return true;
 		}
 		 
@@ -367,7 +372,7 @@ ini_set("memory_limit","512M");
 		/* ---------------------------
 		 * ExecuteSession
 		 */
-		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine, $sharedChunkPath = null)
+		public static function ExecuteSession($host, $port, $token, $concurrent, $concurrentMin, $sessionName, $cmdLine, $sharedChunkPath = null, $ffmpegBin=null, $ffprobeBin=null)
 		{
 			KalturaLog::log("host:$host, port:$port, token:$token, concurrent:$concurrent, concurrentMin:$concurrentMin, sessionName:$sessionName, cmdLine:$cmdLine, sharedChunkPath:$sharedChunkPath");
 			$storeManager = new KChunkedEncodeMemcacheWrap($token);
@@ -381,8 +386,31 @@ ini_set("memory_limit","512M");
 			$setup->cleanUp = 0;
 			$setup->cmd = $cmdLine;
 			$setup->sharedChunkPath = $sharedChunkPath;
+			if(isset($ffmpegBin))
+				$setup->ffmpegBin = $ffmpegBin;
+			if(isset($ffprobeBin))
+				$setup->ffprobeBin = $ffprobeBin;
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ======================== */
+			if(isset($ffprobeBin)) {
+KalturaLog::log("ffprobeBin:$ffprobeBin");
+				list($part, $ffprobeBin) = 
+					KFFmpegToPartnerMatch::extractPartnerId($ffprobeBin);
+				$setup->ffprobeBin = $ffprobeBin;
+				KFFmpegToPartnerMatch::match($part);
+KalturaLog::log("patrner:$part, ffprobeBin:$ffprobeBin");
+			}
+			if(KFFmpegToPartnerMatch::getVersion()==4)
+				$chunker = new KChunkedEncode4($setup);
+			else
+				$chunker = new KChunkedEncode($setup);
+/* ======================== */
 
-			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName);
+			$session = new KChunkedEncodeSessionManager($setup, $storeManager, $sessionName, $chunker);
 			
 			if(($rv=$session->Initialize())!=true) {
 				$session->Report();
@@ -390,7 +418,7 @@ ini_set("memory_limit","512M");
 			}
 			$rv = $session->Generate();
 			$session->Report();
-			return $rv;
+			return array($rv, $session);
 		}
 
 	}
@@ -665,10 +693,11 @@ ini_set("memory_limit","512M");
 				$cmdLine.= 'require_once \'/opt/kaltura/app/batch/bootstrap.php\';';
 ///////////////
 // DEBUG ONLY
-// $dirName = dirname(__FILE__); 
-// $cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
-// $cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeMemcacheWrap.php\';';
-// $cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
+//$dirName = dirname(__FILE__);
+//$cmdLine.= 'require_once \''.$dirName.'/KChunkedEncodeUtils.php\';';
+//$cmdLine.= 'require_once \'/tmp/KChunkedEncodeSessionManager.php\';';
+//$cmdLine.= 'require_once \'/tmp/KChunkedEncodeMemcacheWrap.php\';';
+//$cmdLine.= 'require_once \''.$dirName.'/KFFMpegMediaParser.php\';';
 ///////////////
 				$cmdLine.= '\$rv=KChunkedEncodeMemcacheScheduler::ExecuteJobCommand(';
 				$cmdLine.= '\''.($this->memcacheConfig['host']).'\',';

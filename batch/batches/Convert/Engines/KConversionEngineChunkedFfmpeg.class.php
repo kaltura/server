@@ -19,11 +19,6 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 		return KalturaConversionEngineType::CHUNKED_FFMPEG;
 	}
 	
-	public function getCmd ()
-	{
-		return KBatchBase::$taskConfig->params->ffmpegCmd;
-	}
-	
 	/**
 	 * execute_conversion_cmdline
 	 *	Chunked Encoding can executed both in standalone and memcache managed modes.
@@ -131,6 +126,24 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			{
 				$cmdLine.= ',\''.$sharedChunkPath.'\'';
 			}
+/* ========================
+   ========================
+   FFmpeg6 Intergration
+   Following code is part of the FFMpeg6 intgeration procudere.
+   it should be removed upon FFMpeg6 approval 
+   ======================== */
+			else $cmdLine.= ',\'\'';
+{
+	if(KFFmpegToPartnerMatch::isMatched()==true) {
+	$matchData = KFFmpegToPartnerMatch::getAll();
+//KalturaLog::log("matchedBin:$matchData->ffmpegBin");
+$cmdLine.= ',\''.($matchData[1]).'\'';
+$tmpStr=KFFmpegToPartnerMatch::embedPartnerId($matchData[2]);
+$cmdLine.= ',\''.($tmpStr).'\'';
+	}
+}
+/* ======================== */
+
 			$cmdLine.=');';
 			$cmdLine.= 'if(\$rv==false) exit(1);';
 			$cmdLine.= '"';
@@ -252,7 +265,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			 * Clean up the cmd line - remove 'ffmpeg' and log file redirection instructions
 			 * those will be handled by the Chunked flow
 			 */
-		$cmdLineAdjusted = str_replace(KBatchBase::$taskConfig->params->ffmpegCmd, KDLCmdlinePlaceholders::BinaryName, $cmdLine);
+		$cmdLineAdjusted = str_replace($this->getCmd(), KDLCmdlinePlaceholders::BinaryName, $cmdLine);
 		$cmdValsArr = explode(' ', $cmdLineAdjusted);
 		if(($idx=array_search('>>', $cmdValsArr))!==false){
 			$cmdValsArr = array_slice ($cmdValsArr,0,$idx);
@@ -271,7 +284,7 @@ class KConversionEngineChunkedFfmpeg  extends KConversionEngineFfmpeg
 			}
 		}
 		$cmdLineAdjusted = implode(" ",$cmdValsArr);
-		$cmdLineAdjusted = str_replace(KDLCmdlinePlaceholders::BinaryName, KBatchBase::$taskConfig->params->ffmpegCmd, $cmdLineAdjusted);
+		$cmdLineAdjusted = str_replace(KDLCmdlinePlaceholders::BinaryName, $this->getCmd(), $cmdLineAdjusted);
 		$cmdLineAdjusted = str_replace('\'', '\\\'',$cmdLineAdjusted);
 		KalturaLog::log("Cleaned up cmdLine:$cmdLineAdjusted");
 		

@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.ffmpeg
+ * @package plugins.ffmpeg 
  * @subpackage lib
  */
 class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
@@ -28,7 +28,7 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		 * - explicit mapping for video (if required)
 		 * - the required audio channels
 		 */
-		self::getMappingsForMultiStream($target, $cmdValsArr);
+		$this->getMappingsForMultiStream($target, $cmdValsArr);
 		
 		/*
 		 * Watermarking ...
@@ -46,8 +46,8 @@ class KDLOperatorFfmpeg2_1_3 extends KDLOperatorFfmpeg1_1_1 {
 		 * For resample-filter case -
 		 * 'async 2' causes aud-br distortion ==> set to 'async 1'
 		 */
-		self::rearrngeAudioFilters($target, $cmdValsArr);
-		self::rearrngeVideoFilters($target, $cmdValsArr);
+		$this->rearrngeAudioFilters($target, $cmdValsArr);
+		$this->rearrngeVideoFilters($target, $cmdValsArr);
 		
 		$cmdStr = implode(" ", $cmdValsArr);
 
@@ -463,7 +463,7 @@ Disabled 'amix', for better stereo by 'amerge'
 	 * 
 	 * @param string $cmdStr
 	 */
-	private static function rearrngeAudioFilters($target, array &$cmdValsArr)
+	protected static function rearrngeAudioFilters($target, array &$cmdValsArr)
 	{
 		if(!isset($target->_audio)){
 			return false;
@@ -542,7 +542,7 @@ Disabled 'amix', for better stereo by 'amerge'
 	 * @param array $cmdValsArr
 	 * @return bool
 	 */
-	private static function rearrngeVideoFilters($target, array &$cmdValsArr)
+	protected static function rearrngeVideoFilters($target, array &$cmdValsArr)
 	{
 		if(!isset($target->_video))
 			return false;
@@ -575,7 +575,7 @@ Disabled 'amix', for better stereo by 'amerge'
 	 * @param $videoFilterKeys
 	 * @param $count
 	 */
-	private static function mergeVideoFilterLines(array &$cmdValsArr, $videoFilterKeys, $count)
+	protected static function mergeVideoFilterLines(array &$cmdValsArr, $videoFilterKeys, $count)
 	{
 		$mergedVideoFilter = substr($cmdValsArr[$videoFilterKeys[0]], 0, -1);
 		for ($i = 1; $i < count($videoFilterKeys); $i++)
@@ -901,7 +901,7 @@ ffmpeg -threads 1 -i VIDEO -i WM1.jpg -loop 1 -t 30 -i WM2.jpg
 	 * @param KDLFlavor $target
 	 * @param array $cmdValsArr
 	 */
-	private function getMappingsForMultiStream(KDLFlavor $target, array &$cmdValsArr)
+	protected function getMappingsForMultiStream(KDLFlavor $target, array &$cmdValsArr)
 	{
 		if(!isset($target->_audio))
 			return;

@@ -14,6 +14,23 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	const CACHE_PREFIX = 'executed_sphinx_server_';
 
 	const MAX_SIZE_FOR_PLUGIN_SEARCH_DATA = 800000; // 1MB * 0.8. In bytes
+	
+	private $skipObjects = null;
+	
+	/**
+	 * Add a multidimensional assoc array where key is plugin name and value is array of objects ids, like:
+	 * array(
+	 * 'captions' => array('entry_id', 'category_id', 'kuser_id'),
+	 * 'cuepoint' => array('entry_id')
+	 * )
+	 *
+	 * @param array $objectsToSkipPerPlugin
+	 * @return void
+	 */
+	public function setSkipObjects(array $objectsToSkipPerPlugin = array())
+	{
+		$this->skipObjects = $objectsToSkipPerPlugin;
+	}
 
 	/**
 	 * @param string $baseName
@@ -264,6 +281,15 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$sphinxPluginsData = array();
 		foreach($pluginInstances as $pluginName => $pluginInstance)
 		{
+			// used for sphinx-builder to skip objects that their DB query hangs causing the process to get stuck
+			if (isset($this->skipObjects[$pluginName]) && in_array($object->getId(), $this->skipObjects[$pluginName]))
+			{
+				$objectId = $object->getId();
+				$objectClass = get_class($object);
+				KalturaLog::debug("Skipping object [$objectClass] id [$objectId] for plugin [$pluginName]");
+				continue;
+			}
+			
 			KalturaLog::debug("Loading $pluginName sphinx texts");
 			$sphinxPluginData = null;
 			try

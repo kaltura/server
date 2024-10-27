@@ -288,7 +288,7 @@ class ScriptsRunner
 
 	public function runXmlTokenReplacement($dir)
 	{
-		$serviceUrl = kConf::get('www_host');
+		$serviceUrl = kConf::get('serviceUrl', 'batchBase');
 		$adminConsolePartnerSecret = $this->getAdminConsoleSecret();
 
 		KalturaLog::debug("serviceUrl [$serviceUrl] admin_secret [$adminConsolePartnerSecret]");

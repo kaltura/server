@@ -259,7 +259,6 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_UNIQUE_RECEIVED_POLL_USERS = 'unique_users_received_poll';
 	const METRIC_UNIQUE_ANSWERED_POLL_USERS = 'unique_users_answered_poll';
 	const METRIC_POLL_PARTICIPATION = 'poll_participation';
-	const METRIC_UNIQUE_REACTION_CLICKED_USERS = 'unique_users_reaction_clicked';
 	const METRIC_REACTION_CLICKED_PARTICIPATION = 'reaction_clicked_participation';
 	const METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS = 'unique_users_sent_private_message';
 	const METRIC_PRIVATE_CHAT_PARTICIPATION = 'private_chat_participation';
@@ -469,8 +468,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED,
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED,
 		self::EVENT_TYPE_POLL_RECEIVED,
-		self::EVENT_TYPE_CNC_REACTION_CLICKED,
-		self::EVENT_TYPE_CNC_POLL_ANSWERED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -551,8 +548,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED => 'count_cnc_chat_cconnection_request_approved',
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED => 'count_cnc_chat_connection_request_canceled',
 		self::EVENT_TYPE_POLL_RECEIVED => 'count_poll_received',
-		self::EVENT_TYPE_CNC_REACTION_CLICKED => 'count_reaction_clicked',
-		self::EVENT_TYPE_CNC_POLL_ANSWERED => 'count_poll_answered'
 	);
 
 	//global transform
@@ -589,7 +584,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_SENT_Q_AND_A_USERS => 'floor',
 		self::METRIC_UNIQUE_ANSWERED_POLL_USERS => 'floor',
 		self::METRIC_UNIQUE_RECEIVED_POLL_USERS => 'floor',
-		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => 'floor',
 		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => 'floor',
 		self::METRIC_UNIQUE_ATTENDEES => 'floor',
 		self::METRIC_VE_ATTENDED_UNIQUE_USERS => 'floor',
@@ -664,7 +658,6 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_POLL_PARTICIPATION => true,
 		self::METRIC_UNIQUE_RECEIVED_POLL_USERS => true,
 		self::METRIC_UNIQUE_ANSWERED_POLL_USERS => true,
-		self::METRIC_UNIQUE_REACTION_CLICKED_USERS => true,
 		self::METRIC_REACTION_CLICKED_PARTICIPATION => true,
 		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => true,
 		self::METRIC_PRIVATE_CHAT_PARTICIPATION => true,
@@ -1467,10 +1460,6 @@ class kKavaReportsMgr extends kKavaBase
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_POLL_ANSWERED),
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_ANSWERED_POLL_USERS, self::METRIC_UNIQUE_USER_IDS));
 
-		self::$aggregations_def[self::METRIC_UNIQUE_REACTION_CLICKED_USERS] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_REACTION_CLICKED),
-			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_REACTION_CLICKED_USERS, self::METRIC_UNIQUE_USER_IDS));
-
 		self::$aggregations_def[self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
 			self::getHyperUniqueAggregator(self::METRIC_DOWNLOAD_ATTACHMENT_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
@@ -1494,13 +1483,13 @@ class kKavaReportsMgr extends kKavaBase
 		self::$aggregations_def[self::METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-				self::getLikeFilter(self::DIMENSION_USER_ENGAGEMENT, "%CameraOn%"))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$camera_on_engagement))),
 			self::getLongSumAggregator(self::METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
 
 		self::$aggregations_def[self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC] = self::getFilteredAggregator(
 			self::getAndFilter(array(
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
-				self::getLikeFilter(self::DIMENSION_USER_ENGAGEMENT, "%MicUnmuted%"))),
+				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$mic_unmuted_engagement))),
 			self::getLongSumAggregator(self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
@@ -1995,10 +1984,10 @@ class kKavaReportsMgr extends kKavaBase
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
 
 		self::$metrics_def[self::METRIC_REACTION_CLICKED_PARTICIPATION] = array(
-			self::DRUID_AGGR => array(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_REACTION_CLICKED_USERS),
+			self::DRUID_AGGR => array(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_REACTION_CLICKED_UNIQUE_USERS),
 			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
 				self::METRIC_REACTION_CLICKED_PARTICIPATION, '/', array(
-				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_REACTION_CLICKED_USERS, self::METRIC_UNIQUE_REACTION_CLICKED_USERS),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_REACTION_CLICKED_UNIQUE_USERS, self::METRIC_REACTION_CLICKED_UNIQUE_USERS),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
 
 		self::$metrics_def[self::METRIC_DOWNLOAD_ATTACHMENT_USER_RATIO] = array(

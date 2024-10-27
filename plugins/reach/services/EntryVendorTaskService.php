@@ -460,10 +460,11 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		$shouldModerateOutput = $dbEntryVendorTask->getIsOutputModerated();
 		$accessKeyExpiry = $dbEntryVendorTask->getAccessKeyExpiry();
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($dbEntryVendorTask->getCatalogItemId());
 		
 		try
 		{
-			$dbEntryVendorTask->setAccessKey(kReachUtils::generateReachVendorKs($dbEntryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, true));
+			$dbEntryVendorTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($dbEntryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, true));
 			self::tryToSave($dbEntryVendorTask);
 		}
 		catch (Exception $e)

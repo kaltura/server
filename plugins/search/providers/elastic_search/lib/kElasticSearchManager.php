@@ -15,6 +15,23 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     const METADATA_MAX_LENGTH = 256;
     const EVENT_PLATFORM_METADATA_MAX_LENGTH = 1024;
 
+    private $skipObjects = null;
+
+    /**
+     * Add a multidimensional assoc array where key is plugin name and value is array of objects ids, like:
+     * array(
+     * 'captions' => array('entry_id', 'category_id', 'kuser_id'),
+     * 'cuepoint' => array('entry_id')
+     * )
+     *
+     * @param array $objectsToSkipPerPlugin
+     * @return void
+     */
+    public function setSkipObjects(array $objectsToSkipPerPlugin = array())
+    {
+        $this->skipObjects = $objectsToSkipPerPlugin;
+    }
+
     /**
      * @param BaseObject $object
      * @param BatchJob $raisedJob
@@ -114,6 +131,15 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
 
         foreach($pluginInstances as $pluginName => $pluginInstance)
         {
+            // used for elastic-builder to skip objects that their DB query hangs causing the process to get stuck
+            if (isset($this->skipObjects[$pluginName]) && in_array($object->getId(), $this->skipObjects[$pluginName]))
+            {
+                $objectId = $object->getId();
+                $objectClass = get_class($object);
+                KalturaLog::debug("Skipping object [$objectClass] id [$objectId] for plugin [$pluginName]");
+                continue;
+            }
+
             KalturaLog::debug("Loading $pluginName elastic data contribution");
             $elasticPluginData = null;
             try
@@ -405,7 +431,7 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     private function trimParamFields($tempParams)
     {
-        $itemsToTrim = array('description', 'reference_id');
+        $itemsToTrim = array('name', 'description', 'reference_id');
 
         $params = &$tempParams;
         // in case we are handling category we need to handle the 'doc' element.

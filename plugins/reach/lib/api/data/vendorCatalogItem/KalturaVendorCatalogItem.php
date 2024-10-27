@@ -122,6 +122,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $notes;
 
+	/**
+	 * @var int
+	 */
+	public $partnerId;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -286,6 +291,10 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 			case VendorServiceFeature::LIVE_TRANSLATION:
 				$object = new KalturaVendorLiveTranslationCatalogItem();
 				break;
+        
+			case VendorServiceFeature::QUIZ:
+				$object = new KalturaVendorQuizCatalogItem();
+        break;
 
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();

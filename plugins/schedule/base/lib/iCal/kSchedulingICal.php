@@ -59,8 +59,8 @@ class kSchedulingICal
 	public static function formatDate($time)
 	{
 		$original = date_default_timezone_get();
-        	date_default_timezone_set('UTC');
-        	$date = date(kSchedulingICal::TIME_FORMAT, $time);
+		date_default_timezone_set('UTC');
+		$date = date(kSchedulingICal::TIME_FORMAT, $time);
 		date_default_timezone_set($original);
 		return $date;
 	}

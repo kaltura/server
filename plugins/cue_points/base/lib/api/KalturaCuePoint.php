@@ -203,8 +203,6 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 		}
 	}
 	
-
-	
 	/**
 	 * @param int $endTime
 	 * @param int $duration

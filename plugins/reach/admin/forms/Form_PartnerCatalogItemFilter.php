@@ -13,6 +13,7 @@ class Form_PartnerCatalogItemFilter extends Form_PartnerIdFilter
 		$filterType = $this->getElement('filter_type');
 		$filterType->setMultiOptions(array(
 			'partnerIdEqual' => 'Partner ID',
+			'catalogItemIdEqual' => 'Catalog Item ID',
 		));
 
 		// filter by vendor partner id
