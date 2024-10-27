@@ -420,7 +420,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		$this->retrieveAndDownloadMeetingTranscripts($entry->id, $entry->partnerId);
 		$this->retrieveAndDownloadMeetingChats($entry->id, $entry->partnerId);
 		$this->refreshDownloadUrl();
-		$this->setContentOnEntry($entry, $flavorAsset);
+		$this->setContentOnEntry($entry, $flavorAsset, $entry->partnerId);
 		$this->updateDropFolderFile($entry->id);
 	}
 	
