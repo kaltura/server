@@ -60,6 +60,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
 		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
 		$extraModulesNames = unserialize($this->bundleCache->get($this->bundle_extra_modules_names));
+		KalturaLog::debug("Fetch bundle content from cache for key [{$this->bundle_name}], result: [" . !empty($bundleContent) . "]");
 
 		if (!$bundleContent || $this->regenerate)
 		{
