@@ -453,8 +453,6 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 
 	public function addSchedulingData()
 	{
-		$language = '';
-		$feature = null;
 		/* @var $taskData kScheduledVendorTaskData */
 		$taskData = $this->getTaskJobData();
 		/* @var $connectedEvent LiveStreamScheduleEvent */
@@ -477,12 +475,12 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		}
 	}
 
-	protected function addLanguageToFeature($featureType, &$connectedEvent, $taskData, $language,)
+	protected function addLanguageToFeature($featureType, &$connectedEvent, $taskData, $language)
 	{
 		$feature = new $featureType();
 		$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 		$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
-		$feature->setSystemName(LiveCaptionFeature::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
+		$feature->setSystemName($featureType::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
 		$feature->setLanguage($language);
 		$connectedEvent->addFeature($feature, true);
 		$connectedEvent->save();
@@ -490,7 +488,6 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 
 	public function removeSchedulingData()
 	{
-		$liveFeatureName = '';
 		switch ($this->getServiceFeature())
 		{
 			case KalturaVendorServiceFeature::LIVE_TRANSLATION:
