@@ -683,9 +683,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	{
 		foreach ($this->permissions as $permission)
 		{
-			if ($permission->name && $permission->status)
+			if ($permission->name == $permissionName && $permission->status == $status)
 			{
-				return ($permission->name == $permissionName && $permission->status == $status);
+				return true;
 			}
 		}
 		return false;
@@ -697,6 +697,19 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		{
 			KalturaLog::notice('#### testing2');
 			//TODO get number of privacy contexts on partner
+			$client = Infra_ClientHelper::getClient();
+			$eSearch = new Kaltura_Client_ElasticSearch_ESearchService($client);
+			$categoryItem = new KalturaESearchCategoryItem();
+			$categoryItem->itemType = ESearchItemType::EXISTS;
+			$categoryItem->fieldName = ESearchCategoryFieldName::PRIVACY_CONTEXT;
+			$categoryItem->searchTerm = '';
+			$categoryItemArray[] = $categoryItem;
+			$categoryOperator = new KalturaESearchCategoryOperator();
+			$categoryOperator->searchItems = $categoryItemArray;
+			$categorySearchParams = new Kaltura_Client_ElasticSearch_Type_ESearchCategoryParams();
+			$categorySearchParams->searchOperator = $categoryOperator;
+			$result = $eSearch->searchCategory($categorySearchParams);
+			KalturaLog::notice(print_r($result, true));
 		}
 		$audioThumbEntryId = $this->audioThumbEntryId;
 		if ($audioThumbEntryId)
@@ -780,7 +793,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	{
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
 		if (!$object_to_fill) {
-			KalturaLog::err('Cannot find object to fill');
 			return null;
 		}
 		
