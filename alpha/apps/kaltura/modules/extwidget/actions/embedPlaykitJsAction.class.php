@@ -810,7 +810,7 @@ class embedPlaykitJsAction extends sfAction
 
 
 		}
-		catch (ion $ex)
+		catch (Exception $ex)
 		{
 			KExternalErrors::dieError(KExternalErrors::INTERNAL_SERVER_ERROR);
 		}
