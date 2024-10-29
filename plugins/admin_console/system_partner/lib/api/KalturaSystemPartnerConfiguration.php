@@ -695,21 +695,41 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	{
 		if ($this->isPermissionStatus(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, PermissionStatus::ACTIVE))
 		{
-			KalturaLog::notice('#### testing2');
-			//TODO get number of privacy contexts on partner
-			$client = Infra_ClientHelper::getClient();
-			$eSearch = new Kaltura_Client_ElasticSearch_ESearchService($client);
-			$categoryItem = new KalturaESearchCategoryItem();
-			$categoryItem->itemType = ESearchItemType::EXISTS;
-			$categoryItem->fieldName = ESearchCategoryFieldName::PRIVACY_CONTEXT;
-			$categoryItem->searchTerm = '';
-			$categoryItemArray[] = $categoryItem;
-			$categoryOperator = new KalturaESearchCategoryOperator();
-			$categoryOperator->searchItems = $categoryItemArray;
-			$categorySearchParams = new Kaltura_Client_ElasticSearch_Type_ESearchCategoryParams();
-			$categorySearchParams->searchOperator = $categoryOperator;
-			$result = $eSearch->searchCategory($categorySearchParams);
-			KalturaLog::notice(print_r($result, true));
+			$indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId());
+			$params = array(
+				'index' => $indexName,
+				'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE,
+				'size' => 10
+			);
+			$body = array();
+			$body['_source'] = false;
+
+			$mainBool = new kESearchBoolQuery();
+			// Search over active categories on the partner
+			$partnerStatus = elasticSearchUtils::formatPartnerStatus($this->id, CategoryStatus::ACTIVE);
+			$partnerStatusQuery = new kESearchTermQuery('partner_status', $partnerStatus);
+			$mainBool->addToFilter($partnerStatusQuery);
+			// Get all categories with privacy context
+			$privacyContextsExistsQuery = new kESearchExistsQuery('privacy_context');
+			$mainBool->addToFilter($privacyContextsExistsQuery);
+
+			$body['query'] = $mainBool->getFinalQuery();
+			$params['body'] = $body;
+
+			$elasticClient = new elasticClient();
+			$results = $elasticClient->search($params, true);
+			KalturaLog::notice('#### ' .  print_r($results['hits']['hits'],true));
+			$categorySearch = new kCategorySearch();
+			list($coreResults, $objectCount, $aggregationsResult) = kESearchCoreAdapter::transformElasticToCoreObject($results, $categorySearch);
+			KalturaLog::notice('#### ' .  print_r($coreResults,true));
+			//TODO find a way to get the actual categories to count the PC
+//			$privacyContextsNameArray =
+			$categoriesCount = $results['hits']['total'];
+
+			if ($categoriesCount > 1)
+			{
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, number_format($categoriesCount));
+			}
 		}
 		$audioThumbEntryId = $this->audioThumbEntryId;
 		if ($audioThumbEntryId)
