@@ -460,30 +460,34 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		/* @var $vendorCatalogItem VendorCatalogItem */
 		$vendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($this->getCatalogItemId());
 
+		$feature = null;
 		switch ($this->getServiceFeature())
 		{
 			case KalturaVendorServiceFeature::LIVE_TRANSLATION:
 			{
 				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getTargetLanguage());
-				$this->addLanguageToFeature('LiveCaptionFeature', $connectedEvent, $taskData, $language);
+				$feature = $this->createNewFeature('LiveCaptionFeature', $connectedEvent, $taskData, $language);
 				break;
 			}
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
 				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getSourceLanguage());
-				$this->addLanguageToFeature('LiveCaptionFeature', $connectedEvent, $taskData, $language);
+				$feature = $this->createNewFeature('LiveCaptionFeature', $connectedEvent, $taskData, $language);
 				break;
 		}
+
+		$connectedEvent->addFeature($feature, true);
+		$connectedEvent->save();
 	}
 
-	protected function addLanguageToFeature($featureType, &$connectedEvent, $taskData, $language)
+	protected function createNewFeature($featureType, $connectedEvent, $taskData, $language)
 	{
 		$feature = new $featureType();
 		$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 		$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
 		$feature->setSystemName($featureType::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
 		$feature->setLanguage($language);
-		$connectedEvent->addFeature($feature, true);
-		$connectedEvent->save();
+
+		return $feature;
 	}
 
 	public function removeSchedulingData()
