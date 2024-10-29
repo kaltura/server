@@ -718,17 +718,20 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 
 			$elasticClient = new elasticClient();
 			$results = $elasticClient->search($params, true);
-			KalturaLog::notice('#### ' .  print_r($results['hits']['hits'],true));
-			$categorySearch = new kCategorySearch();
-			list($coreResults, $objectCount, $aggregationsResult) = kESearchCoreAdapter::transformElasticToCoreObject($results, $categorySearch);
-			KalturaLog::notice('#### ' .  print_r($coreResults,true));
-			//TODO find a way to get the actual categories to count the PC
-//			$privacyContextsNameArray =
 			$categoriesCount = $results['hits']['total'];
 
-			if ($categoriesCount > 1)
+			if ($categoriesCount > 0)
 			{
-				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, number_format($categoriesCount));
+				$categorySearch = new kCategorySearch();
+				list($coreResults, $objectCount, $aggregationsResult) = kESearchCoreAdapter::transformElasticToCoreObject($results, $categorySearch);
+				foreach ($coreResults as $coreCategory)
+				{
+					$privacyContentCount = count(explode(',', $coreCategory->getObject()->getprivacyContext()));
+					if ($privacyContentCount > 2)
+					{
+						throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, $privacyContentCount);
+					}
+				}
 			}
 		}
 		$audioThumbEntryId = $this->audioThumbEntryId;

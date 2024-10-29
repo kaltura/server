@@ -19,7 +19,7 @@ class SystemPartnerErrors extends KalturaErrors
 
     const PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR = "PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR;ID;Wrong conversion profile id - @ID@ -  for recording entries";
 
-	const PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS = "PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS;COUNT;Partner has too many privacy contexts @COUNT@. Cannot disable category limit";
+	const PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS = "PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS;COUNT;Partner has at least one category with too many privacy contexts [@COUNT@]. Cannot disable category limit";
 
 	/**
 	 * codes
