@@ -465,27 +465,37 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		{
 			case KalturaVendorServiceFeature::LIVE_TRANSLATION:
 			{
+				$feature = $this->createLiveNewFeature('LiveCaptionFeature', $connectedEvent, $taskData);
 				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getTargetLanguage());
-				$feature = $this->createNewFeature('LiveCaptionFeature', $connectedEvent, $taskData, $language);
+				$feature->setLanguage($language);
 				break;
 			}
 			case KalturaVendorServiceFeature::LIVE_CAPTION:
+			{
+				$feature = $this->createLiveNewFeature('LiveCaptionFeature', $connectedEvent, $taskData);
 				$language = languageCodeManager::getThreeCodeFromKalturaName($vendorCatalogItem->getSourceLanguage());
-				$feature = $this->createNewFeature('LiveCaptionFeature', $connectedEvent, $taskData, $language);
+				$feature->setLanguage($language);
 				break;
+			}
 		}
 
-		$connectedEvent->addFeature($feature, true);
-		$connectedEvent->save();
+		if ($feature)
+		{
+			$connectedEvent->addFeature($feature, true);
+			$connectedEvent->save();
+		}
+		else
+		{
+			KalturaLog::warning('Service feature [' . $this->getServiceFeature() . '] is not supported');
+		}
 	}
 
-	protected function createNewFeature($featureType, $connectedEvent, $taskData, $language)
+	protected function createLiveNewFeature($featureType, $connectedEvent, $taskData)
 	{
 		$feature = new $featureType();
 		$feature->setPreStartTime($connectedEvent->getStartDate(null) - $taskData->getStartDate());
 		$feature->setPostEndTime($taskData->getEndDate() - $connectedEvent->getEndDate(null));
 		$feature->setSystemName($featureType::defaultName(LiveFeature::REACH_FEATURE_PREFIX . "-{$this->getId()}"));
-		$feature->setLanguage($language);
 
 		return $feature;
 	}
