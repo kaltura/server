@@ -29,6 +29,13 @@ class KalturaQuizVendorTaskData extends KalturaVendorTaskData
 	public $context;
 
 	/**
+	 * Formal Style.
+	 *
+	 * @var string
+	 */
+	public $formalStyle;
+
+	/**
 	 * Quiz entry Id
 	 *
 	 * @var string
@@ -40,6 +47,7 @@ class KalturaQuizVendorTaskData extends KalturaVendorTaskData
 		'numberOfQuestions',
 		'questionsType',
 		'context',
+		'formalStyle',
 		'quizOutput',
 	);
 
