@@ -89,7 +89,7 @@ class embedIframeJsAction extends sfAction
 				$host = "$protocol://". kConf::get('html5lib_host') ."/";
 			$html5_version = kConf::getArrayValue('html5_version', 'playerApps', kConfMapNames::APP_VERSIONS, null);
 			if(!$html5_version)
-			    KExternalErrors::dieError('The html player version was not found');
+				KExternalErrors::dieError('The html player version was not found');
 
 			if ($ui_conf_html5_url)
 			{
@@ -156,6 +156,7 @@ class embedIframeJsAction extends sfAction
 
 	private function redirectToV7($v7Id, $v2UiConfId, $partnerId, $shouldTranslatePlugins) : void
 	{
+		$playListQueryParam="";
 		//validate all the params are handled
 		try
 		{
@@ -170,6 +171,14 @@ class embedIframeJsAction extends sfAction
 					$config['bundleConfig'],
 					$config['playerConfig']);
 			}
+
+			//handle special case of playlist-iframe-embed
+			//V2 = flashvars[playlistAPI.kpl0Id]=XXX V7 = playlist_id=XXX
+			$playlistId=$this->getRequestParameter('flashvars[playlistAPI.kpl0Id]', false);
+			if($playlistId)
+			{
+				$playListQueryParam='&playlist_id='.$playlistId;
+			}
 		}
 		catch(Exception $e)
 		{
@@ -182,7 +191,7 @@ class embedIframeJsAction extends sfAction
 		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
 		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
 		$url = $host . '/p/' . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . '?'
-				. $_SERVER['QUERY_STRING'] . "&"
+				. $_SERVER['QUERY_STRING'] . $playListQueryParam . "&"
 				. v2RedirectUtils::V2REDIRECT_PARAM_NAME .'=true'
 				. $shouldTranslatePluginsQueryParam;
 
