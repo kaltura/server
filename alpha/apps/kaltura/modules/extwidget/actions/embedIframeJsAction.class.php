@@ -156,7 +156,7 @@ class embedIframeJsAction extends sfAction
 
 	private function redirectToV7($v7Id, $v2UiConfId, $partnerId, $shouldTranslatePlugins) : void
 	{
-		$playListQueryParam="";
+		$playListQueryParam='';
 		//validate all the params are handled
 		try
 		{
@@ -191,7 +191,7 @@ class embedIframeJsAction extends sfAction
 		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
 		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
 		$url = $host . '/p/' . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . '?'
-				. $_SERVER['QUERY_STRING'] . $playListQueryParam . "&"
+				. $_SERVER['QUERY_STRING'] . $playListQueryParam . '&'
 				. v2RedirectUtils::V2REDIRECT_PARAM_NAME .'=true'
 				. $shouldTranslatePluginsQueryParam;
 
