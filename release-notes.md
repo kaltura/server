@@ -1,3 +1,16 @@
+# Ursa-21.2.0
+## Add partner for AI framework ##
+
+* Issue Type: Task
+* Issue ID: FOUN
+
+### Configuration ###
+	Replace all tokens from the ini file (under connectors-framework section) and remove".template" from the file name: 
+	/opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2024_10_31_add_ai_partner.php
+
 # Ursa-21.1.0
 ## Enable player calls redirection from V2 to V7 ##
 * Issue Type: Task
