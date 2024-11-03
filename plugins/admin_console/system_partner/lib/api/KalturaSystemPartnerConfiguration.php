@@ -709,9 +709,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$partnerStatus = elasticSearchUtils::formatPartnerStatus($this->id, CategoryStatus::ACTIVE);
 			$partnerStatusQuery = new kESearchTermQuery('partner_status', $partnerStatus);
 			$mainBool->addToFilter($partnerStatusQuery);
-			// Get all categories with privacy context
-			$privacyContextsExistsQuery = new kESearchExistsQuery('privacy_context');
-			$mainBool->addToFilter($privacyContextsExistsQuery);
+			// Get all categories with more then 2 privacy contexts
+			$privacyContextsCountQuery = new kESearchCountGreaterThenQuery('privacy_contexts', 2);
+			$mainBool->addToFilter($privacyContextsCountQuery);
 
 			$body['query'] = $mainBool->getFinalQuery();
 			$params['body'] = $body;
@@ -722,16 +722,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 
 			if ($categoriesCount > 0)
 			{
-				$categorySearch = new kCategorySearch();
-				list($coreResults, $objectCount, $aggregationsResult) = kESearchCoreAdapter::transformElasticToCoreObject($results, $categorySearch);
-				foreach ($coreResults as $coreCategory)
-				{
-					$privacyContentCount = count(explode(',', $coreCategory->getObject()->getprivacyContext()));
-					if ($privacyContentCount > 2)
-					{
-						throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, $privacyContentCount);
-					}
-				}
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, $categoriesCount);
 			}
 		}
 		$audioThumbEntryId = $this->audioThumbEntryId;
