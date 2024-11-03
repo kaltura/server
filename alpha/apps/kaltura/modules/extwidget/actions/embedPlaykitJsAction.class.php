@@ -12,6 +12,7 @@ class embedPlaykitJsAction extends sfAction
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const PLAYLIST_ID_PARAM_NAME = "playlist_id";
 	const EXTERNAL_SOURCE_PARAM_NAME = "external_source";
+	const EMBED_FACTORY_PARAM_NAME = "embed_factory";
 	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";
 	const REGENERATE_PARAM_NAME = "regenerate";
@@ -173,6 +174,19 @@ class embedPlaykitJsAction extends sfAction
 		elseif ($iframeEmbed)
 		{
 			$bundleContent = $this->getIfarmEmbedCode($bundleContent);
+		}
+		else
+		{
+			//Embed factory is only relevant in dynamic embed
+			if ($this->getRequestParameter(self::EMBED_FACTORY_PARAM_NAME, false))
+			{
+				$bundleContent = "function getNamespacedKalturaPlayer() {  
+										$bundleContent
+										return KalturaPlayer;
+									}; 
+								const kalturaPlayerFactory = getNamespacedKalturaPlayer();
+								export { kalturaPlayerFactory }";
+			}
 		}
 
 		$protocol = infraRequestUtils::getProtocol();
