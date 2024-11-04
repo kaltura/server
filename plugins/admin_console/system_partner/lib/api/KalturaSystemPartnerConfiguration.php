@@ -691,6 +691,38 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		return false;
 	}
 
+	protected function queryForCountingCategoriesWithTooManyPrivacyContexts($partnerId, $threshold)
+	{
+		$data =
+			[
+				"bool" =>
+				[
+					"filter" =>
+					[
+						[
+							"term" =>
+							[
+								"partner_status" =>
+								[
+									"value" => "p" . $partnerId . "s2"
+								]
+							]
+						],
+						[
+							"script" =>
+							[
+								"script" =>
+								[
+									"source" => "doc['privacy_contexts'].length > $threshold"
+								]
+							]
+						]
+					]
+				]
+			];
+		return $data;
+	}
+
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		if ($this->isPermissionStatus(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, PermissionStatus::ACTIVE))
@@ -698,22 +730,11 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId());
 			$params = array(
 				'index' => $indexName,
-				'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE,
-				'size' => 10
+				'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE
 			);
 			$body = array();
 			$body['_source'] = false;
-
-			$mainBool = new kESearchBoolQuery();
-			// Search over active categories on the partner
-			$partnerStatus = elasticSearchUtils::formatPartnerStatus($this->id, CategoryStatus::ACTIVE);
-			$partnerStatusQuery = new kESearchTermQuery('partner_status', $partnerStatus);
-			$mainBool->addToFilter($partnerStatusQuery);
-			// Get all categories with more then 2 privacy contexts
-			$privacyContextsCountQuery = new kESearchCountGreaterThenQuery('privacy_contexts', 2);
-			$mainBool->addToFilter($privacyContextsCountQuery);
-
-			$body['query'] = $mainBool->getFinalQuery();
+			$body['query'] = $this->queryForCountingCategoriesWithTooManyPrivacyContexts($this->id, 2);
 			$params['body'] = $body;
 
 			$elasticClient = new elasticClient();
