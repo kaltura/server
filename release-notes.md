@@ -1,3 +1,17 @@
+# Ursa-21.3.0
+## Enable embed & social stream in EP ##
+* Issue Type: Task
+* Issue ID: PLAT-24999
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.embedShareStream.enabled = true
+moduls.embedShareStream.permissionType = 2
+moduls.embedShareStream.label = "Enable embed & social stream in EP"
+moduls.embedShareStream.permissionName = FEATURE_EMBED_SHARE_SOCIAL_STREAM
+moduls.embedShareStream.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Ursa-21.1.0
 ## Enable player calls redirection from V2 to V7 ##
 * Issue Type: Task
