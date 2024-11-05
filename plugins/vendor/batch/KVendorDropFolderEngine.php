@@ -255,7 +255,7 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		return $flavorAsset;
 	}
 	
-	protected function setContentOnEntry($entry, $flavorAsset)
+	protected function setContentOnEntry($entry, $flavorAsset, $partnerId)
 	{
 		$resource = new KalturaUrlResource();
 		$resource->url = $this->dropFolderFile->contentUrl;
@@ -265,7 +265,9 @@ abstract class KVendorDropFolderEngine extends KDropFolderFileTransferEngine
 		$assetParamsResourceContainer->resource = $resource;
 		$assetParamsResourceContainer->assetParamsId = $flavorAsset->flavorParamsId;
 		
+		KBatchBase::impersonate($partnerId);
 		KBatchBase::$kClient->media->updateContent($entry->id, $resource);
+		KBatchBase::unimpersonate();
 	}
 	
 	protected function createAndSetTranscriptOnEntry($transcript, $entryId, $label, $fileType, $source)

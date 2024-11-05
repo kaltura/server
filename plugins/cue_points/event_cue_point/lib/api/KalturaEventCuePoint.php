@@ -41,9 +41,4 @@ class KalturaEventCuePoint extends KalturaCuePoint
 			
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
-
-	protected function validateEntryEntitlement(entry $dbEntry)
-	{
-
-	}
 }

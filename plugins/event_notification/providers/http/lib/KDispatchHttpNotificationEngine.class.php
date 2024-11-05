@@ -201,10 +201,10 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
 		$curlWrapper->close();
 
-        	KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results] Headers [$headers] Body [$body]");
-		if(!$results || $httpCode != 200)
+		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results] Headers [$headers] Body [$body]");
+		if(!$results || !in_array($httpCode, array(KCurlHeaderResponse::HTTP_STATUS_OK, KCurlHeaderResponse::HTTP_STATUS_NO_CONTENT)))
 		{
-            		$body = substr($body, 0, self::MAX_BODY_SIZE);
+			$body = substr($body, 0, self::MAX_BODY_SIZE);
 			throw new kTemporaryException("Sending HTTP request failed [$errCode] httpCode [$httpCode]
 			    			    \n url: [$url] \n $errMessage \n Headers:\n [$headers] \n Body:\n [$body]", $httpCode);
 		}

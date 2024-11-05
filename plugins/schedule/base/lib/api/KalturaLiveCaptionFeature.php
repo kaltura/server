@@ -38,6 +38,7 @@ class KalturaLiveCaptionFeature extends KalturaLiveFeature
 	/**
 	 * @var string
 	 * 3 letter code
+	 * Target language
 	 */
 	public $language;
 

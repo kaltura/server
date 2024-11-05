@@ -97,9 +97,4 @@ class KalturaCodeCuePoint extends KalturaCuePoint
 			$this->duration = 0;
 		}
 	}
-
-	protected function validateEntryEntitlement(entry $dbEntry)
-	{
-
-	}
 }

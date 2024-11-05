@@ -900,9 +900,7 @@ class PartnerController extends Zend_Controller_Action
 		
 		try
 		{
-			Infra_ClientHelper::impersonate($partnerId);
 			$partner = $systemPartnerPlugin->systemPartner->get($partnerId);
-			Infra_ClientHelper::unimpersonate();
 			if ($partner)
 			{
 				/** @var $partner KalturaPartner */

@@ -246,9 +246,4 @@ class KalturaAnswerCuePoint extends KalturaCuePoint
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
 		}
 	}
-
-	protected function validateEntryEntitlement(entry $dbEntry)
-	{
-
-	}
 }
