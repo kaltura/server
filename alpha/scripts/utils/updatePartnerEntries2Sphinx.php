@@ -51,8 +51,16 @@ for (;;)
 		if ($mode == 'execute')
 		{
 			echo "Updating [". $item->getId() ."] ... "; 
-			$sphinx->saveToSphinx($item, false, true);
-			echo "Done\n";
+			try {
+				$sphinx->saveToSphinx($item, false, true);
+				echo 'Done' . PHP_EOL;
+			} catch (PDOException $e) {
+				if (strpos($e->getMessage(), 'unknown column') !== false) {
+					echo '[unknown column] error occurred while updating [' . $item->getId() . ']: ' . $e->getMessage() . PHP_EOL;
+				} else {
+					echo 'Failed to update [' . $item->getId() . ']: ' . $e->getMessage() . PHP_EOL;
+				}
+			}
 		}
 		else
 		{
