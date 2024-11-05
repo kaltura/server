@@ -9,6 +9,8 @@ class kQuizVendorTaskData extends kVendorTaskData
 	public int $numberOfQuestions = 0;
 	public ?string $questionsType = null;
 	public string $context = "";
+	public ?string $formalStyle = null;
+	public bool $createQuiz = True;
 	public ?string $quizOutput = null;
 
 	public function getNumberOfQuestions(): int
@@ -39,6 +41,26 @@ class kQuizVendorTaskData extends kVendorTaskData
 	public function setContext(string $context): void
 	{
 		$this->context = $context;
+	}
+
+	public function getFormalStyle(): string
+	{
+		return $this->formalStyle;
+	}
+
+	public function setFormalStyle(string $formalStyle): void
+	{
+		$this->formalStyle = $formalStyle;
+	}
+
+	public function getCreateQuiz(): string
+	{
+		return $this->createQuiz;
+	}
+
+	public function setCreateQuiz(string $createQuiz): void
+	{
+		$this->createQuiz = $createQuiz;
 	}
 
 	public function setQuizOutput(?string $quizOutput): void
