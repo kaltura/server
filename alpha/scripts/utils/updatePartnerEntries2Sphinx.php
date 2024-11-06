@@ -50,9 +50,23 @@ for (;;)
 		usleep(100);
 		if ($mode == 'execute')
 		{
-			echo "Updating [". $item->getId() ."] ... "; 
-			$sphinx->saveToSphinx($item, false, true);
-			echo "Done\n";
+			try 
+			{
+				echo 'Updating ['. $item->getId() .'] ... ';
+				$sphinx->saveToSphinx($item, false, true);
+				echo 'Done' . PHP_EOL;
+			}
+			catch (Exception $e) 
+			{
+				if ($e instanceof PDOException && strpos($e->getMessage(), 'unknown column') !== false)
+				{
+					echo '[unknown column] error occurred while updating [' . $item->getId() . ']: ' . $e->getMessage() . PHP_EOL;
+				}
+				else
+				{
+					echo 'Failed to update [' . $item->getId() . ']: ' . $e->getMessage() . PHP_EOL;
+				}
+			}
 		}
 		else
 		{
