@@ -73,8 +73,8 @@ class CuePointService extends KalturaBaseService
 		if ($limitEntry)
 		{
 			$limitEntryObj = entryPeer::retrieveByPK($limitEntry);
-			$isPlaylist = $limitEntryObj && $limitEntryObj->getType() == entryType::PLAYLIST && str_contains($limitEntryObj->getDataContent(),$cuePoint->entryId);
-			if ($limitEntry != $cuePoint->entryId && !$isPlaylist) {
+			$isPlaylistOfEntry = $limitEntryObj && $limitEntryObj->getType() == entryType::PLAYLIST && str_contains($limitEntryObj->getDataContent(),$cuePoint->entryId);
+			if ($limitEntry != $cuePoint->entryId && !$isPlaylistOfEntry) {
 				throw new KalturaAPIException(KalturaCuePointErrors::NO_PERMISSION_ON_ENTRY, $cuePoint->entryId);
 			}
 		}
