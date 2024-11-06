@@ -2015,7 +2015,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	/*
 	 * Builds a manifest request for entry according to relevant flavors, delivery profile type and location of deliveryProfile(local/remote)
 	 */
-	public static function buildManifestUrl($entry, $protocols, $format, $flavors, $profileId = "", $clipFrom = null, $clipTo = null)
+	public static function buildManifestUrl($entry, $protocols, $format, $flavors, $profileId = "")
 	{
 		$entryId = $entry->getId();
 		$partnerId = $entry->getPartnerId();
