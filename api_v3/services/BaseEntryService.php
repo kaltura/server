@@ -1048,6 +1048,8 @@ class BaseEntryService extends KalturaEntryService
 
 		$contextDataHelper->setMediaProtocol($contextDataParams->mediaProtocol);
 		$contextDataHelper->setStreamerType($contextDataParams->streamerType);
+		$contextDataHelper->setClipFrom($contextDataParams->clipFrom);
+		$contextDataHelper->setClipTo($contextDataParams->clipTo);
 
 		$playbackContextDataHelper = new kPlaybackContextDataHelper();
 		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
