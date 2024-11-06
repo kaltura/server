@@ -2,6 +2,13 @@
 
 class kSchedulingICalEvent extends kSchedulingICalComponent
 {
+	const SEC_IN_WEEK = 604800;
+	const SEC_IN_MONTH = 2678400;
+	const SEC_IN_YEAR = 31556926;
+	const SEC_IN_DAY = 86400;
+	const SEC_IN_HOUR = 3600;
+	const SEC_IN_MINUTE = 60;
+
 	/**
 	 * @var kSchedulingICalRule
 	 */
@@ -27,6 +34,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		'endDate' => 'dtend',
 	);
 
+	protected static $timeZoneField = 'tzid';
+	protected $timeZoneId = '';
+
 	protected static function formatDurationString($durationStringInSeconds)
 	{
 		$duration = 'PT';
@@ -49,6 +59,28 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	protected function getType()
 	{
 		return kSchedulingICal::TYPE_EVENT;
+	}
+
+	protected static function getUidFromEventId($id)
+	{
+		$hash = sha1($id);
+
+		// Format the hash as a UUID
+		$uuid = sprintf(
+			'%08s-%04s-%04x-%04x-%12s',
+			// 32 bits for "time_low"
+			substr($hash, 0, 8),
+			// 16 bits for "time_mid"
+			substr($hash, 8, 4),
+			// 16 bits for "time_hi_and_version", with version 4 UUID
+			(hexdec(substr($hash, 12, 4)) & 0x0fff) | 0x4000,
+			// 16 bits for "clk_seq_hi_res", with variant UUID
+			(hexdec(substr($hash, 16, 4)) & 0x3fff) | 0x8000,
+			// 48 bits for "node"
+			substr($hash, 20, 12)
+		);
+
+		return $uuid;
 	}
 
 	public function getUid()
@@ -88,7 +120,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$ret = parent::writeBody();
 
 		if ($this->rule)
+		{
 			$ret .= $this->writeField('RRULE', $this->rule->getBody());
+		}
 
 		return $ret;
 	}
@@ -125,7 +159,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			$event->$string = $this->getField($string);
 			if ( $string == 'duration')
-			  $event->$string = $this->formatDuration($event->$string);
+			{
+				$event->$string = $this->formatDuration($event->$string);
+			}
 		}
 
 		foreach (self::$dateFields as $date => $field)
@@ -137,12 +173,17 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 				if (preg_match('/"([^"]+)"/', $configurationField, $matches))
 				{
 					if (isset($matches[1]))
+					{
 						$timezoneFormat = $matches[1];
+					}
 
-				} elseif (preg_match('/=([^"]+)/', $configurationField, $matches))
+				}
+				elseif (preg_match('/=([^"]+)/', $configurationField, $matches))
 				{
 					if (isset($matches[1]))
+					{
 						$timezoneFormat = $matches[1];
+					}
 				}
 			}
 			$val = kSchedulingICal::parseDate($this->getField($field), $timezoneFormat);
@@ -157,14 +198,17 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 		$classificationType = $this->getField('class');
 		if (isset($classificationTypes[$classificationType]))
+		{
 			$event->classificationType = $classificationTypes[$classificationType];
+		}
 
 		$rule = $this->getRule();
 		if ($rule)
 		{
 			$event->recurrenceType = KalturaScheduleEventRecurrenceType::RECURRING;
 			$event->recurrence = $rule->toObject();
-		} else
+		}
+		else
 		{
 			$event->recurrenceType = KalturaScheduleEventRecurrenceType::NONE;
 		}
@@ -193,7 +237,27 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$resourceIds = array();
 
 		if ($event->referenceId)
+		{
 			$object->setField('uid', $event->referenceId);
+		}
+
+		if ($event->recurrence && $event->recurrence->timeZone)
+		{
+			$timeZones = DateTimeZone::listIdentifiers();
+
+			if (in_array($event->recurrence->timeZone, $timeZones))
+			{
+				$object->timeZoneId = $event->recurrence->timeZone;
+			}
+		}
+
+		$resources = ScheduleEventResourcePeer::retrieveByEventIdOrItsParentId($event->id);
+		foreach ($resources as $resource)
+		{
+			/* @var $resource ScheduleEventResource */
+			$resourceIds[] = $resource->getResourceId();
+		}
+		$resourceIds = array_diff($resourceIds, array(0)); //resource 0 should not be exported outside of kaltura BE.
 
 		foreach (self::$stringFields as $string)
 		{
@@ -201,10 +265,46 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			{
 				if ($string == 'duration')
 				{
+					if (!is_null($event->endDate))
+					{
+						continue;
+					}
 					$duration = self::formatDurationString($event->$string);
 					$object->setField($string, $duration);
-				} else
+				}
+				elseif ($string == 'status')
+				{
+					if ($event->$string == ScheduleEventStatus::ACTIVE)
+					{
+						$object->setField($string, 'CONFIRMED');
+					}
+					else
+					{
+						$object->setField($string, 'CANCELLED');
+					}
+				}
+				else
+				{
 					$object->setField($string, $event->$string);
+				}
+			}
+			elseif ($string == 'location')
+			{
+				if ($resourceIds)
+				{
+					$resourcesNames = array();
+					$c = new Criteria();
+					$c->add(ScheduleResourcePeer::PARTNER_ID, $event->partnerId);
+					foreach ($resourceIds as $resourceId)
+					{
+						/* @var $resource ScheduleResource */
+						$c->add(ScheduleResourcePeer::ID, $resourceId);
+						$resource = ScheduleResourcePeer::doSelectOne($c);
+						$resourcesNames[] = $resource->getName();
+						$c->remove(ScheduleResourcePeer::ID);
+					}
+					$object->setField($string, implode(',', $resourcesNames));
+				}
 			}
 		}
 
@@ -212,7 +312,15 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			if ($event->$date)
 			{
-				$object->setField($field, kSchedulingICal::formatDate($event->$date));
+				if ($object->timeZoneId !== '')
+				{
+					$fieldToUpperCase = $field . ";" . self::$timeZoneField . "=";
+					$object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $object->timeZoneId), $object->timeZoneId);
+				}
+				else
+				{
+					$object->setField($field, kSchedulingICal::formatDate($event->$date));
+				}
 			}
 		}
 
@@ -223,7 +331,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		);
 
 		if ($event->classificationType && isset($classificationTypes[$event->classificationType]))
+		{
 			$classificationType = $object->setField('class', $classificationTypes[$event->classificationType]);
+		}
 
 		if ($event->recurrence)
 		{
@@ -237,14 +347,6 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$object->setField('x-kaltura-partner-id', $event->partnerId);
 		$object->setField('x-kaltura-status', $event->status);
 		$object->setField('x-kaltura-owner-id', $event->ownerId);
-
-
-		$resources = ScheduleEventResourcePeer::retrieveByEventId($event->id);
-		foreach ($resources as $resource)
-		{
-			/* @var $resource ScheduleEventResource */
-			$resourceIds[] = $resource->getResourceId();
-		}
 
 		if ($event->parentId)
 		{
@@ -267,20 +369,27 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-		$resourceIds = array_diff($resourceIds, array(0)); //resource 0 should not be exported outside of kaltura BE.
 		if (count($resourceIds))
+		{
 			$object->setField('x-kaltura-resource-ids', implode(',', $resourceIds));
+		}
 
 		if ($event->tags)
+		{
 			$object->setField('x-kaltura-tags', $event->tags);
+		}
 
 		if ($event instanceof KalturaEntryScheduleEvent)
 		{
 			if ($event->templateEntryId)
+			{
 				$object->setField('x-kaltura-template-entry-id', $event->templateEntryId);
+			}
 
 			if ($event->entryIds)
+			{
 				$object->setField('x-kaltura-entry-ids', $event->entryIds);
+			}
 
 			if ($event->categoryIds)
 			{
@@ -296,7 +405,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 					$fullIds[] = $category->getFullIds();
 				}
 				if (count($fullIds))
+				{
 					$object->setField('related-to', implode(';', $fullIds));
+				}
 			}
 		}
 
@@ -332,5 +443,123 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			$duration = $datetime->format('U');
 		}
 		return $duration;
+	}
+
+
+	public function getTimeZoneId()
+	{
+		return $this->timeZoneId;
+	}
+
+	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null, &$timeZoneBlockArray = null)
+	{
+		try
+		{
+			$dateTimeZone = new DateTimeZone($this->timeZoneId);
+		}
+		catch (Exception $e)
+		{
+			KalturaLog::err('Error while processing the time zone: ' . $e->getMessage());
+			throw new KalturaAPIException('Error while processing the time zone: ' . $e->getMessage());
+		}
+
+		// Calculating until. Frequency is mandatory and also until or count
+		$until = (!$event->recurrence->until) ? $this->getUntilFromCount($event->recurrence->count, $event->recurrence->frequency, $event->startDate) : $event->recurrence->until;
+
+		// In order to reduce the size of the transitions to analyze, we start querying from a year before the start of the event until the last occurrence
+		$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $until);
+		$relevantTransitions = array();
+		$initialTransition = null;
+		$daylightOffset = null;
+		$standardOffset = null;
+
+		// This loop filters the list of transitions to only the ones that are relevant to the recurring event,
+		// from the transition right before the start to the last transition during the event
+		foreach ($transitions as $transition)
+		{
+			// Saving the daylight and standard offsets
+			if ($transition['isdst'])
+			{
+				$daylightOffset = $transition['offset'];
+			}
+			else
+			{
+				$standardOffset = $transition['offset'];
+			}
+
+			if ($transition['ts'] <= $event->startDate)
+			{
+				$initialTransition = $transition;
+			}
+			if ($event->startDate <= $transition['ts'] && $transition['ts'] <= $until)
+			{
+				$relevantTransitions[] = $transition;
+			}
+		}
+		array_unshift($relevantTransitions, $initialTransition);
+
+		// Create VTIMEZONE block content
+		$timeZoneBlockArray[] = $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
+
+		// Create internal Standard/Daylight blocks
+		for ($i = 0; $i < count($relevantTransitions); $i++)
+		{
+			$timeZoneBlockArray[] = $this->buildTimeBlock($relevantTransitions[$i], $daylightOffset, $standardOffset);
+		}
+	}
+
+	protected function getUntilFromCount($count, $frequency, $startDate)
+	{
+		switch ($frequency)
+		{
+			case DatesGenerator::SECONDLY:
+			{
+				return $startDate + $count;
+			}
+			case DatesGenerator::DAILY:
+			{
+				return $startDate + ($count * self::SEC_IN_DAY);
+			}
+			case DatesGenerator::MINUTELY:
+			{
+				return $startDate + ($count * self::SEC_IN_MINUTE);
+			}
+			case DatesGenerator::WEEKLY:
+			{
+				return $startDate + ($count * self::SEC_IN_WEEK);
+			}
+			case DatesGenerator::HOURLY:
+			{
+				return $startDate + ($count * self::SEC_IN_HOUR);
+			}
+			case DatesGenerator::MONTHLY:
+			{
+				return $startDate + ($count * self::SEC_IN_MONTH);
+			}
+			case DatesGenerator::YEARLY:
+			{
+				return $startDate + ($count * self::SEC_IN_YEAR);
+			}
+			default:
+				return $startDate;
+		}
+	}
+
+	protected function buildTimeBlock($transition, $daylightOffset, $standardOffset)
+	{
+		$transitionTimeBlock = '';
+		$timeType = ($transition['isdst']) ? 'DAYLIGHT' : 'STANDARD';
+		$offsetFrom = ($timeType === 'STANDARD') ? dateUtils::formatOffset($daylightOffset) : dateUtils::formatOffset($standardOffset);
+		$offsetTo = ($timeType === 'STANDARD') ? dateUtils::formatOffset($standardOffset) : dateUtils::formatOffset($daylightOffset);
+
+		$transitionTimeBlock .= $this->writeField('BEGIN',$timeType);
+		$transitionTimeBlock .= $this->writeField('TZOFFSETFROM', $offsetFrom);
+		$transitionTimeBlock .= $this->writeField('TZOFFSETTO', $offsetTo);
+		$transitionTimeBlock .= $this->writeField('TZNAME', $transition['abbr']);
+		$transitionTimeBlock .= $this->writeField('DTSTART', kSchedulingICal::formatTransitionDate($transition['ts']));
+		$transitionTimeBlock .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $transition['ts']) . ";BYDAY=" . dateUtils::convertWeekDay($transition['ts']));
+		$transitionTimeBlock .= $this->writeField('END', $timeType);
+
+		return $transitionTimeBlock;
 	}
 }
