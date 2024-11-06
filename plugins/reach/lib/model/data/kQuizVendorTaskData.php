@@ -63,6 +63,11 @@ class kQuizVendorTaskData extends kVendorTaskData
 		$this->createQuiz = $createQuiz;
 	}
 
+	public function getQuizOutput(): string
+	{
+		return $this->quizOutput;
+	}
+
 	public function setQuizOutput(?string $quizOutput): void
 	{
 		$this->quizOutput = $quizOutput;
