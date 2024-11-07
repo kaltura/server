@@ -1049,7 +1049,6 @@ class BaseEntryService extends KalturaEntryService
 		$contextDataHelper->setMediaProtocol($contextDataParams->mediaProtocol);
 		$contextDataHelper->setStreamerType($contextDataParams->streamerType);
 
-		KalturaLog::debug("getPlaybackContext - " . print_r($contextDataParams, true));
 		if (isset($contextDataParams->clipFrom) && isset($contextDataParams->clipTo)
 			&& $contextDataParams->clipFrom >= $contextDataParams->clipTo)
 		{
