@@ -202,7 +202,6 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 				throw new KalturaAPIException(KalturaCuePointErrors::CANNOT_UPDATE_ENTRY_ID);
 		}
 
-		KalturaLog::debug("validateEntryId - $this->tags");
 		$this->validateEntryEntitlement($dbEntry, $this->tags);
 	}
 
@@ -336,7 +335,6 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 			$cuePoint = CuePointPeer::retrieveByPK($sourceObject->getId());
 			$dbEntry = entryPeer::retrieveByPK($cuePoint->getEntryId());
 			$tags = $this->tags ?? $sourceObject->getTags();
-			KalturaLog::debug("validateForUpdate with $tags");
 			$this->validateEntryEntitlement($dbEntry, $tags);
 		}
 		
