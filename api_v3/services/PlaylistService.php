@@ -383,11 +383,11 @@ class PlaylistService extends KalturaEntryService
 	 * @return KalturaBaseEntryArray
 	 */
 	function executeFromContentAction($playlistType, $playlistContent, $detailed = false, $pager = null)
-    {
-        return $this->executeFromContentLogic($playlistType, $playlistContent, $detailed, $pager);
-    }
+    	{
+        	return $this->executeFromContentLogic($playlistType, $playlistContent, $detailed, $pager);
+    	}
 
-    function executeFromContentLogic($playlistType, $playlistContent, $detailed = false, $pager = null, $playlistId = null)
+    	function executeFromContentLogic($playlistType, $playlistContent, $detailed = false, $pager = null, $playlistId = null)
 	{
 		$partnerId = $this->getPartnerId() ? $this->getPartnerId() : kCurrentContext::getCurrentPartnerId();
 		myDbHelper::$use_alternative_con = myDbHelper::DB_HELPER_CONN_PROPEL3;
