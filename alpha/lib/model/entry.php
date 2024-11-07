@@ -2104,7 +2104,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return $creatorKuserId;
 	}
 	
-	public function setEntitledPusersEdit($v)
+	public function setEntitledPusersEdit($v, $parentEntry = null)
 	{
 		$entitledUserPuserEdit = array();
 		
@@ -2132,13 +2132,21 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 			if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserEdit($kuser->getId()))
 			{
-				throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
+				$this->blockedUserFlow($kuser->getId(), $parentEntry);
 			}
 
 			$entitledUserPuserEdit[$kuser->getId()] = $kuser->getPuserId();
 		}
 
 		$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );
+	}
+
+	protected function blockedUserFlow($kuserId, $parentEntry = null)
+	{
+		if (!$parentEntry || ($parentEntry && $parentEntry->getKuserId() !== $kuserId))
+		{
+			throw new kCoreException('Cannot add a blocked user', kCoreException::USER_BLOCKED);
+		}
 	}
 	
 	public function getEntitledKusersEdit()
@@ -2166,7 +2174,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return implode(',', $this->getEntitledUserPuserEditArray());
 	}
 	
-	public function setEntitledPusersView($v)
+	public function setEntitledPusersView($v, $parentEntry = null)
 	{
 		$entitledUserPuserView = array();
 		if(is_null($v) || trim($v) == '')
@@ -2191,7 +2199,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 			if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserView($kuser->getId()))
 			{
-				throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
+				$this->blockedUserFlow($kuser->getId(), $parentEntry);
 			}
 			
 			$entitledUserPuserView[$kuser->getId()] = $kuser->getPuserId();
@@ -2247,7 +2255,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		return unserialize($entitledUserPuserEdit);
 	}
 
-	public function setEntitledPusersPublish($v)
+	public function setEntitledPusersPublish($v, $parentEntry = null)
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
 		$entitledUserPuserPublish = array();
@@ -2276,7 +2284,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 			if ($kuser->getStatus() === KuserStatus::BLOCKED && !$this->isEntitledKuserPublish($kuser->getId()))
 			{
-				throw new kCoreException('Cannot add a blocked user', kCoreException::INVALID_USER_ID);
+				$this->blockedUserFlow($kuser->getId(), $parentEntry);
 			}
 			
 			$entitledUserPuserPublish[$kuser->getId()] = $kuser->getPuserId();
@@ -3049,13 +3057,13 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			if($parentEntry->getId() != $this->getId() && $parentEntry->getPuserId() != $this->getPuserId())
 			{
 				if(!in_array($parentEntry->getPuserId(), $this->getEntitledUserPuserEditArray()))
-					$this->setEntitledPusersEdit(implode(",", array_merge($this->getEntitledUserPuserEditArray(), array($parentEntry->getPuserId()))));
-				
+					$this->setEntitledPusersEdit(implode(",", array_merge($this->getEntitledUserPuserEditArray(), array($parentEntry->getPuserId()))), $parentEntry);
+
 				if(!in_array($parentEntry->getPuserId(), $this->getEntitledPusersPublishArray()))
-					$this->setEntitledPusersPublish(implode(",", array_merge($this->getEntitledPusersPublishArray(), array($parentEntry->getPuserId()))));
+					$this->setEntitledPusersPublish(implode(",", array_merge($this->getEntitledPusersPublishArray(), array($parentEntry->getPuserId()))), $parentEntry);
 
 				if(!in_array($parentEntry->getPuserId(), $this->getEntitledPusersViewArray()))
-					$this->setEntitledPusersView(implode(",", array_merge($this->getEntitledPusersViewArray(), array($parentEntry->getPuserId()))));
+					$this->setEntitledPusersView(implode(",", array_merge($this->getEntitledPusersViewArray(), array($parentEntry->getPuserId()))), $parentEntry);
 			}
 		}
 		
