@@ -328,27 +328,27 @@ class myPlaylistUtils
 		return array($filter);
 	}
 
-    public static function executeStaticPlaylistFromEntryIdsString($entryIdListStr, $filter = null, $detailed = true, $pager = null, $playlistId = null)
+    	public static function executeStaticPlaylistFromEntryIdsString($entryIdListStr, $filter = null, $detailed = true, $pager = null, $playlistId = null)
 	{
-        $entryIdList = self::getEntryIdsFromStaticPlaylistString($entryIdListStr);
-        if($entryIdList)
-        {
-            if(kEntitlementUtils::getEntitlementEnforcement() && kCurrentContext::$ks_object && kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlistId)
-            {
-                kEntitlementUtils::initEntitlementEnforcement(null, false);
-                entryPeer::setDefaultCriteriaFilter();
-                $result =  self::executeStaticPlaylistFromEntryIds($entryIdList, $filter, $detailed, $pager);
-                kEntitlementUtils::initEntitlementEnforcement();
-                entryPeer::setDefaultCriteriaFilter();
-                return $result;
-            }
-            else
-            {
-                return self::executeStaticPlaylistFromEntryIds($entryIdList, $filter, $detailed, $pager);
-            }
-        }
+        	$entryIdList = self::getEntryIdsFromStaticPlaylistString($entryIdListStr);
+        	if($entryIdList)
+        	{
+            		if(kEntitlementUtils::getEntitlementEnforcement() && kCurrentContext::$ks_object && kCurrentContext::$ks_object->getDisableEntitlementForPlaylistPlaylistId() === $playlistId)
+            		{
+                		kEntitlementUtils::initEntitlementEnforcement(null, false);
+                		entryPeer::setDefaultCriteriaFilter();
+                		$result =  self::executeStaticPlaylistFromEntryIds($entryIdList, $filter, $detailed, $pager);
+                		kEntitlementUtils::initEntitlementEnforcement();
+                		entryPeer::setDefaultCriteriaFilter();
+                		return $result;
+            		}
+            		else
+            		{
+                		return self::executeStaticPlaylistFromEntryIds($entryIdList, $filter, $detailed, $pager);
+            		}
+        	}
 
-	return null;
+		return null;
 	}
 
 	/**
