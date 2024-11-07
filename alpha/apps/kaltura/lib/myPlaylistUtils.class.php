@@ -206,7 +206,7 @@ class myPlaylistUtils
 				break;
 			case PlaylistType::STATIC_LIST:
 			case PlaylistType::PATH:
-                $entryIdListStr = $playlist->getDataContent();
+                		$entryIdListStr = $playlist->getDataContent();
 				$entryObjectsArray = self::executeStaticPlaylistFromEntryIdsString($entryIdListStr, $filter, $detailed, $pager, $playlist->getEntryId());
 			default:
 				break;
@@ -348,7 +348,7 @@ class myPlaylistUtils
             }
         }
 
-		return null;
+	return null;
 	}
 
 	/**
