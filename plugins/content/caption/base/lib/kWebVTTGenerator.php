@@ -92,13 +92,12 @@ class kWebVTTGenerator
 
 		foreach ($parsedCaption as $curCaption)
 		{
-			if ($segmentStartTime > -1 && $segmentEndTime > -1
-				&& ($curCaption["startTime"] < $segmentStartTime || $curCaption["startTime"] >= $segmentEndTime)
-				&& ($curCaption["endTime"] < $segmentStartTime || $curCaption["endTime"] >= $segmentEndTime)
-			)
+			if (self::validateCaptionTimeFrame($curCaption, $segmentStartTime, $segmentEndTime))
+			{
 				continue;
+			}
 
-			if ($curCaption["startTime"] >= $curCaption["endTime"])
+			if ($curCaption['startTime'] >= $curCaption['endTime'])
 			{
 				continue;
 			}
@@ -188,9 +187,7 @@ class kWebVTTGenerator
 
 		foreach ($parsedCaption as $curCaption)
 		{
-			if ($segmentStartTime > -1 && $segmentEndTime > -1
-				&& ($curCaption["startTime"] < $segmentStartTime || $curCaption["startTime"] >= $segmentEndTime)
-				&& ($curCaption["endTime"] < $segmentStartTime || $curCaption["endTime"] >= $segmentEndTime))
+			if (self::validateCaptionTimeFrame($curCaption, $segmentStartTime, $segmentEndTime))
 			{
 				continue;
 			}
@@ -251,6 +248,13 @@ class kWebVTTGenerator
 		}
 
 		return array($segmentStartTime, $segmentEndTime);
+	}
+
+	protected static function validateCaptionTimeFrame($curCaption, $segmentStartTime, $segmentEndTime)
+	{
+		return $segmentStartTime > -1 && $segmentEndTime > -1
+			&& ($curCaption['startTime'] < $segmentStartTime || $curCaption['startTime'] >= $segmentEndTime)
+			&& ($curCaption['endTime'] < $segmentStartTime || $curCaption['endTime'] >= $segmentEndTime);
 	}
 
 	/**
