@@ -201,6 +201,14 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 			if($this->entryId !== null && $this->entryId != $dbCuePoint->getEntryId())
 				throw new KalturaAPIException(KalturaCuePointErrors::CANNOT_UPDATE_ENTRY_ID);
 		}
+
+		KalturaLog::debug("validateEntryId - $this->tags");
+		$this->validateEntryEntitlement($dbEntry, $this->tags);
+	}
+
+	protected function validateEntryEntitlement(entry $dbEntry, $tags)
+	{
+
 	}
 	
 	/**
@@ -314,15 +322,29 @@ abstract class KalturaCuePoint extends KalturaObject implements IRelatedFilterab
 	
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if($this->tags !== null)
+		if ($this->tags !== null)
+		{
 			$this->validatePropertyMaxLength("tags", CuePointPeer::MAX_TAGS_LENGTH);
-		
-		if($this->entryId !== null)
+		}
+
+		if ($this->entryId !== null)
+		{
 			$this->validateEntryId($sourceObject->getId());
+		}
+		else
+		{
+			$cuePoint = CuePointPeer::retrieveByPK($sourceObject->getId());
+			$dbEntry = entryPeer::retrieveByPK($cuePoint->getEntryId());
+			$tags = $this->tags ?? $sourceObject->getTags();
+			KalturaLog::debug("validateForUpdate with $tags");
+			$this->validateEntryEntitlement($dbEntry, $tags);
+		}
 		
-		if($this->startTime !== null)
+		if ($this->startTime !== null)
+		{
 			$this->validateStartTime($sourceObject->getId());
-					
+		}
+
 		$propertiesToSkip[] = 'cuePointType';
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
