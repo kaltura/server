@@ -623,6 +623,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'allowedEmailDomainsForAdmins',
 	);
 
+	const PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT = 2;
+
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -679,7 +681,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, true);
 	}
 
-	protected function isPermissionStatus($permissionName, $status)
+	protected function isPermissionStatusAsRquired($permissionName, $status)
 	{
 		foreach ($this->permissions as $permission)
 		{
@@ -691,7 +693,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		return false;
 	}
 
-	protected function queryForCountingCategoriesWithTooManyPrivacyContexts($partnerId, $threshold)
+	protected function buildExcedingPrivecyContextForCategoryQuery($partnerId, $threshold)
 	{
 		$data =
 			[
@@ -725,7 +727,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
-		if ($this->isPermissionStatus(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, PermissionStatus::ACTIVE))
+		if ($this->isPermissionStatusAsRquired(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, PermissionStatus::ACTIVE))
 		{
 			$indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId());
 			$params = array(
@@ -734,7 +736,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			);
 			$body = array();
 			$body['_source'] = false;
-			$body['query'] = $this->queryForCountingCategoriesWithTooManyPrivacyContexts($this->id, 2);
+			$body['query'] = $this->buildExcedingPrivecyContextForCategoryQuery($this->id, self::PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT);
 			$params['body'] = $body;
 
 			$elasticClient = new elasticClient();
@@ -827,7 +829,9 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
-		if (!$object_to_fill) {
+		if (!$object_to_fill)
+		{
+			KalturaLog::err('Cannot find object to fill');
 			return null;
 		}
 		
