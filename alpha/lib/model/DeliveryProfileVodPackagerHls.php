@@ -57,6 +57,14 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		}
 
 		$parentFlavors = parent::buildHttpFlavorsArray();
+		$assetsRequireFMP4layback = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
+		if($assetsRequireFMP4layback)
+		{
+			foreach ($parentFlavors as &$parentFlavor)
+			{
+				$parentFlavor['url'] = "container/fmp4/" . $parentFlavor['url'];
+			}
+		}
 		$mergedFlavors = array_merge($flavors, $parentFlavors);
 		return $mergedFlavors;
 

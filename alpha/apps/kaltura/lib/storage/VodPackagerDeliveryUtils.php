@@ -136,4 +136,29 @@ class VodPackagerDeliveryUtils
 		}
 		return implode(',', $captionLanguages);
 	}
+	
+	public static function doAssetsRequireFMP4Playback($flavorAssets)
+	{
+		$assetsRequireFMP4layback = false;
+		
+		$flavorParamIds = array_values(array_map((function(asset $asset) { return $asset->getFlavorParamsId(); }), $flavorAssets ));
+		if(count($flavorParamIds))
+		{
+			$flavorParams = assetParamsPeer::retrieveByPKs($flavorParamIds);
+			
+			$assetVideoCodecs = array_unique(array_values(array_map((function(assetParams $assetParams) {
+				return $assetParams->getVideoCodec();
+			}), $flavorParams)));
+			
+			if(count($assetVideoCodecs) &&
+				count(array_intersect(array(flavorParams::VIDEO_CODEC_H265,flavorParams::VIDEO_CODEC_AV1),
+					$assetVideoCodecs)))
+			{
+				$assetsRequireFMP4layback = true;
+			}
+		}
+		
+		KalturaLog::debug("doAssetsRequireFMP4Playback [$assetsRequireFMP4layback]");
+		return $assetsRequireFMP4layback;
+	}
 }
