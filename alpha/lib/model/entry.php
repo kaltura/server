@@ -2134,7 +2134,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 
 			if ($kuser->getStatus() === KuserStatus::BLOCKED &&
 				!$this->isEntitledKuserEdit($kuser->getId()) &&
-				$this->isBlockedUserAllowed($kuser->getId(), $parentEntry))
+				// If kuser is the owner of the parent entry, ignore that the user is blocked
+				$this->isKuserOwnerOfEntry($kuser->getId(), $parentEntry))
 			{
 				throw new kCoreException('Cannot add a blocked user', kCoreException::USER_BLOCKED);
 			}
@@ -2145,9 +2146,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->putInCustomData ( "entitledUserPuserEdit" , serialize($entitledUserPuserEdit) );
 	}
 
-	protected function isBlockedUserAllowed($kuserId, $parentEntry = null)
+	protected function isKuserOwnerOfEntry($kuserId, $entry = null)
 	{
-		return (!$parentEntry || ($parentEntry && $parentEntry->getKuserId() !== $kuserId));
+		return (!$entry || ($entry && $entry->getKuserId() !== $kuserId));
 	}
 	
 	public function getEntitledKusersEdit()
@@ -2199,8 +2200,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 
 			if ($kuser->getStatus() === KuserStatus::BLOCKED &&
-				!$this->isEntitledKuserEdit($kuser->getId()) &&
-				!$this->isBlockedUserAllowed($kuser->getId(), $parentEntry))
+				!$this->isEntitledKuserView($kuser->getId()) &&
+				// If kuser is the owner of the parent entry, ignore that the user is blocked
+				$this->isKuserOwnerOfEntry($kuser->getId(), $parentEntry))
 
 			{
 				throw new kCoreException('Cannot add a blocked user', kCoreException::USER_BLOCKED);
@@ -2287,8 +2289,9 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 				throw new kCoreException('Invalid user id', kCoreException::INVALID_USER_ID);
 
 			if ($kuser->getStatus() === KuserStatus::BLOCKED &&
-				!$this->isEntitledKuserEdit($kuser->getId()) &&
-				!$this->isBlockedUserAllowed($kuser->getId(), $parentEntry))
+				!$this->isEntitledKuserPublish($kuser->getId()) &&
+				// If kuser is the owner of the parent entry, ignore that the user is blocked
+				$this->isKuserOwnerOfEntry($kuser->getId(), $parentEntry))
 			{
 				throw new kCoreException('Cannot add a blocked user', kCoreException::USER_BLOCKED);
 			}
@@ -2343,7 +2346,6 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function isEntitledKuserPublish($kuserId, $useUserGroups = true)
 	{
 		$entitledKusersArray = explode(',', $this->getEntitledKusersPublish());
-		KalturaLog::notice('### edit array: ' . print_r($entitledKusersArray, true));
 		if(in_array(trim($kuserId), $entitledKusersArray))
 			return true;
 
