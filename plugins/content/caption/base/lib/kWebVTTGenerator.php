@@ -184,7 +184,6 @@ class kWebVTTGenerator
 		[$segmentStartTime, $segmentEndTime] = self::calculateSegmentTime($segmentIndex, $segmentDuration, $clipFrom, $clipTo);
 		
 		$parsedCaption = $captionsContentManager->parseWebVTT($webVTTcontent);
-
 		foreach ($parsedCaption as $curCaption)
 		{
 			if (self::validateCaptionTimeFrame($curCaption, $segmentStartTime, $segmentEndTime))
@@ -226,11 +225,11 @@ class kWebVTTGenerator
 
 	protected static function calculateSegmentTime($segmentIndex, $segmentDuration, $clipFrom, $clipTo)
 	{
-		$segmentStartTime = $clipFrom ?? 0;
+		$segmentStartTime = $clipFrom ?: 0;
 
 		if ($segmentIndex == -1)
 		{
-			if (!isset($clipFrom) && !isset($clipTo))
+			if (!$clipFrom && !$clipTo)
 			{
 				return array(-1, -1);
 			}
@@ -242,7 +241,7 @@ class kWebVTTGenerator
 
 		$segmentEndTime = $segmentStartTime + $segmentDuration * 1000;
 
-		if (isset($clipTo) && $clipTo < $segmentEndTime)
+		if ($clipTo && $clipTo < $segmentEndTime)
 		{
 			$segmentEndTime = $clipTo;
 		}
