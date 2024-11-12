@@ -17,4 +17,10 @@ class MicroServiceChecklist extends MicroServiceBaseService
 		$url = parent::buildServiceUrl($hostName, false, false);
 		return str_replace('/v1', '', $url);
 	}
+
+	public static function buildScriptUrl($hostName)
+	{
+		$url = parent::buildServiceUrl($hostName . '-ui', false, false);
+		return str_replace('/v1', '', $url);
+	}
 }
