@@ -74,6 +74,16 @@ class kContextDataHelper
 	private $streamerType = null;
 	
 	private $mediaProtocol = null;
+
+	/**
+	 * @var int
+	 */
+	private $clipFrom;
+
+	/**
+	 * @var int
+	 */
+	private $clipTo;
 	
 	/**
 	 * 
@@ -150,6 +160,38 @@ class kContextDataHelper
 
 	public function setMediaProtocol($protocol) {
 		 $this->mediaProtocol = $protocol;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getClipFrom()
+	{
+		return $this->clipFrom;
+	}
+
+	/**
+	 * @param $clipFrom
+	 */
+	public function setClipFrom($clipFrom)
+	{
+		$this->clipFrom = $clipFrom;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getClipTo()
+	{
+		return $this->clipTo;
+	}
+
+	/**
+	 * @param $clipTo
+	 */
+	public function setClipTo($clipTo)
+	{
+		$this->clipTo = $clipTo;
 	}
 
 	public function buildContextDataResult($scope, $flavorTags, $streamerType, $mediaProtocol, $shouldHandleRuleCodes = false)

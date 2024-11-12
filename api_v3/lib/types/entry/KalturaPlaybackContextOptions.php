@@ -6,5 +6,13 @@
  */
 class KalturaPlaybackContextOptions extends KalturaEntryContextDataParams
 {
+	/**
+	 * @var int
+	 */
+	public $clipFrom;
 
+	/**
+	 * @var int
+	 */
+	public $clipTo;
 }

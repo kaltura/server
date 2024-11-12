@@ -712,6 +712,8 @@ class KalturaErrors extends APIErrors
 	
 	const FEATURE_RECYCLE_BIN_DISABLED = "FEATURE_RECYCLE_BIN_DISABLED;;Feature recycle bin is disabled for partner";
 
+	const CLIPPING_PARAMS_INVALID = "CLIPPING_PARAMS_INVALID;;Clipping parameters are invalid";
+
 	/*
 	 * FileAsset Service
 	 */
