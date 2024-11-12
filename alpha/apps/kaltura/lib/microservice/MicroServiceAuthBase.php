@@ -12,4 +12,14 @@ abstract class MicroServiceAuthBase extends MicroServiceBaseService
 		$this->hostName = self::$host;
 		parent::__construct();
 	}
+
+    public static function buildServiceUrl($hostName, $serviceName, $isApi = true)
+    {
+        $serviceUrl = parent::buildServiceUrl($hostName, $serviceName, $isApi);
+
+        //remove the last suffix after the domain
+
+        return $serviceUrl;
+    }
+
 }

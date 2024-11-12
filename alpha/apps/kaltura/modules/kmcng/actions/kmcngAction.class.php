@@ -300,7 +300,8 @@ class kmcngAction extends kalturaAction
 				'userReportsEndpoint' => array('uri' => MicroServiceUserReports::buildServiceUrl(MicroServiceUserReports::$host, MicroServiceUserReports::$service)),
 				'mrEndpoint' => array('uri' => MicroServiceMediaRepurposing::buildServiceUrl(MicroServiceMediaRepurposing::$host, MicroServiceMediaRepurposing::$service)),
 				'vendorIntegrationsEndpoint' => array('uri' => MicroServiceVendorIntegrations::buildServiceUrl(MicroServiceVendorIntegrations::$host, MicroServiceVendorIntegrations::$service)),
-				'unisphereLoaderEndpoint' => array('uri' => MicroServiceUnisphereLoader::buildServiceUrl(MicroServiceUnisphereLoader::$host, MicroServiceUnisphereLoader::$service, false))
+				'unisphereLoaderEndpoint' => array('uri' => MicroServiceUnisphereLoader::buildServiceUrl(MicroServiceUnisphereLoader::$host, MicroServiceUnisphereLoader::$service, false)),
+                'checklistEndpoint' => array('uri' => MicroServiceChecklist::buildServiceUrl(MicroServiceChecklist::$host, false, false), 'checklistItem' => kConf::get('kmcng_checklist_item','local','kmc-ng-v1')),
 			),
 		);
 
