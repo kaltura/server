@@ -12,7 +12,7 @@ class MicroServiceChecklist extends MicroServiceBaseService
 		parent::__construct();
 	}
 
-	public static function buildServiceUrl($hostName, $serviceName, $isApi = true)
+	public static function buildServiceUrl($hostName, $serviceName , $isApi = true)
 	{
 		$url = parent::buildServiceUrl($hostName, false, false);
 		return str_replace('/v1', '', $url);

@@ -303,7 +303,7 @@ class kmcngAction extends kalturaAction
 				'unisphereLoaderEndpoint' => array('uri' => MicroServiceUnisphereLoader::buildServiceUrl(MicroServiceUnisphereLoader::$host, MicroServiceUnisphereLoader::$service, false)),
 				'checklistEndpoint' => array('uri' => MicroServiceChecklist::buildServiceUrl(MicroServiceChecklist::$host, false, false),
                                             'checklistItem' => kConf::get('kmcng_checklist_item','local','kmc-ng-v1'),
-                                            'scriptUri' => MicroServiceChecklist::buildScriptUrl(MicroServiceChecklist::$host, false, false)),
+                                            'scriptUri' => MicroServiceChecklist::buildScriptUrl(MicroServiceChecklist::$host)),
 			),
 		);
 
