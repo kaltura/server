@@ -12,6 +12,7 @@ define('MAX_RECORDS', 100);
 define('K1_KUSER', 'k1');
 define('K2_KUSER', 'k2');
 define ('MAX_USERS_TO_HANDLE', 10000);
+define('DEFAULT_PROM_FILE', '/etc/node_exported/data/mergeNewlyCreatedDuplicatedUsers.prom');
 
 try
 {
@@ -249,7 +250,7 @@ function sendMail($toArray, $subject, $body, $sender = null)
 
 function writeSuccess($filePath = null): void
 {
-	$filePath = $filePath ?? '/etc/node_exported/data/mergeNewlyCreatedDuplicatedUsers.prom';
+	$filePath = $filePath ?? DEFAULT_PROM_FILE;
 	createDirPath($filePath);
 	
 	$description = 'Successfully finished mergeNewlyCreatedDuplicatedUsers.php script';
@@ -262,7 +263,7 @@ function writeSuccess($filePath = null): void
 
 function writeFailure($e, $filePath = null): void
 {
-	$filePath = $filePath ?? '/etc/node_exported/data/mergeNewlyCreatedDuplicatedUsers.prom';
+	$filePath = $filePath ?? DEFAULT_PROM_FILE;
 	createDirPath($filePath);
 	
 	$description = 'Error in mergeNewlyCreatedDuplicatedUsers.php script';
