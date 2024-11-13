@@ -1,3 +1,11 @@
+# Ursa-21.4.0
+## Create KMS Restricted Role on partner 0 ##
+* Issue Type: Task
+* Issue ID: PLAT-25018
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2024_11_13_create_kms_restricted_role.php
+
 # Ursa-21.3.0
 ## Enable embed & social stream in EP ##
 * Issue Type: Task
