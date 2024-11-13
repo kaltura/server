@@ -33,14 +33,14 @@ try
 	}
 
 	mergeNewDuplicatedUsers($lastRunFilePath);
-	writeSuccessToFile($filePath);
+	writeSuccessToFile();
 
 	flock($fp, LOCK_UN);
 }
 catch(Exception $e)
 {
 	KalturaLog::err($e);
-	writeFailureToFile($address, $e);
+	writeFailureToFile($e);
 	
 	if($address)
 	{
@@ -250,6 +250,7 @@ function sendMail($toArray, $subject, $body, $sender = null)
 function writeSuccessToFile($filePath = null): void
 {
 	$filePath = $filePath ?? '/etc/node_exported/data/mergeNewlyCreatedDuplicatedUsers.prom';
+	createDirPath($filePath);
 	
 	$description = 'Successfully finished mergeNewlyCreatedDuplicatedUsers.php script';
 	$timestamp = date("Y-m-d H:i:s");
@@ -262,6 +263,7 @@ function writeSuccessToFile($filePath = null): void
 function writeFailureToFile($e, $filePath = null): void
 {
 	$filePath = $filePath ?? '/etc/node_exported/data/mergeNewlyCreatedDuplicatedUsers.prom';
+	createDirPath($filePath);
 	
 	$description = 'Error in mergeNewlyCreatedDuplicatedUsers.php script';
 	$timestamp = date("Y-m-d H:i:s");
@@ -271,4 +273,13 @@ function writeFailureToFile($e, $filePath = null): void
 	$data = "merge_newly_created_duplicate_users{timestamp=\"$timestamp\", host=\"$hostname\", description=\"$description\", message=\"$message\", code=\"$code\"} 1";
 	
 	file_put_contents($filePath, $data, LOCK_EX);
+}
+
+function createDirPath($filePath): void
+{
+	$dirPath = dirname($filePath);
+	if (!is_dir($dirPath))
+	{
+		mkdir($dirPath, 0775, true);
+	}
 }
