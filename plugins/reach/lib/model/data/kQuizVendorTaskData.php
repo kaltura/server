@@ -23,7 +23,7 @@ class kQuizVendorTaskData extends kVendorTaskData
 		$this->numberOfQuestions = $numberOfQuestions;
 	}
 
-	public function getQuestionsType(): string
+	public function getQuestionsType(): ?string
 	{
 		return $this->questionsType;
 	}
@@ -43,7 +43,7 @@ class kQuizVendorTaskData extends kVendorTaskData
 		$this->context = $context;
 	}
 
-	public function getFormalStyle(): string
+	public function getFormalStyle(): ?string
 	{
 		return $this->formalStyle;
 	}
@@ -53,17 +53,17 @@ class kQuizVendorTaskData extends kVendorTaskData
 		$this->formalStyle = $formalStyle;
 	}
 
-	public function getCreateQuiz(): string
+	public function getCreateQuiz(): bool
 	{
 		return $this->createQuiz;
 	}
 
-	public function setCreateQuiz(string $createQuiz): void
+	public function setCreateQuiz(bool $createQuiz): void
 	{
 		$this->createQuiz = $createQuiz;
 	}
 
-	public function getQuizOutput(): string
+	public function getQuizOutput(): ?string
 	{
 		return $this->quizOutput;
 	}
