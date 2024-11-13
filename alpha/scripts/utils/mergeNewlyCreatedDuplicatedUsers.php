@@ -1,6 +1,8 @@
 <?php
-if ($argc < 3){
-	die ($argv[0]. " <last_run_file_path> <sent_to | /path/to/file> <dryrun>.\n");
+
+if ($argc < 3)
+{
+	die ("$argv[0] <last_run_file_path> <sent_to> <dryrun>");
 }
 
 require_once(__DIR__ . '/../bootstrap.php');
@@ -31,26 +33,18 @@ try
 	}
 
 	mergeNewDuplicatedUsers($lastRunFilePath);
-	
-	if (!isMailAddress($address))
-	{
-		writeSuccessToFile($address);
-	}
+	writeSuccessToFile($filePath);
 
 	flock($fp, LOCK_UN);
 }
 catch(Exception $e)
 {
 	KalturaLog::err($e);
+	writeFailureToFile($address, $e);
 	
-	# check if '$address' is a valid mail or write to file
-	if(isMailAddress($address))
+	if($address)
 	{
 		sendMail(array($address), "Error in mergeNewlyCreatedDuplicatedUsers.php script", $e, 'Kaltura');
-	}
-	else
-	{
-		writeFailureToFile($address, $e);
 	}
 }
 
@@ -253,13 +247,10 @@ function sendMail($toArray, $subject, $body, $sender = null)
 	}
 }
 
-function isMailAddress($address): bool
+function writeSuccessToFile($filePath = null): void
 {
-	return preg_match('/^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/', $address);
-}
-
-function writeSuccessToFile($filePath): void
-{
+	$filePath = $filePath ?? '/etc/node_exported/data/mergeNewlyCreatedDuplicatedUsers.prom';
+	
 	$description = 'Successfully finished mergeNewlyCreatedDuplicatedUsers.php script';
 	$timestamp = date("Y-m-d H:i:s");
 	$hostname = gethostname();
@@ -268,8 +259,10 @@ function writeSuccessToFile($filePath): void
 	file_put_contents($filePath, $data, LOCK_EX);
 }
 
-function writeFailureToFile($filePath, $e): void
+function writeFailureToFile($e, $filePath = null): void
 {
+	$filePath = $filePath ?? '/etc/node_exported/data/mergeNewlyCreatedDuplicatedUsers.prom';
+	
 	$description = 'Error in mergeNewlyCreatedDuplicatedUsers.php script';
 	$timestamp = date("Y-m-d H:i:s");
 	$message = $e->getMessage();
