@@ -33,7 +33,7 @@ class kQuizVendorTaskData extends kVendorTaskData
 		$this->questionsType = $questionsType;
 	}
 
-	public function getContext(): ?string
+	public function getContext(): string
 	{
 		return $this->context;
 	}
