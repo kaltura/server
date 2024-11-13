@@ -46,7 +46,7 @@ catch(Exception $e)
 	{
 		sendMail(array($address), "Error in mergeNewlyCreatedDuplicatedUsers.php script", $e, 'Kaltura');
 	}
-}	
+}
 
 function mergeNewDuplicatedUsers($lastRunFilePath)
 {
