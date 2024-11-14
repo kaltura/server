@@ -235,7 +235,7 @@ class KalturaAnnotation extends KalturaCuePoint
 	protected function validateEntryEntitlement(entry $dbEntry, $tags)
 	{
 		$tagsList = explode(',', $tags);
-		if (in_array('hotspots', $tagsList) && !kEntitlementUtils::isEntitledForEditEntry($dbEntry))
+		if (in_array('hotspots', $tagsList) && !kEntitlementUtils::isEntryEntitled($dbEntry))
 		{
 			KalturaLog::debug("User is not allowed to edit " . get_class($this) . " on entry [$this->entryId]");
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
