@@ -725,6 +725,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 
 		$roleId = is_numeric($restrictingRole) ? $restrictingRole : self::getRoleIdFromSystemName($restrictingRole);
+		if (!$roleId)
+		{
+			return;
+		}
 
 		KalturaLog::debug("Removing permissions according to restricting role [$roleId]");
 		$roleMap = self::getPermissions($roleId, true);
@@ -740,6 +744,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$c->addAnd(UserRolePeer::SYSTEM_NAME, $systemName, Criteria::EQUAL);
 		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::IN);
 		$role = UserRolePeer::doSelectOne($c);
+		if (!$role)
+		{
+			return null;
+		}
 		return $role->getId();
 	}
 
