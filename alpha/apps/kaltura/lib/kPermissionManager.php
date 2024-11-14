@@ -724,12 +724,23 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			return;
 		}
 
-		KalturaLog::debug("Removing permissions according to restricting role [$restrictingRole]");
-		$roleMap = self::getPermissions($restrictingRole, true);
+		$roleId = is_numeric($restrictingRole) ? $restrictingRole : self::getRoleIdFromSystemName($restrictingRole);
+
+		KalturaLog::debug("Removing permissions according to restricting role [$roleId]");
+		$roleMap = self::getPermissions($roleId, true);
 
 		self::removeApiActionPermission($roleMap[self::API_ACTIONS_ARRAY_NAME]);
 		self::removeApiParametersPermissions($roleMap[self::API_PARAMETERS_ARRAY_NAME]);
 		self::removePermissionNames($roleMap[self::PERMISSION_NAMES_ARRAY]);
+	}
+
+	protected static function getRoleIdFromSystemName($systemName)
+	{
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::SYSTEM_NAME, $systemName, Criteria::EQUAL);
+		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::IN);
+		$role = UserRolePeer::doSelectOne($c);
+		return $role->getId();
 	}
 
 	protected static function removeApiActionPermission($apiActions)
