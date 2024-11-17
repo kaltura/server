@@ -57,6 +57,9 @@ while (count($partners))
 			$v2v7Permission->setType(PermissionType::SPECIAL_FEATURE);
 			$v2v7Permission->setPartnerId($partner->getId());
 			$v2v7Permission->setName(PermissionName::FEATURE_V2_V7_REDIRECT);
+			$v2v7Permission->setStatus(PermissionStatus::ACTIVE);
+			$v2v7Permission->save();
+			KalturaLog::debug('Set permission [' . PermissionName::FEATURE_V2_V7_REDIRECT . '] for partner id [' . $partner->getId() . ']');
 		}
 		elseif ($v2v7Permission->getStatus() != PermissionStatus::ACTIVE)
 		{
@@ -74,6 +77,9 @@ while (count($partners))
 				$automationManagerPermission->setType(PermissionType::SPECIAL_FEATURE);
 				$automationManagerPermission->setPartnerId($partner->getId());
 				$automationManagerPermission->setName(PermissionName::FEATURE_MEDIA_REPURPOSING_NG_PERMISSION);
+				$automationManagerPermission->setStatus(PermissionStatus::ACTIVE);
+				$automationManagerPermission->save();
+				KalturaLog::debug('Set permission [' . PermissionName::FEATURE_MEDIA_REPURPOSING_NG_PERMISSION . '] for partner id [' . $partner->getId() . ']');
 			}
 			elseif ($automationManagerPermission->getStatus() != PermissionStatus::ACTIVE)
 			{
@@ -92,6 +98,9 @@ while (count($partners))
 					$teamsPermission->setType(PermissionType::SPECIAL_FEATURE);
 					$teamsPermission->setPartnerId($partner->getId());
 					$teamsPermission->setName($permissionName);
+					$teamsPermission->setStatus(PermissionStatus::ACTIVE);
+					$teamsPermission->save();
+					KalturaLog::debug('Set permission [FEATURE_TEAMS_RECORDING_UPLOAD_PERMISSION] for partner id [' . $partner->getId() . ']');
 				}
 				elseif ($teamsPermission->getStatus() != PermissionStatus::ACTIVE)
 				{
