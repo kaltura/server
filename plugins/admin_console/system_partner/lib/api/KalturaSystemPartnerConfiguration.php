@@ -623,6 +623,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'allowedEmailDomainsForAdmins',
 	);
 
+	const PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT = 2;
+
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -678,9 +680,74 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		if($templatePartner)
 			myPartnerUtils::copyConversionProfiles($templatePartner, $partner, true);
 	}
-	
+
+	protected function isPermissionStatusAsRquired($permissionName, $status)
+	{
+		foreach ($this->permissions as $permission)
+		{
+			if ($permission->name == $permissionName && $permission->status == $status)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected function buildExcedingPrivecyContextForCategoryQuery($partnerId, $threshold)
+	{
+		$data =
+			[
+				"bool" =>
+				[
+					"filter" =>
+					[
+						[
+							"term" =>
+							[
+								"partner_status" =>
+								[
+									"value" => "p" . $partnerId . "s2"
+								]
+							]
+						],
+						[
+							"script" =>
+							[
+								"script" =>
+								[
+									"source" => "doc['privacy_contexts'].length > $threshold"
+								]
+							]
+						]
+					]
+				]
+			];
+		return $data;
+	}
+
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		if ($this->isPermissionStatusAsRquired(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, PermissionStatus::ACTIVE))
+		{
+			$indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId());
+			$params = array(
+				'index' => $indexName,
+				'type' => ElasticIndexMap::ELASTIC_CATEGORY_TYPE
+			);
+			$body = array();
+			$body['_source'] = false;
+			$body['query'] = $this->buildExcedingPrivecyContextForCategoryQuery($this->id, self::PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT);
+			$params['body'] = $body;
+
+			$elasticClient = new elasticClient();
+			$results = $elasticClient->search($params, true);
+			$categoriesCount = $results['hits']['total'];
+
+			if ($categoriesCount > 0)
+			{
+				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, $categoriesCount);
+			}
+		}
 		$audioThumbEntryId = $this->audioThumbEntryId;
 		if ($audioThumbEntryId)
 		{
@@ -762,7 +829,8 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	public function toObject ( $object_to_fill = null , $props_to_skip = array() )
 	{
 		$object_to_fill = parent::toObject($object_to_fill, $props_to_skip);
-		if (!$object_to_fill) {
+		if (!$object_to_fill)
+		{
 			KalturaLog::err('Cannot find object to fill');
 			return null;
 		}
