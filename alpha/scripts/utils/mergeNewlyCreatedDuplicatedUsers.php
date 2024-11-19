@@ -12,7 +12,7 @@ define('MAX_RECORDS', 100);
 define('K1_KUSER', 'k1');
 define('K2_KUSER', 'k2');
 define ('MAX_USERS_TO_HANDLE', 10000);
-define('DEFAULT_PROM_FILE', '/etc/node_exported/data/mergeNewlyCreatedDuplicatedUsers.prom');
+define('DEFAULT_PROM_FILE', '/etc/node_exporter/data/mergeNewlyCreatedDuplicatedUsers.prom');
 
 try
 {
