@@ -40,7 +40,7 @@ KalturaStatement::setDryRun ( $dryRun );
 
 $c = new Criteria();
 $c->addAscendingOrderByColumn(PartnerPeer::ID);
-$c->addAnd(PartnerPeer::ID, 99, Criteria::GREATER_EQUAL);
+$c->addAnd(PartnerPeer::ID, 99, Criteria::GREATER_THAN);
 $c->addAnd(PartnerPeer::STATUS,1, Criteria::EQUAL);
 $c->setLimit($countLimitEachLoop);
 $partners = PartnerPeer::doSelect ( $c, $con );
