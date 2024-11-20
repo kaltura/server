@@ -189,6 +189,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				case Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ:
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorQuizCatalogItem', $formData, false, true);
 					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::OCR:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorOcrCatalogItem', $formData, false, true);
+					break;
 			}
 
 			$form->resetUnUpdatebleAttributes($catalogItem);
