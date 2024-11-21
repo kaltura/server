@@ -626,7 +626,7 @@ class kEntitlementUtils
 		// entry that doesn't belong to any category is public
 		//when ks is not provided - the entry is still public (for example - download action)
 		$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
-		if (!$categoryEntry)
+		if (!$categoryEntry && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_UNCATEGORIZED_ENTRIES_VALIDATION, kCurrentContext::getCurrentPartnerId()))
 		{
 			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
 			return true;
@@ -655,7 +655,8 @@ class kEntitlementUtils
 		else
 		{
 			$allCategoriesEntry = categoryEntryPeer::retrieveActiveAndPendingByEntryId($entry->getId());
-			if ($ks && (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '') && !count($allCategoriesEntry))
+			if ($ks && (!$ksPrivacyContexts || trim($ksPrivacyContexts) == '') && !count($allCategoriesEntry)
+				&& !PermissionPeer::isValidForPartner(PermissionName::FEATURE_UNCATEGORIZED_ENTRIES_VALIDATION, kCurrentContext::getCurrentPartnerId()))
 			{
 				// entry that doesn't belong to any category is public
 				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category and privacy context on the ks is not set');
