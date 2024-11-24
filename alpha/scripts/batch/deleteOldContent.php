@@ -480,7 +480,7 @@ class kOldContentCleaner
 		while(count($partnerIds))
 		{
 			$criteria = new Criteria();
-			$criteria->add(FileSyncPeer::STATUS, array(FileSync::FILE_SYNC_STATUS_DELETED, FileSync::FILE_SYNC_STATUS_PENDING), Criteria::NOT_IN);
+			$criteria->add(FileSyncPeer::STATUS, array(FileSync::FILE_SYNC_STATUS_DELETED, FileSync::FILE_SYNC_STATUS_PENDING, FileSync::FILE_SYNC_STATUS_PURGED), Criteria::NOT_IN);
 			$criteria->add(FileSyncPeer::PARTNER_ID, $partnerIds, Criteria::IN);
 			$criteria->addDescendingOrderByColumn(FileSyncPeer::FILE_SIZE);
 			$criteria->setLimit(self::$queryLimit);
