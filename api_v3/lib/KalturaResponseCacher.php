@@ -397,6 +397,12 @@ class KalturaResponseCacher extends kApiCache
 								}
 							}
 
+							$cleanActionParamsActions = "{$action}_clean";
+							if (method_exists($className, $cleanActionParamsActions))
+							{
+								$className::$cleanActionParamsActions($params);
+							}
+
 							$ksPartnerId = $this->_ksObj ? $this->_ksObj->partner_id : 0;
 							if (!self::rateLimit($service, $action, $params, $this->_partnerId, $ksPartnerId))
 							{

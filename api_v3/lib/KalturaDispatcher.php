@@ -86,6 +86,7 @@ class KalturaDispatcher
 		kCurrentContext::$language = isset($params['language']) ? strtoupper($params['language']) : null;
 		kCurrentContext::initKsPartnerUser($ksStr, $p, $userId);
 
+		$this->checkAndTrimLoginId($service, $action, $params);
 		if (!KalturaResponseCacher::rateLimit($service, $action, $params, kCurrentContext::$partner_id, kCurrentContext::$ks_partner_id))
 		{
 			throw new KalturaAPIException(KalturaErrors::ACTION_BLOCKED, $action, $service);
@@ -156,6 +157,14 @@ class KalturaDispatcher
 		
 		
 		return $res;
+	}
+
+	protected function checkAndTrimLoginId($service, $action, &$params)
+	{
+		if ($service === 'user' && $action === 'loginbyloginid')
+		{
+			$params['loginId'] = trim($params['loginId']);
+		}
 	}
 	
 	/**
