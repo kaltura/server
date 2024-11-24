@@ -3074,14 +3074,22 @@ class kKavaReportsMgr extends kKavaBase
 			$entry_search = new kEntrySearch();
 			$entry_search->setFilterOnlyContext();
 			$pager = new kPager();
-			$pager->setPageSize(self::MAX_ESEARCH_RESULTS);
-			$elastic_results = $entry_search->doSearch($input_filter->entry_operator, $pager);
-			$elastic_entry_ids = kESearchCoreAdapter::getObjectIdsFromElasticResults($elastic_results);
+            $page_index = 0;
+            $elastic_entry_ids = array();
+            do {
+                $page_index++;
+                $pager->setPageIndex($page_index);
+                $pager->setPageSize(min(self::MAX_ESEARCH_RESULTS - count($elastic_entry_ids), kPager::MAX_PAGE_SIZE));
+                $elastic_results = $entry_search->doSearch($input_filter->entry_operator, $pager);
+                $elastic_entry_ids = array_merge($elastic_entry_ids, kESearchCoreAdapter::getObjectIdsFromElasticResults($elastic_results));
+                $moreElasticResultsToFetch = $elastic_results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] > count($elastic_entry_ids);
 
-			if ($elastic_results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] > count($elastic_entry_ids))
-			{
-				throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
-			}
+            } while ($moreElasticResultsToFetch && count($elastic_entry_ids) < self::MAX_ESEARCH_RESULTS);
+
+            if ($moreElasticResultsToFetch)
+            {
+                throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
+            }
 
 			if ($elastic_entry_ids)
 			{
