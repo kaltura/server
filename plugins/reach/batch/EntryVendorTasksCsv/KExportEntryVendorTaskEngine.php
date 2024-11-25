@@ -31,7 +31,8 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		10 => "CLIPS",
 		11 => "LIVE_TRANSLATION",
 		12 => "QUIZ",
-		13 => "OCR",
+		13 => "SUMMARY",
+		14 => "OCR",
 		"N/A" => "N/A",
 	);
 	

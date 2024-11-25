@@ -13,6 +13,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION' => 'LIVE_CAPTION',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION' => 'LIVE_TRANSLATION',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ' => 'QUIZ',
+	'Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY' => 'SUMMARY',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::OCR' => 'OCR',
 
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
