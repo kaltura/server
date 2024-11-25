@@ -4295,8 +4295,10 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	{
 		$categoryNamesSearchData = array();
 		$categoryPrivacyByContextSearchData = array();
-
+		
+		KalturaCriterion::disableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		$categories = categoryPeer::retrieveByPKs($categoryIds);
+		KalturaCriterion::enableTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
 		foreach ($categories as $category)
 		{
 			$categoryEntryStatus = $mapCategoryEntryStatus[$category->getId()];
