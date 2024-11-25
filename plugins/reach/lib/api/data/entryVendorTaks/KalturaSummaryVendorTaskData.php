@@ -62,34 +62,4 @@ class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
 		$this->validatePropertyNotNull("typeOfSummary");
 		$this->validatePropertyNotNull("writingStyle");
 	}
-
-	public function getSummaryOutputJson(): ?string
-	{
-		return $this->summaryOutputJson;
-	}
-
-	public function setSummaryOutputJson(?string $summaryOutputJson): void
-	{
-		$this->summaryOutputJson = $summaryOutputJson;
-	}
-
-	public function getTypeOfSummary(): typeOfSummaryTaskData
-	{
-		return $this->typeOfSummary;
-	}
-
-	public function setTypeOfSummary(typeOfSummaryTaskData $typeOfSummary): void
-	{
-		$this->typeOfSummary = $typeOfSummary;
-	}
-
-	public function getWritingStyle(): SummaryWritingStyleTaskData
-	{
-		return $this->writingStyle;
-	}
-
-	public function setWritingStyle(SummaryWritingStyleTaskData $writingStyle): void
-	{
-		$this->writingStyle = $writingStyle;
-	}
 }

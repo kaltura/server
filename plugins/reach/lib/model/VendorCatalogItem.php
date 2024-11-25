@@ -255,8 +255,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 			case VendorServiceFeature::SUMMARY:
 				$serviceFeatureName = 'summary';
+				break;
 
-      case VendorServiceFeature::OCR:
+			case VendorServiceFeature::OCR:
 				$serviceFeatureName = 'ocr';
 				break;
 
