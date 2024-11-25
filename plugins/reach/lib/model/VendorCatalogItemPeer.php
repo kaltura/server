@@ -44,7 +44,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::CLIPS => self::CLIPS_OM_CLASS,
 		VendorServiceFeature::LIVE_TRANSLATION => self::LIVE_TRANSLATION_OM_CLASS,
 		VendorServiceFeature::QUIZ => self::QUIZ_OM_CLASS,
-		VendorServiceFeature::SUMMARY => self::SUMMARY_OM_CLASS
+		VendorServiceFeature::SUMMARY => self::SUMMARY_OM_CLASS,
 		VendorServiceFeature::OCR => self::OCR_OM_CLASS,
 	);
 	
