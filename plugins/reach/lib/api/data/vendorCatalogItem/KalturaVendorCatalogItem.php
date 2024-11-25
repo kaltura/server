@@ -301,8 +301,8 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				break;
 
 			case VendorServiceFeature::OCR:
-						$object = new KalturaVendorOcrCatalogItem();
-						break;
+				$object = new KalturaVendorOcrCatalogItem();
+				break;
 
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();
