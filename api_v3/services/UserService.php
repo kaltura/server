@@ -373,12 +373,6 @@ class UserService extends KalturaBaseUserService
 		return parent::loginImpl(null, trim($loginId), $password, $partnerId, $expiry, $privileges, $otp);
 	}
 
-	public static function loginByLoginIdAction_clean(&$params)
-	{
-		$params['loginId'] = trim($params['loginId']);
-		return $params;
-	}
-
 	protected static function validateLoginDataParams($paramsArray)
 	{
 		kCurrentContext::$HTMLPurifierBehaviour = HTMLPurifierBehaviourType::BLOCK;
