@@ -1,9 +1,9 @@
 <?php
 /**
  * @package plugins.reach
- * @subpackage model.enum
+ * @subpackage model
  */
-class TypeOfSummaryTaskData
+interface TypeOfSummaryTaskData extends BaseEnum
 {
 	const CONCISE = "concise";
 	const DETAILED = "detailed";

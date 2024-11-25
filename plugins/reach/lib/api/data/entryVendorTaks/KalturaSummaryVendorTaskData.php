@@ -10,16 +10,23 @@ class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
 	/**
 	 * Type of summary.
 	 *
-	 * @var TypeOfSummaryTaskData
+	 * @var KalturaTypeOfSummaryTaskData
 	 */
 	public $typeOfSummary;
 
 	/**
 	 * Writing style of the summary.
 	 *
-	 * @var SummaryWritingStyleTaskData
+	 * @var KalturaSummaryWritingStyleTaskData
 	 */
 	public $writingStyle;
+
+	/**
+	 * Language code
+	 *
+	 * @var KalturaLanguage
+	 */
+	public $language;
 
 	/**
 	 * JSON string containing the summary output.
@@ -31,6 +38,7 @@ class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
 	private static $map_between_objects = array(
 		'typeOfSummary',
 		'writingStyle',
+		'language',
 		'summaryOutputJson',
 	);
 
@@ -41,7 +49,8 @@ class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
 
 	public function toObject($dbObject = null, $propsToSkip = array())
 	{
-		if (!$dbObject) {
+		if (!$dbObject)
+		{
 			$dbObject = new kSummaryVendorTaskData();
 		}
 
@@ -64,12 +73,12 @@ class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
 		$this->summaryOutputJson = $summaryOutputJson;
 	}
 
-	public function getTypeOfSummary(): TypeOfSummaryTaskData
+	public function getTypeOfSummary(): typeOfSummaryTaskData
 	{
 		return $this->typeOfSummary;
 	}
 
-	public function setTypeOfSummary(TypeOfSummaryTaskData $typeOfSummary): void
+	public function setTypeOfSummary(typeOfSummaryTaskData $typeOfSummary): void
 	{
 		$this->typeOfSummary = $typeOfSummary;
 	}

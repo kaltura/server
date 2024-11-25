@@ -4,7 +4,7 @@
  * @package plugins.reach
  * @subpackage model.enum
  */
-class SummaryWritingStyleTaskData
+interface SummaryWritingStyleTaskData extends BaseEnum
 {
 	const FORMAL = "formal";
 	const CASUAL = "casual";

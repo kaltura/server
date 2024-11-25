@@ -6,30 +6,49 @@
  */
 class kSummaryVendorTaskData extends kVendorTaskData
 {
-	public TypeOfSummaryTaskData $typeOfSummary;
+	public String $typeOfSummary;
 
-	public SummaryWritingStyleTaskData $writingStyle;
+	public String  $writingStyle;
+
+	public ?String $language;
 
 	public ?string $summaryOutputJson = null;
 
-	public function getTypeOfSummary(): TypeOfSummaryTaskData
+	public function __construct()
+	{
+		$this->typeOfSummary = TypeOfSummaryTaskData::CONCISE;
+		$this->writingStyle = SummaryWritingStyleTaskData::FORMAL;
+		$this->language = null;
+	}
+
+	public function getTypeOfSummary()
 	{
 		return $this->typeOfSummary;
 	}
 
-	public function setTypeOfSummary(TypeOfSummaryTaskData $typeOfSummary): void
+	public function setTypeOfSummary( $typeOfSummary): void
 	{
 		$this->typeOfSummary = $typeOfSummary;
 	}
 
-	public function getWritingStyle(): SummaryWritingStyleTaskData
+	public function getWritingStyle()
 	{
 		return $this->writingStyle;
 	}
 
-	public function setWritingStyle(SummaryWritingStyleTaskData $writingStyle): void
+	public function setWritingStyle( $writingStyle): void
 	{
 		$this->writingStyle = $writingStyle;
+	}
+
+	public function getLanguage()
+	{
+		return $this->language;
+	}
+
+	public function setLanguage($language): void
+	{
+		$this->language = $language;
 	}
 
 	public function getSummaryOutputJson(): ?string
