@@ -27,6 +27,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const CLIPS_OM_CLASS = 'VendorClipsCatalogItem';
 	const LIVE_TRANSLATION_OM_CLASS = 'VendorLiveTranslationCatalogItem';
 	const QUIZ_OM_CLASS = 'VendorQuizCatalogItem';
+	const OCR_OM_CLASS = 'VendorOcrCatalogItem';
 
 	// cache classes by their type
 	protected static $class_types_cache = array(
@@ -42,6 +43,7 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::CLIPS => self::CLIPS_OM_CLASS,
 		VendorServiceFeature::LIVE_TRANSLATION => self::LIVE_TRANSLATION_OM_CLASS,
 		VendorServiceFeature::QUIZ => self::QUIZ_OM_CLASS,
+		VendorServiceFeature::OCR => self::OCR_OM_CLASS,
 	);
 	
 	public static function setDefaultCriteriaFilter ()
