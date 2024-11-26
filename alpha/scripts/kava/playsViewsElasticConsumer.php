@@ -4,10 +4,8 @@ require_once(__DIR__ . '../../../../../kava-utils/lib/StreamQueue.php');
 require_once(__DIR__ . '/../bootstrap.php');
 require_once(__DIR__ . '/playsViewsCommon.php');
 
-class
-playsViewsElasticConsumer extends BaseConsumer
+class playsViewsElasticConsumer extends BaseConsumer
 {
-
 	protected function processMessage($message)
 	{
 		global $elasticClient, $indexConfig, $explicitPartnerIds;

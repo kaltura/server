@@ -11,7 +11,6 @@ define('MEMC_KEY_PREFIX', 'plays_views_');
 
 class playsViewsMemcacheConsumer extends BaseConsumer
 {
-
 	protected function processMessage($message)
 	{
 		global $memc, $queryCacheMemc, $maxLastPlayedAt;
@@ -63,7 +62,6 @@ if ($argc < 2)
 	exit(1);
 }
 
-//$conf = loadIniFiles($argv[1]);
 $memcache = $argv[1];
 $queryCacheMemcaches = isset($argv[2]) ? $argv[2] : null;
 
@@ -82,7 +80,7 @@ writeLog('Info: started, pid=' . getmypid());
 // connect to memcache
 list($memcacheHost, $memcachePort) = explode(':', $memcache);
 $memc = new kInfraMemcacheCacheWrapper();
-$ret = $memc->init(array('host'=>$memcacheHost ,'port'=>$memcachePort));
+$ret = $memc->init(array('host'=>$memcacheHost, 'port'=>$memcachePort));
 if (!$ret)
 {
 	writeLog("Failed to connect to cache host {$memcacheHost} port {$memcachePort}");
@@ -98,10 +96,10 @@ if ($queryCacheMemcaches)
 	{
 		list($currMemcacheHost, $currMemcachePort) = explode(':', $queryCacheMemcache);
 		$currQueryCacheMemc = new kInfraMemcacheCacheWrapper();
-		$ret = $currQueryCacheMemc->init($currMemcacheHost, $currMemcachePort);
+		$ret = $currQueryCacheMemc->init(array('host'=>$currMemcacheHost, 'port'=>$currMemcachePort));
 		if (!$ret)
 		{
-			writeLog("Failed to connect to cache host {$memcacheHost} port {$memcachePort}");
+			writeLog("Failed to connect to cache host {$currMemcacheHost} port {$currMemcachePort}");
 			exit(1);
 		}
 		$queryCacheMemc[] = $currQueryCacheMemc;
