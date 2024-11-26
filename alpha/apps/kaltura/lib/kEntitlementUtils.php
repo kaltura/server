@@ -628,9 +628,9 @@ class kEntitlementUtils
 		$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
 		if (!$categoryEntry)
 		{
-			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_UNCATEGORIZED_ENTRIES_VALIDATION, kCurrentContext::getCurrentPartnerId()))
+			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NO_CATEGORY_ENTRY_ENTITLEMENT_CHECK, kCurrentContext::getCurrentPartnerId()))
 			{
-				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] not entitled: entry does not belong to any category');
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] not entitled: entry does not belong to any category - blocked by configuration');
 				return false;
 			}
 			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
