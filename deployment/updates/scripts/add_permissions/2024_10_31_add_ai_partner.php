@@ -2,7 +2,7 @@
 
 /**
 * @package deployment
-* @subpackage quasar.roles_and_permissions
+* @subpackage ursa.roles_and_permissions
 */
 
 $script = realpath(dirname(__FILE__) . '/../../../') . '/base/scripts/insertDefaults.php';
