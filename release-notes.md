@@ -1,4 +1,25 @@
-# Ursa-21.2.0
+# Ursa-21.4.0
+## Create KMS Restricted Role on partner 0 ##
+* Issue Type: Task
+* Issue ID: PLAT-25018
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2024_11_13_create_kms_restricted_role.php
+
+# Ursa-21.3.0
+## Enable embed & social stream in EP ##
+* Issue Type: Task
+* Issue ID: PLAT-24999
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.embedShareStream.enabled = true
+moduls.embedShareStream.permissionType = 2
+moduls.embedShareStream.label = "Enable embed & social stream in EP"
+moduls.embedShareStream.permissionName = FEATURE_EMBED_SHARE_SOCIAL_STREAM
+moduls.embedShareStream.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 ## Add partner for AI framework ##
 
 * Issue Type: Task
