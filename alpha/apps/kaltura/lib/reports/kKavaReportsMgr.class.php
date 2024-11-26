@@ -5109,6 +5109,40 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getCuePointDurationAndUser($ids, $partner_id, $context)
+	{
+		$context['peer'] = 'CuePointPeer';
+		if (!isset($context['columns']))
+			$context['columns'] = array();
+		$context['columns'][] = 'START_TIME';
+		$context['columns'][] = 'END_TIME';
+		$context['columns'][] = 'KUSER_ID';
+
+
+		$result = array();
+		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
+		foreach ($enrichedResult as $id => $row)
+		{
+			if (!is_array($row)) {
+				$result[$id] = $id;
+				continue;
+			}
+
+			$kuserId = array_pop($row);
+			$endTime = array_pop($row);
+			$startTime = array_pop($row);
+			$duration = $endTime - $startTime;
+
+			$result[$id] = $row;
+			$result[$id][] = $startTime;
+			$result[$id][] = $endTime;
+			$result[$id][] = $duration;
+			$result[$id][] = $kuserId;
+		}
+
+		return $result;
+	}
+
 	protected static function getAppGuidByEventId($partner_id, $virtual_event_id)
 	{
 		$filter = array('appCustomIdIn' => array($virtual_event_id));
