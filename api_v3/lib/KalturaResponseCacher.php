@@ -602,7 +602,7 @@ class KalturaResponseCacher extends kApiCache
 		parent::storeCache($response, $responseMetadata, $serializeResponse);
 	}
 	
-	public static function rateLimit($service, $action, $params, $partnerId = null, $ksPartnerId = null)
+	public static function rateLimit($service, $action, &$params, $partnerId = null, $ksPartnerId = null)
 	{
 		$unlimitedPartnerIds = array(self::BATCH_PARTNER_ID, self::MEDIA_REPURPOSING_PARTNER_ID);
 		if (!kConf::hasMap('api_rate_limit') || in_array($ksPartnerId, $unlimitedPartnerIds))
@@ -623,6 +623,15 @@ class KalturaResponseCacher extends kApiCache
 		if (!$rule)
 		{
 			return true;
+		}
+
+		if (isset($rule['_trim']))
+		{
+			$paramsToBeTrimmed = explode(',', $rule['_trim']);
+			foreach ($paramsToBeTrimmed as $param)
+			{
+				$params[$param] = trim($params[$param]);
+			}
 		}
 
 		if (isset($rule['_key']))
