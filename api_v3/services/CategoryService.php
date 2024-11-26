@@ -7,6 +7,9 @@
  */
 class CategoryService extends KalturaBaseService
 {
+	protected $defaultPrivacyContextsPhrases = ['NOTDEFAULTPC', 'DEFAULTPC'];
+	const PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT = 1;
+
 	public function initService($serviceId, $serviceName, $actionName)
 	{
 		parent::initService($serviceId, $serviceName, $actionName);
@@ -33,21 +36,8 @@ class CategoryService extends KalturaBaseService
 		if ($category->parentId != null && //batch to index categories or to move categories might miss this category to be moved or index
 			$this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
-			
-		if($category->privacyContext != null && 
-		   $category->privacyContext != '')
-	   	{
-			$privacyContexts = explode(',', $category->privacyContext);  
-		  	
-			foreach($privacyContexts as $privacyContext)
-		  	{
-		  		if(!preg_match('/^[a-zA-Z\d]+$/', $privacyContext) || strlen($privacyContext) < 4)
-		  		{
-		  			KalturaLog::err('Invalid privacy context: ' . print_r($privacyContext, true));
-		   			throw new KalturaAPIException(KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING, $privacyContext);
-		  		}
-		  	}
-	   	}
+
+		$this->validatePrivacyContexts($category);
 			
 		try
 		{
@@ -153,20 +143,6 @@ class CategoryService extends KalturaBaseService
 		$categoryDb = categoryPeer::retrieveByPK($id);
 		if (!$categoryDb)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $id );
-		
-		if ($category->privacyContext != null && $category->privacyContext != '') 
-		{
-			$privacyContexts = explode ( ',', $category->privacyContext );
-			
-			foreach ( $privacyContexts as $privacyContext )
-			{
-				if (! preg_match ( '/^[a-zA-Z\d]+$/', $privacyContext ) || strlen ( $privacyContext ) < 4) 
-				{
-					KalturaLog::err ( 'Invalid privacy context: ' . print_r ( $privacyContext, true ) );
-					throw new KalturaAPIException ( KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING, $privacyContext );
-				}
-			}
-		}
 			
 		//it is possible that not all of the sub tree is updated, 
 		//and updating fields that will add batch job to re-index categories - might not update all sub categories.
@@ -174,6 +150,8 @@ class CategoryService extends KalturaBaseService
 		if (($category->parentId != null && $category->parentId !=  $categoryDb->getParentId()) && 
 			$this->getPartner()->getFeaturesStatusByType(IndexObjectType::LOCK_CATEGORY))
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
+
+		$this->validatePrivacyContexts($category);
 
 		if (kEntitlementUtils::getEntitlementEnforcement())
 		{
@@ -197,6 +175,56 @@ class CategoryService extends KalturaBaseService
 		$category = new KalturaCategory();
 		$category->fromObject($categoryDb, $this->getResponseProfile());
 		return $category;
+	}
+
+	protected function validatePrivacyContexts($category)
+	{
+		$partnerId = kCurrentContext::getCurrentPartnerId();
+		if ($category->privacyContext != null && $category->privacyContext != '')
+		{
+			$privacyContexts = explode(',', $category->privacyContext);
+			$privacyContextsCount = $this->countNonDefaultPrivacyContexts(array_unique($privacyContexts));
+
+			if ($privacyContextsCount > self::PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT)
+			{
+				$disableCategoryLimitPermission = PermissionPeer::getByNameAndPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partnerId);
+				if ($disableCategoryLimitPermission && $disableCategoryLimitPermission->getStatus() == PermissionStatus::ACTIVE)
+				{
+					throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, $privacyContextsCount);
+				}
+			}
+
+			foreach ($privacyContexts as $privacyContext)
+			{
+				if (!preg_match('/^[a-zA-Z\d]+$/', $privacyContext) || strlen($privacyContext) < 4)
+				{
+					KalturaLog::err('Invalid privacy context: ' . print_r($privacyContext, true));
+					throw new KalturaAPIException (KalturaErrors::PRIVACY_CONTEXT_INVALID_STRING, $privacyContext);
+				}
+			}
+		}
+	}
+
+	protected function countNonDefaultPrivacyContexts($privacyContexts): int
+	{
+		$count = 0;
+		foreach ($privacyContexts as $privacyContext)
+		{
+			$containsPhrase = false;
+			foreach ($this->defaultPrivacyContextsPhrases as $phrase)
+			{
+				if (str_contains($privacyContext, $phrase))
+				{
+					$containsPhrase = true;
+					break;
+				}
+			}
+			if (!$containsPhrase)
+			{
+				$count++;
+			}
+		}
+		return $count;
 	}
 
 	/**
