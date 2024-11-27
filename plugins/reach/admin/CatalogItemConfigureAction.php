@@ -192,8 +192,8 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				case Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY:
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorSummaryCatalogItem', $formData, false, true);
 					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::OCR:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorOcrCatalogItem', $formData, false, true);
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItem', $formData, false, true);
 					break;
 			}
 

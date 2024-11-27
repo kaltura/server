@@ -3,11 +3,11 @@
  * @package plugins.reach
  * @subpackage model
  */
-class VendorOcrCatalogItem extends VendorCatalogItem
+class VendorVideoAnalysisCatalogItem extends VendorCatalogItem
 {
 	public function applyDefaultValues(): void
 	{
-		$this->setServiceFeature(VendorServiceFeature::OCR);
+		$this->setServiceFeature(VendorServiceFeature::VIDEO_ANALYSIS);
 	}
 
 	public function isDuplicateTask(entry $entry): bool
