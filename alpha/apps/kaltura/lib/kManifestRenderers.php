@@ -946,8 +946,6 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				break;
 			}
 		}
-
-		$this->setClosedCaptions();
 	}
 
 	protected function setClosedCaptions()

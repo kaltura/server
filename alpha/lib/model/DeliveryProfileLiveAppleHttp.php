@@ -46,6 +46,11 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 		return $isLive;
 	}
+
+    public function getPackagerUrl( $entryServerNode ): string
+    {
+        return $this->getLivePackagerUrl($entryServerNode);
+    }
 		
 	/**
 	 * Check if the given URL contains live entries (typically live .m3u8 URLs)
@@ -126,6 +131,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		{
 			if(!$this->isFlavorAllowed($kLiveStreamParams->getFlavorId()))
 				continue;
+
+            if($kLiveStreamParams->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
+                continue;
 			
 			/* @var $kLiveStreamParams kLiveStreamParams */
 			/* @var $stream kLiveStreamParams */
