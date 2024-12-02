@@ -1,12 +1,13 @@
 <?php
 
-require_once (dirname(__FILE__).'/../bootstrap.php');
-require_once(__DIR__ . '../../../../../kava-utils/lib/StreamQueue.php');
+require_once(__DIR__ . '/../bootstrap.php');
+require_once(__DIR__ . '/../../../../../kava-utils/lib/StreamQueue.php');
 require_once(__DIR__ . '/playsViewsCommon.php');
 
 define('QUERY_CACHE_KEY_PREFIX', 'QCI-entry:id=');
 define('QUERY_CACHE_KEY_EXPIRY', 90000);
 define('MEMC_KEY_PREFIX', 'plays_views_');
+define('MEMC_KEY_LAST_PLAYED_AT', 'plays_views_last_played_at');
 
 
 class playsViewsMemcacheConsumer extends BaseConsumer
@@ -35,7 +36,7 @@ class playsViewsMemcacheConsumer extends BaseConsumer
 
 		if (!$memc->set($key, json_encode($data)))
 		{
-			writeLog("Error: Failed to set key [$key] in memcache");
+			Utils::writeLog("Error: Failed to set key [$key] in memcache");
 			return;
 		}
 
@@ -46,7 +47,7 @@ class playsViewsMemcacheConsumer extends BaseConsumer
 			{
 				if (!$qc->set($key, strval(time()), QUERY_CACHE_KEY_EXPIRY))
 				{
-					writeLog("Error: Failed to set key [$key] in memcache");
+					Utils::writeLog("Error: Failed to set key [$key] in memcache");
 					return;
 				}
 			}
@@ -71,11 +72,11 @@ try
 }
 catch (Exception $ex)
 {
-	errorLog('Missing topics path config');
+	Utils::errorLog('Missing topics path config');
 	exit(1);
 }
 
-writeLog('Info: started, pid=' . getmypid());
+Utils::writeLog('Info: started, pid=' . getmypid());
 
 // connect to memcache
 list($memcacheHost, $memcachePort) = explode(':', $memcache);
@@ -83,7 +84,7 @@ $memc = new kInfraMemcacheCacheWrapper();
 $ret = $memc->init(array('host'=>$memcacheHost, 'port'=>$memcachePort));
 if (!$ret)
 {
-	writeLog("Failed to connect to cache host {$memcacheHost} port {$memcachePort}");
+	Utils::writeLog("Failed to connect to cache host {$memcacheHost} port {$memcachePort}");
 	exit(1);
 }
 
@@ -99,15 +100,22 @@ if ($queryCacheMemcaches)
 		$ret = $currQueryCacheMemc->init(array('host'=>$currMemcacheHost, 'port'=>$currMemcachePort));
 		if (!$ret)
 		{
-			writeLog("Failed to connect to cache host {$currMemcacheHost} port {$currMemcachePort}");
+			Utils::writeLog("Failed to connect to cache host {$currMemcacheHost} port {$currMemcachePort}");
 			exit(1);
 		}
 		$queryCacheMemc[] = $currQueryCacheMemc;
 	}
 }
 
+//When loading the server bootstrap it disables the stream wrappers, we need to enable it back for the s3Wrapper to be able to fetch files form s3
+if (!array_intersect(array('https', 'http'), stream_get_wrappers()))
+{
+	stream_wrapper_restore('http');
+	stream_wrapper_restore('https');
+}
+
 $consumer = new playsViewsMemcacheConsumer($topicsPath, PLAYSVIEWS_TOPIC, str_replace(':', '_', $memcache));
 $maxLastPlayedAt = 0;
 $consumer->consumeQueue();
 
-writeLog('Info: done');
+Utils::writeLog('Info: done');

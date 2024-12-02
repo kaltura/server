@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . '../../../../../kava-utils/lib/StreamQueue.php');
+require_once(__DIR__ . '/../../../../../kava-utils/lib/StreamQueue.php');
 require_once(__DIR__ . '/../bootstrap.php');
 require_once(__DIR__ . '/playsViewsCommon.php');
 
@@ -65,11 +65,11 @@ try
 }
 catch (Exception $ex)
 {
-	errorLog('Missing topics path config');
+	Utils::errorLog('Missing topics path config');
 	exit(1);
 }
 
-writeLog('Info: started, pid=' . getmypid());
+Utils::writeLog('Info: started, pid=' . getmypid());
 
 // connect to elastic
 $elasticClient = new elasticClient();
@@ -125,4 +125,4 @@ catch(Exception $e)
 {
 	KalturaLog::err($e->getMessage());
 }
-writeLog('Info: done');
+Utils::writeLog('Info: done');
