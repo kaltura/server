@@ -3074,14 +3074,23 @@ class kKavaReportsMgr extends kKavaBase
 			$entry_search = new kEntrySearch();
 			$entry_search->setFilterOnlyContext();
 			$pager = new kPager();
-			$pager->setPageSize(self::MAX_ESEARCH_RESULTS);
-			$elastic_results = $entry_search->doSearch($input_filter->entry_operator, $pager);
-			$elastic_entry_ids = kESearchCoreAdapter::getObjectIdsFromElasticResults($elastic_results);
-
-			if ($elastic_results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] > count($elastic_entry_ids))
+            		$page_index = 0;
+            		$elastic_entry_ids = array();
+            		do 
 			{
-				throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
-			}
+                		$page_index++;
+                	    	$pager->setPageIndex($page_index);
+                    	    	$pager->setPageSize(min(self::MAX_ESEARCH_RESULTS - count($elastic_entry_ids), kPager::MAX_PAGE_SIZE));
+                	    	$elastic_results = $entry_search->doSearch($input_filter->entry_operator, $pager);
+                	    	$elastic_entry_ids = array_merge($elastic_entry_ids, kESearchCoreAdapter::getObjectIdsFromElasticResults($elastic_results));
+                	    	$moreElasticResultsToFetch = $elastic_results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] > count($elastic_entry_ids);
+            		 } 
+			 while ($moreElasticResultsToFetch && count($elastic_entry_ids) < self::MAX_ESEARCH_RESULTS);
+
+            		if ($moreElasticResultsToFetch)
+            		{
+                		throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
+            		}
 
 			if ($elastic_entry_ids)
 			{
@@ -5106,6 +5115,40 @@ class kKavaReportsMgr extends kKavaBase
 			}
 			$result[$id] = $output;
 		}
+		return $result;
+	}
+
+	protected static function getCuePointDurationAndUser($ids, $partner_id, $context)
+	{
+		$context['peer'] = 'CuePointPeer';
+		if (!isset($context['columns']))
+			$context['columns'] = array();
+		$context['columns'][] = 'START_TIME';
+		$context['columns'][] = 'END_TIME';
+		$context['columns'][] = 'KUSER_ID';
+
+
+		$result = array();
+		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
+		foreach ($enrichedResult as $id => $row)
+		{
+			if (!is_array($row)) {
+				$result[$id] = $id;
+				continue;
+			}
+
+			$kuserId = array_pop($row);
+			$endTime = array_pop($row);
+			$startTime = array_pop($row);
+			$duration = $endTime - $startTime;
+
+			$result[$id] = $row;
+			$result[$id][] = $startTime;
+			$result[$id][] = $endTime;
+			$result[$id][] = $duration;
+			$result[$id][] = $kuserId;
+		}
+
 		return $result;
 	}
 
