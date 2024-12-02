@@ -253,6 +253,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	/**
 	 * Init permission items map from DB for the given role
 	 * @param UserRole $dbRole
+	 * @param bool $isRestrictingRole
 	 */
 	private static function getPermissionsFromDb($dbRole, $isRestrictingRole)
 	{
@@ -594,7 +595,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 
 		// if user has no defined roles or no user is defined -> get default role IDs according to session type (admin/not)
-	if (!$roleIds)
+		if (!$roleIds)
 		{
 			if (!$operatingPartner)
 			{
@@ -737,112 +738,19 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$permissions = $roleMap[self::PERMISSION_NAMES_ARRAY];
 		KalturaLog::debug("Permissions to remove: " . print_r($permissions, true));
 		self::$permissionsToRemove = $permissions;
-
-
-
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
-		if (!$ks)
-		{
-			return;
-		}
-		$restrictingRole = $ks->getRole(kSessionBase::PRIVILEGE_RESTRICTING_ROLE);
-		if (!$restrictingRole)
-		{
-			return;
-		}
-
-		$roleId = is_numeric($restrictingRole) ? $restrictingRole : self::getRoleIdFromSystemName($restrictingRole);
-		if (!$roleId)
-		{
-			return;
-		}
-
-		KalturaLog::debug("Removing permissions according to restricting role [$roleId]");
-		$roleMap = self::getPermissions($roleId, true);
-
-//		self::removeApiActionPermission($roleMap[self::API_ACTIONS_ARRAY_NAME]);
-//		self::removeApiParametersPermissions($roleMap[self::API_PARAMETERS_ARRAY_NAME]);
-//		self::removePermissionNames($roleMap[self::PERMISSION_NAMES_ARRAY]);
 	}
 
 	protected static function getRoleIdFromSystemName($systemName)
 	{
 		$c = new Criteria();
 		$c->addAnd(UserRolePeer::SYSTEM_NAME, $systemName, Criteria::EQUAL);
-		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::IN);
+		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::EQUAL);
 		$role = UserRolePeer::doSelectOne($c);
 		if (!$role)
 		{
 			return null;
 		}
 		return $role->getId();
-	}
-
-	protected static function removeApiActionPermission($apiActions)
-	{
-		foreach ($apiActions as $service => $actionsArray)
-		{
-			if (!isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]))
-			{
-				continue;
-			}
-			foreach ($actionsArray as $actionName => $actionEmptyArray)
-			{
-				if (isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$actionName]))
-				{
-					KalturaLog::debug("Removing permission for service [$service] action [$actionName]");
-					unset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$actionName]);
-				}
-			}
-			if (count(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]) == 0)
-			{
-				KalturaLog::debug("Removed all permissions for service [$service]");
-				unset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]);
-			}
-		}
-	}
-
-	protected static function removeApiParametersPermissions($apiParameters)
-	{
-		foreach ($apiParameters as $itemAction => $itemObjectsArray)
-		{
-			foreach ($itemObjectsArray as $itemObjectName => $itemParametersArray)
-			{
-				if (!isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]))
-				{
-					continue;
-				}
-
-				foreach ($itemParametersArray as $itemParameterName => $itemParameterValue)
-				{
-					if (isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName][$itemParameterName]))
-					{
-						KalturaLog::debug("Removing parameter [$itemParameterName] from action [$itemAction] and object [$itemObjectName]");
-						unset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName][$itemParameterName]);
-					}
-				}
-
-				if (count(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]) == 0)
-				{
-					KalturaLog::debug("Removed all parameters for object [$itemObjectName]");
-					unset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]);
-				}
-			}
-		}
-	}
-
-	protected static function removePermissionNames($permissionNames)
-	{
-		foreach ($permissionNames as $permissionName)
-		{
-			if (!isset(self::$map[self::PERMISSION_NAMES_ARRAY][$permissionName]))
-			{
-				continue;
-			}
-
-			KalturaLog::debug("Removing permission name [$permissionName]");
-			unset(self::$map[self::PERMISSION_NAMES_ARRAY][$permissionName]);
-		}
 	}
 	
 	// ----------------------------------------------------------------------------
