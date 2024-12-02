@@ -628,7 +628,8 @@ class kEntitlementUtils
 		$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
 		if (!$categoryEntry)
 		{
-			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NO_CATEGORY_ENTRY_ENTITLEMENT_CHECK, kCurrentContext::getCurrentPartnerId()))
+			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NO_CATEGORY_ENTRY_ENTITLEMENT_CHECK, kCurrentContext::getCurrentPartnerId())
+				&& self::entryHasAccessControlRules($entry))
 			{
 				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] not entitled: entry does not belong to any category - blocked by configuration');
 				return false;
@@ -669,5 +670,26 @@ class kEntitlementUtils
 		}
 
 		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
+	}
+
+	protected static function entryHasAccessControlRules(entry $entry)
+	{
+		$accessControlId = $entry->getAccessControlId();
+		if (!$accessControlId)
+		{
+			return false;
+		}
+		$accessControl = accessControlPeer::retrieveByPK($accessControlId);
+		if (!$accessControl)
+		{
+			return false;
+		}
+
+		if ($accessControl->getRules())
+		{
+			return true;
+		}
+
+		return false;
 	}
 }
