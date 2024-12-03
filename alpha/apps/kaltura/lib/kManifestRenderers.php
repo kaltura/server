@@ -946,13 +946,21 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				break;
 			}
 		}
+        $this->setClosedCaptions();
 	}
 
 	protected function setClosedCaptions()
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$streams = $dbEntry->getStreams();
-		if($streams)
+        $liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->entryId);
+        if(!count($liveEntryServerNodes))
+            return;
+        $entryServerNodeStreams = $liveEntryServerNodes[0]->getStreams();
+        $webvttStreams = array_filter($entryServerNodeStreams, function($stream) {
+            return $stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT;
+        });
+		if($streams && !count($webvttStreams))
 		{
 			/* @var $stream kStreamContainer */
 			foreach ($streams as $stream)
