@@ -1551,6 +1551,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions, $entry->getId()))
 			{
+                if($copyCaptions && $sourceAsset instanceof captionAsset)
+                {
+                    $targetEntry->setBlockAutoTranscript(true);
+                }
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
 		}
