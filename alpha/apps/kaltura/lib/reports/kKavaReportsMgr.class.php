@@ -315,6 +315,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
 	const REPORT_ROW_FILTER_BY_COLUMN = 'report_row_filter_by_column';
 	const REPORT_MAX_RESULT_SIZE = 'report_max_result_size';
+	const REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER = 'report_enrich_edit_context_from_filter';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -5328,7 +5329,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function enrichData($report_def, $headers, $partner_id, &$data)
+	protected static function enrichData($report_def, $headers, $partner_id, $input_filter, &$data)
 	{
 		// get the enrichment specification
 		$enrich_specs = array();
@@ -5357,6 +5358,14 @@ class kKavaReportsMgr extends kKavaBase
 			$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ? 
 				$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
 
+			if (isset($enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER]))
+			{
+				$mapping = $enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER];
+				foreach ($mapping as $context_field => $filter_field)
+				{
+					$enrich_context[$context_field] = $input_filter->$filter_field;
+				}
+			}
 			// output
 			$cur_fields = $enrich_def[self::REPORT_ENRICH_OUTPUT];
 			if (!is_array($cur_fields))
@@ -6347,7 +6356,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		if (isset($report_def[self::REPORT_ENRICH_DEF]))
 		{
-			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
+			self::enrichData($report_def, $result[0], $partner_id, $input_filter, $result[1]);
 		}
 
 		//order not found
