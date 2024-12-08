@@ -522,7 +522,14 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 				//retrieve the current working partner's captions according to the entryId,
 				//if the entry type is playlist return all the captions for the inner entries
+				//if the entry type is live return all webVTT captions
 				$entry = entryPeer::retrieveByPK($config->entryId);
+				if ($entry->getType() == entryType::LIVE_STREAM)
+				{
+					$contributor->captions = self::getLiveCaptionArray($entry, $config->deliveryProfile);
+					$contributors[] = $contributor;
+					return $contributors;
+				}
 				$c = new Criteria();
 				if ($entry->getType() == entryType::PLAYLIST)
 				{
@@ -642,6 +649,38 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		}
 
 		return $contributors;
+	}
+
+	protected static function getLiveCaptionArray(LiveEntry $entry, $deliveryProfile): array
+	{
+		$webVTTStreamFlavorIds = $entry->getWebVTTStreamFlavorIds($entry->getEntryId(), $deliveryProfile);
+		if(!count($webVTTStreamFlavorIds))
+		{
+		    return array();
+		}
+
+		$captions = array();
+		$entryStreams = $entry->getStreams();
+		/* @var $deliveryProfile DeliveryProfileLiveAppleHttp */
+		$liveEntryServerNodes = $deliveryProfile->sortLiveEntryServerNodes($entry->getEntryId(), array(EntryServerNodeStatus::PLAYABLE));
+		foreach ($entryStreams as $stream)
+		{
+			/* @var $stream kStreamContainer */
+			if (in_array($stream->getId(), $webVTTStreamFlavorIds))
+			{
+					$caption = [
+					'tokenizer'=> $deliveryProfile->getTokenizer(),
+					'urlPrefix'=> count($liveEntryServerNodes) ? $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]) : '',
+					'url'=> 'index-s' . $stream->getId() . '-t.m3u8',
+					'label'=> $stream->getLabel(),
+					'default'=> 'NO',
+					'language'=> $stream->getLanguage()
+					];
+
+					$captions[] = $caption;
+			}
+		}
+		return $captions;
 	}
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
