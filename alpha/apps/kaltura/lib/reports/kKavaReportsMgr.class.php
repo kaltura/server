@@ -5355,17 +5355,9 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			// func
 			$enrich_func = $enrich_def[self::REPORT_ENRICH_FUNC];
-			$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ? 
-				$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
 
-			if (isset($enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER]))
-			{
-				$mapping = $enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER];
-				foreach ($mapping as $context_field => $filter_field)
-				{
-					$enrich_context[$context_field] = $input_filter->$filter_field;
-				}
-			}
+			$enrich_context = self::getEnricheContext($enrich_def, $input_filter);
+
 			// output
 			$cur_fields = $enrich_def[self::REPORT_ENRICH_OUTPUT];
 			if (!is_array($cur_fields))
@@ -5467,6 +5459,23 @@ class kKavaReportsMgr extends kKavaBase
 				$start = $limit;
 			}
 		}
+	}
+
+	protected static function getEnricheContext($enrich_def, $input_filter)
+	{
+		$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ?
+			$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
+
+		if (isset($enrich_context) && isset($enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER]))
+		{
+			$mapping = $enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER];
+			foreach ($mapping as $context_field => $filter_field)
+			{
+				$enrich_context[$context_field] = $input_filter->$filter_field;
+			}
+		}
+
+		return $enrich_context;
 	}
 
 	/// table functions
