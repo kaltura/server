@@ -953,7 +953,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$streams = $dbEntry->getStreams();
-        $webVTTStreamFlavorIds = LiveEntry::getWebVTTStreamFlavorIds($this->entryId);
+		$webVTTStreamFlavorIds = LiveEntry::getWebVTTStreamFlavorIds($this->entryId);
 		if($streams && !count($webVTTStreamFlavorIds))
 		{
 			/* @var $stream kStreamContainer */

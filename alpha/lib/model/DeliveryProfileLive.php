@@ -493,10 +493,10 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE));
 	}
 
-    public function getPackagerUrl( $entryServerNode ): string
-    {
-        return $this->getLivePackagerUrl($entryServerNode);
-    }
+	public function getPackagerUrl( $entryServerNode ): string
+	{
+		return $this->getLivePackagerUrl($entryServerNode);
+	}
 
 }
 
