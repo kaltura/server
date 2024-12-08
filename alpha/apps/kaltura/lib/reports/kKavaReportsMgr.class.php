@@ -5356,7 +5356,7 @@ class kKavaReportsMgr extends kKavaBase
 			// func
 			$enrich_func = $enrich_def[self::REPORT_ENRICH_FUNC];
 
-			$enrich_context = self::getEnricheContext($enrich_def, $input_filter);
+			$enrich_context = self::getEnrichContext($enrich_def, $input_filter);
 
 			// output
 			$cur_fields = $enrich_def[self::REPORT_ENRICH_OUTPUT];
@@ -5461,12 +5461,12 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	protected static function getEnricheContext($enrich_def, $input_filter)
+	protected static function getEnrichContext($enrich_def, $input_filter)
 	{
 		$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ?
 			$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
 
-		if (isset($enrich_context) && isset($enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER]))
+		if (isset($enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER]))
 		{
 			$mapping = $enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER];
 			foreach ($mapping as $context_field => $filter_field)
