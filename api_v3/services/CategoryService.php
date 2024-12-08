@@ -136,7 +136,7 @@ class CategoryService extends KalturaBaseService
 	 * @return KalturaCategory
 	 */
 	function updateAction($id, KalturaCategory $category)
-	{		
+	{
 		if($category->owner == '')
 			$category->owner = null;
 			
@@ -180,7 +180,7 @@ class CategoryService extends KalturaBaseService
 	protected function validatePrivacyContexts($category)
 	{
 		$partnerId = kCurrentContext::getCurrentPartnerId();
-		if ($category->privacyContext != null && $category->privacyContext != '')
+		if ($category->privacyContext != null && $category->privacyContext != '' && !($category->privacyContext instanceof KalturaNullField))
 		{
 			$privacyContexts = explode(',', $category->privacyContext);
 			$privacyContextsCount = $this->countNonDefaultPrivacyContexts(array_unique($privacyContexts));
