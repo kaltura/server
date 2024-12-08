@@ -1240,7 +1240,7 @@ abstract class LiveEntry extends entry
 
 	public function getWebVTTStreamFlavorIds($entryId, DeliveryProfileLiveAppleHttp $deliveryProfile): array
 	{
-        $liveEntryServerNodes = $deliveryProfile->sortLiveEntryServerNodes($entryId, array(EntryServerNodeStatus::PLAYABLE));
+		$liveEntryServerNodes = $deliveryProfile->sortLiveEntryServerNodes($entryId, array(EntryServerNodeStatus::PLAYABLE));
 		if(!count($liveEntryServerNodes))
 		{
 			KalturaLog::info("live entry server node not found");
