@@ -1238,9 +1238,9 @@ abstract class LiveEntry extends entry
 		return $this->isContainsAdminTag(self::LOW_LATENCY_TAG);
 	}
 
-	public static function getWebVTTStreamFlavorIds(string $entryId): array
+	public function getWebVTTStreamFlavorIds($entryId, DeliveryProfileLiveAppleHttp $deliveryProfile): array
 	{
-		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($entryId);
+        $liveEntryServerNodes = $deliveryProfile->sortLiveEntryServerNodes($entryId, array(EntryServerNodeStatus::PLAYABLE));
 		if(!count($liveEntryServerNodes))
 		{
 			KalturaLog::info("live entry server node not found");

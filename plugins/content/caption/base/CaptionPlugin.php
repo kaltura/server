@@ -651,9 +651,9 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		return $contributors;
 	}
 
-	protected static function getLiveCaptionArray(entry $entry, $deliveryProfile): array
+	protected static function getLiveCaptionArray(LiveEntry $entry, $deliveryProfile): array
 	{
-		$webVTTStreamFlavorIds = LiveEntry::getWebVTTStreamFlavorIds($entry->getEntryId());
+		$webVTTStreamFlavorIds = $entry->getWebVTTStreamFlavorIds($entry->getEntryId(), $deliveryProfile);
 		if(!count($webVTTStreamFlavorIds))
 		{
 		    return array();
@@ -661,8 +661,8 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		$captions = array();
 		$entryStreams = $entry->getStreams();
-		$liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($entry->getEntryId());
 		/* @var $deliveryProfile DeliveryProfileLiveAppleHttp */
+		$liveEntryServerNodes = $deliveryProfile->sortLiveEntryServerNodes($entry->getEntryId(), array(EntryServerNodeStatus::PLAYABLE));
 		foreach ($entryStreams as $stream)
 		{
 			/* @var $stream kStreamContainer */
@@ -670,7 +670,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 			{
 					$caption = [
 					'tokenizer'=> $deliveryProfile->getTokenizer(),
-					'urlPrefix'=> $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]),
+					'urlPrefix'=> count($liveEntryServerNodes) ? $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]) : '',
 					'url'=> 'index-s' . $stream->getId() . '-t.m3u8',
 					'label'=> $stream->getLabel(),
 					'default'=> 'NO',

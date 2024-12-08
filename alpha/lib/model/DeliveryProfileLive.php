@@ -122,20 +122,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$status[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
 
 		$entryId = $this->getDynamicAttributes()->getEntryId();
-		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $status);
+		$liveEntryServerNodes = $this->sortLiveEntryServerNodes($entryId, $status);
 		if(!count($liveEntryServerNodes))
 			return;
-
-		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
-		$dcInMaintenance = $this->getIsMaintenanceFromCache($entryId);
-		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
-		$liveEntryServerNodes = $this->filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance);
-		if (empty($liveEntryServerNodes))
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
-
-		//sort the entryServerNode array by weight from the heaviest to lowest
-		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
-		
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
 		
 		// If min/max bitrate was requested, add the constraint to the array of flavorParamsIds in the profile's attributes.
@@ -156,6 +145,24 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode));
 			$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 		}
+	}
+
+	public function sortLiveEntryServerNodes($entryId, $statuses): array
+	{
+		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $statuses);
+		if(!count($liveEntryServerNodes))
+			return array();
+
+		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
+		$dcInMaintenance = $this->getIsMaintenanceFromCache($entryId);
+		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
+		$liveEntryServerNodes = $this->filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance);
+		if (empty($liveEntryServerNodes))
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
+
+		//sort the entryServerNode array by weight from the heaviest to lowest
+		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
+		return $liveEntryServerNodes;
 	}
 
 	private function filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance)
