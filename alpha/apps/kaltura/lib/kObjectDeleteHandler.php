@@ -138,12 +138,12 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 		if($entry instanceof LiveStreamEntry &&
 			PermissionPeer::isValidForPartner(PermissionName::FEATURE_KALTURA_LIVE_DELETE_RECORDED_VOD, $entry->getPartnerId()))
 		{
-			if(!$entry->getRecordedEntryId())
+			if(!$entry->getRecordedEntryIdFromCustomData())
 			{
 				return;
 			}
 
-			$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
+			$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryIdFromCustomData());
 			if($recordedEntry)
 			{
 				myEntryUtils::deleteEntry($recordedEntry);
