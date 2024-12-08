@@ -46,11 +46,6 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 		return $isLive;
 	}
-
-    public function getPackagerUrl( $entryServerNode ): string
-    {
-        return $this->getLivePackagerUrl($entryServerNode);
-    }
 		
 	/**
 	 * Check if the given URL contains live entries (typically live .m3u8 URLs)

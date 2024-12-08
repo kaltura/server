@@ -946,22 +946,15 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 				break;
 			}
 		}
-
-            $this->setClosedCaptions();
+		$this->setClosedCaptions();
 	}
 
 	protected function setClosedCaptions()
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$streams = $dbEntry->getStreams();
-        $liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($this->entryId);
-        if(!count($liveEntryServerNodes))
-            return;
-        $entryServerNodeStreams = $liveEntryServerNodes[0]->getStreams();
-        $webvttStreams = array_filter($entryServerNodeStreams, function($stream) {
-            return $stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT;
-        });
-		if($streams && !count($webvttStreams))
+        $webVTTStreamFlavorIds = LiveEntry::getWebVTTStreamFlavorIds($this->entryId);
+		if($streams && !count($webVTTStreamFlavorIds))
 		{
 			/* @var $stream kStreamContainer */
 			foreach ($streams as $stream)
@@ -1055,7 +1048,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			$codecs = ',CODECS="mp4a.40.2"';
 		}
 
-		$closedCaption = '';
+		$closedCaption = ",CLOSED-CAPTIONS=NONE";
 		if($this->closedCaptions)
 		{
 			$closedCaption = ",CLOSED-CAPTIONS=\"CC\"";

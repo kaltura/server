@@ -522,7 +522,14 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 				//retrieve the current working partner's captions according to the entryId,
 				//if the entry type is playlist return all the captions for the inner entries
+				//if the entry type is live return all webVTT captions
 				$entry = entryPeer::retrieveByPK($config->entryId);
+                if ($entry->getType() == entryType::LIVE_STREAM)
+                {
+                    $contributor->captions = self::getLiveCaptionArray($entry, $config->deliveryProfile);
+                    $contributors[] = $contributor;
+                    return $contributors;
+                }
 				$c = new Criteria();
 				if ($entry->getType() == entryType::PLAYLIST)
 				{
@@ -532,58 +539,6 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 						$entryIds[] = $playlistEntry->getId();
 					$c->addAnd(assetPeer::ENTRY_ID, $entryIds, Criteria::IN);
 				}
-                elseif ($entry->getType() == entryType::LIVE_STREAM)
-                {
-                    $liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryId($entry->getEntryId());
-                    if(!count($liveEntryServerNodes))
-                    {
-                        KalturaLog::info("live entry server node not found");
-                        return array();
-                    }
-                    $entryServerNodeStreams = $liveEntryServerNodes[0]->getStreams();
-                    if(!count($entryServerNodeStreams))
-                    {
-                        return array();
-                    }
-
-                    $streamIds = [];
-                    foreach($entryServerNodeStreams as $stream)
-                    {
-                        /* @var $stream kLiveStreamParams */
-                        if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
-                        {
-                            KalturaLog::info("Stream has a webvtt codec - flavorId " . print_r($stream->getFlavorId(), true));
-                            $streamIds[] = $stream->getFlavorId();
-                        }
-                    }
-
-                    if(!count($streamIds))
-                    {
-                        return array();
-                    }
-
-                    $entry = entryPeer::retrieveByPK($entry->getEntryId());
-                    $entryStreams = $entry->getStreams();
-                    $deliveryProfile = $config->deliveryProfile;
-                    /* @var $deliveryProfile DeliveryProfileLiveAppleHttp */
-                    foreach ($entryStreams as $stream) {
-                        /* @var $stream kStreamContainer */
-                        if (in_array($stream->getId(), $streamIds)) {
-                            $caption = [
-                                'tokenizer'=> $deliveryProfile->getTokenizer(),
-                                'urlPrefix'=> $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]),
-                                'url'=> 'index-s' . $stream->getId() . '-t.m3u8',
-                                'label'=> $stream->getLabel(),
-                                'default'=> 'NO',
-                                'language'=> $stream->getLanguage()
-                            ];
-
-                            $contributor->captions[] = $caption;
-                        }
-                    }
-                    $contributors[] = $contributor;
-                    return $contributors;
-                }
 				else
 				{
 					$entryId = kParentChildEntryUtils::getCaptionAssetEntryId($config->entryId);
@@ -695,6 +650,36 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 		return $contributors;
 	}
+
+    protected static function getLiveCaptionArray(entry $entry, $deliveryProfile): array
+    {
+        $webVTTStreamFlavorIds = LiveEntry::getWebVTTStreamFlavorIds($entry->getEntryId());
+        if(!count($webVTTStreamFlavorIds))
+        {
+            return array();
+        }
+
+        $captions = array();
+        $entryStreams = $entry->getStreams();
+        $liveEntryServerNodes = EntryServerNodePeer::retrievePlayableByEntryId($entry->getEntryId());
+        /* @var $deliveryProfile DeliveryProfileLiveAppleHttp */
+        foreach ($entryStreams as $stream) {
+            /* @var $stream kStreamContainer */
+            if (in_array($stream->getId(), $webVTTStreamFlavorIds)) {
+                $caption = [
+                    'tokenizer'=> $deliveryProfile->getTokenizer(),
+                    'urlPrefix'=> $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]),
+                    'url'=> 'index-s' . $stream->getId() . '-t.m3u8',
+                    'label'=> $stream->getLabel(),
+                    'default'=> 'NO',
+                    'language'=> $stream->getLanguage()
+                ];
+
+                $captions[] = $caption;
+            }
+        }
+        return $captions;
+    }
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
