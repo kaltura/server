@@ -8,7 +8,7 @@
 class CategoryService extends KalturaBaseService
 {
 	protected $defaultPrivacyContextsPhrases = ['NOTDEFAULTPC', 'DEFAULTPC'];
-	const PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT = 1;
+	const PRIVACY_CONTEXT_THRESHOLD_FOR_CATEGORY_LIMIT = 1;
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -185,7 +185,7 @@ class CategoryService extends KalturaBaseService
 			$privacyContexts = explode(',', $category->privacyContext);
 			$privacyContextsCount = $this->countNonDefaultPrivacyContexts(array_unique($privacyContexts));
 
-			if ($privacyContextsCount > self::PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT)
+			if ($privacyContextsCount > self::PRIVACY_CONTEXT_THRESHOLD_FOR_CATEGORY_LIMIT)
 			{
 				$disableCategoryLimitPermission = PermissionPeer::getByNameAndPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $partnerId);
 				if ($disableCategoryLimitPermission && $disableCategoryLimitPermission->getStatus() == PermissionStatus::ACTIVE)
