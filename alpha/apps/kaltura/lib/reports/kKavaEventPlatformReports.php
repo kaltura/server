@@ -200,7 +200,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_ENRICH_CONTEXT => array(
 						'info_fields' => array('profileData.userRole', 'profileData.industry'),
 					),
-					self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER => array("virtual_event_id", "virtual_event_ids")
+					self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER => array("virtual_event_id" => "virtual_event_ids")
 				)
 			),
 			self::REPORT_JOIN_REPORTS => array(
