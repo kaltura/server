@@ -3,10 +3,13 @@
 class KalturaICalSerializer extends KalturaSerializer
 {
 	private $calendar;
-	
+
+	protected $timeZoneBlockArray;
+
 	public function __construct()
 	{
 		$this->calendar = new kSchedulingICalCalendar();
+		$this->timeZoneBlockArray = array();
 	}
 	/**
 	 * {@inheritDoc}
@@ -26,6 +29,31 @@ class KalturaICalSerializer extends KalturaSerializer
 		return $this->calendar->begin();
 	}
 
+	protected function injectTimeZoneBlocks($iCalString)
+	{
+		$position = strpos($iCalString, 'BEGIN:' . kSchedulingICal::TYPE_EVENT);
+		if ($position !== false)
+		{
+			$iCalBeforeEvents = substr($iCalString, 0, $position);
+			$iCalWithEvents = substr($iCalString, $position);
+			// Clean array from duplicated transitions
+			$this->timeZoneBlockArray = array_unique($this->timeZoneBlockArray);
+			// Add BEGIN/END timezone tags
+			array_unshift($this->timeZoneBlockArray, "BEGIN:VTIMEZONE\r\n");
+			$this->timeZoneBlockArray[] = "END:VTIMEZONE\r\n";
+			//Inject to the iCal
+			$timeZoneBlocksCollection = implode('', $this->timeZoneBlockArray);
+			return $iCalBeforeEvents . $timeZoneBlocksCollection . $iCalWithEvents;
+		}
+		return $iCalString;
+	}
+
+	protected function innerSerialize($object)
+	{
+		$event = kSchedulingICalEvent::fromObject($object);
+		return $event->write($object, $this->timeZoneBlockArray);
+	}
+
 
 	/**
 	 * {@inheritDoc}
@@ -35,17 +63,18 @@ class KalturaICalSerializer extends KalturaSerializer
 	{
 		if($object instanceof KalturaScheduleEvent)
 		{
-			$event = kSchedulingICalEvent::fromObject($object);
-			return $event->write();
+			$scheduleEventArray = new KalturaScheduleEventArray();
+			$scheduleEventArray[] = $object;
+			return $this->serialize($scheduleEventArray);
 		}
 		elseif($object instanceof KalturaScheduleEventArray)
 		{
 			$ret = '';
 			foreach($object as $item)
 			{
-				$ret .= $this->serialize($item);
+				$ret .= $this->innerSerialize($item);
 			}
-			return $ret;
+			return $this->injectTimeZoneBlocks($ret);
 		}
 		elseif($object instanceof KalturaScheduleEventListResponse)
 		{
