@@ -122,7 +122,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$status[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
 
 		$entryId = $this->getDynamicAttributes()->getEntryId();
-		$liveEntryServerNodes = $this->sortLiveEntryServerNodes($entryId, $status);
+		$liveEntryServerNodes = $this->getSortedLiveEntryServerNodes($entryId, $status);
 		if(!count($liveEntryServerNodes))
 			return;
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
@@ -147,7 +147,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		}
 	}
 
-	public function sortLiveEntryServerNodes($entryId, $statuses): array
+	public function getSortedLiveEntryServerNodes($entryId, $statuses): array
 	{
 		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $statuses);
 		if(!count($liveEntryServerNodes))

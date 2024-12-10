@@ -954,8 +954,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
 		$streams = $dbEntry->getStreams();
-		$webVTTStreamFlavorIds = $dbEntry->getType() == entryType::LIVE_STREAM ? $dbEntry->getWebVTTStreamFlavorIds($this->entryId) : array();
-		if($streams && !count($webVTTStreamFlavorIds))
+		if($streams)
 		{
 			/* @var $stream kStreamContainer */
 			foreach ($streams as $stream)
@@ -1012,7 +1011,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			}
 		}
 
-		if($flavorsArr && $this->closedCaptions)
+		if($flavorsArr && $this->closedCaptions && $this->shouldUseClosedCaptions())
 		{
 			$flavorsArr = array_merge($this->closedCaptions, array(''), $flavorsArr);
 		}
@@ -1029,6 +1028,16 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 
 		return $flavorsArr;
 	}
+
+    private function shouldUseClosedCaptions(): bool
+    {
+        $dbEntry = entryPeer::retrieveByPK($this->entryId);
+        foreach ($this->contributors as $contributor) {
+           if($contributor instanceof WebVttCaptionsManifestEditor && $dbEntry->getType() == entryType::LIVE_STREAM)
+               return false;
+        }
+        return true;
+    }
 
 
 	private function addExtXStreamInf($flavor, $audio)
@@ -1050,7 +1059,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		}
 
 		$closedCaption = '';
-		if($this->closedCaptions)
+		if($this->closedCaptions && $this->shouldUseClosedCaptions())
 		{
 			$closedCaption = ",CLOSED-CAPTIONS=\"CC\"";
 		}

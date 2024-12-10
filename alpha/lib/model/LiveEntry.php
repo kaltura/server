@@ -1237,32 +1237,4 @@ abstract class LiveEntry extends entry
     {
 		return $this->isContainsAdminTag(self::LOW_LATENCY_TAG);
 	}
-
-	public function getWebVTTStreamFlavorIds($entryId, DeliveryProfileLiveAppleHttp $deliveryProfile): array
-	{
-		$liveEntryServerNodes = $deliveryProfile->sortLiveEntryServerNodes($entryId, array(EntryServerNodeStatus::PLAYABLE));
-		if(!count($liveEntryServerNodes))
-		{
-			KalturaLog::info("live entry server node not found");
-			return array();
-		}
-		$entryServerNodeStreams = $liveEntryServerNodes[0]->getStreams();
-		if(!count($entryServerNodeStreams))
-		{
-			KalturaLog::info("entry server node does not have streams");
-			return array();
-		}
-
-		$streamFlavorIds = [];
-		foreach($entryServerNodeStreams as $stream)
-		{
-			/* @var $stream kLiveStreamParams */
-			if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
-			{
-				KalturaLog::info("Stream has a webvtt codec - flavorId " . print_r($stream->getFlavorId(), true));
-				$streamFlavorIds[] = $stream->getFlavorId();
-			}
-		}
-		return $streamFlavorIds;
-	}
 }
