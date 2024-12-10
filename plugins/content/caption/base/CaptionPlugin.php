@@ -661,20 +661,20 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$entryStreams = $entry->getStreams();
 		if(!count($entryStreams))
 		{
-            return array();
+			return array();
 		}
 
 		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entry->getEntryId(), array(EntryServerNodeStatus::PLAYABLE));
 		if(!count($liveEntryServerNodes))
 		{
-            KalturaLog::info("live entry server node not found");
-            return array();
+			KalturaLog::info("live entry server node not found");
+			return array();
 		}
 
 		$webVTTStreamFlavorIds = self::getWebVTTStreamFlavorIds($liveEntryServerNodes[0]);
 		if(!count($webVTTStreamFlavorIds))
 		{
-            return array();
+			return array();
 		}
 
 		$liveCaptions = array();
