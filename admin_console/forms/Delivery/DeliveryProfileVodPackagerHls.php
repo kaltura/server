@@ -11,8 +11,12 @@ class Form_Delivery_DeliveryProfileVodPackagerHls extends Form_Delivery_Delivery
 		$this->addElement('checkbox', 'allowFairplayOffline', array(
 			'label'			=> 'Allow Fairplay Offline:',
 		));
+		
+		$this->addElement('checkbox', 'supportFmp4', array(
+			'label'			=> 'Support fmp4 playback:',
+		));
 
-		return array_merge(parent::getAdvancedSettings(), array('allowFairplayOffline'));
+		return array_merge(parent::getAdvancedSettings(), array('allowFairplayOffline', 'supportFmp4'));
 	}
 
 }
