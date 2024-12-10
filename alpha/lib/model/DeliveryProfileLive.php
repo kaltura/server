@@ -160,9 +160,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
 		$liveEntryServerNodes = $this->filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance);
 		if (empty($liveEntryServerNodes))
-        {
+		{
 			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
-        }
+		}
 
 		//sort the entryServerNode array by weight from the heaviest to lowest
 		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
