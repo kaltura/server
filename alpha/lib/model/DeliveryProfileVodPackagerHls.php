@@ -69,8 +69,8 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		$parentFlavors = parent::buildHttpFlavorsArray();
 		
 		$dpSupportFmp4Playback = $this->getSupportFmp4();
-		$assetsRequireFMP4layback = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
-		if($dpSupportFmp4Playback && $assetsRequireFMP4layback)
+		$assetsRequireFMP4Playback = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
+		if($dpSupportFmp4Playback && $assetsRequireFMP4Playback)
 		{
 			foreach ($parentFlavors as &$parentFlavor)
 			{
