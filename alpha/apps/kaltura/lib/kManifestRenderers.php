@@ -1032,9 +1032,12 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 	private function shouldUseClosedCaptions(): bool
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		foreach ($this->contributors as $contributor) {
+		foreach ($this->contributors as $contributor)
+		{
 			if($contributor instanceof WebVttCaptionsManifestEditor && $dbEntry->getType() == entryType::LIVE_STREAM)
+			{
 				return false;
+			}
 		}
 		return true;
 	}

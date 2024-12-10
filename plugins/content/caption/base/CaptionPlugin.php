@@ -527,13 +527,12 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				if ($entry->getType() == entryType::LIVE_STREAM)
 				{
 					$liveCaptions = self::getLiveCaptionArray($entry, $config->deliveryProfile);
-					if (!count($liveCaptions))
+					if (count($liveCaptions))
 					{
-						return array();
+                        $contributor->captions = $liveCaptions;
+                        $contributors[] = $contributor;
+                        return $contributors;
 					}
-					$contributor->captions = $liveCaptions;
-					$contributors[] = $contributor;
-					return $contributors;
 				}
 				$c = new Criteria();
 				if ($entry->getType() == entryType::PLAYLIST)
@@ -660,15 +659,21 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	{
 		$entryStreams = $entry->getStreams();
 		if(!count($entryStreams))
+		{
 			return array();
+		}
 
 		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entry->getEntryId(), array(EntryServerNodeStatus::PLAYABLE));
 		if(!count($liveEntryServerNodes))
+        {
 			return array();
+        }
 
 		$webVTTStreamFlavorIds = self::getWebVTTStreamFlavorIds($liveEntryServerNodes[0]);
 		if(!count($webVTTStreamFlavorIds))
+        {
 			return array();
+        }
 
 		$liveCaptions = array();
 		foreach ($entryStreams as $stream)
