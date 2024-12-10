@@ -658,42 +658,42 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 	protected static function getLiveCaptionArray($entry, $deliveryProfile): array
 	{
-        $entryStreams = $entry->getStreams();
-        if(!count($entryStreams))
-        {
+		$entryStreams = $entry->getStreams();
+		if(!count($entryStreams))
+		{
             return array();
-        }
+		}
 
-        $liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entry->getEntryId(), array(EntryServerNodeStatus::PLAYABLE));
-        if(!count($liveEntryServerNodes))
-        {
+		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entry->getEntryId(), array(EntryServerNodeStatus::PLAYABLE));
+		if(!count($liveEntryServerNodes))
+		{
             KalturaLog::info("live entry server node not found");
             return array();
-        }
+		}
 
-        $webVTTStreamFlavorIds = self::getWebVTTStreamFlavorIds($liveEntryServerNodes[0]);
-        if(!count($webVTTStreamFlavorIds))
-        {
+		$webVTTStreamFlavorIds = self::getWebVTTStreamFlavorIds($liveEntryServerNodes[0]);
+		if(!count($webVTTStreamFlavorIds))
+		{
             return array();
-        }
+		}
 
-        $liveCaptions = array();
+		$liveCaptions = array();
 		foreach ($entryStreams as $stream)
 		{
-			/* @var $stream kStreamContainer */
-			if (in_array($stream->getId(), $webVTTStreamFlavorIds))
-			{
-					$caption = [
-					'tokenizer'=> $deliveryProfile->getTokenizer(),
-					'urlPrefix'=> $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]),
-					'url'=> 'index-s' . $stream->getId() . '-t.m3u8',
-					'label'=> $stream->getLabel(),
-					'default'=> 'NO',
-					'language'=> $stream->getLanguage()
-					];
+		    /* @var $stream kStreamContainer */
+		    if (in_array($stream->getId(), $webVTTStreamFlavorIds))
+		    {
+				$caption = [
+				'tokenizer'=> $deliveryProfile->getTokenizer(),
+				'urlPrefix'=> $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]),
+				'url'=> 'index-s' . $stream->getId() . '-t.m3u8',
+				'label'=> $stream->getLabel(),
+				'default'=> 'NO',
+				'language'=> $stream->getLanguage()
+				];
 
-					$liveCaptions[] = $caption;
-			}
+				$liveCaptions[] = $caption;
+		    }
 		}
 		return $liveCaptions;
 	}
@@ -703,19 +703,19 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$entryServerNodeStreams = $entryServerNode->getStreams();
 		if(!count($entryServerNodeStreams))
 		{
-            KalturaLog::info("entry server node does not have streams");
-            return array();
+			KalturaLog::info("entry server node does not have streams");
+			return array();
 		}
 		$webVTTStreamFlavorIds = array();
 
 		foreach($entryServerNodeStreams as $stream)
 		{
-            /* @var $stream kLiveStreamParams */
-            if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
-            {
-					KalturaLog::info("Stream has a webvtt codec - flavorId " . print_r($stream->getFlavorId(), true));
-					$webVTTStreamFlavorIds[] = $stream->getFlavorId();
-            }
+		    /* @var $stream kLiveStreamParams */
+		    if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
+			{
+				KalturaLog::info("Stream has a webvtt codec - flavorId " . print_r($stream->getFlavorId(), true));
+				$webVTTStreamFlavorIds[] = $stream->getFlavorId();
+			}
 		}
 		return $webVTTStreamFlavorIds;
 	}
