@@ -1029,14 +1029,17 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		return $flavorsArr;
 	}
 
-	private function shouldUseClosedCaptions(): bool
+	protected function shouldUseClosedCaptions(): bool
 	{
 		$dbEntry = entryPeer::retrieveByPK($this->entryId);
-		foreach ($this->contributors as $contributor)
+		if($dbEntry)
 		{
-			if($contributor instanceof WebVttCaptionsManifestEditor && $dbEntry->getType() == entryType::LIVE_STREAM)
+			foreach ($this->contributors as $contributor)
 			{
-				return false;
+				if($contributor instanceof WebVttCaptionsManifestEditor && $dbEntry->getType() == entryType::LIVE_STREAM)
+				{
+					return false;
+				}
 			}
 		}
 		return true;
