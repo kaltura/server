@@ -1,4 +1,11 @@
 # Ursa-21.4.0
+## Kava - redirect external client tags to dedicated druid url ##
+- Issue Type: Story
+- Issue ID: AN-23399
+### configuration ###
+add kava_external_client_tags section to local.ini with:
+0 = @CLIENT_TAG@
+
 ## Create KMS Restricted Role on partner 0 ##
 * Issue Type: Task
 * Issue ID: PLAT-25018

@@ -24,7 +24,7 @@ class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
 	/**
 	 * Language code
 	 *
-	 * @var KalturaLanguage
+	 * @var KalturaLanguageCode
 	 */
 	public $language;
 

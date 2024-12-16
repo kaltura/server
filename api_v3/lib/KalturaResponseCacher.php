@@ -625,6 +625,15 @@ class KalturaResponseCacher extends kApiCache
 			return true;
 		}
 
+		if (isset($rule['_trim']))
+		{
+			$paramsToBeTrimmed = explode(',', $rule['_trim']);
+			foreach ($paramsToBeTrimmed as $param)
+			{
+				$params[$param] = trim($params[$param]);
+			}
+		}
+
 		if (isset($rule['_key']))
 		{
 			$keyOptions = explode(',', $rule['_key']);

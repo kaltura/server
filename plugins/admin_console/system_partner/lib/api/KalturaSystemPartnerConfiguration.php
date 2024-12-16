@@ -683,9 +683,10 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 
 	protected function isPermissionStatusAsRquired($permissionName, $status)
 	{
+		$dbPermission = PermissionPeer::getByNameAndPartner($permissionName, $this->id);
 		foreach ($this->permissions as $permission)
 		{
-			if ($permission->name == $permissionName && $permission->status == $status)
+			if ($permission->name == $permissionName && $permission->status == $status && $dbPermission->getStatus() != $status)
 			{
 				return true;
 			}
