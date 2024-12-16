@@ -522,7 +522,18 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 				//retrieve the current working partner's captions according to the entryId,
 				//if the entry type is playlist return all the captions for the inner entries
+				//if the entry type is live return all webVTT captions
 				$entry = entryPeer::retrieveByPK($config->entryId);
+				if ($entry->getType() == entryType::LIVE_STREAM)
+				{
+					$liveCaptions = self::getLiveCaptionArray($entry, $config->deliveryProfile);
+					if (count($liveCaptions))
+					{
+						$contributor->captions = $liveCaptions;
+						$contributors[] = $contributor;
+						return $contributors;
+					}
+				}
 				$c = new Criteria();
 				if ($entry->getType() == entryType::PLAYLIST)
 				{
@@ -642,6 +653,69 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		}
 
 		return $contributors;
+	}
+
+	protected static function getLiveCaptionArray($entry, $deliveryProfile): array
+	{
+		$entryStreams = $entry->getStreams();
+		if(!count($entryStreams))
+		{
+			return array();
+		}
+
+		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entry->getEntryId(), array(EntryServerNodeStatus::PLAYABLE));
+		if(!count($liveEntryServerNodes))
+		{
+			return array();
+		}
+
+		$webVTTStreamFlavorIds = self::getWebVTTStreamFlavorIds($liveEntryServerNodes[0]);
+		if(!count($webVTTStreamFlavorIds))
+		{
+			return array();
+		}
+
+		$liveCaptions = array();
+		foreach ($entryStreams as $stream)
+		{
+		    /* @var $stream kStreamContainer */
+		    if (in_array($stream->getId(), $webVTTStreamFlavorIds))
+		    {
+				$caption = [
+				'tokenizer'=> $deliveryProfile->getTokenizer(),
+				'urlPrefix'=> $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]),
+				'url'=> 'index-s' . $stream->getId() . '-t.m3u8',
+				'label'=> $stream->getLabel(),
+				'default'=> 'NO',
+				'language'=> $stream->getLanguage()
+				];
+
+				$liveCaptions[] = $caption;
+		    }
+		}
+		return $liveCaptions;
+	}
+
+	protected static function getWebVTTStreamFlavorIds($entryServerNode): array
+	{
+		$entryServerNodeStreams = $entryServerNode->getStreams();
+		if(!count($entryServerNodeStreams))
+		{
+			KalturaLog::info("entry server node does not have streams");
+			return array();
+		}
+		$webVTTStreamFlavorIds = array();
+
+		foreach($entryServerNodeStreams as $stream)
+		{
+		    /* @var $stream kLiveStreamParams */
+		    if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
+			{
+				KalturaLog::info("Stream has a webvtt codec - flavorId " . print_r($stream->getFlavorId(), true));
+				$webVTTStreamFlavorIds[] = $stream->getFlavorId();
+			}
+		}
+		return $webVTTStreamFlavorIds;
 	}
 
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
