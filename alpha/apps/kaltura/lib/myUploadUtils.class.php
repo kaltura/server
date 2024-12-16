@@ -5,10 +5,10 @@ class myUploadUtils
 	const EICAR_MD5 = '44d88612fea8a8f36de82e1278abb02f';
 	const EICAR_MIN_FILE_SIZE = 68;
 	const EICAR_MAX_FILE_SIZE = 128;
-	const BAT_FILE_EXTENSION = 'bat';
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
 	const FILE_EXT_WHITELIST = 'file_extensions_whitelist';
 	const SECURITY_MAP = 'security';
+	const EXEC_FILE_EXT_ARRAY = ['bat', 'ps1', 'psh', 'psd1', 'psm1', 'dll', 'ps1xml', 'psc1', 'pssc', 'psrc'];
 
 	public static function uploadFile ( $file_data , $id , $filename , $hash , $extra_id = null )
 	{
@@ -216,7 +216,7 @@ class myUploadUtils
 
 		if ($fileType == self::TEXT_PLAIN_FILE_TYPE)
 		{
-			if ( strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)) == self::BAT_FILE_EXTENSION)
+			if (in_array(strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)), self::EXEC_FILE_EXT_ARRAY))
 			{
 				return false;
 			}
