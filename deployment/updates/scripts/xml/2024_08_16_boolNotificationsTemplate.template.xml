@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaBooleanNotificationTemplate">
+                <name>Entry Changed</name>
+                <systemName>HTTP_ENTRY_CHANGED</systemName>
+                <description>HTTP notification template to be sent when an entry metadata changed.</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>1</eventObjectType>
+                <!-- EventNotificationEventObjectType::ENTRY -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventObjectChangedCondition">
+                        <description>Entry metadata changed, capabilities added</description>
+                        <modifiedColumns>capabilities</modifiedColumns>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Entry capabilities changed to live_schedule_capability</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getCapabilities() == LiveEntry::LIVE_SCHEDULE_CAPABILITY </code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Entry type is a LIVE_STREAM</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>$scope->getObject()->getType() == entryType::LIVE_STREAM </code>
+                        </field>
+                    </item>
+                </eventConditions>
+
+                <method>2</method>
+                <!-- KalturaHttpNotificationMethod::POST -->
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status>
+            <!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+
+</xml>

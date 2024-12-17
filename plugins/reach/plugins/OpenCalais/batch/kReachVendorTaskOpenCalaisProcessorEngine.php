@@ -68,7 +68,7 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
             $preventAutoCategorizationMetadata = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($autoCategorizationMetadataProfileId, KalturaMetadataObjectType::ENTRY ,$vendorTask->entryId);
             if ($preventAutoCategorizationMetadata->totalCount)
             {
-                $preventAutoCategorizationValue = $this->retrieveValueFromXml(new SimpleXMLElement($preventAutoCategorizationMetadata->objects[0]->xmlData), self::PREVENT_AUTOMATED_CATEGORIZATION_FIELD_NAME);
+                $preventAutoCategorizationValue = $this->retrieveValueFromXml(new SimpleXMLElement($preventAutoCategorizationMetadata->objects[0]->xml), self::PREVENT_AUTOMATED_CATEGORIZATION_FIELD_NAME);
                 if ($preventAutoCategorizationValue === 'True')
                 {
                     KalturaLog::info('Open Calais generation should be skipped for this entry - PreventAutoCategorizationValue flag is on');
