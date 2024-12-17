@@ -8,7 +8,6 @@ class myUploadUtils
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
 	const FILE_EXT_WHITELIST = 'file_extensions_whitelist';
 	const SECURITY_MAP = 'security';
-	const EXEC_FILE_EXT_ARRAY = ['bat', 'ps1', 'psh', 'psd1', 'psm1', 'dll', 'ps1xml', 'psc1', 'pssc', 'psrc'];
 
 	public static function uploadFile ( $file_data , $id , $filename , $hash , $extra_id = null )
 	{
@@ -216,7 +215,8 @@ class myUploadUtils
 
 		if ($fileType == self::TEXT_PLAIN_FILE_TYPE)
 		{
-			if (in_array(strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)), self::EXEC_FILE_EXT_ARRAY))
+			$forbidden_extensions_array = kConf::get('file_extensions', self::SECURITY_MAP, array());
+			if (in_array(strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)), $forbidden_extensions_array))
 			{
 				return false;
 			}
