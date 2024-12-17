@@ -658,7 +658,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 	protected static function getLiveCaptionArray($entry, $deliveryProfile): array
 	{
 		$entryStreams = $entry->getStreams();
-		if(!count($entryStreams))
+		if(is_null($entryStreams) || !count($entryStreams))
 		{
 			return array();
 		}
