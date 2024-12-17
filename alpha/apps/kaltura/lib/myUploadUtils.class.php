@@ -5,7 +5,6 @@ class myUploadUtils
 	const EICAR_MD5 = '44d88612fea8a8f36de82e1278abb02f';
 	const EICAR_MIN_FILE_SIZE = 68;
 	const EICAR_MAX_FILE_SIZE = 128;
-	const BAT_FILE_EXTENSION = 'bat';
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
 	const FILE_EXT_WHITELIST = 'file_extensions_whitelist';
 	const SECURITY_MAP = 'security';
@@ -216,7 +215,8 @@ class myUploadUtils
 
 		if ($fileType == self::TEXT_PLAIN_FILE_TYPE)
 		{
-			if ( strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)) == self::BAT_FILE_EXTENSION)
+			$forbidden_extensions_array = kConf::get('file_extensions', self::SECURITY_MAP, array());
+			if (in_array(strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)), $forbidden_extensions_array))
 			{
 				return false;
 			}
