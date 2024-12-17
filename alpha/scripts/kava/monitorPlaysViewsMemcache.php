@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . '/../../apps/kaltura/lib/reports//kDruidBase.php');
+require_once(__DIR__ . '/../../apps/kaltura/lib/reports/kDruidBase.php');
 require_once(__DIR__ . '/playsViewsCommon.php');
 require_once(__DIR__ . '/../../../../../kava-utils/lib/Utils.php');
 
