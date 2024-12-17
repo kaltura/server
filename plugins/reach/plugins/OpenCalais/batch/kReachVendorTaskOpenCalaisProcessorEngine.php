@@ -9,18 +9,22 @@ require_once (__DIR__ . DIRECTORY_SEPARATOR . 'RuleEngine.php');
  */
 class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcessorEngine
 {
-	const OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME = 'OpenCalais_PartnerData';
-	const OPEN_CALAIS_API_URL_FIELD_NAME = 'OpenCalaisAPIEndpoint';
-	const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
+    const OPEN_CALAIS_API_KEY_METADATA_PROFILE_SYS_NAME = 'OpenCalais_PartnerData';
+    const OPEN_CALAIS_API_URL_FIELD_NAME = 'OpenCalaisAPIEndpoint';
+    const OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME = 'OpenCalaisAPIKey';
     const OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME = 'OmitOutputtingOriginalText';
     const ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME = 'EnableTickerExtraction';
-	const CALAIS_SELECTIVE_TAGS_METADATA_FIELD_NAME = 'CalaisSelectiveTags';
+    const CALAIS_SELECTIVE_TAGS_METADATA_FIELD_NAME = 'CalaisSelectiveTags';
 
     const OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME = 'OpenCalais_Mapping';
     const OPEN_CALAIS_DYNAMIC_OBJECT_MAPPING_SYSTEM_NAME = 'OpenCalais_DynamicObjectMapping';
     const OPEN_CALAIS_MAPPING_POSTFIX = '_OpenCalais';
 
     const SHOWTAXONOMY_SYSTEM_NAME = 'ShowTaxonomy';
+
+    const SHOW_DATA_EXTRACTION_WORKFLOW_SYSTEM_NAME = 'ShowDataExtractionWorkflow';
+
+    const PREVENT_AUTOMATED_CATEGORIZATION_FIELD_NAME = 'PreventAutomatedCategorization';
     // Mapping metadata constants
     const RULE_NAME = 'Rule';
     const KALTURA_FIELD_NAME_XPATH = '/metadata/Rule/Kaltura/ShowTaxonomyElement';
@@ -59,7 +63,20 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         KBatchBase::impersonate($vendorTask->partnerId);
 
         try {
-            $mappingProfileId = $this->getMappingMetadataProfileId();
+            // If entry has PreventAutomatedCategorization set to True --> no tags should be created for the entry.
+            $autoCategorizationMetadataProfileId = $this->getMetaDataProfileId(self::SHOW_DATA_EXTRACTION_WORKFLOW_SYSTEM_NAME);
+            $preventAutoCategorizationMetadata = $this->retrieveMetadataObjectsByMetadataProfileAndObjectId($autoCategorizationMetadataProfileId, KalturaMetadataObjectType::ENTRY ,$vendorTask->entryId);
+            if ($preventAutoCategorizationMetadata->totalCount)
+            {
+                $preventAutoCategorizationValue = $this->retrieveValueFromXml(new SimpleXMLElement($preventAutoCategorizationMetadata->objects[0]->xmlData), self::PREVENT_AUTOMATED_CATEGORIZATION_FIELD_NAME);
+                if ($preventAutoCategorizationValue === 'True')
+                {
+                    KalturaLog::info('Open Calais generation should be skipped for this entry - PreventAutoCategorizationValue flag is on');
+                    return $this->endTaskSuccess($vendorTask);
+                }
+            }
+
+            $mappingProfileId = $this->getMetaDataProfileId(self::OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME);
             $values = $this->getValuesUsingRuleEngine($vendorTask, $mappingProfileId);
 
             KalturaLog::info('Rule engine result values: ' . print_r($values, true));
@@ -144,15 +161,14 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
      */
     protected function handleCuePoints($cuePointsList, $entryId)
     {
-
         foreach ($cuePointsList as $cuePoint)
         {
             $cuePointObj = new KalturaAnnotation();
-	        $cuePointObj->entryId = $entryId;
-	        foreach ($cuePoint as $propName => $value)
-			{
-		        $cuePointObj->$propName = $value;
-	        }
+            $cuePointObj->entryId = $entryId;
+            foreach ($cuePoint as $propName => $value)
+            {
+                $cuePointObj->$propName = $value;
+            }
             $this->addCuePoint($cuePointObj);
         }
     }
@@ -163,8 +179,8 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
     {
         $cuePointFilter = new KalturaAnnotationFilter();
         $cuePointFilter->entryIdEqual = $entryId;
-        $cuePoints = KalturaCuePointClientPlugin::get(KBatchBase::$kClient)->cuePoint->listAction($cuePointFilter);
-        if($cuePoints->totalCount > 0)
+        $cuePoints = KalturaCuePointClientPlugin::get(KBatchBase::$kClient)->cuePoint?->listAction($cuePointFilter);
+        if ($cuePoints->totalCount > 0)
         {
             /** @var KalturaCuePoint $cuePoint */
             foreach ($cuePoints->objects as $cuePoint)
@@ -172,7 +188,6 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
                 KalturaCuePointClientPlugin::get(KBatchBase::$kClient)->cuePoint->delete($cuePoint->id);
             }
         }
-
     }
 
     /**
@@ -296,8 +311,8 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
 
     protected function sendOpenCalaisGetTagsRequest ($transcript, $partnerId)
     {
-	    $openCalaisData = $this->getOpenCalaisSimpleXMLElementFromPartnerMetadata($partnerId);
-	    $url = $this->retrieveValueFromXml($openCalaisData, self::OPEN_CALAIS_API_URL_FIELD_NAME);
+        $openCalaisData = $this->getOpenCalaisSimpleXMLElementFromPartnerMetadata($partnerId);
+        $url = $this->retrieveValueFromXml($openCalaisData, self::OPEN_CALAIS_API_URL_FIELD_NAME);
 
         $retryCounter = 0;
         do
@@ -320,16 +335,16 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         return $response;
     }
 
-	/**
-	 * @param SimpleXMLElement $data
-	 * @return string[]
-	 */
+    /**
+     * @param SimpleXMLElement $data
+     * @return string[]
+     */
     protected function getHeaders($data)
     {
         $apiKey = $this->retrieveValueFromXml($data, self::OPEN_CALAIS_API_KEY_METADATA_FIELD_NAME);
         $enableTickerExtraction = $this->retrieveValueFromXml($data, self::ENABLE_TICKER_EXTRACTION_METADATA_FIELD_NAME);
         $omitOutputtingOriginalText = $this->retrieveValueFromXml($data, self::OMIT_OUTPUTTING_ORIGINAL_TEXT_METADATA_FIELD_NAME);
-	    $calaisSelectiveTags = $this->retrieveValueFromXml($data, self::CALAIS_SELECTIVE_TAGS_METADATA_FIELD_NAME);
+        $calaisSelectiveTags = $this->retrieveValueFromXml($data, self::CALAIS_SELECTIVE_TAGS_METADATA_FIELD_NAME);
         $headers = array (
             "Content-Type: text/xml",
             "charset: utf8",
@@ -345,29 +360,29 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         {
             $headers[] = "omitOutputtingOriginalText: ". ($omitOutputtingOriginalText == 'Yes' ? 'true' : 'false');
         }
-	    if($calaisSelectiveTags != '')
-	    {
-		    $headers[] = "x-calais-selectiveTags: $calaisSelectiveTags";
-	    }
+        if($calaisSelectiveTags != '')
+        {
+            $headers[] = "x-calais-selectiveTags: $calaisSelectiveTags";
+        }
         return $headers;
     }
 
-	/**
-	 * @param SimpleXMLElement $xmlData
-	 * @param string $fieldName
-	 *
-	 * @return string
-	 */
+    /**
+     * @param SimpleXMLElement $xmlData
+     * @param string $fieldName
+     *
+     * @return string
+     */
     protected function retrieveValueFromXml ($xmlData, $fieldName)
     {
-	    $result = $xmlData->xpath("//$fieldName");
+        $result = $xmlData->xpath("//$fieldName");
 
-	    if (count($result))
-	    {
-			return strval($result[0]);
-	    }
+        if (count($result))
+        {
+            return strval($result[0]);
+        }
 
-	    return '';
+        return '';
     }
 
 
@@ -457,13 +472,6 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
         return KBatchBase::$kClient->baseEntry->get($entryId);
     }
 
-    /**
-     * @return string
-     */
-    protected function getMappingMetadataProfileId()
-    {
-        return $this->getMetaDataProfileId(self::OPEN_CALAIS_MAPPING_METADATA_PROFILE_SYS_NAME);
-    }
 
     /**
      * @param $systemName
@@ -559,28 +567,28 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
 
                 $this->targetAllMetadataFields[$fieldName]['metadataProfileId'] = intval($xml->xpath($metadataProfileIdXpath)[0]);
 
-				$additionalConditionsXpath = "/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element[@name='$fieldName']/xsd:annotation/xsd:appinfo/additionalConditions";
-				$additionalConditions = $xml->xpath($additionalConditionsXpath);
+                $additionalConditionsXpath = "/xsd:schema/xsd:element/xsd:complexType/xsd:sequence/xsd:element[@name='$fieldName']/xsd:annotation/xsd:appinfo/additionalConditions";
+                $additionalConditions = $xml->xpath($additionalConditionsXpath);
 
-				if (count($additionalConditions))
-				{
-					$this->targetAllMetadataFields[$fieldName]['additionalConditions'] = array();
-					foreach ($additionalConditions as $additionalCondition)
-					{
-						$additionalConditionObject = array();
-						$additionalConditionObject['fieldName'] = strval($additionalCondition->xpath('./fieldName')[0]);
+                if (count($additionalConditions))
+                {
+                    $this->targetAllMetadataFields[$fieldName]['additionalConditions'] = array();
+                    foreach ($additionalConditions as $additionalCondition)
+                    {
+                        $additionalConditionObject = array();
+                        $additionalConditionObject['fieldName'] = strval($additionalCondition->xpath('./fieldName')[0]);
 
-						$validValues = $additionalCondition->xpath('./validValue');
-						foreach ($validValues as $validValue)
-						{
-							$additionalConditionObject['validValues'][] = strval($validValue);
-						}
+                        $validValues = $additionalCondition->xpath('./validValue');
+                        foreach ($validValues as $validValue)
+                        {
+                            $additionalConditionObject['validValues'][] = strval($validValue);
+                        }
 
-						$this->targetAllMetadataFields[$fieldName]['additionalConditions'][] = $additionalConditionObject;
-					}
-				}
+                        $this->targetAllMetadataFields[$fieldName]['additionalConditions'][] = $additionalConditionObject;
+                    }
+                }
 
-			}
+            }
 
         }
 
@@ -669,21 +677,21 @@ class kReachVendorTaskOpenCalaisProcessorEngine extends kReachVendorTaskProcesso
             $dynamicObjects = $this->retrieveDynamicObjectByMetadataProfileAndXpath($metadataProfileId, KalturaMetadataObjectType::DYNAMIC_OBJECT, self::DYNAMIC_OBJECT_ID_XPATH, $objectId);
             if ($dynamicObjects->totalCount)
             {
-            	$dynamicObject = new SimpleXMLElement($dynamicObjects->objects[0]->xml);
-            	if ($this->targetAllMetadataFields[$metadataProfileFieldName]['additionalConditions'])
-				{
-					KalturaLog::info("Additional conditions exist for metadata profile $metadataProfileId");
-					foreach ($this->targetAllMetadataFields[$metadataProfileFieldName]['additionalConditions'] as $condition)
-					{
-						KalturaLog::info('Checking field name ' . $condition['fieldName'] . ' against set list ' .  print_r($condition['validValues'], true));
-						$requiredValue = strval($dynamicObject->xpath('./' . $condition['fieldName'])[0]);
-						if (!in_array($requiredValue, $condition['validValues']))
-						{
-							KalturaLog::info('Additional conditions for dynamic object ' . $dynamicObjects->objects[0]->id . ' not met.');
-							return false;
-						}
-					}
-				}
+                $dynamicObject = new SimpleXMLElement($dynamicObjects->objects[0]->xml);
+                if ($this->targetAllMetadataFields[$metadataProfileFieldName]['additionalConditions'])
+                {
+                    KalturaLog::info("Additional conditions exist for metadata profile $metadataProfileId");
+                    foreach ($this->targetAllMetadataFields[$metadataProfileFieldName]['additionalConditions'] as $condition)
+                    {
+                        KalturaLog::info('Checking field name ' . $condition['fieldName'] . ' against set list ' .  print_r($condition['validValues'], true));
+                        $requiredValue = strval($dynamicObject->xpath('./' . $condition['fieldName'])[0]);
+                        if (!in_array($requiredValue, $condition['validValues']))
+                        {
+                            KalturaLog::info('Additional conditions for dynamic object ' . $dynamicObjects->objects[0]->id . ' not met.');
+                            return false;
+                        }
+                    }
+                }
 
                 return true;
             }
