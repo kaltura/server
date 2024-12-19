@@ -21,6 +21,14 @@ class KalturaVendorVideoAnalysisCatalogItem extends KalturaVendorCatalogItem
 		'maxVideoDuration',
 	);
 
+	/* (non-PHPdoc)
+	 * @see KalturaCuePoint::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
 	protected function getServiceFeature(): int
 	{
 		return VendorServiceFeature::VIDEO_ANALYSIS;
