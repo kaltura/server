@@ -31,7 +31,7 @@ class VendorVideoAnalysisCatalogItem extends VendorCatalogItem
 
 	public function getVideoAnalysisType()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_VIDEO_ANALYSIS_TYPE, null, true);
+		return $this->getFromCustomData(self::CUSTOM_DATA_VIDEO_ANALYSIS_TYPE, null, VendorVideoAnalysisType::OCR);
 	}
 
 	public function setMaxVideoDuration($v)
@@ -41,7 +41,7 @@ class VendorVideoAnalysisCatalogItem extends VendorCatalogItem
 
 	public function getMaxVideoDuration()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_MAX_VIDEO_DURATION, null, true);
+		return $this->getFromCustomData(self::CUSTOM_DATA_MAX_VIDEO_DURATION, null, null);
 	}
 
 	public function isEntryDurationExceeding(entry $entry)
