@@ -5,6 +5,22 @@
  */
 class KalturaVendorVideoAnalysisCatalogItem extends KalturaVendorCatalogItem
 {
+	/**
+	 * @var KalturaVendorVideoAnalysisType
+	 */
+	public $videoAnalysisType;
+
+	/**
+	 * @var int
+	 */
+	public $maxVideoDuration;
+
+	private static $map_between_objects = array
+	(
+		'videoAnalysisType',
+		'maxVideoDuration',
+	);
+
 	protected function getServiceFeature(): int
 	{
 		return VendorServiceFeature::VIDEO_ANALYSIS;
