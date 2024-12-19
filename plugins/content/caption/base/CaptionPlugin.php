@@ -673,7 +673,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		foreach ($webVTTStreams as $stream)
 		{
 			/* @var $stream kLiveStreamParams */
-            $streamLang = $stream->getLanguage() || 'Unknown';
+            $streamLang = $stream->getLanguage() ?? 'Unknown';
 			$caption = [
                 'tokenizer'=> $deliveryProfile->getTokenizer(),
                 'urlPrefix'=> $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]),
