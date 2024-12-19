@@ -718,6 +718,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
+		if ($vendorCatalogItem->isEntryDurationExceeding($entry))
+		{
+			KalturaLog::log("Entry [{$entry->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
+			return true;
+		}
+
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $taskDuration);
 		if($entryVendorTask)
 		{

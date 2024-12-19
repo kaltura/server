@@ -354,4 +354,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_NOTES);
 	}
+
+	public function isEntryDurationExceeding(entry $entry)
+	{
+		return false;
+	}
 } // VendorCatalogItem
