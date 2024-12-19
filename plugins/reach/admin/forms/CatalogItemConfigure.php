@@ -124,6 +124,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$requireSource->setValue(Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE);
 			$this->addElement($requireSource);
 		}
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
+		{
+			$videoAnalysisType = new Kaltura_Form_Element_EnumSelect('videoAnalysisType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorVideoAnalysisType'));
+			$videoAnalysisType->setLabel('Analysis Type:');
+			$videoAnalysisType->setRequired(true);
+			$videoAnalysisType->setValue(Kaltura_Client_Reach_Enum_VendorVideoAnalysisType::OCR);
+			$this->addElement($videoAnalysisType);
+		}
 		
 		$audioCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION,
 											Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION,
@@ -212,6 +221,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'filters' => array('StringTrim'),
 				'placement' => 'prepend',
 				'readonly' => $this->disableAttributes,
+			));
+		}
+
+		if ($this->catalogItemType === Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
+		{
+			$this->addElement('text', 'maxVideoDuration', array(
+				'label' => 'Max Video Duration Limit (sec):',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
 			));
 		}
 
