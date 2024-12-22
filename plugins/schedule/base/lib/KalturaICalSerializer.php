@@ -70,11 +70,16 @@ class KalturaICalSerializer extends KalturaSerializer
 		elseif($object instanceof KalturaScheduleEventArray)
 		{
 			$ret = '';
+			$hasTimeZone = false;
 			foreach($object as $item)
 			{
 				$ret .= $this->innerSerialize($item);
+				if ($item->recurrence && $item->recurrence->timeZone)
+				{
+				    $hasTimeZone = true;
+				}
 			}
-			return $this->injectTimeZoneBlocks($ret);
+			return $hasTimeZone ? $this->injectTimeZoneBlocks($ret) : $ret ;
 		}
 		elseif($object instanceof KalturaScheduleEventListResponse)
 		{
