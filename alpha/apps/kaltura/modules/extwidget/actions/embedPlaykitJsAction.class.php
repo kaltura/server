@@ -661,6 +661,15 @@ class embedPlaykitJsAction extends sfAction
 				}
 			}
 		}
+		if (!isset($this->playerConfig->plugins))
+		{
+			$this->playerConfig->plugins = new stdClass();
+		}
+		if (!isset($this->playerConfig->plugins->kava))
+		{
+			$this->playerConfig->plugins->kava = new stdClass();
+		}
+		$this->playerConfig->plugins->kava->requestMethod = "GET";
 	}
 
 	private function setFixVersionsNumber()
