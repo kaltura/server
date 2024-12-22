@@ -661,6 +661,7 @@ class embedPlaykitJsAction extends sfAction
 				}
 			}
 		}
+		
 		if (!isset($this->playerConfig->plugins))
 		{
 			$this->playerConfig->plugins = new stdClass();
