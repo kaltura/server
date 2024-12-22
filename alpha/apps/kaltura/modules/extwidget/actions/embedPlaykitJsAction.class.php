@@ -661,7 +661,7 @@ class embedPlaykitJsAction extends sfAction
 				}
 			}
 		}
-		
+
 		if (!isset($this->playerConfig->plugins))
 		{
 			$this->playerConfig->plugins = new stdClass();
@@ -670,7 +670,7 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$this->playerConfig->plugins->kava = new stdClass();
 		}
-		$this->playerConfig->plugins->kava->requestMethod = "GET";
+		$this->playerConfig->plugins->kava->requestMethod = 'GET';
 	}
 
 	private function setFixVersionsNumber()
