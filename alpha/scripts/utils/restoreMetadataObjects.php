@@ -1,6 +1,7 @@
 <?php
 ini_set('memory_limit','1024M');
-if ($argc < 3)
+
+if ($argc < 4)
 {
 	echo PHP_EOL . ' ---- Restore Deleted Metadata Profile && Objects ---- ' . PHP_EOL;
 	echo ' Execute: php ' . $argv[0] . ' partnerId, metadata profile ID, [ /path/to/metadata object IDs list || metadataObjectId_1,metadataObjectId_2,.. || metadataObject ] [realrun / dryrun]' . PHP_EOL;
@@ -9,14 +10,33 @@ if ($argc < 3)
 
 $partnerId = $argv[1];
 $metadataProfileId = $argv[2];
-$metadataObjectIds = explode(',', $argv[3]);
+
+if (is_file($argv[3]))
+{
+	$metadataObjectIds = file($argv[3]) or die (' Error: cannot open file at: "' . $argv[3] .'"' . PHP_EOL);
+}
+
+elseif (strpos($argv[3], ','))
+{
+	$metadataProfilesIds = explode(',', $argv[3]);
+}
+
+elseif (strpos($argv[3],'_'))
+{
+	$metadataProfilesIds[] = $argv[3];
+}
+
+else
+{
+	die (' Error: invalid input supplied at: "' . $argv[4] . '"' . PHP_EOL);
+}
+
 $totalMetadataObjectIds = count($metadataObjectIds);
 
-
-require("/opt/kaltura/app/alpha/scripts/bootstrap.php");
+require_once (dirname(__FILE__) . '/../bootstrap.php');
 
 $dryRun = true;
-if (isset($argv[3]) && $argv[3] == 'realrun')
+if (isset($argv[4]) && $argv[4] == 'realrun')
 {
 	$dryRun = false;
 }
@@ -63,31 +83,32 @@ function restoreMDObjects($metadataObjectIds, $mdVersion, $partnerId)
 	foreach ($metadataObjectIds as $metadataObjectId)
 	{
 		$metadataObjectId = trim($metadataObjectId);
-		KalturaLog::debug("=== Metadata Object Id: " . $metadataObjectId);
+		KalturaLog::debug("Metadata Object Id: " . $metadataObjectId);
+
 		MetadataPeer::setUseCriteriaFilter(false);
 		$metadataObject = MetadataPeer::retrieveByPK($metadataObjectId);
 		MetadataPeer::setUseCriteriaFilter(true);
 
 		/* @var $metadataObjectId metadata */
 
-		if (!$metadataObjectId)
+		if (!$metadataObject)
 		{
 			KalturaLog::debug("ERR3 - metadata object id " . $metadataObjectId . " not found");
 			continue;
 		}
 
-		KalturaLog::debug('=== Restoring metadata object id [' . $metadataObject->getID() . ']');
-		$mdOProfileVersion = $metadataObject->getMetadataProfileVersion();
-
-		if ($mdOProfileVersion <> $mdVersion)
-		{
-			KalturaLog::debug("ERR4 - metadata object version $mdOProfileVersion <> metadata profile version $mdVersion");
-			continue;
-		}
-
 		if ($metadataObject->getStatus() == 3)
 		{
+			KalturaLog::debug('Restoring metadata object id [' . $metadataObject->getID() . ']');
+			$mdOProfileVersion = $metadataObject->getMetadataProfileVersion();
 			$mdObjectversion = $metadataObject->getVersion();
+
+			if ($mdOProfileVersion <> $mdVersion)
+			{
+				KalturaLog::debug("ERR4 - metadata object version $mdOProfileVersion <> metadata profile version $mdVersion");
+				continue;
+			}
+
 			$fileSyncs = getFileSyncs($metadataObjectId, $mdObjectversion, $partnerId);
 
 			foreach ($fileSyncs as $fileSync)
