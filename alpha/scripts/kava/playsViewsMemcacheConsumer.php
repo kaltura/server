@@ -6,9 +6,6 @@ require_once(__DIR__ . '/playsViewsCommon.php');
 
 define('QUERY_CACHE_KEY_PREFIX', 'QCI-entry:id=');
 define('QUERY_CACHE_KEY_EXPIRY', 90000);
-define('MEMC_KEY_PREFIX', 'plays_views_');
-define('MEMC_KEY_LAST_PLAYED_AT', 'plays_views_last_played_at');
-
 
 class playsViewsMemcacheConsumer extends BaseConsumer
 {
@@ -58,13 +55,13 @@ class playsViewsMemcacheConsumer extends BaseConsumer
 // parse the command line
 if ($argc < 2)
 {
-	echo "Usage:\n\t" . basename(__file__) . " <memcache host>:<memcache port> [<qc1 memcache host>:<qc1 memcache port>,<qc2 memcache host>:<qc2 memcache port>]\n";
-	echo "For example, php " . basename(__file__) . " localhost:11211\n";
+	echo "Usage:\n\t" . basename(__file__)  . " <id>\n";
 	exit(1);
 }
 
-$memcache = $argv[1];
-$queryCacheMemcaches = isset($argv[2]) ? $argv[2] : null;
+$id = $argv[1];
+$memcache = getenv(MEMCACHE_VAR . "_$id");
+$queryCacheMemcaches = getenv(QC_MEMCACHE_VAR . "_$id");
 
 try
 {
