@@ -29,7 +29,9 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	private $bulkUploadResultParams = array(
 		'vendorPartnerId', 'name', 'systemName', 'serviceType', 'turnAroundTime',
 		'sourceLanguage', 'targetLanguage', 'outputFormat', 'enableSpeakerId', 'fixedPriceAddons',
-		'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission', 'requireSource', 'stage', 'contract', 'notes', 'createdBy');
+		'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission', 'requireSource', 'stage', 'contract', 'notes', 'createdBy',
+		'minimalRefundTime', 'minimalOrderTime', 'durationLimit'
+	);
 
 	/**
 	 * (non-PHPdoc)
@@ -388,6 +390,10 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 				$object = new KalturaVendorLiveCaptionCatalogItem();
 				break;
 
+			case VendorServiceFeature::LIVE_TRANSLATION:
+				$object = new KalturaVendorLiveTranslationCatalogItem();
+				break;
+
 			default:
 				$object = new KalturaVendorCaptionsCatalogItem();
 				break;
@@ -421,6 +427,9 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			'contract',
 			'notes',
 			'createdBy',
+			'minimalRefundTime',
+			'minimalOrderTime',
+			'durationLimit',
 		);
 	}
 
