@@ -17,6 +17,7 @@ class embedPlaykitJsAction extends sfAction
 	const CONFIG_PARAM_NAME = "config";
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
+	const IFRAME_EMBED_TYPE = "iframeEmbedType";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
@@ -29,6 +30,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
+	const RAPT = "rapt";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -490,11 +492,15 @@ class embedPlaykitJsAction extends sfAction
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
 		$playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
 		$external_source = $this->getRequestParameter(self::EXTERNAL_SOURCE_PARAM_NAME);
+		$iframe_embed_type = $this->getRequestParameter(self::IFRAME_EMBED_TYPE);
 		$loadContentMethod = "";
 		if (!is_null($entry_id)) {
 		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
 		} elseif (!is_null($playlist_id)) {
-		    $loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
+			$loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
+			if($iframe_embed_type === self::RAPT) {
+				$loadContentMethod = "kalturaPlayer.loadMedia({\"playlistId\":\"$playlist_id\"});";
+			}
 		} elseif (!is_null($external_source)) {
 			$loadContentMethod = "kalturaPlayer.setMedia({\"sources\":$external_source});";
 		}
@@ -536,12 +542,17 @@ class embedPlaykitJsAction extends sfAction
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
 
 		}
+		$kalturaPlayer = "KalturaPlayer.setup(config);";
+		if($iframe_embed_type === self::RAPT)
+		{
+			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
+		}
 
 		$autoEmbedCode = "
 		try {
 			var config=$config;
 			$v2tov7ConfigJs
-			var kalturaPlayer = KalturaPlayer.setup(config);
+			var kalturaPlayer = $kalturaPlayer
 			$loadContentMethod
 		} catch (e) {
 			console.error(e.message);
