@@ -178,6 +178,13 @@ class rawAction extends sfAction
 			$archiveFile = $file_sync->getFullPath();
 			$mimeType = kFile::mimeType($archiveFile);
 			
+			//KMS-30656: csv file is not properly identified by mime type in some cases so look at the extension as well
+			$fileExt = pathinfo($archiveFile, PATHINFO_EXTENSION);
+			if(kstring::beginsWith($mimeType, 'text/plain') && $fileExt == 'csv')
+			{
+				$mimeType = 'text/csv';
+			}
+			
 			kFileUtils::dumpFile($archiveFile, $mimeType, null, 0, $file_sync->getEncryptionKey(), $file_sync->getIv(), $file_sync->getFileSize());
 		}
 		elseif ($entry->getType() == entryType::DATA)
