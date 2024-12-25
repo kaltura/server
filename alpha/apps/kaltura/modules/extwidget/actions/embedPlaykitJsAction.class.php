@@ -497,10 +497,9 @@ class embedPlaykitJsAction extends sfAction
 		if (!is_null($entry_id)) {
 		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
 		} elseif (!is_null($playlist_id)) {
+			$loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
 			if($iframe_embed_type === self::RAPT) {
 				$loadContentMethod = "kalturaPlayer.loadMedia({\"playlistId\":\"$playlist_id\"});";
-			} else {
-				$loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
 			}
 		} elseif (!is_null($external_source)) {
 			$loadContentMethod = "kalturaPlayer.setMedia({\"sources\":$external_source});";
