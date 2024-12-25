@@ -657,7 +657,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 	protected static function getLiveCaptionArray($entryId, $deliveryProfile): array
 	{
-		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entryId, array(EntryServerNodeStatus::PLAYABLE));
+		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entryId, array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::MARKED_FOR_DELETION));
 		if(!count($liveEntryServerNodes))
 		{
 			return array();
