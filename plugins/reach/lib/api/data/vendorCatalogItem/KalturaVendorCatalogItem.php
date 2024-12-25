@@ -126,6 +126,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 * @var int
 	 */
 	public $partnerId;
+	
+	/**
+	 * @var string
+	 */
+	public $adminTagsToExclude;
 
 	private static $map_between_objects = array
 	(
@@ -149,6 +154,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'contract',
 		'createdBy',
 		'notes',
+		'adminTagsToExclude',
 	);
 
 	abstract protected function getServiceFeature();
