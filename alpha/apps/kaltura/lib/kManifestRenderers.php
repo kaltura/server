@@ -1011,7 +1011,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			}
 		}
 
-		if($flavorsArr && $this->closedCaptions)
+		if($flavorsArr && $this->closedCaptions && $this->shouldUseClosedCaptions())
 		{
 			$flavorsArr = array_merge($this->closedCaptions, array(''), $flavorsArr);
 		}
@@ -1027,6 +1027,22 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		}
 
 		return $flavorsArr;
+	}
+
+	protected function shouldUseClosedCaptions(): bool
+	{
+		$dbEntry = entryPeer::retrieveByPK($this->entryId);
+		if($dbEntry)
+		{
+			foreach ($this->contributors as $contributor)
+			{
+				if($contributor instanceof WebVttCaptionsManifestEditor && $dbEntry->getType() == entryType::LIVE_STREAM)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 
@@ -1049,7 +1065,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		}
 
 		$closedCaption = '';
-		if($this->closedCaptions)
+		if($this->closedCaptions && $this->shouldUseClosedCaptions())
 		{
 			$closedCaption = ",CLOSED-CAPTIONS=\"CC\"";
 		}

@@ -163,4 +163,6 @@ return array(
 
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStage::PRODUCTION' => 'Production',
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStage::QA' => 'QA',
+
+	'Kaltura_Client_Reach_Enum_VendorVideoAnalysisType::OCR' => 'OCR',
 );

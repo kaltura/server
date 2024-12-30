@@ -718,6 +718,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
+		if ($vendorCatalogItem->isEntryDurationExceeding($entry))
+		{
+			KalturaLog::log("Entry [{$entry->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
+			return true;
+		}
+
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $taskDuration);
 		if($entryVendorTask)
 		{
@@ -785,7 +791,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		//Kaltura Recorded entries are ready on creation so make sure the vendors wont fetch the job until it gets its assets
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $vendorCatalogItem->requiresEntryReady())
 		{
-			$entryAssets = assetPeer::retrieveReadyByEntryId($entry->getId());
+			$entryAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
 			if(!count($entryAssets))
 			{
 				$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;

@@ -9,7 +9,7 @@
 		 * 
 		 */
 	class KFFmpegToPartnerMatch {
-		static protected $ffmpegVersion=4;
+		static protected $ffmpegVersion=6;
 		static protected $ffmpegBin="ffmpeg";
 		static protected $ffprobeBin="ffprobe";
 		static protected $isMatched=false;
