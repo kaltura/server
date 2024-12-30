@@ -256,12 +256,12 @@ class embedPlaykitJsAction extends sfAction
 				$uiConf->provider->env->$key = $value;
 		}
 
-        //todo - add unisphereLoaderUrl
-        $uiConf->provider->unisphereLoaderUrl =
-            MicroServiceUnisphereLoader::buildServiceUrl(
-                MicroServiceUnisphereLoader::$host,
-                MicroServiceUnisphereLoader::$service,
-                false);
+		//todo - add unisphereLoaderUrl
+		$uiConf->provider->unisphereLoaderUrl =
+			MicroServiceUnisphereLoader::buildServiceUrl(
+				MicroServiceUnisphereLoader::$host,
+				MicroServiceUnisphereLoader::$service,
+				false);
 	}
 
 	private function mergeI18nConfig($uiConf, $i18nContent)
