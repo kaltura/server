@@ -71,6 +71,7 @@ class kSimuliveUtils
 		if (self::shouldLiveInterrupt($entry, $currentEvent))
 		{
 			// endTime null will cause "expirationTime" to be added to the json
+			KalturaLog::log("EndTime was {$endTime} - reseting to null as interrupt");
 			$endTime = null;
 		}
 
