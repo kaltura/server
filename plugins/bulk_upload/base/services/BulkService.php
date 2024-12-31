@@ -324,6 +324,7 @@ class BulkService extends KalturaBaseService
 		$c->addDescendingOrderByColumn(BatchJobLogPeer::ID);
 		
 		$coreBulkUploadFilter->attachToCriteria($c);
+		$c->setLimit(10000);
 		$count = BatchJobLogPeer::doCount($c);
 		$pager->attachToCriteria($c);
 		$jobs = BatchJobLogPeer::doSelect($c);
