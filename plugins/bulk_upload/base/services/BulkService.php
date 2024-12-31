@@ -9,6 +9,7 @@
 class BulkService extends KalturaBaseService
 {
 	const PARTNER_DEFAULT_CONVERSION_PROFILE_ID = -1;
+	const MAX_RESULTS_COUNT = 10000;
 	
 	const SERVICE_NAME = "bulkUpload";
 
@@ -324,7 +325,7 @@ class BulkService extends KalturaBaseService
 		$c->addDescendingOrderByColumn(BatchJobLogPeer::ID);
 		
 		$coreBulkUploadFilter->attachToCriteria($c);
-		$c->setLimit(10000);
+		$c->setLimit(self::MAX_RESULTS_COUNT);
 		$count = BatchJobLogPeer::doCount($c);
 		$pager->attachToCriteria($c);
 		$jobs = BatchJobLogPeer::doSelect($c);
