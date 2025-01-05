@@ -738,9 +738,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $taskDuration = null)
 	{
+		//Check if the entry is temporary, if so, dont create the task
 		if($entry->getIsTemporary())
 		{
 			KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
+			return null;
+		}
+		
+		//Check if static content and the catalog item is excluding static content, if so, dont create the task
+		if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entry->getAdminTagsArr()))
+		{
+			KalturaLog::debug("Entry [{$entry->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
 			return null;
 		}
 		
