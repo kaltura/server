@@ -118,6 +118,14 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			return new Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION)
 			return new Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS)
+			return new Kaltura_Client_Reach_Type_VendorClipsCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ)
+			return new Kaltura_Client_Reach_Type_VendorQuizCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY)
+			return new Kaltura_Client_Reach_Type_VendorSummaryCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
+			return new Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItemFilter();
 		else
 			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}

@@ -57,6 +57,14 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItem', $formData, false, true);
 				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION)
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItem', $formData, false, true);
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS)
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorClipsCatalogItem', $formData, false, true);
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ)
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorQuizCatalogItem', $formData, false, true);
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY)
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorSummaryCatalogItem', $formData, false, true);
+				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItem', $formData, false, true);
 			}
 		}
 		$action->view->form = $form;
