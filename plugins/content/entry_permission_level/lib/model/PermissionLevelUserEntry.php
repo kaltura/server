@@ -9,6 +9,8 @@ class PermissionLevelUserEntry extends UserEntry
 	
 	const CUSTOM_DATA_PERMISSION_LEVELS = 'permission_levels';
 
+	const CUSTOM_DATA_PERMISSION_ORDER = 'permission_order';
+
 	public function __construct()
 	{
 		$this->setType(EntryPermissionLevelPlugin::getPermissionLevelUserEntryTypeCoreValue(PermissionLevelUserEntryType::PERMISSION_LEVEL));
@@ -28,5 +30,15 @@ class PermissionLevelUserEntry extends UserEntry
 		
 		$serialized = serialize($permissionLevels);
 		return $this->putInCustomData(self::CUSTOM_DATA_PERMISSION_LEVELS, $serialized);
+	}
+
+	public function getPermissionOrder()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_PERMISSION_ORDER);
+	}
+
+	public function setPermissionOrder($permissionOrder)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_PERMISSION_ORDER, $permissionOrder);
 	}
 }

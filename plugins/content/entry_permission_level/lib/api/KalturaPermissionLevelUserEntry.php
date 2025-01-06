@@ -10,11 +10,19 @@ class KalturaPermissionLevelUserEntry extends KalturaUserEntry
 	 * @var KalturaPermissionLevelArray
 	 */
 	public $permissionLevels;
+
+	/**
+	 * @var int
+	 */
+	public $permissionOrder;
 	
 	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
-	private static $map_between_objects = array('permissionLevels');
+	private static $map_between_objects = array(
+		'permissionLevels',
+		'permissionOrder',
+	);
 	
 	/* (non-PHPdoc)
 	 * @see KalturaObject::getMapBetweenObjects()
