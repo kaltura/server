@@ -89,7 +89,7 @@ body {
 		height: 10%;
 		margin: 20px auto 0 auto;;
 	}
-	#main .content p{
+	#main .content p:not(.kaltura-player-container){
 		width: 735px;
 		height: 60px;
 		margin: 0 auto 10px auto;;
@@ -103,7 +103,7 @@ body {
 		margin: 0 16px 0 16px;
 	}
 	#main .content h1, 
-	#main .content p{
+	#main .content p:not(.kaltura-player-container){
 		margin: 0 16px 0 16px;
 	}
 }
