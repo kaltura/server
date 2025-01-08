@@ -1904,7 +1904,7 @@ class Partner extends BasePartner
 			{
 				if(myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, $this->id) === false)
 				{
-					throw new KalturaAPIException( APIErrors::PARTNER_REGISTRATION_ERROR, "Action is temporarily blocked from this country");
+					KExternalErrors::dieError(KExternalErrors::IP_COUNTRY_BLOCKED);
 				}
 			}
 		}
