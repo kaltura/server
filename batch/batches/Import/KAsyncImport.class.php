@@ -190,6 +190,9 @@ class KAsyncImport extends KJobHandlerWorker
 	 */
 	private function fetchFile(KalturaBatchJob $job, KalturaImportJobData $data)
     	{
+        	// TODO: this will not work due to 'Internal not allowed url' need to add regex to security.ini
+        	$srcFileUrl = kBatchUtils::translateExternalToInternalHost($data->srcFileUrl, self::$taskConfig->params);
+			
         	$jobSubType = $job->jobSubType;
         	$urlHeadersArray = $data->urlHeaders ? $this->getUrlHeadersArray($data->urlHeaders) : $data->urlHeaders;
         	$sshProtocols = array(
@@ -207,11 +210,11 @@ class KAsyncImport extends KJobHandlerWorker
         	{
             		if ($data->shouldRedirect)
             		{
-                		$sourceUrl =  KCurlWrapper::getRedirectUrl($data->srcFileUrl, $urlHeadersArray);
+                		$sourceUrl =  KCurlWrapper::getRedirectUrl($srcFileUrl, $urlHeadersArray);
             		}
             		else
             		{
-                		$sourceUrl = $data->srcFileUrl;
+                		$sourceUrl = $srcFileUrl;
             		}
 
 			$this->updateJob($job, 'Downloading file header', KalturaBatchJobStatus::QUEUED);
@@ -412,7 +415,7 @@ class KAsyncImport extends KJobHandlerWorker
 	{
 		try
 		{
-			$sourceUrl = $data->srcFileUrl;
+			$sourceUrl = kBatchUtils::translateExternalToInternalHost($data->srcFileUrl, self::$taskConfig->params);
 			
 			//Replace # sign to avoid cases where it's part of the user/password. The # sign is considered as fragment part of the URL.
 			//https://bugs.php.net/bug.php?id=73754

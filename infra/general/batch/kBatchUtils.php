@@ -190,4 +190,23 @@ class kBatchUtils
 		}
 		return $configArray;
 	}
+	
+	/**
+	 * @param $serviceUrl
+	 * @param $params
+	 * @return array|mixed|string|string[]
+	 */
+	public static function translateExternalToInternalHost($serviceUrl, $params = array())
+	{
+		// the params should be under 'JobHandlerWorker' worker - so that all workers have access if needed
+		if (!isset($params->redirectExternalToInternal->targetServiceUrlRegex) || !isset($params->redirectExternalToInternal->targetServiceUrlReplace))
+		{
+			return $serviceUrl;
+		}
+		
+		$internalServiceUrl = preg_replace($params->redirectExternalToInternal->targetServiceUrlRegex, $params->redirectExternalToInternal->targetServiceUrlReplace, $serviceUrl);
+		
+		// preg_replace will return null if an error occurred, in that case return the original serviceUrl
+		return $internalServiceUrl ?? $serviceUrl;
+	}
 }
