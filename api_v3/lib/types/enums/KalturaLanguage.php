@@ -35,12 +35,14 @@ class KalturaLanguage extends KalturaStringEnum
 	const DA = 'Danish';
 	const NL = 'Dutch';
 	const EN = 'English';
+	const EN_AU = 'English (Australian)';
 	const EN_GB = 'English (British)';
 	const EN_US = 'English (American)';
 	const EO = 'Esperanto';
 	const ET = 'Estonian';
 	const FO = 'Faeroese';
 	const FA = 'Farsi';
+	const FA_IR = 'Persian (Iran)';
 	const FJ = 'Fiji';
 	const FI = 'Finnish';
 	const FR = 'French';
@@ -124,6 +126,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const SI = 'Sinhalese';
 	const SS = 'Siswati';
 	const SK = 'Slovak';
+	const SK_SK = 'Slovakian';
 	const SL = 'Slovenian';
 	const SO = 'Somali';
 	const ES = 'Spanish';
@@ -157,6 +160,8 @@ class KalturaLanguage extends KalturaStringEnum
 	const JI = 'Yiddish';
 	const YO = 'Yoruba';
 	const ZU = 'Zulu';
+	const ZH_CN = 'Simplified Chinese';
+	const ZH_HK = 'Traditional Chinese';
 	const ZH_TW = 'Taiwanese Mandarin';
 	const ZXX = 'No linguistic content';
 	const MU = 'Multilingual';
@@ -227,6 +232,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const BIK = 'Bikol';
 	const BIN = 'Bini';
 	const BPY = 'Bishnupriya Manipuri';
+	const BS = 'Bosnian';
 	const BUA = 'Buriat';
 	const BUG = 'Buginese';
 	const CAA = 'Chor';
