@@ -251,75 +251,32 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
  	 */
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$object = null;
-		switch ($sourceObject->getServiceFeature())
-		{
-			case VendorServiceFeature::CAPTIONS:
-				$object = new KalturaVendorCaptionsCatalogItem();
-				break;
+		$object = self::getObjectByServiceFeature($sourceObject->getServiceFeature());
 
-			case VendorServiceFeature::TRANSLATION:
-				$object = new KalturaVendorTranslationCatalogItem();
-				break;
-
-			case VendorServiceFeature::ALIGNMENT:
-				$object = new KalturaVendorAlignmentCatalogItem();
-				break;
-
-			case VendorServiceFeature::AUDIO_DESCRIPTION:
-				$object = new KalturaVendorAudioDescriptionCatalogItem();
-				break;
-
-			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
-				$object = new KalturaVendorExtendedAudioDescriptionCatalogItem();
-				break;
-
-			case VendorServiceFeature::CHAPTERING:
-				$object = new KalturaVendorChapteringCatalogItem();
-				break;
-
-			case VendorServiceFeature::DUBBING:
-				$object = new KalturaVendorDubbingCatalogItem();
-				break;
-
-			case VendorServiceFeature::INTELLIGENT_TAGGING:
-				$object = new KalturaVendorIntelligentTaggingCatalogItem();
-				break;
-
-			case VendorServiceFeature::LIVE_CAPTION:
-				$object = new KalturaVendorLiveCaptionCatalogItem();
-				break;
-
-			case VendorServiceFeature::CLIPS:
-				$object = new KalturaVendorClipsCatalogItem();
-				break;
-
-			case VendorServiceFeature::LIVE_TRANSLATION:
-				$object = new KalturaVendorLiveTranslationCatalogItem();
-				break;
-
-			case VendorServiceFeature::QUIZ:
-				$object = new KalturaVendorQuizCatalogItem();
-				break;
-
-			case VendorServiceFeature::SUMMARY:
-				$object = new KalturaVendorSummaryCatalogItem();
-				break;
-
-			case VendorServiceFeature::VIDEO_ANALYSIS:
-				$object = new KalturaVendorVideoAnalysisCatalogItem();
-				break;
-
-			default:
-				$object = new KalturaVendorCaptionsCatalogItem();
-				break;
-		}
-
-		if (!$object)
-			return null;
-
-		/* @var $object KalturaVendorCatalogItem */
 		$object->fromObject($sourceObject, $responseProfile);
+
 		return $object;
+	}
+
+	public static function getObjectByServiceFeature($serviceFeature)
+	{
+		return match ($serviceFeature)
+		{
+			VendorServiceFeature::CAPTIONS => new KalturaVendorCaptionsCatalogItem(),
+			VendorServiceFeature::TRANSLATION => new KalturaVendorTranslationCatalogItem(),
+			VendorServiceFeature::ALIGNMENT => new KalturaVendorAlignmentCatalogItem(),
+			VendorServiceFeature::AUDIO_DESCRIPTION => new KalturaVendorAudioDescriptionCatalogItem(),
+			VendorServiceFeature::CHAPTERING => new KalturaVendorChapteringCatalogItem(),
+			VendorServiceFeature::INTELLIGENT_TAGGING => new KalturaVendorIntelligentTaggingCatalogItem(),
+			VendorServiceFeature::DUBBING => new KalturaVendorDubbingCatalogItem(),
+			VendorServiceFeature::LIVE_CAPTION => new KalturaVendorLiveCaptionCatalogItem(),
+			VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION => new KalturaVendorExtendedAudioDescriptionCatalogItem(),
+			VendorServiceFeature::CLIPS => new KalturaVendorClipsCatalogItem(),
+			VendorServiceFeature::LIVE_TRANSLATION => new KalturaVendorLiveTranslationCatalogItem(),
+			VendorServiceFeature::QUIZ => new KalturaVendorQuizCatalogItem(),
+			VendorServiceFeature::SUMMARY => new KalturaVendorSummaryCatalogItem(),
+			VendorServiceFeature::VIDEO_ANALYSIS => new KalturaVendorVideoAnalysisCatalogItem(),
+			default => new KalturaVendorCaptionsCatalogItem(),
+		};
 	}
 }
