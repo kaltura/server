@@ -21,6 +21,7 @@ class KalturaLanguage extends KalturaStringEnum
 	const DZ = 'Bhutani';
 	const BH = 'Bihari';
 	const BI = 'Bislama';
+	const BS = 'Bosnian';
 	const BR = 'Breton';
 	const BG = 'Bulgarian';
 	const MY = 'Burmese';
@@ -232,7 +233,6 @@ class KalturaLanguage extends KalturaStringEnum
 	const BIK = 'Bikol';
 	const BIN = 'Bini';
 	const BPY = 'Bishnupriya Manipuri';
-	const BS = 'Bosnian';
 	const BUA = 'Buriat';
 	const BUG = 'Buginese';
 	const CAA = 'Chor';
