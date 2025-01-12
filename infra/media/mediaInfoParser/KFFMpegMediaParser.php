@@ -385,7 +385,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$rv = array_reduce($stream->side_data_list, function($carry, $obj) {
 							return $carry ?? (property_exists($obj, 'rotation') ? $obj->rotation : null);
 							}, null);
-			if(isset($rv)) $mediaInfo->videoRotation=$rv;
+			if(isset($rv)) $mediaInfo->videoRotation=abs($rv);
 		}
 		$mediaInfo->scanType = 0; // default 0/progressive
 		
