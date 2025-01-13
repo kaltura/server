@@ -204,6 +204,12 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
 		));
+		
+		$this->addElement('text', 'adminTagsToExclude', array(
+			'label'	  => 'Admin tags to exclude:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+		));
 
 		$liveCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION, Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION);
 		if (in_array($this->catalogItemType, $liveCatalogItemTypesArray))

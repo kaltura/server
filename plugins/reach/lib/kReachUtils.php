@@ -196,7 +196,19 @@ class kReachUtils
 	 */
 	public static function getEntryVendorTaskCsvHeaders()
 	{
-		return array('id', 'partnerId', 'vendorPartnerId', 'entryId', 'createdAt', 'serviceType', 'serviceFeature', 'turnAroundTime', 'expectedFinishTime', 'status', 'errDescription');
+		return array(
+			'id',
+			'partnerId',
+			'vendorPartnerId',
+			'entryId',
+			'createdAt',
+			'serviceType',
+			'serviceFeature',
+			'turnAroundTime',
+			'expectedFinishTime',
+			'status',
+			'errDescription',
+		);
 	}
 
 	/**
@@ -204,7 +216,36 @@ class kReachUtils
 	 */
 	public static function getVendorCatalogItemsCsvHeaders()
 	{
-		return array('id','status','vendorPartnerId','name','systemName','serviceFeature','serviceType','turnAroundTime','sourceLanguage','targetLanguage','outputFormat','createdAt','updatedAt','enableSpeakerId','fixedPriceAddons','pricing:pricePerUnit','pricing:priceFunction', 'flavorParamsId', 'clearAudioFlavorParamsId','allowResubmission','requireSource','stage','contract','notes','createdBy');
+		return array(
+			'id',
+			'status',
+			'vendorPartnerId',
+			'name',
+			'systemName',
+			'serviceFeature',
+			'serviceType',
+			'turnAroundTime',
+			'sourceLanguage',
+			'targetLanguage',
+			'outputFormat',
+			'createdAt',
+			'updatedAt',
+			'enableSpeakerId',
+			'fixedPriceAddons',
+			'pricing:pricePerUnit',
+			'pricing:priceFunction',
+			'flavorParamsId',
+			'clearAudioFlavorParamsId',
+			'allowResubmission',
+			'requireSource',
+			'stage',
+			'contract',
+			'notes',
+			'createdBy',
+			'minimalRefundTime',
+			'minimalOrderTime',
+			'durationLimit',
+		);
 	}
 
 

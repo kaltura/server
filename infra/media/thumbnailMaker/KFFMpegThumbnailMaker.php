@@ -69,8 +69,11 @@ class KFFMpegThumbnailMaker extends KBaseThumbnailMaker
 		$targetType = $params['targetType']; 
 		$vidDur = 	$params['vidDur'];
 		$scanType = $params['scanType'];
+		// 'deintrlace' changed to '-vf yadif', 
+		// since the FFM6 does not support the old 'deinterlace' option.
+		// 'yadif' filter is the standard option in Kaltura general transcoding flow. 
 		if(isset($scanType) && $scanType==1)
-			$scanType = " -deinterlace";
+			$scanType = " -vf yadif";
 		else $scanType = null;
 
 		$dimensions = (is_null($width) || is_null($height)) ? '' : ("-s ". $width ."x" . $height);

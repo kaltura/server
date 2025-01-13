@@ -376,6 +376,17 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($stream->tags) && isset($stream->tags->rotate)){
 			$mediaInfo->videoRotation = trim($stream->tags->rotate);
 		}
+			// in post FFM4.4 versions, the 'tags:rotate' was removed, 
+			// in favor of 'stream::side_data_list[]rotation' field.
+			// both appeared in FFM4, making one of them redundant, hence removed.
+		else if(isset($stream->side_data_list)) {
+			// bellow scans through the side_data_list array, in search for 'rotation' fld.
+			// if found - returns its val, otherwise - null.
+			$rv = array_reduce($stream->side_data_list, function($carry, $obj) {
+							return $carry ?? (property_exists($obj, 'rotation') ? $obj->rotation : null);
+							}, null);
+			if(isset($rv)) $mediaInfo->videoRotation=abs($rv);
+		}
 		$mediaInfo->scanType = 0; // default 0/progressive
 		
 		$mediaInfo->matrixCoefficients = isset($stream->color_space)? trim($stream->color_space): null;

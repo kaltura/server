@@ -66,7 +66,7 @@ body {
 	letter-spacing: normal;
 	color: #333333;
 }
-#main .content p{
+#main :not(.kaltura-player-container) .content p{
 	font-family: 'Lato';
 	font-size: 16px;
 	font-weight: normal;
@@ -89,7 +89,7 @@ body {
 		height: 10%;
 		margin: 20px auto 0 auto;;
 	}
-	#main .content p{
+	#main :not(.kaltura-player-container) .content p {
 		width: 735px;
 		height: 60px;
 		margin: 0 auto 10px auto;;
@@ -103,7 +103,7 @@ body {
 		margin: 0 16px 0 16px;
 	}
 	#main .content h1, 
-	#main .content p{
+	#main :not(.kaltura-player-container) .content p {
 		margin: 0 16px 0 16px;
 	}
 }

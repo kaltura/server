@@ -3144,6 +3144,17 @@ class kKavaReportsMgr extends kKavaBase
 			);
 		}
 
+		if (in_array($data_source, array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_REALTIME)))
+		{
+			$druid_filter[] = array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
+					self::DRUID_VALUES => array('111')
+				)
+			);
+		}
+
 		return $druid_filter;
 	}
 
