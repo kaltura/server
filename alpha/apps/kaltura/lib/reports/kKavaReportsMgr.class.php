@@ -6180,6 +6180,9 @@ class kKavaReportsMgr extends kKavaBase
 				}
 				
 				$order_found = true;
+				$order_by = $order_by[0] === '-' || $order_by[0] === '+' ? $order_by[0] : "";
+				$order_by .= $root_metric;
+
 				unset($report_defs[$index]);
 				break;
 			}
