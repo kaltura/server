@@ -320,7 +320,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 
 		ReportType::EP_VIEWTIME => array(
 			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-			self::REPORT_GRAPH_METRICS => array(self::METRIC_VIEW_PERIOD_PLAY_TIME),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME),
 		),
 
 		ReportType::EP_TOP_MOMENTS => array(
