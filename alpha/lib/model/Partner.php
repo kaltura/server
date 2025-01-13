@@ -1902,7 +1902,10 @@ class Partner extends BasePartner
 			$blockedCountriesList = $globalAccessLimitationsConfiguration['blockedCountries'];
 			if ($blockedCountriesList)
 			{
-				return myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, $this->id);
+				if(myPartnerUtils::isRequestFromAllowedCountry($blockedCountriesList, $this->id) === false)
+				{
+					KExternalErrors::dieError(KExternalErrors::IP_COUNTRY_BLOCKED);
+				}
 			}
 		}
 		
