@@ -469,6 +469,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED,
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED,
 		self::EVENT_TYPE_POLL_RECEIVED,
+		self::EVENT_TYPE_PAGE_LOAD,
+		self::EVENT_TYPE_BUTTON_CLICKED,
+		self::EVENT_TYPE_QR_CODE_SCANNED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -549,6 +552,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED => 'count_cnc_chat_cconnection_request_approved',
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED => 'count_cnc_chat_connection_request_canceled',
 		self::EVENT_TYPE_POLL_RECEIVED => 'count_poll_received',
+		self::EVENT_TYPE_PAGE_LOAD => 'count_page_loaded',
+		self::EVENT_TYPE_BUTTON_CLICKED => 'count_button_clicked',
+		self::EVENT_TYPE_QR_CODE_SCANNED => 'count_qr_code_scanned'
 	);
 
 	//global transform
