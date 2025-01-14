@@ -260,23 +260,38 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 
 	public static function getObjectByServiceFeature($serviceFeature)
 	{
-		return match ($serviceFeature)
+		switch ($serviceFeature)
 		{
-			VendorServiceFeature::CAPTIONS => new KalturaVendorCaptionsCatalogItem(),
-			VendorServiceFeature::TRANSLATION => new KalturaVendorTranslationCatalogItem(),
-			VendorServiceFeature::ALIGNMENT => new KalturaVendorAlignmentCatalogItem(),
-			VendorServiceFeature::AUDIO_DESCRIPTION => new KalturaVendorAudioDescriptionCatalogItem(),
-			VendorServiceFeature::CHAPTERING => new KalturaVendorChapteringCatalogItem(),
-			VendorServiceFeature::INTELLIGENT_TAGGING => new KalturaVendorIntelligentTaggingCatalogItem(),
-			VendorServiceFeature::DUBBING => new KalturaVendorDubbingCatalogItem(),
-			VendorServiceFeature::LIVE_CAPTION => new KalturaVendorLiveCaptionCatalogItem(),
-			VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION => new KalturaVendorExtendedAudioDescriptionCatalogItem(),
-			VendorServiceFeature::CLIPS => new KalturaVendorClipsCatalogItem(),
-			VendorServiceFeature::LIVE_TRANSLATION => new KalturaVendorLiveTranslationCatalogItem(),
-			VendorServiceFeature::QUIZ => new KalturaVendorQuizCatalogItem(),
-			VendorServiceFeature::SUMMARY => new KalturaVendorSummaryCatalogItem(),
-			VendorServiceFeature::VIDEO_ANALYSIS => new KalturaVendorVideoAnalysisCatalogItem(),
-			default => new KalturaVendorCaptionsCatalogItem(),
-		};
+			case VendorServiceFeature::CAPTIONS:
+				return new KalturaVendorCaptionsCatalogItem();
+			case VendorServiceFeature::TRANSLATION:
+				return new KalturaVendorTranslationCatalogItem();
+			case VendorServiceFeature::ALIGNMENT:
+				return new KalturaVendorAlignmentCatalogItem();
+			case VendorServiceFeature::AUDIO_DESCRIPTION:
+				return new KalturaVendorAudioDescriptionCatalogItem();
+			case VendorServiceFeature::CHAPTERING:
+				return new KalturaVendorChapteringCatalogItem();
+			case VendorServiceFeature::INTELLIGENT_TAGGING:
+				return new KalturaVendorIntelligentTaggingCatalogItem();
+			case VendorServiceFeature::DUBBING:
+				return new KalturaVendorDubbingCatalogItem();
+			case VendorServiceFeature::LIVE_CAPTION:
+				return new KalturaVendorLiveCaptionCatalogItem();
+			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
+				return new KalturaVendorExtendedAudioDescriptionCatalogItem();
+			case VendorServiceFeature::CLIPS:
+				return new KalturaVendorClipsCatalogItem();
+			case VendorServiceFeature::LIVE_TRANSLATION:
+				return new KalturaVendorLiveTranslationCatalogItem();
+			case VendorServiceFeature::QUIZ:
+				return new KalturaVendorQuizCatalogItem();
+			case VendorServiceFeature::SUMMARY:
+				return new KalturaVendorSummaryCatalogItem();
+			case VendorServiceFeature::VIDEO_ANALYSIS:
+				return new KalturaVendorVideoAnalysisCatalogItem();
+			default:
+				return new KalturaVendorCaptionsCatalogItem();
+		}
 	}
 }
