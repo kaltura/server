@@ -4,7 +4,7 @@
  * @subpackage api.filters
  */
 
-class KalturaIntelligentTaggingCatalogItemFilter extends KalturaVendorCatalogItemFilter
+class KalturaVendorIntelligentTaggingCatalogItemFilter extends KalturaVendorCatalogItemFilter
 {
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
 	{
