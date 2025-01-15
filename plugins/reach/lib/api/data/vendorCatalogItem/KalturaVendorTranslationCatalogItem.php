@@ -45,6 +45,21 @@ class KalturaVendorTranslationCatalogItem extends KalturaVendorCaptionsCatalogIt
 		
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
+
+	protected function validateTargetLanguage(VendorCatalogItem $sourceObject = null)
+	{
+		if ($this->targetLanguage == KalturaCatalogItemLanguage::AUTO_DETECT)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::TARGET_LANGUAGE_NOT_SUPPORTED, $this->targetLanguage);
+		}
+	}
+
+	protected function validate(VendorCatalogItem $sourceObject = null)
+	{
+		$this->validateTargetLanguage($sourceObject);
+
+		return parent::validate($sourceObject);
+	}
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
