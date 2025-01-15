@@ -4550,6 +4550,35 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function genericEnrichWithCustomValues($objectIds, $partnerId, $context)
+	{
+		$peer = $context['peer'];
+		$property = $context['property'];
+
+		if (!class_exists($peer))
+		{
+			KalturaLog::log("Peer class $peer not found!");
+			return;
+		}
+
+		$objects = $peer::retrieveByPKs($objectIds);
+
+		$result = [];
+		foreach ($objects as $object)
+		{
+			$getter_callback = array ( $object ,"get{$property}");
+			if (!is_callable($getter_callback))
+			{
+				KalturaLog::log("Getter for $property not found!");
+				return;
+			}
+
+			$result[$object->id] = call_user_func($getter_callback);
+		}
+
+		return $result;
+	}
+
 	protected static function getCategoriesNames($ids, $partner_id)
 	{
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
