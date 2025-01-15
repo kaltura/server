@@ -53,16 +53,17 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 		if ($partnerId || $catalogItemId)
 		{
-			$vendorCatalogItemFilter = $this->getCatalogItemFilter($serviceFeature);
+			$vendorCatalogItemFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 			$vendorCatalogItemFilter->orderBy = "-createdAt";
 			$vendorCatalogItemFilter->serviceTypeEqual = $serviceType;
+			$vendorCatalogItemFilter->serviceFeatureEqual = $serviceFeature;
 			$vendorCatalogItemFilter->turnAroundTimeEqual = $turnAroundTime;
 			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
 			$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
 			$vendorCatalogItemFilter->vendorPartnerIdEqual = $vendorPartnerId;
 			$vendorCatalogItemFilter->catalogItemIdEqual = $catalogItemId;
 
-			if(in_array($serviceFeature, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
+			if (in_array($serviceFeature, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
 			{
 				$vendorCatalogItemFilter->targetLanguageEqual = $targetLanguage;
 			}

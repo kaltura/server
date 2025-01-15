@@ -99,7 +99,7 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$sourceLanguage = $this->_getParam('filterSourceLanguage') != "" ? $this->_getParam('filterSourceLanguage') : null;
 		$targetLanguage = $this->_getParam('filterTargetLanguage') != "" ? $this->_getParam('filterTargetLanguage') : null;
 
-		$catalogItemFilter = $this->getCatalogItemFilterByServiceFeature($serviceFeature);
+		$catalogItemFilter = new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 		$catalogItemFilter->orderBy = "-id";
 		$catalogItemFilter->serviceFeatureEqual = $serviceFeature;
 		$catalogItemFilter->serviceTypeEqual = $serviceType;
