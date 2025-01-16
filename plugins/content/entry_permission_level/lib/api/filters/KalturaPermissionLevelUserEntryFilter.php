@@ -29,34 +29,40 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 	{
 		$this->typeEqual = EntryPermissionLevelPlugin::getApiValue(PermissionLevelUserEntryType::PERMISSION_LEVEL);
 
-		if ($this->permissionLevels)
-		{
-			$permissionBitMask = [
-				KalturaUserEntryPermissionLevel::SPEAKER => 1,
-				KalturaUserEntryPermissionLevel::ROOM_MODERATOR => 2,
-				KalturaUserEntryPermissionLevel::ATTENDEE => 4,
-				KalturaUserEntryPermissionLevel::ADMIN => 8,
-				KalturaUserEntryPermissionLevel::PREVIEW_ONLY => 16,
-				KalturaUserEntryPermissionLevel::CHAT_MODERATOR => 32,
-				KalturaUserEntryPermissionLevel::PANELIST => 64,
-			];
-
-			KalturaLog::debug(print_r($this->permissionLevels, true));
-			$extendedHistory = 0;
-			foreach ($this->permissionLevels as $permissionLevel)
-			{
-				/** @var KalturaPermissionLevel $permissionLevel */
-				$val = $permissionLevel->permissionLevel;
-				$extendedHistory += $permissionBitMask[intval($val)];
-			}
-
-			if ($extendedHistory)
-			{
-				$this->permissionLevelsBitmask = $extendedHistory;
-			}
-		}
+		$this->setPermissionLevelsBitMask();
 
 		$response = parent::getListResponse($pager, $responseProfile);
 		return $response;
+	}
+
+	protected function setPermissionLevelsBitMask()
+	{
+		if (!$this->permissionLevels)
+		{
+			return;
+		}
+
+		$permissionBitMask = [
+			KalturaUserEntryPermissionLevel::SPEAKER => 1,
+			KalturaUserEntryPermissionLevel::ROOM_MODERATOR => 2,
+			KalturaUserEntryPermissionLevel::ATTENDEE => 4,
+			KalturaUserEntryPermissionLevel::ADMIN => 8,
+			KalturaUserEntryPermissionLevel::PREVIEW_ONLY => 16,
+			KalturaUserEntryPermissionLevel::CHAT_MODERATOR => 32,
+			KalturaUserEntryPermissionLevel::PANELIST => 64,
+		];
+
+		$extendedHistory = 0;
+		foreach ($this->permissionLevels as $permissionLevel)
+		{
+			/** @var KalturaPermissionLevel $permissionLevel */
+			$val = $permissionLevel->permissionLevel;
+			$extendedHistory += $permissionBitMask[intval($val)];
+		}
+
+		if ($extendedHistory)
+		{
+			$this->permissionLevelsBitmask = $extendedHistory;
+		}
 	}
 }
