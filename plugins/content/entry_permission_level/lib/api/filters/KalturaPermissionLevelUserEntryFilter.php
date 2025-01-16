@@ -29,20 +29,20 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 	{
 		$this->typeEqual = EntryPermissionLevelPlugin::getApiValue(PermissionLevelUserEntryType::PERMISSION_LEVEL);
 
-		$this->setPermissionLevelsBitMask();
+		$this->setPermissionLevelsBitmask();
 
 		$response = parent::getListResponse($pager, $responseProfile);
 		return $response;
 	}
 
-	protected function setPermissionLevelsBitMask()
+	protected function setPermissionLevelsBitmask()
 	{
 		if (!$this->permissionLevels)
 		{
 			return;
 		}
 
-		$permissionBitMask = [
+		$permissionBitmask = [
 			KalturaUserEntryPermissionLevel::SPEAKER => 1,
 			KalturaUserEntryPermissionLevel::ROOM_MODERATOR => 2,
 			KalturaUserEntryPermissionLevel::ATTENDEE => 4,
@@ -52,17 +52,17 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 			KalturaUserEntryPermissionLevel::PANELIST => 64,
 		];
 
-		$extendedHistory = 0;
+		$newBitmask = 0;
 		foreach ($this->permissionLevels as $permissionLevel)
 		{
 			/** @var KalturaPermissionLevel $permissionLevel */
 			$val = $permissionLevel->permissionLevel;
-			$extendedHistory += $permissionBitMask[intval($val)];
+			$newBitmask += $permissionBitmask[intval($val)];
 		}
 
-		if ($extendedHistory)
+		if ($newBitmask)
 		{
-			$this->permissionLevelsBitmask = $extendedHistory;
+			$this->permissionLevelsBitmask = $newBitmask;
 		}
 	}
 }

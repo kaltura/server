@@ -42,9 +42,9 @@ class PermissionLevelUserEntry extends UserEntry
 	protected function decodePermissionLevels($encodedPermissionLevels)
 	{
 		$permissionLevels = array();
-		foreach (self::PERMISSION_BIT_MASK as $permission => $permissionBitMask)
+		foreach (self::PERMISSION_BIT_MASK as $permission => $permissionBitmask)
 		{
-			if ($encodedPermissionLevels & $permissionBitMask)
+			if ($encodedPermissionLevels & $permissionBitmask)
 			{
 				$permissionLevels[] = $permission;
 			}
@@ -70,8 +70,8 @@ class PermissionLevelUserEntry extends UserEntry
 		foreach ($permissionLevels as $permissionLevel)
 		{
 			/** @var PermissionLevel $permissionLevel */
-			$bitMask = self::PERMISSION_BIT_MASK[$permissionLevel->getPermissionLevel()];
-			$encodedPermissionLevels = $encodedPermissionLevels | $bitMask;
+			$bitmask = self::PERMISSION_BIT_MASK[$permissionLevel->getPermissionLevel()];
+			$encodedPermissionLevels = $encodedPermissionLevels | $bitmask;
 		}
 
 		return $encodedPermissionLevels;
