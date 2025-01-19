@@ -11,25 +11,70 @@ class PermissionLevelUserEntry extends UserEntry
 
 	const CUSTOM_DATA_PERMISSION_ORDER = 'permission_order';
 
+	const PERMISSION_BIT_MASK = [
+			UserEntryPermissionLevel::SPEAKER => 1,
+			UserEntryPermissionLevel::ROOM_MODERATOR => 2,
+			UserEntryPermissionLevel::ATTENDEE => 4,
+			UserEntryPermissionLevel::ADMIN => 8,
+			UserEntryPermissionLevel::PREVIEW_ONLY => 16,
+			UserEntryPermissionLevel::CHAT_MODERATOR => 32,
+			UserEntryPermissionLevel::PANELIST => 64,
+		];
+
 	public function __construct()
 	{
 		$this->setType(EntryPermissionLevelPlugin::getPermissionLevelUserEntryTypeCoreValue(PermissionLevelUserEntryType::PERMISSION_LEVEL));
 		parent::__construct();
 	}
 	
-	public function getPermissionLevels ()
+	public function getPermissionLevels()
 	{
-		$serialized = $this->getFromCustomData(self::CUSTOM_DATA_PERMISSION_LEVELS);
-		return unserialize($serialized);
+		$permissionLevels = $this->decodePermissionLevels(($this->getExtendedStatus()));
+
+		return array_map( function($permissionLevel)
+		{
+			$permissionLevelObject = new PermissionLevel();
+			$permissionLevelObject->setPermissionLevel($permissionLevel);
+			return $permissionLevelObject;
+		}, $permissionLevels);
+	}
+
+	protected function decodePermissionLevels($encodedPermissionLevels)
+	{
+		$permissionLevels = array();
+		foreach (self::PERMISSION_BIT_MASK as $permission => $permissionBitmask)
+		{
+			if ($encodedPermissionLevels & $permissionBitmask)
+			{
+				$permissionLevels[] = $permission;
+			}
+		}
+
+		return $permissionLevels;
 	}
 	
-	public function setPermissionLevels ($permissionLevels)
+	public function setPermissionLevels($permissionLevels)
 	{
-		if(!count($permissionLevels))
+		if (!count($permissionLevels))
+		{
 			return;
-		
-		$serialized = serialize($permissionLevels);
-		return $this->putInCustomData(self::CUSTOM_DATA_PERMISSION_LEVELS, $serialized);
+		}
+
+		$encodedPermissions = $this->encodePermissionLevels($permissionLevels);
+		$this->setExtendedStatus($encodedPermissions);
+	}
+
+	protected function encodePermissionLevels($permissionLevels)
+	{
+		$encodedPermissionLevels = 0;
+		foreach ($permissionLevels as $permissionLevel)
+		{
+			/** @var PermissionLevel $permissionLevel */
+			$bitmask = self::PERMISSION_BIT_MASK[$permissionLevel->getPermissionLevel()];
+			$encodedPermissionLevels = $encodedPermissionLevels | $bitmask;
+		}
+
+		return $encodedPermissionLevels;
 	}
 
 	public function getPermissionOrder()
