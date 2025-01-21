@@ -1691,7 +1691,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				if(is_array($subtitlesData) && count($subtitlesData) > 0)
 				{
 					$flavorParamsObj->setSubtitlesData(json_encode($subtitlesData));
-					$extraParams = $extraParams . " -ss " . $singleAttribute->getOffset() . " -copyts ";
+					$offset = $singleAttribute->getOffset() ?  $singleAttribute->getOffset() / 1000 : 0.01;
+					$extraParams = "$extraParams -ss $offset -copyts ";
 				}
 			}
 		}
