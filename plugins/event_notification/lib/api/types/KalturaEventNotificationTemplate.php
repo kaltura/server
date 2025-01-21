@@ -114,6 +114,14 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	 * @var KalturaEventNotificationParameterArray
 	 */
 	public $userParameters;
+
+	/**
+	 * Event batch job will be delayed until specific condition criteria is met
+	 *
+	 * @var KalturaEventNotificationDelayedConditions
+	 * @requiresPermission update
+	 */
+	public $eventDelayedConditions;
 	
 	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -134,6 +142,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 		'eventConditions',
 		'contentParameters',
 		'userParameters',
+		'eventDelayedConditions'
 	);
 		 
 	/* (non-PHPdoc)
@@ -173,7 +182,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	{
 		if(is_null($dbObject))
 			throw new kCoreException("Event notification template type [" . $this->type . "] not found", kCoreException::OBJECT_TYPE_NOT_FOUND, $this->type);
-        	
+
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
 	

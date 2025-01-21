@@ -1,3 +1,9 @@
+# Ursa-21.8.0
+## Add option to delay notifications ##
+* Issue Type: Task
+* Issue ID: PLAT-25045
+### Deployment script ### 
+    php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
 # Ursa-21.4.0
 ## Kava - redirect external client tags to dedicated druid url ##
 - Issue Type: Story

@@ -39,6 +39,16 @@ class Form_EmailNotificationTemplateConfiguration extends Form_EventNotification
 	 */
 	protected function addTypeElements(Kaltura_Client_EventNotification_Type_EventNotificationTemplate $eventNotificationTemplate)
 	{
+		$this->addElement('select', 'event_delayed_conditions', array(
+			'label'			=> 'Delay Notification Condition:',
+			'filters'		=> array('StringTrim'),
+			'required'		=> true,
+			'multiOptions' 	=> array(
+				Kaltura_Client_EventNotification_Enum_EventNotificationDelayedConditions::NONE => 'Do not delay',
+				Kaltura_Client_EventNotification_Enum_EventNotificationDelayedConditions::PENDING_ENTRY_READY => 'Until entry is ready',
+			),
+		));
+
 		$format = new Kaltura_Form_Element_EnumSelect('format', array(
 			'enum' => 'Kaltura_Client_EmailNotification_Enum_EmailNotificationFormat',
 			'label'			=> 'Format:',

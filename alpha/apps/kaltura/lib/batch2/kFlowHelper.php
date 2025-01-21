@@ -2967,6 +2967,16 @@ class kFlowHelper
 			$entry->save();
 		}
 	}
+
+	public static function handleDelayedNotification(entry $entry)
+	{
+		$delayedLockedJob = BatchJobLockPeer::retrieveByEntryIdAndStatus($entry->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
+		if ($delayedLockedJob)
+		{
+			$delayedJob = BatchJobPeer::retrieveByEntryIdAndStatus($entry->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
+			kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING);
+		}
+	}
 	
 	/**
 	 * @param entry $entry

@@ -117,7 +117,29 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
 		$jobData->setJobId($batchJob->getId());
 		$batchJob->setData($jobData);
-		
+
+		if ($this->getEventDelayedConditions() && $entryId && $this->areDelayedEventConditionsMet($entryId))
+		{
+			return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_DELAYED);
+		}
+
 		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
+	}
+
+	public function areDelayedEventConditionsMet($objectId)
+	{
+		$delayedEventConditions = $this->getEventDelayedConditions();
+		if ($delayedEventConditions)
+		{
+			switch ($delayedEventConditions)
+			{
+				case EventNotificationDelayedConditions::PENDING_ENTRY_READY:
+				{
+					$entry = BaseentryPeer::retrieveByPK($objectId);
+					return $entry->getStatus() !== entryStatus::READY;
+				}
+			}
+		}
+		return false;
 	}
 }

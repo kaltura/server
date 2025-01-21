@@ -90,6 +90,16 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		));
 		$this->addElements(array($element));
 
+		$this->addElement('select', 'event_delayed_conditions', array(
+			'label'			=> 'Delay Notification Condition:',
+			'filters'		=> array('StringTrim'),
+			'required'		=> true,
+			'multiOptions' 	=> array(
+				Kaltura_Client_EventNotification_Enum_EventNotificationDelayedConditions::NONE => 'None',
+				Kaltura_Client_EventNotification_Enum_EventNotificationDelayedConditions::PENDING_ENTRY_READY => 'When entry is ready',
+			),
+		));
+
 		$this->addElement('select', 'secureHashingAlgo', array(
 			'label'			=> 'Secure Hashing Algorithm:',
 			'filters'		=> array('StringTrim'),

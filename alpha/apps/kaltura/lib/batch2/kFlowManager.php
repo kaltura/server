@@ -686,6 +686,7 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			&& $object->getStatus() == entryStatus::READY)
 		{
 			kFlowHelper::addDeliveryTagToEntry($object);
+			kFlowHelper::handleDelayedNotification($object);
 		}
 
 		if ($object instanceof entry
