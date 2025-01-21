@@ -1685,16 +1685,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$extraParams = $conversionData[self::EXTRA_CONVERSION_PARAMS];
 			}
-			if(isset($conversionParams[self::SUBTITLES_DATA_ARRAY]) && isset($conversionParams[self::SUBTITLES_DATA_ARRAY][$singleAttributeIndex]))
-			{
-				$subtitlesData = $conversionParams[self::SUBTITLES_DATA_ARRAY][$singleAttributeIndex];
-				if(is_array($subtitlesData) && count($subtitlesData) > 0)
-				{
-					$flavorParamsObj->setSubtitlesData(json_encode($subtitlesData));
-					$offset = $singleAttribute->getOffset() ?  $singleAttribute->getOffset() / 1000 : 0.01;
-					$extraParams = "$extraParams -ss $offset -copyts ";
-				}
-			}
 		}
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
 		$conversionExtraParams = $originalConversionEnginesExtraParams ? explode('|', $originalConversionEnginesExtraParams) : null;
@@ -1756,6 +1746,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if(isset($conversionParams[self::FRAME_RATE]))
 			{
 				$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
+			}
+			if(isset($conversionParams[self::SUBTITLES_DATA_ARRAY]) && isset($conversionParams[self::SUBTITLES_DATA_ARRAY][$index]))
+			{
+				$subtitlesData = $conversionParams[self::SUBTITLES_DATA_ARRAY][$index];
+				if(is_array($subtitlesData) && count($subtitlesData) > 0)
+				{
+					$flavorParamsObj->setSubtitlesData(json_encode($subtitlesData));
+				}
 			}
 			if(isset($conversionParams[self::AUDIO_CHANNELS]))
 			{
