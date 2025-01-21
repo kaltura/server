@@ -2968,13 +2968,36 @@ class kFlowHelper
 		}
 	}
 
-	public static function handleDelayedNotification(entry $entry)
+	public static function handleDelayedNotification($object)
 	{
-		$delayedLockedJob = BatchJobLockPeer::retrieveByEntryIdAndStatus($entry->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
-		if ($delayedLockedJob)
+
+		$delayedLockedJobs = match (true)
 		{
-			$delayedJob = BatchJobPeer::retrieveByEntryIdAndStatus($entry->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
-			kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING);
+			$object instanceof entry => BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED)
+		};
+
+		if (count($delayedLockedJobs) > 0)
+		{
+			foreach ($delayedLockedJobs as $job)
+			{
+				/* @var $job BatchJobLock */
+				$delayedJob = BatchJobPeer::retrieveByPK($job->getId());
+				/* @var $job BatchJob */
+				if ($delayedJob)
+				{
+					$jobData = $delayedJob->getData();
+					/* @var $jobData kEventNotificationDispatchJobData */
+					match (true)
+					{
+						$jobData->getEventDelayedConditions() == EventNotificationDelayedConditions::PENDING_ENTRY_READY =>
+							kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING)
+					};
+				}
+				else
+				{
+					KalturaLog::err('Batch Job [' . $job->getId() . '] is in Lock table but not in Sep table.');
+				}
+			}
 		}
 	}
 	

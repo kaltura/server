@@ -14,6 +14,11 @@ class kEventNotificationDispatchJobData extends kJobData
 	 * @var int
 	 */
 	protected $jobId;
+
+	/**
+	 * @var KalturaEventNotificationDelayedConditions
+	 */
+	protected $eventDelayedConditions;
 	
 	/**
 	 * Define the content dynamic parameters
@@ -21,7 +26,23 @@ class kEventNotificationDispatchJobData extends kJobData
 	 * @var array<key,value>
 	 */
 	protected $contentParameters;
-	
+
+	/**
+	 * @return KalturaEventNotificationDelayedConditions $eventDelayedConditions
+	 */
+	public function getEventDelayedConditions()
+	{
+		return $this->eventDelayedConditions;
+	}
+
+	/**
+	 * @param KalturaEventNotificationDelayedConditions $eventDelayedConditions
+	 */
+	public function setEventDelayedConditions($eventDelayedConditions)
+	{
+		$this->eventDelayedConditions = $eventDelayedConditions;
+	}
+
 	/**
 	 * @return int $jobId
 	 */

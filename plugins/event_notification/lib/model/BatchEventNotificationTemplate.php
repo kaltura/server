@@ -116,17 +116,18 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 		
 		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
 		$jobData->setJobId($batchJob->getId());
-		$batchJob->setData($jobData);
 
-		if ($this->getEventDelayedConditions() && $entryId && $this->areDelayedEventConditionsMet($entryId))
+		if ($this->areDelayedEventConditionsMet($jobData, $entryId))
 		{
+			$batchJob->setData($jobData);
 			return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_DELAYED);
 		}
 
+		$batchJob->setData($jobData);
 		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
 	}
 
-	public function areDelayedEventConditionsMet($objectId)
+	public function areDelayedEventConditionsMet(&$jobData, $objectId = null)
 	{
 		$delayedEventConditions = $this->getEventDelayedConditions();
 		if ($delayedEventConditions)
@@ -135,8 +136,16 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 			{
 				case EventNotificationDelayedConditions::PENDING_ENTRY_READY:
 				{
-					$entry = BaseentryPeer::retrieveByPK($objectId);
-					return $entry->getStatus() !== entryStatus::READY;
+					if ($objectId)
+					{
+						$jobData->setEventDelayedConditions(EventNotificationDelayedConditions::PENDING_ENTRY_READY);
+						$entry = BaseentryPeer::retrieveByPK($objectId);
+						if ($entry)
+						{
+							return $entry->getStatus() !== entryStatus::READY;
+						}
+					}
+					KalturaLog::err('Template set to delay BatchJob completion until entry in READY state but entryId is [' . $objectId . ']');
 				}
 			}
 		}

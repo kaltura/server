@@ -250,6 +250,6 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 		$c = new Criteria();
 		$c->add ( self::ENTRY_ID , $obj_id );
 		$c->add ( self::STATUS , $status );
-		return self::doSelectOne( $c );
+		return self::doSelect( $c );
 	}
 } // BatchJobLockPeer

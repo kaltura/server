@@ -86,7 +86,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 		$c = new Criteria();
 		$c->add ( self::ENTRY_ID , $obj_id );
 		$c->add ( self::STATUS , $status );
-		return self::doSelectOne( $c );
+		return self::doSelect( $c );
 	}
 	
 	public static function doAvgTimeDiff($jobType, $t1, $t2, PDO $con = null)
