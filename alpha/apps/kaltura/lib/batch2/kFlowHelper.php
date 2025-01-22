@@ -2970,11 +2970,15 @@ class kFlowHelper
 
 	public static function handleDelayedNotification($object)
 	{
-
-		$delayedLockedJobs = match (true)
+		$delayedLockedJobs = [];
+		switch (true)
 		{
-			$object instanceof entry => BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED)
-		};
+			case ($object instanceof entry):
+			{
+				$delayedLockedJobs = BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
+				break;
+			}
+		}
 
 		if (count($delayedLockedJobs) > 0)
 		{
@@ -2986,12 +2990,18 @@ class kFlowHelper
 				if ($delayedJob)
 				{
 					$jobData = $delayedJob->getData();
-					/* @var $jobData kEventNotificationDispatchJobData */
-					match (true)
+					if ($jobData)
 					{
-						$jobData->getEventDelayedConditions() == EventNotificationDelayedConditions::PENDING_ENTRY_READY =>
-							kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING)
-					};
+						/* @var $jobData kEventNotificationDispatchJobData */
+						switch (true)
+						{
+							case ($jobData->getEventDelayedConditions() == EventNotificationDelayedConditions::PENDING_ENTRY_READY):
+								{
+									kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING);
+									break;
+								}
+						}
+					}
 				}
 				else
 				{
