@@ -568,7 +568,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			if (!isset($participantsList['items']))
 			{
 				KalturaLog::warning("Error getting meeting participants from Webex for meeting id [$meetingId], response: " . print_r($participantsList, true));
-				continue;
+				// When getting an empty list we should break the while loop as it won't do anything to continue and try again
+				break;
 			}
 			KalturaLog::info("Webex meeting id [$meetingId] has [" . count($participantsList['items']) . '] participants');
 			list($parsedCoHosts, $parsedUsers) = $this->parseAdditionalUsers($participantsList['items']);
