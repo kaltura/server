@@ -26,17 +26,15 @@ class VendorLiveCaptionCatalogItem extends VendorLiveCatalogItem
 			$latestEvent = $object;
 		}
 
+		$data = new kScheduledVendorTaskData();
 		if($latestEvent)
 		{
-			$data = new kScheduledVendorTaskData();
 			$data->setEntryDuration($latestEvent->getDuration()*1000);
 			$data->setStartDate(intval($latestEvent->getStartDate()));
 			$data->setEndDate(intval($latestEvent->getEndDate()));
 			$data->setScheduledEventId($latestEvent->getId());
-
-			return $data;
 		}
 
-		return null;
+		return $data;
 	}
 }
