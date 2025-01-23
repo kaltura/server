@@ -4550,30 +4550,35 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function genericEnrichWithCustomValues($objectIds, $partnerId, $context)
+	protected static function genericEnrichFromSingleLayerCache($objectIds, $partnerId, $context)
 	{
-		$peer = $context['peer'];
-		$property = $context['property'];
-
-		if (!class_exists($peer))
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cache)
 		{
-			KalturaLog::log("Peer class $peer not found!");
+			KalturaLog::log(kCacheManager::CACHE_TYPE_PLAYS_VIEWS . ' cache not found!');
 			return;
 		}
 
-		$objects = $peer::retrieveByPKs($objectIds);
+		$cacheKeys = array_combine($objectIds, array_map(function($objectId){
+			return "plays_views_$objectId";
+		}, $objectIds));
+
+		$fieldName = $context['fieldName'];
+		$format = $context['dateFormat'] ?? null;
 
 		$result = [];
-		foreach ($objects as $object)
+		foreach($cacheKeys as $objectId => $cacheKey)
 		{
-			$getter_callback = array ( $object ,"get{$property}");
-			if (!is_callable($getter_callback))
+			$cacheResult = $cache->get($cacheKey);
+			if ($cacheResult)
 			{
-				KalturaLog::log("Getter for $property not found!");
-				return;
+				$cacheResult = json_decode($cacheResult, true);
+				$result[$objectId] = $cacheResult[$fieldName];
+				if ($format)
+				{
+					$result[$objectId] = date($format, $result[$objectId]);
+				}
 			}
-
-			$result[$object->id] = call_user_func($getter_callback);
 		}
 
 		return $result;
