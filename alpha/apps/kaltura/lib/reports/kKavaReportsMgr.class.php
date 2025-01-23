@@ -4552,15 +4552,17 @@ class kKavaReportsMgr extends kKavaBase
 
 	protected static function genericEnrichFromSingleLayerCache($objectIds, $partnerId, $context)
 	{
-		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		$cacheType = $context['cacheType'];
+		$cacheKeyPrefix = $context['cacheKeyPrefix'];
+		$cache = kCacheManager::getSingleLayerCache($cacheType);
 		if (!$cache)
 		{
-			KalturaLog::log(kCacheManager::CACHE_TYPE_PLAYS_VIEWS . ' cache not found!');
+			KalturaLog::log($cacheType . ' cache not found!');
 			return;
 		}
 
-		$cacheKeys = array_combine($objectIds, array_map(function($objectId){
-			return "plays_views_$objectId";
+		$cacheKeys = array_combine($objectIds, array_map(function($objectId) use ($cacheKeyPrefix){
+			return $cacheKeyPrefix . $objectId;
 		}, $objectIds));
 
 		$fieldName = $context['fieldName'];
