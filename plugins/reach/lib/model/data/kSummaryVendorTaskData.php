@@ -6,13 +6,10 @@
  */
 class kSummaryVendorTaskData extends kVendorTaskData
 {
-	protected String $typeOfSummary;
-
-	protected String  $writingStyle;
-
-	protected ?String $language;
-
-	protected ?string $summaryOutputJson = null;
+	protected $typeOfSummary;
+	protected $writingStyle;
+	protected $language;
+	protected $summaryOutputJson = null;
 
 	public function __construct()
 	{

@@ -6,12 +6,12 @@
  */
 class kQuizVendorTaskData extends kVendorTaskData
 {
-	public int $numberOfQuestions = 0;
-	public ?string $questionsType = null;
-	public string $context = "";
-	public ?string $formalStyle = null;
-	public bool $createQuiz = True;
-	public ?string $quizOutput = null;
+	public $numberOfQuestions = 0;
+	public $questionsType = null;
+	public $context = "";
+	public $formalStyle = null;
+	public $createQuiz = True;
+	public $quizOutput = null;
 
 	public function getNumberOfQuestions(): int
 	{
