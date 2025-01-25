@@ -129,6 +129,7 @@ class infraRequestUtils
 			header("Cache-Control: $cache_scope, max-age=$max_age, max-stale=0");
 			header('Expires: ' . self::formatHttpTime(time() + $max_age));
 			header('Last-modified: ' . self::formatHttpTime($last_modified));
+			header("Pragma: cache" );
 		}
 		else
 		{
