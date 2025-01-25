@@ -187,13 +187,20 @@ class embedIframeJsAction extends sfAction
 			return;
 		}
 
+		$targetId='';
+		//In v2 'playerId' turns to 'targetId' in v7
+		if($this->getRequestParameter('autoembed'))
+		{
+			$targetId = '&targetId=' . $this->getRequestParameter('playerId');
+		}
 
 		$shouldTranslatePluginsQueryParam = $shouldTranslatePlugins ? '&' . v2RedirectUtils::SHOULD_TRANSLATE_PLUGINS . '=true' : '' ;
 		$host = myPartnerUtils::getCdnHost($partnerId, null , 'api');
 		$url = $host . '/p/' . $partnerId  . '/embedPlaykitJs/uiconf_id/' . $v7Id . '?'
 				. $_SERVER['QUERY_STRING'] . $playListQueryParam . '&'
 				. v2RedirectUtils::V2REDIRECT_PARAM_NAME .'=true'
-				. $shouldTranslatePluginsQueryParam;
+				. $shouldTranslatePluginsQueryParam
+				. $targetId;
 
 		requestUtils::sendCachingHeaders(600, false, time());
 		kFile::cacheRedirect($url);
