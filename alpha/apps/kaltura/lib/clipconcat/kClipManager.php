@@ -1687,7 +1687,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			if(isset($conversionData[self::EXTRA_CONVERSION_PARAMS]))
 			{
-				$extraParams = $extraParams . $conversionData[self::EXTRA_CONVERSION_PARAMS];
+				$extraParams .= $conversionData[self::EXTRA_CONVERSION_PARAMS];
 			}
 		}
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
