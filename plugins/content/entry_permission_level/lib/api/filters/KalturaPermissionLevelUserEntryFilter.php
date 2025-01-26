@@ -13,7 +13,7 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 	/**
 	 * @var int
 	 */
-	public $permissionLevelsBitmask;
+	private $permissionLevelsBitmask;
 
 	static private $map_between_objects = array
 	(
