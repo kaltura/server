@@ -1879,7 +1879,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$mappedFilters = "";
 		if(count($sortedFilters) == 1 && isset($sortedFilters["whiteBackground"]))
 		{
-			return "[0]" . $sortedFilters[0];
+			return "[0]" . $sortedFilters["whiteBackground"];
 		}
 		if(count($sortedFilters) > 0)
 		{
