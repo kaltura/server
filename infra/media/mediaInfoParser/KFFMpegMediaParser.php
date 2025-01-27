@@ -376,7 +376,7 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($stream->tags) && isset($stream->tags->rotate)){
 			$mediaInfo->videoRotation = trim($stream->tags->rotate);
 		}
-			// in post FFM4.4 versions, the 'tags:rotate' was removed, 
+			// in post FFM4.4 versions, the 'tags:rotate' (old QuickTime-style) was removed,
 			// in favor of 'stream::side_data_list[]rotation' field.
 			// both appeared in FFM4, making one of them redundant, hence removed.
 		else if(isset($stream->side_data_list)) {
@@ -385,7 +385,30 @@ class KFFMpegMediaParser extends KBaseMediaParser
 			$rv = array_reduce($stream->side_data_list, function($carry, $obj) {
 							return $carry ?? (property_exists($obj, 'rotation') ? $obj->rotation : null);
 							}, null);
-			if(isset($rv)) $mediaInfo->videoRotation=abs($rv);
+			if(isset($rv)) {
+			// FFM4 'stream:tags:rotate' represents counterclockwise rotation.
+			// while the FFM6 'stream::side_data_list[]rotation' represents clockwise rotation.
+			// since the 'rotation' in Kaltura uses the 'tags:rotate' vals,
+			// the new 'stream::side_data_list[]rotation' vals should be transformed into the old mode.
+				switch($rv){
+				case 0:
+					$mediaInfo->videoRotation=0;
+					break;
+				case -90:
+					$mediaInfo->videoRotation=90;
+					break;
+				case 90:
+					$mediaInfo->videoRotation=270;
+					break;
+				case -180:
+					$mediaInfo->videoRotation=180;
+					break;
+				default:
+					$nirv=((-1*$rv)+360)%360;
+					$mediaInfo->videoRotation=$nirv;
+					break;
+				}
+			}
 		}
 		$mediaInfo->scanType = 0; // default 0/progressive
 		

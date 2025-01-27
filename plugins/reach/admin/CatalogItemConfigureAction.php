@@ -39,32 +39,6 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 			{
 				$formData = $action->getRequest()->getPost();
 				$form->populate($formData);
-				if ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAlignmentCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorExtendedAudioDescriptionCatalogItem', $formData, false, true);
-				elseif ($formData['type'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorChapteringCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorDubbingCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorClipsCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorQuizCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorSummaryCatalogItem', $formData, false, true);
-				elseif ($formData['catalogItemTypeForView'] == Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItem', $formData, false, true);
 			}
 		}
 		$action->view->form = $form;

@@ -251,75 +251,47 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
  	 */
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$object = null;
-		switch ($sourceObject->getServiceFeature())
+		$object = self::getObjectByServiceFeature($sourceObject->getServiceFeature());
+
+		$object->fromObject($sourceObject, $responseProfile);
+
+		return $object;
+	}
+
+	public static function getObjectByServiceFeature($serviceFeature)
+	{
+		switch ($serviceFeature)
 		{
 			case VendorServiceFeature::CAPTIONS:
-				$object = new KalturaVendorCaptionsCatalogItem();
-				break;
-
+				return new KalturaVendorCaptionsCatalogItem();
 			case VendorServiceFeature::TRANSLATION:
-				$object = new KalturaVendorTranslationCatalogItem();
-				break;
-
+				return new KalturaVendorTranslationCatalogItem();
 			case VendorServiceFeature::ALIGNMENT:
-				$object = new KalturaVendorAlignmentCatalogItem();
-				break;
-
+				return new KalturaVendorAlignmentCatalogItem();
 			case VendorServiceFeature::AUDIO_DESCRIPTION:
-				$object = new KalturaVendorAudioDescriptionCatalogItem();
-				break;
-
-			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
-				$object = new KalturaVendorExtendedAudioDescriptionCatalogItem();
-				break;
-
+				return new KalturaVendorAudioDescriptionCatalogItem();
 			case VendorServiceFeature::CHAPTERING:
-				$object = new KalturaVendorChapteringCatalogItem();
-				break;
-
-			case VendorServiceFeature::DUBBING:
-				$object = new KalturaVendorDubbingCatalogItem();
-				break;
-
+				return new KalturaVendorChapteringCatalogItem();
 			case VendorServiceFeature::INTELLIGENT_TAGGING:
-				$object = new KalturaVendorIntelligentTaggingCatalogItem();
-				break;
-
+				return new KalturaVendorIntelligentTaggingCatalogItem();
+			case VendorServiceFeature::DUBBING:
+				return new KalturaVendorDubbingCatalogItem();
 			case VendorServiceFeature::LIVE_CAPTION:
-				$object = new KalturaVendorLiveCaptionCatalogItem();
-				break;
-
+				return new KalturaVendorLiveCaptionCatalogItem();
+			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
+				return new KalturaVendorExtendedAudioDescriptionCatalogItem();
 			case VendorServiceFeature::CLIPS:
-				$object = new KalturaVendorClipsCatalogItem();
-				break;
-
+				return new KalturaVendorClipsCatalogItem();
 			case VendorServiceFeature::LIVE_TRANSLATION:
-				$object = new KalturaVendorLiveTranslationCatalogItem();
-				break;
-
+				return new KalturaVendorLiveTranslationCatalogItem();
 			case VendorServiceFeature::QUIZ:
-				$object = new KalturaVendorQuizCatalogItem();
-				break;
-
+				return new KalturaVendorQuizCatalogItem();
 			case VendorServiceFeature::SUMMARY:
-				$object = new KalturaVendorSummaryCatalogItem();
-				break;
-
+				return new KalturaVendorSummaryCatalogItem();
 			case VendorServiceFeature::VIDEO_ANALYSIS:
-				$object = new KalturaVendorVideoAnalysisCatalogItem();
-				break;
-
+				return new KalturaVendorVideoAnalysisCatalogItem();
 			default:
-				$object = new KalturaVendorCaptionsCatalogItem();
-				break;
+				return new KalturaVendorCaptionsCatalogItem();
 		}
-
-		if (!$object)
-			return null;
-
-		/* @var $object KalturaVendorCatalogItem */
-		$object->fromObject($sourceObject, $responseProfile);
-		return $object;
 	}
 }

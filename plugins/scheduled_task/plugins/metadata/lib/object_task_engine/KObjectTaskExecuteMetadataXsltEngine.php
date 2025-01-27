@@ -35,7 +35,7 @@ class KObjectTaskExecuteMetadataXsltEngine extends KObjectTaskEntryEngineBase
 			return;
 		}
 
-		$xsltFilePath = sys_get_temp_dir().'/xslt_'.time(true).'.xslt';
+		$xsltFilePath = sys_get_temp_dir().'/xslt_'.time().'.xslt';
 		file_put_contents($xsltFilePath, $xslt);
 		$metadataId = $metadataResult->objects[0]->id;
 		$metadataPlugin->metadata->updateFromXSL($metadataId, $xsltFilePath);

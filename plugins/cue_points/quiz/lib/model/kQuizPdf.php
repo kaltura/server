@@ -101,8 +101,8 @@ class kQuizPdf
 		$stylePrefix = $this->getStylePrefix($title);
 		$this->pdf->addTitle($title, $this->styles[$stylePrefix.self::TITLE_STYLE]);
 		$this->pdf->setOutFileName($dbEntry->getName());
-		$questionType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
-		$questions = CuePointPeer::retrieveByEntryId($this->entryId, array($questionType));
+		$cuePointType = QuizPlugin::getCuePointTypeCoreValue(QuizCuePointType::QUIZ_QUESTION);
+		$questions = CuePointPeer::retrieveByEntryId($this->entryId, array($cuePointType));
 		$questNum = 0;
 		foreach ($questions as $question)
 		{
@@ -111,14 +111,17 @@ class kQuizPdf
 			$this->pdf->addList($questNum, $question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
 			$alphabet = range('A', 'Z');
 			$ansIdx = 0;
-			foreach ($question->getOptionalAnswers() as $optionalAnswer)
+			if($question->getQuestionType() !== QuestionType::OPEN_QUESTION)
 			{
-				if ($ansIdx < sizeof($alphabet))
+				foreach ($question->getOptionalAnswers() as $optionalAnswer)
 				{
-					$text = $optionalAnswer->getText();
-					$stylePrefix = $this->getStylePrefix($text);
-					$this->pdf->addList($alphabet[$ansIdx] . '.', $text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
-					$ansIdx += 1;
+					if ($ansIdx < sizeof($alphabet))
+					{
+						$text = $optionalAnswer->getText();
+						$stylePrefix = $this->getStylePrefix($text);
+						$this->pdf->addList($alphabet[$ansIdx] . '.', $text, $this->styles[$stylePrefix . self::INDENT_LIST_STYLE]);
+						$ansIdx += 1;
+					}
 				}
 			}
 		}

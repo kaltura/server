@@ -191,6 +191,8 @@ class kKavaBase extends kDruidBase
 
 	// event types - application events
 	const EVENT_TYPE_PAGE_LOAD = 'pageLoad';
+	const EVENT_TYPE_BUTTON_CLICKED = 'buttonClicked';
+	const EVENT_TYPE_QR_CODE_SCANNED = 'qrCodeScanned';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -853,6 +855,26 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR4 => 1,
 			self::DIMENSION_EVENT_SESSION_CONTEXT_ID => 1,
 			self::DIMENSION_POSITION => 1,
+		),
+		self::DATASOURCE_APPLICATION_EVENTS => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_ENTRY_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_LOCATION_COUNTRY => 1,
+			self::DIMENSION_LOCATION_REGION => 1,
+			self::DIMENSION_LOCATION_CITY => 1,
+			self::DIMENSION_BROWSER_FAMILY => 1,
+			self::DIMENSION_BROWSER => 1,
+			self::DIMENSION_OS_FAMILY => 1,
+			self::DIMENSION_OS => 1,
+			self::DIMENSION_DEVICE => 1,
+			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_EVENT_VAR2 => 1,
+			self::DIMENSION_EVENT_VAR3 => 1,
+			self::DIMENSION_EVENT_VAR4 => 1,
+			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
 		)
 	);
 
