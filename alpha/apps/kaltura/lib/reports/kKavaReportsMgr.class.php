@@ -398,6 +398,8 @@ class kKavaReportsMgr extends kKavaBase
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
 
+	const COLUMN_FORMAT_STANDARD_DATE = 'date';
+
 	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
 
 	const SCHEDULE_EVENT_PAST_DATE = 1577836800; // 1.1.2020
@@ -4565,21 +4567,37 @@ class kKavaReportsMgr extends kKavaBase
 			return $cacheKeyPrefix . $objectId;
 		}, $objectIds));
 
-		$fieldName = $context['fieldName'];
-		$format = $context['dateFormat'] ?? null;
+
+		$cacheResult = $cache->multiGet($cacheKeys);
+		$fieldNames = $context['fieldNames'];
 
 		$result = [];
 		foreach($cacheKeys as $objectId => $cacheKey)
 		{
-			$cacheResult = $cache->get($cacheKey);
-			if ($cacheResult)
+			if ($cacheResult[$cacheKey])
 			{
-				$cacheResult = json_decode($cacheResult, true);
-				$result[$objectId] = $cacheResult[$fieldName];
-				if ($format)
+				$singleCacheResult = json_decode($cacheResult[$cacheKey], true);
+				$objectResult = [];
+				foreach ($fieldNames as $fieldName)
 				{
-					$result[$objectId] = date($format, $result[$objectId]);
+					$format = null;
+					if(strpos($fieldName, 'DATE(') !== null)
+					{
+						$format = self::COLUMN_FORMAT_STANDARD_DATE;
+						$fieldName = substr($fieldName,5, -1);
+					}
+
+					switch($format)
+					{
+						case self::COLUMN_FORMAT_STANDARD_DATE:
+							$objectResult[] = date('Y-m-d H:i:s', $singleCacheResult[$fieldName]);
+							break;
+						default:
+							$objectResult[] = $singleCacheResult[$fieldName];
+					}
 				}
+
+				$result[$objectId] = $objectResult;
 			}
 		}
 
