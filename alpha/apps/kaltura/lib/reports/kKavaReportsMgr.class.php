@@ -398,8 +398,6 @@ class kKavaReportsMgr extends kKavaBase
 	const COLUMN_FORMAT_QUOTE = 'quote';
 	const COLUMN_FORMAT_UNIXTIME = 'unixtime';
 
-	const COLUMN_FORMAT_STANDARD_DATE = 'date';
-
 	const EMPTY_INTERVAL = '2010-01-01T00Z/2010-01-01T00Z';
 
 	const SCHEDULE_EVENT_PAST_DATE = 1577836800; // 1.1.2020
