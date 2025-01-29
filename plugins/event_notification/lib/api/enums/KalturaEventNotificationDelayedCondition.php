@@ -4,6 +4,6 @@
  * @subpackage api.enum
  * @see EventNotificationTemplateStatus
  */
-class KalturaEventNotificationDelayedConditions extends KalturaEnum implements EventNotificationDelayedConditions
+class KalturaEventNotificationDelayedCondition extends KalturaEnum implements EventNotificationDelayedCondition
 {
 }

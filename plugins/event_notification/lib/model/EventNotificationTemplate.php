@@ -21,7 +21,7 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 	const CUSTOM_DATA_MANUAL_DISPATCH_ENABLED = 'manualDispatchEnabled';
 	const CUSTOM_DATA_AUTOMATIC_DISPATCH_ENABLED = 'automaticDispatchEnabled';
 	const CUSTOM_DATA_URL_ENCODE = 'urlEncode';
-	const EVENT_DELAYED_CONDITIONS = 'eventDelayedConditions';
+	const EVENT_DELAYED_CONDITION = 'eventDelayedCondition';
 
 	/**
 	 * Dispatch the event notification
@@ -60,14 +60,14 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 		return array("eventNotificationTemplate:id=".strtolower($this->getId()), "eventNotificationTemplate:partnerId=".strtolower($this->getPartnerId()));
 	}
 
-	public function setEventDelayedConditions($v)
+	public function setEventDelayedCondition($v)
 	{
-		return $this->putInCustomData(self::EVENT_DELAYED_CONDITIONS, $v);
+		return $this->putInCustomData(self::EVENT_DELAYED_CONDITION, $v);
 	}
 
-	public function getEventDelayedConditions()
+	public function getEventDelayedCondition()
 	{
-		return $this->getFromCustomData(self::EVENT_DELAYED_CONDITIONS, null, null);
+		return $this->getFromCustomData(self::EVENT_DELAYED_CONDITION, null, null);
 	}
 	
 	public function getContentParametersKeyValueArray()

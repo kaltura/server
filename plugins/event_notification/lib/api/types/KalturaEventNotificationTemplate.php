@@ -118,10 +118,10 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 	/**
 	 * Event batch job will be delayed until specific condition criteria is met
 	 *
-	 * @var KalturaEventNotificationDelayedConditions
+	 * @var KalturaEventNotificationDelayedCondition
 	 * @requiresPermission update
 	 */
-	public $eventDelayedConditions;
+	public $eventDelayedCondition;
 	
 	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
@@ -142,7 +142,7 @@ class KalturaEventNotificationTemplate extends KalturaObject implements IFiltera
 		'eventConditions',
 		'contentParameters',
 		'userParameters',
-		'eventDelayedConditions'
+		'eventDelayedCondition'
 	);
 		 
 	/* (non-PHPdoc)

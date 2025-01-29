@@ -2970,43 +2970,40 @@ class kFlowHelper
 
 	public static function handleDelayedNotification($object)
 	{
-		$delayedLockedJobs = [];
+		$delayedJobLocks = [];
 		switch (true)
 		{
 			case ($object instanceof entry):
 			{
-				$delayedLockedJobs = BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
+				$delayedJobLocks = BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
 				break;
 			}
 		}
 
-		if (count($delayedLockedJobs) > 0)
+		foreach ($delayedJobLocks as $jobLock)
 		{
-			foreach ($delayedLockedJobs as $job)
+			/* @var $jobLock BatchJobLock */
+			$delayedJob = BatchJobPeer::retrieveByPK($jobLock->getId());
+			/* @var $delayedJob BatchJob */
+			if ($delayedJob)
 			{
-				/* @var $job BatchJobLock */
-				$delayedJob = BatchJobPeer::retrieveByPK($job->getId());
-				/* @var $job BatchJob */
-				if ($delayedJob)
+				$jobData = $delayedJob->getData();
+				if ($jobData && $jobData instanceof kEventNotificationDispatchJobData)
 				{
-					$jobData = $delayedJob->getData();
-					if ($jobData)
+					/* @var $jobData kEventNotificationDispatchJobData */
+					switch (true)
 					{
-						/* @var $jobData kEventNotificationDispatchJobData */
-						switch (true)
-						{
-							case ($jobData->getEventDelayedConditions() == EventNotificationDelayedConditions::PENDING_ENTRY_READY):
-								{
-									kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING);
-									break;
-								}
-						}
+						case ($jobData->getEventDelayedCondition() == EventNotificationDelayedCondition::PENDING_ENTRY_READY):
+							{
+								kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING);
+								break;
+							}
 					}
 				}
-				else
-				{
-					KalturaLog::err('Batch Job [' . $job->getId() . '] is in Lock table but not in Sep table.');
-				}
+			}
+			else
+			{
+				KalturaLog::err('Batch Job [' . $jobLock->getId() . '] is in Lock table but not in Sep table.');
 			}
 		}
 	}

@@ -129,16 +129,16 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 
 	public function areDelayedEventConditionsMet(&$jobData, $objectId = null)
 	{
-		$delayedEventConditions = $this->getEventDelayedConditions();
+		$delayedEventConditions = $this->getEventDelayedCondition();
 		if ($delayedEventConditions)
 		{
 			switch ($delayedEventConditions)
 			{
-				case EventNotificationDelayedConditions::PENDING_ENTRY_READY:
+				case EventNotificationDelayedCondition::PENDING_ENTRY_READY:
 				{
 					if ($objectId)
 					{
-						$jobData->setEventDelayedConditions(EventNotificationDelayedConditions::PENDING_ENTRY_READY);
+						$jobData->setEventDelayedCondition(EventNotificationDelayedCondition::PENDING_ENTRY_READY);
 						$entry = BaseentryPeer::retrieveByPK($objectId);
 						if ($entry)
 						{
