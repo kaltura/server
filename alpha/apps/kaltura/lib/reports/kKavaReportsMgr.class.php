@@ -4552,14 +4552,12 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function genericEnrichFromSingleLayerCache($objectIds, $partnerId, $context)
+	protected static function getEntryLastPlayedAt($objectIds, $partnerId, $context)
 	{
-		$cacheType = $context['cacheType'];
-		$cacheKeyPrefix = $context['cacheKeyPrefix'];
-		$cache = kCacheManager::getSingleLayerCache($cacheType);
+		$cacheKeyPrefix = entry::PLAYSVIEWS_CACHE_KEY_PREFIX;
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
 		if (!$cache)
 		{
-			KalturaLog::log($cacheType . ' cache not found!');
 			return;
 		}
 
@@ -4569,34 +4567,15 @@ class kKavaReportsMgr extends kKavaBase
 
 
 		$cacheResult = $cache->multiGet($cacheKeys);
-		$fieldNames = $context['fieldNames'];
 
 		$result = [];
 		foreach($cacheKeys as $objectId => $cacheKey)
 		{
+			$singleCacheResult = json_decode($cacheResult[$cacheKey], true);
+
 			if ($cacheResult[$cacheKey])
 			{
-				$singleCacheResult = json_decode($cacheResult[$cacheKey], true);
-				$objectResult = [];
-				foreach ($fieldNames as $fieldName)
-				{
-					$format = null;
-					if(strpos($fieldName, 'DATE(') !== null)
-					{
-						$format = self::COLUMN_FORMAT_STANDARD_DATE;
-						$fieldName = substr($fieldName,5, -1);
-					}
-
-					switch($format)
-					{
-						case self::COLUMN_FORMAT_STANDARD_DATE:
-							$objectResult[] = date('Y-m-d H:i:s', $singleCacheResult[$fieldName]);
-							break;
-						default:
-							$objectResult[] = $singleCacheResult[$fieldName];
-					}
-				}
-
+				$objectResult = date('Y-m-d H:i:s', $singleCacheResult['last_played_at']);
 				$result[$objectId] = $objectResult;
 			}
 		}
