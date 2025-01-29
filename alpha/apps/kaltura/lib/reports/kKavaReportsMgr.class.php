@@ -4556,6 +4556,37 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getEntryLastPlayedAt($objectIds, $partnerId, $context)
+	{
+		$cacheKeyPrefix = entry::PLAYSVIEWS_CACHE_KEY_PREFIX;
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cache)
+		{
+			return;
+		}
+
+		$cacheKeys = array_combine($objectIds, array_map(function($objectId) use ($cacheKeyPrefix){
+			return $cacheKeyPrefix . $objectId;
+		}, $objectIds));
+
+
+		$cacheResult = $cache->multiGet($cacheKeys);
+
+		$result = [];
+		foreach($cacheKeys as $objectId => $cacheKey)
+		{
+			$singleCacheResult = json_decode($cacheResult[$cacheKey], true);
+
+			if ($cacheResult[$cacheKey])
+			{
+				$objectResult = date('Y-m-d H:i:s', $singleCacheResult['last_played_at']);
+				$result[$objectId] = $objectResult;
+			}
+		}
+
+		return $result;
+	}
+
 	protected static function getCategoriesNames($ids, $partner_id)
 	{
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
