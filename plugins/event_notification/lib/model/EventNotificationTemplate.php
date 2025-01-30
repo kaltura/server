@@ -67,7 +67,7 @@ abstract class EventNotificationTemplate extends BaseEventNotificationTemplate i
 
 	public function getEventDelayedCondition()
 	{
-		return $this->getFromCustomData(self::EVENT_DELAYED_CONDITION, null, null);
+		return $this->getFromCustomData(self::EVENT_DELAYED_CONDITION);
 	}
 	
 	public function getContentParametersKeyValueArray()

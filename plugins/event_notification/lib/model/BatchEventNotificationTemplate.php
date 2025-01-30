@@ -130,24 +130,18 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 	public function areDelayedEventConditionsMet(&$jobData, $objectId = null)
 	{
 		$delayedEventConditions = $this->getEventDelayedCondition();
-		if ($delayedEventConditions)
+		if ($delayedEventConditions && $delayedEventConditions == EventNotificationDelayedCondition::PENDING_ENTRY_READY)
 		{
-			switch ($delayedEventConditions)
+			if ($objectId)
 			{
-				case EventNotificationDelayedCondition::PENDING_ENTRY_READY:
+				$jobData->setEventDelayedCondition(EventNotificationDelayedCondition::PENDING_ENTRY_READY);
+				$entry = BaseentryPeer::retrieveByPK($objectId);
+				if ($entry)
 				{
-					if ($objectId)
-					{
-						$jobData->setEventDelayedCondition(EventNotificationDelayedCondition::PENDING_ENTRY_READY);
-						$entry = BaseentryPeer::retrieveByPK($objectId);
-						if ($entry)
-						{
-							return $entry->getStatus() !== entryStatus::READY;
-						}
-					}
-					KalturaLog::err('Template set to delay BatchJob completion until entry in READY state but entryId is [' . $objectId . ']');
+					return $entry->getStatus() !== entryStatus::READY;
 				}
 			}
+			KalturaLog::warning('Template set to delay BatchJob completion until entry in READY state but entryId is [' . $objectId . ']');
 		}
 		return false;
 	}

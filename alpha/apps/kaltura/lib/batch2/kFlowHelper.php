@@ -2971,13 +2971,9 @@ class kFlowHelper
 	public static function handleDelayedNotification($object)
 	{
 		$delayedJobLocks = [];
-		switch (true)
+		if ($object instanceof entry)
 		{
-			case ($object instanceof entry):
-			{
-				$delayedJobLocks = BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
-				break;
-			}
+			$delayedJobLocks = BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
 		}
 
 		foreach ($delayedJobLocks as $jobLock)
