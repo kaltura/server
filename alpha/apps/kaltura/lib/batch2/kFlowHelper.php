@@ -2967,6 +2967,42 @@ class kFlowHelper
 			$entry->save();
 		}
 	}
+
+	public static function handleDelayedNotification($object)
+	{
+		$delayedJobLocks = [];
+		if ($object instanceof entry)
+		{
+			$delayedJobLocks = BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
+		}
+
+		foreach ($delayedJobLocks as $jobLock)
+		{
+			/* @var $jobLock BatchJobLock */
+			$delayedJob = BatchJobPeer::retrieveByPK($jobLock->getId());
+			/* @var $delayedJob BatchJob */
+			if ($delayedJob)
+			{
+				$jobData = $delayedJob->getData();
+				if ($jobData && $jobData instanceof kEventNotificationDispatchJobData)
+				{
+					/* @var $jobData kEventNotificationDispatchJobData */
+					switch (true)
+					{
+						case ($jobData->getEventDelayedCondition() == EventNotificationDelayedCondition::PENDING_ENTRY_READY):
+							{
+								kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING);
+								break;
+							}
+					}
+				}
+			}
+			else
+			{
+				KalturaLog::err('Batch Job [' . $jobLock->getId() . '] is in Lock table but not in Sep table.');
+			}
+		}
+	}
 	
 	/**
 	 * @param entry $entry

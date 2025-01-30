@@ -116,8 +116,33 @@ abstract class BatchEventNotificationTemplate extends EventNotificationTemplate
 		
 		$batchJob = kJobsManager::addJob($batchJob, $jobData, $jobType, $eventNotificationType);
 		$jobData->setJobId($batchJob->getId());
+
+		$batchJobStatus = BatchJob::BATCHJOB_STATUS_PENDING;
+		if ($this->areDelayedEventConditionsMet($jobData, $entryId))
+		{
+			$batchJobStatus = BatchJob::BATCHJOB_STATUS_DELAYED;
+		}
+
 		$batchJob->setData($jobData);
-		
-		return kJobsManager::updateBatchJob($batchJob, BatchJob::BATCHJOB_STATUS_PENDING);
+		return kJobsManager::updateBatchJob($batchJob, $batchJobStatus);
+	}
+
+	public function areDelayedEventConditionsMet(&$jobData, $objectId = null)
+	{
+		$delayedEventConditions = $this->getEventDelayedCondition();
+		if ($delayedEventConditions && $delayedEventConditions == EventNotificationDelayedCondition::PENDING_ENTRY_READY)
+		{
+			if ($objectId)
+			{
+				$jobData->setEventDelayedCondition(EventNotificationDelayedCondition::PENDING_ENTRY_READY);
+				$entry = BaseentryPeer::retrieveByPK($objectId);
+				if ($entry)
+				{
+					return $entry->getStatus() !== entryStatus::READY;
+				}
+			}
+			KalturaLog::warning('Template set to delay BatchJob completion until entry in READY state but entryId is [' . $objectId . ']');
+		}
+		return false;
 	}
 }

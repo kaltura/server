@@ -20,8 +20,8 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	);
 	
 	const COUNT = 'COUNT(batch_job_lock.ID)';
-	
-	
+
+
 	/**
 	 * This function returns a list of all job statuses that still require scheduling
 	 * and therefore a lock object should appear for them in the lock table.
@@ -35,7 +35,8 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 			BatchJob::BATCHJOB_STATUS_RETRY,
 			BatchJob::BATCHJOB_STATUS_PROCESSING,
 			BatchJob::BATCHJOB_STATUS_PROCESSED,
-			BatchJob::BATCHJOB_STATUS_MOVEFILE
+			BatchJob::BATCHJOB_STATUS_MOVEFILE,
+			BatchJob::BATCHJOB_STATUS_DELAYED
 		);
 	}
 	
@@ -242,5 +243,13 @@ class BatchJobLockPeer extends BaseBatchJobLockPeer {
 	        $c->add(self::JOB_SUB_TYPE, $jobSubTypes, Criteria::IN);
 	
 	    return self::doSelect($c);
+	}
+
+	public static function retrieveByEntryIdAndStatus($obj_id, $status)
+	{
+		$c = new Criteria();
+		$c->add ( self::ENTRY_ID , $obj_id );
+		$c->add ( self::STATUS , $status );
+		return self::doSelect( $c );
 	}
 } // BatchJobLockPeer
