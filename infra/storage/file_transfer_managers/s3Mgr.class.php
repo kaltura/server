@@ -132,18 +132,10 @@ class s3Mgr extends kFileTransferMgr
 			return $this->generateCachedCredentialsS3Client();
 		}
 		
-		// use the given ARN and Region
-		if ($s3Region)
-		{
-			KalturaLog::debug("Login using ARN [ $s3IAMRole ] and region [ $s3Region ]");
-			$this->s3Arn = $s3IAMRole;
-			$this->s3Region = $s3Region;
-			
-			return $this->generateCachedCredentialsS3Client($dirnameSuffix);
-		}
+		$this->s3Arn = $s3IAMRole;
+		KalturaLog::debug("Login using ARN [ $s3IAMRole ] and region [ $s3Region ]");
 		
-		KalturaLog::err("Missing 's3Region' in Drop Folder config - cannot assume customer ARN [ $s3IAMRole ]");
-		return false;
+		return $this->generateCachedCredentialsS3Client($dirnameSuffix);
 	}
 
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
@@ -604,7 +596,7 @@ class s3Mgr extends kFileTransferMgr
 	{
 		if (!class_exists($className))
 		{
-			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
+			KalturaLog::err("Class [ $className ] was not found!!");
 			return false;
 		}
 		
