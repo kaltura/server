@@ -35,7 +35,7 @@ class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureE
 		$this->addElement('text', 's3IAMRole', array(
 			'label'			=> 'IAM Role:',
 			'filters'		=> array('StringTrim'),
-			'description' => 'If set to "true" - we use Kaltura IAM role (bucket must allow Kaltura EC2 role to operate on it)',
+			'description' => 'If set to "true" - we use Kaltura ARN (bucket must allow Kaltura EC2 role to operate on it)',
 		));
 	}
 

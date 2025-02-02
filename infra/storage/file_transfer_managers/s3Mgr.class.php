@@ -83,12 +83,10 @@ class s3Mgr extends kFileTransferMgr
 		if (class_exists('KBatchBase'))
 		{
 			$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
-			$this->s3Region = kBatchUtils::getKconfParam('s3Region', true);
 		}
 		else
 		{
 			$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
-			$this->s3Region = kConf::getArrayValue('s3Region', 'storage_options', 'cloud_storage', null);
 		}
 
 		// do nothing
@@ -129,6 +127,8 @@ class s3Mgr extends kFileTransferMgr
 		if (!$isValidIAMRole)
 		{
 			KalturaLog::debug("IAM Role [ $s3IAMRole ] is not valid - attempting access to S3 bucket using Kaltura s3Arn");
+			$this->s3Region = $this->getInternalS3Region();
+			
 			return $this->generateCachedCredentialsS3Client();
 		}
 		
@@ -609,5 +609,15 @@ class s3Mgr extends kFileTransferMgr
 		}
 		
 		return true;
+	}
+	
+	private function getInternalS3Region()
+	{
+		if (class_exists('KBatchBase'))
+		{
+			return kBatchUtils::getKconfParam('s3Region', true);
+		}
+		
+		return kConf::getArrayValue('s3Region', 'storage_options', 'cloud_storage', null);
 	}
 }
