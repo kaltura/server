@@ -285,6 +285,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 
 		$host =null; $username=null; $password=null; $port=null;
 		$privateKey = null; $publicKey = null;
+		$s3IAMRole = null;
+		$s3Region = null;
 
 		if($dropFolder instanceof KalturaRemoteDropFolder)
 		{
@@ -304,6 +306,8 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$host = $dropFolder->s3Host;
 			$username = $dropFolder->s3UserId;
 			$password = $dropFolder->s3Password;
+			$s3IAMRole = $dropFolder->s3IAMRole;
+			$s3Region = $dropFolder->s3Region;
 		}
 
 		// login to server
@@ -312,6 +316,11 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 			$privateKeyFile = $privateKey ? kFile::createTempFile($privateKey, 'privateKey') : null;
 			$publicKeyFile = $publicKey ? kFile::createTempFile($publicKey, 'publicKey'): null;
 			$fileTransferMgr->loginPubKey($host, $username, $publicKeyFile, $privateKeyFile, $passPhrase, $port);
+		}
+		elseif ($s3IAMRole && $s3Region)
+		{
+			$dirnameSuffix = '_drop_folder_id_' . $dropFolder->id;
+			$fileTransferMgr->loginIAMRole($s3IAMRole, $s3Region, $dirnameSuffix);
 		}
 		else
 		{

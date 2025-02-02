@@ -1,4 +1,3 @@
-
 <?php
 /**
  * @package plugins.S3DropFolder
@@ -25,6 +24,11 @@ class KalturaS3DropFolder extends KalturaDropFolder
 	 * @var string
 	 */
 	public $s3Password;
+	
+	/**
+	 * @var string
+	 */
+	public $s3IAMRole;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -33,7 +37,8 @@ class KalturaS3DropFolder extends KalturaDropFolder
 		's3Host',
 		's3Region',
 		's3UserId',
-		's3Password'
+		's3Password',
+		's3IAMRole'
 	);
 
 	public function getMapBetweenObjects()

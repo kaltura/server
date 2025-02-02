@@ -597,4 +597,9 @@ class kString
 		
 		return stripos($haystack, $needle, $offset);
 	}
+	
+	public static function isValidAwsArn($arn)
+	{
+		return preg_match('#^arn:aws[a-zA-Z-]*:[a-z0-9-]+:[a-z0-9-]*:\d{12}:[a-zA-Z0-9-_:/]+$#', $arn) === 1;
+	}
 }

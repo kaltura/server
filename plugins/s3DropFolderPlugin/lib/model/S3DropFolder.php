@@ -12,6 +12,8 @@ class S3DropFolder extends RemoteDropFolder
 	const S3_USER_ID = 's3UserId';
 
 	const S3_PASSWORD = 's3Password';
+	
+	const S3_IAM_ROLE = 's3IAMRole';
 
 	/**
 	 * @var string
@@ -32,6 +34,11 @@ class S3DropFolder extends RemoteDropFolder
 	 * @var string
 	 */
 	protected $s3Password;
+	
+	/**
+	 * @var string
+	 */
+	protected $s3IAMRole;
 
 	/**
 	 * return string
@@ -52,6 +59,11 @@ class S3DropFolder extends RemoteDropFolder
 	 * return string
 	 */
 	public function getS3Password (){ return $this->getFromCustomData(self::S3_PASSWORD);}
+	
+	/**
+	 * @return string|null
+	 */
+	public function getS3IAMRole(){ return $this->getFromCustomData(self::S3_IAM_ROLE);}
 
 	/**
 	 * @param string $v
@@ -72,6 +84,11 @@ class S3DropFolder extends RemoteDropFolder
 	 * @param string $v
 	 */
 	public function setS3Password ($v){ $this->putInCustomData(self::S3_PASSWORD, $v);}
+	
+	/**
+	 * @param string $v
+	 */
+	public function setS3IAMRole ($v){ $this->putInCustomData(self::S3_IAM_ROLE, $v);}
 
 
 	public function getImportJobData()
@@ -100,6 +117,8 @@ class S3DropFolder extends RemoteDropFolder
 			's3Host' => $this->getS3Host(),
 			's3UserId' => $this->getS3UserId(),
 			's3Password' => $this->getS3Password(),
-			's3Region' => $this->getS3Region());
+			's3Region' => $this->getS3Region(),
+			's3IAMRole' => $this->getS3IAMRole(),
+		);
 	}
 }

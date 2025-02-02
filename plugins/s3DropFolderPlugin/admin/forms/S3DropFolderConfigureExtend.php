@@ -31,6 +31,12 @@ class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureE
 			'label'			=> 'Password:',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('text', 's3IAMRole', array(
+			'label'			=> 'IAM Role:',
+			'filters'		=> array('StringTrim'),
+			'description' => 'If set to "true" - we use Kaltura IAM role (bucket must allow Kaltura EC2 role to operate on it)',
+		));
 	}
 
 }

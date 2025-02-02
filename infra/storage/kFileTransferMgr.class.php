@@ -37,6 +37,7 @@ class kFileTransferMgrException extends Exception
 	const remoteFileExists   = 6; // trying to putFile that already exists with $overwrite == false
 	const extensionMissing   = 7; // php extension is not installed
 	const attributeMissing   = 8; // option attribute is missing
+	const errorAssumeRole    = 9; // error trying to assume role
 	const otherError         = 99; // other - exception's getMessage() will provide more details
 }
 
@@ -96,6 +97,19 @@ abstract class kFileTransferMgr
 	 * @return the connection resource identifier
 	 */
 	abstract protected function doConnect($server, &$port);
+	
+	/**
+	 * @param $s3IAMRole string|null
+	 * @param $s3Region string|null
+	 * @param $dirnameSuffix string|null
+	 *
+	 * @throws kFileTransferMgrException
+	 *
+	 * @return bool
+	 */
+	
+	// TODO implement in all classes that extends kFileTransferMgr
+	abstract protected function doLoginIAMRole($s3IAMRole = null, $s3Region = null, $dirnameSuffix = null);
 
 	/**
 	 * Should login to a previous initiatied connection with the user / pass given.
@@ -271,6 +285,19 @@ abstract class kFileTransferMgr
 	public function getConnection ()
 	{
 		return $this->connection_id;
+	}
+	
+	public function loginIAMRole($s3IAMRole = null, $s3Region = null, $dirnameSuffix = null)
+	{
+		KalturaLog::debug("Attempting to assume role [ $s3IAMRole ] for S3 Region [ $s3Region ]");
+		
+		if(!$this->doLoginIAMRole($s3IAMRole, $s3Region, $dirnameSuffix))
+		{
+			$last_error = error_get_last();
+			throw new kFileTransferMgrException ( "Error trying to assume role [ $s3IAMRole ] - " . $last_error['message'], kFileTransferMgrException::errorAssumeRole);
+		}
+		
+		KalturaLog::debug("Logged in using IAM Role successfully");
 	}
 
 

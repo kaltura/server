@@ -83,10 +83,12 @@ class s3Mgr extends kFileTransferMgr
 		if (class_exists('KBatchBase'))
 		{
 			$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
+			$this->s3Region = kBatchUtils::getKconfParam('s3Region', true);
 		}
 		else
 		{
 			$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
+			$this->s3Region = kConf::getArrayValue('s3Region', 'storage_options', 'cloud_storage', null);
 		}
 
 		// do nothing
@@ -109,6 +111,46 @@ class s3Mgr extends kFileTransferMgr
 	{
 		return 1;
 	}
+	
+	protected function doLoginIAMRole($s3IAMRole = null, $s3Region = null, $dirnameSuffix = null)
+	{
+		if(!class_exists('Aws\S3\S3Client'))
+		{
+			KalturaLog::err('Class Aws\S3\S3Client was not found!!');
+			return false;
+		}
+		
+		// check if the given ARN is valid
+		KalturaLog::debug("Checking if [ $s3IAMRole ] is a valid IAM Role");
+		$isValidIAMRole = kString::isValidAwsArn($s3IAMRole);
+		
+		// if IAM Role or region were not provided or IAM role invalid - try default s3Arn and s3Region from cloud_config
+		// this is to support a case were customer give our cloud_storage config 's3Arn' access to his bucket so no need to assume customer arn role
+		if (!$isValidIAMRole)
+		{
+			KalturaLog::debug("IAM Role [ $s3IAMRole ] is not valid - attempting access to S3 bucket using Kaltura s3Arn");
+			return $this->generateCachedCredentialsS3Client();
+		}
+		
+		// use the given ARN and Region
+		if ($s3Region)
+		{
+			$this->s3Arn = $s3IAMRole;
+			$this->s3Region = $s3Region;
+			KalturaLog::debug("Login using ARN [ $s3IAMRole ] and region [ $s3Region ]");
+			
+			if(!class_exists('Aws\Sts\StsClient'))
+			{
+				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
+				return false;
+			}
+			
+			return $this->generateCachedCredentialsS3Client($dirnameSuffix);
+		}
+		
+		KalturaLog::err("Missing 's3Region' in Drop Folder config - cannot assume customer ARN [ $s3IAMRole ]");
+		return false;
+	}
 
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
 	//
@@ -124,7 +166,9 @@ class s3Mgr extends kFileTransferMgr
 
 		if($this->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
-			KalturaLog::debug('Found env VAR from config- ' . $this->s3Arn);
+			$s3Arn = $this->s3Arn;
+			KalturaLog::debug("Login using ARN [ $s3Arn ]");
+			
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
 				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
@@ -143,9 +187,9 @@ class s3Mgr extends kFileTransferMgr
 		return $this->generateStaticCredsClient($sftp_user, $sftp_pass);
 	}
 
-	private function generateCachedCredentialsS3Client()
+	private function generateCachedCredentialsS3Client($dirnameSuffix = null)
 	{
-		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn);
+		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn, $this->s3Region, $dirnameSuffix);
 		$config = $this->getBaseClientConfig();
 		$config['credentials'] = $cacheProviderCredentials;
 		$this->s3 = S3Client::factory($config);
