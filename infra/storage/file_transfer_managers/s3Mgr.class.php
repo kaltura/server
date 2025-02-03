@@ -112,17 +112,17 @@ class s3Mgr extends kFileTransferMgr
 	
 	protected function doLoginIAMRole($s3IAMRole = null, $s3Region = null, $dirnameSuffix = null)
 	{
-		// verify required class exists
+		// verify required classes exists
 		if (!$this->verifyClassExists('Aws\S3\S3Client') || !$this->verifyClassExists('Aws\Sts\StsClient'))
 		{
 			return false;
 		}
 		
 		// check if the given ARN is valid
-		KalturaLog::debug("Checking if [ $s3IAMRole ] is a valid IAM Role");
+		KalturaLog::debug("Checking if [ $s3IAMRole ] is a valid ARN");
 		$isValidIAMRole = kString::isValidAwsArn($s3IAMRole);
 		
-		// if ARN or region were not provided or ARN invalid - try default s3Arn and s3Region from cloud_config
+		// if ARN was not provided or invalid - try default s3Arn and s3Region from cloud_config
 		// this is to support a case were customer give our cloud_storage config 's3Arn' access to his bucket so no need to assume customer arn role
 		if (!$isValidIAMRole)
 		{
@@ -133,6 +133,8 @@ class s3Mgr extends kFileTransferMgr
 		}
 		
 		$this->s3Arn = $s3IAMRole;
+		$this->s3Region = $s3Region ?? $this->s3Region;
+		
 		KalturaLog::debug("Login using ARN [ $s3IAMRole ] and region [ $s3Region ]");
 		
 		return $this->generateCachedCredentialsS3Client($dirnameSuffix);
