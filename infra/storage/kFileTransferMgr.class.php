@@ -273,7 +273,6 @@ abstract class kFileTransferMgr
 		return $this->connection_id;
 	}
 	
-
 	/**
 	 * Connect & authenticate on the given server, using the given username & password.
 	 *
