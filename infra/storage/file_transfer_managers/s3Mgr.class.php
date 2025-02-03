@@ -33,6 +33,7 @@ class s3Mgr extends kFileTransferMgr
 	protected $endPoint = null;
 	protected $storageClass = null;
 	protected $s3Arn = null;
+	protected $hash = false;
 
 	const SIZE = 'Size';
 	const LAST_MODIFICATION = 'LastModified';
@@ -79,14 +80,24 @@ class s3Mgr extends kFileTransferMgr
 		{
 			$this->storageClass = $options['storageClass'];
 		}
-
-		if (class_exists('KBatchBase'))
+		
+		if($options && isset($options['s3Arn']))
 		{
-			$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
+			$this->s3Arn = $options['s3Arn'];
+			$this->hash = true;
 		}
 		else
 		{
-			$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
+			if (class_exists('KBatchBase'))
+			{
+				$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
+				$this->s3Region = kBatchUtils::getKconfParam('s3Region', true);
+			}
+			else
+			{
+				$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
+				$this->s3Region = kConf::getArrayValue('s3Region', 'storage_options', 'cloud_storage', null);
+			}
 		}
 
 		// do nothing
@@ -110,36 +121,6 @@ class s3Mgr extends kFileTransferMgr
 		return 1;
 	}
 	
-	protected function doLoginIAMRole($s3IAMRole = null, $s3Region = null, $dirnameSuffix = null)
-	{
-		// verify required classes exists
-		if (!$this->verifyClassExists('Aws\S3\S3Client') || !$this->verifyClassExists('Aws\Sts\StsClient'))
-		{
-			return false;
-		}
-		
-		// check if the given ARN is valid
-		KalturaLog::debug("Checking if [ $s3IAMRole ] is a valid ARN");
-		$isValidIAMRole = kString::isValidAwsArn($s3IAMRole);
-		
-		// if ARN was not provided or invalid - try default s3Arn and s3Region from cloud_config
-		// this is to support a case were customer give our cloud_storage config 's3Arn' access to his bucket so no need to assume customer arn role
-		if (!$isValidIAMRole)
-		{
-			KalturaLog::debug("IAM Role [ $s3IAMRole ] is not valid - attempting access to S3 bucket using Kaltura s3Arn");
-			$this->s3Region = $this->getInternalS3Region();
-			
-			return $this->generateCachedCredentialsS3Client();
-		}
-		
-		$this->s3Arn = $s3IAMRole;
-		$this->s3Region = $s3Region ?? $this->s3Region;
-		
-		KalturaLog::debug("Login using ARN [ $s3IAMRole ] and region [ $s3Region ]");
-		
-		return $this->generateCachedCredentialsS3Client($dirnameSuffix);
-	}
-
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
 	//
 	// S3 Signature is required to be V4 for SSE-KMS support. Newer S3 regions also require V4.
@@ -152,10 +133,11 @@ class s3Mgr extends kFileTransferMgr
 			return false;
 		}
 
-		if($this->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+		if($this->s3Arn && $this->s3Region && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
 			$s3Arn = $this->s3Arn;
-			KalturaLog::debug("Login using ARN [ $s3Arn ]");
+			$s3Region = $this->s3Region;
+			KalturaLog::debug("Login using ARN [ $s3Arn ] and region [ $s3Region ]");
 			
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
@@ -175,8 +157,10 @@ class s3Mgr extends kFileTransferMgr
 		return $this->generateStaticCredsClient($sftp_user, $sftp_pass);
 	}
 
-	private function generateCachedCredentialsS3Client($dirnameSuffix = null)
+	private function generateCachedCredentialsS3Client()
 	{
+		$dirnameSuffix = $this->hash ? hash('md5', $this->s3Arn) : null;
+		
 		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn, $this->s3Region, $dirnameSuffix);
 		$config = $this->getBaseClientConfig();
 		$config['credentials'] = $cacheProviderCredentials;
@@ -592,26 +576,5 @@ class s3Mgr extends kFileTransferMgr
 		}
 		
 		return $this->getPreSignedUrl($remote_file, $expires);
-	}
-	
-	private function verifyClassExists($className)
-	{
-		if (!class_exists($className))
-		{
-			KalturaLog::err("Class [ $className ] was not found!!");
-			return false;
-		}
-		
-		return true;
-	}
-	
-	private function getInternalS3Region()
-	{
-		if (class_exists('KBatchBase'))
-		{
-			return kBatchUtils::getKconfParam('s3Region', true);
-		}
-		
-		return kConf::getArrayValue('s3Region', 'storage_options', 'cloud_storage', null);
 	}
 }

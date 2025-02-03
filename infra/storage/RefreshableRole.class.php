@@ -26,7 +26,7 @@ class RefreshableRole
 		
 		if ($dirnameSuffix)
 		{
-			$credentialsCacheDir .= $dirnameSuffix;
+			$credentialsCacheDir .= "_$dirnameSuffix";
 		}
 
 		$profile = new InstanceProfileProvider();
