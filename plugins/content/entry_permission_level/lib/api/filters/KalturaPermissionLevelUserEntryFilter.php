@@ -52,17 +52,12 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 			KalturaUserEntryPermissionLevel::PANELIST => 64,
 		];
 
-		$newBitmask = 0;
+		$this->permissionLevelsBitmask = 0;
 		foreach ($this->permissionLevels as $permissionLevel)
 		{
 			/** @var KalturaPermissionLevel $permissionLevel */
 			$val = $permissionLevel->permissionLevel;
-			$newBitmask += $permissionBitmask[intval($val)];
-		}
-
-		if ($newBitmask)
-		{
-			$this->permissionLevelsBitmask = $newBitmask;
+			$this->permissionLevelsBitmask += $permissionBitmask[intval($val)];
 		}
 	}
 }
