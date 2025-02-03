@@ -437,7 +437,6 @@ abstract class kFileTransferMgr
 	 * Download a file from the server
 	 *
 	 * @param $remote_file Remote file name
-	 * @param $remote_file Remote file name
 	 * @param $local_file Local file name
 	 *
 	 * @throws kFileTransferMgrException
