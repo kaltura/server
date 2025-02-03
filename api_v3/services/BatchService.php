@@ -701,7 +701,7 @@ class BatchService extends KalturaBatchService
 	* @action getAllChildJobs
 	* @param int $rootJobId root job id
 	* @return KalturaBatchJobArray
-    	 */
+	*/
 	function getAllChildJobsAction($rootJobId)
 	{
             $rootJob = BatchJobPeer::retrieveByPK($rootJobId);
