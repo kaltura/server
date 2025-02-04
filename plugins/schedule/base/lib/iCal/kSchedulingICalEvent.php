@@ -297,7 +297,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 				if ($resourceIds)
 				{
 					$c = new Criteria();
-					$c->add(ScheduleResourcePeer::PARTNER_ID, 102);
+					$c->add(ScheduleResourcePeer::PARTNER_ID, $event->partnerId);
 					$c->add(ScheduleResourcePeer::ID, $resourceIds, Criteria::IN);
 					$resources = ScheduleResourcePeer::doSelect($c);
 
