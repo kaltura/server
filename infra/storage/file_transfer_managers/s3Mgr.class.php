@@ -91,12 +91,10 @@ class s3Mgr extends kFileTransferMgr
 			if (class_exists('KBatchBase'))
 			{
 				$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
-				$this->s3Region = kBatchUtils::getKconfParam('s3Region', true);
 			}
 			else
 			{
 				$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
-				$this->s3Region = kConf::getArrayValue('s3Region', 'storage_options', 'cloud_storage', null);
 			}
 		}
 
