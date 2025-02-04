@@ -304,7 +304,10 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 						/* @var $resource ScheduleResource */
 						$c->add(ScheduleResourcePeer::ID, $resourceId);
 						$resource = ScheduleResourcePeer::doSelectOne($c);
-						$resourcesNames[] = $resource->getName();
+						if ($resource)
+						{
+							$resourcesNames[] = $resource->getName();
+						}
 						$c->remove(ScheduleResourcePeer::ID);
 					}
 					$object->setField($string, implode(',', $resourcesNames));
