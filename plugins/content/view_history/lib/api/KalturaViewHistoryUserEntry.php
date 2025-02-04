@@ -29,6 +29,12 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 	public $playlistLastEntryId;
 
 	/**
+	 * @var KalturaUserEntryExtendedStatus
+	 * @filter eq,in,notin
+	 */
+	public $extendedStatus;
+
+	/**
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)  
 	 */
 	private static $map_between_objects = array(
@@ -36,6 +42,7 @@ class KalturaViewHistoryUserEntry extends KalturaUserEntry
 		'lastTimeReached',
 		'lastUpdateTime',
 		'playlistLastEntryId',
+		"extendedStatus",
 	);
 		 
 	/* (non-PHPdoc)
