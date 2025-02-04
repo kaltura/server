@@ -11,6 +11,11 @@ class KalturaReportExportJobData extends KalturaJobData
 	public $recipientEmail;
 
 	/**
+	 * @var string
+	 */
+	public $recipientName;
+
+	/**
 	 * @var KalturaReportExportItemArray
 	 */
 	public $reportItems;
