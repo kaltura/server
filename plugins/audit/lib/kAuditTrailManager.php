@@ -489,8 +489,6 @@ class kAuditTrailManager implements kObjectChangedEventConsumer, kObjectCopiedEv
 	protected static function getMasterPartnerId()
 	{
 		$partnerId = kCurrentContext::$master_partner_id;
-		return $partnerId == Partner::AUTH_BROKER_PARTNER ? Partner::ADMIN_CONSOLE_PARTNER_ID : $partnerId;
+		return $partnerId == Partner::AUTH_BROKER_PARTNER ? kCurrentContext::getCurrentPartnerId() : $partnerId;
 	}
-
-
 }
