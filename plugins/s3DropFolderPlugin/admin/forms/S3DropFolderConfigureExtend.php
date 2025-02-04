@@ -13,8 +13,8 @@ class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureE
 	public function getDescription()
 	{
 		return "Authentication precedence:<br>
-				1. User & Password (leave empty to use 'IAM Role')<br><br>
-				2. IAM Role:<br>
+				1. User & Password (leave empty to use 'S3 ARN')<br><br>
+				2. S3 ARN:<br>
 				2.1. Set Role ARN - will be used to assume that role<br>
 				Note: role 'Trust Policy' must allow 'cloud_storage' s3Arn to assume it<br><br>
 				2.2. Leave empty - will use 'cloud_storage' s3Arn to access bucket<br>
@@ -43,8 +43,8 @@ class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureE
 			'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElement('text', 's3IAMRole', array(
-			'label'			=> 'IAM Role:',
+		$this->addElement('text', 's3Arn', array(
+			'label'			=> 'S3 ARN:',
 			'filters'		=> array('StringTrim'),
 		));
 	}

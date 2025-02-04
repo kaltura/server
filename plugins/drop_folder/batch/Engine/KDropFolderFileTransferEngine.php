@@ -280,7 +280,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		if($dropFolder instanceof KalturaS3DropFolder)
 		{
 			$engineOptions['s3Region'] = $dropFolder->s3Region;
-			$engineOptions['s3Arn'] = !empty($dropFolder->s3IAMRole) ? $dropFolder->s3IAMRole : null;
+			$engineOptions['s3Arn'] = !empty($dropFolder->s3Arn) ? $dropFolder->s3Arn : null;
 		}
 		$fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($dropFolder->type), $engineOptions);
 
