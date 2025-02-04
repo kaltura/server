@@ -17,13 +17,17 @@ class PermissionLevelUserEntry extends UserEntry
 		parent::__construct();
 	}
 	
-	public function getPermissionLevels ()
+	public function getPermissionLevels()
 	{
 		$serialized = $this->getFromCustomData(self::CUSTOM_DATA_PERMISSION_LEVELS);
+		if (!$serialized)
+		{
+			return null;
+		}
 		return unserialize($serialized);
 	}
 	
-	public function setPermissionLevels ($permissionLevels)
+	public function setPermissionLevels($permissionLevels)
 	{
 		if(!count($permissionLevels))
 			return;

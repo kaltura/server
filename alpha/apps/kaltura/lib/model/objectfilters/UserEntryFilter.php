@@ -28,6 +28,7 @@ class UserEntryFilter extends baseObjectFilter
 			"_eq_extended_status",
 			"_in_extended_status",
 			"_notin_extended_status",
+			"_bitor_extended_status",
 			"_eq_privacy_context",
 			"_in_privacy_context",
 			"_eq_partner_id",
