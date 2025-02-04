@@ -28,7 +28,7 @@ class UserEntryFilter extends baseObjectFilter
 			"_eq_extended_status",
 			"_in_extended_status",
 			"_notin_extended_status",
-			"_bitor_extended_status",
+			"_bitand_extended_status",
 			"_eq_privacy_context",
 			"_in_privacy_context",
 			"_eq_partner_id",
@@ -52,5 +52,10 @@ class UserEntryFilter extends baseObjectFilter
 	protected function getIdFromPeer (  )
 	{
         return UserEntryPeer::ID;
+	}
+	
+	public function setExtendedStatusBitAnd($value)
+	{
+		$this->set("_bitand_extended_status", $value);
 	}
 }

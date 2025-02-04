@@ -10,6 +10,16 @@ class PermissionLevelUserEntry extends UserEntry
 	const CUSTOM_DATA_PERMISSION_LEVELS = 'permission_levels';
 
 	const CUSTOM_DATA_PERMISSION_ORDER = 'permission_order';
+	
+	public static $permissionLevelBitmask = array(
+			UserEntryPermissionLevel::SPEAKER => 1,
+			UserEntryPermissionLevel::ROOM_MODERATOR => 2,
+			UserEntryPermissionLevel::ATTENDEE => 4,
+			UserEntryPermissionLevel::ADMIN => 8,
+			UserEntryPermissionLevel::PREVIEW_ONLY => 16,
+			UserEntryPermissionLevel::CHAT_MODERATOR => 32,
+			UserEntryPermissionLevel::PANELIST => 64,
+		);
 
 	public function __construct()
 	{
@@ -32,6 +42,7 @@ class PermissionLevelUserEntry extends UserEntry
 		if(!count($permissionLevels))
 			return;
 		
+		$this->syncExtendedStatus($permissionLevels);
 		$serialized = serialize($permissionLevels);
 		return $this->putInCustomData(self::CUSTOM_DATA_PERMISSION_LEVELS, $serialized);
 	}
@@ -44,5 +55,23 @@ class PermissionLevelUserEntry extends UserEntry
 	public function setPermissionOrder($permissionOrder)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_PERMISSION_ORDER, $permissionOrder);
+	}
+	
+	public function syncExtendedStatus($permissionLevels)
+	{
+		if (!$permissionLevels || !count($permissionLevels))
+		{
+			return;
+		}
+		
+		$permissionLevelsBitmask = 0;
+		foreach ($permissionLevels as $permissionLevel)
+		{
+			/** @var PermissionLevel $permissionLevel */
+			$val = $permissionLevel->getPermissionLevel();
+			$permissionLevelsBitmask += self::$permissionLevelBitmask[intval($val)];
+		}
+		
+		$this->setExtendedStatus($permissionLevelsBitmask);
 	}
 }
