@@ -117,12 +117,9 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$this->initManualLiveStreamConfiguration($entry);
 			return;
 		}
-		$status = array(EntryServerNodeStatus::PLAYABLE);
-		if($this->getDynamicAttributes()->getServeVodFromLive())
-			$status[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
 
 		$entryId = $this->getDynamicAttributes()->getEntryId();
-		$liveEntryServerNodes = $this->getSortedLiveEntryServerNodes($entryId, $status);
+		$liveEntryServerNodes = $this->getSortedLiveEntryServerNodes($entryId);
 		if(!count($liveEntryServerNodes))
 			return;
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
@@ -147,8 +144,12 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		}
 	}
 
-	public function getSortedLiveEntryServerNodes($entryId, $statuses): array
+	public function getSortedLiveEntryServerNodes($entryId): array
 	{
+		$statuses = array(EntryServerNodeStatus::PLAYABLE);
+		if($this->getDynamicAttributes()->getServeVodFromLive())
+			$statuses[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
+
 		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $statuses);
 		if(!count($liveEntryServerNodes))
 		{
