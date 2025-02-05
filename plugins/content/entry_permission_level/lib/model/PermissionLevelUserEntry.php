@@ -57,13 +57,8 @@ class PermissionLevelUserEntry extends UserEntry
 		$this->putInCustomData(self::CUSTOM_DATA_PERMISSION_ORDER, $permissionOrder);
 	}
 	
-	public function syncExtendedStatus($permissionLevels)
+	protected function syncExtendedStatus($permissionLevels)
 	{
-		if (!$permissionLevels || !count($permissionLevels))
-		{
-			return;
-		}
-		
 		$permissionLevelsBitmask = 0;
 		foreach ($permissionLevels as $permissionLevel)
 		{

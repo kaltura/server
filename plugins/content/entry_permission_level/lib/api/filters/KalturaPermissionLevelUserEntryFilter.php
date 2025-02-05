@@ -18,7 +18,7 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 		return $response;
 	}
 	
-	public function toObject ($object_to_fill = null, $props_to_skip = array())
+	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
 		$object = parent::toObject($object_to_fill, $props_to_skip);
 		$permissionLevelsBitmask = $this->getPermissionLevelsBitmask();
@@ -41,7 +41,10 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 		{
 			/** @var KalturaPermissionLevel $permissionLevel */
 			$val = $permissionLevel->permissionLevel;
-			$permissionLevelsBitmask += PermissionLevelUserEntry::$permissionLevelBitmask[intval($val)];
+			if (isset(PermissionLevelUserEntry::$permissionLevelBitmask[intval($val)]))
+			{
+				$permissionLevelsBitmask += PermissionLevelUserEntry::$permissionLevelBitmask[intval($val)];
+			}
 		}
 		
 		return $permissionLevelsBitmask;
