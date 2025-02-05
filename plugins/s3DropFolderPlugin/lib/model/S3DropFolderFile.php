@@ -19,7 +19,6 @@ class S3DropFolderFile extends DropFolderFile
 
 	public function getFileUrl()
 	{
-		KalturaLog::debug("Generating drop folder file URL");
 		$dbDropFolder = DropFolderPeer::retrieveByPK($this->getDropFolderId());
 		$s3Options = $dbDropFolder->getDropFolderParams();
 		$s3TransferMgr = kFileTransferMgr::getInstance(kFileTransferMgrType::S3, $s3Options);

@@ -33,7 +33,7 @@ class s3Mgr extends kFileTransferMgr
 	protected $endPoint = null;
 	protected $storageClass = null;
 	protected $s3Arn = null;
-	protected $hash = false;
+	protected $dirnameSuffix = null;
 
 	const SIZE = 'Size';
 	const LAST_MODIFICATION = 'LastModified';
@@ -84,7 +84,7 @@ class s3Mgr extends kFileTransferMgr
 		if($options && isset($options['s3Arn']))
 		{
 			$this->s3Arn = $options['s3Arn'];
-			$this->hash = true;
+			$this->dirnameSuffix = hash('md5', $this->s3Arn);
 		}
 		else
 		{
@@ -96,7 +96,10 @@ class s3Mgr extends kFileTransferMgr
 			{
 				$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
 			}
+			
+			$this->dirnameSuffix = 's3Mgr';
 		}
+		
 
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!
@@ -131,11 +134,9 @@ class s3Mgr extends kFileTransferMgr
 			return false;
 		}
 
-		if($this->s3Arn && $this->s3Region && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
+		if($this->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
-			$s3Arn = $this->s3Arn;
-			$s3Region = $this->s3Region;
-			KalturaLog::debug("Login using ARN [ $s3Arn ] and region [ $s3Region ]");
+			KalturaLog::debug("Login using ARN [ {$this->s3Arn} ] and region [ {$this->s3Region} ]");
 			
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
@@ -157,9 +158,7 @@ class s3Mgr extends kFileTransferMgr
 
 	private function generateCachedCredentialsS3Client()
 	{
-		$dirnameSuffix = $this->hash ? hash('md5', $this->s3Arn) : null;
-		
-		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn, $this->s3Region, $dirnameSuffix);
+		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn, $this->s3Region, $this->dirnameSuffix);
 		$config = $this->getBaseClientConfig();
 		$config['credentials'] = $cacheProviderCredentials;
 		$this->s3 = S3Client::factory($config);
