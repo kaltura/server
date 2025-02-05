@@ -147,7 +147,8 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	public function getSortedLiveEntryServerNodes($entryId): array
 	{
 		$statuses = array(EntryServerNodeStatus::PLAYABLE);
-		if($this->getDynamicAttributes()->getServeVodFromLive())
+		$dynamicAttributes = $this->getDynamicAttributes();
+		if($dynamicAttributes && $dynamicAttributes->getServeVodFromLive())
 			$statuses[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
 
 		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $statuses);
