@@ -27,8 +27,8 @@ class kSchedulingICalCalendar extends kSchedulingICalComponent
 	public function begin()
 	{
 		$ret = $this->writeField('BEGIN', $this->getType());
-		$ret .= $this->writeField('PRODID', self::PRODID_PREFIX . mySystemUtils::getVersion() . self::PRODID_POSTFIX);
-		$ret .= $this->writeField('VERSION', self::VERSION);
+//		$ret .= $this->writeField('PRODID', self::PRODID_PREFIX . mySystemUtils::getVersion() . self::PRODID_POSTFIX);
+//		$ret .= $this->writeField('VERSION', self::VERSION);
 		return $ret;
 	}
 }
