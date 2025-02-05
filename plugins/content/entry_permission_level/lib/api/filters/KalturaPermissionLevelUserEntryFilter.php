@@ -9,56 +9,44 @@ class KalturaPermissionLevelUserEntryFilter extends KalturaUserEntryFilter
 	 * @var KalturaPermissionLevelArray
 	 */
 	public $permissionLevels;
-
-	/**
-	 * @var int
-	 * @readonly
-	 */
-	public $permissionLevelsBitmask;
-
-	static private $map_between_objects = array
-	(
-		'permissionLevelsBitmask' => '_bitor_extended_status',
-	);
-
-	public function getMapBetweenObjects()
-	{
-		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
-	}
+	
 
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$this->typeEqual = EntryPermissionLevelPlugin::getApiValue(PermissionLevelUserEntryType::PERMISSION_LEVEL);
-
-		$this->setPermissionLevelsBitmask();
-
 		$response = parent::getListResponse($pager, $responseProfile);
 		return $response;
 	}
-
-	protected function setPermissionLevelsBitmask()
+	
+	public function toObject($object_to_fill = null, $props_to_skip = array())
 	{
-		if (!$this->permissionLevels)
+		$object = parent::toObject($object_to_fill, $props_to_skip);
+		$permissionLevelsBitmask = $this->getPermissionLevelsBitmask();
+		if($permissionLevelsBitmask)
+		{
+			$object->setExtendedStatusBitAnd($permissionLevelsBitmask);
+		}
+		return $object;
+	}
+
+	protected function getPermissionLevelsBitmask()
+	{
+		if (!$this->permissionLevels || !count($this->permissionLevels))
 		{
 			return;
 		}
-
-		$permissionBitmask = [
-			KalturaUserEntryPermissionLevel::SPEAKER => 1,
-			KalturaUserEntryPermissionLevel::ROOM_MODERATOR => 2,
-			KalturaUserEntryPermissionLevel::ATTENDEE => 4,
-			KalturaUserEntryPermissionLevel::ADMIN => 8,
-			KalturaUserEntryPermissionLevel::PREVIEW_ONLY => 16,
-			KalturaUserEntryPermissionLevel::CHAT_MODERATOR => 32,
-			KalturaUserEntryPermissionLevel::PANELIST => 64,
-		];
-
-		$this->permissionLevelsBitmask = 0;
+		
+		$permissionLevelsBitmask = 0;
 		foreach ($this->permissionLevels as $permissionLevel)
 		{
 			/** @var KalturaPermissionLevel $permissionLevel */
 			$val = $permissionLevel->permissionLevel;
-			$this->permissionLevelsBitmask += $permissionBitmask[intval($val)];
+			if (isset(PermissionLevelUserEntry::$permissionLevelBitmask[intval($val)]))
+			{
+				$permissionLevelsBitmask += PermissionLevelUserEntry::$permissionLevelBitmask[intval($val)];
+			}
 		}
+		
+		return $permissionLevelsBitmask;
 	}
 }

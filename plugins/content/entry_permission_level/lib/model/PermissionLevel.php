@@ -3,7 +3,7 @@
  * @package plugins.entryPermissionLevel
  * @subpackage model
  */
-class PermissionLevel extends UserEntry
+class PermissionLevel
 {
 	protected $permissionLevel;
 	
