@@ -13,7 +13,7 @@ class S3DropFolder extends RemoteDropFolder
 
 	const S3_PASSWORD = 's3Password';
 	
-	const S3_ARN = 's3Arn';
+	const USE_S3_ARN = 'useS3Arn';
 
 	/**
 	 * @var string
@@ -38,7 +38,7 @@ class S3DropFolder extends RemoteDropFolder
 	/**
 	 * @var bool
 	 */
-	protected $s3Arn;
+	protected $useS3Arn;
 
 	/**
 	 * return string
@@ -63,7 +63,7 @@ class S3DropFolder extends RemoteDropFolder
 	/**
 	 * @return bool
 	 */
-	public function getS3Arn (){ return (bool) $this->getFromCustomData(self::S3_ARN);}
+	public function getUseS3Arn (){ return (bool) $this->getFromCustomData(self::USE_S3_ARN);}
 
 	/**
 	 * @param string $v
@@ -88,7 +88,7 @@ class S3DropFolder extends RemoteDropFolder
 	/**
 	 * @param bool $v
 	 */
-	public function setS3Arn ($v){ $this->putInCustomData(self::S3_ARN, (bool) $v);}
+	public function setUseS3Arn ($v){ $this->putInCustomData(self::USE_S3_ARN, (bool) $v);}
 
 
 	public function getImportJobData()
@@ -118,7 +118,7 @@ class S3DropFolder extends RemoteDropFolder
 			's3UserId' => $this->getS3UserId(),
 			's3Password' => $this->getS3Password(),
 			's3Region' => $this->getS3Region(),
-			's3Arn' => (boolean) $this->getS3Arn(),
+			's3Arn' => $this->getUseS3Arn(),
 		);
 	}
 }

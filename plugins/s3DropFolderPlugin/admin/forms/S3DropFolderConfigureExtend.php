@@ -40,7 +40,7 @@ class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureE
 			'filters'		=> array('StringTrim'),
 		));
 		
-		$this->addElement('checkbox', 's3Arn', array(
+		$this->addElement('checkbox', 'useS3Arn', array(
 			'label'      => 'Bucket Policy Allow Access',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag', array('tag' => 'dt'))),
 			'uncheckedValue' => false,
