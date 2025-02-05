@@ -84,7 +84,7 @@ class s3Mgr extends kFileTransferMgr
 		if($options && isset($options['s3Arn']))
 		{
 			$this->s3Arn = $options['s3Arn'];
-			$this->dirnameSuffix = hash('md5', $this->s3Arn);
+			$this->dirnameSuffix = 'remote_s3_drop_folder';
 		}
 		else
 		{
@@ -99,7 +99,6 @@ class s3Mgr extends kFileTransferMgr
 			
 			$this->dirnameSuffix = 's3Mgr';
 		}
-		
 
 		// do nothing
 		$this->connection_id = 1; //SIMULATING!

@@ -26,7 +26,7 @@ class KalturaS3DropFolder extends KalturaDropFolder
 	public $s3Password;
 	
 	/**
-	 * @var string
+	 * @var bool
 	 */
 	public $s3Arn;
 
