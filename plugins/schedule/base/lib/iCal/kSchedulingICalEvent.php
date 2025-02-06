@@ -164,7 +164,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-		foreach (self::$dateFields as $date => $field)//TODO ADD CODITION
+		foreach (self::$dateFields as $date => $field)
 		{
 			$configurationField = $this->getConfigurationField($field);
 			$timezoneFormat = null;
