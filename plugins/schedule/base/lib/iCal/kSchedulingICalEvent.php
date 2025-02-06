@@ -293,7 +293,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 					$object->setField($string, $event->$string);
 				}
 			}
-			elseif ($string == 'location')
+			elseif (($string == 'location') && $newIcalFormat)
 			{
 				if ($resourceIds)
 				{
