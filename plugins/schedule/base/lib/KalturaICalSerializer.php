@@ -6,6 +6,8 @@ class KalturaICalSerializer extends KalturaSerializer
 
 	protected $timeZoneBlockArray;
 
+	protected $newIcalFormat;
+
 	public function __construct()
 	{
 		$this->calendar = new kSchedulingICalCalendar();
@@ -26,7 +28,7 @@ class KalturaICalSerializer extends KalturaSerializer
 	 */
 	public function getHeader() 
 	{
-		return $this->calendar->begin();
+		return $this->calendar->begin($this->newIcalFormat);
 	}
 
 	protected function injectTimeZoneBlocks($iCalString)
@@ -63,10 +65,11 @@ class KalturaICalSerializer extends KalturaSerializer
 	 * {@inheritDoc}
 	 * @see KalturaSerializer::serialize()
 	 */
-	public function serialize($object)
+	public function serialize($object, $partnerId = null)
 	{
 		if($object instanceof KalturaScheduleEvent)
 		{
+			$this->newIcalFormat = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $object->partnerId);
 			$scheduleEventArray = new KalturaScheduleEventArray();
 			$scheduleEventArray[] = $object;
 			return $this->serialize($scheduleEventArray);
@@ -78,7 +81,7 @@ class KalturaICalSerializer extends KalturaSerializer
 			{
 				$ret .= $this->innerSerialize($item);
 			}
-			return $this->injectTimeZoneBlocks($ret);
+			return ($this->newIcalFormat) ? $this->injectTimeZoneBlocks($ret) : $ret;
 		}
 		elseif($object instanceof KalturaScheduleEventListResponse)
 		{

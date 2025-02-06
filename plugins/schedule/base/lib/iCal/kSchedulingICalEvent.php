@@ -233,6 +233,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	 */
 	public static function fromObject(KalturaScheduleEvent $event)
 	{
+		$newIcalFormat = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $event->partnerId);
 		$object = new kSchedulingICalEvent();
 		$resourceIds = array();
 
@@ -240,7 +241,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			$object->setField('uid', $event->referenceId);
 		}
-		else
+		elseif ($newIcalFormat)
 		{
 	        $object->setField('uid', self::getUidFromEventId($event->id));
 		}
@@ -269,14 +270,14 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			{
 				if ($string == 'duration')
 				{
-					if (!is_null($event->endDate))
+					if ($newIcalFormat && !is_null($event->endDate))
 					{
 						continue;
 					}
 					$duration = self::formatDurationString($event->$string);
 					$object->setField($string, $duration);
 				}
-				elseif ($string == 'status')
+				elseif (($string == 'status') && ($newIcalFormat))
 				{
 					if ($event->$string == ScheduleEventStatus::ACTIVE)
 					{
@@ -319,7 +320,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			if ($event->$date)
 			{
-				if ($object->timeZoneId !== '')
+				if (($object->timeZoneId !== '') && $newIcalFormat)
 				{
 					$fieldToUpperCase = $field . ";" . self::$timeZoneField . "=";
 					$object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $object->timeZoneId), $object->timeZoneId);

@@ -24,11 +24,14 @@ class kSchedulingICalCalendar extends kSchedulingICalComponent
 		return kSchedulingICal::TYPE_CALENDAR;
 	}
 
-	public function begin()
+	public function begin($newIcalFormat = null)
 	{
 		$ret = $this->writeField('BEGIN', $this->getType());
-		$ret .= $this->writeField('PRODID', self::PRODID_PREFIX . mySystemUtils::getVersion() . self::PRODID_POSTFIX);
-		$ret .= $this->writeField('VERSION', self::VERSION);
+		if ($newIcalFormat)
+		{
+			$ret .= $this->writeField('PRODID', self::PRODID_PREFIX . mySystemUtils::getVersion() . self::PRODID_POSTFIX);
+			$ret .= $this->writeField('VERSION', self::VERSION);
+		}
 		return $ret;
 	}
 }
