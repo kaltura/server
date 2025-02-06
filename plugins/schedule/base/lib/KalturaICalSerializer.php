@@ -28,7 +28,7 @@ class KalturaICalSerializer extends KalturaSerializer
 	 */
 	public function getHeader() 
 	{
-		return $this->calendar->begin();
+		return $this->calendar->begin($this->newIcalFormat);
 	}
 
 	protected function injectTimeZoneBlocks($iCalString)
