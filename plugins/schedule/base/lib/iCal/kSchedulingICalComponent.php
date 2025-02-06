@@ -262,7 +262,8 @@ abstract class kSchedulingICalComponent
 
 	protected function addVtimeZoneBlockIfApplicable($object = null, &$timeZoneBlockArray = null): void
 	{
-		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId())
+		$newIcalStandard = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $object->partnerId);
+		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId() && $newIcalStandard)//TODO add condition
 		{
 			$this->addVtimeZoneBlock($object, $timeZoneBlockArray);
 		}

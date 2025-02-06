@@ -164,7 +164,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 
-		foreach (self::$dateFields as $date => $field)
+		foreach (self::$dateFields as $date => $field)//TODO ADD CODITION
 		{
 			$configurationField = $this->getConfigurationField($field);
 			$timezoneFormat = null;
@@ -276,7 +276,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 					$duration = self::formatDurationString($event->$string);
 					$object->setField($string, $duration);
 				}
-				elseif ($string == 'status')
+				elseif ($string == 'status')//TODO status
 				{
 					if ($event->$string == ScheduleEventStatus::ACTIVE)
 					{
@@ -319,7 +319,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		{
 			if ($event->$date)
 			{
-				if ($object->timeZoneId !== '')
+				if (($object->timeZoneId !== '') && !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $event->partnerId))//TODO add condition
 				{
 					$fieldToUpperCase = $field . ";" . self::$timeZoneField . "=";
 					$object->setField($fieldToUpperCase, kSchedulingICal::formatDate($event->$date, $object->timeZoneId), $object->timeZoneId);
