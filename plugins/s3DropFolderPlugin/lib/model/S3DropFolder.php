@@ -118,7 +118,7 @@ class S3DropFolder extends RemoteDropFolder
 			's3UserId' => $this->getS3UserId(),
 			's3Password' => $this->getS3Password(),
 			's3Region' => $this->getS3Region(),
-			's3Arn' => $this->getUseS3Arn(),
+			'useS3Arn' => $this->getUseS3Arn(),
 		);
 	}
 }

@@ -84,7 +84,7 @@ class s3Mgr extends kFileTransferMgr
 		if($options && isset($options['s3Arn']))
 		{
 			$this->s3Arn = $options['s3Arn'];
-			$this->dirnameSuffix = 'remote_s3_drop_folder';
+			$this->dirnameSuffix = 'dropFolderWatcherRemoteS3';
 		}
 		else
 		{

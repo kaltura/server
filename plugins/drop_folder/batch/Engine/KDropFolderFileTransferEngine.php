@@ -280,8 +280,21 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 		if($dropFolder instanceof KalturaS3DropFolder)
 		{
 			$engineOptions['s3Region'] = $dropFolder->s3Region;
-			$engineOptions['s3Arn'] = $dropFolder->useS3Arn ? kBatchBase::$taskConfig->params->s3Arn : null;
+
+			if ($dropFolder->useS3Arn)
+			{
+				if (!empty(kBatchBase::$taskConfig->params->s3Arn))
+				{
+					$engineOptions['s3Arn'] = kBatchBase::$taskConfig->params->s3Arn;
+				}
+				else
+				{
+					$msg = "Drop Folder ID [{$dropFolder->id}] enabled 'Bucket Policy Allow Access' but 's3Arn' value in 'DropFolderWatcherRemoteS3' is missing";
+					throw new kFileTransferMgrException($msg, kFileTransferMgrException::otherError);
+				}
+			}
 		}
+		
 		$fileTransferMgr = kFileTransferMgr::getInstance(self::getFileTransferMgrType($dropFolder->type), $engineOptions);
 
 		$host =null; $username=null; $password=null; $port=null;
