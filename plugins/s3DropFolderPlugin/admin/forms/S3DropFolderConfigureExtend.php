@@ -14,8 +14,8 @@ class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureE
 	{
 		return "Authentication precedence:<br>
 				1. User & Password (if passed will be used)<br>
-				2. Bucket Policy Allow Access:<br>
-				Note: Bucket policy must allow 'DropFolderWatcherRemoteS3' s3Arn role";
+				2. Bucket Policy Allows Access<br>
+				Note: Bucket policy must allow 'DropFolderWatcherRemoteS3' s3Arn role to operate it";
 	}
 
 	public function init()
