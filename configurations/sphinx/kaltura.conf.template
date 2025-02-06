@@ -409,6 +409,7 @@ index kaltura_metadata:kaltura_base
 	rt_attr_uint = metadata_status
 	rt_field = plugins_data
 	rt_field = sphinx_match_optimizations
+	rt_attr_json = dynamic_attributes
 }
 
 index kaltura_schedule_event:kaltura_base
