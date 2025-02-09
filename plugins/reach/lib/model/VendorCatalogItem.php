@@ -262,6 +262,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$serviceFeatureName = 'video analysis';
 				break;
 
+			case VendorServiceFeature::MODERATION:
+				$serviceFeatureName = 'moderation';
+				break;
+
 			default:
 				$serviceFeatureName = '';
 		}

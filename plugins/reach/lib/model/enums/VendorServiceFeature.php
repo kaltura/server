@@ -19,4 +19,5 @@ interface VendorServiceFeature extends BaseEnum
 	const QUIZ                          = 12;
 	const SUMMARY                       = 13;
 	const VIDEO_ANALYSIS                = 14;
+	const MODERATION                    = 15;
 }

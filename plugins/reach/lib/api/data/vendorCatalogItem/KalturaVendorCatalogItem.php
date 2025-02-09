@@ -290,6 +290,8 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				return new KalturaVendorSummaryCatalogItem();
 			case VendorServiceFeature::VIDEO_ANALYSIS:
 				return new KalturaVendorVideoAnalysisCatalogItem();
+			case VendorServiceFeature::MODERATION:
+				return new KalturaVendorModerationCatalogItem();
 			default:
 				return new KalturaVendorCaptionsCatalogItem();
 		}
