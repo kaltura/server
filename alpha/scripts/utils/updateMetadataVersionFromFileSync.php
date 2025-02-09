@@ -25,7 +25,7 @@ if (in_array('realrun', $argv))
 
 
 require_once(__DIR__ . '/../../../deployment/bootstrap.php');
-
+kEventsManager::enableEvents(false);
 $con = myDbHelper::getConnection(myDbHelper::DB_HELPER_CONN_PROPEL2);
 KalturaStatement::setDryRun($dryRun);
 
