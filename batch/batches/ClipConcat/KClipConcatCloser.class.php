@@ -25,7 +25,7 @@ class KClipConcatCloser extends KJobCloserWorker
 	protected function exec(KalturaBatchJob $job)
 	{
 		$children = KBatchBase::$kClient->batch->getAllChildJobs($job->id);
-		$doneStatuses = array(KalturaBatchJobStatus::FINISHED, KalturaBatchJobStatus::FAILED);
+		$doneStatuses = array(KalturaBatchJobStatus::FINISHED, KalturaBatchJobStatus::FAILED, KalturaBatchJobStatus::ABORTED);
 		foreach ($children as $child)
 		{
              if (!in_array($child->status, $doneStatuses))
