@@ -1,3 +1,14 @@
+# Ursa-21.10.0
+## Add getAllChildJobs action to Batch service
+- Issue Type: Task
+- Issue ID: SUP-46309
+
+#### Deployment ####
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_02_03_update_batch_permissions.php
+
 # Ursa-21.9.0
 ## Add option do disable generation of iCal files in new format
 * Issue Type: Task
