@@ -446,7 +446,10 @@ class ReportService extends KalturaBaseService
 		{
 			$params->recipientEmail = $kuser ? $kuser->getEmail() : $partner->getAdminEmail();
 		}
-		$params->recipientName = $kuser ? $kuser->getFullName() : $partner->getName();
+		if (!$params->recipientName)
+		{
+			$params->recipientName = $kuser ? $kuser->getFullName() : $partner->getName();
+		}
 
 		if (!is_null($params->reportsItemsGroup) && strlen($params->reportsItemsGroup) > self::MAX_EXPORT_GROUP_NAME_LENGTH)
 		{
