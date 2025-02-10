@@ -1,10 +1,4 @@
-# Ursa-21.9.0
-## Add option to delay notifications ##
-* Issue Type: Task
-* Issue ID: PLAT-25045
-### Deployment script ### 
-    php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
-
+# Ursa-21.10.0
 ## Add getAllChildJobs action to Batch service
 - Issue Type: Task
 - Issue ID: SUP-46309
@@ -15,6 +9,12 @@
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2025_02_03_update_batch_permissions.php
 
+# Ursa-21.9.0
+## Add option to delay notifications ##
+* Issue Type: Task
+* Issue ID: PLAT-25045
+### Deployment script ### 
+    php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
 # Ursa-21.4.0
 ## Kava - redirect external client tags to dedicated druid url ##
 - Issue Type: Story
