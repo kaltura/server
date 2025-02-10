@@ -463,7 +463,7 @@ class kXsd
 	 */
 	public static function transformXmlData($xml, $xsdFile, $xslStr)
 	{
-		$singleQuoteAsSpecialChar = htmlspecialchars("'",ENT_QUOTES,'UTF-8');
+		$singleQuoteAsSpecialChar = htmlspecialchars("'", ENT_QUOTES, 'UTF-8');
 		$xslStr = str_replace($singleQuoteAsSpecialChar, "_SINGLE_QUOTE_", $xslStr);
 		$xml = str_replace("'", "_SINGLE_QUOTE_", $xml);
 
