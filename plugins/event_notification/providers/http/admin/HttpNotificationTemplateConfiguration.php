@@ -96,7 +96,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'required'		=> true,
 			'multiOptions' 	=> array(
 				Kaltura_Client_EventNotification_Enum_EventNotificationDelayedCondition::NONE => 'None',
-				Kaltura_Client_EventNotification_Enum_EventNotificationDelayedCondition::PENDING_ENTRY_READY => 'When entry is ready',
+				Kaltura_Client_EventNotification_Enum_EventNotificationDelayedCondition::PENDING_ENTRY_READY => 'Until entry is ready',
 			),
 		));
 
