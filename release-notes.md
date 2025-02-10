@@ -1,3 +1,21 @@
+# Ursa-21.9.0
+## Add option do disable generation of iCal files in new format
+* Issue Type: Task
+* Issue ID: SUP-46741
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.disableNewIcalStandard.enabled = true
+moduls.disableNewIcalStandard.permissionType = 2
+moduls.disableNewIcalStandard.label = "Disable new iCal standard"
+moduls.disableNewIcalStandard.permissionName = FEATURE_DISABLE_NEW_ICAL_STANDARD
+moduls.disableNewIcalStandard.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add option to delay notifications ##
+* Issue Type: Task
+* Issue ID: PLAT-25045
+### Deployment script ### 
+    php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
 # Ursa-21.4.0
 ## Kava - redirect external client tags to dedicated druid url ##
 - Issue Type: Story

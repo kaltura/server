@@ -10,9 +10,15 @@ class KalturaDeliveryProfileVodPackagerHls extends KalturaDeliveryProfileVodPack
 	 */
 	public $allowFairplayOffline;
 
+	/**
+	 * @var bool
+	 */
+	public $supportFmp4;
+
 	private static $map_between_objects = array
 	(
 		'allowFairplayOffline',
+		'supportFmp4',
 	);
 
 	public function getMapBetweenObjects ( )

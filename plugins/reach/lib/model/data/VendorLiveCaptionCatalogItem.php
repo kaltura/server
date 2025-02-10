@@ -12,23 +12,29 @@ class VendorLiveCaptionCatalogItem extends VendorLiveCatalogItem
 
 	public function getTaskJobData($object)
 	{
+		$latestEvent = null;
 		if($object instanceof LiveEntry && $object->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY))
 		{
 			$events = ScheduleEventPeer::retrieveByTemplateEntryIdAndTypes($object->getId(), [ScheduleEventType::LIVE_STREAM]);
 
-			$data = new kScheduledVendorTaskData();
-			if(count($events))
-			{
-				$latestEvent = $events[count($events)-1];
-				$data->setEntryDuration($latestEvent->getDuration()*1000);
-				$data->setStartDate($latestEvent->getStartDate());
-				$data->setEndDate($latestEvent->getEndDate());
-				$data->setScheduledEventId($latestEvent->getId());
+			if (count($events)) {
+				$latestEvent = $events[count($events) - 1];
 			}
-
-			return $data;
+		}
+		elseif ($object instanceof LiveStreamScheduleEvent)
+		{
+			$latestEvent = $object;
 		}
 
-		return null;
+		$data = new kScheduledVendorTaskData();
+		if($latestEvent)
+		{
+			$data->setEntryDuration($latestEvent->getDuration()*1000);
+			$data->setStartDate(intval($latestEvent->getStartDate()));
+			$data->setEndDate(intval($latestEvent->getEndDate()));
+			$data->setScheduledEventId($latestEvent->getId());
+		}
+
+		return $data;
 	}
 }

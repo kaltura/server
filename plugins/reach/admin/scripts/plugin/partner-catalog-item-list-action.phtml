@@ -70,7 +70,7 @@
                 <td><?php echo $catalogItem->contract; ?></td>
                 <td><?php echo $catalogItem->notes; ?></td>
 				<td>
-					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $this->filterForm->getElement('filter_input')->getValue(); ?>)">
+					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $catalogItem->partnerId; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
 						<option value="remove" ><?php echo $this->translate('Remove'); ?></option>
 					</select>

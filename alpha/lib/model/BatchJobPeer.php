@@ -32,6 +32,7 @@ class BatchJobPeer extends BaseBatchJobPeer
 			BatchJob::BATCHJOB_STATUS_PROCESSED,
 			BatchJob::BATCHJOB_STATUS_MOVEFILE,
 			BatchJob::BATCHJOB_STATUS_RETRY,
+			BatchJob::BATCHJOB_STATUS_DELAYED
 		);
 	}
 	
@@ -77,6 +78,14 @@ class BatchJobPeer extends BaseBatchJobPeer
 	{
 		$c = new Criteria();
 		$c->add ( self::ENTRY_ID , $obj_id );
+		return self::doSelect( $c );
+	}
+
+	public static function retrieveByEntryIdAndStatus($obj_id, $status)
+	{
+		$c = new Criteria();
+		$c->add ( self::ENTRY_ID , $obj_id );
+		$c->add ( self::STATUS , $status );
 		return self::doSelect( $c );
 	}
 	
