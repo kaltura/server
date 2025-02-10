@@ -463,9 +463,10 @@ class kXsd
 	 */
 	public static function transformXmlData($xml, $xsdFile, $xslStr)
 	{
+		$singleQuoteReplacement = "_SINGLE_QUOTE_";
 		$singleQuoteAsSpecialChar = htmlspecialchars("'", ENT_QUOTES, 'UTF-8');
-		$xslStr = str_replace($singleQuoteAsSpecialChar, "_SINGLE_QUOTE_", $xslStr);
-		$xml = str_replace("'", "_SINGLE_QUOTE_", $xml);
+		$xslStr = str_replace($singleQuoteAsSpecialChar, $singleQuoteReplacement, $xslStr);
+		$xml = str_replace("'", $singleQuoteReplacement, $xml);
 
 		$from = new KDOMDocument();
 		$from->loadXML($xml);
@@ -480,7 +481,7 @@ class kXsd
 		}
 		
 		$output = $proc->transformToXML($from);
-		$output = str_replace("_SINGLE_QUOTE_", "'", $output);
+		$output = str_replace($singleQuoteReplacement, "'", $output);
 		$to = new KDOMDocument();
 		$to->loadXML($output);
 		if(!$to->schemaValidate($xsdFile->filePath, $xsdFile->encryptionKey, kConf::get("encryption_iv")))
