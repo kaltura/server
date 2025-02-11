@@ -4,6 +4,7 @@
 - Issue Type: Task
 - Issue ID: PSVAMB-69071
 #### Deployment ####
+- Ensure existence of ```ScheduleEventNotifications``` in local plugins.ini configuration file
 - Generate Clients
 
 ### Deployment Scripts ###
