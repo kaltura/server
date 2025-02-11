@@ -1,4 +1,14 @@
 # Ursa-21.10.0
+
+## Enable ScheduleEventNotificationPlugin
+- Issue Type: Task
+- Issue ID: PSVAMB-69071
+#### Deployment ####
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/base/scripts/installPlugins.php
+
 ## Add getAllChildJobs action to Batch service
 - Issue Type: Task
 - Issue ID: SUP-46309
