@@ -29,6 +29,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 	 * @var KalturaWebexAPIDropFolderFile
 	 */
 	protected $dropFolderFile;
+
+	const MAX_NUMBER_OF_LOOP_ITERATIONS = 100;
 	
 	
 	public function watchFolder(KalturaDropFolder $dropFolder)
@@ -36,6 +38,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		$this->initDropFolderEngine($dropFolder);
 		$startTime = $this->lastFileTimestamp;
 		$nextPageLink = null;
+		$countIterations = 0;
 		do
 		{
 			$recordingsList = $this->retrieveRecordingsList($startTime, $nextPageLink);
@@ -44,8 +47,9 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			{
 				$this->handleRecordingsList($recordingsList);
 			}
+			$countIterations += 1;
 		}
-		while ($nextPageLink);
+		while ($nextPageLink && $countIterations < self::MAX_NUMBER_OF_LOOP_ITERATIONS);
 		
 		$this->updateDropFolderLastFileTimestamp();
 		$this->handleDropFolderFiles();
@@ -314,6 +318,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			return;
 		}
 		$nextPageLink = null;
+		$countIterations = 0;
 		do
 		{
 			if ($nextPageLink)
@@ -327,8 +332,9 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
 			
 			$this->handleRecentTranscriptsList($transcriptsList);
+			$countIterations += 1;
 		}
-		while ($nextPageLink);
+		while ($nextPageLink && $countIterations < self::MAX_NUMBER_OF_LOOP_ITERATIONS);
 	}
 	
 	protected function retrieveRecentTranscripts()
@@ -555,6 +561,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		$nextPageLink = null;
 		$coHostsList = array();
 		$usersList = array();
+		$countIterations = 0;
 		do
 		{
 			if ($nextPageLink)
@@ -577,8 +584,9 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			$usersList = array_merge($usersList, $parsedUsers);
 			
 			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
+			$countIterations += 1;
 		}
-		while ($nextPageLink);
+		while ($nextPageLink && $countIterations < self::MAX_NUMBER_OF_LOOP_ITERATIONS);
 		
 		$userToExclude = strtolower($ownerId);
 		$coHostsUserIds = $this->getKalturaUserIdsFromVendorUsers($coHostsList, $this->dropFolder->partnerId, $this->dropFolder->webexAPIVendorIntegration->createUserIfNotExist, $userToExclude);
@@ -673,14 +681,16 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			return;
 		}
 		$nextPageLink = null;
+		$countIterations = 0;
 		do
 		{
 			$transcriptsList = $this->retrieveMeetingTranscriptsList($nextPageLink);
 			$this->handleMeetingTranscriptsList($entryId, $partnerId, $transcriptsList);
 			
 			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
+			$countIterations += 1;
 		}
-		while ($nextPageLink);
+		while ($nextPageLink && $countIterations < self::MAX_NUMBER_OF_LOOP_ITERATIONS);
 	}
 	
 	protected function retrieveMeetingTranscriptsList($nextPageLink)
@@ -734,12 +744,14 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		
 		$nextPageLink = null;
 		$meetingChats = '';
+		$countIterations = 0;
 		do
 		{
 			$meetingChats .= $this->retrieveMeetingChats($nextPageLink);
 			$nextPageLink = $this->webexClient->getNextPageLinkFromLastRequest();
+			$countIterations += 1;
 		}
-		while ($nextPageLink);
+		while ($nextPageLink && $countIterations < self::MAX_NUMBER_OF_LOOP_ITERATIONS);
 		
 		if (!$meetingChats)
 		{
