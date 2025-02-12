@@ -6,9 +6,9 @@
  */
 class kModerationVendorTaskData extends kVendorTaskData
 {
-	public string $ruleIds = "";
-	public string $policyIds = "";
-	public string $moderationOutputJson = "";
+	protected string $ruleIds = "";
+	protected string $policyIds = "";
+	protected string $moderationOutputJson = "";
 
 	public function getRuleIds(): string
 	{
