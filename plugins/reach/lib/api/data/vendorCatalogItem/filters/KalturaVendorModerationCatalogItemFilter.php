@@ -8,7 +8,8 @@ class KalturaVendorModerationCatalogItemFilter extends KalturaVendorCatalogItemF
 {
     public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, $type = null)
     {
-        if (!$type) {
+        if (!$type)
+        {
             $type = KalturaVendorServiceFeature::MODERATION;
         }
 

@@ -12,7 +12,8 @@ class KalturaVendorModerationCatalogItem extends KalturaVendorCatalogItem
 
     public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
     {
-        if (is_null($object_to_fill)) {
+        if (is_null($object_to_fill))
+        {
             $object_to_fill = new VendorModerationCatalogItem();
         }
 
@@ -21,7 +22,8 @@ class KalturaVendorModerationCatalogItem extends KalturaVendorCatalogItem
 
     public function toObject($object_to_fill = null, $props_to_skip = array())
     {
-        if(is_null($object_to_fill)) {
+        if(is_null($object_to_fill))
+        {
             $object_to_fill = new VendorModerationCatalogItem();
         }
 

@@ -6,11 +6,11 @@
  */
 class kModerationVendorTaskData extends kVendorTaskData
 {
-	public ?string $ruleIds = "";
-	public ?string $policyIds = "";
-	public ?string $moderationOutputJson = null;
+	public string $ruleIds = "";
+	public string $policyIds = "";
+	public string $moderationOutputJson = "";
 
-	public function getRuleIds(): ?string
+	public function getRuleIds(): string
 	{
 		return $this->ruleIds;
 	}
@@ -20,7 +20,7 @@ class kModerationVendorTaskData extends kVendorTaskData
 		$this->ruleIds = $ruleIds;
 	}
 
-	public function getPolicyIds(): ?string
+	public function getPolicyIds(): string
 	{
 		return $this->policyIds;
 	}
@@ -30,12 +30,12 @@ class kModerationVendorTaskData extends kVendorTaskData
 		$this->policyIds = $policyIds;
 	}
 
-	public function getModerationOutputJson(): ?string
+	public function getModerationOutputJson(): string
 	{
 		return $this->moderationOutputJson;
 	}
 
-	public function setModerationOutputJson(?string $moderationOutputJson): void
+	public function setModerationOutputJson(string $moderationOutputJson): void
 	{
 		$this->moderationOutputJson = $moderationOutputJson;
 	}
