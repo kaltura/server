@@ -1,41 +1,42 @@
 <?php
 
-if($argc < 3)
+if($argc < 2)
 {
 	echo "Arguments missing.\n\n";
-	echo "Usage: php " . __FILE__ . " {mapping} {isDateString} <realrun / dryrun> \n";
+	echo "Usage: php " . __FILE__ . " {mapping} <realrun / dryrun> \n";
 	exit;
 }
 $mapping = $argv[1];
-$isDateString = ($argv[2] === "true");
-$dryRun = ($argv[3] === "dryrun");
+$dryRun = ($argv[2] === "dryrun");
 
 require_once(__DIR__ . '/../bootstrap.php');
 
 KalturaStatement::setDryRun($dryRun);
 
-$entryMappings = file($mapping, FILE_IGNORE_NEW_LINES);
+$handle = fopen($mapping, 'r');
 
-$counter = 0;
-foreach ($entryMappings as $entryMapping)
+$entryMapping = fgetcsv($handle);
+while ($entryMapping !== false)
 {
-	list ($entryId,$createdAt) = explode(",", $entryMapping);
-	$createdAt = $isDateString ? strtotime($createdAt) : $createdAt;
-	
+	list ($entryId,$createdAt) = $entryMapping;
+
 	$entry = entryPeer::retrieveByPK($entryId);
 	if(!$entry)
 	{
 		echo "Entry id [$entryId] not found\n";
 		continue;
 	}
-	
+
 	$entry->setOriginalCreationDate($entry->getCreatedAt());
 	$entry->setCreatedAt($createdAt);
 	$entry->setAvailableFrom($createdAt);
 	$entry->save();
-	
+
 	kEventsManager::flushEvents();
 	kMemoryManager::clearMemory();
+
+	$entryMapping = fgetcsv($handle);
 }
 
+fclose($handle);
 KalturaLog::debug('Done');
