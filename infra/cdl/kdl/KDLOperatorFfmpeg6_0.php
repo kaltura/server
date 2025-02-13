@@ -36,16 +36,18 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 				$keyVidFilters = $flGrKey+1;
 			}
 		}
-
-		if(isset($target->_forGenericSource) && $target->_forGenericSource==true) {
-			$target->multyAudioMapping = null;
-			$generalAudMapping = 'a';
+			// Audio mapping handling is needed only if there is an audio stream to generate ...
+		if(isset($target->_audio)) {
+			if(isset($target->_forGenericSource) && $target->_forGenericSource==true) {
+				$target->multyAudioMapping = null;
+				$generalAudMapping = 'a';
+			}
+			else $generalAudMapping = 'a:0';
 		}
-		else $generalAudMapping = 'a:0';
 		
 		$mappingStr = null;
 		/*
-		 * Following code adapts the FFM4.4 and earlier) cmdLines to FFM6 standard.
+		 * Following code adapts the FFM4.4 (and earlier) cmdLines to FFM6 standard.
 		 * FFM6 'resolves' the ambiguity in previous versions while using both 
 		 * the filter_complex and stream mappings. 
 		 * Starting with FFM6 the streams that are used by the filter_complex are 
@@ -53,11 +55,12 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 		 * it is ADDED to the filter_complex 'mapped' streams, resulting converted 
 		 * streams duplication. FFM4 and older versions don't duplicate the 
 		 * transcodided streams.
-		 * The solution is to use 'named' filter graphs out connections and explicitly 
-		 * to map them, and to avoid mapping of the source streams.
+		 * The solution is -
+		 * - using 'named' filter graphs out connections and explicitly mapping them
+		 * - avoiding 'redundant' source stream mapping
 		 *
-		 * Another task is to force the output vid stream as the 1st stream, 
-		 * and the aud as the 2nd. It is needed for the multy-entry-edit feature.
+		 * Another task is to force the output vid stream to be the 1st stream, 
+		 * and the aud to be the 2nd. It is needed for the multy-entry-edit feature.
 		 * 
 		 * !!! IMPORTANT !!!
 		 *		This syntax is fully compatibale with the FFM4.4 as well.
@@ -81,7 +84,8 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 			$mappingStr = '-map \'[vout]\' ';
 			if(isset($target->multyAudioMapping)) 
 				$mappingStr.= implode(' ', $target->multyAudioMapping);
-			else $mappingStr.= "-map $generalAudMapping";
+			else if(isset($generalAudMapping))
+				$mappingStr.= "-map $generalAudMapping";
 		}
 			// only aud filters are used ==> 
 			//	add aout connection to the audio filter graph.
