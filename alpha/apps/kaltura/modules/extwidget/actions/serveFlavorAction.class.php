@@ -441,6 +441,7 @@ class serveFlavorAction extends kalturaAction
 			self::$requestAuthorized = true;
 		}
 
+		$entry = null;
 		if ($entryId)
 		{
 			$entry = entryPeer::retrieveByPKNoFilter($entryId);
@@ -533,7 +534,8 @@ class serveFlavorAction extends kalturaAction
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 		}
 
-		if (!is_null($entryId) && $flavorAsset->getEntryId() != $entryId)
+		$parentEntryId = $entry ? $entry->getParentEntryId() : null;
+		if (!is_null($entryId) && ( $flavorAsset->getEntryId() != $entryId && $flavorAsset->getEntryId() != $parentEntryId))
 			KExternalErrors::dieError(KExternalErrors::FLAVOR_NOT_FOUND);
 
 		if ($fileName)
