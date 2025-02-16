@@ -283,13 +283,11 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 
 			if ($dropFolder->useS3Arn)
 			{
-				if (!empty(kBatchBase::$taskConfig->params->s3Arn))
+				$engineOptions['s3Arn'] = kConf::getArrayValue('s3Arn', 's3_drop_folder', 'drop_folder', null);
+				
+				if (empty($engineOptions['s3Arn']))
 				{
-					$engineOptions['s3Arn'] = kBatchBase::$taskConfig->params->s3Arn;
-				}
-				else
-				{
-					$msg = "Drop Folder ID [{$dropFolder->id}] enabled 'Bucket Policy Allow Access' but 's3Arn' value in 'DropFolderWatcherRemoteS3' is missing";
+					$msg = "Drop Folder ID [{$dropFolder->id}] enabled 'Bucket Policy Allow Access' but 's3Arn' value under 's3_drop_folder' in 'drop_folder' map is missing";
 					throw new kFileTransferMgrException($msg, kFileTransferMgrException::otherError);
 				}
 			}
