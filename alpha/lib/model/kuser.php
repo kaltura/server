@@ -62,6 +62,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	
 	const MAX_NAME_LEN = 40;
 
+	const MAX_ABOUT_ME_LEN = 4096;
+
 	const MAX_COUNTRY_LEN = 2;
 	
 	private $roughcut_count = -1;
@@ -1685,5 +1687,16 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		$capabilities = $this->getFromCustomData(self::CAPABILITIES, null, '');
 		return ($capabilities == '') ? array() : explode(',', $capabilities);
+	}
+
+	public function setAboutMe($v)
+	{
+		PeerUtils::setExtension($this, $v, self::MAX_ABOUT_ME_LEN, __FUNCTION__);
+		return parent::setAboutMe(kString::alignUtf8String($v, self::MAX_ABOUT_ME_LEN));
+	}
+
+	public function getAboutMe()
+	{
+		return parent::getAboutMe() . PeerUtils::getExtension($this, __FUNCTION__);
 	}
 }
