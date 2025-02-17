@@ -641,9 +641,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	
 	private function fixDescription($description)
 	{
-		$description = str_replace("\r", '', trim($description, " \t\r\n"));
-		//$description = substr($description, 0, strlen($description) - 1);
-		return $description;
+		return isset($description) ? str_replace("\r", '', trim($description, " \t\r\n")) : '';
 	}
 	
 	protected function writeHeader() { }

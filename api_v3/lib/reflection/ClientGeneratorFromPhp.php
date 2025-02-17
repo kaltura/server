@@ -38,12 +38,12 @@ abstract class ClientGeneratorFromPhp
 
 	public function __construct($sourcePath = null)
 	{
-		$this->_sourcePath = realpath($sourcePath);
+		$this->_sourcePath = isset($sourcePath) ? realpath($sourcePath) : null;
 		
 		if (($sourcePath !== null) && !(is_dir($sourcePath)))
 			throw new Exception("Source path was not found [$sourcePath]");
 		
-		if (is_dir($sourcePath))
+		if ($sourcePath && is_dir($sourcePath))
 			$this->addSourceFiles($this->_sourcePath);
 
 		$typesClassMapPath = $this->getTypesClassMapPath();
@@ -382,7 +382,7 @@ abstract class ClientGeneratorFromPhp
 	    }
 	    
 	    $actionId = $actionReflector->getActionId();
-	    if (strpos($actionReflector->getActionInfo()->clientgenerator, "ignore") !== false)
+	    if ($actionReflector->getActionInfo() && $actionReflector->getActionInfo()->clientgenerator && strpos($actionReflector->getActionInfo()->clientgenerator, "ignore") !== false)
 	    {
 	        KalturaLog::info("Action [$actionId] in service [$serviceId] ignored by generator");
 	        return false;
