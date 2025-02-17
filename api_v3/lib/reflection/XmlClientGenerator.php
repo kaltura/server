@@ -111,7 +111,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 				if($actionInfo->serverOnly)
 					continue;
 					
-				if (strpos($actionInfo->clientgenerator, "ignore") !== false)
+				if ($actionInfo->clientgenerator && strpos($actionInfo->clientgenerator, "ignore") !== false)
 					continue;
 					
 				$serviceActionElement = $this->getServiceActionElement($actionReflector);
