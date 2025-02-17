@@ -22,15 +22,10 @@ class S3DropFolderFile extends DropFolderFile
 		$dbDropFolder = DropFolderPeer::retrieveByPK($this->getDropFolderId());
 		$s3Options = $dbDropFolder->getDropFolderParams();
 		
-		if ($s3Options['useS3Arn'])
+		if ($s3Options['useS3Arn'] && empty($s3Options['s3Arn']))
 		{
-			$s3Options['s3Arn'] = kConf::getArrayValue('s3Arn', 's3_drop_folder', 'drop_folder', null);
-			
-			if (empty($s3Options['s3Arn']))
-			{
-				$msg = "Drop Folder ID [{$dbDropFolder->getId()}] enabled 'Bucket Policy Allow Access' but 's3Arn' value under 's3_drop_folder' in 'drop_folder' map is missing";
-				throw new kFileTransferMgrException($msg, kFileTransferMgrException::otherError);
-			}
+			$msg = "Drop Folder ID [{$dbDropFolder->getId()}] enabled 'Bucket Policy Allow Access' but 's3Arn' value under 's3_drop_folder' in 'runtime_config' map is missing";
+			throw new kFileTransferMgrException($msg, kFileTransferMgrException::otherError);
 		}
 		
 		

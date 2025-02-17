@@ -39,6 +39,11 @@ class S3DropFolder extends RemoteDropFolder
 	 * @var bool
 	 */
 	protected $useS3Arn;
+	
+	/**
+	 * @var string
+	 */
+	protected $s3Arn;
 
 	/**
 	 * return string
@@ -64,6 +69,19 @@ class S3DropFolder extends RemoteDropFolder
 	 * @return bool
 	 */
 	public function getUseS3Arn (){ return (bool) $this->getFromCustomData(self::USE_S3_ARN);}
+	
+	/**
+	 * @return string
+	 */
+	public function getS3Arn ()
+	{
+		if (empty($this->getUseS3Arn()))
+		{
+			return null;
+		}
+		
+		return kConf::getArrayValue('s3Arn', 's3_drop_folder', 'runtime_config', null);
+	}
 
 	/**
 	 * @param string $v
@@ -119,6 +137,7 @@ class S3DropFolder extends RemoteDropFolder
 			's3Password' => $this->getS3Password(),
 			's3Region' => $this->getS3Region(),
 			'useS3Arn' => $this->getUseS3Arn(),
+			's3Arn' => $this->getS3Arn()
 		);
 	}
 }

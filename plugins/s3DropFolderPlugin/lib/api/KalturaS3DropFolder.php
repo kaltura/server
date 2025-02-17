@@ -29,6 +29,12 @@ class KalturaS3DropFolder extends KalturaDropFolder
 	 * @var bool
 	 */
 	public $useS3Arn;
+	
+	/**
+	 * @var string
+	 * @readonly
+	 */
+	public $s3Arn;
 
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
@@ -38,7 +44,8 @@ class KalturaS3DropFolder extends KalturaDropFolder
 		's3Region',
 		's3UserId',
 		's3Password',
-		'useS3Arn'
+		'useS3Arn',
+		's3Arn'
 	);
 
 	public function getMapBetweenObjects()
