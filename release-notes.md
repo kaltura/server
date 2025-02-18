@@ -1,4 +1,15 @@
 # Ursa-21.10.0
+## Rsvp Plugin ##
+* Issue Type: Task
+* Issue ID: PLAT-25025
+
+### Configuration ###
+To enable this plugin add the following to your plugins.ini file:
+
+	- Rsvp
+
+### Deployment ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
 
 ## Enable ScheduleEventNotificationPlugin
 - Issue Type: Task
