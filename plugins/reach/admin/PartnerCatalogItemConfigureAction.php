@@ -130,6 +130,8 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 				return new Kaltura_Client_Reach_Type_VendorSummaryCatalogItemFilter();
 			case Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS:
 				return new Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItemFilter();
+			case Kaltura_Client_Reach_Enum_VendorServiceFeature::MODERATION:
+				return new Kaltura_Client_Reach_Type_VendorModerationCatalogItemFilter();
 			default:
 				return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 		}

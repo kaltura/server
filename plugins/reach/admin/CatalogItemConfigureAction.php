@@ -177,6 +177,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				case Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS:
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItem', $formData, false, true);
 					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::MODERATION:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorModerationCatalogItem', $formData, false, true);
+					break;
 			}
 
 			$form->resetUnUpdatebleAttributes($catalogItem);
