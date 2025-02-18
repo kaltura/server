@@ -172,18 +172,42 @@
 			
 			if(!isset($this->scanType))
 				$this->scanType = $sourceData->scanType;
-
+			if(!isset($this->fps) || $this->fps<=0){
+				
 				/*
 				 * Limit the complexity evaluation FPS to 'reasonable' values,
 				 * in order to avoid processing overloading in cases with huge/invalid FPS values.
+				 * Make sure that the raw frame rate (r_frame_rate) is also within 'reasonable' values
 				 */
-			if(!isset($sourceData->videoFrameRate) || $sourceData->videoFrameRate>KDLSanityLimits::MaxFramerate){
-				$this->fps = KDLSanityLimits::MaxFramerate;
+				if(isset($sourceData->rawData)) {
+					$rawData = json_decode($sourceData->rawData);
+					$streams = isset($rawData->streams)? $rawData->streams: array();
+					
+					// Get first video stream and r_frame_rate
+					$videoStream = null;
+					foreach($streams as $stream) {
+						if($stream->codec_type === 'video') {
+							$videoStream = $stream;
+							break;
+						}
+					}
+
+					if(isset($videoStream->r_frame_rate)) {
+						$frRateParts = explode("/", $videoStream->r_frame_rate);
+						if(count($frRateParts)==2 && $frRateParts[1]>0) {
+							$rawFps = round($frRateParts[0]/$frRateParts[1], 3);
+						}
+					}
+				}
 			}
-			else if($sourceData->videoFrameRate==0){
+			if(!isset($sourceData->videoFrameRate) || $sourceData->videoFrameRate>KDLSanityLimits::MaxFramerate 
+			|| $sourceData->videoFrameRate==0){
 				$this->fps = KDLConstants::MaxFramerate;
 			}
-			
+			else if(isset($rawFps) && $rawFps>KDLSanityLimits::MaxFramerate){
+				$this->fps = KDLConstants::MaxFramerate;
+			}
+
 				/*
 				 * Determine the sampling paramters
 				 * - number of sumpling points
@@ -220,8 +244,7 @@
 				}
 				if(isset($this->samplingPointDuration)) $samplingPointDuration = $this->samplingPointDuration;
 				else $samplingPointDuration = self::DEFAULT_SINGLE_SAMPLING_POINT_DUR;
-KalturaLog::log("dur:$duration, samplingPoints:$samplingPoints, stepInterval:$stepInterval, samplingPointDuration:$samplingPointDuration");
-//die;	
+				KalturaLog::log("dur:$duration, samplingPoints:$samplingPoints, stepInterval:$stepInterval, samplingPointDuration:$samplingPointDuration");
 			}
 			
 			$diff = 0;
