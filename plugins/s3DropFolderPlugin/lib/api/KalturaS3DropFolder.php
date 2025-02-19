@@ -63,4 +63,17 @@ class KalturaS3DropFolder extends KalturaDropFolder
 		$dbObject->setType(S3DropFolderPlugin::getDropFolderTypeCoreValue(S3DropFolderType::S3DROPFOLDER));
 		return parent::toObject($dbObject, $skip);
 	}
+	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if ($this->useS3Arn)
+		{
+			if (empty(kConf::getArrayValue('s3Arnnnnn', 's3_drop_folder', 'runtime_config', null)))
+			{
+				throw new KalturaAPIException(KalturaS3DropFolderErrors::MISSING_S3ARN_CONFIG);
+			}
+		}
+		
+		parent::validateForInsert($propertiesToSkip);
+	}
 }
