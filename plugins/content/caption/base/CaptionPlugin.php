@@ -737,7 +737,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				try
 				{
 
-					$url = $assetDb->getDownloadUrl(true, false, null, null, false);
+					$url = $assetDb->getDownloadUrl(true, false, null, null, true);
 					if ($url)
 					{
 						$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentIndex/-1/version/' . $assetDb->getVersion() . '/captions.vtt';
