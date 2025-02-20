@@ -1,4 +1,35 @@
 # Ursa-21.10.0
+## S3 Drop Folder - add support for ARN Role (AWS Deployments only) ##
+- Issue Type: Task
+- Issue ID: VCP-19989
+### Configurations ###
+Add the following section to runtime_config map:
+* Replace AWS_ACCOUNT_ID with AWS account
+* Replace ROLE_NAME with AWS Role name
+```
+[s3_drop_folder]
+s3Arn = 'arn:aws:iam::AWS_ACCOUNT_ID:role/ROLE_NAME'
+```
+### Deployment ###
+On-Prem / All-In-One Only  
+Generate Clients (Replace @path_to_server@ with your path):
+- Build new clients:  
+  ``php @path_to_server@/generator/generate.php``
+- Clear Cache  
+  ``find @path_to_server@/cache -type cache -delete``
+- Restart Apache2  
+  ``service apache2 restart``
+
+### Enable (AWS Only) ###
+1. The EC2 running `KAsyncDropFolderWatcherRemoteS3` & `KAsyncDropFolderContentProcessor` workers should allow the `s3Arn` role to be assumed
+2. The EC2 that batch is sending the api calls to (defined at `batch.ini` map `serviceUrl` param) should allow the `s3Arn` role to be assumed
+3. The `s3Arn` role policy should allow to Get, List and Delete from the destination bucket (or '*' for all buckets)
+4. The `s3Arn` ‘Maximum session duration’ set to 12 hours
+5. The S3 Bucket Policy should allow the `s3Arn` to operate it
+6. In S3 Drop Folder (Kaltura Admin Console):  
+   6.1. Leave User & Password Empty  
+   6.2. Tick 'Bucket Policy Allow Access' checkbox
+
 ## Rsvp Plugin ##
 * Issue Type: Task
 * Issue ID: PLAT-25025
