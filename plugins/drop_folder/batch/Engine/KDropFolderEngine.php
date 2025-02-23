@@ -46,20 +46,65 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	 * @param $fromCreatedAt
 	 * @return array
 	 */
-	protected function loadDropFolderFilesByPage($pager, $fromCreatedAt = null)
+	protected function loadDropFolderFilesByPage($pager, $fromId = null)
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
-		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::ID_ASC;
 		
-		if ($fromCreatedAt)
+		if ($fromId)
 		{
-			$dropFolderFileFilter->createdAtGreaterThanOrEqual = $fromCreatedAt;
+			$dropFolderFileFilter->idGreaterThanOrEqual = $fromId;
 		}
 		
 		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
 		return $dropFolderFiles->objects;
+	}
+
+	protected function getSingleDropFolderFileIdByCreatedAt($fromCreatedAt)
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = 1;
+
+		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
+		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
+		$dropFolderFileFilter->createdAtGreaterThanOrEqual = $fromCreatedAt;
+		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
+
+		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
+		return isset($dropFolderFiles->objects[0]->id) ? $dropFolderFiles->objects[0]->id : null;
+	}
+
+	protected function handleExistingDropFolderFiles($timeRange)
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = 500;
+		if(KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
+		{
+			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+		}
+
+		$fromCreatedAt = time() - $timeRange;
+		$dropFolderFileId = $this->getSingleDropFolderFileIdByCreatedAt($fromCreatedAt);
+		if(!$dropFolderFileId)
+		{
+			return;
+		}
+
+		do
+		{
+			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager, $dropFolderFileId);
+			foreach ($dropFolderFiles as $dropFolderFile)
+			{
+				$this->handleExistingDropFolderFile($dropFolderFile);
+				$dropFolderFileId = $dropFolderFile->id;
+			}
+
+		} while (count($dropFolderFiles) >= $pager->pageSize);
 	}
 
 	/**
