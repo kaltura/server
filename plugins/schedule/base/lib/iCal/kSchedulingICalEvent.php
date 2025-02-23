@@ -504,6 +504,12 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		}
 		array_unshift($relevantTransitions, $initialTransition);
 
+		if (is_null($daylightOffset) || is_null($standardOffset))
+		{
+			KalturaLog::warning('Error while processing the time zone transitions: should be offsets for daylight and standard. Only one is populated');
+			throw new KalturaAPIException('Error while processing the time zone transitions: should be offsets for daylight and standard. Only one is populated');
+		}
+
 		// Create VTIMEZONE block content
 		$timeZoneBlockArray[] = $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
 
