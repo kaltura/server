@@ -177,27 +177,39 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return self::CACHE_KEY_PREFIX . "{$key->object_id}_{$key->object_type}_{$key->object_sub_type}_{$key->version}";
 	}
 
+	private static function getFromSmallFileCache($cacheKey)
+	{
+		$redisCacheStore = self::initSmallFileRedisInstance();
+		if (!$redisCacheStore)
+		{
+			return;
+		}
+
+		try
+		{
+			$result = $redisCacheStore->doGet($cacheKey);
+			if ($result)
+			{
+				$uncompressedResult = gzuncompress($result);
+				$result = $uncompressedResult ?? $result;
+				KalturaLog::info("returning from redis cache, key [$cacheKey] size [" . strlen($result) . "]");
+				return $result;
+			}
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::info('File not found on Redis cache. [' . $e->getCode() . ' : ' . $e->getMessage() . ']');
+		}
+	}
+
 	public static function file_get_contents ( FileSyncKey $key , $fetch_from_remote_if_no_local = true , $strict = true , $max_file_size = 0 )
 	{
 		$cacheKey = self::getCacheKey($key);
-		$redisCacheStore = self::initSmallFileRedisInstance();
-		if ($redisCacheStore)
+
+		$resultFromSmallCache = self::getFromSmallFileCache($cacheKey);
+		if ($resultFromSmallCache)
 		{
-			try
-			{
-				$result = $redisCacheStore->doGet($cacheKey);
-				if ($result)
-				{
-					$uncompressedResult = gzuncompress($result);
-					$result = $uncompressedResult ? $uncompressedResult : $result;
-					KalturaLog::info("returning from redis cache, key [$cacheKey] size [" . strlen($result) . "]");
-					return $result;
-				}
-			}
-			catch(Exception $e)
-			{
-				KalturaLog::info('File not found on Redis cache. [' . $e->getCode() . ' : ' . $e->getMessage() . ']');
-			}
+			return $resultFromSmallCache;
 		}
 
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FILE_SYNC);
@@ -279,8 +291,13 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		kFile::filePutContents($fullPath , $content);
 		self::setPermissions($fullPath);
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content), kPathManager::getStorageProfileIdForKey($key));
-		$encryptedContent = self::encryptByFileSyncKey($key, kPathManager::getStorageProfileIdForKey($key));
-		$contentToPut = $encryptedContent ? $encryptedContent : $content;
+		self::setInSmallFileCache($key, $content);
+	}
+
+	protected static function setInSmallFileCache($key, $content)
+	{
+		self::encryptByFileSyncKey($key, kPathManager::getStorageProfileIdForKey($key));
+		$contentToPut = gzcompress($content) ??  $content;
 		$compressedContentToPut = gzcompress($contentToPut);
 		$contentToPut = $compressedContentToPut ? $compressedContentToPut : $contentToPut;
 
@@ -288,24 +305,30 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$contentSize = strlen($contentToPut);
 		$fileSyncFilesToCache = kConf::get(self::FILE_SYNC_TYPES_TO_CACHE, kConfMapNames::RUNTIME_CONFIG, array());
 		$maxFileSizeToCache = kConf::get(self::MAX_FILE_SIZE_TO_CACHE, kConfMapNames::RUNTIME_CONFIG);
+		if (!$fileSyncFilesToCache || !$maxFileSizeToCache)
+		{
+			return;
+		}
 		if ($contentSize <= $maxFileSizeToCache && in_array("{$key->object_type}_{$key->object_sub_type}", $fileSyncFilesToCache))
 		{
 			$redisWrapper = self::initSmallFileRedisInstance();
-			if ($redisWrapper)
+			if (!$redisWrapper)
 			{
-				$cacheKey = self::getCacheKey($key);
-				try
+				return;
+			}
+
+			$cacheKey = self::getCacheKey($key);
+			try
+			{
+				$fileAdd = $redisWrapper->doSet($cacheKey, $contentToPut);
+				if ($fileAdd === false)
 				{
-					$fileAdd = $redisWrapper->doSet($cacheKey, $contentToPut);
-					if ($fileAdd === false)
-					{
-						KalturaLog::err("Failed to add file content with key [$key]");
-					}
+					KalturaLog::err("Failed to add file content with key [$key]");
 				}
-				catch (Exception $e)
-				{
-					KalturaLog::err('Failed to add file content with key [$key] - [' . $e->getCode() . ' : ' . $e->getMessage() . ']');
-				}
+			}
+			catch (Exception $e)
+			{
+				KalturaLog::err("Failed to add file content with key [$key] - [" . $e->getCode() . " : " . $e->getMessage() . "]");
 			}
 		}
 	}
