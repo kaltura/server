@@ -1742,11 +1742,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
 
-		if ( $entry->getStatus() != entryStatus::READY ) {
+		if (in_array($entry->getStatus(), [entryStatus::READY, entryStatus::NO_CONTENT]))
+		{
+			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
+		}
+		else
+		{
 			$entry->addClonePendingEntry($newEntry->getId());
 			$entry->save();
-		} else {
-			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
 		}
 
  	    //if entry is a static playlist, link between it and its new child entries
