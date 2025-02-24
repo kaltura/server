@@ -12,6 +12,11 @@ class kReportExportJobData extends kJobData
 	protected $recipientEmail;
 
 	/**
+	 * @var string
+	 */
+	protected $recipientName;
+
+	/**
 	 * @var array
 	 */
 	protected $reportItems;
@@ -60,6 +65,22 @@ class kReportExportJobData extends kJobData
 	public function setRecipientEmail($recipientEmail)
 	{
 		$this->recipientEmail = $recipientEmail;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getRecipientName()
+	{
+		return $this->recipientName;
+	}
+
+	/**
+	 * @param string $recipientName
+	 */
+	public function setRecipientName($recipientName)
+	{
+		$this->recipientName = $recipientName;
 	}
 
 	/**

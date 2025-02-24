@@ -1,3 +1,36 @@
+# Ursa-21.10.0
+## Rsvp Plugin ##
+* Issue Type: Task
+* Issue ID: PLAT-25025
+
+### Configuration ###
+To enable this plugin add the following to your plugins.ini file:
+
+	- Rsvp
+
+### Deployment ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Enable ScheduleEventNotificationPlugin
+- Issue Type: Task
+- Issue ID: PSVAMB-69071
+#### Deployment ####
+- Ensure existence of ```ScheduleEventNotifications``` in local plugins.ini configuration file
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/base/scripts/installPlugins.php
+
+## Add getAllChildJobs action to Batch service
+- Issue Type: Task
+- Issue ID: SUP-46309
+
+#### Deployment ####
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_02_03_update_batch_permissions.php
+
 # Ursa-21.9.0
 ## Add option do disable generation of iCal files in new format
 * Issue Type: Task

@@ -300,17 +300,15 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 					$resourcesNames = array();
 					$c = new Criteria();
 					$c->add(ScheduleResourcePeer::PARTNER_ID, $event->partnerId);
-					foreach ($resourceIds as $resourceId)
+					$c->add(ScheduleResourcePeer::ID, $resourceIds, Criteria::IN);
+					$resources = ScheduleResourcePeer::doSelect($c);
+
+					foreach ($resources as $resource)
 					{
 						/* @var $resource ScheduleResource */
-						$c->add(ScheduleResourcePeer::ID, $resourceId);
-						$resource = ScheduleResourcePeer::doSelectOne($c);
-						if ($resource)
-						{
-							$resourcesNames[] = $resource->getName();
-						}
-						$c->remove(ScheduleResourcePeer::ID);
+						$resourcesNames[] = $resource->getName();
 					}
+
 					$object->setField($string, implode(',', $resourcesNames));
 				}
 			}

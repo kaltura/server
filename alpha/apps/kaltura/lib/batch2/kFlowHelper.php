@@ -3330,12 +3330,12 @@ class kFlowHelper
 		$expiryInDays = $expiry / 60 / 60 / 24;
 		if ($expiryInDays >= 1)
 		{
-			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, self::DAYS, $validUntil);
+			$params = array($data->getRecipientName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, self::DAYS, $validUntil);
 		}
 		else
 		{
 			$expiryInHours = $expiry / 60 / 60;
-			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInHours, self::HOURS, $validUntil);
+			$params = array($data->getRecipientName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInHours, self::HOURS, $validUntil);
 		}
 		$titleParams = array($data->getReportsGroup(), $time);
 
@@ -3349,7 +3349,8 @@ class kFlowHelper
 			kConf::get("report_sender_name"),
 			$data->getRecipientEmail(),
 			$params,
-			$titleParams
+			$titleParams,
+			$data->getRecipientName()
 		);
 		return $dbBatchJob;
 	}
@@ -3358,7 +3359,7 @@ class kFlowHelper
 	{
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_FAILURE;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(),
+		$params = array($data->getRecipientName(), $time, $dbBatchJob->getId(),
 			$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
 		$titleParams = array($data->getReportsGroup(), $time);
 
@@ -3372,7 +3373,8 @@ class kFlowHelper
 			kConf::get("report_sender_name"),
 			$data->getRecipientEmail(),
 			$params,
-			$titleParams
+			$titleParams,
+			$data->getRecipientName()
 		);
 		return $dbBatchJob;
 	}
@@ -3381,7 +3383,7 @@ class kFlowHelper
 	{
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_ABORT;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
+		$params = array($data->getRecipientName(), $time, $dbBatchJob->getId());
 		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
@@ -3394,7 +3396,8 @@ class kFlowHelper
 			kConf::get("report_sender_name"),
 			$data->getRecipientEmail(),
 			$params,
-			$titleParams
+			$titleParams,
+			$data->getRecipientName()
 		);
 		return $dbBatchJob;
 	}

@@ -694,4 +694,18 @@ class BatchService extends KalturaBatchService
 		SchedulerPeer::deleteBySchedulerConfigId($scheduler->getConfiguredId());
 		return true;
 	}
+
+	/**
+	* batch getAllChildJobs action returns all child jobs
+	*
+	* @action getAllChildJobs
+	* @param int $rootJobId root job id
+	* @return KalturaBatchJobArray
+	*/
+	function getAllChildJobsAction($rootJobId)
+	{
+            $rootJob = BatchJobPeer::retrieveByPK($rootJobId);
+			$result = KalturaBatchJobArray::fromBatchJobArray($rootJob->getChildJobs());
+            return $result;
+	}
 }
