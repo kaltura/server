@@ -291,12 +291,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		kFile::filePutContents($fullPath , $content);
 		self::setPermissions($fullPath);
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content), kPathManager::getStorageProfileIdForKey($key));
+		self::encryptByFileSyncKey($key, kPathManager::getStorageProfileIdForKey($key));
 		self::setInSmallFileCache($key, $content);
 	}
 
 	protected static function setInSmallFileCache($key, $content)
 	{
-		self::encryptByFileSyncKey($key, kPathManager::getStorageProfileIdForKey($key));
 		$contentToPut = gzcompress($content) ??  $content;
 		$compressedContentToPut = gzcompress($contentToPut);
 		$contentToPut = $compressedContentToPut ? $compressedContentToPut : $contentToPut;
