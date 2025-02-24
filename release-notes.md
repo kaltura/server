@@ -1,4 +1,4 @@
-# Ursa-21.10.0
+# Ursa-21.11.0
 ## S3 Drop Folder - add support for ARN Role (AWS Deployments only) ##
 - Issue Type: Task
 - Issue ID: VCP-19989
