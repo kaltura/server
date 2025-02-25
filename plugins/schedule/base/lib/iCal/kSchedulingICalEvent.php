@@ -248,7 +248,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 		if ($event->recurrence && $event->recurrence->timeZone)
 		{
-			$timeZones = DateTimeZone::listIdentifiers();
+			$timeZones = DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC);
 
 			if (in_array($event->recurrence->timeZone, $timeZones))
 			{
