@@ -177,49 +177,37 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return self::CACHE_KEY_PREFIX . "{$key->object_id}_{$key->object_type}_{$key->object_sub_type}_{$key->version}";
 	}
 
-	private static function getFromSmallFileCache($cacheKey)
+	protected static function getCacheType(FileSyncKey $key)
 	{
-		$redisCacheStore = self::initSmallFileRedisInstance();
-		if (!$redisCacheStore)
-		{
-			return;
-		}
+		$fileSyncFilesToCache = kConf::get(self::FILE_SYNC_TYPES_TO_CACHE, kConfMapNames::RUNTIME_CONFIG, array());
+		$objectKeys = array (
+			$key->getObjectType() . ':' . $key->getObjectSubType(),
+			$key->getObjectType() . ':' . '*',
+			'*' // WildCard
+		);
 
-		try
+		if ($fileSyncFilesToCache && array_intersect($objectKeys, $fileSyncFilesToCache))
 		{
-			$result = $redisCacheStore->doGet($cacheKey);
-			if ($result)
-			{
-				$uncompressedResult = gzuncompress($result);
-				$result = $uncompressedResult ?? $result;
-				KalturaLog::info("returning from redis cache, key [$cacheKey] size [" . strlen($result) . "]");
-				return $result;
-			}
+			return kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC;
 		}
-		catch(Exception $e)
+		else
 		{
-			KalturaLog::info('File not found on Redis cache. [' . $e->getCode() . ' : ' . $e->getMessage() . ']');
+			return kCacheManager::CACHE_TYPE_FILE_SYNC;
 		}
 	}
 
 	public static function file_get_contents ( FileSyncKey $key , $fetch_from_remote_if_no_local = true , $strict = true , $max_file_size = 0 )
 	{
 		$cacheKey = self::getCacheKey($key);
-
-		$resultFromSmallCache = self::getFromSmallFileCache($cacheKey);
-		if ($resultFromSmallCache)
-		{
-			return $resultFromSmallCache;
-		}
-
-		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FILE_SYNC);
+		$cacheType = self::getCacheType($key);
+		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if ($cacheStore)
 		{
 			$result = $cacheStore->get($cacheKey);
 			if ($result)
 			{
 				KalturaLog::info("returning from cache, key [$cacheKey] size [" . strlen($result) . "]");
-				return $result;
+				return ($cacheType == kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC) ? gzuncompress($result) : $result;
 			}
 		}
 
@@ -299,33 +287,31 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		$fileSyncFilesToCache = kConf::get(self::FILE_SYNC_TYPES_TO_CACHE, kConfMapNames::RUNTIME_CONFIG, array());
 		$maxFileSizeToCache = kConf::get(self::MAX_FILE_SIZE_TO_CACHE, kConfMapNames::RUNTIME_CONFIG);
-		if (!$fileSyncFilesToCache || !$maxFileSizeToCache || !in_array("{$key->object_type}_{$key->object_sub_type}", $fileSyncFilesToCache))
+		$objectKeys = array (
+			$key->getObjectType() . ':' . $key->getObjectSubType(),
+			$key->getObjectType() . ':' . '*',
+			'*' // WildCard
+		);
+		if (!$fileSyncFilesToCache || !$maxFileSizeToCache || !array_intersect($objectKeys, $fileSyncFilesToCache))
 		{
 			return;
 		}
 
-		$contentToPut = gzcompress($content) ?? $content;
-		$contentSize = strlen($contentToPut);
+		$contentSize = strlen($content);
 		if ($contentSize <= $maxFileSizeToCache)
 		{
-			$redisWrapper = self::initSmallFileRedisInstance();
-			if (!$redisWrapper)
+			$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC);
+			if (!$cacheStore)
 			{
 				return;
 			}
 
 			$cacheKey = self::getCacheKey($key);
-			try
+			$contentToPut = gzcompress($content) ?? $content;
+			$result = $cacheStore->set($cacheKey, $contentToPut, self::FILE_SYNC_CACHE_EXPIRY);
+			if ($result === false)
 			{
-				$fileAdd = $redisWrapper->doSet($cacheKey, $contentToPut);
-				if ($fileAdd === false)
-				{
-					KalturaLog::err("Failed to add file content with key [$key]");
-				}
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::err("Failed to add file content with key [$key] - [" . $e->getCode() . " : " . $e->getMessage() . "]");
+				KalturaLog::err("Failed to add file content with key [$key]");
 			}
 		}
 	}
