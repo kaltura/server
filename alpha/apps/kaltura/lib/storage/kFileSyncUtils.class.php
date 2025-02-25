@@ -207,7 +207,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			if ($result)
 			{
 				KalturaLog::info("returning from cache, key [$cacheKey] size [" . strlen($result) . "]");
-				return ($cacheType == kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC) ? gzuncompress($result) : $result;
+				return gzuncompress($result) ?? $result;
 			}
 		}
 
@@ -314,17 +314,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				KalturaLog::err("Failed to add file content with key [$key]");
 			}
 		}
-	}
-
-	protected static function initSmallFileRedisInstance()
-	{
-		$redisWrapper = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC);
-		if (!$redisWrapper)
-		{
-			return null;
-		}
-
-		return $redisWrapper;
 	}
 
 	protected static function setPermissions($filePath)
