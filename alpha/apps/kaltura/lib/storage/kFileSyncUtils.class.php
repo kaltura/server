@@ -297,17 +297,16 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function setInSmallFileCache($key, $content)
 	{
-		$contentToPut = gzcompress($content) ??  $content;
-
-		//If the file is under a specific threshold in size, save it to redis cache
-		$contentSize = strlen($contentToPut);
 		$fileSyncFilesToCache = kConf::get(self::FILE_SYNC_TYPES_TO_CACHE, kConfMapNames::RUNTIME_CONFIG, array());
 		$maxFileSizeToCache = kConf::get(self::MAX_FILE_SIZE_TO_CACHE, kConfMapNames::RUNTIME_CONFIG);
-		if (!$fileSyncFilesToCache || !$maxFileSizeToCache)
+		if (!$fileSyncFilesToCache || !$maxFileSizeToCache || !in_array("{$key->object_type}_{$key->object_sub_type}", $fileSyncFilesToCache))
 		{
 			return;
 		}
-		if ($contentSize <= $maxFileSizeToCache && in_array("{$key->object_type}_{$key->object_sub_type}", $fileSyncFilesToCache))
+
+		$contentToPut = gzcompress($content) ?? $content;
+		$contentSize = strlen($contentToPut);
+		if ($contentSize <= $maxFileSizeToCache)
 		{
 			$redisWrapper = self::initSmallFileRedisInstance();
 			if (!$redisWrapper)
