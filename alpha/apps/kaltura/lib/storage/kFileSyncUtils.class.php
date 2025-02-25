@@ -298,8 +298,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	protected static function setInSmallFileCache($key, $content)
 	{
 		$contentToPut = gzcompress($content) ??  $content;
-		$compressedContentToPut = gzcompress($contentToPut);
-		$contentToPut = $compressedContentToPut ? $compressedContentToPut : $contentToPut;
 
 		//If the file is under a specific threshold in size, save it to redis cache
 		$contentSize = strlen($contentToPut);
