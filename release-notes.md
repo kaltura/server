@@ -31,7 +31,6 @@ Generate Clients (Replace @path_to_server@ with your path):
    6.2. Tick 'Bucket Policy Allow Access' checkbox
 
 # Ursa-21.10.0
-
 ## Rsvp Plugin ##
 * Issue Type: Task
 * Issue ID: PLAT-25025
