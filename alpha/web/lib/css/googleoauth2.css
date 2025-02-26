@@ -6,3 +6,4 @@ a { color: #DDDDDD; }
 #google-oauth-form label span { float: left; width: 80px; }
 #google-oauth-form label input { padding: 2px 5px; border: solid 1px #b5cbd3; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; }
 #google-oauth-form label input.invalid { border: solid 1px darkred; }
+#google-oauth-form #otp-label.hidden { display: none; }
