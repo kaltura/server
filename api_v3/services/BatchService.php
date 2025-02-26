@@ -691,7 +691,7 @@ class BatchService extends KalturaBatchService
 		}
 
 		KalturaLog::debug("Deleting scheduler data for scheduler id {$scheduler->getId()} with configuredId {$scheduler->getConfiguredId()}");
-		SchedulerPeer::deleteBySchedulerConfigId($scheduler->getConfiguredId());
+		SchedulerPeer::deleteBySchedulerConfigId($scheduler->getId(), $scheduler->getConfiguredId());
 		return true;
 	}
 
