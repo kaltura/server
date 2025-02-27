@@ -75,6 +75,8 @@ class KalturaErrors extends APIErrors
 
 	const PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE = "PROPERTY_VALIDATION_ALL_MUST_BE_NULL_BUT_ONE;PROP_NAME;Only one of the passed properties: @PROP_NAME@ should not be null";
 
+	const PROPERTY_VALIDATION_NOT_VALID = "PROPERTY_VALIDATION_UNTIL_NOT_VALID;PROP_NAME;The property \"@PROP_NAME@\" is not valid";
+
 	const PROPERTY_VALIDATION_MIN_LENGTH = "PROPERTY_VALIDATION_MIN_LENGTH;PROP_NAME,MIN_LEN;The property \"@PROP_NAME@\" must have a min length of @MIN_LEN@ characters";
 
 	const PROPERTY_VALIDATION_MAX_LENGTH = "PROPERTY_VALIDATION_MAX_LENGTH;PROP_NAME,MAX_LEN;The property \"@PROP_NAME@\" cannot have more than @MAX_LEN@ characters";

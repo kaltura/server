@@ -503,7 +503,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 		array_unshift($relevantTransitions, $initialTransition);
-
+		
 		// Create VTIMEZONE block content
 		$timeZoneBlockArray[] = $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
 
