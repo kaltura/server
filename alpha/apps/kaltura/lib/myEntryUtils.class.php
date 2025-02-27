@@ -1746,11 +1746,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
 		}
-		else
+
+	    if ( $entry->getStatus() != entryStatus::READY )
 		{
-			$entry->addClonePendingEntry($newEntry->getId());
-			$entry->save();
-		}
+		    $entry->addClonePendingEntry($newEntry->getId());
+		    $entry->save();
+	    }
 
  	    //if entry is a static playlist, link between it and its new child entries
 		if ($entry->getType() == entryType::PLAYLIST)
