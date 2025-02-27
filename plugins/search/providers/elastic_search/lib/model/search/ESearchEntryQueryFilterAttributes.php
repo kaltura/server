@@ -13,6 +13,7 @@ class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 		$mustNotDisplayInSearchBoolQuery->addToMustNot($displayInSearchQuery);
 		
 		$queryContainsDisplayInSearch = false;
+		$recycleDisplayInSearch = false;
 		$ignoreDisplayInSearchQueries = array();
 		foreach	($this->ignoreDisplayInSearchValues as $key => $value)
 		{
@@ -26,6 +27,11 @@ class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 				if ($key == ESearchEntryFieldName::DISPLAY_IN_SEARCH)
 				{
 					$queryContainsDisplayInSearch = true;
+					if (in_array(EntryDisplayInSearchType::RECYCLED, $value))
+					{
+						$recycleDisplayInSearch = true;
+					}
+
 				}
 			}
 		}
@@ -34,13 +40,22 @@ class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 		{
 			return $mustNotDisplayInSearchBoolQuery;
 		}
-		
-		$displayInSearchBoolQuery = new kESearchBoolQuery();
-		$displayInSearchBoolQuery->addQueriesToShould($ignoreDisplayInSearchQueries);
-		if (!$queryContainsDisplayInSearch)
+
+		if (!$queryContainsDisplayInSearch || ($queryContainsDisplayInSearch && !$recycleDisplayInSearch))
 		{
+			$displayInSearchBoolQuery = new kESearchBoolQuery();
 			$displayInSearchBoolQuery->addToShould($mustNotDisplayInSearchBoolQuery);
+			return $displayInSearchBoolQuery;
 		}
-		return $displayInSearchBoolQuery;
+		if ($queryContainsDisplayInSearch && $recycleDisplayInSearch)
+		{
+			$excludedSystemDisplayInSearch = array(EntryDisplayInSearchType::SYSTEM);
+			$systemDisplayInSearchQuery = new kESearchTermsQuery(ESearchEntryFieldName::DISPLAY_IN_SEARCH, $excludedSystemDisplayInSearch);
+			$mustNotDisplayInSearchSystem = new kESearchBoolQuery();
+			$mustNotDisplayInSearchSystem->addToMustNot($systemDisplayInSearchQuery);
+			return $mustNotDisplayInSearchSystem;
+		}
+
+		return null;
 	}
 }
