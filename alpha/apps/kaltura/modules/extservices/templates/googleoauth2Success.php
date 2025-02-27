@@ -8,6 +8,7 @@
 			<div class="error"></div>
 			<label><span>Email:</span><input type="text" name="email" /></label>
 			<label><span>Password:</span><input type="password" name="password" /></label>
+			<label id="otp-label" class="hidden"><span>OTP:</span><input type="text" name="otp" /></label>
 			<button id="login" type="submit">Login</button>
 		</form>
 		<script type="text/javascript">
