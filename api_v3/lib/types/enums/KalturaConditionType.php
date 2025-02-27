@@ -26,6 +26,7 @@ class KalturaConditionType extends KalturaDynamicEnum implements ConditionType
 			ConditionType::HTTP_HEADER => 'Validate that request came with specific header values',
 			ConditionType::ACTION_NAME => 'Validate that request is for a desired service and action',
 			ConditionType::URL_AUTH_PARAMS => 'Validate url authentication params on request',
+			ConditionType::SESSION_TYPE => 'Validate request session type',
 			);
 		
 		return self::mergeDescriptions(self::getEnumClass(), $descriptions);
