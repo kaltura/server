@@ -434,35 +434,22 @@ class GroupUserService extends KalturaBaseService
 
 	protected function validateMaxGroupsPerUser($partnerId, $kuserId)
 	{
-		$maxGroupsPerUser = self::getPartnerMaximumGroupsPerUser($partnerId);
+		$maxGroupsPerUser = $this->getPartnerMaximumGroupsPerUser($partnerId);
 
-		$criteria = new Criteria();
-		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
-		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
-		$kuserGroupList = KuserKgroupPeer::doSelect($criteria);
-
+		$kuserGroupList = $this->retrieveActiveGroupsForKuser($kuserId);
 		if (count($kuserGroupList) < $maxGroupsPerUser)
 		{
 			return;
 		}
 
-		$countLimitedGroups = 0;
-		foreach ($kuserGroupList as $kuserGroup)
-		{
-			/** @var KuserKgroup $kuserGroup */
-			if ($kuserGroup->getGroupType() == GroupType::GROUP)
-			{
-				$countLimitedGroups += 1;
-			}
-		}
-
+		$countLimitedGroups = $this->countLimitedGroups($kuserGroupList);
 		if ($countLimitedGroups >= $maxGroupsPerUser)
 		{
 			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
 		}
 	}
 
-	protected static function getPartnerMaximumGroupsPerUser($partnerId)
+	protected function getPartnerMaximumGroupsPerUser($partnerId)
 	{
 		$groupUserCountLimitMap = kConf::get('group_user_count_limit', 'local', array());
 		$partnersList = array_keys($groupUserCountLimitMap);
@@ -472,5 +459,27 @@ class GroupUserService extends KalturaBaseService
 		}
 
 		return GroupUserService::DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER;
+	}
+
+	protected function retrieveActiveGroupsForKuser($kuserId)
+	{
+		$criteria = new Criteria();
+		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
+		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+		return KuserKgroupPeer::doSelect($criteria);
+	}
+
+	protected function countLimitedGroups($kuserGroupList)
+	{
+		$countLimitedGroups = 0;
+		foreach ($kuserGroupList as $kuserGroup)
+		{
+			/** @var KuserKgroup $kuserGroup */
+			if ($kuserGroup->getGroupType() == GroupType::GROUP)
+			{
+				$countLimitedGroups += 1;
+			}
+		}
+		return $countLimitedGroups;
 	}
 }
