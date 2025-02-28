@@ -10,17 +10,16 @@
  */ 
 class SchedulerPeer extends BaseSchedulerPeer
 {
-	public static function deleteBySchedulerConfigId($schedulerId)
+	public static function deleteBySchedulerConfigId($schedulerId, $schedulerConfiguredId)
 	{
 		$criteria = new Criteria();
-		$criteria->add(SchedulerPeer::CONFIGURED_ID, $schedulerId);
-
+		$criteria->add(SchedulerPeer::CONFIGURED_ID, $schedulerConfiguredId);
 		SchedulerPeer::doDelete($criteria);
 		
-		SchedulerWorkerPeer::deleteBySchedulerConfigId($schedulerId);
-		SchedulerConfigPeer::deleteBySchedulerConfigId($schedulerId);
-		SchedulerStatusPeer::deleteBySchedulerConfigId($schedulerId);
-		ControlPanelCommandPeer::deleteBySchedulerConfigId($schedulerId);
+		SchedulerWorkerPeer::deleteBySchedulerConfigId($schedulerConfiguredId);
+		SchedulerConfigPeer::deleteBySchedulerId($schedulerId);
+		SchedulerStatusPeer::deleteBySchedulerId($schedulerId);
+		ControlPanelCommandPeer::deleteBySchedulerConfigId($schedulerConfiguredId);
 	}
 	
 	public static function getConfiguredIdByHostName($hostname)
