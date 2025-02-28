@@ -37,8 +37,11 @@ class GroupUserService extends KalturaBaseService
 
 		//verify kgroup exists
 		$kgroup = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->groupId);
-		if ( !$kgroup || $kgroup->getType() != KuserType::GROUP)
+		$groupTypes = array(KuserType::GROUP, KuserType::APPLICATIVE_GROUP);
+		if (!$kgroup || !in_array($kgroup->getType(), $groupTypes))
+		{
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupUser->userId );
+		}
 
 		//verify kuser does not belongs to kgroup
 		$kuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
@@ -431,21 +434,43 @@ class GroupUserService extends KalturaBaseService
 
 	protected function validateMaxGroupsPerUser($partnerId, $kuserId)
 	{
+		$maxGroupsPerUser = self::getPartnerMaximumGroupsPerUser($partnerId);
+
 		$criteria = new Criteria();
 		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
 		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+		$kuserGroupList = KuserKgroupPeer::doSelect($criteria);
 
-		$maxGroupsPerUser = GroupUserService::DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER;
+		if (count($kuserGroupList) < $maxGroupsPerUser)
+		{
+			return;
+		}
+
+		$countLimitedGroups = 0;
+		foreach ($kuserGroupList as $kuserGroup)
+		{
+			/** @var KuserKgroup $kuserGroup */
+			if (!$kuserGroup->getGroupApplication())
+			{
+				$countLimitedGroups += 1;
+			}
+		}
+
+		if ($countLimitedGroups >= $maxGroupsPerUser)
+		{
+			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
+		}
+	}
+
+	protected static function getPartnerMaximumGroupsPerUser($partnerId)
+	{
 		$groupUserCountLimitMap = kConf::get('group_user_count_limit', 'local', array());
 		$partnersList = array_keys($groupUserCountLimitMap);
 		if (in_array($partnerId, $partnersList))
 		{
-			$maxGroupsPerUser = $groupUserCountLimitMap[$partnerId];
+			return $groupUserCountLimitMap[$partnerId];
 		}
 
-		if (KuserKgroupPeer::doCount($criteria) >= $maxGroupsPerUser)
-		{
-			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
-		}
+		return GroupUserService::DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER;
 	}
 }

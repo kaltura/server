@@ -68,6 +68,11 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 	 */
 	public $userRole;
 
+	/**
+	 * @var int
+	 */
+	public $groupApplication;
+
 	private static $map_between_objects = array
 	(
 		"id",
@@ -78,7 +83,8 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 		"createdAt",
 		"updatedAt",
 		"creationMode",
-		"userRole"
+		"userRole",
+		"groupApplication",
 	);
 
 	public function getMapBetweenObjects ( )
