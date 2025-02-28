@@ -6,9 +6,9 @@
 class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 {
 	/**
-	 * @var KalturaNullableBoolean
+	 * @var KalturaGroupType
 	 */
-	public $isApplicativeGroup;
+	public $groupType;
 
 	static private $map_between_objects = array	();
 
@@ -45,7 +45,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
 			$c->add(kuserPeer::PUSER_ID, $this->groupIdEqual);
-			$c->add(kuserPeer::TYPE, $this->getGroupType());
+			$c->add(kuserPeer::TYPE, $this->groupType);
 			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get categoryUser of deleted users.
 				kuserPeer::setUseCriteriaFilter(false);
 
@@ -127,7 +127,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 			$c->add(kuserPeer::PUSER_ID, $groupIdIn, Criteria::IN);
-			$c->add(kuserPeer::TYPE, $this->getGroupType());
+			$c->add(kuserPeer::TYPE, $this->groupType);
 			$kusers = kuserPeer::doSelect($c);
 
 			if (!$kusers)
@@ -172,15 +172,5 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 		}
 		$response->totalCount = $totalCount;
 		return $response;
-	}
-
-	protected function getGroupType()
-	{
-		if ($this->isApplicativeGroup)
-		{
-			return KuserType::APPLICATIVE_GROUP;
-		}
-
-		return KuserType::GROUP;
 	}
 }

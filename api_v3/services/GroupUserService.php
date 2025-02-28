@@ -450,7 +450,7 @@ class GroupUserService extends KalturaBaseService
 		foreach ($kuserGroupList as $kuserGroup)
 		{
 			/** @var KuserKgroup $kuserGroup */
-			if (!$kuserGroup->getGroupApplication())
+			if ($kuserGroup->getGroupType() == GroupType::GROUP)
 			{
 				$countLimitedGroups += 1;
 			}

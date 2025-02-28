@@ -17,7 +17,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 {
 	const GROUP_USER_CREATION_MODE = 'creation_mode';
 	const GROUP_USER_ROLE = 'user_role';
-	const GROUP_APPLICATION = 'group_application';
+	const GROUP_TYPE = 'group_type';
 
 	public function setPuserId($puserId)
 	{
@@ -96,13 +96,13 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 		return $this->getFromCustomData(self::GROUP_USER_ROLE, null, GroupUserRole::MEMBER);
 	}
 
-	public function setGroupApplication($v)
+	public function setGroupType($v)
 	{
-		$this->putInCustomData(self::GROUP_APPLICATION, $v);
+		$this->putInCustomData(self::GROUP_TYPE, $v);
 	}
 
-	public function getGroupApplication()
+	public function getGroupType()
 	{
-		return $this->getFromCustomData(self::GROUP_APPLICATION, null, 0);
+		return $this->getFromCustomData(self::GROUP_TYPE, null, GroupType::GROUP);
 	}
 }
