@@ -43,21 +43,16 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
 	 * @param KalturaFilterPager $pager
-	 * @param $fromCreatedAt
+	 * @param $fromId
 	 * @return array
 	 */
-	protected function loadDropFolderFilesByPage($pager, $fromId = null)
+	protected function loadDropFolderFilesPageById($pager, $fromId)
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
 		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::ID_ASC;
-		
-		if ($fromId)
-		{
-			$dropFolderFileFilter->idGreaterThanOrEqual = $fromId;
-		}
-		
+		$dropFolderFileFilter->idGreaterThanOrEqual = $fromId;
 		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
 		return $dropFolderFiles->objects;
 	}
@@ -97,14 +92,14 @@ abstract class KDropFolderEngine implements IKalturaLogger
 
 		do
 		{
-			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager, $dropFolderFileId);
+			$dropFolderFiles = $this->loadDropFolderFilesPageById($pager, $dropFolderFileId);
 			foreach ($dropFolderFiles as $dropFolderFile)
 			{
 				$this->handleExistingDropFolderFile($dropFolderFile);
 				$dropFolderFileId = $dropFolderFile->id;
 			}
-
-		} while (count($dropFolderFiles) >= $pager->pageSize);
+		}
+		while (count($dropFolderFiles) >= $pager->pageSize);
 	}
 
 	/**
