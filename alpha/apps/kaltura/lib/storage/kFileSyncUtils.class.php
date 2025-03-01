@@ -19,6 +19,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	const SOURCE_TYPE_FILE = 'file';
 	const SOURCE_TYPE_HTTP = 'http';
+	const FILE_SYNC_TYPES_TO_CACHE = 'file_sync_types_to_cache';
+	const MAX_FILE_SIZE_TO_CACHE = 'max_file_size_to_cache';
 
 	/**
 	 * Contain all object types and sub types that should not be synced
@@ -170,17 +172,42 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		return $files;
 	}
 
+	protected static function getCacheKey(FileSyncKey $key)
+	{
+		return self::CACHE_KEY_PREFIX . "{$key->object_id}_{$key->object_type}_{$key->object_sub_type}_{$key->version}";
+	}
+
+	protected static function getCacheType(FileSyncKey $key)
+	{
+		$fileSyncFilesToCache = kConf::get(self::FILE_SYNC_TYPES_TO_CACHE, kConfMapNames::RUNTIME_CONFIG, array());
+		$objectKeys = array (
+			$key->getObjectType() . ':' . $key->getObjectSubType(),
+			$key->getObjectType() . ':' . '*',
+			'*' // WildCard
+		);
+
+		if ($fileSyncFilesToCache && array_intersect($objectKeys, $fileSyncFilesToCache))
+		{
+			return kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC;
+		}
+		else
+		{
+			return kCacheManager::CACHE_TYPE_FILE_SYNC;
+		}
+	}
+
 	public static function file_get_contents ( FileSyncKey $key , $fetch_from_remote_if_no_local = true , $strict = true , $max_file_size = 0 )
 	{
-		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_FILE_SYNC);
+		$cacheKey = self::getCacheKey($key);
+		$cacheType = self::getCacheType($key);
+		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if ($cacheStore)
 		{
-			$cacheKey = self::CACHE_KEY_PREFIX . "{$key->object_id}_{$key->object_type}_{$key->object_sub_type}_{$key->version}";
 			$result = $cacheStore->get($cacheKey);
 			if ($result)
 			{
-				KalturaLog::info("returning from cache, key [$cacheKey] size [".strlen($result)."]");
-				return $result;
+				KalturaLog::info("returning from cache, key [$cacheKey] size [" . strlen($result) . "]");
+				return gzuncompress($result) ?? $result;
 			}
 		}
 
@@ -253,6 +280,40 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		self::setPermissions($fullPath);
 		self::createSyncFileForKey($rootPath, $filePath,  $key , $strict , !is_null($res), false, md5($content), kPathManager::getStorageProfileIdForKey($key));
 		self::encryptByFileSyncKey($key, kPathManager::getStorageProfileIdForKey($key));
+		self::setInSmallFileCache($key, $content);
+	}
+
+	protected static function setInSmallFileCache($key, $content)
+	{
+		$fileSyncFilesToCache = kConf::get(self::FILE_SYNC_TYPES_TO_CACHE, kConfMapNames::RUNTIME_CONFIG, array());
+		$maxFileSizeToCache = kConf::get(self::MAX_FILE_SIZE_TO_CACHE, kConfMapNames::RUNTIME_CONFIG);
+		$objectKeys = array (
+			$key->getObjectType() . ':' . $key->getObjectSubType(),
+			$key->getObjectType() . ':' . '*',
+			'*' // WildCard
+		);
+		if (!$fileSyncFilesToCache || !$maxFileSizeToCache || !array_intersect($objectKeys, $fileSyncFilesToCache))
+		{
+			return;
+		}
+
+		$contentSize = strlen($content);
+		if ($contentSize <= $maxFileSizeToCache)
+		{
+			$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC);
+			if (!$cacheStore)
+			{
+				return;
+			}
+
+			$cacheKey = self::getCacheKey($key);
+			$contentToPut = gzcompress($content) ?? $content;
+			$result = $cacheStore->set($cacheKey, $contentToPut, self::FILE_SYNC_CACHE_EXPIRY);
+			if ($result === false)
+			{
+				KalturaLog::err("Failed to add file content with key [$key]");
+			}
+		}
 	}
 
 	protected static function setPermissions($filePath)
