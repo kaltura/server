@@ -95,6 +95,7 @@ abstract class KDropFolderEngine implements IKalturaLogger
 			$dropFolderFiles = $this->loadDropFolderFilesPageById($pager, $dropFolderFileId);
 			foreach ($dropFolderFiles as $dropFolderFile)
 			{
+				KalturaLog::info("Handle drop folder file: {$dropFolderFile->fileName}");
 				$this->handleExistingDropFolderFile($dropFolderFile);
 				$dropFolderFileId = $dropFolderFile->id;
 			}
