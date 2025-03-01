@@ -95,29 +95,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		return true;
 	}
 	
-	protected function handleExistingDropFolderFiles()
-	{
-		$pager = new KalturaFilterPager();
-		$pager->pageIndex = 0;
-		$pager->pageSize = 500;
-		if(KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
-		{
-			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
-		}
-		
-		$fromCreatedAt = time() - self::DEFAULT_ZOOM_QUERY_TIMERANGE;
-		do
-		{
-			$pager->pageIndex++;
-			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager, $fromCreatedAt);
-			foreach ($dropFolderFiles as $dropFolderFile)
-			{
-				$this->handleExistingDropFolderFile($dropFolderFile);
-			}
-			
-		} while (count($dropFolderFiles) >= $pager->pageSize);
-	}
-	
 	public function watchFolder(KalturaDropFolder $dropFolder)
 	{
 		if($this->shouldDisableExpiredDropFolder($dropFolder))
@@ -146,8 +123,8 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			KalturaLog::info("Advancing DropFolderId {$this->dropFolder->id} in a day");
 			$this->updateDropFolderLastMeetingHandled($this->dropFolder->lastHandledMeetingTime + self::ONE_DAY);
 		}
-		
-		$this->handleExistingDropFolderFiles();
+
+		$this->handleExistingDropFolderFiles(self::DEFAULT_ZOOM_QUERY_TIMERANGE);
 	}
 
 	protected function refreshZoomClientTokens()

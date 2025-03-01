@@ -43,23 +43,64 @@ abstract class KDropFolderEngine implements IKalturaLogger
 	/**
 	 * Load all the files from the database that their status is not PURGED, PARSED or DETECTED
 	 * @param KalturaFilterPager $pager
-	 * @param $fromCreatedAt
+	 * @param $fromId
 	 * @return array
 	 */
-	protected function loadDropFolderFilesByPage($pager, $fromCreatedAt = null)
+	protected function loadDropFolderFilesPageById($pager, $fromId)
 	{
 		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
 		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
 		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
-		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
-		
-		if ($fromCreatedAt)
-		{
-			$dropFolderFileFilter->createdAtGreaterThanOrEqual = $fromCreatedAt;
-		}
-		
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::ID_ASC;
+		$dropFolderFileFilter->idGreaterThanOrEqual = $fromId;
 		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
 		return $dropFolderFiles->objects;
+	}
+
+	protected function getSingleDropFolderFileIdByCreatedAt($fromCreatedAt)
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = 1;
+
+		$dropFolderFileFilter = new KalturaDropFolderFileFilter();
+		$dropFolderFileFilter->dropFolderIdEqual = $this->dropFolder->id;
+		$dropFolderFileFilter->createdAtGreaterThanOrEqual = $fromCreatedAt;
+		$dropFolderFileFilter->statusNotIn = KalturaDropFolderFileStatus::PARSED.','.KalturaDropFolderFileStatus::DETECTED;
+		$dropFolderFileFilter->orderBy = KalturaDropFolderFileOrderBy::CREATED_AT_ASC;
+
+		$dropFolderFiles = $this->dropFolderFileService->listAction($dropFolderFileFilter, $pager);
+		return isset($dropFolderFiles->objects[0]->id) ? $dropFolderFiles->objects[0]->id : null;
+	}
+
+	protected function handleExistingDropFolderFiles($timeRange)
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageIndex = 0;
+		$pager->pageSize = 500;
+		if(KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
+		{
+			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
+		}
+
+		$fromCreatedAt = time() - $timeRange;
+		$dropFolderFileId = $this->getSingleDropFolderFileIdByCreatedAt($fromCreatedAt);
+		if(!$dropFolderFileId)
+		{
+			return;
+		}
+
+		do
+		{
+			$dropFolderFiles = $this->loadDropFolderFilesPageById($pager, $dropFolderFileId);
+			foreach ($dropFolderFiles as $dropFolderFile)
+			{
+				KalturaLog::info("Handle drop folder file: {$dropFolderFile->fileName}");
+				$this->handleExistingDropFolderFile($dropFolderFile);
+				$dropFolderFileId = $dropFolderFile->id;
+			}
+		}
+		while (count($dropFolderFiles) >= $pager->pageSize);
 	}
 
 	/**
