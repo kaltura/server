@@ -10,6 +10,7 @@ abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"idGreaterThanOrEqual" => "_gte_id",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
 		"dropFolderIdEqual" => "_eq_drop_folder_id",
@@ -76,6 +77,11 @@ abstract class KalturaDropFolderFileBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $idIn;
+
+	/**
+	 * @var int
+	 */
+	public $idGreaterThanOrEqual;
 
 	/**
 	 * @var int
