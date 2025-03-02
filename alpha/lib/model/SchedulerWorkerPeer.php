@@ -10,10 +10,10 @@
  */ 
 class SchedulerWorkerPeer extends BaseSchedulerWorkerPeer
 {
-	public static function deleteBySchedulerConfigId($schedulerId)
+	public static function deleteBySchedulerConfigId($schedulerConfiguredId)
 	{
 		$criteria = new Criteria();
-		$criteria->add(SchedulerWorkerPeer::SCHEDULER_CONFIGURED_ID, $schedulerId);
+		$criteria->add(SchedulerWorkerPeer::SCHEDULER_CONFIGURED_ID, $schedulerConfiguredId);
 
 		SchedulerWorkerPeer::doDelete($criteria);
 	}
