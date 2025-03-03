@@ -457,6 +457,18 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		return $this->timeZoneId;
 	}
 
+	protected function refineTransitions(DateTimeZone $dateTimeZone, KalturaScheduleEvent $event, $until)
+	{
+		$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $until);
+		if (count($transitions) == 1)
+		{
+			$transitions = $dateTimeZone->getTransitions();
+			$transitions = array(end($transitions));
+		}
+
+		return $transitions;
+	}
+
 	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null, &$timeZoneBlockArray = null)
 	{
 		try
@@ -473,7 +485,8 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$until = (!$event->recurrence->until) ? $this->getUntilFromCount($event->recurrence->count, $event->recurrence->frequency, $event->startDate) : $event->recurrence->until;
 
 		// In order to reduce the size of the transitions to analyze, we start querying from a year before the start of the event until the last occurrence
-		$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $until);
+		$transitions = $this->refineTransitions($dateTimeZone, $event, $until);
+
 		$relevantTransitions = array();
 		$initialTransition = null;
 		$daylightOffset = null;
@@ -555,6 +568,8 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	{
 		$transitionTimeBlock = '';
 		$timeType = ($transition['isdst']) ? 'DAYLIGHT' : 'STANDARD';
+		$daylightOffset ??= $standardOffset;
+		$standardOffset ??= $daylightOffset;
 		$offsetFrom = ($timeType === 'STANDARD') ? dateUtils::formatOffset($daylightOffset) : dateUtils::formatOffset($standardOffset);
 		$offsetTo = ($timeType === 'STANDARD') ? dateUtils::formatOffset($standardOffset) : dateUtils::formatOffset($daylightOffset);
 
