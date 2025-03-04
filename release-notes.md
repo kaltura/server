@@ -51,7 +51,7 @@ The Bucket Policy should include the following:
 ```
 6. In S3 Drop Folder (Kaltura Admin Console):  
    6.1. Leave User & Password Empty  
-   6.2. Tick 'Bucket Policy Allow Access' checkbox
+   6.2. Tick 'Bucket Policy Allows Access' checkbox
 
 
 # Ursa-21.10.0
