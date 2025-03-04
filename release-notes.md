@@ -1,3 +1,11 @@
+# Ursa-21.11.0
+## Add demoteAdmin action to User service ##
+* Issue Type: Task
+* Issue ID: PLAT-25145
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2025_03_03_user_demoteAdmin_permissions.php
+
 # Ursa-21.10.0
 ## Rsvp Plugin ##
 * Issue Type: Task
