@@ -14,7 +14,7 @@ class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureE
 	{
 		return "Authentication precedence:<br>
 				1. User & Password (if passed will be used)<br>
-				2. Bucket Policy Allows Access<br>
+				2. Bucket Policy Allow Access<br>
 				Note: Bucket policy must allow 'runtime_config' map 's3_drop_folder' section 's3Arn' value role to operate it";
 	}
 
