@@ -393,6 +393,14 @@ abstract class KalturaScheduleEvent extends KalturaObject implements IRelatedFil
 		}
 
 		$this->validatePropertyNotNull('recurrence');
+		if ($this->recurrence instanceof KalturaScheduleEventRecurrence)
+		{
+			if ($this->recurrence->until && $this->recurrence->until < $this->endDate)
+			{
+				throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NOT_VALID, 'Recurrence::until');
+			}
+		}
+
 		$this->validatePropertyNotNull('duration');
 
 	}

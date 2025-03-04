@@ -1,4 +1,16 @@
 # Tucana-20.17.0
+## Add option do disable generation of iCal files in new format
+* Issue Type: Task
+* Issue ID: SUP-46741
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.disableNewIcalStandard.enabled = true
+moduls.disableNewIcalStandard.permissionType = 2
+moduls.disableNewIcalStandard.label = "Disable new iCal standard"
+moduls.disableNewIcalStandard.permissionName = FEATURE_DISABLE_NEW_ICAL_STANDARD
+moduls.disableNewIcalStandard.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 ## New KME user reset password link  ##
 - Issue Type: Bug
 - Issue ID: NR2-8250
