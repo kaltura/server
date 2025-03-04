@@ -118,6 +118,8 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 			return new Kaltura_Client_Reach_Type_VendorSummaryCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
 			return new Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::METADATA_ENRICHMENT)
+			return new Kaltura_Client_Reach_Type_VendorMetadataEnrichmentCatalogItemFilter();
 		else
 			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}

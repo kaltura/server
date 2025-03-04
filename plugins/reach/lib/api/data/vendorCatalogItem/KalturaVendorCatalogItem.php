@@ -292,6 +292,8 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				return new KalturaVendorVideoAnalysisCatalogItem();
 			case VendorServiceFeature::MODERATION:
 				return new KalturaVendorModerationCatalogItem();
+			case VendorServiceFeature::METADATA_ENRICHMENT:
+				return new KalturaVendorMetadataEnrichmentCatalogItem();
 			default:
 				return new KalturaVendorCaptionsCatalogItem();
 		}
