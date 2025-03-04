@@ -80,6 +80,10 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 			case 'kModerationVendorTaskData':
 				$taskData = new KalturaModerationVendorTaskData();
 				break;
+
+			case 'kMetadataEnrichmentVendorTaskData':
+				$taskData = new KalturaMetadataEnrichmentVendorTaskData();
+				break;
 		}
 		
 		if ($taskData)
