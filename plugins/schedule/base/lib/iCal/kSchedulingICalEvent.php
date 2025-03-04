@@ -9,6 +9,8 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	const SEC_IN_HOUR = 3600;
 	const SEC_IN_MINUTE = 60;
 	const DATE_FORMAT = "Y-m-d\TH:i:sP";
+	const UNIX_EPOCH_START_TIME_COMPACT = '19700101T000000';
+	const UNIX_EPOCH_START_TIME = '1970-01-01T00:00:00+00:00';
 
 	/**
 	 * @var kSchedulingICalRule
@@ -484,7 +486,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			$offsetInSeconds = $dateTimeZone->getOffset($newStartDate);
 			$standardTransition = array(
 				'ts' => 0,
-				'time' => '1970-01-01T00:00:00+00:00',
+				'time' => self::UNIX_EPOCH_START_TIME,
 				'offset' => $offsetInSeconds,
 				'isdst' => null,
 				'abbr' => $dateTimeZone->getName()
@@ -619,7 +621,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$transitionTimeBlock .= $this->writeField('TZNAME', $transition['abbr']);
 		$dtstart = kSchedulingICal::formatTransitionDate($transition['ts']);
 		$transitionTimeBlock .= $this->writeField('DTSTART', $dtstart);
-		if ($dtstart != '19700101T000000') // This date denotes timestamp 0. No reason to have a rule if the timezone does not observe daylight savings
+		if ($dtstart != self::UNIX_EPOCH_START_TIME_COMPACT) // This date denotes timestamp 0. No reason to have a rule if the timezone does not observe daylight savings
 		{
 			$transitionTimeBlock .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $transition['ts']) . ";BYDAY=" . dateUtils::convertWeekDay($transition['ts']));
 		}
