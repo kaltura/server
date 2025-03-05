@@ -17,7 +17,7 @@ class kSchedulingICalRule extends kSchedulingICalComponent
 		'byOffset' => 'bysetpos',
 		'weekStartDay' => 'wkst',
 	);
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see kSchedulingICalComponent::getLineDelimiter()
@@ -26,7 +26,7 @@ class kSchedulingICalRule extends kSchedulingICalComponent
 	{
 		return ";";
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see kSchedulingICalComponent::getFieldDelimiter()
@@ -35,7 +35,7 @@ class kSchedulingICalRule extends kSchedulingICalComponent
 	{
 		return '=';
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see kSchedulingICalComponent::getType()
@@ -74,13 +74,13 @@ class kSchedulingICalRule extends kSchedulingICalComponent
 		{
 			if(is_numeric($attribute))
 				$attribute = $field;
-			
+
 			$rule->$attribute = $this->getField($field);
 		}
-		
+
 		return $rule;
 	}
-	
+
 	/**
 	 * @param KalturaScheduleEventRecurrence $rule
 	 * @return kSchedulingICalRule
@@ -98,7 +98,7 @@ class kSchedulingICalRule extends kSchedulingICalComponent
 			KalturaScheduleEventRecurrenceFrequency::MONTHLY => 'MONTHLY',
 			KalturaScheduleEventRecurrenceFrequency::YEARLY => 'YEARLY',
 		);
-		
+
 		if($rule->frequency && isset($frequencyTypes[$rule->frequency]))
 			$object->setField('freq', $frequencyTypes[$rule->frequency]);
 
@@ -109,28 +109,28 @@ class kSchedulingICalRule extends kSchedulingICalComponent
 		{
 			if(is_numeric($attribute))
 				$attribute = $field;
-			
+
 			if($rule->$attribute)
 				$object->setField($field, $rule->$attribute);
 		}
-		
+
 		return $object;
 	}
-	
+
 	public function getBody()
 	{
 		$lines = array();
 		foreach($this->fields as $field => $value)
 			$lines[] = $field . $this->getFieldDelimiter() . $value;
-		
+
 		return implode($this->getLineDelimiter(), $lines);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see kSchedulingICalComponent::write()
 	 */
-	public function write()
+	public function write($object = null, &$timeZoneBlockArray = null)
 	{
 		return $this->writeBody();
 	}

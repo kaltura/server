@@ -4,38 +4,38 @@ class dateUtils
 	const KALTURA_FORMAT = "K";
 	const MODEL_DEFAULT_FORMAT = "D";
 
-	
+
 	const SECOND =  1; // in seconds
 	const MINUTE = 60; // in seconds
 	const HOUR = 3600; // in seconds
 	const DAY = 86400; // in seconds
-	
+
 	// the result date fits the DB and the calendar object that comes with symfony 
 	public static function convertFromPhpDate ( $original_date , $new_format = "Y-m-d" )
 	{
 		return $converted_date = date ( $new_format , strtotime($original_date) );
 	}
-	
+
 	/**
-	 * return current time 
+	 * return current time
 	 *
 	 */
 	public static function now()
 	{
 		return time();
 	}
-	
+
 	public static function today()
 	{
 		return date ( "Y-m-d" , time() );
 	}
-	
+
 	public static function todayOffset ( $delta_in_days )
 	{
 		$calculated_day = dateUtils::DAY * $delta_in_days + time();
 		return date ( "Y-m-d" , $calculated_day  );
 	}
-	
+
 	public static function firstDayOfMonth( $baseDate = null )
 	{
 		if(!$baseDate)
@@ -46,11 +46,11 @@ class dateUtils
 			return date("Y-m-01", $dateObj->getTimestamp());
 		}
 	}
-	
+
 	public static function nowWithMilliseconds ( )
 	{
 		$time = ( microtime(true) );
-		$milliseconds = (int)(($time - (int)$time) * 1000);  
+		$milliseconds = (int)(($time - (int)$time) * 1000);
 		return strftime( "%d/%m %H:%M:%S." , time() ) . $milliseconds ;
 	}
 
@@ -70,7 +70,7 @@ class dateUtils
 			// call parent with NULL so there will be no formating of the original date  
 			$params = array ( NULL );
 			$date = call_user_func_array ( $f , $params );
-			 
+
 			// now - we'll format it our way
 			return kString::formatDate( $date );
 		}
@@ -85,11 +85,11 @@ class dateUtils
 			return  call_user_func (  $f , $format ) ;
 		}
 	}
-	
+
 	/**
 	 * Format a string in HH:MM:SS from milliseconds
 	 */
-	
+
 	public static function formatDuration ( $time_in_msecs )
 	{
 		$time_in_secs = (int)($time_in_msecs / 1000);
@@ -98,7 +98,7 @@ class dateUtils
 		$seconds = (int)( $time_in_secs - $minutes * 60 - $hours * 3600 ) ;
 		$decimal = (int)(($time_in_msecs%1000) / 100 );
 		$str = ( $hours > 10 ? "$hours:" : ($hours > 0 ? "0$hours:" : "") ) .
-			( $minutes > 10 ? $minutes : "0$minutes" ) . ":" . 
+			( $minutes > 10 ? $minutes : "0$minutes" ) . ":" .
 			( $seconds > 10 ? $seconds : "0$seconds" ) . ".$decimal";
 		return $str ;
 	}
@@ -126,25 +126,71 @@ class dateUtils
 		$diff = $date2->diff($date1)->format("%a");
 		return $diff;
 	}
-	
+
 	public static function kGmdate (string $format, $timestamp = null)
 	{
 		if(!is_null($timestamp))
 		{
 			$timestamp = intval($timestamp);
 		}
-		
+
 		return gmdate($format, $timestamp);
 	}
-	
+
 	public static function kDate (string $format, $timestamp = null)
 	{
 		if(!is_null($timestamp))
 		{
 			$timestamp = intval($timestamp);
 		}
-		
+
 		return date($format, $timestamp);
+	}
+
+	// Format the offset from secs to +hhmm format
+	public static function formatOffset(int $offset)
+	{
+		$hours = floor($offset / 3600);
+		$minutes = floor(abs($offset) % 3600 / 60);
+		return sprintf('%+03d%02d', $hours, $minutes);
+	}
+
+	public static function convertWeekDay(int $timestamp)
+	{
+		$date = new DateTime('@' . $timestamp);
+		$dayOfWeek = $date->format('w'); // Get the day of the week (0 for Sunday, 6 for Saturday)
+		$dayOfMonth = (int) $date->format('j'); // Get the day of the month
+		$occurrenceOfSpecificDay = ceil($dayOfMonth / 7);
+
+		// Find the first day of the month
+		$firstDayOfMonth = new DateTime($date->format('Y-m-01'));
+
+		// Count how many times the same weekday has occurred up to the given day
+		$occurrenceOfWeekDay = 0;
+		for ($day = 1; $day <= $dayOfMonth; $day++)
+		{
+			$currentDayOfWeek = $firstDayOfMonth->format('w');
+			if ($currentDayOfWeek == $dayOfWeek)
+			{
+				$occurrenceOfWeekDay++;
+			}
+			$firstDayOfMonth->modify('+1 day');
+		}
+
+		// Weekday abbreviations
+		$weekDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+		// Return the occurrence and the weekday abbreviation, e.g., "1MO" for first Monday
+		$occurrenceOfSpecificDay = ($occurrenceOfSpecificDay == $occurrenceOfWeekDay) ? -1 : $occurrenceOfSpecificDay;
+		return $occurrenceOfSpecificDay . $weekDays[$dayOfWeek];
+	}
+
+	public static function getDateOnPreviousYear($timestamp)
+	{
+		$date = new DateTime();
+		$date->setTimestamp($timestamp);
+		$date->modify('-1 year');
+		return $date->getTimestamp();
 	}
 }
 ?>

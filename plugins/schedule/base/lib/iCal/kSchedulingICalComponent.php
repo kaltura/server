@@ -158,9 +158,9 @@ abstract class kSchedulingICalComponent
 		return $this->components;
 	}
 
-	public function setField($field, $value)
+	public function setField($field, $value, $subFieldVal = null)
 	{
-		$this->fields[strtoupper($field)] = $value;
+		$this->fields[strtoupper($field) . $subFieldVal] = $value;
 	}
 
 	public function getField($field)
@@ -238,7 +238,7 @@ abstract class kSchedulingICalComponent
 		return $ret;
 	}
 
-	public function begin()
+	public function begin($newIcalStandard = null)
 	{
 		return $this->writeField('BEGIN', $this->getType());
 	}
@@ -248,14 +248,24 @@ abstract class kSchedulingICalComponent
 		return $this->writeField('END', $this->getType());
 	}
 
-	public function write()
+	public function write($object = null, &$timeZoneBlockArray = null)
 	{
 		$ret = '';
 
-		$ret .= $this->begin();
+		$newIcalStandard = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $object->partnerId);
+		$this->addVtimeZoneBlockIfApplicable($newIcalStandard, $object, $timeZoneBlockArray);
+		$ret .= $this->begin($newIcalStandard);
 		$ret .= $this->writeBody();
 		$ret .= $this->end();
 
 		return $ret;
+	}
+
+	protected function addVtimeZoneBlockIfApplicable($newIcalStandard, $object = null, &$timeZoneBlockArray = null): void
+	{
+		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId() && $newIcalStandard)
+		{
+			$this->addVtimeZoneBlock($object, $timeZoneBlockArray);
+		}
 	}
 }
