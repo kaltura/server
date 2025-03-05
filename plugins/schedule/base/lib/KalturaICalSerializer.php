@@ -65,7 +65,7 @@ class KalturaICalSerializer extends KalturaSerializer
 	 * {@inheritDoc}
 	 * @see KalturaSerializer::serialize()
 	 */
-	public function serialize($object, $partnerId = null)
+	public function serialize($object)
 	{
 		if($object instanceof KalturaScheduleEvent)
 		{
@@ -75,13 +75,13 @@ class KalturaICalSerializer extends KalturaSerializer
 		}
 		elseif($object instanceof KalturaScheduleEventArray)
 		{
-			$this->newIcalFormat = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $object->toArray()[0]->partnerId);
+			$newIcalFormat = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, kCurrentContext::getCurrentPartnerId());
 			$ret = '';
 			foreach($object as $item)
 			{
 				$ret .= $this->innerSerialize($item);
 			}
-			return ($this->newIcalFormat) ? $this->injectTimeZoneBlocks($ret) : $ret;
+			return ($newIcalFormat) ? $this->injectTimeZoneBlocks($ret) : $ret;
 		}
 		elseif($object instanceof KalturaScheduleEventListResponse)
 		{
