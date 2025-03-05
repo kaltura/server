@@ -69,13 +69,13 @@ class KalturaICalSerializer extends KalturaSerializer
 	{
 		if($object instanceof KalturaScheduleEvent)
 		{
-			$this->newIcalFormat = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $object->partnerId);
 			$scheduleEventArray = new KalturaScheduleEventArray();
 			$scheduleEventArray[] = $object;
 			return $this->serialize($scheduleEventArray);
 		}
 		elseif($object instanceof KalturaScheduleEventArray)
 		{
+			$this->newIcalFormat = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $object->toArray()[0]->partnerId);
 			$ret = '';
 			foreach($object as $item)
 			{
