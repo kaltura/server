@@ -208,69 +208,15 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 			return '';
 		}
 
-		switch ($vendorCatalogItem->getServiceFeature())
+		$reflector = new ReflectionClass('VendorServiceFeature');
+		$constantNames = array_flip($reflector->getConstants());
+		$serviceFeature = $vendorCatalogItem->getServiceFeature();
+		$constantName = '';
+		if(isset($constantNames[$serviceFeature]))
 		{
-			case VendorServiceFeature::CAPTIONS:
-				$serviceFeatureName = 'captions';
-				break;
-
-			case VendorServiceFeature::TRANSLATION:
-				$serviceFeatureName = 'translation';
-				break;
-
-			case VendorServiceFeature::ALIGNMENT:
-				$serviceFeatureName = 'alignment';
-				break;
-
-			case VendorServiceFeature::AUDIO_DESCRIPTION:
-				$serviceFeatureName = 'audio description';
-				break;
-
-			case VendorServiceFeature::CHAPTERING:
-				$serviceFeatureName = 'chaptering';
-				break;
-
-			case VendorServiceFeature::INTELLIGENT_TAGGING:
-				$serviceFeatureName = 'intelligent tagging';
-				break;
-			
-			case VendorServiceFeature::DUBBING:
-				$serviceFeatureName = 'dubbing';
-				break;
-
-			case VendorServiceFeature::LIVE_CAPTION:
-				$serviceFeatureName = 'live caption';
-				break;
-
-			case VendorServiceFeature::LIVE_TRANSLATION:
-				$serviceFeatureName = 'live translation';
-				break;
-
-			case VendorServiceFeature::CLIPS:
-				$serviceFeatureName = 'clips';
-				break;
-
-			case VendorServiceFeature::QUIZ:
-				$serviceFeatureName = 'quiz';
-				break;
-
-			case VendorServiceFeature::SUMMARY:
-				$serviceFeatureName = 'summary';
-				break;
-
-			case VendorServiceFeature::VIDEO_ANALYSIS:
-				$serviceFeatureName = 'video analysis';
-				break;
-
-			case VendorServiceFeature::MODERATION:
-				$serviceFeatureName = 'moderation';
-				break;
-
-			default:
-				$serviceFeatureName = '';
+			$constantName = str_replace("_", " ", strtolower($constantNames[$serviceFeature]));
 		}
-
-		return $serviceFeatureName;
+		return $constantName;
 	}
 	
 	public function getCacheInvalidationKeys()
