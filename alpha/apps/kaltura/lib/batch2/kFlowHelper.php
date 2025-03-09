@@ -3616,19 +3616,41 @@ class kFlowHelper
 
 	public static function handleKuserKgroupStatusUpdate($kuserkgroup)
 	{
-		if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
-		{
-			$kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
-			//Validate group exists to avoid exception
-			if(!$kgroup)
-			{
-				return;
-			}
-
-			$numberOfUsersPerGroup = $kgroup->getMembersCount();
-			$kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
-			$kgroup->save();
+		if ($kuserkgroup->getStatus() != KuserKgroupStatus::DELETED) {
+			return;
 		}
+
+		self::updateKgroupMembersCount($kuserkgroup);
+		self::handleUserDeletion($kuserkgroup);
+	}
+
+	private static function updateKgroupMembersCount($kuserkgroup)
+	{
+		$kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
+
+		// Validate group exists to avoid exception
+		if (!$kgroup) {
+			return;
+		}
+
+		$numberOfUsersPerGroup = $kgroup->getMembersCount();
+		$kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
+		$kgroup->save();
+	}
+
+	private static function handleUserDeletion($kuserkgroup)
+	{
+		$kuser = kuserPeer::retrieveByPK($kuserkgroup->getKuserId());
+
+		if (!$kuser)
+		{
+			return;
+		}
+
+		$filter = new KuserKgroupFilter();
+		$filter->setGroupIdEqual($kuserkgroup->getPgroupId());
+		$filter->setUserIdEqual($kuserkgroup->getPuserId());
+		kJobsManager::addDeleteJob($kuserkgroup->getPartnerId(), DeleteObjectType::USER_GROUP_SUBSCRIPTION, $filter);
 	}
 
 	public static function addPeriodicStorageExports($entryId, $partner, $periodicStorageProfiles)
