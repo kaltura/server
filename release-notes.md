@@ -1,5 +1,6 @@
 # Ursa-21.12.0
 
+
 # Ursa-21.11.0
 ## S3 Drop Folder - add support for ARN Role (AWS Deployments only) ##
 - Issue Type: Task
