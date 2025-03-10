@@ -13,10 +13,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set current date and time
-        run: echo "Build Time: $(date)" > BUILD_TIME.txt
+        run: |
+          export DATE=$(date)
+          echo "Build Time:$DATE"  > BUILD_TIME.txt
 
       - name: Append latest commit hash
-        run: echo "Latest Commit: $(git rev-parse HEAD)" >> BUILD_TIME.txt
+        run: |
+          export COMMIT=$(git rev-parse HEAD)
+          echo "Latest Commit:$COMMIT"  >> BUILD_TIME.txt
 
       - name: Commit and push changes
         run: |
