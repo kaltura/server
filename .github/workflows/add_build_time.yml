@@ -1,9 +1,9 @@
 name: Update BUILD_TIME
 
 on:
-  push:
-    branches:
-      - ${{ github.ref_name }}
+  pull_request:
+    types:
+      - closed  # Runs only when a PR is closed
   workflow_dispatch:
 
 jobs:
