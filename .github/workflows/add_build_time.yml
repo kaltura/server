@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - ${{ github.ref_name }}
+  workflow_dispatch:
 
 jobs:
   update-build-time:
