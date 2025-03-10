@@ -8,6 +8,9 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	const SEC_IN_DAY = 86400;
 	const SEC_IN_HOUR = 3600;
 	const SEC_IN_MINUTE = 60;
+	const DATE_FORMAT = "Y-m-d\TH:i:sP";
+	const UNIX_EPOCH_START_TIME_COMPACT = '19700101T000000';
+	const UNIX_EPOCH_START_TIME = '1970-01-01T00:00:00+00:00';
 
 	/**
 	 * @var kSchedulingICalRule
@@ -248,7 +251,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 
 		if ($event->recurrence && $event->recurrence->timeZone)
 		{
-			$timeZones = DateTimeZone::listIdentifiers();
+			$timeZones = DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC);
 
 			if (in_array($event->recurrence->timeZone, $timeZones))
 			{
@@ -457,6 +460,43 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		return $this->timeZoneId;
 	}
 
+	protected function isTransitionsSyntetic($transitions, $startDate)
+	{
+		if (count($transitions) == 1)
+		{
+			$transitionTime = substr($transitions[0]['time'], 0, 10);
+			$formattedStartDate = substr(dateUtils::kDate(self::DATE_FORMAT, $startDate), 0, 10);
+			if ($transitionTime === $formattedStartDate)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected function refineTransitions(&$transitions, DateTimeZone $dateTimeZone, KalturaScheduleEvent $event, $startDate)
+	{
+		/**
+		 * The blow is a use case were the country of the time zone does not observes daylight savings
+		 * or might not contain transitions
+		 */
+		if (!$transitions || $this->isTransitionsSyntetic($transitions, $startDate))
+		{
+			$newStartDate = new DateTime('@' . $event->startDate, $dateTimeZone);
+			$offsetInSeconds = $dateTimeZone->getOffset($newStartDate);
+			$standardTransition = array(
+				'ts' => 0,
+				'time' => self::UNIX_EPOCH_START_TIME,
+				'offset' => $offsetInSeconds,
+				'isdst' => null,
+				'abbr' => $dateTimeZone->getName()
+			);
+			$transitions = array($standardTransition);
+		}
+
+		return $transitions;
+	}
+
 	public function addVtimeZoneBlock(KalturaScheduleEvent $event = null, &$timeZoneBlockArray = null)
 	{
 		try
@@ -472,8 +512,15 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		// Calculating until. Frequency is mandatory and also until or count
 		$until = (!$event->recurrence->until) ? $this->getUntilFromCount($event->recurrence->count, $event->recurrence->frequency, $event->startDate) : $event->recurrence->until;
 
-		// In order to reduce the size of the transitions to analyze, we start querying from a year before the start of the event until the last occurrence
-		$transitions = $dateTimeZone->getTransitions(dateUtils::getDateOnPreviousYear($event->startDate), $until);
+		/** In order to reduce the size of the transitions to analyze, we start querying from a year before the start
+		 * of the event until the last occurrence.
+		 * In cases where there are no transitions, one syntetic transition will be returned with the date of the even
+		 * one year prior - we will refine and replace this transition as needed in refineTransitions()
+		 */
+		$startDateYearPreviously = dateUtils::getDateOnPreviousYear($event->startDate);
+		$transitions = $dateTimeZone->getTransitions($startDateYearPreviously, $until);
+		$this->refineTransitions($transitions, $dateTimeZone, $event, $startDateYearPreviously);
+
 		$relevantTransitions = array();
 		$initialTransition = null;
 		$daylightOffset = null;
@@ -503,7 +550,7 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 			}
 		}
 		array_unshift($relevantTransitions, $initialTransition);
-
+		
 		// Create VTIMEZONE block content
 		$timeZoneBlockArray[] = $this->writeField(strtoupper(self::$timeZoneField), $this->timeZoneId);
 
@@ -555,6 +602,16 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 	{
 		$transitionTimeBlock = '';
 		$timeType = ($transition['isdst']) ? 'DAYLIGHT' : 'STANDARD';
+
+		if (!$daylightOffset)
+		{
+			$daylightOffset = $standardOffset;
+		}
+		if (!$standardOffset)
+		{
+			$standardOffset = $daylightOffset;
+		}
+
 		$offsetFrom = ($timeType === 'STANDARD') ? dateUtils::formatOffset($daylightOffset) : dateUtils::formatOffset($standardOffset);
 		$offsetTo = ($timeType === 'STANDARD') ? dateUtils::formatOffset($standardOffset) : dateUtils::formatOffset($daylightOffset);
 
@@ -562,8 +619,12 @@ class kSchedulingICalEvent extends kSchedulingICalComponent
 		$transitionTimeBlock .= $this->writeField('TZOFFSETFROM', $offsetFrom);
 		$transitionTimeBlock .= $this->writeField('TZOFFSETTO', $offsetTo);
 		$transitionTimeBlock .= $this->writeField('TZNAME', $transition['abbr']);
-		$transitionTimeBlock .= $this->writeField('DTSTART', kSchedulingICal::formatTransitionDate($transition['ts']));
-		$transitionTimeBlock .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $transition['ts']) . ";BYDAY=" . dateUtils::convertWeekDay($transition['ts']));
+		$dtstart = kSchedulingICal::formatTransitionDate($transition['ts']);
+		$transitionTimeBlock .= $this->writeField('DTSTART', $dtstart);
+		if ($dtstart != self::UNIX_EPOCH_START_TIME_COMPACT) // This date denotes timestamp 0. No reason to have a rule if the timezone does not observe daylight savings
+		{
+			$transitionTimeBlock .= $this->writeField('RRULE', "FREQ=YEARLY;BYMONTH=" . date('n', $transition['ts']) . ";BYDAY=" . dateUtils::convertWeekDay($transition['ts']));
+		}
 		$transitionTimeBlock .= $this->writeField('END', $timeType);
 
 		return $transitionTimeBlock;
