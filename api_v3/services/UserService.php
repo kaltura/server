@@ -953,9 +953,19 @@ class UserService extends KalturaBaseUserService
 		}
 
 		$status = $dbUser->getStatus();
-		if (($status == KuserStatus::DELETED || $status == KuserStatus::BLOCKED) && $dbUser->getIsAccountOwner())
+		if (($status == KuserStatus::DELETED || $status == KuserStatus::BLOCKED))
 		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_OR_BLOCK_ROOT_ADMIN_USER);
+			throw new KalturaAPIException(KalturaErrors::USER_IS_BLOCKED);
+		}
+
+		if ($dbUser->getIsAccountOwner())
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
+		}
+
+		if (!$dbUser->getIsAdmin())
+		{
+			throw new KalturaAPIException(KalturaErrors::DEMOTE_ONLY_ADMIN);
 		}
 
 		$dbUser->setIsAdmin(false);
