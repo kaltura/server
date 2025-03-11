@@ -72,6 +72,8 @@ class KalturaConditionArray extends KalturaTypedArray
 				return new KalturaActionNameCondition();
 			case ConditionType::URL_AUTH_PARAMS:
 				return new KalturaUrlAuthenticationParamsCondition();
+			case ConditionType::SESSION_TYPE:
+				return new KalturaSessionTypeCondition();
 			default:
 			     return KalturaPluginManager::loadObject('KalturaCondition', $dbObject->getType());
 		}
