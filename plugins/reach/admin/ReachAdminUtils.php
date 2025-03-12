@@ -53,7 +53,11 @@ class ReachAdminUtils
 
 			case Kaltura_Client_Reach_Enum_VendorServiceFeature::MODERATION:
 				return array('VendorModerationCatalogItem', 'VendorModerationCatalogItemFilter');
+
+			case Kaltura_Client_Reach_Enum_VendorServiceFeature::METADATA_ENRICHMENT:
+				return array('VendorMetadataEnrichmentCatalogItem', 'VendorMetadataEnrichmentCatalogItemFilter');
 		}
+		
 		return array('VendorCatalogItem', 'VendorCatalogItemFilter');
 	}
 
