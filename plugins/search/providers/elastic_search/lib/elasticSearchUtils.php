@@ -47,7 +47,7 @@ class elasticSearchUtils
             'thai' => 'thai',
         );
 
-        $language = strtolower($language);
+        $language = is_null($language) ? $language : strtolower($language);
         if(isset($fieldMap[$language]))
             return $fieldName.$delimiter.$fieldMap[$language];
 
