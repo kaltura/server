@@ -146,8 +146,7 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		$targetLanguage = $this->_getParam('targetLanguage') != "" ? $this->_getParam('targetLanguage') : null;
 		$vendorPartnerId = $this->_getParam('vendorPartnerId') != "" ? $this->_getParam('vendorPartnerId') : null;
 
-		$catalogItemFilterName = ReachAdminUtils::getCatalogItemFilterTypeName($serviceFeature);
-		$catalogItemProfileFilter = new $catalogItemFilterName();
+		$catalogItemProfileFilter = ReachAdminUtils::getCatalogItemFilter($serviceFeature);
 		$catalogItemProfileFilter->orderBy = "-createdAt";
 		$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
