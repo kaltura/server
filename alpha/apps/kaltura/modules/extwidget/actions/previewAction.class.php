@@ -87,7 +87,7 @@ class previewAction extends kalturaAction
 			'uiConfId'				=>	$this->uiconf_id,
 			'width'					=>	$this->uiConf->getWidth(),
 			'height'				=>	$this->uiConf->getHeight(),
-			'includeKalturaLinks'	=>	true,
+			'includeKalturaLinks'	=>	false,
 			'cacheSt'				=>	$cacheSt,
 		);
 

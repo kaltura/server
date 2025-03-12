@@ -1047,6 +1047,11 @@ class playManifestAction extends kalturaAction
 			return;
 		}
 
+		if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_FLAVORS_OPTIMIZATION, $this->entry->getPartnerId()))
+		{
+			return;
+		}
+
 		$flavors = $this->deliveryAttributes->getFlavorAssets();
 
 		usort($flavors, array($this, 'sortFlavorsByFrameSizeAndBitrate'));

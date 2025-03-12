@@ -1,0 +1,32 @@
+name: Update BUILD_TIME
+
+on:
+  pull_request:
+    types:
+      - closed  # Runs only when a PR is closed
+  workflow_dispatch:
+
+jobs:
+  update-build-time:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set current date and time
+        run: |
+          export DATE=$(date)
+          echo "Build Time:$DATE"  > BUILD_TIME.txt
+
+      - name: Append latest commit hash
+        run: |
+          export COMMIT=$(git rev-parse HEAD)
+          echo "Latest Commit:$COMMIT"  >> BUILD_TIME.txt
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add BUILD_TIME.txt
+          git commit -m "Update BUILD_TIME.txt with latest build info" || echo "No changes to commit"
+          git push

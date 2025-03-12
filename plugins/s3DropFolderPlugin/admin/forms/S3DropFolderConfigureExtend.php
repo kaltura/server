@@ -41,7 +41,7 @@ class Form_S3DropFolderConfigureExtend_SubForm extends Form_DropFolderConfigureE
 		));
 		
 		$this->addElement('checkbox', 'useS3Arn', array(
-			'label'      => 'Bucket Policy Allow Access',
+			'label'      => 'Bucket Policy Allows Access',
 			'decorators' => array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag', array('tag' => 'div', 'class' => 'rememeber'))),
 			'uncheckedValue' => false,
 			'checkedValue'   => true,
