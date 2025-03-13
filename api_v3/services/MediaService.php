@@ -157,7 +157,6 @@ class MediaService extends KalturaEntryService
 		}
 		else
 		{
-			$kResource = $resource->toObject();
 			$tempMediaEntry = new KalturaMediaEntry();
 			$tempMediaEntry->type = $dbEntry->getType();
 			$tempMediaEntry->mediaType = $dbEntry->getMediaType();
