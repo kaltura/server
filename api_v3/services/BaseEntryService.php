@@ -1049,6 +1049,14 @@ class BaseEntryService extends KalturaEntryService
 		$contextDataHelper->setMediaProtocol($contextDataParams->mediaProtocol);
 		$contextDataHelper->setStreamerType($contextDataParams->streamerType);
 
+		if (isset($contextDataParams->clipFrom) && isset($contextDataParams->clipTo)
+			&& $contextDataParams->clipFrom >= $contextDataParams->clipTo)
+		{
+			throw new KalturaAPIException(KalturaErrors::CLIPPING_PARAMS_INVALID);
+		}
+		$contextDataHelper->setClipFrom($contextDataParams->clipFrom);
+		$contextDataHelper->setClipTo($contextDataParams->clipTo);
+
 		$playbackContextDataHelper = new kPlaybackContextDataHelper();
 		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
 		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry);
