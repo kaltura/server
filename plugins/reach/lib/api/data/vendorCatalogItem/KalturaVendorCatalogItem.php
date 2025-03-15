@@ -262,8 +262,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	{
 		switch ($serviceFeature)
 		{
-			case VendorServiceFeature::CAPTIONS:
-				return new KalturaVendorCaptionsCatalogItem();
 			case VendorServiceFeature::TRANSLATION:
 				return new KalturaVendorTranslationCatalogItem();
 			case VendorServiceFeature::ALIGNMENT:
