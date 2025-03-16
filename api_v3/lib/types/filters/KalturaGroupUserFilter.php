@@ -123,11 +123,12 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 		{
 			$groupIdIn = explode(',', $this->groupIdIn);
 			$partnerId = kCurrentContext::getCurrentPartnerId();
+			$groupType = $this->groupType ?? GroupType::GROUP;
 
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 			$c->add(kuserPeer::PUSER_ID, $groupIdIn, Criteria::IN);
-			$c->add(kuserPeer::TYPE, $this->groupType);
+			$c->add(kuserPeer::TYPE, $groupType);
 			$kusers = kuserPeer::doSelect($c);
 
 			if (!$kusers)
