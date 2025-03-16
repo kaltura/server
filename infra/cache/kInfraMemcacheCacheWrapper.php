@@ -68,6 +68,7 @@ class kInfraMemcacheCacheWrapper extends kInfraBaseCacheWrapper
 		if ($this->memcache)
 		{
 			$this->memcache->close();
+			$this->connectAttempts = 0;
 		}
 		$this->memcache = null;
 	}
