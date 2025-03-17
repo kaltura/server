@@ -238,6 +238,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$result = $cacheStore->get($cacheKey);
 			if ($result)
 			{
+				$cacheStore->set($cacheKey, $result, self::FILE_SYNC_CACHE_EXPIRY); // Extend ttl for the key
 				if (str_starts_with($result, self::COMPRESSED_PREFIX))
 				{
 					$result = gzuncompress(substr($result, strlen(self::COMPRESSED_PREFIX)));
