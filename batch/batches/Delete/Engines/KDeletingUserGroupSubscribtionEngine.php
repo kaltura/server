@@ -24,6 +24,7 @@ class KDeletingUserGroupSubscribtionEngine extends KDeletingEngine
 
 	protected function deleteUserCategoriesSubscription($categories,$userId)
 	{
+		$deletedCount = 0; // Initializing a counter for deleted objects
 		foreach ($categories as $categoryId)
 		{
 			$filter = new KalturaCategoryUserFilter();
@@ -39,6 +40,7 @@ class KDeletingUserGroupSubscribtionEngine extends KDeletingEngine
 					// If the user is not part of the category by a group, delete the user from the category
 					try {
 						KBatchBase::$kClient->categoryUser->delete($categoryId, $userId);
+						$deletedCount++; // Increment the counter after successful deletion
 					} catch (Exception $e) {
 						KalturaLog::err("Failed to delete user with id [$userId] from category [$categoryId]");
 					}
@@ -51,7 +53,7 @@ class KDeletingUserGroupSubscribtionEngine extends KDeletingEngine
 				KalturaLog::err("Failed to retrieve list of categoryUsers for userId [$userId] and categoryId [$categoryId]");
 			}
 		}
-		return 0;
+		return $deletedCount;
 	}
 
 	protected function getUserSubscribedCategories($groupId, $userId)
@@ -63,11 +65,9 @@ class KDeletingUserGroupSubscribtionEngine extends KDeletingEngine
 
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = self::PAGE_SIZE;
-		$pageIndex = 1;
+		$pager->pageIndex = 1;
 
 		do {
-			$pager->pageIndex = $pageIndex;
-
 			try
 			{
 				$groupCategoriesPage = KBatchBase::$kClient->categoryUser->listAction($filter, $pager);
@@ -77,17 +77,17 @@ class KDeletingUserGroupSubscribtionEngine extends KDeletingEngine
 				}, $groupCategories);
 
 				// Create a new filter for user subscriptions
-				$userFilter = new KalturaCategoryUserFilter();
-				$userFilter->statusEqual = KalturaCategoryUserStatus::ACTIVE;
-				$userFilter->userIdEqual = $userId;
-				$userFilter->categoryIdIn = implode(',', $categoryIds); // Convert array to comma-separated string
-				$userFilter->permissionNamesMatchAnd = "CATEGORY_SUBSCRIBE";
-				$userFilter->permissionLevelEqual = KalturaCategoryUserPermissionLevel::NONE;
+				$categoryUserFilter = new KalturaCategoryUserFilter();
+				$categoryUserFilter->statusEqual = KalturaCategoryUserStatus::ACTIVE;
+				$categoryUserFilter->userIdEqual = $userId;
+				$categoryUserFilter->categoryIdIn = implode(',', $categoryIds);
+				$categoryUserFilter->permissionNamesMatchAnd = "CATEGORY_SUBSCRIBE";
+				$categoryUserFilter->permissionLevelEqual = KalturaCategoryUserPermissionLevel::NONE;
 
 				try
 				{
 
-					$userSubscribedCategoriesPage = KBatchBase::$kClient->categoryUser->listAction($userFilter, new KalturaFilterPager());
+					$userSubscribedCategoriesPage = KBatchBase::$kClient->categoryUser->listAction($categoryUserFilter, new KalturaFilterPager());
 					$userSubscribedCategoryIds = array_map(function ($categoryUser) {
 						return $categoryUser->categoryId;
 					}, $userSubscribedCategoriesPage->objects);
@@ -101,7 +101,7 @@ class KDeletingUserGroupSubscribtionEngine extends KDeletingEngine
 					break;
 				}
 
-				$pageIndex++;
+				$pager->pageIndex++;
 			}
 			catch (Exception $e)
 			{
