@@ -254,7 +254,7 @@ function writeSuccess($filePath = null): void
 	createDirPath($filePath);
 	
 	$description = 'Successfully finished mergeNewlyCreatedDuplicatedUsers.php script';
-	$timestamp = date("Y-m-d H:i:s");
+	$timestamp = time();
 	$hostname = gethostname();
 	$data = "merge_newly_created_duplicate_users{timestamp=\"$timestamp\", host=\"$hostname\", description=\"$description\"} 0".PHP_EOL;
 	
@@ -267,7 +267,7 @@ function writeFailure($e, $filePath = null): void
 	createDirPath($filePath);
 	
 	$description = 'Error in mergeNewlyCreatedDuplicatedUsers.php script';
-	$timestamp = date("Y-m-d H:i:s");
+	$timestamp = time();
 	$message = $e->getMessage();
 	$code = $e->getCode();
 	$hostname = gethostname();
