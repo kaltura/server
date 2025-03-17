@@ -3616,7 +3616,8 @@ class kFlowHelper
 
 	public static function handleKuserKgroupStatusUpdate($kuserkgroup)
 	{
-		if ($kuserkgroup->getStatus() != KuserKgroupStatus::DELETED) {
+		if ($kuserkgroup->getStatus() != KuserKgroupStatus::DELETED) 
+		{
 			return;
 		}
 
@@ -3624,12 +3625,13 @@ class kFlowHelper
 		self::handleUserDeletion($kuserkgroup);
 	}
 
-	private static function updateKgroupMembersCount($kuserkgroup)
+	public static function updateKgroupMembersCount($kuserkgroup)
 	{
 		$kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
 
 		// Validate group exists to avoid exception
-		if (!$kgroup) {
+		if (!$kgroup) 
+		{
 			return;
 		}
 
@@ -3638,7 +3640,7 @@ class kFlowHelper
 		$kgroup->save();
 	}
 
-	private static function handleUserDeletion($kuserkgroup)
+	public static function handleUserDeletion($kuserkgroup)
 	{
 		$kuser = kuserPeer::retrieveByPK($kuserkgroup->getKuserId());
 
