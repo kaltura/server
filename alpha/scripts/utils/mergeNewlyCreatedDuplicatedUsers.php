@@ -255,9 +255,10 @@ function writeSuccess($filePath = null): void
 	
 	$description = 'Successfully finished mergeNewlyCreatedDuplicatedUsers.php script';
 	$timestamp = time();
+	$date = date("Y-m-d H:i:s", $timestamp);
 	$hostname = gethostname();
-	$data = "merge_newly_created_duplicate_users{timestamp=\"$timestamp\", host=\"$hostname\", description=\"$description\"} 0".PHP_EOL;
-	
+	$data = "merge_newly_created_duplicate_users_success{timestamp=\"$date\", host=\"$hostname\", description=\"$description\"} $timestamp".PHP_EOL;
+
 	file_put_contents($filePath, $data, LOCK_EX);
 }
 
@@ -265,14 +266,15 @@ function writeFailure($e, $filePath = null): void
 {
 	$filePath = $filePath ?? DEFAULT_PROM_FILE;
 	createDirPath($filePath);
-	
+
 	$description = 'Error in mergeNewlyCreatedDuplicatedUsers.php script';
 	$timestamp = time();
+	$date = date("Y-m-d H:i:s", $timestamp);
 	$message = $e->getMessage();
 	$code = $e->getCode();
 	$hostname = gethostname();
-	$data = "merge_newly_created_duplicate_users{timestamp=\"$timestamp\", host=\"$hostname\", description=\"$description\", message=\"$message\", code=\"$code\"} 1".PHP_EOL;
-	
+	$data = "merge_newly_created_duplicate_users{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", message=\"$message\", code=\"$code\"} $timestamp".PHP_EOL;
+
 	file_put_contents($filePath, $data, LOCK_EX);
 }
 
