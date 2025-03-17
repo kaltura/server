@@ -9,6 +9,7 @@ class GroupUserService extends KalturaBaseService
 {
 	const DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER = 1024;
 	const USER_GROUP_SYNC_THRESHOLD_DEFUALT = '50';
+	const ACTIVE_GROUPS_PER_QUERY = 500;
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -436,17 +437,27 @@ class GroupUserService extends KalturaBaseService
 	{
 		$maxGroupsPerUser = $this->getPartnerMaximumGroupsPerUser($partnerId);
 
-		$kuserGroupList = $this->retrieveActiveGroupsForKuser($kuserId);
-		if (count($kuserGroupList) < $maxGroupsPerUser)
+		$countLimitedGroups = 0;
+		$startId = 0;
+		do
 		{
-			return;
-		}
+			$kuserGroupList = $this->retrieveActiveGroupsForKuser($kuserId, $startId);
 
-		$countLimitedGroups = $this->countLimitedGroups($kuserGroupList);
-		if ($countLimitedGroups >= $maxGroupsPerUser)
-		{
-			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
+			if (empty($kuserGroupList))
+			{
+				return;
+			}
+
+			$countLimitedGroups += $this->countLimitedGroups($kuserGroupList);
+			if ($countLimitedGroups >= $maxGroupsPerUser)
+			{
+				throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
+			}
+
+			$lastKuserGroup = end($kuserGroupList);
+			$startId = $lastKuserGroup->getId() + 1;
 		}
+		while (count($kuserGroupList) >= self::ACTIVE_GROUPS_PER_QUERY);
 	}
 
 	protected function getPartnerMaximumGroupsPerUser($partnerId)
@@ -461,11 +472,19 @@ class GroupUserService extends KalturaBaseService
 		return GroupUserService::DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER;
 	}
 
-	protected function retrieveActiveGroupsForKuser($kuserId)
+	protected function retrieveActiveGroupsForKuser($kuserId, $startId = 0)
 	{
 		$criteria = new Criteria();
 		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
 		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
+		$criteria->setLimit(self::ACTIVE_GROUPS_PER_QUERY);
+		$criteria->addAscendingOrderByColumn(KuserKgroupPeer::ID);
+
+		if ($startId)
+		{
+			$criteria->add(KuserKgroupPeer::ID, $startId, Criteria::GREATER_THAN);
+		}
+
 		return KuserKgroupPeer::doSelect($criteria);
 	}
 

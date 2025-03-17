@@ -129,11 +129,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	{
 		if ($object instanceof IIndexable)
 		{
-			if ($object instanceof IPartiallyIndexable)
-			{
-				/** @var IPartiallyIndexable $object */
-				return $object->isIndexable();
-			}
 			return true;
 		}
 			
@@ -147,11 +142,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	{
 		if ($object instanceof IIndexable)
 		{
-			if ($object instanceof IPartiallyIndexable)
-			{
-				/** @var IPartiallyIndexable $object */
-				return $object->isIndexable();
-			}
 			return true;
 		}
 			
@@ -184,11 +174,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	{
 		if ($object instanceof IIndexable)
 		{
-			if ($object instanceof IPartiallyIndexable)
-			{
-				/** @var IPartiallyIndexable $object */
-				return $object->isIndexable();
-			}
 			return true;
 		}
 		
@@ -647,11 +632,6 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
     {
 		if ($object instanceof IIndexable)
 		{
-			if ($object instanceof IPartiallyIndexable)
-			{
-				/** @var IPartiallyIndexable $object */
-				return $object->isIndexable();
-			}
 			return true;
 		}
 			
