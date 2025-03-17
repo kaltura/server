@@ -568,20 +568,31 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 				throw new KalturaAPIException(KalturaErrors::ACCESS_CONTROL_ID_NOT_FOUND, $this->accessControlId);
 		}
 	}
-	
+
 	public function validateConversionProfile(entry $sourceObject = null)
 	{
 		if(is_null($this->conversionProfileId))
 			return;
-			
 		if($sourceObject && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
-		
 		if($this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
 			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
-			if(!$conversionProfile || $conversionProfile->getType() != ConversionProfileType::MEDIA)
-				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
+			if (!$conversionProfile || $conversionProfile->getType() != ConversionProfileType::MEDIA)
+			{
+				conversionProfile2Peer::setUseCriteriaFilter(false);
+				$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
+				$c = new Criteria();
+				$c->add(conversionProfile2Peer::ID, $this->conversionProfileId, Criteria::EQUAL);
+				$c->add(conversionProfile2Peer::DELETED_AT, null, Criteria::EQUAL);
+				$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::DELETED, Criteria::NOT_EQUAL);
+				$c->addAnd(conversionProfile2Peer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+				$c->addDescendingOrderByColumn(conversionProfile2Peer::PARTNER_ID);
+				$conversionProfile = conversionProfile2Peer::doSelectOne($c);
+				conversionProfile2Peer::setUseCriteriaFilter(true);
+				if (!$conversionProfile || $conversionProfile->getType() != ConversionProfileType::MEDIA)
+					throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
+			}
 		}
 	}
 	
