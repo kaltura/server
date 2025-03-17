@@ -256,7 +256,7 @@ function writeSuccess($filePath = null): void
 	$description = 'Successfully finished mergeNewlyCreatedDuplicatedUsers.php script';
 	$timestamp = date("Y-m-d H:i:s");
 	$hostname = gethostname();
-	$data = "merge_newly_created_duplicate_users{timestamp=\"$timestamp\", host=\"$hostname\", description=\"$description\"} 0";
+	$data = "merge_newly_created_duplicate_users{timestamp=\"$timestamp\", host=\"$hostname\", description=\"$description\"} 0".PHP_EOL;
 	
 	file_put_contents($filePath, $data, LOCK_EX);
 }
@@ -271,7 +271,7 @@ function writeFailure($e, $filePath = null): void
 	$message = $e->getMessage();
 	$code = $e->getCode();
 	$hostname = gethostname();
-	$data = "merge_newly_created_duplicate_users{timestamp=\"$timestamp\", host=\"$hostname\", description=\"$description\", message=\"$message\", code=\"$code\"} 1";
+	$data = "merge_newly_created_duplicate_users{timestamp=\"$timestamp\", host=\"$hostname\", description=\"$description\", message=\"$message\", code=\"$code\"} 1".PHP_EOL;
 	
 	file_put_contents($filePath, $data, LOCK_EX);
 }
