@@ -28,6 +28,7 @@ class KalturaGroup extends KalturaBaseUser
 	(
 		'membersCount',
 		'processStatus',
+		'groupType' => 'type',
 	);
 
 	public function getMapBetweenObjects ( )

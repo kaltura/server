@@ -69,6 +69,7 @@ class KalturaGroupUser extends KalturaObject implements IRelatedFilterable
 	public $userRole;
 
 	/**
+	 * @readonly
 	 * @var KalturaGroupType
 	 */
 	public $groupType;
