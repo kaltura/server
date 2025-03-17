@@ -54,6 +54,7 @@ class GroupUserService extends KalturaBaseService
 
 		$dbGroupUser = $groupUser->toInsertableObject();
 		$dbGroupUser->setPartnerId($this->getPartnerId());
+		$dbGroupUser->setGroupType($kgroup->getType());
 		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
 		$dbGroupUser->save();
 		$groupUser->fromObject($dbGroupUser);
@@ -475,7 +476,7 @@ class GroupUserService extends KalturaBaseService
 		foreach ($kuserGroupList as $kuserGroup)
 		{
 			/** @var KuserKgroup $kuserGroup */
-			if ($kuserGroup->getGroupType() == GroupType::GROUP)
+			if ($kuserGroup->getGroupType() != GroupType::APPLICATIVE_GROUP)
 			{
 				$countLimitedGroups += 1;
 			}
