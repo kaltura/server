@@ -359,6 +359,11 @@ class Form_PartnerConfiguration extends Infra_Form
 			'label'			=> 'Login Block Period (seconds):',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('text', 'login_fail_timeframe', array(
+			'label'			=> 'Login Failure Time Frame in secs (1 < hours < 24):',
+			'filters'		=> array('StringTrim'),
+		));
 		
 		$this->addElement('text', 'num_prev_pass_to_keep', array(
 			'label'			=> 'Number of recent passwords kept:',
@@ -1073,6 +1078,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		$this->addDisplayGroup(array_merge(array(Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_max',
 									// Kaltura_Client_SystemPartner_Enum_SystemPartnerLimitType::USER_LOGIN_ATTEMPTS.'_overagePrice',
 									 'login_block_period',
+									 'login_fail_timeframe',
 									 'num_prev_pass_to_keep',
 									 'pass_replace_freq',
 									 'password_structure_validations_edit'),

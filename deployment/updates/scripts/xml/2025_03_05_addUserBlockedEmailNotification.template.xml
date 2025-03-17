@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>@SERVICE_URL@</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>30</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+	</config>
+	<session>
+		<partnerId>-2</partnerId>
+		<secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+		<sessionType>2</sessionType>
+	</session>
+
+	<multirequest>
+		<request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+			<template objectType="KalturaEmailNotificationTemplate">
+				<name>User Blocked After Failed Login Attempts</name>
+				<systemName>User_Blocked_Email</systemName>
+				<description>User Blocked After Failed Login Attempts.</description>
+				<automaticDispatchEnabled>1</automaticDispatchEnabled>
+				<eventType>3</eventType>
+				<!-- EventNotificationEventType::OBJECT_CHANGED-->
+				<eventObjectType>34</eventObjectType>
+				<!-- EventNotificationEventObjectType::USERLOGINDATA-->
+				<eventConditions objectType="array">
+					<item objectType="KalturaEventObjectChangedCondition">
+						<description>Check if user was blocked</description>
+						<modifiedColumns>user_login_data.LOGIN_BLOCKED_UNTIL</modifiedColumns>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>User blocked due to excess of failed login attempts within a timeframe</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>$scope->getObject() instanceof UserLoginData &amp;&amp; $scope->getObject()->getLoginBlockedUntil()</code>
+						</field>
+					</item>
+					<item objectType="KalturaEventFieldCondition">
+						<description>Check that the failures happened within a set timeframe</description>
+						<field objectType="KalturaEvalBooleanField">
+							<code>partnerPeer::retrieveActiveByPK($scope->getObject()->getConfigPartnerId())->getLoginFailTimeframe()</code>
+						</field>
+					</item>
+				</eventConditions>
+				<format>1</format>
+				<subject>Replace this text with desired email subject</subject>
+				<body>Replace this text with desired email body. You can use {entry_id}, {entry_name}, {entry_status} and {entry_reference_id} as variables.</body>
+				<fromEmail>{from_email}</fromEmail>
+				<fromName>{from_name}</fromName>
+				<contentParameters objectType="array">
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_email</key>
+						<description>Server configuration: partner_notification_email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_email")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>from_name</key>
+						<description>Server configuration: partner_notification_name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>kConf::get("partner_notification_name")</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>login_email</key>
+						<description>User login Email</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getLoginEmail()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>user_full_name</key>
+						<description>User full name</description>
+						<value objectType="KalturaEvalStringField">
+							<code>$scope->getObject()->getFullName()</code>
+						</value>
+					</item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>num_of_failed_logins</key>
+						<description>Number of failed login attempts</description>
+						<value objectType="KalturaEvalStringField">
+							<code>!is_null(partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())) ? partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())->getMaxLoginAttempts() : ''</code>
+<!--							<code>!is_null(kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), end(explode(',', $scope->getObject()->getEntitledPusersPublish())))) ? (kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(),end(explode(',', $scope->getObject()->getEntitledPusersPublish()))))->getEmail() : ''</code>-->
+						</value>
+					</item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>login_fail_timeframe</key>
+                        <description>Timeframe of failed logins</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>!is_null(partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())) ? partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())->getLoginFailTimeframe() : ''</code>
+                        </value>
+                    </item>
+					<item objectType="KalturaEventNotificationParameter">
+						<key>login_blocked_until</key>
+						<description>Login blocked until</description>
+						<value objectType="KalturaEvalStringField">
+                            <code>!is_null(partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())) ? date('Y-m-d H:i:s', partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())->getLoginBlockPeriod() + time()) : ''</code>
+						</value>
+					</item>
+				</contentParameters>
+				<userParameters objectType="array">
+				</userParameters>
+			</template>
+		</request>
+		<request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+			<id>{1:result:id}</id>
+			<status>1</status>
+			<!-- EventNotificationTemplateStatus::DISABLED -->
+		</request>
+	</multirequest>
+</xml>

@@ -737,12 +737,44 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			throw new kUserException('', kUserException::LOGIN_BLOCKED);
 		}
+
+		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
 		if ($loginData->getLoginAttempts()+1 >= $loginData->getMaxLoginAttempts())
 		{
+			if ($partner && $partner->getLoginFailTimeframe()) //timeframe is set for this partner
+			{
+				if (time() - $loginData->getFirstLoginFailTime() <= $partner->getLoginFailTimeframe())
+				{
+					$loginData->setFirstLoginFailTime(null);
+					$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
+					$loginData->setLoginAttempts(0);
+					$loginData->save();
+					KalturaLog::notice('User login blocked for login data id ['.$loginData->getId().']');
+					throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
+				}
+				else
+				{
+					$loginData->setLoginAttempts(0);
+					$loginData->setFirstLoginFailTime(time());
+					$loginData->save();
+					throw new kUserException('', kUserException::WRONG_PASSWORD);
+				}
+			}
+			$loginData->setFirstLoginFailTime(null);
 			$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
 			$loginData->setLoginAttempts(0);
 			$loginData->save();
 			throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
+		}
+
+		if ($partner && $partner->getLoginFailTimeframe() && (time() - $loginData->getFirstLoginFailTime() > $partner->getLoginFailTimeframe()))
+		{
+			$loginData->setLoginAttempts(0);
+			$loginData->setFirstLoginFailTime(time());
+		}
+		if ($loginData->getLoginAttempts() == 0)
+		{
+			$loginData->setFirstLoginFailTime(time());
 		}
 		$loginData->incLoginAttempts();
 		$loginData->save();

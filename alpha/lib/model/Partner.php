@@ -129,6 +129,8 @@ class Partner extends BasePartner
 	
 	const CUSTOM_ANALYTICS_DOMAIN = 'custom_analytics_domain';
 
+	const CUSTOM_LOGIN_FAIL_TIMEFRAME= 'login_fail_timeframe';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -2456,5 +2458,16 @@ class Partner extends BasePartner
 	public function setAllowedEmailDomainsForAdmins($v)
 	{
 		return $this->putInCustomData(self::ALLOWED_EMAIL_DOMAINS_FOR_ADMINS, $v);
+	}
+
+	public function getLoginFailTimeframe()
+	{
+		return $this->getFromCustomData(self::CUSTOM_LOGIN_FAIL_TIMEFRAME);
+	}
+
+	public function setLoginFailTimeframe($v)
+	{
+		$timeframe = $v ? $v : null;
+		return $this->putInCustomData(self::CUSTOM_LOGIN_FAIL_TIMEFRAME, $timeframe);
 	}
 }
