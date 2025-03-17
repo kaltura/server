@@ -113,6 +113,4 @@ class KDeletingUserGroupSubscribtionEngine extends KDeletingEngine
 		return $listOfUserSubscribedCategoryIds;
 	}
 
-
-
 }
