@@ -273,7 +273,7 @@ function writeFailure($e, $filePath = null): void
 	$message = $e->getMessage();
 	$code = $e->getCode();
 	$hostname = gethostname();
-	$data = "merge_newly_created_duplicate_users{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", message=\"$message\", code=\"$code\"} $timestamp".PHP_EOL;
+	$data = "merge_newly_created_duplicate_users_failure{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", message=\"$message\", code=\"$code\"} $timestamp".PHP_EOL;
 
 	file_put_contents($filePath, $data, LOCK_EX);
 }
