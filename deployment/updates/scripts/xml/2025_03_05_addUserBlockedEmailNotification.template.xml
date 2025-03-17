@@ -81,7 +81,6 @@
 						<description>Number of failed login attempts</description>
 						<value objectType="KalturaEvalStringField">
 							<code>!is_null(partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())) ? partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())->getMaxLoginAttempts() : ''</code>
-<!--							<code>!is_null(kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), end(explode(',', $scope->getObject()->getEntitledPusersPublish())))) ? (kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(),end(explode(',', $scope->getObject()->getEntitledPusersPublish()))))->getEmail() : ''</code>-->
 						</value>
 					</item>
                     <item objectType="KalturaEventNotificationParameter">
