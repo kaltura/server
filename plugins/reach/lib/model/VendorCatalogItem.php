@@ -266,6 +266,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$serviceFeatureName = 'moderation';
 				break;
 
+			case VendorServiceFeature::METADATA_ENRICHMENT:
+				$serviceFeatureName = 'metadata enrichment';
+				break;
+
 			default:
 				$serviceFeatureName = '';
 		}
