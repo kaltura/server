@@ -45,8 +45,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
 			$c->add(kuserPeer::PUSER_ID, $this->groupIdEqual);
-			$groupType = $this->groupType ?? GroupType::GROUP;
-			$c->add(kuserPeer::TYPE, $groupType);
+			$c->add(kuserPeer::TYPE, $this->groupType);
 			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get categoryUser of deleted users.
 				kuserPeer::setUseCriteriaFilter(false);
 
