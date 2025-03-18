@@ -1011,7 +1011,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		}
 		else
 		{
-			$object_to_fill->setLoginFailTimeframe('');
+			$object_to_fill->setLoginFailTimeframe(null);
 		}
 		
 		return $object_to_fill;

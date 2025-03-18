@@ -2467,7 +2467,6 @@ class Partner extends BasePartner
 
 	public function setLoginFailTimeframe($v)
 	{
-		$timeframe = $v ? $v : null;
-		return $this->putInCustomData(self::CUSTOM_LOGIN_FAIL_TIMEFRAME, $timeframe);
+		return $this->putInCustomData(self::CUSTOM_LOGIN_FAIL_TIMEFRAME, $v);
 	}
 }

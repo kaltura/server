@@ -361,7 +361,7 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 
 		$this->addElement('text', 'login_fail_timeframe', array(
-			'label'			=> 'Login Failure Time Frame in secs (1 < hours < 24):',
+			'label'			=> 'Login Failure Timeframe in secs (1<H<24):',
 			'filters'		=> array('StringTrim'),
 		));
 		

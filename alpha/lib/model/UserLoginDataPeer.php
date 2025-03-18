@@ -745,10 +745,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 			{
 				if (time() - $loginData->getFirstLoginFailTime() <= $partner->getLoginFailTimeframe())
 				{
-					$loginData->setFirstLoginFailTime(null);
-					$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
-					$loginData->setLoginAttempts(0);
-					$loginData->save();
+					self::setUserBlockedData($loginData);
 					KalturaLog::notice('User login blocked for login data id ['.$loginData->getId().']');
 					throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
 				}
@@ -760,10 +757,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 					throw new kUserException('', kUserException::WRONG_PASSWORD);
 				}
 			}
-			$loginData->setFirstLoginFailTime(null);
-			$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
-			$loginData->setLoginAttempts(0);
-			$loginData->save();
+			self::setUserBlockedData($loginData);
 			throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
 		}
 
@@ -780,6 +774,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$loginData->save();
 
 		throw new kUserException('', kUserException::WRONG_PASSWORD);
+	}
+
+	protected static function setUserBlockedData($loginData)
+	{
+		$loginData->setFirstLoginFailTime(null);
+		$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
+		$loginData->setLoginAttempts(0);
+		$loginData->save();
 	}
 
 	public static function setLastLoginFields($loginData, $kuser)
