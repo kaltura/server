@@ -5,10 +5,6 @@
  */
 class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 {
-	/**
-	 * @var KalturaGroupType
-	 */
-	public $groupType;
 
 	static private $map_between_objects = array	();
 
@@ -24,6 +20,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
+
 
 	protected function validateUserIdOrGroupIdFiltered()
 	{
@@ -45,7 +42,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
 			$c->add(kuserPeer::PUSER_ID, $this->groupIdEqual);
-			$c->add(kuserPeer::TYPE, $this->groupType);
+			$c->add(kuserPeer::TYPE, KuserType::GROUP);
 			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get categoryUser of deleted users.
 				kuserPeer::setUseCriteriaFilter(false);
 
@@ -127,7 +124,7 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 			$c->add(kuserPeer::PUSER_ID, $groupIdIn, Criteria::IN);
-			$c->add(kuserPeer::TYPE, $this->groupType);
+			$c->add(kuserPeer::TYPE, KuserType::GROUP);
 			$kusers = kuserPeer::doSelect($c);
 
 			if (!$kusers)

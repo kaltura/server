@@ -37,11 +37,8 @@ class GroupUserService extends KalturaBaseService
 
 		//verify kgroup exists
 		$kgroup = kuserPeer::getKuserByPartnerAndUid( $partnerId, $groupUser->groupId);
-		$groupTypes = array(KuserType::GROUP, KuserType::APPLICATIVE_GROUP);
-		if (!$kgroup || !in_array($kgroup->getType(), $groupTypes))
-		{
+		if ( !$kgroup || $kgroup->getType() != KuserType::GROUP)
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupUser->userId );
-		}
 
 		//verify kuser does not belongs to kgroup
 		$kuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
@@ -434,52 +431,21 @@ class GroupUserService extends KalturaBaseService
 
 	protected function validateMaxGroupsPerUser($partnerId, $kuserId)
 	{
-		$maxGroupsPerUser = $this->getPartnerMaximumGroupsPerUser($partnerId);
+		$criteria = new Criteria();
+		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
+		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
 
-		$kuserGroupList = $this->retrieveActiveGroupsForKuser($kuserId);
-		if (count($kuserGroupList) < $maxGroupsPerUser)
-		{
-			return;
-		}
-
-		$countLimitedGroups = $this->countLimitedGroups($kuserGroupList);
-		if ($countLimitedGroups >= $maxGroupsPerUser)
-		{
-			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
-		}
-	}
-
-	protected function getPartnerMaximumGroupsPerUser($partnerId)
-	{
+		$maxGroupsPerUser = GroupUserService::DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER;
 		$groupUserCountLimitMap = kConf::get('group_user_count_limit', 'local', array());
 		$partnersList = array_keys($groupUserCountLimitMap);
 		if (in_array($partnerId, $partnersList))
 		{
-			return $groupUserCountLimitMap[$partnerId];
+			$maxGroupsPerUser = $groupUserCountLimitMap[$partnerId];
 		}
 
-		return GroupUserService::DEFAULT_MAX_NUMBER_OF_GROUPS_PER_USER;
-	}
-
-	protected function retrieveActiveGroupsForKuser($kuserId)
-	{
-		$criteria = new Criteria();
-		$criteria->add(KuserKgroupPeer::KUSER_ID, $kuserId);
-		$criteria->add(KuserKgroupPeer::STATUS, KuserKgroupStatus::ACTIVE);
-		return KuserKgroupPeer::doSelect($criteria);
-	}
-
-	protected function countLimitedGroups($kuserGroupList)
-	{
-		$countLimitedGroups = 0;
-		foreach ($kuserGroupList as $kuserGroup)
+		if (KuserKgroupPeer::doCount($criteria) >= $maxGroupsPerUser)
 		{
-			/** @var KuserKgroup $kuserGroup */
-			if ($kuserGroup->getGroupType() == GroupType::GROUP)
-			{
-				$countLimitedGroups += 1;
-			}
+			throw new KalturaAPIException (KalturaErrors::USER_EXCEEDED_MAX_GROUPS);
 		}
-		return $countLimitedGroups;
 	}
 }
