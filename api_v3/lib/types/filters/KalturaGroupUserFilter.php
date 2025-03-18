@@ -37,8 +37,6 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$this->validateUserIdOrGroupIdFiltered();
-
-		$groupTypes = isset($this->groupType) ? array($this->groupType) : array(GroupType::GROUP, GroupType::APPLICATIVE_GROUP);
 		
 		if($this->groupIdEqual)
 		{
@@ -47,7 +45,8 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId);
 			$c->add(kuserPeer::PUSER_ID, $this->groupIdEqual);
-			$c->add(kuserPeer::TYPE, $groupTypes, Criteria::IN);
+			$groupType = $this->groupType ?? GroupType::GROUP;
+			$c->add(kuserPeer::TYPE, $groupType);
 			if (kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID) //batch should be able to get categoryUser of deleted users.
 				kuserPeer::setUseCriteriaFilter(false);
 
@@ -125,11 +124,12 @@ class KalturaGroupUserFilter extends KalturaGroupUserBaseFilter
 		{
 			$groupIdIn = explode(',', $this->groupIdIn);
 			$partnerId = kCurrentContext::getCurrentPartnerId();
+			$groupType = $this->groupType ?? GroupType::GROUP;
 
 			$c = new Criteria();
 			$c->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 			$c->add(kuserPeer::PUSER_ID, $groupIdIn, Criteria::IN);
-			$c->add(kuserPeer::TYPE, $groupTypes, Criteria::IN);
+			$c->add(kuserPeer::TYPE, $groupType);
 			$kusers = kuserPeer::doSelect($c);
 
 			if (!$kusers)
