@@ -47,11 +47,6 @@ class kBulkGroupUserSyncCsv
 		foreach ($users as $user)
 		{
 			/**@var kuser $user*/
-			if ($user->getType() == KuserType::APPLICATIVE_GROUP)
-			{
-				continue;
-			}
-
 			$this->userMap[$user->getId()][self::MODE] = $user->getUserMode();
 			$this->userMap[trim($user->getPuserId())][self::MODE] = $user->getUserMode();
 			$this->userMap[$user->getId()][self::TYPE] = $user->getType();
@@ -64,9 +59,11 @@ class kBulkGroupUserSyncCsv
 		$requestGroupIds = array_map('trim', $this->groupIds);
 		$partnerId = $this->kuser->getPartnerId();
 		$currentUserGroups = KuserKgroupPeer::retrieveByKuserIds(array($this->kuser->getId()));
+		$currentKgroupsIds = array();
 		$currentPgroupsIds = array();
 		foreach ($currentUserGroups as $currentUserGroup)
 		{
+			$currentKgroupsIds[] = $currentUserGroup->getKgroupId();
 			$currentPgroupsIds[] = $currentUserGroup->getPgroupId();
 		}
 

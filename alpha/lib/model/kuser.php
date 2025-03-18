@@ -8,7 +8,7 @@
  * @package Core
  * @subpackage model
  */ 
-class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticIndexable, IPartiallyIndexable
+class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticIndexable
 {
 	public function __construct()
 	{
@@ -1323,17 +1323,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return kSphinxSearchManager::getSphinxIndexName(kuserIndex::getObjectIndexName());
 	}
-
-	public function isIndexable()
-	{
-		if ($this->getType() == KuserType::APPLICATIVE_GROUP)
-		{
-			return false;
-		}
-
-		return true;
-	}
-
+    
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postInsert()
 	 */
