@@ -737,38 +737,12 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			throw new kUserException('', kUserException::LOGIN_BLOCKED);
 		}
-
-		$partner = PartnerPeer::retrieveByPK($loginData->getConfigPartnerId());
 		if ($loginData->getLoginAttempts()+1 >= $loginData->getMaxLoginAttempts())
 		{
-			if ($partner && $partner->getLoginFailTimeframe()) //timeframe is set for this partner
-			{
-				if (time() - $loginData->getFirstLoginFailTime() <= $partner->getLoginFailTimeframe()) //timeframe is not over yet
-				{
-					self::setUserBlockedData($loginData);
-					KalturaLog::notice('User login blocked for login data id ['.$loginData->getId().']');
-					throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
-				}
-				else
-				{//timeframe is over, we need to reset the login attempts
-					$loginData->setLoginAttempts(0);
-					$loginData->setFirstLoginFailTime(time());
-					$loginData->save();
-					throw new kUserException('', kUserException::WRONG_PASSWORD);
-				}
-			}
-			self::setUserBlockedData($loginData);
-			throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
-		}
-
-		if ($partner && $partner->getLoginFailTimeframe() && (time() - $loginData->getFirstLoginFailTime() > $partner->getLoginFailTimeframe()))
-		{
+			$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
 			$loginData->setLoginAttempts(0);
-			$loginData->setFirstLoginFailTime(time());
-		}
-		if ($loginData->getLoginAttempts() == 0)
-		{
-			$loginData->setFirstLoginFailTime(time());
+			$loginData->save();
+			throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
 		}
 		$loginData->incLoginAttempts();
 		$loginData->save();
@@ -776,15 +750,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		throw new kUserException('', kUserException::WRONG_PASSWORD);
 	}
 
-	protected static function setUserBlockedData($loginData)
-	{
-		$loginData->setFirstLoginFailTime(null);
-		$loginData->setLoginBlockedUntil( time() + ($loginData->getLoginBlockPeriod()) );
-		$loginData->setLoginAttempts(0);
-		$loginData->save();
-	}
-
-	public static function setLastLoginFields($loginData, $kuser)
+		public static function setLastLoginFields($loginData, $kuser)
 	{
 		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
 		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);

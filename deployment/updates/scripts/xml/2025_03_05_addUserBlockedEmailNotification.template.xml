@@ -30,21 +30,15 @@
 						<modifiedColumns>user_login_data.LOGIN_BLOCKED_UNTIL</modifiedColumns>
 					</item>
 					<item objectType="KalturaEventFieldCondition">
-						<description>User blocked due to excess of failed login attempts within a timeframe</description>
+						<description>User blocked due to excess of failed login attempts</description>
 						<field objectType="KalturaEvalBooleanField">
 							<code>$scope->getObject() instanceof UserLoginData &amp;&amp; $scope->getObject()->getLoginBlockedUntil()</code>
-						</field>
-					</item>
-					<item objectType="KalturaEventFieldCondition">
-						<description>Check that the failures happened within a set timeframe</description>
-						<field objectType="KalturaEvalBooleanField">
-							<code>partnerPeer::retrieveActiveByPK($scope->getObject()->getConfigPartnerId())->getLoginFailTimeframe()</code>
 						</field>
 					</item>
 				</eventConditions>
 				<format>1</format>
 				<subject>Replace this text with desired email subject</subject>
-				<body>Replace this text with desired email body. You can use {entry_id}, {entry_name}, {entry_status} and {entry_reference_id} as variables.</body>
+				<body>Replace this text with desired email body. You can use {login_email}, {user_full_name}, {num_of_failed_logins} and {login_blocked_until} as variables.</body>
 				<fromEmail>{from_email}</fromEmail>
 				<fromName>{from_name}</fromName>
 				<contentParameters objectType="array">
@@ -83,13 +77,6 @@
 							<code>!is_null(partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())) ? partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())->getMaxLoginAttempts() : ''</code>
 						</value>
 					</item>
-                    <item objectType="KalturaEventNotificationParameter">
-                        <key>login_fail_timeframe</key>
-                        <description>Timeframe of failed logins</description>
-                        <value objectType="KalturaEvalStringField">
-                            <code>!is_null(partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())) ? partnerPeer::retrieveActiveByPK($scope->getEvent()->getObject()->getConfigPartnerId())->getLoginFailTimeframe() : ''</code>
-                        </value>
-                    </item>
 					<item objectType="KalturaEventNotificationParameter">
 						<key>login_blocked_until</key>
 						<description>Login blocked until</description>

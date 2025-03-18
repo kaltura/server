@@ -521,11 +521,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 */
 	public $allowedEmailDomainsForAdmins;
 
-	/**
-	 * @var string
-	 */
-	public $loginFailTimeframe;
-	
 	
 	private static $map_between_objects = array
 	(
@@ -626,7 +621,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'recycleBinRetentionPeriod',
 		'customAnalyticsDomain',
 		'allowedEmailDomainsForAdmins',
-		'loginFailTimeframe'
 	);
 
 	const PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT = 1;
@@ -814,14 +808,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
                 throw new KalturaAPIException(SystemPartnerErrors::PARTNER_RECORDING_CONVERSION_PROFILE_ID_ERROR, $this->defaultRecordingConversionProfile);
             }
         }
-
-		if (!$this->isNull('loginFailTimeframe'))
-		{ // Should be between 1 and 24 hours (secs)
-			if ($this->loginFailTimeframe < 3600 || $this->loginFailTimeframe > 86400)
-			{
-				throw new KalturaAPIException(SystemPartnerErrors::LOGIN_FAIL_TIMEFRAME_ERROR, $this->loginFailTimeframe);
-			}
-		}
 		
 		if ($sourceObject->getAllowedFromEmailWhiteList() != $this->allowedFromEmailWhiteList)
 		{
@@ -1003,15 +989,6 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		else
 		{
 			$object_to_fill->setAllowedEmailDomainsForAdmins('');
-		}
-
-		if (!is_null($this->loginFailTimeframe))
-		{
-			$object_to_fill->setLoginFailTimeframe($this->loginFailTimeframe);
-		}
-		else
-		{
-			$object_to_fill->setLoginFailTimeframe(null);
 		}
 		
 		return $object_to_fill;

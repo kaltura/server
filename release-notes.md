@@ -3,7 +3,6 @@
 - Issue Type: Task
 - Issue ID: PLAT-25095
 ### Deployment scripts ###
-To trigger this notification, the 'Login Failre Time Frame' field in partner configuration must be set to a valid value.
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
 ``deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php``
 

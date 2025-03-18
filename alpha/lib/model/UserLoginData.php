@@ -513,14 +513,4 @@ class UserLoginData extends BaseUserLoginData
 		$this->putInCustomData('hash_algo', $hasAlgo, null);
 	}
 
-	public function getFirstLoginFailTime()
-	{
-		return $this->getFromCustomData('first_login_fail_time');
-	}
-
-	public function setFirstLoginFailTime($v)
-	{
-		$this->putInCustomData('first_login_fail_time', $v);
-	}
-
 } // UserLoginData
