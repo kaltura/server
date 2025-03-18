@@ -743,14 +743,14 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		{
 			if ($partner && $partner->getLoginFailTimeframe()) //timeframe is set for this partner
 			{
-				if (time() - $loginData->getFirstLoginFailTime() <= $partner->getLoginFailTimeframe())
+				if (time() - $loginData->getFirstLoginFailTime() <= $partner->getLoginFailTimeframe()) //timeframe is not over yet
 				{
 					self::setUserBlockedData($loginData);
 					KalturaLog::notice('User login blocked for login data id ['.$loginData->getId().']');
 					throw new kUserException('', kUserException::LOGIN_RETRIES_EXCEEDED);
 				}
 				else
-				{
+				{//timeframe is over, we need to reset the login attempts
 					$loginData->setLoginAttempts(0);
 					$loginData->setFirstLoginFailTime(time());
 					$loginData->save();
