@@ -1,4 +1,10 @@
 # Ursa-21.12.0
+## X failed login attempts notification 
+- Issue Type: Task
+- Issue ID: PLAT-25095
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
+``deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php``
 
 # Ursa-21.11.0
 ## Add demoteAdmin action to User service ##
