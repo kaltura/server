@@ -712,7 +712,14 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		if(isset($this->supportAccessMode) && !$this->isApiDoneByAccountOwner())
+		$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+		if((isset($this->supportAccessMode) || isset($this->supportAccessAllowedUntil)) &&
+			!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_SUPPORT_ACCESS_MODE_SETTINGS, kCurrentContext::getCurrentPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_USAGE_PERMISSION, 'supportAccessMode');
+		}
+		
+		if(isset($this->supportAccessMode) && !$this->isApiDoneByAccountOwner($partner))
 		{
 			throw new KalturaAPIException(KalturaErrors::CAN_ONLY_BE_UPDATED_BY_ACCOUNT_OWNER);
 		}
@@ -735,8 +742,15 @@ class KalturaPartner extends KalturaObject implements IFilterable
 	 */
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
+		$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
+		if((isset($this->supportAccessMode) || isset($this->supportAccessAllowedUntil)) &&
+			!PermissionPeer::isValidForPartner(PermissionName::FEATURE_ENABLE_SUPPORT_ACCESS_MODE_SETTINGS, kCurrentContext::getCurrentPartnerId()))
+		{
+			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_NO_USAGE_PERMISSION, 'supportAccessMode');
+		}
+		
 		if(isset($this->supportAccessMode) && $this->supportAccessMode != $sourceObject->getSupportAccessMode()
-			&& !$this->isApiDoneByAccountOwner())
+			&& !$this->isApiDoneByAccountOwner($partner))
 		{
 			throw new KalturaAPIException(KalturaErrors::CAN_ONLY_BE_UPDATED_BY_ACCOUNT_OWNER);
 		}
@@ -747,7 +761,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ADMIN_PROPERTY, 'supportAccessAllowedUntil');
 		}
 		
-		if(isset($this->supportAccessAllowedUntil) && $sourceObject->getSupportAccessAllowedUntil() == KalturaSupportAccessMode::BLOCKED)
+		if(isset($this->supportAccessAllowedUntil) && $sourceObject->getSupportAccessMode() == KalturaSupportAccessMode::BLOCKED)
 		{
 			throw new KalturaAPIException(KalturaErrors::SUPPORT_ACCESS_CANNOT_BE_ENABLED);
 		}
@@ -755,8 +769,8 @@ class KalturaPartner extends KalturaObject implements IFilterable
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
-	private function isApiDoneByAccountOwner()
+	private function isApiDoneByAccountOwner($partner)
 	{
-		return kCurrentContext::getCurrentKsKuserId() !=  $sourceObject->getAccountOwnerKuserId();
+		return kCurrentContext::getCurrentKsKuserId() ==  $partner->getAccountOwnerKuserId();
 	}
 }
