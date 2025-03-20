@@ -136,7 +136,7 @@ class KalturaUserAppRole extends KalturaAppRole
 	private static function isValidForInsert(kuser $kuser, $appGuid, $userRoleId)
 	{
 		// groups are not supported
-		if ($kuser->getType() === KuserType::GROUP)
+		if ($kuser->getType() === KuserType::GROUP || $kuser->getType() == KuserType::APPLICATIVE_GROUP)
 		{
 			throw new KalturaAPIException(KalturaErrors::USER_APP_ROLE_NOT_ALLOWED_FOR_GROUP);
 		}

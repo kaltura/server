@@ -183,7 +183,8 @@ class VirtualEventService extends KalturaBaseService
 	protected function isValidGroup($groupId)
 	{
 		$dbGroup = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $groupId);
-		if(!$dbGroup || $dbGroup->getType() != KuserType::GROUP)
+		$groupTypes = array(KuserType::GROUP, KuserType::APPLICATIVE_GROUP);
+		if(!$dbGroup || !in_array($dbGroup->getType(), $groupTypes))
 		{
 			throw new KalturaAPIException(KalturaGroupErrors::INVALID_GROUP_ID, $groupId);
 		}

@@ -17,12 +17,18 @@ class KalturaGroup extends KalturaBaseUser
 	 */
 	public $processStatus;
 
+	/**
+	 * @var KalturaGroupType
+	 */
+	public $groupType;
+
 	private static $names = array('fullName' => 'getFullName', 'screenName' => 'getScreenName');
 
 	private static $map_between_objects = array
 	(
 		'membersCount',
 		'processStatus',
+		'groupType' => 'type',
 	);
 
 	public function getMapBetweenObjects ( )
@@ -35,7 +41,8 @@ class KalturaGroup extends KalturaBaseUser
 		if (is_null($dbObject))
 		{
 			$dbObject = new kuser();
-			$dbObject->setType(KuserType::GROUP);
+			$groupType = $this->groupType ?? KuserType::GROUP;
+			$dbObject->setType($groupType);
 		}
 		parent::toObject($dbObject, $skip);
 		return $dbObject;
@@ -74,5 +81,4 @@ class KalturaGroup extends KalturaBaseUser
 		$dbObject->setPartnerId($dbOriginalGroup->getPartnerId());
 		return $dbObject;
 	}
-
 }
