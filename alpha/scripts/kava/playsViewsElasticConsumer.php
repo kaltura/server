@@ -50,14 +50,15 @@ class playsViewsElasticConsumer extends BaseConsumer
 }
 
 // parse the command line
-if ($argc < 3)
+if ($argc < 2)
 {
-	echo "Usage:\n\t" . basename(__file__) . " <consumerId> <bulk_size>\n";
+	echo "Usage:\n\t" . basename(__file__) . " <id>\n";
 	exit(1);
 }
 
-$consumerId = $argv[1];
-$bulkSize = $argv[2];
+$id = $argv[1];
+$consumerId = getenv(CLUSTER_ID_VAR . "_$id");
+$bulkSize = getenv(BULK_SIZE_VAR);
 
 try
 {

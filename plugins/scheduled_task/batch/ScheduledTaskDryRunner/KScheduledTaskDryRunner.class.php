@@ -177,7 +177,8 @@ class KScheduledTaskDryRunner extends KJobHandlerWorker
 	 */
 	private function getCsvData($entry)
 	{
-		$date = gmdate("M d Y H:i:s", $entry->lastPlayedAt);
+		$lastPlayedAt = $entry->lastPlayedAt ?? 0;
+		$date = gmdate("M d Y H:i:s", $lastPlayedAt);
 		$mediaType = ScheduledTaskBatchHelper::getMediaTypeString($entry->mediaType);
 		return array($entry->id, $entry->name, $date, $mediaType);
 	}

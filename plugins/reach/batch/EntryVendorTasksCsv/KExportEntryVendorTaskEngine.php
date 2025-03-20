@@ -36,6 +36,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		13 => "SUMMARY",
 		14 => "VIDEO_ANALYSIS",
 		15 => "MODERATION",
+		16 => "METADATA_ENRICHMENT",
 		"N/A" => "N/A",
 	);
 	

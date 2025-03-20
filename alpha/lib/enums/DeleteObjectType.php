@@ -12,4 +12,5 @@ interface DeleteObjectType extends BaseEnum
 	const USER_ENTRY = 5;
 	const ENTRY = 6;
 	const CATEGORY_USER_SUBSCRIBER = 7;
+	const USER_GROUP_SUBSCRIPTION = 8;
 }

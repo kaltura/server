@@ -520,7 +520,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $allowedEmailDomainsForAdmins;
-	
+
 	
 	private static $map_between_objects = array
 	(

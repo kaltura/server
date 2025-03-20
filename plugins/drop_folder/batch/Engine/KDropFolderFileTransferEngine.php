@@ -288,7 +288,7 @@ class KDropFolderFileTransferEngine extends KDropFolderEngine
 				if (empty($engineOptions['s3Arn']))
 				{
 					// throw Exception and not kFileTransferMgrException::otherError to catch msg at: plugins/drop_folder/batch/DropFolderWatcher/KAsyncDropFolderWatcher.class.php:72
-					$msg = "Drop Folder ID [{$dropFolder->id}] enabled 'Bucket Policy Allow Access' but 's3Arn' value under 's3_drop_folder' in 'runtime_config' map is missing";
+					$msg = "Drop Folder ID [{$dropFolder->id}] enabled 'Bucket Policy Allows Access' but 's3Arn' value under 's3_drop_folder' in 'runtime_config' map is missing";
 					throw new Exception($msg, kFileTransferMgrException::otherError);
 				}
 			}

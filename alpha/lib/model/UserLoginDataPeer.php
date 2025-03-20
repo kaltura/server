@@ -750,7 +750,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		throw new kUserException('', kUserException::WRONG_PASSWORD);
 	}
 
-	public static function setLastLoginFields($loginData, $kuser)
+		public static function setLastLoginFields($loginData, $kuser)
 	{
 		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
 		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
