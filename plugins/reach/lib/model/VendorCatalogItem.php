@@ -207,16 +207,8 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		{
 			return '';
 		}
-
-		$reflector = new ReflectionClass('VendorServiceFeature');
-		$constantNames = array_flip($reflector->getConstants());
 		$serviceFeature = $vendorCatalogItem->getServiceFeature();
-		$constantName = '';
-		if(isset($constantNames[$serviceFeature]))
-		{
-			$constantName = str_replace("_", " ", strtolower($constantNames[$serviceFeature]));
-		}
-		return $constantName;
+		return ReachPlugin::getTranslatedServiceFeature($serviceFeature);
 	}
 	
 	public function getCacheInvalidationKeys()

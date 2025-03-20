@@ -64,7 +64,8 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		{
 			Infra_ClientHelper::unimpersonate();// to get all catalog items from partner 0
 			// init filter
-			$catalogItemProfileFilter = ReachAdminUtils::getCatalogItemFilter($serviceFeature);
+			$catalogItemFilterName = "Kaltura_Client_Reach_Type_" . ReachPlugin::getCatalogItemCoreFilterName($serviceFeature);
+			$catalogItemProfileFilter = new $catalogItemFilterName();
 			$catalogItemProfileFilter->orderBy = "-createdAt";
 			$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 			$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
@@ -146,8 +147,9 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		$targetLanguage = $this->_getParam('targetLanguage') != "" ? $this->_getParam('targetLanguage') : null;
 		$vendorPartnerId = $this->_getParam('vendorPartnerId') != "" ? $this->_getParam('vendorPartnerId') : null;
 
-		$catalogItemFilterName = ReachAdminUtils::getCatalogItemFilterTypeName($serviceFeature);
+		$catalogItemFilterName = "Kaltura_Client_Reach_Type_" . ReachPlugin::getCatalogItemCoreFilterName($serviceFeature);
 		$catalogItemProfileFilter = new $catalogItemFilterName();
+
 		$catalogItemProfileFilter->orderBy = "-createdAt";
 		$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;

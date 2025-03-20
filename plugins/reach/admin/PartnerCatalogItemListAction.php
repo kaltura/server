@@ -53,7 +53,8 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 		if ($partnerId || $catalogItemId)
 		{
-			$vendorCatalogItemFilter = ReachAdminUtils::getCatalogItemFilter($serviceFeature);
+			$catalogItemFilterName = "Kaltura_Client_Reach_Type_" . ReachPlugin::getCatalogItemCoreFilterName($serviceFeature);
+			$vendorCatalogItemFilter = new $catalogItemFilterName();
 			$vendorCatalogItemFilter->orderBy = "-createdAt";
 			$vendorCatalogItemFilter->serviceTypeEqual = $serviceType;
 			$vendorCatalogItemFilter->serviceFeatureEqual = $serviceFeature;

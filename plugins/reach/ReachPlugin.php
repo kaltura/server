@@ -376,4 +376,63 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		return in_array($entryType, $supportedEntryTypes);
 	}
 
+	public static function getServiceFeatureName($serviceFeature)
+	{
+		$reflector = new ReflectionClass('VendorServiceFeature');
+		$constantNames = array_flip($reflector->getConstants());
+		return isset($constantNames[$serviceFeature]) ? $constantNames[$serviceFeature] : "";
+	}
+
+	public static function getTranslatedServiceFeature($serviceFeature)
+	{
+		$serviceFeatureName = ReachPlugin::getServiceFeatureName($serviceFeature);
+		return str_replace("_", " ", strtolower($serviceFeatureName));
+	}
+
+	public static function getServiceFeatureClassName($serviceFeature)
+	{
+		$serviceFeatureName = ReachPlugin::getServiceFeatureName($serviceFeature);
+		$finalName = '';
+		if($serviceFeatureName)
+		{
+			$serviceFeatureWords = explode("_", strtolower($serviceFeatureName));
+			foreach ($serviceFeatureWords as $serviceFeatureWord)
+			{
+				if(strlen($serviceFeatureWord) > 0)
+				{
+					$capitalFirstChar = strtoupper(substr($serviceFeatureWord, 0, 1));
+					$finalName .= $capitalFirstChar . substr($serviceFeatureWord, 1);
+				}
+			}
+		}
+		return $finalName;
+	}
+
+	public static function getCatalogItemCoreName($serviceFeature)
+	{
+		switch ($serviceFeature)
+		{
+			default:
+				$serviceFeatureNameInClass = ReachPlugin::getServiceFeatureClassName($serviceFeature);
+				return "Vendor" . $serviceFeatureNameInClass . "CatalogItem";
+		}
+	}
+
+	public static function getCatalogItemName($serviceFeature)
+	{
+		switch ($serviceFeature)
+		{
+			default:
+				return "Kaltura" . ReachPlugin::getCatalogItemCoreName($serviceFeature);
+		}
+	}
+
+	public static function getCatalogItemCoreFilterName($serviceFeature)
+	{
+		switch ($serviceFeature)
+		{
+			default:
+				return ReachPlugin::getCatalogItemCoreName($serviceFeature) . "Filter";
+		}
+	}
 }

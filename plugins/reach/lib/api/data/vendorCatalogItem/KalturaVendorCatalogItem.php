@@ -251,47 +251,18 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
  	 */
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$object = self::getObjectByServiceFeature($sourceObject->getServiceFeature());
+		$object = new KalturaVendorCaptionsCatalogItem();
+		switch ($sourceObject->getServiceFeature())
+		{
+			default:
+				$catalogItemName = ReachPlugin::getCatalogItemName($sourceObject->getServiceFeature());
+				if($catalogItemName != "KalturaVendorCatalogItem")
+				{
+					$object = new $catalogItemName();
+				}
+		}
 
 		$object->fromObject($sourceObject, $responseProfile);
-
 		return $object;
-	}
-
-	public static function getObjectByServiceFeature($serviceFeature)
-	{
-		switch ($serviceFeature)
-		{
-			case VendorServiceFeature::TRANSLATION:
-				return new KalturaVendorTranslationCatalogItem();
-			case VendorServiceFeature::ALIGNMENT:
-				return new KalturaVendorAlignmentCatalogItem();
-			case VendorServiceFeature::AUDIO_DESCRIPTION:
-				return new KalturaVendorAudioDescriptionCatalogItem();
-			case VendorServiceFeature::CHAPTERING:
-				return new KalturaVendorChapteringCatalogItem();
-			case VendorServiceFeature::INTELLIGENT_TAGGING:
-				return new KalturaVendorIntelligentTaggingCatalogItem();
-			case VendorServiceFeature::DUBBING:
-				return new KalturaVendorDubbingCatalogItem();
-			case VendorServiceFeature::LIVE_CAPTION:
-				return new KalturaVendorLiveCaptionCatalogItem();
-			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
-				return new KalturaVendorExtendedAudioDescriptionCatalogItem();
-			case VendorServiceFeature::CLIPS:
-				return new KalturaVendorClipsCatalogItem();
-			case VendorServiceFeature::LIVE_TRANSLATION:
-				return new KalturaVendorLiveTranslationCatalogItem();
-			case VendorServiceFeature::QUIZ:
-				return new KalturaVendorQuizCatalogItem();
-			case VendorServiceFeature::SUMMARY:
-				return new KalturaVendorSummaryCatalogItem();
-			case VendorServiceFeature::VIDEO_ANALYSIS:
-				return new KalturaVendorVideoAnalysisCatalogItem();
-			case VendorServiceFeature::MODERATION:
-				return new KalturaVendorModerationCatalogItem();
-			default:
-				return new KalturaVendorCaptionsCatalogItem();
-		}
 	}
 }

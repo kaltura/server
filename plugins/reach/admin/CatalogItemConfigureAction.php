@@ -133,9 +133,10 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				$catalogItemId = $catalogItem->id;
 			}
 
-			$catalogItemName = ReachAdminUtils::getCatalogItemTypeName($formData['type']);
-			if($catalogItemName != "Kaltura_Client_Reach_Type_VendorCatalogItem")
+			$catalogItemCoreName = ReachPlugin::getCatalogItemCoreName($formData['type']);
+			if($catalogItemCoreName != "VendorCatalogItem")
 			{
+				$catalogItemName = "Kaltura_Client_Reach_Type_" . $catalogItemCoreName;
 				$catalogItem = $form->getObject($catalogItemName, $formData, false, true);
 			}
 
