@@ -128,6 +128,10 @@ class Partner extends BasePartner
 	const CUSTOM_DATE_MAX_METADATA_INDEX_LENGTH = 'max_metadata_index_length';
 	
 	const CUSTOM_ANALYTICS_DOMAIN = 'custom_analytics_domain';
+	
+	const SUPPORT_ACCESS_ALLOWED_UNTIL = 'custom_support_access_allowed_until';
+	
+	const SUPPORT_ACCESS_MODE = 'custom_support_access_mode';
 
 	public function save(PropelPDO $con = null)
 	{
@@ -2457,4 +2461,49 @@ class Partner extends BasePartner
 	{
 		return $this->putInCustomData(self::ALLOWED_EMAIL_DOMAINS_FOR_ADMINS, $v);
 	}
+	
+	public function getSupportAccessAllowedUntil()
+	{
+		return $this->getFromCustomData(self::SUPPORT_ACCESS_ALLOWED_UNTIL);
+	}
+	
+	public function setSupportAccessAllowedUntil($v)
+	{
+		return $this->putInCustomData(self::SUPPORT_ACCESS_ALLOWED_UNTIL, $v);
+	}
+	
+	public function getSupportAccessMode()
+	{
+		return $this->getFromCustomData(self::SUPPORT_ACCESS_MODE, null, SupportAccessMode::ALLWAYS_ALLOWED);
+	}
+	
+	public function setSupportAccessMode($v)
+	{
+		return $this->putInCustomData(self::SUPPORT_ACCESS_MODE, $v);
+	}
+	
+	public function isSupportAccessAllowed()
+	{
+		$shouldEnforceSupportAccess = kConf::get('enforce_support_access', kConfMapNames::SECURITY, true);
+		if (!$shouldEnforceSupportAccess || $this->getSupportAccessMode() == SupportAccessMode::ALLWAYS_ALLOWED)
+		{
+			return true;
+		}
+		
+		$allowedUntil = $this->getSupportAccessAllowedUntil();
+		$allowedUntil = $allowedUntil ? $allowedUntil : (time() - 3600);
+		return (time() < $allowedUntil);
+	}
+	
+	public function getSupportAccessMaxKsExpiry()
+	{
+		$shouldEnforceSupportAccess = kConf::get('enforce_support_access', kConfMapNames::SECURITY, true);
+		if(!$shouldEnforceSupportAccess || $this->getSupportAccessMode() == SupportAccessMode::ALLWAYS_ALLOWED)
+		{
+			return dateUtils::DAY;
+		}
+		
+		return $this->getSupportAccessAllowedUntil() - time();
+	}
+	
 }
