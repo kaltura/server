@@ -65,11 +65,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
             return true;
         if ($object instanceof IElasticIndexable)
 		{
-			if ($object instanceof IPartiallyIndexable)
-			{
-				/** @var IPartiallyIndexable $object */
-				return $object->isIndexable();
-			}
 			return true;
 		}
 
@@ -326,11 +321,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     {
 		if ($object instanceof IElasticIndexable)
 		{
-			if ($object instanceof IPartiallyIndexable)
-			{
-				/** @var IPartiallyIndexable $object */
-				return $object->isIndexable();
-			}
 			return true;
 		}
 
@@ -358,11 +348,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         //prevent indexing 2 times- if object is IIndexable we raise the event in kSphinxSearchManager
         if($object instanceof IElasticIndexable && !($object instanceof IIndexable))
 		{
-			if ($object instanceof IPartiallyIndexable)
-			{
-				/** @var IPartiallyIndexable $object */
-				return $object->isIndexable();
-			}
 			return true;
 		}
 
@@ -390,11 +375,6 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
         //prevent indexing 2 times- if object is IIndexable we raise the event in kSphinxSearchManager
         if($object instanceof IElasticIndexable && !($object instanceof IIndexable))
 		{
-			if ($object instanceof IPartiallyIndexable)
-			{
-				/** @var IPartiallyIndexable $object */
-				return $object->isIndexable();
-			}
 			return true;
 		}
 
