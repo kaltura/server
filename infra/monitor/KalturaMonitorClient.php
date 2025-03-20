@@ -23,10 +23,11 @@ class KalturaMonitorClient
 	const EVENT_CURL           = 'curl';
 	const EVENT_AXEL           = 'axel';
 	const EVENT_RABBIT         = 'rabbit';
-	const EVENT_KAFKA         = 'kafka';
+	const EVENT_KAFKA          = 'kafka';
 	const EVENT_SLEEP          = 'sleep';
 	const EVENT_UPLOAD         = 'upload';
 	const EVENT_EXEC           = 'exec';
+	const EVENT_ERROR          = 'error';
 
 
 	const FIELD_ACTION = 			'a';
@@ -789,6 +790,19 @@ class KalturaMonitorClient
 			$data[self::FIELD_ERROR_CODE] = $errorCode;
 		}
 
+		self::writeDeferredEvent($data);
+	}
+	
+	public static function sendErrorEvent($errorCode)
+	{
+		if (!self::$stream)
+			return;
+		
+		$data = array_merge(self::$basicEventInfo, self::$basicApiInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_ERROR,
+			self::FIELD_ERROR_CODE	    => $errorCode,
+		));
+		
 		self::writeDeferredEvent($data);
 	}
 }

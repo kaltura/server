@@ -34,6 +34,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			"categoryEntry" => objectType::CATEGORY_ENTRY,
 			"CaptionAsset" => CaptionAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(CaptionAssetEventNotificationEventObjectType::CAPTION_ASSET),
 			"TranscriptAsset" => TranscriptAssetEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(TranscriptAssetEventNotificationEventObjectType::TRANSCRIPT_ASSET),
+			"LiveStreamScheduleEvent" => ScheduleEventNotificationsPlugin::getEventNotificationEventObjectTypeCoreValue(ScheduleEventNotificationEventObjectType::SCHEDULE_EVENT),
 			);
 
 		if (isset($mapObjectType[$eventObjectClassName]))
@@ -718,6 +719,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
+		if ($vendorCatalogItem->isEntryDurationExceeding($entry))
+		{
+			KalturaLog::log("Entry [{$entry->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
+			return true;
+		}
+
 		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $taskDuration);
 		if($entryVendorTask)
 		{
@@ -732,9 +739,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $taskDuration = null)
 	{
+		//Check if the entry is temporary, if so, dont create the task
 		if($entry->getIsTemporary())
 		{
 			KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
+			return null;
+		}
+		
+		//Check if static content and the catalog item is excluding static content, if so, dont create the task
+		if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entry->getAdminTagsArr()))
+		{
+			KalturaLog::debug("Entry [{$entry->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
 			return null;
 		}
 		
@@ -785,7 +800,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		//Kaltura Recorded entries are ready on creation so make sure the vendors wont fetch the job until it gets its assets
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $vendorCatalogItem->requiresEntryReady())
 		{
-			$entryAssets = assetPeer::retrieveReadyByEntryId($entry->getId());
+			$entryAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
 			if(!count($entryAssets))
 			{
 				$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;

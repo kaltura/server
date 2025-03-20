@@ -291,6 +291,11 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		return $result;
 	}
 	
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+	}
+	
 	/**
 	 * @param int $type
 	 * @return KalturaDropFolder

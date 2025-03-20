@@ -178,6 +178,7 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 		
 		$c = KalturaCriteria::create(categoryKuserPeer::OM_CLASS);
 		$categoryKuserFilter->attachToCriteria($c);
+		///
 		$pager->attachToCriteria($c);
 		$c->applyFilters();
 		

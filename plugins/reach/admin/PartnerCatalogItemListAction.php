@@ -53,16 +53,17 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$action->view->allowed = $this->isAllowedForPartner($partnerId);
 		if ($partnerId || $catalogItemId)
 		{
-			$vendorCatalogItemFilter = $this->getCatalogItemFilter($serviceFeature);
+			$vendorCatalogItemFilter = $this->getCatalogItemFilterByServiceFeature($serviceFeature);
 			$vendorCatalogItemFilter->orderBy = "-createdAt";
 			$vendorCatalogItemFilter->serviceTypeEqual = $serviceType;
+			$vendorCatalogItemFilter->serviceFeatureEqual = $serviceFeature;
 			$vendorCatalogItemFilter->turnAroundTimeEqual = $turnAroundTime;
 			$vendorCatalogItemFilter->partnerIdEqual = $partnerId;
 			$vendorCatalogItemFilter->sourceLanguageEqual = $sourceLanguage;
 			$vendorCatalogItemFilter->vendorPartnerIdEqual = $vendorPartnerId;
 			$vendorCatalogItemFilter->catalogItemIdEqual = $catalogItemId;
 
-			if(in_array($serviceFeature, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
+			if (in_array($serviceFeature, array(Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION, Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)))
 			{
 				$vendorCatalogItemFilter->targetLanguageEqual = $targetLanguage;
 			}
@@ -103,7 +104,7 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 		$action->view->partnerId = $partnerId;
 	}
 
-	protected function getCatalogItemFilter($serviceFeature)
+	protected function getCatalogItemFilterByServiceFeature($serviceFeature)
 	{
 		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
 			return new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
@@ -127,6 +128,12 @@ class PartnerCatalogItemListAction extends KalturaApplicationPlugin
 			return new Kaltura_Client_Reach_Type_VendorClipsCatalogItemFilter();
 		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ)
 			return new Kaltura_Client_Reach_Type_VendorQuizCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY)
+			return new Kaltura_Client_Reach_Type_VendorSummaryCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
+			return new Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItemFilter();
+		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::METADATA_ENRICHMENT)
+			return new Kaltura_Client_Reach_Type_VendorMetadataEnrichmentCatalogItemFilter();
 		else
 			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}

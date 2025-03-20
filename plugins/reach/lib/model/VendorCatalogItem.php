@@ -47,6 +47,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_CONTRACT = 'contract';
 	const CUSTOM_DATA_CREATED_BY = 'createdBy';
 	const CUSTOM_DATA_NOTES = 'notes';
+	const CUSTOM_ADMIN_TAGS_TO_EXCLUDE = 'admin_tags_to_exclude';
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -253,6 +254,22 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$serviceFeatureName = 'quiz';
 				break;
 
+			case VendorServiceFeature::SUMMARY:
+				$serviceFeatureName = 'summary';
+				break;
+
+			case VendorServiceFeature::VIDEO_ANALYSIS:
+				$serviceFeatureName = 'video analysis';
+				break;
+
+			case VendorServiceFeature::MODERATION:
+				$serviceFeatureName = 'moderation';
+				break;
+
+			case VendorServiceFeature::METADATA_ENRICHMENT:
+				$serviceFeatureName = 'metadata enrichment';
+				break;
+
 			default:
 				$serviceFeatureName = '';
 		}
@@ -345,5 +362,31 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	public function getNotes()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_NOTES);
+	}
+	
+	public function setAdminTagsToExclude($v)
+	{
+		$this->putInCustomData(self::CUSTOM_ADMIN_TAGS_TO_EXCLUDE, $v);
+	}
+	
+	public function getAdminTagsToExclude()
+	{
+		return $this->getFromCustomData(self::CUSTOM_ADMIN_TAGS_TO_EXCLUDE);
+	}
+	
+	public function getAdminTagsToExcludeArray()
+	{
+		$adminTagsToExclude = $this->getFromCustomData(self::CUSTOM_ADMIN_TAGS_TO_EXCLUDE);
+		if(!$adminTagsToExclude)
+		{
+			return array();
+		}
+		
+		return array_map("trim", explode(',', $adminTagsToExclude));
+	}
+
+	public function isEntryDurationExceeding(entry $entry)
+	{
+		return false;
 	}
 } // VendorCatalogItem

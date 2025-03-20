@@ -1092,10 +1092,86 @@ class KalturaEntryService extends KalturaBaseService
 			if($conversionProfile)
 				$templateEntryId = $conversionProfile->getDefaultEntryId();
 		}
+		
 		if($templateEntryId)
 		{
-			$templateEntry = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
-			return $templateEntry;
+			Propel::disableInstancePooling();
+			$templateEntryWithoutEntitlements = entryPeer::retrieveByPKNoFilter($templateEntryId, null, false);
+			Propel::enableInstancePooling();
+			if(!$templateEntryWithoutEntitlements)
+			{
+				return null;
+			}
+			
+			$enforceCopyTemplateCrossPartner = kConf::get('enforce_copy_template_cross_partner', kConfMapNames::SECURITY, null);
+			$crossPartnerCopyConfig = kConf::get('cross_partner_copy_config', kConfMapNames::SECURITY, array());
+			if($templateEntryWithoutEntitlements->getPartnerId() != $this->getPartnerId())
+			{
+				KalturaLog::debug("Template entry [$templateEntryId] doesn't belong to partner [" .
+					$this->getPartnerId() . "] but to [" . $templateEntryWithoutEntitlements->getPartnerId() .
+					"] enforceCopyTemplateCrossPartner [" . boolval($enforceCopyTemplateCrossPartner) . "]");
+				
+				if(!$enforceCopyTemplateCrossPartner)
+				{
+					KalturaLog::debug("Cross partner copy is not enforced");
+					KalturaMonitorClient::sendErrorEvent("GET_TEMPLATE_ENTRY_FAILED_PARTNER");
+					return $templateEntryWithoutEntitlements;
+				}
+				
+				if(isset($crossPartnerCopyConfig[$templateEntryWithoutEntitlements->getPartnerId()]) &&
+					in_array($this->getPartnerId(), explode(",", $crossPartnerCopyConfig[$templateEntryWithoutEntitlements->getPartnerId()])))
+				{
+					KalturaLog::debug("Template entry [$templateEntryId] is allowed to be copied to partner [" .
+						$this->getPartnerId() . "] from [" . $templateEntryWithoutEntitlements->getPartnerId() . "]");
+					return $templateEntryWithoutEntitlements;
+				}
+				else
+				{
+					KalturaLog::debug("Template entry [$templateEntryId] is not allowed to be copied to partner ["
+						. $this->getPartnerId() . "] from [" . $templateEntryWithoutEntitlements->getPartnerId() . "]");
+					KalturaMonitorClient::sendErrorEvent("GET_TEMPLATE_ENTRY_FAILED_PARTNER");
+					return null;
+				}
+			}
+			
+			$enforceCopyTemplateEntitlementsCheck = kConf::get('enforce_copy_template_entitlements_check', kConfMapNames::SECURITY, null);
+			$skipEntitlementsPartnerCopyConfig = kConf::get('skip_entitlements_copy_config', kConfMapNames::SECURITY, array());
+			KalturaLog::debug("Template entry [$templateEntryId] belongs to partner [" . $this->getPartnerId() .
+				"] checking entitlements enforceCopyTemplateEntitlementsCheck [$enforceCopyTemplateEntitlementsCheck]");
+			
+			$templateEntryWithEntitlements = entryPeer::retrieveByPK($templateEntryId);
+			if($templateEntryWithEntitlements)
+			{
+				KalturaLog::debug("Template entry [$templateEntryId] entitled");
+				return $templateEntryWithEntitlements;
+			}
+			else
+			{
+				$logMessage = "userId: " . kCurrentContext::getCurrentKsKuserId() . " partnerId: " . $this->getPartnerId() .
+					"call: " . kCurrentContext::$service . "->" . kCurrentContext::$action . " ks: " . kCurrentContext::$ks;
+				
+				KalturaLog::debug("Template entry [$templateEntryId] doesn't have entitlements enforceCopyTemplateEntitlementsCheck [" .
+					$enforceCopyTemplateEntitlementsCheck . "] session info " . $logMessage);
+				if(!$enforceCopyTemplateEntitlementsCheck)
+				{
+					KalturaLog::debug("Copy with entitlements is not enforced");
+					KalturaMonitorClient::sendErrorEvent("GET_TEMPLATE_ENTRY_FAILED_ENTITLEMENTS");
+					return $templateEntryWithoutEntitlements;
+				}
+				
+				if(isset($skipEntitlementsPartnerCopyConfig[$templateEntryWithEntitlements->getPartnerId()]) &&
+					in_array($this->getPartnerId(), explode(",", $skipEntitlementsPartnerCopyConfig[$templateEntryWithEntitlements->getPartnerId()])))
+				{
+					KalturaLog::debug("Partner [" . $this->getPartnerId() . "] is in the skip entitlements copy config");
+					return $templateEntryWithoutEntitlements;
+				}
+				else
+				{
+					KalturaLog::debug("Partner [" . $this->getPartnerId() . "] is not in the skip entitlements copy config");
+					KalturaMonitorClient::sendErrorEvent("GET_TEMPLATE_ENTRY_FAILED_ENTITLEMENTS");
+					return null;
+				}
+			}
 		}
 		return null;
 	}

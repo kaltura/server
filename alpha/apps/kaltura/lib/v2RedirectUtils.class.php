@@ -92,7 +92,7 @@ class v2RedirectUtils
 		{   foreach ($flashvars as $key => $value) 
 			{
 				$key = trim(trim($key, '"'), "'");
-				$config[$key] = json_decode($value);
+				$config[$key] = json_decode($value) !== null ? json_decode($value) : $value;
 			}
 		}
 		$config["uiconf_id"] = $uiconfId;

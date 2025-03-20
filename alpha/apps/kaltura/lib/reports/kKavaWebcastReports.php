@@ -253,7 +253,11 @@ class kKavaWebcastReports extends kKavaReportsMgr
 			return null;
 		}
 
-		$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_HISTORICAL;
+		if (!isset($report_def[self::REPORT_DATA_SOURCE]))
+		{
+			$report_def[self::REPORT_DATA_SOURCE] = self::DATASOURCE_HISTORICAL;
+		}
+
 		if (!isset($report_def[self::REPORT_PLAYBACK_TYPES]))
 		{
 			$report_def[self::REPORT_PLAYBACK_TYPES] = array(self::PLAYBACK_TYPE_VOD, self::PLAYBACK_TYPE_LIVE, self::PLAYBACK_TYPE_DVR);

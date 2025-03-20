@@ -972,11 +972,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					$currentConversionParams[self::TARGET_WIDTH] = $targetWidth; // trigger scale
 				}
 			}
-			if($subtitles)
-			{
-				$prevParams = isset($currentConversionParams[self::EXTRA_CONVERSION_PARAMS]) ? $currentConversionParams[self::EXTRA_CONVERSION_PARAMS] : "";
-				$currentConversionParams[self::EXTRA_CONVERSION_PARAMS] = "$prevParams -copyts ";
-			}
 
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
 		}
@@ -1681,9 +1676,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			// for multi clip flow, reset the original values of the flavor params (-1) and edit the necessary fields for the current clip
 			$this->resetFlavorParamsObject($flavorParamsObj);
 			$originalConversionEnginesExtraParams = $flavorParamsObj->getConversionEnginesExtraParams();
+			if(isset($conversionData[self::SUBTITLES_DATA_ARRAY]) && isset($conversionData[self::SUBTITLES_DATA_ARRAY][$singleAttributeIndex]))
+			{
+				$subtitlesData = $conversionData[self::SUBTITLES_DATA_ARRAY][$singleAttributeIndex];
+				if(is_array($subtitlesData) && count($subtitlesData) > 0)
+				{
+					$offset = $singleAttribute->getOffset() ? $singleAttribute->getOffset() / 1000 : 0.01;
+					$extraParams = " -ss $offset -copyts ";
+				}
+			}
 			if(isset($conversionData[self::EXTRA_CONVERSION_PARAMS]))
 			{
-				$extraParams = $conversionData[self::EXTRA_CONVERSION_PARAMS];
+				$extraParams .= $conversionData[self::EXTRA_CONVERSION_PARAMS];
 			}
 		}
 		$conversionEngines = explode(',', $flavorParamsObj->getConversionEngines());
@@ -1875,7 +1879,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$mappedFilters = "";
 		if(count($sortedFilters) == 1 && isset($sortedFilters["whiteBackground"]))
 		{
-			return "[0]" . $sortedFilters[0];
+			return "[0]" . $sortedFilters["whiteBackground"];
 		}
 		if(count($sortedFilters) > 0)
 		{

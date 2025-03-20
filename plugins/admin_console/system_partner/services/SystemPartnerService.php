@@ -243,9 +243,16 @@ class SystemPartnerService extends KalturaBaseService
 		}
 		catch(KalturaAPIException $e)
 		{
-			if($e->getCode() === SystemPartnerErrors::DOMAINS_NOT_ALLOWED_CODE)
+			switch ($e->getCode())
 			{
-				throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$e->getArgs()));
+				case SystemPartnerErrors::DOMAINS_NOT_ALLOWED_CODE:
+				{
+					throw new KalturaAPIException(SystemPartnerErrors::DOMAINS_NOT_ALLOWED, implode(',',$e->getArgs()));
+				}
+				case SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS_CODE:
+				{
+					throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, implode(',',$e->getArgs()));
+				}
 			}
 		}
 		$dbPartner->save();

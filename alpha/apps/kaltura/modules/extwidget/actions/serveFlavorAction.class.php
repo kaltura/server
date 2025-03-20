@@ -477,8 +477,10 @@ class serveFlavorAction extends kalturaAction
 						$initialClipIndex, $initialSegmentIndex, false, true, $dvrWindow, $endTime, $setId);
 					if ($offset)
 					{
+						KalturaLog::log("Adding offset param from request: $offset ");
 						$mediaSet[kSimuliveUtils::SCHEDULE_TIME_OFFSET_URL_PARAM] += $offset;
 					}
+					KalturaLog::debug("Returning simulive mediaSet: " . print_r($mediaSet, true) );
 					$this->sendJson($mediaSet, false, true, $entry);
 				}
 			}

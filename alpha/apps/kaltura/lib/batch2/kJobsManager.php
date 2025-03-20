@@ -1980,6 +1980,7 @@ class kJobsManager
 		$coreParams = $params->toObject();
 
 		$jobData->setRecipientEmail($coreParams->getRecipientEmail());
+		$jobData->setRecipientName($coreParams->getRecipientName());
 		$jobData->setReportItems($coreParams->getReportItems());
 
 		$offset = $timeOffsetSeconds - ($params->timeZoneOffset * 60);// Convert minutes to seconds

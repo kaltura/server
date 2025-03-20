@@ -216,6 +216,9 @@ class multiLingualUtils
 	{
 		$responseObject->responseLanguage = self::MULTI;
 		$defaultLanguage = self::getDefaultLanguage($dbObject);
+		if(!$defaultLanguage)
+			$defaultLanguage = 'en';
+		
 		$supportedFields = $dbObject->getMultiLingualSupportedFields();
 		if (!$multiLanguageMap)
 		{
@@ -223,10 +226,18 @@ class multiLingualUtils
 			{
 				self::getMappingForDefaultLanguage($responseObject, $multiLanguageMap, $dbObject, $supportedFields, $defaultLanguage);
 			}
-			return;
+//			return;
+//			else
+//			{
+//				self::getMappingForDefaultLanguage($responseObject, $multiLanguageMap, $dbObject, $supportedFields, "en");
+//			}
 		}
+		
+		KalturaLog::debug("TTT: multi lang map: " . print_r($multiLanguageMap, true));
+		KalturaLog::debug("TTT: supportedFields: " . print_r($supportedFields, true));
 		foreach ($supportedFields as $fieldName)
 		{
+			KalturaLog::debug("TTT: fieldName [$fieldName]"); 
 			if (!$responseObject->shouldGet($fieldName, $responseProfile))
 			{
 				continue;
@@ -234,6 +245,7 @@ class multiLingualUtils
 			$defaultValueMapping[$defaultLanguage] = $dbObject->getDefaultFieldValue($fieldName);
 			$tempFieldMapping = ($multiLanguageMap[$fieldName]) ? array_merge($defaultValueMapping, $multiLanguageMap[$fieldName]) : $defaultValueMapping;
 			$multiLanguageMap[$fieldName] = $tempFieldMapping;
+			KalturaLog::debug("TTT: fieldName [$fieldName] map " . print_r($multiLanguageMap[$fieldName], true));
 			$responseObject->$fieldName = KalturaMultiLingualStringArray::fromMultiLingualStringArray($multiLanguageMap[$fieldName]);
 		}
 	}

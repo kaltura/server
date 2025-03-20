@@ -153,7 +153,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	{
 		$serializedObject = parent::getRecognizer();
 		try {
-			$object = unserialize($serializedObject);
+			// serializedObject can be null if the recognizer was not set so cast to string to avoid php deprecated warning
+			$object = unserialize(strval($serializedObject));
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Error unserializing recognizer for delivery id ['.$this->getId().']');
@@ -223,7 +224,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$serializedObject = parent::getTokenizer();
 		
 		try {
-			$object = $serializedObject ? unserialize($serializedObject) : null;
+			// serializedObject can be null if the recognizer was not set so cast to string to avoid php deprecated warning
+			$object = $serializedObject ? unserialize(strval($serializedObject)) : null;
 		}
 		catch (Exception $e) {
 			KalturaLog::err('Error unserializing tokenizer for delivery id ['.$this->getId().']');

@@ -11,10 +11,13 @@ class embedPlaykitJsAction extends sfAction
 	const LANGS_PARAM_NAME = "langs";
 	const ENTRY_ID_PARAM_NAME = "entry_id";
 	const PLAYLIST_ID_PARAM_NAME = "playlist_id";
+	const EXTERNAL_SOURCE_PARAM_NAME = "external_source";
+	const EMBED_FACTORY_PARAM_NAME = "embed_factory";
 	const KS_PARAM_NAME = "ks";
 	const CONFIG_PARAM_NAME = "config";
 	const REGENERATE_PARAM_NAME = "regenerate";
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
+	const IFRAME_EMBED_TYPE = "iframeEmbedType";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
@@ -27,6 +30,7 @@ class embedPlaykitJsAction extends sfAction
 	const KALTURA_TV_PLAYER = 'kaltura-tv-player';
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
+	const RAPT = "rapt";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -59,6 +63,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleContent = $this->bundleCache->get($this->bundle_name);
 		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
 		$extraModulesNames = unserialize($this->bundleCache->get($this->bundle_extra_modules_names));
+		KalturaLog::debug("Fetch bundle content from cache for key [{$this->bundle_name}], result: [" . !empty($bundleContent) . "]");
 
 		if (!$bundleContent || $this->regenerate)
 		{
@@ -172,6 +177,19 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$bundleContent = $this->getIfarmEmbedCode($bundleContent);
 		}
+		else
+		{
+			//Embed factory is only relevant in dynamic embed
+			if ($this->getRequestParameter(self::EMBED_FACTORY_PARAM_NAME, false))
+			{
+				$bundleContent = "function getNamespacedKalturaPlayer() {  
+										$bundleContent
+										return KalturaPlayer;
+									}; 
+								const kalturaPlayerFactory = getNamespacedKalturaPlayer();
+								export { kalturaPlayerFactory }";
+			}
+		}
 
 		$protocol = infraRequestUtils::getProtocol();
 		$host = myPartnerUtils::getCdnHost($this->partnerId, $protocol, 'serviceUrl');
@@ -239,6 +257,13 @@ class embedPlaykitJsAction extends sfAction
 			if (!(property_exists($uiConf->provider->env, $key) && $uiConf->provider->env->$key))
 				$uiConf->provider->env->$key = $value;
 		}
+
+		//todo - add unisphereLoaderUrl
+		$uiConf->provider->unisphereLoaderUrl =
+			MicroServiceUnisphereLoader::buildServiceUrl(
+				MicroServiceUnisphereLoader::$host,
+				MicroServiceUnisphereLoader::$service,
+				false);
 	}
 
 	private function mergeI18nConfig($uiConf, $i18nContent)
@@ -473,13 +498,21 @@ class embedPlaykitJsAction extends sfAction
 
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
 		$playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
+		$external_source = $this->getRequestParameter(self::EXTERNAL_SOURCE_PARAM_NAME);
+		$iframe_embed_type = $this->getRequestParameter(self::IFRAME_EMBED_TYPE);
 		$loadContentMethod = "";
 		if (!is_null($entry_id)) {
 		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
 		} elseif (!is_null($playlist_id)) {
-		    $loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
-		} else {
-		    KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Entry and Playlist ID not defined");
+			$loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
+			if($iframe_embed_type === self::RAPT) {
+				$loadContentMethod = "kalturaPlayer.loadMedia({\"playlistId\":\"$playlist_id\"});";
+			}
+		} elseif (!is_null($external_source)) {
+			$loadContentMethod = "kalturaPlayer.setMedia({\"sources\":$external_source});";
+		}
+		else {
+			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "One of the following params must be defined: entry_id, playlist_id, external_source");
 		}
 		$config = $this->getRequestParameter(self::CONFIG_PARAM_NAME, array());
 		//enable passing nested config options
@@ -516,12 +549,17 @@ class embedPlaykitJsAction extends sfAction
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
 
 		}
+		$kalturaPlayer = "KalturaPlayer.setup(config);";
+		if($iframe_embed_type === self::RAPT)
+		{
+			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
+		}
 
 		$autoEmbedCode = "
 		try {
 			var config=$config;
 			$v2tov7ConfigJs
-			var kalturaPlayer = KalturaPlayer.setup(config);
+			var kalturaPlayer = $kalturaPlayer
 			$loadContentMethod
 		} catch (e) {
 			console.error(e.message);

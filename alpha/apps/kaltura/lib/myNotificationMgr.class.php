@@ -389,6 +389,7 @@ $debug .= "property: $not_property = [$value]\n";
 		$new_params = array();
 		foreach ( $params as $k => $v )
 		{
+			$k = strval($k); // make sure it is a string
 			if ( $prefix )
 				$new_params[$prefix . trim($k)] = trim($v);
 			else

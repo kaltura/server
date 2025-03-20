@@ -187,8 +187,11 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$eventNotificationDependency = new KalturaDependency(EventNotificationPlugin::getPluginName());
 		$bulkUploadDependency = new KalturaDependency(BulkUploadPlugin::getPluginName());
 		$captionPluginDependency = new KalturaDependency(CaptionPlugin::getPluginName());
+		$scheduledEventDependency = new KalturaDependency(SchedulePlugin::getPluginName());
+		$scheduledEventNotificationDependency = new KalturaDependency(ScheduleEventNotificationsPlugin::getPluginName());
+		$transcriptPluginDependency = new KalturaDependency(TranscriptPlugin::getPluginName());
 
-		return array($eventNotificationDependency, $bulkUploadDependency, $captionPluginDependency);
+		return array($eventNotificationDependency, $bulkUploadDependency, $captionPluginDependency, $scheduledEventDependency, $scheduledEventNotificationDependency, $transcriptPluginDependency);
 	}
 	
 	/**

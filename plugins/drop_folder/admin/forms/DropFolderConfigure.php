@@ -220,7 +220,13 @@ class Form_DropFolderConfigure extends Infra_Form
 		    ));
 		    $extendTypeSubFormTitle = new Zend_Form_Element_Hidden(self::EXTENSION_SUBFORM_NAME.'_title');
     		$extendTypeSubFormTitle->setLabel($extendTypeSubForm->getTitle());
-    		$extendTypeSubFormTitle->setDecorators(array('ViewHelper', array('Label', array('placement' => 'append')), array('HtmlTag',  array('tag' => 'b'))));
+			$extendTypeSubFormTitle->setDescription($extendTypeSubForm->getDescription());
+    		$extendTypeSubFormTitle->setDecorators(array(
+				'ViewHelper',
+				array('Label',array('placement' => 'append')),
+				array('HtmlTag',  array('tag' => 'b')),
+				array('Description', array('escape' => false, 'tag' => 'p', 'class' => 'description')))
+			);
     		$this->addElement($extendTypeSubFormTitle);
     		$extendTypeSubForm->setDecorators(array(
     	        'FormElements',

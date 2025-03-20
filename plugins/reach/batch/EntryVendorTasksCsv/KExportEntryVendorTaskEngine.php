@@ -26,11 +26,17 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		3 => "ALIGNMENT",
 		4 => "AUDIO_DESCRIPTION",
 		5 => "CHAPTERING",
+		6 => "INTELLIGENT_TAGGING",
 		7 => "DUBBING",
+		8 => "LIVE_CAPTION",
 		9 => "EXTENDED_AUDIO_DESCRIPTION",
 		10 => "CLIPS",
 		11 => "LIVE_TRANSLATION",
 		12 => "QUIZ",
+		13 => "SUMMARY",
+		14 => "VIDEO_ANALYSIS",
+		15 => "MODERATION",
+		16 => "METADATA_ENRICHMENT",
 		"N/A" => "N/A",
 	);
 	

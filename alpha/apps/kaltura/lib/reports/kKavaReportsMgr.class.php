@@ -315,6 +315,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_HEADERS_TO_REMOVE = 'report_headers_to_remove';
 	const REPORT_ROW_FILTER_BY_COLUMN = 'report_row_filter_by_column';
 	const REPORT_MAX_RESULT_SIZE = 'report_max_result_size';
+	const REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER = 'report_enrich_edit_context_from_filter';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -468,6 +469,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED,
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED,
 		self::EVENT_TYPE_POLL_RECEIVED,
+		self::EVENT_TYPE_PAGE_LOAD,
+		self::EVENT_TYPE_BUTTON_CLICKED,
+		self::EVENT_TYPE_QR_CODE_SCANNED,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -548,6 +552,9 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_APPROVED => 'count_cnc_chat_cconnection_request_approved',
 		self::EVENT_TYPE_PRIVATE_CHAT_CONNECTION_REQUEST_CANCELED => 'count_cnc_chat_connection_request_canceled',
 		self::EVENT_TYPE_POLL_RECEIVED => 'count_poll_received',
+		self::EVENT_TYPE_PAGE_LOAD => 'count_page_loaded',
+		self::EVENT_TYPE_BUTTON_CLICKED => 'count_button_clicked',
+		self::EVENT_TYPE_QR_CODE_SCANNED => 'count_qr_code_scanned'
 	);
 
 	//global transform
@@ -3074,14 +3081,23 @@ class kKavaReportsMgr extends kKavaBase
 			$entry_search = new kEntrySearch();
 			$entry_search->setFilterOnlyContext();
 			$pager = new kPager();
-			$pager->setPageSize(self::MAX_ESEARCH_RESULTS);
-			$elastic_results = $entry_search->doSearch($input_filter->entry_operator, $pager);
-			$elastic_entry_ids = kESearchCoreAdapter::getObjectIdsFromElasticResults($elastic_results);
-
-			if ($elastic_results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] > count($elastic_entry_ids))
+            		$page_index = 0;
+            		$elastic_entry_ids = array();
+            		do 
 			{
-				throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
-			}
+                		$page_index++;
+                	    	$pager->setPageIndex($page_index);
+                    	    	$pager->setPageSize(min(self::MAX_ESEARCH_RESULTS - count($elastic_entry_ids), kPager::MAX_PAGE_SIZE));
+                	    	$elastic_results = $entry_search->doSearch($input_filter->entry_operator, $pager);
+                	    	$elastic_entry_ids = array_merge($elastic_entry_ids, kESearchCoreAdapter::getObjectIdsFromElasticResults($elastic_results));
+                	    	$moreElasticResultsToFetch = $elastic_results[kESearchCoreAdapter::HITS_KEY][kESearchCoreAdapter::TOTAL_KEY] > count($elastic_entry_ids);
+            		 } 
+			 while ($moreElasticResultsToFetch && count($elastic_entry_ids) < self::MAX_ESEARCH_RESULTS);
+
+            		if ($moreElasticResultsToFetch)
+            		{
+                		throw new kCoreException('Search is to general', kCoreException::SEARCH_TOO_GENERAL);
+            		}
 
 			if ($elastic_entry_ids)
 			{
@@ -3131,6 +3147,17 @@ class kKavaReportsMgr extends kKavaBase
 			$druid_filter[] = array(
 				self::DRUID_DIMENSION => $dimension,
 				self::DRUID_VALUES => self::getKuserIds($data_source, $dimension, $input_filter->owners, $partner_id, $response_options->getDelimiter()),
+			);
+		}
+
+		if (in_array($data_source, array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_REALTIME)))
+		{
+			$druid_filter[] = array(
+				self::DRUID_TYPE => self::DRUID_NOT,
+				self::DRUID_FILTER => array(
+					self::DRUID_DIMENSION => self::DIMENSION_ENTRY_ID,
+					self::DRUID_VALUES => array('111')
+				)
 			);
 		}
 
@@ -4529,6 +4556,37 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getEntryLastPlayedAt($objectIds, $partnerId, $context)
+	{
+		$cacheKeyPrefix = entry::PLAYSVIEWS_CACHE_KEY_PREFIX;
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+		if (!$cache)
+		{
+			return;
+		}
+
+		$cacheKeys = array_combine($objectIds, array_map(function($objectId) use ($cacheKeyPrefix){
+			return $cacheKeyPrefix . $objectId;
+		}, $objectIds));
+
+
+		$cacheResult = $cache->multiGet($cacheKeys);
+
+		$result = [];
+		foreach($cacheKeys as $objectId => $cacheKey)
+		{
+			$singleCacheResult = json_decode($cacheResult[$cacheKey], true);
+
+			if ($cacheResult[$cacheKey])
+			{
+				$objectResult = date('Y-m-d H:i:s', $singleCacheResult['last_played_at']);
+				$result[$objectId] = $objectResult;
+			}
+		}
+
+		return $result;
+	}
+
 	protected static function getCategoriesNames($ids, $partner_id)
 	{
 		$c = KalturaCriteria::create(categoryPeer::OM_CLASS);
@@ -5109,6 +5167,40 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
+	protected static function getCuePointDurationAndUser($ids, $partner_id, $context)
+	{
+		$context['peer'] = 'CuePointPeer';
+		if (!isset($context['columns']))
+			$context['columns'] = array();
+		$context['columns'][] = 'START_TIME';
+		$context['columns'][] = 'END_TIME';
+		$context['columns'][] = 'KUSER_ID';
+
+
+		$result = array();
+		$enrichedResult = self::genericQueryEnrich($ids, $partner_id, $context);
+		foreach ($enrichedResult as $id => $row)
+		{
+			if (!is_array($row)) {
+				$result[$id] = $id;
+				continue;
+			}
+
+			$kuserId = array_pop($row);
+			$endTime = array_pop($row);
+			$startTime = array_pop($row);
+			$duration = $endTime - $startTime;
+
+			$result[$id] = $row;
+			$result[$id][] = $startTime;
+			$result[$id][] = $endTime;
+			$result[$id][] = $duration;
+			$result[$id][] = $kuserId;
+		}
+
+		return $result;
+	}
+
 	protected static function getAppGuidByEventId($partner_id, $virtual_event_id)
 	{
 		$filter = array('appCustomIdIn' => array($virtual_event_id));
@@ -5285,7 +5377,7 @@ class kKavaReportsMgr extends kKavaBase
 		return $result;
 	}
 
-	protected static function enrichData($report_def, $headers, $partner_id, &$data)
+	protected static function enrichData($report_def, $headers, $partner_id, $input_filter, &$data)
 	{
 		// get the enrichment specification
 		$enrich_specs = array();
@@ -5311,8 +5403,8 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			// func
 			$enrich_func = $enrich_def[self::REPORT_ENRICH_FUNC];
-			$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ? 
-				$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
+
+			$enrich_context = self::getEnrichContext($enrich_def, $input_filter);
 
 			// output
 			$cur_fields = $enrich_def[self::REPORT_ENRICH_OUTPUT];
@@ -5415,6 +5507,23 @@ class kKavaReportsMgr extends kKavaBase
 				$start = $limit;
 			}
 		}
+	}
+
+	protected static function getEnrichContext($enrich_def, $input_filter)
+	{
+		$enrich_context = isset($enrich_def[self::REPORT_ENRICH_CONTEXT]) ?
+			$enrich_def[self::REPORT_ENRICH_CONTEXT] : null;
+
+		if (isset($enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER]))
+		{
+			$mapping = $enrich_def[self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER];
+			foreach ($mapping as $context_field => $filter_field)
+			{
+				$enrich_context[$context_field] = $input_filter->$filter_field;
+			}
+		}
+
+		return $enrich_context;
 	}
 
 	/// table functions
@@ -6108,6 +6217,9 @@ class kKavaReportsMgr extends kKavaBase
 				}
 				
 				$order_found = true;
+				$order_by = $order_by[0] === '-' || $order_by[0] === '+' ? $order_by[0] : "";
+				$order_by .= $root_metric;
+
 				unset($report_defs[$index]);
 				break;
 			}
@@ -6304,7 +6416,7 @@ class kKavaReportsMgr extends kKavaBase
 		
 		if (isset($report_def[self::REPORT_ENRICH_DEF]))
 		{
-			self::enrichData($report_def, $result[0], $partner_id, $result[1]);
+			self::enrichData($report_def, $result[0], $partner_id, $input_filter, $result[1]);
 		}
 
 		//order not found

@@ -24,4 +24,9 @@ class Form_DropFolderConfigureExtend_SubForm extends Zend_Form_SubForm
 	{
 	    return;
 	}
+	
+	public function getDescription()
+	{
+		return;
+	}
 }

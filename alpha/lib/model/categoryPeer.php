@@ -61,6 +61,7 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 			$c->add ( self::STATUS, CategoryStatus::PURGED, Criteria::NOT_EQUAL );
 		}
 
+		KalturaLog::debug("TTT: getEntitlementEnforcement [" . kEntitlementUtils::getEntitlementEnforcement() . "]");
 		//hasPrivilege
 		if (kEntitlementUtils::getEntitlementEnforcement() && self::getCategoryEntitlementEnforcement())
 		{
@@ -82,9 +83,19 @@ class categoryPeer extends BasecategoryPeer implements IRelatedObjectPeer
 				// get the groups that the user belongs to in case she is not associated to the category directly
 				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
 				$kgroupIds[] = $kuser->getId();
-				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
-				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
-     			$crit->addOr($membersCrit);
+				
+				// split kgroupIds to chunks of 150
+				$kgroupIdsChunked = array_chunk($kgroupIds, 150);
+				foreach($kgroupIdsChunked as $kgroupIdsChunk)
+				{
+					$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIdsChunk, KalturaCriteria::IN_LIKE);
+					$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+					$crit->addOr($membersCrit);
+				}
+				
+//				$membersCrit = $c->getNewCriterion ( self::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
+//				$membersCrit->addTag(KalturaCriterion::TAG_ENTITLEMENT_CATEGORY);
+//     			$crit->addOr($membersCrit);
 			}
 				
 			$c->addAnd ( $crit );

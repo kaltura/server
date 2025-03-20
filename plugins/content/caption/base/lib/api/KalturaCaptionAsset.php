@@ -98,6 +98,12 @@ class KalturaCaptionAsset extends KalturaAsset
 	 */
 	public $associatedTranscriptIds;
 
+	/**
+	 * The usage of the asset
+	 * @var KalturaCaptionAssetUsage
+	 */
+	public $usage;
+
 	private static $map_between_objects = array
 	(
 		"captionParamsId" => "flavorParamsId",
@@ -111,6 +117,7 @@ class KalturaCaptionAsset extends KalturaAsset
 		"displayOnPlayer",
 		"associatedTranscriptIds",
 		"source",
+		"usage"
 	);
 	
 	public function getMapBetweenObjects ( )

@@ -40,6 +40,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * @var kuser
 	 */
 	private static $kuser = null;
+
+	/**
+	 * @var array
+	 */
+	private static $permissionsToRemove = array();
 		
 	
 	// ----------------------------
@@ -197,7 +202,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	
-	private static function getPermissions($roleId, $isRestrictedRole = false)
+	private static function getPermissions($roleId, $isRestrictingRole = false)
 	{
 		$map = self::initEmptyMap();
 		
@@ -233,7 +238,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			}
 		}
 		
-		$map = self::getPermissionsFromDb($dbRole, $isRestrictedRole);
+		$map = self::getPermissionsFromDb($dbRole, $isRestrictingRole);
 		
 		// update cache
 		$cacheRole = array(
@@ -248,8 +253,9 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	/**
 	 * Init permission items map from DB for the given role
 	 * @param UserRole $dbRole
+	 * @param bool $isRestrictingRole
 	 */
-	private static function getPermissionsFromDb($dbRole, $isRestrictedRole)
+	private static function getPermissionsFromDb($dbRole, $isRestrictingRole)
 	{
 		$map = self::initEmptyMap();
 		
@@ -272,21 +278,21 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$alwaysAllowed = array(PermissionName::ALWAYS_ALLOWED_ACTIONS);
 		}
 
-		if (!$isRestrictedRole)
+		if (!$isRestrictingRole)
 		{
 			$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowed);
 		}
 
 		// if the request sent from the internal server set additional permission allowing access without KS
 		// from internal servers
-		if (kIpAddressUtils::isInternalIp() && !$isRestrictedRole)
+		if (kIpAddressUtils::isInternalIp() && !$isRestrictingRole)
 		{
 			KalturaLog::debug('IP in range, adding ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS permission');
 			$alwaysAllowedInternal = array(PermissionName::ALWAYS_ALLOWED_FROM_INTERNAL_IP_ACTIONS);
 			$tmpPermissionNames = array_merge($tmpPermissionNames, $alwaysAllowedInternal);
 		}
 
-		if (PermissionPeer::isValidForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, strval(self::$operatingPartnerId)) && !$isRestrictedRole)
+		if (PermissionPeer::isValidForPartner(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD, strval(self::$operatingPartnerId)) && !$isRestrictingRole)
 		{
 			KalturaLog::debug('Adding DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD permission');
 			$dynamicFlagKMSChunkedCategoryLoad = array(PermissionName::DYNAMIC_FLAG_KMC_CHUNKED_CATEGORY_LOAD);
@@ -296,6 +302,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$permissionNames = array();
 		foreach ($tmpPermissionNames as $name)
 		{
+			if (!$isRestrictingRole && in_array($name, self::$permissionsToRemove))
+			{
+				continue;
+			}
 			$permissionNames[$name] = $name;
 		}
 
@@ -307,7 +317,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$c->addAnd(PermissionPeer::PARTNER_ID, array(strval(PartnerPeer::GLOBAL_PARTNER), strval(self::$operatingPartnerId)), Criteria::IN);
 		$c->addAnd(PermissionItemPeer::PARTNER_ID, array(strval(PartnerPeer::GLOBAL_PARTNER), strval(self::$operatingPartnerId)), Criteria::IN);
 		$lookups = PermissionToPermissionItemPeer::doSelectJoinAll($c);
-		if (!$lookups)
+		if (!$lookups && !self::$permissionsToRemove)
 		{
 			throw new kCoreException('', kCoreException::INTERNAL_SERVER_ERROR);
 		}
@@ -538,7 +548,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 
 		$ks = ks::fromSecureString($ksString);
-		$ksSetRoleId = $ks -> getRole();
+
+		$restrictingRole = $ks->getRole(kSessionBase::PRIVILEGE_RESTRICTING_ROLE);
+		if ($restrictingRole)
+		{
+			self::removeLimitedPermissions($restrictingRole);
+		}
+
+		$ksSetRoleId = $ks->getRole();
 		if(isset($operatingPartner))
 		{
 			$isUsingSecondarySecret = $ks -> getMatchedSecreteIndex() > 0;
@@ -707,96 +724,33 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				self::$map = array_merge_recursive(self::$map, $roleMap);
 			}
 		}
-
-		self::removeLimitedPermissions();
 	}
 
-	protected static function removeLimitedPermissions()
+	protected static function removeLimitedPermissions($restrictingRole)
 	{
-		$ks = ks::fromSecureString(kCurrentContext::$ks);
-		if (!$ks)
+		$roleId = is_numeric($restrictingRole) ? $restrictingRole : self::getRoleIdFromSystemName($restrictingRole);
+		if (!$roleId)
 		{
 			return;
 		}
-		$restrictingRole = $ks->getRole(kSessionBase::PRIVILEGE_RESTRICTING_ROLE);
-		if (!$restrictingRole)
-		{
-			return;
-		}
-
-		KalturaLog::debug("Removing permissions according to restricting role [$restrictingRole]");
-		$roleMap = self::getPermissions($restrictingRole, true);
-
-		self::removeApiActionPermission($roleMap[self::API_ACTIONS_ARRAY_NAME]);
-		self::removeApiParametersPermissions($roleMap[self::API_PARAMETERS_ARRAY_NAME]);
-		self::removePermissionNames($roleMap[self::PERMISSION_NAMES_ARRAY]);
+		KalturaLog::debug("Removing permissions according to restricting role [$roleId]");
+		$roleMap = self::getPermissions($roleId, true);
+		$permissions = $roleMap[self::PERMISSION_NAMES_ARRAY];
+		KalturaLog::debug("Permissions to remove: " . print_r($permissions, true));
+		self::$permissionsToRemove = $permissions;
 	}
 
-	protected static function removeApiActionPermission($apiActions)
+	protected static function getRoleIdFromSystemName($systemName)
 	{
-		foreach ($apiActions as $service => $actionsArray)
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::SYSTEM_NAME, $systemName, Criteria::EQUAL);
+		$c->addAnd(UserRolePeer::PARTNER_ID, PartnerPeer::GLOBAL_PARTNER, Criteria::EQUAL);
+		$role = UserRolePeer::doSelectOne($c);
+		if (!$role)
 		{
-			if (!isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]))
-			{
-				continue;
-			}
-			foreach ($actionsArray as $actionName => $actionEmptyArray)
-			{
-				if (isset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$actionName]))
-				{
-					KalturaLog::debug("Removing permission for service [$service] action [$actionName]");
-					unset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service][$actionName]);
-				}
-			}
-			if (count(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]) == 0)
-			{
-				KalturaLog::debug("Removed all permissions for service [$service]");
-				unset(self::$map[self::API_ACTIONS_ARRAY_NAME][$service]);
-			}
+			return null;
 		}
-	}
-
-	protected static function removeApiParametersPermissions($apiParameters)
-	{
-		foreach ($apiParameters as $itemAction => $itemObjectsArray)
-		{
-			foreach ($itemObjectsArray as $itemObjectName => $itemParametersArray)
-			{
-				if (!isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]))
-				{
-					continue;
-				}
-
-				foreach ($itemParametersArray as $itemParameterName => $itemParameterValue)
-				{
-					if (isset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName][$itemParameterName]))
-					{
-						KalturaLog::debug("Removing parameter [$itemParameterName] from action [$itemAction] and object [$itemObjectName]");
-						unset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName][$itemParameterName]);
-					}
-				}
-
-				if (count(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]) == 0)
-				{
-					KalturaLog::debug("Removed all parameters for object [$itemObjectName]");
-					unset(self::$map[self::API_PARAMETERS_ARRAY_NAME][$itemAction][$itemObjectName]);
-				}
-			}
-		}
-	}
-
-	protected static function removePermissionNames($permissionNames)
-	{
-		foreach ($permissionNames as $permissionName)
-		{
-			if (!isset(self::$map[self::PERMISSION_NAMES_ARRAY][$permissionName]))
-			{
-				continue;
-			}
-
-			KalturaLog::debug("Removing permission name [$permissionName]");
-			unset(self::$map[self::PERMISSION_NAMES_ARRAY][$permissionName]);
-		}
+		return $role->getId();
 	}
 	
 	// ----------------------------------------------------------------------------

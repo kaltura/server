@@ -691,7 +691,21 @@ class BatchService extends KalturaBatchService
 		}
 
 		KalturaLog::debug("Deleting scheduler data for scheduler id {$scheduler->getId()} with configuredId {$scheduler->getConfiguredId()}");
-		SchedulerPeer::deleteBySchedulerConfigId($scheduler->getConfiguredId());
+		SchedulerPeer::deleteBySchedulerConfigId($scheduler->getId(), $scheduler->getConfiguredId());
 		return true;
+	}
+
+	/**
+	* batch getAllChildJobs action returns all child jobs
+	*
+	* @action getAllChildJobs
+	* @param int $rootJobId root job id
+	* @return KalturaBatchJobArray
+	*/
+	function getAllChildJobsAction($rootJobId)
+	{
+            $rootJob = BatchJobPeer::retrieveByPK($rootJobId);
+			$result = KalturaBatchJobArray::fromBatchJobArray($rootJob->getChildJobs());
+            return $result;
 	}
 }

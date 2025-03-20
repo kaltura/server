@@ -27,6 +27,10 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const CLIPS_OM_CLASS = 'VendorClipsCatalogItem';
 	const LIVE_TRANSLATION_OM_CLASS = 'VendorLiveTranslationCatalogItem';
 	const QUIZ_OM_CLASS = 'VendorQuizCatalogItem';
+	const SUMMARY_OM_CLASS = 'VendorSummaryCatalogItem';
+	const VIDEO_ANALYSIS_OM_CLASS = 'VendorVideoAnalysisCatalogItem';
+	const MODERATION_OM_CLASS = 'VendorModerationCatalogItem';
+	const METADATA_ENRICHMENT_OM_CLASS = 'VendorMetadataEnrichmentCatalogItem';
 
 	// cache classes by their type
 	protected static $class_types_cache = array(
@@ -42,6 +46,10 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::CLIPS => self::CLIPS_OM_CLASS,
 		VendorServiceFeature::LIVE_TRANSLATION => self::LIVE_TRANSLATION_OM_CLASS,
 		VendorServiceFeature::QUIZ => self::QUIZ_OM_CLASS,
+		VendorServiceFeature::SUMMARY => self::SUMMARY_OM_CLASS,
+		VendorServiceFeature::VIDEO_ANALYSIS => self::VIDEO_ANALYSIS_OM_CLASS,
+		VendorServiceFeature::MODERATION => self::MODERATION_OM_CLASS,
+		VendorServiceFeature::METADATA_ENRICHMENT => self::METADATA_ENRICHMENT_OM_CLASS,
 	);
 	
 	public static function setDefaultCriteriaFilter ()

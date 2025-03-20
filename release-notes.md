@@ -1,3 +1,165 @@
+# Ursa-21.12.0
+## X failed login attempts notification 
+- Issue Type: Task
+- Issue ID: PLAT-25095
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
+``deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php``
+
+# Ursa-21.11.0
+## Add demoteAdmin action to User service ##
+* Issue Type: Task
+* Issue ID: PLAT-25145
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2025_03_03_user_demoteAdmin_permissions.php
+
+## S3 Drop Folder - add support for ARN Role (AWS Deployments only) ##
+- Issue Type: Task
+- Issue ID: VCP-19989
+### Configurations ###
+Add the following section to `runtime_config` map:
+* Replace AWS_ACCOUNT_ID with AWS account
+* Replace ROLE_NAME with AWS Role name
+```
+[s3_drop_folder]
+s3Arn = 'arn:aws:iam::AWS_ACCOUNT_ID:role/ROLE_NAME'
+```
+### Deployment ###
+On-Prem / All-In-One Only  
+Generate Clients (Replace @path_to_server@ with your path):
+- Build new clients:  
+  ``php @path_to_server@/generator/generate.php``
+- Clear Cache  
+  ``find @path_to_server@/cache -type cache -delete``
+- Restart Apache2  
+  ``service apache2 restart``
+
+### Enable ###
+1. The EC2 running `KAsyncDropFolderWatcherRemoteS3` & `KAsyncDropFolderContentProcessor` workers should allow the `s3Arn` role to be assumed
+2. The EC2 that batch is sending the api calls to (defined at `batch.ini` map `serviceUrl` param) should allow the `s3Arn` role to be assumed
+3. The `s3Arn` role policy should allow to Get, List and Delete from the destination bucket (or '*' for all buckets)
+4. The `s3Arn` ‘Maximum session duration’ must be set to 12 hours
+5. The S3 Bucket Policy should allow the `s3Arn` to operate it  
+The Bucket Policy should include the following:
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::AWS_ACCOUNT_ID:role/ROLE_NAME"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::BUCKET_NAME",
+                "arn:aws:s3:::BUCKET_NAME/*"
+            ]
+        }
+    ]
+}
+```
+6. In S3 Drop Folder (Kaltura Admin Console):  
+   6.1. Leave User & Password Empty  
+   6.2. Tick 'Bucket Policy Allows Access' checkbox
+
+# Ursa-21.10.0
+## Rsvp Plugin ##
+* Issue Type: Task
+* Issue ID: PLAT-25025
+
+### Configuration ###
+To enable this plugin add the following to your plugins.ini file:
+
+	- Rsvp
+
+### Deployment ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Enable ScheduleEventNotificationPlugin
+- Issue Type: Task
+- Issue ID: PSVAMB-69071
+#### Deployment ####
+- Ensure existence of ```ScheduleEventNotifications``` in local plugins.ini configuration file
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/base/scripts/installPlugins.php
+
+## Add getAllChildJobs action to Batch service
+- Issue Type: Task
+- Issue ID: SUP-46309
+
+#### Deployment ####
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_02_03_update_batch_permissions.php
+
+# Ursa-21.9.0
+## Add option do disable generation of iCal files in new format
+* Issue Type: Task
+* Issue ID: SUP-46741
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.disableNewIcalStandard.enabled = true
+moduls.disableNewIcalStandard.permissionType = 2
+moduls.disableNewIcalStandard.label = "Disable new iCal standard"
+moduls.disableNewIcalStandard.permissionName = FEATURE_DISABLE_NEW_ICAL_STANDARD
+moduls.disableNewIcalStandard.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add option to delay notifications ##
+* Issue Type: Task
+* Issue ID: PLAT-25045
+### Deployment script ### 
+    php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
+# Ursa-21.4.0
+## Kava - redirect external client tags to dedicated druid url ##
+- Issue Type: Story
+- Issue ID: AN-23399
+### configuration ###
+add kava_external_client_tags section to local.ini with:
+0 = @CLIENT_TAG@
+
+## Create KMS Restricted Role on partner 0 ##
+* Issue Type: Task
+* Issue ID: PLAT-25018
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2024_11_13_create_kms_restricted_role.php
+
+## Add partner for AI framework ##
+
+* Issue Type: Task
+* Issue ID: FOUN
+
+### Configuration ###
+	Replace all tokens from the ini file (under connectors-framework section) and remove".template" from the file name: 
+	/opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2024_10_31_add_ai_partner.php
+
+# Ursa-21.3.0
+## Enable embed & social stream in EP ##
+* Issue Type: Task
+* Issue ID: PLAT-24999
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.embedShareStream.enabled = true
+moduls.embedShareStream.permissionType = 2
+moduls.embedShareStream.label = "Enable embed & social stream in EP"
+moduls.embedShareStream.permissionName = FEATURE_EMBED_SHARE_SOCIAL_STREAM
+moduls.embedShareStream.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Ursa-21.1.0
 ## Enable player calls redirection from V2 to V7 ##
 * Issue Type: Task

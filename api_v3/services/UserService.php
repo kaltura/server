@@ -937,4 +937,44 @@ class UserService extends KalturaBaseUserService
 		return $imgContent;
 	}
 
+	/**
+	 * @action demoteAdmin
+	 * @param string $userId
+	 * @return KalturaUser
+	 * @throws KalturaAPIException
+	 * @throws PropelException
+	 */
+	public function demoteAdminAction($userId)
+	{
+		$dbUser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $userId);
+		if (!$dbUser)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
+		}
+
+		$status = $dbUser->getStatus();
+		if (($status == KuserStatus::DELETED || $status == KuserStatus::BLOCKED))
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_IS_BLOCKED);
+		}
+
+		if ($dbUser->getIsAccountOwner())
+		{
+			throw new KalturaAPIException(KalturaErrors::CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN);
+		}
+
+		if (!$dbUser->getIsAdmin())
+		{
+			throw new KalturaAPIException(KalturaErrors::DEMOTE_ONLY_ADMIN);
+		}
+
+		$dbUser->setIsAdmin(false);
+		$dbUser->setRoleIds(null);
+		$dbUser->save();
+
+		$user = new KalturaUser();
+		$user->fromObject($dbUser, $this->getResponseProfile());
+
+		return $user;
+	}
 }

@@ -10,10 +10,10 @@ class KEmailNotificationUserRecipientEngine extends  KEmailNotificationRecipient
 	/* (non-PHPdoc)
 	 * @see KEmailNotificationRecipientEngine::getRecipients()
 	 */
-	function getRecipients(array $contentParameters) {
-	    
-               $pager = new KalturaFilterPager();
-               $pager->pageSize = 500;
+	function getRecipients(array $contentParameters)
+	{
+		$pager = new KalturaFilterPager();
+		$pager->pageSize = 500;
 
 		//Replace any content parameter tokens in the filter in the interest of supporting a dynamic filter based on the event context
 		if(count($contentParameters))

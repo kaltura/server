@@ -46,6 +46,12 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$dbMetadata->incrementVersion();
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		kFileSyncUtils::file_put_contents($key, $xmlData);
+		
+		$version = $dbMetadata->getVersion();
+		$dbMetadata->reload();
+		if($version < $dbMetadata->getVersion())
+			return;
+		
 		$dbMetadata->save();
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 	}

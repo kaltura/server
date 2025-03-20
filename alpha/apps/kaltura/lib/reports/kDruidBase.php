@@ -98,6 +98,7 @@ class kDruidBase
 	const DRUID_URL = "druid_url";
 	const EXTERNAL_CALLS_DRUID_URL = "external_calls_druid_url";
 	const KAVA_INTERNAL_CLIENT_TAGS = "kava_internal_client_tags";
+	const KAVA_EXTERNAL_CLIENT_TAGS = "kava_external_client_tags";
 	const DRUID_QUERY_TIMEOUT = 'druid_timeout';
 
 	const COMMENT_MARKER = '@COMMENT@';
@@ -396,11 +397,14 @@ class kDruidBase
 			
 		$url = kConf::get(self::DRUID_URL);
 		$externalCallsUrl = kConf::get(self::EXTERNAL_CALLS_DRUID_URL, 'local', null);
-		$internalClientTags = kConf::get(self::KAVA_INTERNAL_CLIENT_TAGS, 'local', array());
-
-		if ($externalCallsUrl && $internalClientTags)
+		if ($externalCallsUrl)
 		{
-			if(!self::startsWithAny($clientTag, $internalClientTags))
+			$internalClientTags = kConf::get(self::KAVA_INTERNAL_CLIENT_TAGS, 'local', array());
+			$externalClientTags = kConf::get(self::KAVA_EXTERNAL_CLIENT_TAGS, 'local', array());
+
+			$isNotInternalRequest = count($internalClientTags) > 0 && !self::startsWithAny($clientTag, $internalClientTags);
+			$isExternalRequest = count($externalClientTags) > 0 && self::startsWithAny($clientTag, $externalClientTags);
+			if($isNotInternalRequest || $isExternalRequest)
 			{
 				$url = $externalCallsUrl;
 			}

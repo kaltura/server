@@ -235,10 +235,12 @@ class DataService extends KalturaEntryService
 				throw new KalturaAPIException(KalturaErrors::FILE_CONTENT_NOT_SECURE);
 			}
 			$fileType = kFile::mimeType($file_path);
-			if((substr($fileType, 0, 5) == 'text/') || ($fileType == 'application/xml')) {
+			if((substr($fileType, 0, 5) == 'text/') || ($fileType == 'application/xml'))
+			{
 				$dbEntry->setDataContent(kFile::getFileContent($file_path));
 			}
-			else{
+			else
+			{
 				KalturaLog::err("Resource of type [" . get_class($resource) . "] with file type ". $fileType. " is not supported");
 				throw new KalturaAPIException(KalturaErrors::FILE_TYPE_NOT_SUPPORTED, $fileType);
 			}

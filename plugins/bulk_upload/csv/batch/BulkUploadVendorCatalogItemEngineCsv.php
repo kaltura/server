@@ -29,7 +29,9 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	private $bulkUploadResultParams = array(
 		'vendorPartnerId', 'name', 'systemName', 'serviceType', 'turnAroundTime',
 		'sourceLanguage', 'targetLanguage', 'outputFormat', 'enableSpeakerId', 'fixedPriceAddons',
-		'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission', 'requireSource', 'stage', 'contract', 'notes', 'createdBy');
+		'pricing', 'flavorParamsId', 'clearAudioFlavorParamsId', 'allowResubmission', 'requireSource', 'stage', 'contract', 'notes', 'createdBy',
+		'minimalRefundTime', 'minimalOrderTime', 'durationLimit'
+	);
 
 	/**
 	 * (non-PHPdoc)
@@ -259,7 +261,6 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 				case KalturaBulkUploadAction::UPDATE_STATUS:
 					$bulkUploadResultChunk[] = $bulkUploadResult;
-					$vendorCatalogItem->lastBulkUpdateId = $this->job->id;
 					KBatchBase::$kClient->vendorCatalogItem->updateStatus($bulkUploadResult->vendorCatalogItemId, KalturaVendorCatalogItemStatus::DEPRECATED);
 					break;
 
@@ -357,42 +358,25 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 
 	protected static function getObjectByServiceFeature($serviceFeature)
 	{
-		$object = null;
-		switch ($serviceFeature)
+		return match ($serviceFeature)
 		{
-			case VendorServiceFeature::CAPTIONS:
-				$object = new KalturaVendorCaptionsCatalogItem();
-				break;
-
-			case VendorServiceFeature::TRANSLATION:
-				$object = new KalturaVendorTranslationCatalogItem();
-				break;
-
-			case VendorServiceFeature::ALIGNMENT:
-				$object = new KalturaVendorAlignmentCatalogItem();
-				break;
-
-			case VendorServiceFeature::AUDIO_DESCRIPTION:
-				$object = new KalturaVendorAudioDescriptionCatalogItem();
-				break;
-
-			case VendorServiceFeature::CHAPTERING:
-				$object = new KalturaVendorChapteringCatalogItem();
-				break;
-			
-			case VendorServiceFeature::DUBBING:
-				$object = new KalturaVendorDubbingCatalogItem();
-				break;
-
-			case VendorServiceFeature::LIVE_CAPTION:
-				$object = new KalturaVendorLiveCaptionCatalogItem();
-				break;
-
-			default:
-				$object = new KalturaVendorCaptionsCatalogItem();
-				break;
-		}
-		return $object;
+			VendorServiceFeature::CAPTIONS => new KalturaVendorCaptionsCatalogItem(),
+			VendorServiceFeature::TRANSLATION => new KalturaVendorTranslationCatalogItem(),
+			VendorServiceFeature::ALIGNMENT => new KalturaVendorAlignmentCatalogItem(),
+			VendorServiceFeature::AUDIO_DESCRIPTION => new KalturaVendorAudioDescriptionCatalogItem(),
+			VendorServiceFeature::CHAPTERING => new KalturaVendorChapteringCatalogItem(),
+			VendorServiceFeature::INTELLIGENT_TAGGING => new KalturaVendorIntelligentTaggingCatalogItem(),
+			VendorServiceFeature::DUBBING => new KalturaVendorDubbingCatalogItem(),
+			VendorServiceFeature::LIVE_CAPTION => new KalturaVendorLiveCaptionCatalogItem(),
+			VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION => new KalturaVendorExtendedAudioDescriptionCatalogItem(),
+			VendorServiceFeature::CLIPS => new KalturaVendorClipsCatalogItem(),
+			VendorServiceFeature::LIVE_TRANSLATION => new KalturaVendorLiveTranslationCatalogItem(),
+			VendorServiceFeature::QUIZ => new KalturaVendorQuizCatalogItem(),
+			VendorServiceFeature::SUMMARY => new KalturaVendorSummaryCatalogItem(),
+			VendorServiceFeature::VIDEO_ANALYSIS => new KalturaVendorVideoAnalysisCatalogItem(),
+			VendorServiceFeature::MODERATION => new KalturaVendorModerationCatalogItem(),
+			default => new KalturaVendorCaptionsCatalogItem(),
+		};
 	}
 
 	protected function getColumns()
@@ -421,6 +405,9 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			'contract',
 			'notes',
 			'createdBy',
+			'minimalRefundTime',
+			'minimalOrderTime',
+			'durationLimit',
 		);
 	}
 
