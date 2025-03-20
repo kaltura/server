@@ -722,7 +722,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ADMIN_PROPERTY, 'supportAccessAllowedUntil');
 		}
 		
-		if(isset($this->supportAccessAllowedUntil) && isset($this->supportAccessMode) == KalturaSupportAccessMode::NEVER_ALLOWED)
+		if(isset($this->supportAccessAllowedUntil) && isset($this->supportAccessMode) == KalturaSupportAccessMode::BLOCKED)
 		{
 			throw new KalturaAPIException(KalturaErrors::SUPPORT_ACCESS_CANNOT_BE_ENABLED);
 		}
@@ -747,7 +747,7 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ADMIN_PROPERTY, 'supportAccessAllowedUntil');
 		}
 		
-		if(isset($this->supportAccessAllowedUntil) && $sourceObject->getSupportAccessAllowedUntil() == KalturaSupportAccessMode::NEVER_ALLOWED)
+		if(isset($this->supportAccessAllowedUntil) && $sourceObject->getSupportAccessAllowedUntil() == KalturaSupportAccessMode::BLOCKED)
 		{
 			throw new KalturaAPIException(KalturaErrors::SUPPORT_ACCESS_CANNOT_BE_ENABLED);
 		}
