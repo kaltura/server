@@ -46,6 +46,7 @@ function getUsers($partnerId, $hasEmail)
 	$emailCriteria = new Criteria();
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
+	$emailCriteria->add(kuserPeer::TYPE, 0);
 	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
 	if($hasEmail)
 	{
@@ -66,6 +67,7 @@ function countUsersWithDuplicatedEmail($partnerId)
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId);
 	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
 	$emailCriteria->add(kuserPeer::STATUS, 1);
+	$emailCriteria->add(kuserPeer::TYPE, 0);
 	$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNOTNULL);
 	$emailCriteria->addGroupByColumn(kuserPeer::EMAIL);
 	$emailCriteria->addSelectColumn($countField);
