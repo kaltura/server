@@ -111,7 +111,10 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			case KalturaHttpNotificationMethod::POST:
 				$curlWrapper->setOpt(CURLOPT_POST, true);
 				if ($curlData)
+				{
 					$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $curlData);
+					$curlWrapper->setOpt(CURLOPT_POSTREDIR, CURL_REDIR_POST_ALL);
+				}
 				break;
 
 			case KalturaHttpNotificationMethod::PUT:
