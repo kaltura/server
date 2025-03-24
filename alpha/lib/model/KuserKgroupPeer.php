@@ -78,11 +78,17 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 	 * @param array $kuserIds
 	 * @return array
 	 */
-	public static function retrieveKgroupIdsByKuserIds($kuserIds){
+	public static function retrieveKgroupIdsByKuserIds($kuserIds, $includeApplicativeGroups = true)
+	{
 		$kuserKgroups = self::retrieveByKuserIds($kuserIds);
 		$kgroupIds = array();
-		foreach ($kuserKgroups as $kuserKgroup){
+		foreach ($kuserKgroups as $kuserKgroup)
+		{
 			/* @var $kuserKgroup KuserKgroup */
+			if (!$includeApplicativeGroups && $kuserKgroup->getGroupType() == GroupType::APPLICATIVE_GROUP)
+			{
+				continue;
+			}
 			$kgroupIds[] = $kuserKgroup->getKgroupId();
 		}
 		return $kgroupIds;
@@ -92,12 +98,14 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 	 * @param int $kuserId
 	 * @return array
 	 */
-	public static function retrieveKgroupIdsByKuserId($kuserId){
-		if (isset(self::$kgroupIdsByKuserId[$kuserId])){
+	public static function retrieveKgroupIdsByKuserId($kuserId, $includeApplicativeGroups = true)
+	{
+		if (isset(self::$kgroupIdsByKuserId[$kuserId]))
+		{
 			return self::$kgroupIdsByKuserId[$kuserId];
 		}
 
-		self::$kgroupIdsByKuserId[$kuserId] = self::retrieveKgroupIdsByKuserIds(array($kuserId));
+		self::$kgroupIdsByKuserId[$kuserId] = self::retrieveKgroupIdsByKuserIds(array($kuserId), $includeApplicativeGroups);
 
 		return self::$kgroupIdsByKuserId[$kuserId];
 	}
