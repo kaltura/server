@@ -607,6 +607,8 @@ class KalturaErrors extends APIErrors
 
 	const CANNOT_UPDATE_CATEGORY_USER_OWNER = "CANNOT_UPDATE_CATEGORY_USER_OWNER;;Cannot change CategoryUser object for category Owner";
 
+	const CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY = "CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY;;Cannot add applicative group to category";
+
 	/**
 	 * entry
 	 */
