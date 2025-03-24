@@ -17,6 +17,8 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 {
 	private static $kgroupIdsByKuserId = array();
 
+	const nonEntitledTypes = array(GroupType::APPLICATIVE_GROUP);
+
 	/**
 	 * Creates default criteria filter
 	 */
@@ -78,14 +80,14 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 	 * @param array $kuserIds
 	 * @return array
 	 */
-	public static function retrieveKgroupIdsByKuserIds($kuserIds, $includeApplicativeGroups = true)
+	public static function retrieveKgroupIdsByKuserIds($kuserIds, $includeNonEntitledTypes = true)
 	{
 		$kuserKgroups = self::retrieveByKuserIds($kuserIds);
 		$kgroupIds = array();
 		foreach ($kuserKgroups as $kuserKgroup)
 		{
 			/* @var $kuserKgroup KuserKgroup */
-			if (!$includeApplicativeGroups && $kuserKgroup->getGroupType() == GroupType::APPLICATIVE_GROUP)
+			if (!$includeNonEntitledTypes && in_array($kuserKgroup->getGroupType(), self::nonEntitledTypes))
 			{
 				continue;
 			}
