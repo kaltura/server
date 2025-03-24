@@ -55,4 +55,9 @@ class KuserKgroupFilter extends baseObjectFilter
 	{
 		$this->set('_eq_group_id', $v);
 	}
+
+	public function setUserIdEqual($v)
+	{
+		$this->set('_eq_user_id', $v);
+	}
 }

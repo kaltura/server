@@ -1,4 +1,19 @@
+# Ursa-21.12.0
+## X failed login attempts notification 
+- Issue Type: Task
+- Issue ID: PLAT-25095
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
+``deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php``
+
 # Ursa-21.11.0
+## Add demoteAdmin action to User service ##
+* Issue Type: Task
+* Issue ID: PLAT-25145
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2025_03_03_user_demoteAdmin_permissions.php
+
 ## S3 Drop Folder - add support for ARN Role (AWS Deployments only) ##
 - Issue Type: Task
 - Issue ID: VCP-19989
@@ -52,7 +67,6 @@ The Bucket Policy should include the following:
 6. In S3 Drop Folder (Kaltura Admin Console):  
    6.1. Leave User & Password Empty  
    6.2. Tick 'Bucket Policy Allows Access' checkbox
-
 
 # Ursa-21.10.0
 ## Rsvp Plugin ##

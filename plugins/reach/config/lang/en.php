@@ -16,6 +16,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY' => 'SUMMARY',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS' => 'VIDEO_ANALYSIS',
 	'Kaltura_Client_Reach_Enum_VendorServiceFeature::MODERATION' => 'MODERATION',
+	'Kaltura_Client_Reach_Enum_VendorServiceFeature::METADATA_ENRICHMENT' => 'METADATA_ENRICHMENT',
 
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',

@@ -96,12 +96,21 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	 * @param KalturaEvent $event
 	 * @return bool is new Partner Object
 	 */
-	protected function fireEventWithoutPartnerCheck($event, $partnerId)
+	protected function fireEventWithoutPartnerCheck($event, &$scope, $partnerId)
 	{
 		/** event kObjectAddedEvent with partner object -> create new partner  */
 		if($event instanceof kObjectAddedEvent && $event->getObject() instanceof Partner &&  $partnerId > 0)
 			return true;
 
+		if ($event instanceof kObjectChangedEvent && $event->getObject() instanceof UserLoginData && in_array('user_login_data.LOGIN_BLOCKED_UNTIL', $event->getModifiedColumns()))
+		{
+			if (!$scope->getPartnerId())
+			{
+				$partnerId = $event->getObject()->getConfigPartnerId();
+				$scope->setPartnerId($partnerId);
+			}
+			return true;
+		}
 		return false;
 	}
 
@@ -155,7 +164,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		$partnerId = $scope->getPartnerId();
 		$ksPartnerId = kCurrentContext::$ks_partner_id;
 
-		$fireEventWithoutPartnerCheck = $this->fireEventWithoutPartnerCheck($event, $partnerId);
+		$fireEventWithoutPartnerCheck = $this->fireEventWithoutPartnerCheck($event, $scope, $partnerId);
 		if (!$fireEventWithoutPartnerCheck)
 		{
 			if ( (($ksPartnerId && $ksPartnerId == Partner::MEDIA_SERVER_PARTNER_ID) || $partnerId <= 0 ||
