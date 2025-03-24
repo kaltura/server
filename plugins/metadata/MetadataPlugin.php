@@ -46,9 +46,20 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		$dbMetadata->incrementVersion();
 		$key = $dbMetadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
 		kFileSyncUtils::file_put_contents($key, $xmlData);
+		Propel::disableInstancePooling();
+		$currentMetadata = MetadataPeer::retrieveByPK($dbMetadata->getId());
+		Propel::enableInstancePooling();
+		if ($currentMetadata->getVersion() > $dbMetadata->getVersion())
+		{
+			throw new kCoreException("Metadata version already increased by a different process", kCoreException::INTERNAL_SERVER_ERROR);
+		}
 		$dbMetadata->save();
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 	}
+
+
+
+
 
 	/* (non-PHPdoc)
 	 * @see KalturaPlugin::getInstance()
