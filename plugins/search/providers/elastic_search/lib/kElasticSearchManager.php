@@ -63,9 +63,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     {
         if($object instanceof CuePoint && in_array($object->getType(), CuePointPlugin::getElasticIndexOnEntryTypes()) && !in_array($object->getType(), CuePointPlugin::getIndexOnEntryTypes()))
             return true;
-
-        if($object instanceof IElasticIndexable)
-            return true;
+        if ($object instanceof IElasticIndexable)
+		{
+			return true;
+		}
 
         return false;
     }
@@ -318,8 +319,10 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
      */
     public function shouldConsumeReadyForElasticIndexEvent($object, $params = null)
     {
-        if($object instanceof IElasticIndexable)
-            return true;
+		if ($object instanceof IElasticIndexable)
+		{
+			return true;
+		}
 
         return false;
     }
@@ -344,7 +347,9 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     {
         //prevent indexing 2 times- if object is IIndexable we raise the event in kSphinxSearchManager
         if($object instanceof IElasticIndexable && !($object instanceof IIndexable))
-            return true;
+		{
+			return true;
+		}
 
         return false;
     }
@@ -369,7 +374,9 @@ class kElasticSearchManager implements kObjectReadyForIndexEventConsumer, kObjec
     {
         //prevent indexing 2 times- if object is IIndexable we raise the event in kSphinxSearchManager
         if($object instanceof IElasticIndexable && !($object instanceof IIndexable))
-            return true;
+		{
+			return true;
+		}
 
         return false;
     }
