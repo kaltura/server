@@ -101,7 +101,7 @@ class categoryKuserPeer extends BasecategoryKuserPeer {
 		//check if kuserId has permission in category by a junction group
 		if($supportGroups)
 		{
-			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId, false);
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId);
 			if (count($kgroupIds) == 0)
 				return null;
 
