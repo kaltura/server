@@ -57,10 +57,6 @@ class MetadataPlugin extends KalturaPlugin implements IKalturaVersion, IKalturaP
 		kEventsManager::raiseEvent(new kObjectDataChangedEvent($dbMetadata, $previousVersion));
 	}
 
-
-
-
-
 	/* (non-PHPdoc)
 	 * @see KalturaPlugin::getInstance()
 	 */
