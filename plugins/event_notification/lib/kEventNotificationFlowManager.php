@@ -95,7 +95,8 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 	{
 		if (!$scope->getPartnerId())
 		{
-			$partnerId = $event->getObject()->getConfigPartnerId();
+			$object = $event->getObject();
+			$partnerId = $object->getLastLoginPartnerId() ?: $object->getConfigPartnerId();
 			if ($partnerId)
 			{
 				$scope->setPartnerId($partnerId);
