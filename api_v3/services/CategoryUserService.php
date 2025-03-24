@@ -26,12 +26,6 @@ class CategoryUserService extends KalturaBaseService
 		if($category->getMembersCount() >= $maxUserPerCategory)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_MAX_USER_REACHED,$maxUserPerCategory);
 
-		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $categoryUser->userId);
-		if ($kuser->getType() == KuserType::APPLICATIVE_GROUP)
-		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY);
-		}
-
 		$lockKey = 'categoryUser_add_' . $categoryUser->categoryId . '_' . $categoryUser->userId;
 		$dbCategoryKuser = kLock::runLocked($lockKey, array($this, 'addCategoryUserImpl'), array($categoryUser, $dbCategoryKuser, $category));
 

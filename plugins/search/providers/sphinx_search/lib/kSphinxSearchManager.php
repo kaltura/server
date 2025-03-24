@@ -127,10 +127,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function shouldConsumeUpdatedEvent(BaseObject $object)
 	{
-		if ($object instanceof IIndexable)
-		{
+		if($object instanceof IIndexable)
 			return true;
-		}
 			
 		return false;
 	}
@@ -140,10 +138,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
     public function shouldConsumeReadyForIndexEvent(BaseObject $object)
 	{
-		if ($object instanceof IIndexable)
-		{
+		if($object instanceof IIndexable)
 			return true;
-		}
 			
 		return false;
 	}
@@ -172,10 +168,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if ($object instanceof IIndexable)
-		{
+		if($object instanceof IIndexable)
 			return true;
-		}
 		
 		return false;
 	}
@@ -630,7 +624,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
      */
     public function shouldConsumeErasedEvent (BaseObject $object)
     {
-		if ($object instanceof IIndexable)
+		if($object instanceof IIndexable)
 		{
 			return true;
 		}

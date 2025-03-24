@@ -167,7 +167,7 @@ class kObjectDeleteHandler extends kObjectDeleteHandlerBase implements kObjectDe
 			// remove user from groups
 			KuserKgroupPeer::deleteByKuserId($kuser->getId());
 		}
-		elseif 	($kuser->getType() == KuserType::GROUP || $kuser->getType() == KuserType::APPLICATIVE_GROUP){
+		elseif 	($kuser->getType() == KuserType::GROUP){
 			// remove users from group
 			$filter = new KuserKgroupFilter();
 			$filter->setGroupIdEqual($kuser->getPuserId());

@@ -257,7 +257,7 @@ class kEntitlementUtils
 			if($kuserId)
 			{
 				// get the groups that the user belongs to in case she is not associated to the category directly
-				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId, false);
+				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId);
 				$kgroupIds[] = $kuserId;
 				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 				$membersCrit->addOr($crit);
@@ -527,7 +527,7 @@ class kEntitlementUtils
 		$privacyContexts[] = self::ENTRY_PRIVACY_CONTEXT;
 
 		// get the groups that the user belongs to in case she is not associated to the category directly
-		$kuserIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId(kCurrentContext::getCurrentKsKuserId(), false);
+		$kuserIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId(kCurrentContext::getCurrentKsKuserId());
 		$kuserIds[] = kCurrentContext::getCurrentKsKuserId();
 		foreach ($privacyContexts as $privacyContext){
 			foreach ( $kuserIds as $kuserId){
