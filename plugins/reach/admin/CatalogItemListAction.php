@@ -67,7 +67,8 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		$sourceLanguage = $this->_getParam('filterSourceLanguage') != "" ? $this->_getParam('filterSourceLanguage') : null;
 		$targetLanguage = $this->_getParam('filterTargetLanguage') != "" ? $this->_getParam('filterTargetLanguage') : null;
 
-		$catalogItemFilter = $this->getCatalogItemFilterByServiceFeature($serviceFeature);
+		$catalogItemFilterName = "Kaltura_Client_Reach_Type_" . ReachPlugin::getCatalogItemCoreFilterName($serviceFeature);
+		$catalogItemFilter = new $catalogItemFilterName();
 		$catalogItemFilter->orderBy = "-id";
 		$catalogItemFilter->serviceFeatureEqual = $serviceFeature;
 		$catalogItemFilter->serviceTypeEqual = $serviceType;
@@ -88,40 +89,6 @@ class CatalogItemListAction extends KalturaApplicationPlugin implements IKaltura
 		}
 
 		return $catalogItemFilter;
-	}
-
-	protected function getCatalogItemFilterByServiceFeature($serviceFeature)
-	{
-		if ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS)
-			return new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
-			return new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT)
-			return new Kaltura_Client_Reach_Type_VendorAlignmentCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION)
-			return new Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION)
-			return new Kaltura_Client_Reach_Type_VendorExtendedAudioDescriptionCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING)
-			return new Kaltura_Client_Reach_Type_VendorChapteringCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING)
-			return new Kaltura_Client_Reach_Type_VendorDubbingCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION)
-			return new Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION)
-			return new Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS)
-			return new Kaltura_Client_Reach_Type_VendorClipsCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ)
-			return new Kaltura_Client_Reach_Type_VendorQuizCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY)
-			return new Kaltura_Client_Reach_Type_VendorSummaryCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
-			return new Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItemFilter();
-		elseif ($serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::METADATA_ENRICHMENT)
-			return new Kaltura_Client_Reach_Type_VendorMetadataEnrichmentCatalogItemFilter();
-		else
-			return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
 	}
 
 	public function getInstance($interface)
