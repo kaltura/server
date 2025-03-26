@@ -1,0 +1,24 @@
+<!-- File: plugins/admin_console/kaltura_application_links/admin/views/scripts/generic-app.phtml -->
+
+<style type="text/css">
+    #sub-header { padding: 5px 20px 0px; }
+    #wrapper { padding: 0 0 0 0; width: 100%; }
+</style>
+<div>
+    <h1> Application generic links </h1>
+    <ul id="applicationLinks"></ul>
+</div>
+<script type="text/javascript">
+    var initialized = false;
+    (function(window) {
+        var ulElement = document.getElementById('applicationLinks');
+        <?php foreach ($this->urls as $url): ?>
+        var liElement = document.createElement('li');
+        var aElement = document.createElement('a');
+        aElement.href = '<?php echo htmlspecialchars($url[0]); ?>';
+        aElement.textContent = '<?php echo htmlspecialchars($url[1]); ?>';
+        liElement.appendChild(aElement);
+        ulElement.appendChild(liElement);
+        <?php endforeach; ?>
+    })(window);
+</script>
