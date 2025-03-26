@@ -1,14 +1,18 @@
+<style type="text/css">
+    #sub-header { padding: 5px 20px 0px; }
+    #wrapper { padding: 0 0 0 0; width: 100%; }
+</style>
 <div>
 	<iframe id="ApplicationIframe" width="100%" height="100%" src="about:blank" frameborder="0" class="auto-height"></iframe>
 </div>
-<!--<script type="text/javascript">-->
-<!--    var initialized = false;-->
-<!--    (function(window) {-->
-<!--        if (initialized) {-->
-<!--            return;-->
-<!--        }-->
-<!--        initialized = true;-->
-<!--        var applicationIframe = window.document.getElementById('ApplicationIframe');-->
-<!--        applicationIframe.src = '--><?php //echo $this->loginUrl; ?>//';
-<!--    })(window);
-<!-- </script>
+<script type="text/javascript">
+    var initialized = false;
+    (function(window) {
+        if (initialized) {
+            return;
+        }
+        initialized = true;
+        var applicationIframe = window.document.getElementById('ApplicationIframe');
+        applicationIframe.src = '<?php echo $this->loginUrl; ?>';
+    })(window);
+</script>
