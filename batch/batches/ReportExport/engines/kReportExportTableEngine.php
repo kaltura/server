@@ -22,7 +22,12 @@ class kReportExportTableEngine extends kReportExportEngine
 	{
 		fwrite($this->fp, "\xEF\xBB\xBF");
 		$this->writeReportTitle();
-		$this->writeDelimitedRow($result->header);
+		$headers = $result->header;
+		if ($this->reportItem->responseOptions->useFriendlyHeader)
+		{
+			//TODO: map headers to friendlyName
+		}
+		$this->writeDelimitedRow($headers);
 
 		$rows = explode(';', $result->data);
 		foreach ($rows as $row)

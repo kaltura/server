@@ -37,13 +37,19 @@ class KalturaReportExportParams extends KalturaObject
 	 */
 	public $baseUrl;
 
+	/**
+	 * @var bool
+	 */
+	public $useFriendlyHeaders = false;
+
 	private static $map_between_objects = array
 	(
 		"recipientEmail",
 		"recipientName",
 		"reportItems",
 		"reportsItemsGroup",
-		"baseUrl"
+		"baseUrl",
+		"useFriendlyHeaders"
 	);
 
 	public function getMapBetweenObjects()
