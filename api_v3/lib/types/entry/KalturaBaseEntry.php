@@ -573,13 +573,13 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	{
 		if(is_null($this->conversionProfileId))
 			return;
-			
+
 		if($sourceObject && $sourceObject->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ENTRY_STATUS, $this->getFormattedPropertyNameWithClassName('conversionProfileId'), $sourceObject->getStatus());
 		
 		if($this->conversionProfileId != conversionProfile2::CONVERSION_PROFILE_NONE)
 		{
-			$conversionProfile = conversionProfile2Peer::retrieveByPK($this->conversionProfileId);
+			$conversionProfile = conversionProfile2Peer::retrieveByID($this->conversionProfileId);
 			if(!$conversionProfile || $conversionProfile->getType() != ConversionProfileType::MEDIA)
 				throw new KalturaAPIException(KalturaErrors::CONVERSION_PROFILE_ID_NOT_FOUND, $this->conversionProfileId);
 		}
