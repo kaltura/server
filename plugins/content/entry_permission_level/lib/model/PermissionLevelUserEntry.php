@@ -41,7 +41,8 @@ class PermissionLevelUserEntry extends UserEntry
 	{
 		if(!count($permissionLevels))
 			return;
-		
+
+		$permissionLevels = array_unique($permissionLevels, SORT_REGULAR);
 		$this->syncExtendedStatus($permissionLevels);
 		$serialized = serialize($permissionLevels);
 		return $this->putInCustomData(self::CUSTOM_DATA_PERMISSION_LEVELS, $serialized);
