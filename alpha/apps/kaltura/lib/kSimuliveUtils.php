@@ -14,7 +14,6 @@ class kSimuliveUtils
 	const SCHEDULE_TIME_OFFSET_URL_PARAM = 'timeOffset';
 	const SCHEDULE_TIME_URL_PARAM = 'time';
 	const DURATION_ROUND_THRESHOLD_MILISECONDS = 100;
-	const LABEL_SEPARATOR = '-';
 	/**
 	 * @param LiveEntry $entry
 	 * @param int $time
@@ -43,7 +42,7 @@ class kSimuliveUtils
 		$sourceEntryLabels = array();
 		foreach ($sourceEntries as $source)
 		{
-			$sourceEntryLabels[] = "content" . self::LABEL_SEPARATOR . $source->getEntryId();
+			$sourceEntryLabels[] = self::generateSourceLabel('content', $source->getEntryId());
 		}
 
 		// getting the preStart assets (only if the preStartEntry exists)
@@ -51,7 +50,7 @@ class kSimuliveUtils
 		if ($preStartEntry)
 		{
 			array_unshift($sourceEntries, $preStartEntry);
-			array_unshift($sourceEntryLabels, "preStartContent" . self::LABEL_SEPARATOR . $preStartEntry->getEntryId());
+			array_unshift($sourceEntryLabels, self::generateSourceLabel('preStartContent', $preStartEntry->getEntryId()));
 		}
 
 		// getting the postEnd assets (only if the postEndEntry exists)
@@ -59,7 +58,7 @@ class kSimuliveUtils
 		if ($postEndEntry)
 		{
 			$sourceEntries[] = $postEndEntry;
-			$sourceEntryLabels[] = "postEntryContent" . self::LABEL_SEPARATOR . $postEndEntry->getEntryId();
+			$sourceEntryLabels[] = self::generateSourceLabel('postEntryContent', $postEndEntry->getEntryId());
 		}
 
 		list($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets) = self::getSourceAssets($sourceEntries);
@@ -369,11 +368,11 @@ class kSimuliveUtils
 	public static function addTimestamps(&$labels, $startTime, $durations)
 	{
 		$timestamp = $startTime;
-		$labels[0] .= self::LABEL_SEPARATOR . $timestamp;
+		$labels[0] = self::addParam('startTime', $timestamp, $labels[0]);
 		for ($i = 1; $i < count($labels); $i++)
 		{
 			$timestamp = $timestamp + $durations[$i-1];
-			$labels[$i] .=  self::LABEL_SEPARATOR . $timestamp;
+			$labels[$i] = self::addParam('startTime', $timestamp, $labels[$i]);
 		}
 	}
 
@@ -396,10 +395,18 @@ class kSimuliveUtils
 		}
 	}
 
-	public static function addParamToId($key, $value, $existId=null)
+	protected static function generateSourceLabel($type, $srcId)
 	{
-		$id =  $key . '=' . $value;
-		return $existId ? $existId . ',' . $id : $id;
+		$label = '';
+		$label = self::addParam('type', $type, $label);
+		$label = self::addParam('sourceEntryId', $srcId, $label);
+		return $label;
+	}
+
+	public static function addParam($key, $value, $current=null)
+	{
+		$newParam =  $key . '=' . $value;
+		return $current ? $current . ',' . $newParam : $newParam;
 	}
 
 }

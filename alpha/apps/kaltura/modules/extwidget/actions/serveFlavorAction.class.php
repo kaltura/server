@@ -135,7 +135,7 @@ class serveFlavorAction extends kalturaAction
 		$mediaSet['discontinuity'] = $discontinuity;
 		if ($setId)
 		{
-			$setId = kSimuliveUtils::addParamToId('offset', $offset, $setId);
+			$setId = kSimuliveUtils::addParam('offset', $offset, $setId);
 			$mediaSet['id'] = $setId;
 		}
 
