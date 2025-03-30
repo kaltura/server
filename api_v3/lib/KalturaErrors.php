@@ -128,6 +128,8 @@ class KalturaErrors extends APIErrors
 	const FAILED_TO_INIT_OBJECT = "FAILED_TO_INIT_OBJECT;RESOURCE_ID;Failed to initialize necessary object";
 	
 	const ANONYMOUS_ACCESS_FORBIDDEN = "ANONYMOUS_ACCESS_FORBIDDEN;;Anonymous access to this functionality is forbidden";
+
+	const MULTI_ATTEMPTS_TO_UPDATE_METADATA = "MULTI_ATTEMPTS_TO_UPDATE_METADATA;;Multiple attempts to update metadata detected";
 	/**
 	 * Service Oriented Errors
 	 *
