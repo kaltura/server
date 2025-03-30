@@ -264,7 +264,7 @@ class MetadataService extends KalturaBaseService
 	 */	
 	function updateAction ($id, $xmlData = null, $version = null)
 	{
-		return kLock::runLocked("metadata_update_xsl_{$id}", array($this, 'updateImpl'), array($id, $xmlData, $version), 2,40);
+		return kLock::runLocked("metadata_update_xsl_{$id}", array($this, 'updateImpl'), array($id, $xmlData, $version), 2, 40);
 	}
 
 	function updateImpl($id, $xmlData = null, $version = null)
