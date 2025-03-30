@@ -21,7 +21,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	const SOURCE_TYPE_HTTP = 'http';
 	const FILE_SYNC_TYPES_TO_CACHE = 'file_sync_types_to_cache';
 	const MAX_FILE_SIZE_TO_CACHE = 'max_file_size_to_cache';
-	const COMPRESSED_PREFIX = '#COMPRESS';
+	const COMPRESSED_PREFIX = '#COMPRESS_';
 
 	/**
 	 * Contain all object types and sub types that should not be synced
@@ -201,7 +201,8 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	{
 		$cacheType = self::getCacheType($key);
 		$maxFileSizeToCache = kConf::get(self::MAX_FILE_SIZE_TO_CACHE, kConfMapNames::RUNTIME_CONFIG);
-		if (!$maxFileSizeToCache || $cacheType != kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC)
+		$contentSize = strlen($content);
+		if (!$maxFileSizeToCache || $cacheType != kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC || $contentSize > $maxFileSizeToCache)
 		{
 			return;
 		}
@@ -211,23 +212,19 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 	protected static function storeData($content, $maxFileSizeToCache, $key, $cacheType)
 	{
-		$contentSize = strlen($content);
-		if ($contentSize <= $maxFileSizeToCache)
+		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
+		if (!$cacheStore)
 		{
-			$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
-			if (!$cacheStore)
-			{
-				return;
-			}
+			return;
+		}
 
-			$cacheKey = self::getCacheKey($key);
-			$compressedContent = gzcompress($content);
-			$contentToPut = $compressedContent ? (self::COMPRESSED_PREFIX . $compressedContent) : $content;
-			$result = $cacheStore->set($cacheKey, $contentToPut, self::FILE_SYNC_CACHE_EXPIRY);
-			if ($result === false)
-			{
-				KalturaLog::err("Failed to add file content with key [$key]");
-			}
+		$cacheKey = self::getCacheKey($key);
+		$compressedContent = gzcompress($content);
+		$contentToPut = $compressedContent ? (self::COMPRESSED_PREFIX . $compressedContent) : $content;
+		$result = $cacheStore->set($cacheKey, $contentToPut, self::FILE_SYNC_CACHE_EXPIRY);
+		if ($result === false)
+		{
+			KalturaLog::err("Failed to add file content with key [$key]");
 		}
 	}
 
@@ -238,7 +235,6 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$result = $cacheStore->get($cacheKey);
 			if ($result)
 			{
-				$cacheStore->set($cacheKey, $result, self::FILE_SYNC_CACHE_EXPIRY); // Extend ttl for the key
 				if (str_starts_with($result, self::COMPRESSED_PREFIX))
 				{
 					$result = gzuncompress(substr($result, strlen(self::COMPRESSED_PREFIX)));
@@ -260,6 +256,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$cachedResult = self::getDataFromCacheStore($cacheStore, $cacheKey);
 		if ($cachedResult)
 		{
+			if ($cacheType == kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC)
+			{
+				$cacheStore->set($cacheKey, $cachedResult, self::FILE_SYNC_CACHE_EXPIRY); // Extend ttl for the key
+			}
 			return $cachedResult;
 		}
 
