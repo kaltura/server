@@ -378,9 +378,14 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 
 	public static function getServiceFeatureName($serviceFeature)
 	{
-		$reflector = new ReflectionClass('VendorServiceFeature');
-		$constantNames = array_flip($reflector->getConstants());
+		$constantNames = ReachPlugin::getServiceFeatureNames();
 		return isset($constantNames[$serviceFeature]) ? $constantNames[$serviceFeature] : "";
+	}
+
+	public static function getServiceFeatureNames()
+	{
+		$reflector = new ReflectionClass('VendorServiceFeature');
+		return array_flip($reflector->getConstants());
 	}
 
 	public static function getTranslatedServiceFeature($serviceFeature)
