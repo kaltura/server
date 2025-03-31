@@ -1,10 +1,34 @@
-# Ursa-21.12.0
+# Ursa-21.13.0
+
+## Update Subscriber added to channel email event notification template ##
+* Issue Type: Task
+* Issue ID: SUP-37427
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+
+     - deployment/updates/scripts/xml/2025_03_17_addSubscriberAddedToChannelEmailNotification.template.xml
+     - php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_subscriber_added_to_channel.php
+
+Update script:
+
+     - deployment/updates/scripts/xml/2025_03_17_updateSubscriberAddedToChannelEmailNotification.template.xml
+     - php deployment/updates/scripts/2025_03_17_deploy_update_email_event_notification_subscriber_added_to_channel.php
+
+
 ## X failed login attempts notification 
 - Issue Type: Task
 - Issue ID: PLAT-25095
 ### Deployment scripts ###
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
 ``deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php``
+
 
 # Ursa-21.11.0
 ## Add demoteAdmin action to User service ##
