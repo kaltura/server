@@ -4,7 +4,9 @@
  * @subpackage config
  */
 setlocale(LC_ALL, 'en_US.UTF-8');
-libxml_disable_entity_loader(true);
+if (PHP_VERSION_ID < 80000) {
+	libxml_disable_entity_loader(true);
+}
 
 // to make sure stream calls to localhost machine
 stream_wrapper_unregister ('http');

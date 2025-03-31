@@ -1,3 +1,73 @@
+# Ursa-21.12.0
+## X failed login attempts notification 
+- Issue Type: Task
+- Issue ID: PLAT-25095
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
+``deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php``
+
+# Ursa-21.11.0
+## Add demoteAdmin action to User service ##
+* Issue Type: Task
+* Issue ID: PLAT-25145
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2025_03_03_user_demoteAdmin_permissions.php
+
+## S3 Drop Folder - add support for ARN Role (AWS Deployments only) ##
+- Issue Type: Task
+- Issue ID: VCP-19989
+### Configurations ###
+Add the following section to `runtime_config` map:
+* Replace AWS_ACCOUNT_ID with AWS account
+* Replace ROLE_NAME with AWS Role name
+```
+[s3_drop_folder]
+s3Arn = 'arn:aws:iam::AWS_ACCOUNT_ID:role/ROLE_NAME'
+```
+### Deployment ###
+On-Prem / All-In-One Only  
+Generate Clients (Replace @path_to_server@ with your path):
+- Build new clients:  
+  ``php @path_to_server@/generator/generate.php``
+- Clear Cache  
+  ``find @path_to_server@/cache -type cache -delete``
+- Restart Apache2  
+  ``service apache2 restart``
+
+### Enable ###
+1. The EC2 running `KAsyncDropFolderWatcherRemoteS3` & `KAsyncDropFolderContentProcessor` workers should allow the `s3Arn` role to be assumed
+2. The EC2 that batch is sending the api calls to (defined at `batch.ini` map `serviceUrl` param) should allow the `s3Arn` role to be assumed
+3. The `s3Arn` role policy should allow to Get, List and Delete from the destination bucket (or '*' for all buckets)
+4. The `s3Arn` ‘Maximum session duration’ must be set to 12 hours
+5. The S3 Bucket Policy should allow the `s3Arn` to operate it  
+The Bucket Policy should include the following:
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::AWS_ACCOUNT_ID:role/ROLE_NAME"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::BUCKET_NAME",
+                "arn:aws:s3:::BUCKET_NAME/*"
+            ]
+        }
+    ]
+}
+```
+6. In S3 Drop Folder (Kaltura Admin Console):  
+   6.1. Leave User & Password Empty  
+   6.2. Tick 'Bucket Policy Allows Access' checkbox
+
 # Ursa-21.10.0
 ## Rsvp Plugin ##
 * Issue Type: Task
