@@ -487,8 +487,13 @@ class KalturaFrontController
 				case kCoreException::USER_BLOCKED:
 					$object = new KalturaAPIException(KalturaErrors::USER_BLOCKED);
 					break;
+					
 				case kCoreException::PARTNER_BLOCKED:
 					$object = new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN_CONTENT_BLOCKED);
+					break;
+					
+				case kCoreException::ACCESS_UNAUTHORIZED:
+					$object = new KalturaAPIException(KalturaErrors::ACCESS_UNAUTHORIZED);
 					break;
 					
 				case kCoreException::INVALID_KS:
