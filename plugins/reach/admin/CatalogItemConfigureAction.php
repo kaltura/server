@@ -133,63 +133,22 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				$catalogItemId = $catalogItem->id;
 			}
 
-			switch ($formData['type'])
+			$catalogItemCoreName = ReachPlugin::getCatalogItemCoreName($formData['type']);
+			if($catalogItemCoreName != "VendorCatalogItem")
 			{
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorCaptionsCatalogItem', $formData, false, true);
-				    break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorTranslationCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAlignmentCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorExtendedAudioDescriptionCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorChapteringCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorIntelligentTaggingCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorDubbingCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorClipsCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorQuizCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorSummaryCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::MODERATION:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorModerationCatalogItem', $formData, false, true);
-					break;
-				case Kaltura_Client_Reach_Enum_VendorServiceFeature::METADATA_ENRICHMENT:
-					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorMetadataEnrichmentCatalogItem', $formData, false, true);
-					break;
+				$catalogItemName = "Kaltura_Client_Reach_Type_" . $catalogItemCoreName;
+				$catalogItem = $form->getObject($catalogItemName, $formData, false, true);
 			}
 
 			$form->resetUnUpdatebleAttributes($catalogItem);
 			if($catalogItemId)
-				$catalogItem = $reachPluginClient->vendorCatalogItem->update($catalogItemId, $catalogItem);
+			{
+				$reachPluginClient->vendorCatalogItem->update($catalogItemId, $catalogItem);
+			}
 			else
-				$catalogItem = $reachPluginClient->vendorCatalogItem->add($catalogItem);
+			{
+				$reachPluginClient->vendorCatalogItem->add($catalogItem);
+			}
 			$form->setAttrib('class', 'valid');
 			$action->view->formValid = true;
 		}
