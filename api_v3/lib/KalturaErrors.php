@@ -128,6 +128,8 @@ class KalturaErrors extends APIErrors
 	const FAILED_TO_INIT_OBJECT = "FAILED_TO_INIT_OBJECT;RESOURCE_ID;Failed to initialize necessary object";
 	
 	const ANONYMOUS_ACCESS_FORBIDDEN = "ANONYMOUS_ACCESS_FORBIDDEN;;Anonymous access to this functionality is forbidden";
+
+	const MULTI_ATTEMPTS_TO_UPDATE_METADATA = "MULTI_ATTEMPTS_TO_UPDATE_METADATA;;Multiple attempts to update metadata detected";
 	/**
 	 * Service Oriented Errors
 	 *
@@ -606,6 +608,8 @@ class KalturaErrors extends APIErrors
 	const CANNOT_OVERRIDE_MANUAL_CHANGES = "CANNOT_OVERRIDE_MANUAL_CHANGES;;Cannot override manual changes";
 
 	const CANNOT_UPDATE_CATEGORY_USER_OWNER = "CANNOT_UPDATE_CATEGORY_USER_OWNER;;Cannot change CategoryUser object for category Owner";
+
+	const CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY = "CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY;;Cannot add applicative group to category";
 
 	/**
 	 * entry

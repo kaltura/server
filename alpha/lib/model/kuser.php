@@ -1323,7 +1323,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	{
 		return kSphinxSearchManager::getSphinxIndexName(kuserIndex::getObjectIndexName());
 	}
-    
+
 	/* (non-PHPdoc)
 	 * @see lib/model/om/Baseentry#postInsert()
 	 */
