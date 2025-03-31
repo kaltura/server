@@ -265,6 +265,8 @@ class APIErrors
 	const SERVICE_FORBIDDEN = "SERVICE_FORBIDDEN;SERVICE;The access to service [@SERVICE@] is forbidden";
 	
 	const SERVICE_FORBIDDEN_CONTENT_BLOCKED = "SERVICE_FORBIDDEN_CONTENT_BLOCKED;;The access to this service is forbidden since the specified partner is blocked";
+
+	const ACCESS_UNAUTHORIZED = "ACCESS_UNAUTHORIZED;;Access unauthorized";
 	
 	const SERVICE_FORBIDDEN_FULLY_BLOCKED = "SERVICE_FORBIDDEN_FULLY_BLOCKED;;The access to this service is forbidden since the specified partner is fully blocked";
 	
