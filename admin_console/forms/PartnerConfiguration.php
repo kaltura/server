@@ -1080,7 +1080,7 @@ class Form_PartnerConfiguration extends Infra_Form
 									array('crossLine')),
 									 'passwordSecurity', array('legend' => 'Password Security'));
 		
-		$this->addDisplayGroup(array('secondary_secret_role_id','allowed_email_domains_for_admins','crossLine'), 'security', array('legend' => 'Security'));
+		$this->addDisplayGroup(array('secondary_secret_role_id','allowed_email_domains_for_admins', 'crossLine'), 'security', array('legend' => 'Security'));
 		$this->addDisplayGroup(array('use_two_factor_authentication', 'use_sso', 'block_direct_login', 'ALLOW_SSO_PER_USER',
 		                                   'two_factor_authentication_mode', 'crossLine'), 'authenticationSettings', array('legend' => 'Authentication Settings'));
 
