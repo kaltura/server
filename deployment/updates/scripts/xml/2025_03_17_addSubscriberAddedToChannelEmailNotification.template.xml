@@ -18,35 +18,21 @@
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Subscriber Added to Channel</name>
                 <systemName>SUBSCRIBER_ADDED_TO_CHANNEL</systemName>
-                <description>Email notification template to be sent when a new subscriber is added to a channel</description>
+                <description>Email notification template to be sent when a new user is added to the channel as a subscriber</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
-                <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
+                <eventType>5</eventType> <!-- EventNotificationEventType::OBJECT_CREATED -->
                 <eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CAETGORYKUSER -->
                 <eventConditions objectType="array">
-                    <item objectType="KalturaEventFieldCondition">
-                        <description>PermissionNames field modified</description>
-                        <field objectType="KalturaEvalBooleanField">
-                            <code>in_array(categoryKuser::PERMISSION_NAMES, $scope->getEvent()->getModifiedColumns())</code>
-                        </field>
-                    </item>
                     <item objectType="KalturaEventFieldCondition">
                         <description>PermissionNames contains subscribe permission</description>
                         <field objectType="KalturaEvalBooleanField">
                             <code>in_array('CATEGORY_SUBSCRIBE', explode(',',$scope->getObject()->getPermissionNames()))</code>
                         </field>
                     </item>
-                    <item objectType="KalturaEventFieldCondition">
-                        <description>Old value of PermissionNames did not contain subscribe permission</description>
-                        <field objectType="KalturaEvalBooleanField">
-                            <code>!in_array('CATEGORY_SUBSCRIBE', explode(',',$scope->getEvent()->getObject()->getColumnsOldValue()->getPermissionNames()))</code>
-                        </field>
-                    </item>
                 </eventConditions>
                 <format>1</format>
-                <subject>[AppTitle] - {user_name} has been added to {category_name}</subject>
-                <body>
-                    <![CDATA[ A new user has been added as subscriber to {category_name} <a href="[AppCategoryUrl]{category_name_encoded}/{category_id}">{category_name}</a><br>Name of new subscriber - {user_name} <br>Email of the new subscriber - {user_email} ]]>
-                </body>
+                <subject>[AppTitle] - {user_name} has been added to {category_name} as a subscriber</subject>
+                <body>Replace this text with desired email body. You can use {category_name}, {category_id}, {user_name} and {user_email} as variables.</body>
                 <fromEmail>{from_email}</fromEmail>
                 <fromName>{from_name}</fromName>
                 <bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
@@ -107,6 +93,10 @@
                     </item>
                 </contentParameters>
             </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
         </request>
     </multirequest>
 </xml>
