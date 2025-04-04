@@ -183,6 +183,9 @@ class CatalogItemConfigureAction extends KalturaApplicationPlugin
 				case Kaltura_Client_Reach_Enum_VendorServiceFeature::METADATA_ENRICHMENT:
 					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorMetadataEnrichmentCatalogItem', $formData, false, true);
 					break;
+				case Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION_CONFIG_SCHEDULING:
+					$catalogItem = $form->getObject('Kaltura_Client_Reach_Type_VendorConfigSchedulingLiveCaptionCatalogItem', $formData, false, true);
+					break;
 			}
 
 			$form->resetUnUpdatebleAttributes($catalogItem);
