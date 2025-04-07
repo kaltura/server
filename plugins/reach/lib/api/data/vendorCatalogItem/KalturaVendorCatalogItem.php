@@ -278,8 +278,6 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 				return new KalturaVendorDubbingCatalogItem();
 			case VendorServiceFeature::LIVE_CAPTION:
 				return new KalturaVendorLiveCaptionCatalogItem();
-			case VendorServiceFeature::LIVE_CAPTION_CONFIG_SCHEDULING:
-				return new KalturaVendorConfigSchedulingLiveCaptionCatalogItem();
 			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
 				return new KalturaVendorExtendedAudioDescriptionCatalogItem();
 			case VendorServiceFeature::CLIPS:

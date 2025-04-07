@@ -211,8 +211,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'placement' => 'prepend',
 		));
 
-		$liveCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION, Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION,
-			Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION_CONFIG_SCHEDULING);
+		$liveCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION, Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION);
 		if (in_array($this->catalogItemType, $liveCatalogItemTypesArray))
 		{
 			$this->addElement('text', 'minimalRefundTime', array(
@@ -235,10 +234,7 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'placement' => 'prepend',
 				'readonly' => $this->disableAttributes,
 			));
-		}
 
-		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION_CONFIG_SCHEDULING)
-		{
 			$this->addElement('text', 'startTimeBuffer', array(
 				'label' => 'Start Time Buffer (seconds):',
 				'filters' => array('StringTrim'),
@@ -252,7 +248,6 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'placement' => 'prepend',
 				'readonly' => $this->disableAttributes,
 			));
-
 		}
 
 		$this->addLine("Pricing Line");

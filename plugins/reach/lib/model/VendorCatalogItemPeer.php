@@ -24,7 +24,6 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 	const DUBBING_OM_CLASS = 'VendorDubbingCatalogItem';
 	const INTELLIGENT_TAGGING_OM_CLASS = 'VendorIntelligentTaggingCatalogItem';
 	const LIVE_CAPTION_OM_CLASS = 'VendorLiveCaptionCatalogItem';
-	const LIVE_CAPTION_CONFIG_SCHEDULING_OM_CLASS = 'VendorConfigSchedulingLiveCaptionCatalogItem';
 	const CLIPS_OM_CLASS = 'VendorClipsCatalogItem';
 	const LIVE_TRANSLATION_OM_CLASS = 'VendorLiveTranslationCatalogItem';
 	const QUIZ_OM_CLASS = 'VendorQuizCatalogItem';
@@ -44,7 +43,6 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		VendorServiceFeature::DUBBING => self::DUBBING_OM_CLASS,
 		VendorServiceFeature::INTELLIGENT_TAGGING => self::INTELLIGENT_TAGGING_OM_CLASS,
 		VendorServiceFeature::LIVE_CAPTION => self::LIVE_CAPTION_OM_CLASS,
-		VendorServiceFeature::LIVE_CAPTION_CONFIG_SCHEDULING => self::LIVE_CAPTION_CONFIG_SCHEDULING_OM_CLASS,
 		VendorServiceFeature::CLIPS => self::CLIPS_OM_CLASS,
 		VendorServiceFeature::LIVE_TRANSLATION => self::LIVE_TRANSLATION_OM_CLASS,
 		VendorServiceFeature::QUIZ => self::QUIZ_OM_CLASS,
