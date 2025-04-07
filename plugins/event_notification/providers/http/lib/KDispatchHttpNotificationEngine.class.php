@@ -89,6 +89,12 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 					$key = str_replace(array_keys($contentParameters), $contentParameters, $key);
 					$value = str_replace(array_keys($contentParameters), $contentParameters, $value);
 				}
+
+				if ($key == 'Authorization')
+				{
+					$value = $this->handleOauth2($data->url, $value);
+				}
+
 				$headers[] = "$key: $value";
 			}
 		}
@@ -99,8 +105,8 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		}
 
 		$curlWrapper = new KCurlWrapper();
-        	$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, 1);
-        	$curlWrapper->setOpt(CURLOPT_HEADER, 1);
+		$curlWrapper->setOpt(CURLOPT_RETURNTRANSFER, 1);
+		$curlWrapper->setOpt(CURLOPT_HEADER, 1);
 
 		if(count($headers))
 			$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $headers);
@@ -210,5 +216,22 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		}
 
 		return true;
+	}
+
+	protected function handleOauth2($url, $value)
+	{
+		if (str_contains($url, 'fcm.googleapis.com') && $value == 'firebase')
+		{
+			$accessTokens = kFirebaseOauth::requestAuthorizationTokens($value);
+			if (!$accessTokens || !isset($accessTokens[kFirebaseOauth::ACCESS_TOKEN]))
+			{
+				KalturaLog::err('Error: Failed requesting access token');
+				return $value;
+			}
+
+			return 'Bearer ' . $accessTokens[kOAuth::ACCESS_TOKEN];
+		}
+
+		return $value;
 	}
 }
