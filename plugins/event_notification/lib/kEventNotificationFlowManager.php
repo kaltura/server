@@ -21,6 +21,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
 			$scope = $event->getScope();
+			$this->setPartnerIdInScope($scope, $event);
 			$notificationTemplate->dispatch($scope);
 		}
 		return true;
@@ -90,6 +91,19 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		return get_class($object);
 	}
 
+	protected function setPartnerIdInScope(&$scope, $event)
+	{
+		if (!$scope->getPartnerId())
+		{
+			$object = $event->getObject();
+			$partnerId = $object->getLastLoginPartnerId() ?: $object->getConfigPartnerId();
+			if ($partnerId)
+			{
+				$scope->setPartnerId($partnerId);
+			}
+		}
+	}
+
 	/**
 	 * Events that are excluded from isAllowedPartner are defined here,
 	 * specific event that needs to be activated regardless of partner affiliation
@@ -104,11 +118,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 
 		if ($event instanceof kObjectChangedEvent && $event->getObject() instanceof UserLoginData && in_array('user_login_data.LOGIN_BLOCKED_UNTIL', $event->getModifiedColumns()))
 		{
-			if (!$scope->getPartnerId())
-			{
-				$partnerId = $event->getObject()->getConfigPartnerId();
-				$scope->setPartnerId($partnerId);
-			}
+			$this->setPartnerIdInScope($scope, $event);
 			return true;
 		}
 		return false;

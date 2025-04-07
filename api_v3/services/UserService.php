@@ -969,7 +969,7 @@ class UserService extends KalturaBaseUserService
 		}
 
 		$dbUser->setIsAdmin(false);
-		$dbUser->setRoleIds(null);
+		$dbUser->setRoleIds('');
 		$dbUser->save();
 
 		$user = new KalturaUser();
