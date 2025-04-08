@@ -26,9 +26,8 @@ class playsViewsElasticConsumer extends BaseConsumer
 		
 		$doc = array_map('intval', $data);
 		$indexName = isset($indexConfig[$partnerId]) ? $indexConfig[$partnerId] : ElasticIndexMap::ELASTIC_ENTRY_INDEX;
-		$index = kBaseESearch::getSplitIndexNamePerPartner($indexName, $partnerId);
 		$params = array(
-			'index' => $index,
+			'index' => $indexName,
 			'type' => ElasticIndexMap::ELASTIC_ENTRY_TYPE,
 			'id' => $entryId,
 			'action' => ElasticMethodType::UPDATE,
