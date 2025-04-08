@@ -1075,10 +1075,9 @@ abstract class BaseconversionProfile2Peer {
 	public static function retrieveByID($id)
 	{
 		conversionProfile2Peer::setUseCriteriaFilter(false);
-		$partnerId = kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::$partner_id;
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$c = new Criteria();
 		$c->add(conversionProfile2Peer::ID, $id, Criteria::EQUAL);
-		$c->add(conversionProfile2Peer::DELETED_AT, null, Criteria::EQUAL);
 		$c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::DELETED, Criteria::NOT_EQUAL);
 		$c->addAnd(conversionProfile2Peer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
 		$c->addDescendingOrderByColumn(conversionProfile2Peer::PARTNER_ID);
