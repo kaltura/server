@@ -147,7 +147,11 @@ class kElasticUserCategoryEntryEntitlementDecorator implements IKalturaESearchEn
 		$categoriesCount = $results['hits']['total'];
 		if ($categoriesCount > $maxUserCategories)
 		{
-			KalturaLog::debug("More then max user categories found. userId[$kuserId] count[$categoriesCount]");
+			KalturaLog::debug("Maximum user categories limit reached: [$maxUserCategories]. userId: [$kuserId] count: [$categoriesCount]. Fetching an additional page to extend the total limit to: [" . ($maxUserCategories * 2) . "].");
+			$params['body']['from'] = $maxUserCategories;
+			$secondResults = $elasticClient->search($params, true);
+			$secondCategories = $secondResults['hits']['hits'];
+			$categories = array_merge($categories, $secondCategories);
 		}
 
 		$categoryIds = array();
