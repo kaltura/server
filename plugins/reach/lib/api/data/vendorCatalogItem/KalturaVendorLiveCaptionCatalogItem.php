@@ -8,6 +8,8 @@ class KalturaVendorLiveCaptionCatalogItem extends KalturaVendorLiveCatalogItem
 	/**
 	 * How long before the live stream start should service activate? (in secs)
 	 * @insertonly
+	 * @minValue 0
+	 * @maxValue 3600
 	 * @var int
 	 */
 	public $startTimeBuffer;
@@ -15,6 +17,8 @@ class KalturaVendorLiveCaptionCatalogItem extends KalturaVendorLiveCatalogItem
 	/**
 	 * How long after the live stream end should service de-activate? (in secs)
 	 * @insertonly
+	 * @minValue 0
+	 * @maxValue 3600
 	 * @var int
 	 */
 	public $endTimeBuffer;
@@ -47,9 +51,6 @@ class KalturaVendorLiveCaptionCatalogItem extends KalturaVendorLiveCatalogItem
 		{
 			$object_to_fill = new VendorLiveCaptionCatalogItem();
 		}
-
-		$this->validatePropertyMinMaxValue('startTimeBuffer', 0, 3600, true);
-		$this->validatePropertyMinMaxValue('endTimeBuffer', 0, 3600, true);
 
 		return parent::toInsertableObject($object_to_fill, $props_to_skip);
 	}
