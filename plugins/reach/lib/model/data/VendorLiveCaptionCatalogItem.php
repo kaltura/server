@@ -5,6 +5,30 @@
  */
 class VendorLiveCaptionCatalogItem extends VendorLiveCatalogItem
 {
+	const CUSTOM_DATA_START_TIME_BUFFER = 'startTimeBuffer';
+
+	const CUSTOM_DATA_END_TIME_BUFFER = 'endTimeBuffer';
+
+	public function getStartTimeBuffer()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_START_TIME_BUFFER, null, 0);
+	}
+
+	public function setStartTimeBuffer($startTimeBuffer): void
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_START_TIME_BUFFER, $startTimeBuffer);
+	}
+
+	public function getEndTimeBuffer()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_END_TIME_BUFFER, null, 0);
+	}
+
+	public function setEndTimeBuffer($endTimeBuffer): void
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_END_TIME_BUFFER, $endTimeBuffer);
+	}
+
 	public function applyDefaultValues()
 	{
 		$this->setServiceFeature(VendorServiceFeature::LIVE_CAPTION);
@@ -33,6 +57,11 @@ class VendorLiveCaptionCatalogItem extends VendorLiveCatalogItem
 			$data->setStartDate(intval($latestEvent->getStartDate()));
 			$data->setEndDate(intval($latestEvent->getEndDate()));
 			$data->setScheduledEventId($latestEvent->getId());
+			if ($this->getStartTimeBuffer() || $this->getEndTimeBuffer())
+			{
+				$data->setStartDate(intval($data->getStartDate()) - $this->getStartTimeBuffer());
+				$data->setEndDate(intval($data->getEndDate()) + $this->getEndTimeBuffer());
+			}
 		}
 
 		return $data;

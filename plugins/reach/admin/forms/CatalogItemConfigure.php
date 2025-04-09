@@ -234,6 +234,20 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'placement' => 'prepend',
 				'readonly' => $this->disableAttributes,
 			));
+
+			$this->addElement('text', 'startTimeBuffer', array(
+				'label' => 'Start Time Buffer (seconds):',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'readonly' => $this->disableAttributes,
+			));
+
+			$this->addElement('text', 'endTimeBuffer', array(
+				'label' => 'End Time Buffer (seconds):',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'readonly' => $this->disableAttributes,
+			));
 		}
 
 		$this->addLine("Pricing Line");
