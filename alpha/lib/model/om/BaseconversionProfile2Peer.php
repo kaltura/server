@@ -1066,6 +1066,21 @@ abstract class BaseconversionProfile2Peer {
 		return !empty($v) > 0 ? $v[0] : null;
 	}
 
+	public static function retrieveByID($id)
+	{
+		conversionProfile2Peer::setUseCriteriaFilter(false);
+        $partnerId = kCurrentContext::getCurrentPartnerId();
+        $c = new Criteria();
+        $c->add(conversionProfile2Peer::ID, $id, Criteria::EQUAL);
+        $c->add(conversionProfile2Peer::STATUS, ConversionProfileStatus::DELETED, Criteria::NOT_EQUAL);
+        $c->addAnd(conversionProfile2Peer::PARTNER_ID, array($partnerId, PartnerPeer::GLOBAL_PARTNER), Criteria::IN);
+        $c->addDescendingOrderByColumn(conversionProfile2Peer::PARTNER_ID);
+        $conversionProfile = conversionProfile2Peer::doSelectOne($c);
+        conversionProfile2Peer::setUseCriteriaFilter(true);
+        return $conversionProfile;
+	}
+
+
 	/**
 	 * Retrieve multiple objects by pkey.
 	 *
