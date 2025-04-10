@@ -1,3 +1,12 @@
+# Ursa-21.14.0
+
+## Enable startBuffer and endBuffer for Live Captioning Reach vendor tasks
+- Issue Type: Task
+- Issue ID: PSVAMB-84534
+#### Deployment ####
+- Generate Clients
+
+
 # Ursa-21.13.0
 
 ## Update Subscriber added to channel email event notification template ##
