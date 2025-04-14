@@ -672,7 +672,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		$liveCaptions = array();
 		$baseUrl = $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]);
 		$url = parse_url($baseUrl, PHP_URL_PATH);
-		$prefix = substr($baseUrl, 0, -strlen($url));
+		$prefix = substr($baseUrl, 0, strpos($baseUrl, $url));
 		foreach ($webVTTStreams as $stream)
 		{
 			/* @var $stream kLiveStreamParams */
