@@ -238,7 +238,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$result = $cacheStore->get($cacheKey);
 			if ($result)
 			{
-				if (str_starts_with($result, self::COMPRESSED_PREFIX))
+				if(kString::beginsWith($result, self::COMPRESSED_PREFIX))
 				{
 					KalturaLog::debug("Result is compressed. Un-compressing...");
 					$result = gzuncompress(substr($result, strlen(self::COMPRESSED_PREFIX)));
