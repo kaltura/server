@@ -17,12 +17,12 @@ class kEntrySearch extends kBaseESearch
 		$this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
     }
 
-    protected function handleDisplayInSearch()
+    protected function handleDisplayInSearch(ESearchOperator $eSearchOperator)
     {
         if($this->queryAttributes->getObjectId())
             return;
 
-        $displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter();
+        $displayInSearchQuery = $this->queryAttributes->getQueryFilterAttributes()->getDisplayInSearchFilter($eSearchOperator);
         if ($displayInSearchQuery)
         {
             $this->mainBoolQuery->addToFilter($displayInSearchQuery);

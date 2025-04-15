@@ -12,7 +12,7 @@ abstract class ESearchBaseQueryFilterAttributes
 		$this->ignoreDisplayInSearchValues = array();
 	}
 
-	public abstract function getDisplayInSearchFilter();
+	public abstract function getDisplayInSearchFilter(ESearchOperator $eSearchOperator);
 
 	public function addValueToIgnoreDisplayInSearch($key, $value)
 	{
