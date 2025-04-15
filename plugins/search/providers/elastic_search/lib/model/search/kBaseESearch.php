@@ -15,7 +15,7 @@ abstract class kBaseESearch extends kBaseSearch
 	protected function execSearch(ESearchOperator $eSearchOperator)
 	{
 		$subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
-		$this->handleDisplayInSearch();
+		$this->handleDisplayInSearch($eSearchOperator);
 		if($this->filterOnlyContext)
 		{
 			$this->mainBoolQuery->addToFilter($subQuery);

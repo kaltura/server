@@ -35,7 +35,7 @@ abstract class kBaseSearch
 		return $this->queryAttributes;
 	}
 
-	protected function handleDisplayInSearch()
+	protected function handleDisplayInSearch(ESearchOperator $eSearchOperator)
 	{
 	}
 
