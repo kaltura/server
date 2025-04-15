@@ -126,6 +126,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 * @var int
 	 */
 	public $partnerId;
+
+	/**
+	 * @var int
+	 */
+	public $defaultReachProfileId;
 	
 	/**
 	 * @var string
@@ -155,6 +160,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'createdBy',
 		'notes',
 		'adminTagsToExclude',
+		'defaultReachProfileId'
 	);
 
 	abstract protected function getServiceFeature();

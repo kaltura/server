@@ -8,8 +8,9 @@
  * @package plugins.reach
  * @subpackage model.om
  */
-abstract class BasePartnerCatalogItem extends BaseObject  implements Persistent {
-
+abstract class BasePartnerCatalogItem extends BaseObject  implements Persistent
+{
+	const DEFAULT_REACH_PROFILE_ID = "defaultReachProfileId";
 
 	/**
 	 * The Peer class.
@@ -1490,6 +1491,16 @@ abstract class BasePartnerCatalogItem extends BaseObject  implements Persistent 
 	public function getLastHydrateTime()
 	{
 		return $this->last_hydrate_time;
+	}
+
+	public function setDefaultReachProfileId($value)
+	{
+		$this->putInCustomData(self::DEFAULT_REACH_PROFILE_ID, $value);
+	}
+
+	public function getDefaultReachProfileId()
+	{
+		return $this->getFromCustomData(self::DEFAULT_REACH_PROFILE_ID);
 	}
 
 } // BasePartnerCatalogItem

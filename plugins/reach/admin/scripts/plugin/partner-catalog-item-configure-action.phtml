@@ -32,12 +32,12 @@
 				<th><?php echo $this->translate('Source Language'); ?></th>
 				<th><?php echo $this->translate('Target Language'); ?></th>
 				<th><?php echo $this->translate('Output Format'); ?></th>
-			</tr>
+                <th><?php echo $this->translate('Default Reach Profile ID'); ?></th>
+            </tr>
 			</thead>
 			<tfoot>
 			<tr>
-				<td colspan="13">
-				</td>
+				<td colspan="14"></td>
 			</tr>
 			</tfoot>
 			<tbody>
@@ -64,7 +64,8 @@
 					else
 					    echo null;?>
 					</td>
-				</tr>
+                    <td><input name="defaultReachProfileId-<?php echo $catalogItem->id; ?>" /></td>
+                </tr>
 			<?php endforeach;?>
 			</tbody>
 		</table>

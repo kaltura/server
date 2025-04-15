@@ -26,7 +26,8 @@
 			<th><?php echo $this->translate('Output Format'); ?></th>
 			<th><?php echo $this->translate('Stage'); ?></th>
 			<th><?php echo $this->translate('Contract'); ?></th>
-			<th><?php echo $this->translate('Notes'); ?></th>
+            <th><?php echo $this->translate('Notes'); ?></th>
+            <th><?php echo $this->translate('Default Reach Profile ID'); ?></th>
 			<th><?php echo $this->translate('Action'); ?></th>
 		</tr>
 		</thead>
@@ -69,6 +70,7 @@
                 </td>
                 <td><?php echo $catalogItem->contract; ?></td>
                 <td><?php echo $catalogItem->notes; ?></td>
+                <td><?php echo $catalogItem->defaultReachProfileId; ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $catalogItem->partnerId; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>
