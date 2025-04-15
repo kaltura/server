@@ -132,7 +132,7 @@ class kConfCacheManager
 				$key = self::loadKey();
 
 			$map = $cacheObj->load($key, $mapName);
-			if($map)
+			if(isset($map))
 			{
 				$cacheObj->incUsage($mapName);
 				self::store($key, $mapName, $map, $cacheEntity);
