@@ -114,17 +114,24 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$formData = $action->getRequest()->getPost();
 			$partnerCatalogItems = null;
 			if (isset($formData['selectAllItemsCheckbox']))
+			{
 				$partnerCatalogItems = $this->getAvailableCatalogItems($partnerId);
+			}
 			elseif (isset($formData['catalogItemsCheckBoxes']))
+			{
 				$partnerCatalogItems = $formData['catalogItemsCheckBoxes'];
+			}
 
 			$this->client = Infra_ClientHelper::getClient();
 			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
 			Infra_ClientHelper::impersonate($partnerId);
 			$this->client->startMultiRequest();
 			foreach ($partnerCatalogItems as $partnerCatalogItem)
-				$partnerCatalogItem = $reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem);
-			$result = $this->client->doMultiRequest();
+			{
+				$reachProfileId = $formData["defaultReachProfileId-$partnerCatalogItem"];
+				$reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem, is_numeric($reachProfileId) ? $reachProfileId : null);
+			}
+			$this->client->doMultiRequest();
 		}
 
 		$form->setAttrib('class', 'valid');

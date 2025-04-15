@@ -277,10 +277,24 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		
 		return $object_to_fill;
 	}
+
+	public function getValidateForInsertReachProfile($partnerCatalogItem)
+	{
+		if($this->isNull("reachProfileId"))
+		{
+			$this->reachProfileId = $partnerCatalogItem->getDefaultReachProfileId();
+		}
+		$this->validatePropertyNotNull("reachProfileId");
+		$dbReachProfile = ReachProfilePeer::retrieveActiveByPk($this->reachProfileId);
+		if (!$dbReachProfile)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $this->reachProfileId);
+		}
+		return $dbReachProfile;
+	}
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("reachProfileId");
 		$this->validatePropertyNotNull("catalogItemId");
 		$this->validatePropertyNotNull("entryId");
 		$this->validateEntryId();
