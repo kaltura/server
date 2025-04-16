@@ -56,11 +56,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask->reachProfileId = $dbReachProfile->getId();
 
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($entryVendorTask->catalogItemId);
-
-		if($dbVendorCatalogItem->getRequiresOverages() && !$dbReachProfile->getAllowsOverages())
-		{
-			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_DOES_NOT_ALLOW_OVERAGES, $entryVendorTask->reachProfileId);
-		}
+		kReachUtils::validateProfileAndCatalogItemOverages($dbVendorCatalogItem, $dbReachProfile);
 
 		$dbTaskData = $entryVendorTask->taskJobData ? $entryVendorTask->taskJobData->toObject() : null;
 		$taskVersion = $dbVendorCatalogItem->getTaskVersion($dbEntry->getId(), $dbTaskData);

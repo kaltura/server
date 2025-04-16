@@ -436,4 +436,12 @@ class kReachUtils
 		$dbEvent->save();
 		return $dbEvent;
 	}
+
+	public static function validateProfileAndCatalogItemOverages($dbVendorCatalogItem, $dbReachProfile)
+	{
+		if($dbVendorCatalogItem->getRequiresOverages() && !$dbReachProfile->getAllowsOverages())
+		{
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_DOES_NOT_ALLOW_OVERAGES, $dbReachProfile->getId());
+		}
+	}
 }
