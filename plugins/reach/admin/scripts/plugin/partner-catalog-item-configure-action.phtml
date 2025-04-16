@@ -33,11 +33,12 @@
 				<th><?php echo $this->translate('Target Language'); ?></th>
 				<th><?php echo $this->translate('Output Format'); ?></th>
 				<th><?php echo $this->translate('Default Reach Profile ID'); ?></th>
+				<th><?php echo $this->translate('Requires Overages'); ?></th>
 			</tr>
 			</thead>
 			<tfoot>
 			<tr>
-				<td colspan="14"></td>
+				<td colspan="15"></td>
 			</tr>
 			</tfoot>
 			<tbody>
@@ -65,6 +66,7 @@
 					    echo null;?>
 					</td>
 					<td><input name="defaultReachProfileId-<?php echo $catalogItem->id; ?>" /></td>
+                    <td><?php echo $catalogItem->requiresOverages; ?></td>
 				</tr>
 			<?php endforeach;?>
 			</tbody>

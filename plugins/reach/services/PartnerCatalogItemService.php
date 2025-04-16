@@ -65,6 +65,10 @@ class PartnerCatalogItemService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $defaultReachProfileId);
 			}
+			if($dbVendorCatalogItem->getRequiresOverages() && !$dbReachProfile->getAllowsOverages())
+			{
+				throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_DOES_NOT_ALLOW_OVERAGES, $defaultReachProfileId);
+			}
 			$partnerCatalogItem->setDefaultReachProfileId($defaultReachProfileId);
 		}
 

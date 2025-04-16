@@ -564,4 +564,11 @@ class ReachProfile extends BaseReachProfile
 	{
 		return array("reachProfile:id=".strtolower($this->getId()));
 	}
+
+	public function getAllowsOverages()
+	{
+		// TODO - implement
+		return true;
+	}
+
 } // ReachProfile

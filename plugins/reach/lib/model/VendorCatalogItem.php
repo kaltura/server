@@ -48,6 +48,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_CREATED_BY = 'createdBy';
 	const CUSTOM_DATA_NOTES = 'notes';
 	const CUSTOM_ADMIN_TAGS_TO_EXCLUDE = 'admin_tags_to_exclude';
+	const CUSTOM_ADMIN_REQUIRES_OVERAGES = 'requiresOverages';
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -276,6 +277,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	public function getContract()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CONTRACT);
+	}
+
+	public function setRequiresOverages($v)
+	{
+		$this->putInCustomData(self::CUSTOM_ADMIN_REQUIRES_OVERAGES, $v);
+	}
+
+	public function getRequiresOverages()
+	{
+		return $this->getFromCustomData(self::CUSTOM_ADMIN_REQUIRES_OVERAGES);
 	}
 
 	public function setCreatedBy($v)

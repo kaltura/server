@@ -82,6 +82,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				continue;
 			}
 
+			if($catalogItemToAdd->getRequiresOverages() && !$reachProfile->getAllowsOverages())
+			{
+				KalturaLog::log("Reach Profile ID $profileId does not allow overages for catalog item with ID $catalogItemIdToAdd");
+				continue;
+			}
+
 			//Pass the object Id as the context of the task
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
 			self::addEntryVendorTaskByObjectIds($entry, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
