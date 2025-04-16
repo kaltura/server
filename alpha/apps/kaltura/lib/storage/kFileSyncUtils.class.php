@@ -568,7 +568,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		
 		if(!kFile::isSharedPath($temp_file_path) || kSharedFileSystemMgr::getIsMoveAtomic($temp_file_path))
 		{
-			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key);
+			list($rootPath, $filePath) = self::getLocalFilePathArrForKey($target_key, false, kFile::fileSize($temp_file_path));
 			$targetFullPath = $rootPath . $filePath;
 			if(!$targetFullPath)
 			{
@@ -1170,7 +1170,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	 * @param FileSyncKey $key
 	 * @return array
 	 */
-	public static function getLocalFilePathArrForKey ( FileSyncKey $key , $strict = false )
+	public static function getLocalFilePathArrForKey ( FileSyncKey $key , $strict = false , $srcFileSize = null )
 	{
 		KalturaLog::debug("key [$key], strict [$strict]");
 		list($fileSync, $local) = self::getReadyFileSyncForKey($key, false, $strict);
@@ -1180,7 +1180,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		}
 
 		// TODO - should return null if doesn't exists
-		return kPathManager::getFilePathArr($key);
+		return kPathManager::getFilePathArr($key, null, $srcFileSize);
 	}
 
 	/**
