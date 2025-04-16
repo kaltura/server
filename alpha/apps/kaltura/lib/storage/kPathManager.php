@@ -118,7 +118,6 @@ class kPathManager
 		// If the file size is small enough and dc is set to shared and cloud storage is enabled, sync it directly to shared storage
 		$maxSmallFileSize = kConf::get('max_small_file_size', kConfMapNames::RUNTIME_CONFIG, 0);
 		$cloudStorageObjectMap = kConf::get('cloud_storage_object_map', 'cloud_storage', array());
-		KalturaLog::debug("max small file size [$maxSmallFileSize], src file size [$srcFileSize]");
 		if( (($srcFileSize && $maxSmallFileSize > 0 && $srcFileSize < $maxSmallFileSize) || array_intersect($objectKeys, $cloudStorageObjectMap)) &&
 			myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) )
 		{
