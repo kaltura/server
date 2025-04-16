@@ -20,7 +20,16 @@ abstract class kOAuth
 	
 	protected static function curlRetrieveTokensData($url, $userPwd, $header, $postFields)
 	{
-		return null;
+		self::$errorCode = 0;
+
+		$curlWrapper = new KCurlWrapper();
+		$curlWrapper->setOpt(CURLOPT_POST, 1);
+		$curlWrapper->setOpt(CURLOPT_HTTPHEADER, $header);
+		$curlWrapper->setOpt(CURLOPT_POSTFIELDS, $postFields);
+		$response = $curlWrapper->exec($url);
+		self::$errorCode = $curlWrapper->getHttpCode();
+
+		return $response;
 	}
 	
 	public static function requestAuthorizationTokens($authCode)
