@@ -7,36 +7,26 @@ class ESearchEntryQueryFilterAttributes extends ESearchBaseQueryFilterAttributes
 {
 	public function getDisplayInSearchFilter(ESearchOperator $eSearchOperator)
 	{
-		$ignoreDisplayInSearchQueries = array();
-		$eSearchOperatorType= $eSearchOperator->getOperator();
 		foreach	($this->ignoreDisplayInSearchValues as $key => $value)
 		{
-			if ($key == ESearchEntryFieldName::RECYCLED_AT)
+			switch ($key)
 			{
-				return null;
+				case ESearchEntryFieldName::PARENT_ENTRY_ID:
+				case ESearchEntryFieldName::ID:
+				case ESearchEntryFieldName::DISPLAY_IN_SEARCH:
+					if($value)
+					{
+						return null;
+					}
+					break;
+				case ESearchEntryFieldName::RECYCLED_AT:
+					return null;
+				default:
+					break;
 			}
-			elseif ($value)
-			{
-				$ignoreDisplayInSearchQueries[] = new kESearchTermsQuery($key, $value);
-			}
 		}
 
-		if (!count($ignoreDisplayInSearchQueries))
-		{
-			return $this->getMustNotDisplayInSearch();
-		}
-
-		$displayInSearchBoolQuery = new kESearchBoolQuery();
-		if ($eSearchOperatorType == ESearchOperatorType::NOT_OP)
-		{
-				$displayInSearchBoolQuery->addQueriesToMustNot($ignoreDisplayInSearchQueries);
-		}
-		else
-		{
-			$displayInSearchBoolQuery->addQueriesToShould($ignoreDisplayInSearchQueries);
-		}
-
-		return $displayInSearchBoolQuery;
+		return $this->getMustNotDisplayInSearch();
 	}
 	protected function getMustNotDisplayInSearch()
 	{
