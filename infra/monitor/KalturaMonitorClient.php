@@ -820,8 +820,8 @@ class KalturaMonitorClient
 			return;
 		}
 		
-		$p = isset($matches[1]) ? $matches[1] : (isset($matches[2]) ? $matches[2] : null);
-		if(!$p)
+		$partner_id = isset($matches[1]) ? $matches[1] : (isset($matches[2]) ? $matches[2]/100 : null);
+		if(!$partner_id)
 		{
 			return;
 		}
@@ -836,7 +836,7 @@ class KalturaMonitorClient
 		$params['service'] = $service;
 		$params['action'] = $action;
 		
-		if(!KalturaResponseCacher::rateLimit($service, $action, $params, $p))
+		if(!KalturaResponseCacher::rateLimit($service, $action, $params, $partner_id))
 		{
 			KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
 		}
