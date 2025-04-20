@@ -8,7 +8,7 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 
 	const SRT_TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\,[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\,[0-9]{3})( .*)?$#';
 
-	protected function customPergMatchAll($pattern, $subject, &$matches)
+	protected function customPregMatchAll($pattern, $subject, &$matches)
 	{
 		$matches = [];
 		$offset = 0;
@@ -51,7 +51,7 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 		$matches = null;
 		$regex = '/(?P<index>\d+)\s*\r?\n\s*(?P<startHours>\d{1,2}):(?P<startMinutes>\d{1,2}):(?P<startSeconds>\d{1,2})[,\.](?P<startMilliseconds>\d{1,3})\s*-->\s*(?P<endHours>\d{1,2}):(?P<endMinutes>\d{1,2}):(?P<endSeconds>\d{1,2})[,\.](?P<endMilliseconds>\d{1,3})\s*\r?\n((?P<content>.+)\r?(\n|$))?\s*\r?(\n|$)/sU';
 
-		$pregMatchAll = $this->customPergMatchAll($regex, $content, $matches);
+		$pregMatchAll = $this->customPregMatchAll($regex, $content, $matches);
 		if(!$pregMatchAll || !count($matches) || !count($matches[0]))
 		{
 			KalturaLog::err("Content regex not found");
