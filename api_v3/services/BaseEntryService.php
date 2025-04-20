@@ -1118,13 +1118,15 @@ class BaseEntryService extends KalturaEntryService
 		
 		return $this->getEntry($entryId);
 	}
-	
+
 	/**
 	 * Restore the entry from the recycle bin
 	 *
 	 * @action restoreRecycled
 	 * @param string $entryId
 	 * @return KalturaBaseEntry The restored entry
+	 * @throws KalturaAPIException
+	 * @throws PropelException
 	 */
 	public function restoreRecycledAction($entryId)
 	{
@@ -1144,5 +1146,46 @@ class BaseEntryService extends KalturaEntryService
 		$entry->save();
 		
 		return $this->getEntry($entryId);
+	}
+
+	/**
+	 * Return the user's permission on an entry
+	 *
+	 * @action getUserPermission
+	 * @param string $userId
+	 * @param string $entryId
+	 * @return int
+	 */
+	public function getUserPermissionAction($userId, $entryId)
+	{
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$entry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+		}
+
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $userId);
+		if (!$kuser)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $userId);
+		}
+		$kuserId = $kuser->getId();
+
+		kCurrentContext::$ks_kuser_id = $kuserId;
+
+		if ($entry->isEntitledKuserEdit($kuserId))
+		{
+			return KalturaUserPermissionOnEntry::EDIT;
+		}
+		if ($entry->isEntitledKuserPublish($kuserId))
+		{
+			return KalturaUserPermissionOnEntry::PUBLISH;
+		}
+		if ($entry->isEntitledKuserView($kuserId))
+		{
+			return KalturaUserPermissionOnEntry::VIEW;
+		}
+
+		return KalturaUserPermissionOnEntry::NONE;
 	}
 }

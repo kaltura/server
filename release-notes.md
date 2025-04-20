@@ -1,3 +1,11 @@
+# Ursa-21.14.0
+## Add getUserPermission action to BaseEntry service ##
+* Issue Type: Task
+* Issue ID: PLAT-25216
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2025_04_20_add_getuserpermission_baseentry.php
+
 # Ursa-21.13.0
 
 ## Update Subscriber added to channel email event notification template ##
