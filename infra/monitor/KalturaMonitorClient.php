@@ -805,4 +805,40 @@ class KalturaMonitorClient
 		
 		self::writeDeferredEvent($data);
 	}
+	
+	public static function checkApiRateLimit()
+	{
+		$uri = isset($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : '';
+		if(!$uri)
+		{
+			return;
+		}
+		
+		preg_match('#/p/([^/]+)/sp/([^/]+)#', $uri, $matches);
+		if(!$matches || !count($matches))
+		{
+			return;
+		}
+		
+		$p = isset($matches[1]) ? $matches[1] : (isset($matches[2]) ? $matches[2] : null);
+		if(!$p)
+		{
+			return;
+		}
+		
+		$context = sfContext::getInstance();
+		$request = $context->getRequest();
+		
+		$service = $request->getParameter('module');
+		$action = $request->getParameter('action');
+		
+		$params = infraRequestUtils::getRequestParams();
+		$params['service'] = $service;
+		$params['action'] = $action;
+		
+		if(!KalturaResponseCacher::rateLimit($service, $action, $params, $p))
+		{
+			KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
+		}
+	}
 }

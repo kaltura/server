@@ -28,5 +28,6 @@ DbManager::initialize();
 
 ActKeyUtils::checkCurrent();
 KalturaMonitorClient::monitorPs2Start();
+KalturaMonitorClient::checkApiRateLimit();
 sfContext::getInstance()->getController()->dispatch();
 KalturaMonitorClient::monitorRequestEnd();
