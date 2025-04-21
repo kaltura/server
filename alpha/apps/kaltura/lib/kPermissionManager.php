@@ -45,6 +45,11 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	 * @var array
 	 */
 	private static $permissionsToRemove = array();
+
+	/**
+	 * @var int
+	 */
+	private static $restrictingRoleId = null;
 		
 	
 	// ----------------------------
@@ -74,6 +79,10 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			$partnerId = 'null';
 		}
 		$key = 'role_'.$roleId.'_partner_'.$partnerId.'_internal_'.intval(kIpAddressUtils::isInternalIp());
+		if (isset(self::$restrictingRoleId))
+		{
+			$key .= '_restrictingrole_' . self::$restrictingRoleId;
+		}
 		return $key;
 	}
 	
@@ -738,6 +747,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$permissions = $roleMap[self::PERMISSION_NAMES_ARRAY];
 		KalturaLog::debug("Permissions to remove: " . print_r($permissions, true));
 		self::$permissionsToRemove = $permissions;
+		self::$restrictingRoleId = $roleId;
 	}
 
 	protected static function getRoleIdFromSystemName($systemName)
