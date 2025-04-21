@@ -1118,13 +1118,15 @@ class BaseEntryService extends KalturaEntryService
 		
 		return $this->getEntry($entryId);
 	}
-	
+
 	/**
 	 * Restore the entry from the recycle bin
 	 *
 	 * @action restoreRecycled
 	 * @param string $entryId
 	 * @return KalturaBaseEntry The restored entry
+	 * @throws KalturaAPIException
+	 * @throws PropelException
 	 */
 	public function restoreRecycledAction($entryId)
 	{
@@ -1144,5 +1146,40 @@ class BaseEntryService extends KalturaEntryService
 		$entry->save();
 		
 		return $this->getEntry($entryId);
+	}
+
+	/**
+	 * Return the user's permission on an entry
+	 *
+	 * @action getUserPermission
+	 * @param string $entryId
+	 * @return KalturaUserPermissionOnEntry
+	 * @throws KalturaAPIException
+	 */
+	public function getUserPermissionAction($entryId)
+	{
+		$userPermission = new KalturaUserPermissionOnEntry();
+
+		$kuserId = kCurrentContext::getCurrentKsKuserId();
+		$entry = entryPeer::retrieveByPK($entryId);
+		if (!$kuserId || !$entry)
+		{
+			return $userPermission;
+		}
+
+		if ($entry->isEntitledKuserEdit($kuserId))
+		{
+			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::EDIT;
+		}
+		elseif ($entry->isEntitledKuserPublish($kuserId))
+		{
+			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::PUBLISH;
+		}
+		elseif ($entry->isEntitledKuserView($kuserId))
+		{
+			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::VIEW;
+		}
+
+		return $userPermission;
 	}
 }
