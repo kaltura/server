@@ -4,7 +4,7 @@
  * @subpackage enum
  */
 
-class KalturaUserPermissionOnEntry extends KalturaEnum
+class KalturaUserPermissionOnEntryEnum extends KalturaEnum
 {
 	const NONE = 0;
 	const VIEW = 1;

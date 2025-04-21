@@ -1152,40 +1152,41 @@ class BaseEntryService extends KalturaEntryService
 	 * Return the user's permission on an entry
 	 *
 	 * @action getUserPermission
-	 * @param string $userId
 	 * @param string $entryId
-	 * @return int
+	 * @return KalturaUserPermissionOnEntry
+	 * @throws KalturaAPIException
 	 */
-	public function getUserPermissionAction($userId, $entryId)
+	public function getUserPermissionAction($entryId)
 	{
+		$kuserId = kCurrentContext::getCurrentKsKuserId();
+		$kuser = $kuser = kuserPeer::retrieveByPK($kuserId);
+		if (!$kuser)
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $kuserId);
+		}
+
+		$userPermission = new KalturaUserPermissionOnEntry();
+		$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::NONE;
+
 		$entry = entryPeer::retrieveByPK($entryId);
 		if (!$entry)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			return $userPermission;
 		}
-
-		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $userId);
-		if (!$kuser)
-		{
-			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $userId);
-		}
-		$kuserId = $kuser->getId();
-
-		kCurrentContext::$ks_kuser_id = $kuserId;
 
 		if ($entry->isEntitledKuserEdit($kuserId))
 		{
-			return KalturaUserPermissionOnEntry::EDIT;
+			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::EDIT;
 		}
-		if ($entry->isEntitledKuserPublish($kuserId))
+		elseif ($entry->isEntitledKuserPublish($kuserId))
 		{
-			return KalturaUserPermissionOnEntry::PUBLISH;
+			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::PUBLISH;
 		}
-		if ($entry->isEntitledKuserView($kuserId))
+		elseif ($entry->isEntitledKuserView($kuserId))
 		{
-			return KalturaUserPermissionOnEntry::VIEW;
+			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::VIEW;
 		}
 
-		return KalturaUserPermissionOnEntry::NONE;
+		return $userPermission;
 	}
 }
