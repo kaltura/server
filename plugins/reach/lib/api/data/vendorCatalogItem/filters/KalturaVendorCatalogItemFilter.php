@@ -83,12 +83,15 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		}
 
 		$responseObjects = KalturaVendorCatalogItemArray::fromDbArray($list, $responseProfile);
-		if ($this->partnerIdEqual && kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		if ($this->partnerIdEqual)
 		{
 			$catalogItemFields = VendorCatalogItemPeer::doSelectStmt($c);
 			foreach ($responseObjects as $responseObject)
 			{
-				$responseObject->partnerId = $partnerIdEqual;
+				if(kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
+				{
+					$responseObject->partnerId = $partnerIdEqual;
+				}
 				$catalogItemCustomData = $catalogItemFields->fetchColumn(14);
 				$partnerCatalogItem = new PartnerCatalogItem();
 				$partnerCatalogItem->setCustomData($catalogItemCustomData);
