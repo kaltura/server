@@ -99,6 +99,14 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 * @readonly
 	 */
 	public $userId;
+
+	/**
+	 * The entryObjectType
+	 * @var KalturaEntryObjectType
+	 * @filter eq
+	 * @readonly
+	 */
+	public $entryObjectType;
 	
 	/**
 	 * The user ID that approved this task for execution (in case moderation is requested)
@@ -226,6 +234,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'catalogItemId',
 		'price',
 		'userId',
+		'objectType',
 		'moderatingUser',
 		'errDescription',
 		'accessKey',
