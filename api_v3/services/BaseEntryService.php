@@ -1158,18 +1158,11 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	public function getUserPermissionAction($entryId)
 	{
-		$kuserId = kCurrentContext::getCurrentKsKuserId();
-		$kuser = $kuser = kuserPeer::retrieveByPK($kuserId);
-		if (!$kuser)
-		{
-			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_FOUND, $kuserId);
-		}
-
 		$userPermission = new KalturaUserPermissionOnEntry();
-		$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::NONE;
 
+		$kuserId = kCurrentContext::getCurrentKsKuserId();
 		$entry = entryPeer::retrieveByPK($entryId);
-		if (!$entry)
+		if (!$kuserId || !$entry)
 		{
 			return $userPermission;
 		}
