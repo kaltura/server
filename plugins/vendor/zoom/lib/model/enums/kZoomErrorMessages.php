@@ -18,4 +18,5 @@ interface kZoomErrorMessages extends BaseEnum
 	const MISSING_ENTRY_FOR_CHAT = 'Missing entry for the chat file';
 	const ERROR_HANDLING_CHAT = 'Error while trying to handle chat file';
 	const ERROR_HANDLING_TRANSCRIPT = 'Error while trying to handle transcript file';
+	const ERROR_WHILE_RETRIEVING_USER_PERMISSIONS = 'Error while trying to retrieve user permissions';
 }
