@@ -195,10 +195,14 @@ abstract class kReportExportEngine
 	protected function mapHeadersNames($headers)
 	{
 		$friendlyHeaders = [];
-		foreach ($headers as $header) {
-			if (isset(self::$headersMapping[$header])) {
+		foreach ($headers as $header)
+		{
+			if (isset(self::$headersMapping[$header]))
+			{
 				$friendlyHeaders[] = self::$headersMapping[$header];
-			} else {
+			}
+			else
+			{
 				$friendlyHeaders[] = $header; // Keep original if no mapping
 			}
 		}
