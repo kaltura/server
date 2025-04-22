@@ -12,10 +12,16 @@ class KalturaReportResponseOptions extends KalturaObject
 	 */
 	public $skipEmptyDates;
 
+	/**
+	 * @var bool
+	 */
+	public $useFriendlyHeadersNames = false;
+
 	private static $map_between_objects = array
 	(
 		'delimiter',
 		'skipEmptyDates',
+		'useFriendlyHeadersNames',
 	);
 
 	protected function getMapBetweenObjects()

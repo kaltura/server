@@ -78,6 +78,10 @@ class kReportExportGraphEngine extends kReportExportEngine
 				$rows[$key][] = $value;
 			}
 		}
+		if ($this->reportItem->responseOptions->useFriendlyHeadersNames)
+		{
+			$headers = $this->mapHeadersNames($headers);
+		}
 		$this->writeRow($headers);
 
 		foreach ($rows as $key => $row)
