@@ -15,13 +15,13 @@ class KalturaReportResponseOptions extends KalturaObject
 	/**
 	 * @var bool
 	 */
-	public $useFriendlyNames = false;
+	public $useFriendlyHeadersNames = false;
 
 	private static $map_between_objects = array
 	(
 		'delimiter',
 		'skipEmptyDates',
-		'useFriendlyNames',
+		'useFriendlyHeadersNames',
 	);
 
 	protected function getMapBetweenObjects()
