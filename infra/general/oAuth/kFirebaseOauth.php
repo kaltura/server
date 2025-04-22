@@ -8,6 +8,9 @@ class kFirebaseOauth
 {
 	const ACCESS_TOKEN = 'access_token';
 	const EXPIRES_IN = 'expires_in';
+	const TOKEN_EXPIRY_GRACE = 600;
+
+	const URL = 'https://oauth2.googleapis.com/token';
 
 	/**
 	 * @param $authCode
@@ -15,21 +18,89 @@ class kFirebaseOauth
 	 */
 	public static function requestAuthorizationTokens($authCode)
 	{
+		$accessTokens = self::getTokensFromCache();
+		if ($accessTokens)
+		{
+			KalturaLog::info("Retrieved tokens from cache");
+			return $accessTokens;
+		}
+
 		KalturaLog::info('Requesting authorization tokens from Firebase');
 
-		$url = 'https://oauth2.googleapis.com/token';
-
 		$header = self::getHeaderData();
-		$jwt = self::createFirebaseJwt($url);
+		$jwt = self::createFirebaseJwt(self::URL);
 		if (!$jwt)
 		{
 			return null;
 		}
 		$postFields = http_build_query(array('grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'assertion' => $jwt));
 
-		$response = self::curlRetrieveTokensData($url, null, $header, $postFields);
+		$response = self::curlRetrieveTokensData(self::URL, null, $header, $postFields);
+		$accessTokens = self::retrieveTokensDataFromResponse($response);
+		if (!$accessTokens)
+		{
+			return null;
+		}
+		self::saveTokensToCache($accessTokens);
 
-		return self::retrieveTokensDataFromResponse($response);
+		return $accessTokens;
+	}
+
+	protected static function getTokensFromCache()
+	{
+		$cache = self::getCache();
+		if (!$cache)
+		{
+			return null;
+		}
+
+		$accessTokens = $cache->get(self::getCacheKey());
+		if (!self::validateTokens($accessTokens))
+		{
+			return null;
+		}
+
+		if ($accessTokens[kFirebaseOauth::EXPIRES_IN] > time() + self::TOKEN_EXPIRY_GRACE)
+		{
+			return $accessTokens;
+		}
+
+		return null;
+	}
+
+	protected static function saveTokensToCache($accessTokens)
+	{
+		$cache = self::getCache();
+		if (!$cache)
+		{
+			return;
+		}
+
+		$cache->set(self::getCacheKey(), $accessTokens, kTimeConversion::HOUR);
+	}
+
+	protected static function getCache()
+	{
+		$memcacheConfig = kConf::get('memcacheLocal', 'cache', null);
+		if (!$memcacheConfig)
+		{
+			KalturaLog::err("Failed to get memcache configuration");
+			return null;
+		}
+
+		$memcache = new kInfraMemcacheCacheWrapper();
+		if (!$memcache->init($memcacheConfig))
+		{
+			KalturaLog::err("Failed to connect to memcache");
+			return null;
+		}
+
+		return $memcache;
+	}
+
+	protected static function getCacheKey()
+	{
+		return 'firebase_oauth_tokens';
 	}
 
 	/**
