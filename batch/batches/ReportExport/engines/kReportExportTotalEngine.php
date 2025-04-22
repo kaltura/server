@@ -17,11 +17,12 @@ class kReportExportTotalEngine extends kReportExportEngine
 		fwrite($this->fp, "\xEF\xBB\xBF");
 		$this->writeReportTitle();
 		$headers = $result->header;
+		$headersArr = explode($this->getDelimiter(), $headers);
 		if ($this->reportItem->responseOptions->useFriendlyHeadersNames)
 		{
-			$headers = $this->mapHeadersNames($headers);
+			$headersArr = $this->mapHeadersNames($headersArr);
 		}
-		$this->writeDelimitedRow($headers);
+		$this->writeRow($headersArr);
 		$this->writeDelimitedRow($result->data);
 		fclose($this->fp);
 		return $this->filename;
