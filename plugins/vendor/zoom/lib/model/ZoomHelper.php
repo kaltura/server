@@ -89,7 +89,7 @@ class ZoomHelper
 	 */
 	public static function canConfigureEventSubscription($zoomUserPermissions)
     {
-		if(!is_array($zoomUserPermissions))
+		if(is_array($zoomUserPermissions))
 		{
 			return in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions);
 		}
