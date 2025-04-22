@@ -115,8 +115,10 @@ class KalturaPDO extends PropelPDO
 	 */
 	public function prepare($sql, $driver_options = array())
 	{
-		$comment = $this->getCommentWrapped();
-		$sql = $comment . $sql;
+		if (!preg_match('/^SELECT/', $sql)) {
+			$comment = $this->getCommentWrapped();
+			$sql = $comment . $sql;
+		}
 		
 		return parent::prepare($sql, $driver_options);
 	}
