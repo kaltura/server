@@ -204,7 +204,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	
 	protected function translateEnumsToHumanReadable($enumName, $enumValue)
 	{
-		$enumMap = self::${$enumName . "EnumTranslate"};
+		$enumMap = isset(self::${$enumName . "EnumTranslate"}) ? self::${$enumName . "EnumTranslate"} : null;
 		if(!$enumMap && $enumName == "serviceFeature")
 		{
 			$enumMap = array_merge(ReachPlugin::getServiceFeatureNames(), array("N/A" => "N/A"));
