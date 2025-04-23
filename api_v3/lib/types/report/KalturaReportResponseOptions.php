@@ -15,7 +15,7 @@ class KalturaReportResponseOptions extends KalturaObject
 	/**
 	 * @var bool
 	 */
-	public $useFriendlyHeadersNames = false;
+	public $useFriendlyHeadersNames;
 
 	private static $map_between_objects = array
 	(
