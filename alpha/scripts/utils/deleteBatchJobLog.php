@@ -2,6 +2,11 @@
 
 require_once(__DIR__ . '/../bootstrap.php');
 
+// Disable instance pooling to reduce memory usage
+Propel::disableInstancePooling();
+kEventsManager::enableEvents(false);
+kEventsManager::enableDeferredEvents(false);
+
 // -----------------------------
 //  Get command line parameters
 // -----------------------------
