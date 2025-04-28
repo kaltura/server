@@ -189,10 +189,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 
 		if ($fileSyncFilesToCache && array_intersect($objectKeys, $fileSyncFilesToCache))
 		{
+			KalturaLog::debug('Using cache type [' . kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC . ']');
 			return kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC;
 		}
 		else
 		{
+			KalturaLog::debug('Using cache type [' . kCacheManager::CACHE_TYPE_FILE_SYNC . ']');
 			return kCacheManager::CACHE_TYPE_FILE_SYNC;
 		}
 	}
@@ -207,10 +209,10 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			return;
 		}
 
-		self::storeData($content, $maxFileSizeToCache, $key, $cacheType);
+		self::storeData($content, $key, $cacheType);
 	}
 
-	protected static function storeData($content, $maxFileSizeToCache, $key, $cacheType)
+	protected static function storeData($content, $key, $cacheType)
 	{
 		$cacheStore = kCacheManager::getSingleLayerCache($cacheType);
 		if (!$cacheStore)
@@ -224,8 +226,9 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 		$result = $cacheStore->set($cacheKey, $contentToPut, self::FILE_SYNC_CACHE_EXPIRY);
 		if ($result === false)
 		{
-			KalturaLog::err("Failed to add file content with key [$key]");
+			KalturaLog::err("Failed to add file content with key [$key] to cache [$cacheType]");
 		}
+		KalturaLog::debug("File content with key [$key] was stored to [$cacheType]");
 	}
 
 	protected static function getDataFromCacheStore($cacheStore, $cacheKey)
@@ -235,11 +238,12 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 			$result = $cacheStore->get($cacheKey);
 			if ($result)
 			{
-				if (str_starts_with($result, self::COMPRESSED_PREFIX))
+				if(kString::beginsWith($result, self::COMPRESSED_PREFIX))
 				{
+					KalturaLog::debug("Result is compressed. Un-compressing...");
 					$result = gzuncompress(substr($result, strlen(self::COMPRESSED_PREFIX)));
 				}
-				KalturaLog::info("returning from cache, key [$cacheKey] size [" . strlen($result) . "]");
+				KalturaLog::info("Returning from cache, key [$cacheKey] size [" . strlen($result) . "]");
 				return $result;
 			}
 		}

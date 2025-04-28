@@ -1118,13 +1118,15 @@ class BaseEntryService extends KalturaEntryService
 		
 		return $this->getEntry($entryId);
 	}
-	
+
 	/**
 	 * Restore the entry from the recycle bin
 	 *
 	 * @action restoreRecycled
 	 * @param string $entryId
 	 * @return KalturaBaseEntry The restored entry
+	 * @throws KalturaAPIException
+	 * @throws PropelException
 	 */
 	public function restoreRecycledAction($entryId)
 	{

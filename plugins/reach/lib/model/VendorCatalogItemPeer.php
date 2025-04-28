@@ -15,42 +15,8 @@
  */
 class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer 
 {
-	const CAPTIONS_OM_CLASS = 'VendorCaptionsCatalogItem';
-	const TRANSLATION_OM_CLASS = 'VendorTranslationCatalogItem';
-	const ALIGNMENT_OM_CLASS = 'VendorAlignmentCatalogItem';
-	const AUDIO_DESCRIPTION_OM_CLASS = 'VendorAudioDescriptionCatalogItem';
-	const EXTENDED_AUDIO_DESCRIPTION_OM_CLASS = 'VendorExtendedAudioDescriptionCatalogItem';
-	const CHAPTERING_OM_CLASS = 'VendorChapteringCatalogItem';
-	const DUBBING_OM_CLASS = 'VendorDubbingCatalogItem';
-	const INTELLIGENT_TAGGING_OM_CLASS = 'VendorIntelligentTaggingCatalogItem';
-	const LIVE_CAPTION_OM_CLASS = 'VendorLiveCaptionCatalogItem';
-	const CLIPS_OM_CLASS = 'VendorClipsCatalogItem';
-	const LIVE_TRANSLATION_OM_CLASS = 'VendorLiveTranslationCatalogItem';
-	const QUIZ_OM_CLASS = 'VendorQuizCatalogItem';
-	const SUMMARY_OM_CLASS = 'VendorSummaryCatalogItem';
-	const VIDEO_ANALYSIS_OM_CLASS = 'VendorVideoAnalysisCatalogItem';
-	const MODERATION_OM_CLASS = 'VendorModerationCatalogItem';
-	const METADATA_ENRICHMENT_OM_CLASS = 'VendorMetadataEnrichmentCatalogItem';
-
 	// cache classes by their type
-	protected static $class_types_cache = array(
-		VendorServiceFeature::TRANSLATION => self::TRANSLATION_OM_CLASS, 
-		VendorServiceFeature::CAPTIONS => self::CAPTIONS_OM_CLASS,
-		VendorServiceFeature::ALIGNMENT => self::ALIGNMENT_OM_CLASS,
-		VendorServiceFeature::AUDIO_DESCRIPTION => self::AUDIO_DESCRIPTION_OM_CLASS,
-		VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION => self::EXTENDED_AUDIO_DESCRIPTION_OM_CLASS,
-		VendorServiceFeature::CHAPTERING => self::CHAPTERING_OM_CLASS,
-		VendorServiceFeature::DUBBING => self::DUBBING_OM_CLASS,
-		VendorServiceFeature::INTELLIGENT_TAGGING => self::INTELLIGENT_TAGGING_OM_CLASS,
-		VendorServiceFeature::LIVE_CAPTION => self::LIVE_CAPTION_OM_CLASS,
-		VendorServiceFeature::CLIPS => self::CLIPS_OM_CLASS,
-		VendorServiceFeature::LIVE_TRANSLATION => self::LIVE_TRANSLATION_OM_CLASS,
-		VendorServiceFeature::QUIZ => self::QUIZ_OM_CLASS,
-		VendorServiceFeature::SUMMARY => self::SUMMARY_OM_CLASS,
-		VendorServiceFeature::VIDEO_ANALYSIS => self::VIDEO_ANALYSIS_OM_CLASS,
-		VendorServiceFeature::MODERATION => self::MODERATION_OM_CLASS,
-		VendorServiceFeature::METADATA_ENRICHMENT => self::METADATA_ENRICHMENT_OM_CLASS,
-	);
+	protected static $class_types_cache = array();
 	
 	public static function setDefaultCriteriaFilter ()
 	{
@@ -78,9 +44,12 @@ class VendorCatalogItemPeer extends BaseVendorCatalogItemPeer
 		{
 			$typeField = self::translateFieldName(VendorCatalogItemPeer::SERVICE_FEATURE, BasePeer::TYPE_COLNAME, BasePeer::TYPE_NUM);
 			$catalogItemType = $row[$typeField];
-			if(isset(self::$class_types_cache[$catalogItemType]))
-				return self::$class_types_cache[$catalogItemType];
-			
+			$OMClassName = ReachPlugin::getCatalogItemCoreName($catalogItemType);
+			if($OMClassName != "")
+			{
+				return $OMClassName;
+			}
+
 			$extendedCls = KalturaPluginManager::getObjectClass(parent::OM_CLASS, $catalogItemType);
 			if($extendedCls)
 			{

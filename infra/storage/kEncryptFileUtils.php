@@ -87,7 +87,7 @@ class kEncryptFileUtils
             }
             while (!feof($fd1))
             {
-                $iv = call_user_func_array("self::$functionName", array($fd1, $key, $iv, $fd2));
+                $iv = call_user_func_array("kEncryptFileUtils::$functionName", array($fd1, $key, $iv, $fd2));
             }
             fclose($fd1);
             fclose($fd2);

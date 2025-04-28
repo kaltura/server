@@ -207,74 +207,8 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		{
 			return '';
 		}
-
-		switch ($vendorCatalogItem->getServiceFeature())
-		{
-			case VendorServiceFeature::CAPTIONS:
-				$serviceFeatureName = 'captions';
-				break;
-
-			case VendorServiceFeature::TRANSLATION:
-				$serviceFeatureName = 'translation';
-				break;
-
-			case VendorServiceFeature::ALIGNMENT:
-				$serviceFeatureName = 'alignment';
-				break;
-
-			case VendorServiceFeature::AUDIO_DESCRIPTION:
-				$serviceFeatureName = 'audio description';
-				break;
-
-			case VendorServiceFeature::CHAPTERING:
-				$serviceFeatureName = 'chaptering';
-				break;
-
-			case VendorServiceFeature::INTELLIGENT_TAGGING:
-				$serviceFeatureName = 'intelligent tagging';
-				break;
-			
-			case VendorServiceFeature::DUBBING:
-				$serviceFeatureName = 'dubbing';
-				break;
-
-			case VendorServiceFeature::LIVE_CAPTION:
-				$serviceFeatureName = 'live caption';
-				break;
-
-			case VendorServiceFeature::LIVE_TRANSLATION:
-				$serviceFeatureName = 'live translation';
-				break;
-
-			case VendorServiceFeature::CLIPS:
-				$serviceFeatureName = 'clips';
-				break;
-
-			case VendorServiceFeature::QUIZ:
-				$serviceFeatureName = 'quiz';
-				break;
-
-			case VendorServiceFeature::SUMMARY:
-				$serviceFeatureName = 'summary';
-				break;
-
-			case VendorServiceFeature::VIDEO_ANALYSIS:
-				$serviceFeatureName = 'video analysis';
-				break;
-
-			case VendorServiceFeature::MODERATION:
-				$serviceFeatureName = 'moderation';
-				break;
-
-			case VendorServiceFeature::METADATA_ENRICHMENT:
-				$serviceFeatureName = 'metadata enrichment';
-				break;
-
-			default:
-				$serviceFeatureName = '';
-		}
-
-		return $serviceFeatureName;
+		$serviceFeature = $vendorCatalogItem->getServiceFeature();
+		return ReachPlugin::getTranslatedServiceFeature($serviceFeature);
 	}
 	
 	public function getCacheInvalidationKeys()
