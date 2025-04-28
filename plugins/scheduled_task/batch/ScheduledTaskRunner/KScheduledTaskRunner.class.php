@@ -28,34 +28,51 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		return self::getType();
 	}
 
+	protected function getMrIndexPerPartner($partnerId)
+	{
+		$index = $partnerId % $this->getParams('mrNumberOfWorkers');
+		if ($index < 0)
+		{
+			$index += 10;
+		}
+		return $index;
+	}
+
 	/* (non-PHPdoc)
 	 * @see KBatchBase::run()
 	*/
 	public function run($jobs = null)
 	{
 		$maxProfiles = $this->getParams('maxProfiles');
+		$mrIndex = $this->getIndex();
+//		$mrIndex = $this->getParams('mrIndex');
 		$lastRuntimePerPartner = array();
 		$profiles = $this->getSortedScheduledTaskProfiles($maxProfiles);
 		/** @var KalturaScheduledTaskProfile $profile */
 		$profile = $this->getNextProfile($profiles);
 		while( $profile )
 		{
-			//make sure a profile for the same partner runs in a minimum of 2 seconds diff
-			if (isset($lastRuntimePerPartner[$profile->partnerId]) && time() - $lastRuntimePerPartner[$profile->partnerId] <= 2 )
+			$mrIndexPerPartner = $this->getMrIndexPerPartner($profile->partnerId);
+			KalturaLog::notice('partnerId [' . $profile->partnerId . '] index [' . $mrIndex . '] mrIndexPerPartner [' . $mrIndexPerPartner . ']');
+			if ($mrIndexPerPartner == $mrIndex)
 			{
-				sleep(2);
+				//make sure a profile for the same partner runs in a minimum of 2 seconds diff
+				if (isset($lastRuntimePerPartner[$profile->partnerId]) && time() - $lastRuntimePerPartner[$profile->partnerId] <= 2)
+				{
+					sleep(2);
+				}
+				try
+				{
+					$processor = $this->getProcessor($profile);
+					$processor->processProfile($profile);
+				}
+				catch (Exception $ex)
+				{
+					KalturaLog::err($ex);
+				}
+				$lastRuntimePerPartner[$profile->partnerId] = time();
+				$profile = $this->getNextProfile($profiles);
 			}
-			try
-			{
-				$processor = $this->getProcessor($profile);
-				$processor->processProfile($profile);
-			}
-			catch(Exception $ex)
-			{
-				KalturaLog::err($ex);
-			}
-			$lastRuntimePerPartner[$profile->partnerId] = time();
-			$profile = $this->getNextProfile($profiles);
 		}
 	}
 
