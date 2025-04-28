@@ -292,9 +292,10 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		if ($integrationSetting->zoomCategory)
 		{
-			if (VendorHelper::createCategoryForVendorIntegration($zoomIntegration->getPartnerId(), $integrationSetting->zoomCategory, $zoomIntegration))
+			$createdCategories = ZoomHelper::createCategoriesForIntegration($integrationSetting->zoomCategory, $zoomIntegration);
+			if ($createdCategories)
 			{
-				$zoomIntegration->setZoomCategory($integrationSetting->zoomCategory);
+				$zoomIntegration->setZoomCategory(implode(',', $createdCategories));
 			}
 		}
 		else
@@ -304,9 +305,10 @@ class ZoomVendorService extends KalturaBaseService
 		
 		if ($integrationSetting->zoomWebinarCategory)
 		{
-			if (VendorHelper::createCategoryForVendorIntegration($zoomIntegration->getPartnerId(), $integrationSetting->zoomWebinarCategory, $zoomIntegration))
+			$createdCategories = ZoomHelper::createCategoriesForIntegration($integrationSetting->zoomWebinarCategory, $zoomIntegration);
+			if ($createdCategories)
 			{
-				$zoomIntegration->setZoomWebinarCategory($integrationSetting->zoomWebinarCategory);
+				$zoomIntegration->setZoomWebinarCategory(implode(',', $createdCategories));
 			}
 		}
 		else
