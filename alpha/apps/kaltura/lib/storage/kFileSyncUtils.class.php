@@ -202,7 +202,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 	protected static function setInSmallFileCache($key, $content)
 	{
 		$cacheType = self::getCacheType($key);
-		$maxFileSizeToCache = kConf::get(self::MAX_FILE_SIZE_TO_CACHE, kConfMapNames::RUNTIME_CONFIG);
+		$maxFileSizeToCache = kConf::get(self::MAX_FILE_SIZE_TO_CACHE, kConfMapNames::RUNTIME_CONFIG, 1024);
 		$contentSize = strlen($content);
 		if (!$maxFileSizeToCache || $cacheType != kCacheManager::CACHE_TYPE_SMALL_FILE_SYNC || $contentSize > $maxFileSizeToCache)
 		{
