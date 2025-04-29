@@ -127,7 +127,7 @@ class kFirebaseOauth
 		]));
 
 		$now = time();
-		$expiry = $now + 3600; // Token valid for 1 hour
+		$expiry = $now + kTimeConversion::HOUR; // Token valid for 1 hour
 
 		$payload = base64_encode(json_encode(array(
 			'iss' => $serviceAccount['client_email'],
