@@ -121,7 +121,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			}
 		}
 
-		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion, null, EntryVendorTaskCreationMode::MANUAL, $taskDuration);
+		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $entryVendorTask->entryObjectType, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion, null, EntryVendorTaskCreationMode::MANUAL, $taskDuration);
 		if(!$dbEntryVendorTask)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::TASK_NOT_CREATED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);

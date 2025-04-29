@@ -20,18 +20,22 @@ class VendorAlignmentCatalogItem extends VendorCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::ALIGNMENT);
 	}
 	
-	public function getTaskVersion($entryId, $jobData = null)
+	public function getTaskVersion($entryId, $entryObjectType = KalturaEntryObjectType::ENTRY, $jobData = null)
 	{
-		$taskVersion = parent::getTaskVersion($entryId, $jobData);
-		
+		$taskVersion = parent::getTaskVersion($entryId, $entryObjectType, $jobData);
+
 		if(!$jobData || !($jobData instanceof kAlignmentVendorTaskData))
+		{
 			return $taskVersion;
-		
+		}
+
 		/* @var $jobData kAlignmentVendorTaskData */
 		$attachmentAsset = assetPeer::retrieveById($jobData->getTextTranscriptAssetId());
 		if(!$attachmentAsset)
+		{
 			return $taskVersion;
-		
+		}
+
 		return $taskVersion * $attachmentAsset->getVersion();
 	}
 	

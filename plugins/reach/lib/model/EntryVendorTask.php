@@ -19,7 +19,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_ACCESS_KEY = 			'access_key';
 	const CUSTOM_DATA_ERR_DESCRIPTION = 	'err_description';
 	const CUSTOM_DATA_USER_ID = 			'user_id';
-	const CUSTOM_DATA_ENTRY_OBJECT_TYPE = 			'entry_object_type';
+	const CUSTOM_DATA_ENTRY_OBJECT_TYPE = 	'entry_object_type';
 	const CUSTOM_DATA_MODERATING_USER = 	'moderating_user';
 	const CUSTOM_DATA_ACCURACY 	= 			'accuracy';
 	const CUSTOM_DATA_OUTPUT_OBJECT_ID = 	'output_object_id';
@@ -185,8 +185,9 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 
 	public function getEntryObjectType()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_OBJECT_TYPE);
+		return $this->getFromCustomData(self::CUSTOM_DATA_ENTRY_OBJECT_TYPE);
 	}
+
 	public function getReachProfile()
 	{
 		return ReachProfilePeer::retrieveByPK($this->getReachProfileId());

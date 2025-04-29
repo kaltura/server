@@ -194,8 +194,12 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return call_user_func($this->getPricing()->getPriceFunction(), $durationMsec, $this->getPricing()->getPricePerUnit());
 	}
 	
-	public function getTaskVersion($entryId, $jobData = null)
+	public function getTaskVersion($entryId, $entryObjectType = KalturaEntryObjectType::ENTRY, $jobData = null)
 	{
+		if($entryObjectType != KalturaEntryObjectType::ENTRY)
+		{
+			return 0;
+		}
 		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
 		return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 	}
