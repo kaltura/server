@@ -30,10 +30,11 @@ class KScheduledTaskRunner extends KPeriodicWorker
 
 	protected function getMrIndexPerPartner($partnerId)
 	{
-		$index = $partnerId % $this->getParams('mrNumberOfWorkers');
-		if ($index < 0)
+		$index = 0;
+		$mrNumberOfWorkers = $this->getParams('mrNumberOfWorkers');
+		if($mrNumberOfWorkers)
 		{
-			$index += 10;
+			$index = ($partnerId / 10) % $mrNumberOfWorkers;
 		}
 		return $index;
 	}

@@ -98,7 +98,7 @@ class KGenericScheduler
 	 */
 	private function loadConfig($configFileName = null)
 	{
-		$firstLoad = is_null($this->schedulerConfig);//TODO fix batch
+		$firstLoad = is_null($this->schedulerConfig);
 		if($firstLoad)
 		{
 			$this->schedulerConfig = new KSchedulerConfig($configFileName);
