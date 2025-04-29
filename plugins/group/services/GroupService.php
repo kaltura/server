@@ -179,9 +179,18 @@ class GroupService extends KalturaBaseUserService
 		$groupTypeItem->setItemType(ESearchItemType::EXACT_MATCH);
 		$groupTypeItem->setFieldName(ESearchUserFieldName::TYPE);
 
+		$applicativeGroupTypeItem = new ESearchUserItem();
+		$applicativeGroupTypeItem->setSearchTerm(KuserType::APPLICATIVE_GROUP);
+		$applicativeGroupTypeItem->setItemType(ESearchItemType::EXACT_MATCH);
+		$applicativeGroupTypeItem->setFieldName(ESearchUserFieldName::TYPE);
+
+		$orOperator = new ESearchOperator();
+		$orOperator->setOperator(ESearchOperatorType::OR_OP);
+		$orOperator->setSearchItems(array($groupTypeItem, $applicativeGroupTypeItem));
+
 		$baseOperator = new ESearchOperator();
 		$baseOperator->setOperator(ESearchOperatorType::AND_OP);
-		$baseOperator->setSearchItems(array($coreParams->getSearchOperator(), $groupTypeItem));
+		$baseOperator->setSearchItems(array($coreParams->getSearchOperator(), $orOperator));
 
 		$objectStatusesArr = array();
 		$objectStatuses = $coreParams->getObjectStatuses();
