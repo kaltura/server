@@ -245,14 +245,21 @@ class LogMethod
 		if (isset($backtrace[$backtraceIndex]))
 		{
 			if (isset($backtrace[$backtraceIndex]["class"]))
-				return $backtrace[$backtraceIndex]["class"].$backtrace[$backtraceIndex]["type"].$backtrace[$backtraceIndex]["function"];
+			{
+				$res = $backtrace[$backtraceIndex]["class"] . $backtrace[$backtraceIndex]["type"] . $backtrace[$backtraceIndex]["function"];
+			}
 			else
-				return $backtrace[$backtraceIndex]["function"];
+			{
+				$res = $backtrace[$backtraceIndex]["function"];
+			}
 		}
 		else 
 		{
-			return "global";
+			$res =  "global";
 		}
+
+		unset($backtrace);
+		return $res;
 	}
 }
 
