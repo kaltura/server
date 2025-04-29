@@ -286,7 +286,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 	public function getRequiresOverages()
 	{
-		return $this->getFromCustomData(self::CUSTOM_ADMIN_REQUIRES_OVERAGES);
+		return $this->getFromCustomData(self::CUSTOM_ADMIN_REQUIRES_OVERAGES, null, false);
 	}
 
 	public function setCreatedBy($v)
