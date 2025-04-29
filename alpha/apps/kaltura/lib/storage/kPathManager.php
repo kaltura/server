@@ -69,10 +69,10 @@ class kPathManager
 	 * @param int $storageProfileId
 	 * @param $version
 	 */
-	public static function getFilePathArr(FileSyncKey $key, $storageProfileId = null)
+	public static function getFilePathArr(FileSyncKey $key, $storageProfileId = null, $srcFileSize = null)
 	{
 		KalturaLog::log(__METHOD__." - key [$key], requested storageProfileId [$storageProfileId]");
-		$storageProfileId = self::getStorageProfileIdForKey($key, $storageProfileId);
+		$storageProfileId = self::getStorageProfileIdForKey($key, $storageProfileId, $srcFileSize);
 		KalturaLog::log(__METHOD__." - key [$key], chosen storageProfileId [$storageProfileId]");
 		
 		$storageProfile = self::getStorageProfile($storageProfileId);
@@ -99,7 +99,7 @@ class kPathManager
 		return implode('', self::getFilePathArr($key, $storageProfileId));
 	}
 	
-	public static function getStorageProfileIdForKey(FileSyncKey $key, $storageProfileId = null)
+	public static function getStorageProfileIdForKey(FileSyncKey $key, $storageProfileId = null, $srcFileSize = null)
 	{
 		if($storageProfileId && !in_array($storageProfileId, kDataCenterMgr::getSharedStorageProfileIds($key->getPartnerId())))
 		{
@@ -115,8 +115,11 @@ class kPathManager
 			'*' // WildCard
 		);
 		
+		// If the file size is small enough and dc is set to shared and cloud storage is enabled, sync it directly to shared storage
+		$maxSmallFileSize = kConf::get('max_small_file_size', kConfMapNames::RUNTIME_CONFIG, 0);
 		$cloudStorageObjectMap = kConf::get('cloud_storage_object_map', 'cloud_storage', array());
-		if( array_intersect($objectKeys, $cloudStorageObjectMap) && myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) )
+		if( (($srcFileSize && $maxSmallFileSize > 0 && $srcFileSize < $maxSmallFileSize) || array_intersect($objectKeys, $cloudStorageObjectMap)) &&
+			myCloudUtils::isCloudDc(kDataCenterMgr::getCurrentDcId()) )
 		{
 			$storageProfileIds = kDataCenterMgr::getSharedStorageProfileIds($key->getPartnerId());
 			$storageProfileId = reset($storageProfileIds);
