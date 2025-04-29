@@ -45,7 +45,6 @@ class KScheduledTaskRunner extends KPeriodicWorker
 	{
 		$maxProfiles = $this->getParams('maxProfiles');
 		$mrIndex = $this->getIndex();
-//		$mrIndex = $this->getParams('mrIndex');
 		$lastRuntimePerPartner = array();
 		$profiles = $this->getSortedScheduledTaskProfiles($maxProfiles);
 		/** @var KalturaScheduledTaskProfile $profile */
@@ -53,10 +52,10 @@ class KScheduledTaskRunner extends KPeriodicWorker
 		while( $profile )
 		{
 			$mrIndexPerPartner = $this->getMrIndexPerPartner($profile->partnerId);
-			KalturaLog::notice('partnerId [' . $profile->partnerId . '] index [' . $mrIndex . '] mrIndexPerPartner [' . $mrIndexPerPartner . ']');
 			if ($mrIndexPerPartner == $mrIndex)
 			{
 				//make sure a profile for the same partner runs in a minimum of 2 seconds diff
+				KalturaLog::notice('partnerId [' . $profile->partnerId . '] index [' . $mrIndex . '] mrIndexPerPartner [' . $mrIndexPerPartner . ']');
 				if (isset($lastRuntimePerPartner[$profile->partnerId]) && time() - $lastRuntimePerPartner[$profile->partnerId] <= 2)
 				{
 					sleep(2);

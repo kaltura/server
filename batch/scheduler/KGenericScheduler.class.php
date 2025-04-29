@@ -72,7 +72,6 @@ class KGenericScheduler
 	public function __construct($phpPath, $configFileName)
 	{
 		$this->phpPath = $phpPath;
-		KalturaLog::notice("### - configFileName [$configFileName]");
 		$this->loadConfig($configFileName);
 	}
 
@@ -592,22 +591,16 @@ class KGenericScheduler
 	
 	private function loadRunningTasks() {
 		$taskConfigs = $this->schedulerConfig->getTaskConfigList();
-		KalturaLog::info('### - 1 - ' .count($taskConfigs));
 		$runningBatches = KScheduleHelperManager::loadRunningBatches();
-		KalturaLog::info('### - 1 [' . print_r($runningBatches, true). ']');
-		KalturaLog::info('### - 2');
 		
 		foreach($runningBatches as $workerName => $indexes)
 		{
-			KalturaLog::info('### - 3');
 			if(!is_array($indexes))
 			{
-				KalturaLog::info('### - 3 not array');
 				continue;
 			}
 			
 			foreach ($indexes as $taskIndex => $procId) {
-				KalturaLog::info("### - 3.2 $workerName $taskConfigs[$workerName]");
 				$proc = new KProcessWrapper($taskConfigs[$workerName], $taskIndex);
 				$proc->initMockedProcess($procId);
 				if($proc->isRunning()) {
