@@ -664,7 +664,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds(entry $entry, EntryObjectType $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
+	public static function addEntryVendorTaskByObjectIds(entry $entry, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
 	{
 		$entryId = $entry->getId();
 		$vendorCatalogItemId = $vendorCatalogItem->getId();
@@ -751,11 +751,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setEntryId($entry->getId());
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setReachProfileId($reachProfile->getId());
-		$entryVendorTask->setPartnerId($entry->getPartnerId());
-		$entryVendorTask->setKuserId(self::getTaskKuserId($entry));
-		$entryVendorTask->setUserId(self::getTaskPuserId($entry));
+		$entryVendorTask->setPartnerId($reachProfile->getPartnerId());
+		$entryVendorTask->setKuserId(self::getTaskKuserId($entry, $entryObjectType));
+		$entryVendorTask->setUserId(self::getTaskPuserId($entry, $entryObjectType));
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
 		$entryVendorTask->setVersion($version);
+		$entryVendorTask->setEntryObjectType($entryObjectType);
 		$entryVendorTask->setQueueTime(null);
 		$entryVendorTask->setFinishTime(null);
 
@@ -850,24 +851,24 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	}
 	
 	//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-	protected static function getTaskKuserId(entry $entry)
+	protected static function getTaskKuserId(entry $entry, $entryObjectType)
 	{
 		$kuserId = kCurrentContext::getCurrentKsKuserId();
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
-			$kuserId = $entry->getKuserId();
+			$kuserId = $entryObjectType == KalturaEntryObjectType::ENTRY ? $entry->getKuserId() : null;
 		}
 		
 		return $kuserId;
 	}
 	
 	//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-	protected static function getTaskPuserId(entry $entry)
+	protected static function getTaskPuserId(entry $entry, $entryObjectType)
 	{
 		$puserId = kCurrentContext::$ks_uid;
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
-			$puserId = $entry->getPuserId();
+			$puserId = $entryObjectType == KalturaEntryObjectType::ENTRY ? $entry->getPuserId() : null;
 		}
 		
 		return $puserId;
