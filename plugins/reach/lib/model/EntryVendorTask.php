@@ -185,7 +185,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 
 	public function getEntryObjectType()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_ENTRY_OBJECT_TYPE);
+		return $this->getFromCustomData(self::CUSTOM_DATA_ENTRY_OBJECT_TYPE, null, KalturaEntryObjectType::ENTRY);
 	}
 
 	public function getReachProfile()
