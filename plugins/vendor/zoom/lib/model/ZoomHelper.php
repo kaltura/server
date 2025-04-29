@@ -89,7 +89,11 @@ class ZoomHelper
 	 */
 	public static function canConfigureEventSubscription($zoomUserPermissions)
     {
-        return in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions);
+		if(is_array($zoomUserPermissions))
+		{
+			return in_array('Recording:Read', $zoomUserPermissions) && in_array('Recording:Edit', $zoomUserPermissions);
+		}
+	    self::exitWithError(kZoomErrorMessages::ERROR_WHILE_RETRIEVING_USER_PERMISSIONS);
     }
 
     /**

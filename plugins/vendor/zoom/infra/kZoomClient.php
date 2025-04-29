@@ -247,10 +247,12 @@ class kZoomClient extends kVendorClient
 		if (!$response)
 		{
 			$data = $curlWrapper->getErrorMsg();
+			KalturaLog::debug('Zoom API call failed: ' . $data);
 		}
 		else
 		{
 			$data = json_decode($response, true);
+			KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
 		}
 		return $data;
 	}
