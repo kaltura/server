@@ -439,9 +439,9 @@ class kReachUtils
 
 	public static function validateProfileAndCatalogItemOverages($dbVendorCatalogItem, $dbReachProfile)
 	{
-		if($dbVendorCatalogItem->getRequiresOverages() && !$dbReachProfile->getAllowsOverages())
+		if($dbVendorCatalogItem->getRequiresOverages() && !$dbReachProfile->getAllowsNegativeOverages())
 		{
-			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_DOES_NOT_ALLOW_OVERAGES, $dbReachProfile->getId());
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_DOES_NOT_ALLOW_NEGATIVE_OVERAGES, $dbReachProfile->getId());
 		}
 	}
 }

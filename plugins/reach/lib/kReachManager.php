@@ -82,9 +82,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				continue;
 			}
 
-			if($catalogItemToAdd->getRequiresOverages() && !$reachProfile->getAllowsOverages())
+			if($catalogItemToAdd->getRequiresOverages() && !$reachProfile->getAllowsNegativeOverages())
 			{
-				KalturaLog::log("Reach Profile ID $profileId does not allow overages for catalog item with ID $catalogItemIdToAdd");
+				KalturaLog::log("Reach Profile ID $profileId does not allow negative overages for catalog item with ID $catalogItemIdToAdd");
 				continue;
 			}
 
