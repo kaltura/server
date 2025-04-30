@@ -136,6 +136,10 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		foreach ($categoriesList as $category)
 		{
 			$category = trim($category);
+			if (!$category)
+			{
+				continue;
+			}
 			$categoryId = $this->findCategoryIdByName($category);
 			if ($categoryId)
 			{
