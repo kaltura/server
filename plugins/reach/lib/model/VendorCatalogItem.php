@@ -196,12 +196,15 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	
 	public function getTaskVersion($entryId, $entryObjectType = KalturaEntryObjectType::ENTRY, $jobData = null)
 	{
-		if($entryObjectType != KalturaEntryObjectType::ENTRY)
+		switch ($entryObjectType)
 		{
-			return 0;
+			case KalturaEntryObjectType::ENTRY:
+				$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
+				return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+
+			default:
+				return 0;
 		}
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
-		return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 	}
 
 	public static function translateServiceFeatureEnum($catalogItemId)

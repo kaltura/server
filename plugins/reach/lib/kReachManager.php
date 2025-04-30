@@ -850,25 +850,38 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $status;
 	}
 	
-	//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-	protected static function getTaskKuserId(entry $entry, $entryObjectType)
+	protected static function getTaskKuserId($entryObject, $entryObjectType)
 	{
 		$kuserId = kCurrentContext::getCurrentKsKuserId();
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
-			$kuserId = $entryObjectType == KalturaEntryObjectType::ENTRY ? $entry->getKuserId() : null;
+			switch ($entryObjectType)
+			{
+				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
+				case KalturaEntryObjectType::ENTRY:
+					return $entryObject->getKuserId();
+
+				default:
+					return null;
+			}
 		}
-		
 		return $kuserId;
 	}
 	
-	//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-	protected static function getTaskPuserId(entry $entry, $entryObjectType)
+	protected static function getTaskPuserId($entryObject, $entryObjectType)
 	{
 		$puserId = kCurrentContext::$ks_uid;
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
-			$puserId = $entryObjectType == KalturaEntryObjectType::ENTRY ? $entry->getPuserId() : null;
+			switch ($entryObjectType)
+			{
+				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
+				case KalturaEntryObjectType::ENTRY:
+					return $entryObject->getPuserId();
+
+				default:
+					return null;
+			}
 		}
 		
 		return $puserId;
