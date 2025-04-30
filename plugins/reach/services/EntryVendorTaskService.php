@@ -56,6 +56,8 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask->reachProfileId = $dbReachProfile->getId();
 
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($entryVendorTask->catalogItemId);
+		kReachUtils::validateProfileAndCatalogItemOverages($dbVendorCatalogItem, $dbReachProfile);
+
 		$dbTaskData = $entryVendorTask->taskJobData ? $entryVendorTask->taskJobData->toObject() : null;
 		$taskVersion = $dbVendorCatalogItem->getTaskVersion($dbEntry->getId(), $dbTaskData);
 		$taskDuration = $dbTaskData ? $dbTaskData->getEntryDuration() : null;

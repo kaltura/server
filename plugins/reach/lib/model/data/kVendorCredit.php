@@ -26,6 +26,11 @@ class kVendorCredit
 	protected $overageCredit;
 
 	/**
+	 * @var bool
+	 */
+	protected $allowNegativeOverageCredit = false;
+
+	/**
 	 * @var int
 	 */
 	protected $addOn;
@@ -63,6 +68,15 @@ class kVendorCredit
 	{
 		return $this->overageCredit;
 	}
+
+	/**
+	 * @return bool $allowNegativeOverageCredit
+	 */
+	public function getAllowNegativeOverageCredit()
+	{
+		return $this->allowNegativeOverageCredit;
+	}
+
 
 	/**
 	 * @param int $credit
@@ -103,6 +117,14 @@ class kVendorCredit
 	public function setOverageCredit($overageCredit)
 	{
 		$this->overageCredit = $overageCredit;
+	}
+
+	/**
+	 * @param bool $allowNegativeOverageCredit
+	 */
+	public function setAllowNegativeOverageCredit($allowNegativeOverageCredit)
+	{
+		$this->allowNegativeOverageCredit = $allowNegativeOverageCredit;
 	}
 
 	/**

@@ -34,6 +34,7 @@ class KalturaReachErrors implements kReachErrors
 	/* Reach Profile */
 
 	const REACH_PROFILE_NOT_FOUND = "REACH_PROFILE_NOT_FOUND;ID;Reach profile with id provided not found [@ID@]";
+	const REACH_PROFILE_DOES_NOT_ALLOW_NEGATIVE_OVERAGES = "REACH_PROFILE_DOES_NOT_ALLOW_NEGATIVE_OVERAGES;ID;Reach profile id [@ID@] does not allow negative overages";
 
 	const DICTIONARY_LANGUAGE_DUPLICATION = "DICTIONARY_LANGUAGE_DUPLICATION;LANGUAGE;Vendor profile configuration error - not allowed duplicate dictionaries for language [@LANGUAGE@] ";
 	const TARGET_LANGUAGE_NOT_SUPPORTED = "TARGET_LANGUAGE_NOT_SUPPORTED;LANGUAGE;Cannot set [@LANGUAGE@] as target language";
