@@ -1,5 +1,18 @@
-# Ursa-21.13.0
+# Ursa-21.15.0
+## Add new firebase notifications ##
+* Issue Type: Task
+* Issue ID: PLAT-25184
 
+### Deployment ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_03_12_firebase_oauth2_notifications.template.xml
+
+Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
+
+    php /opt/kaltura/app/deployment/updates/scripts/2025_03_12_deploy_firebase_oauth2_notifications.php
+
+# Ursa-21.13.0
 ## Update Subscriber added to channel email event notification template ##
 * Issue Type: Task
 * Issue ID: SUP-37427
@@ -27,8 +40,8 @@ Update script:
 - Issue ID: PLAT-25095
 ### Deployment scripts ###
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
-``deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php``
 
+    php deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php
 
 # Ursa-21.11.0
 ## Add demoteAdmin action to User service ##
