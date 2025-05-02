@@ -13,7 +13,7 @@ class kSessionConf extends kBaseConfCache implements kMapCacheInterface , kKeyCa
 	{
 		if(isset(self::$map[self::CONF_MAP_PREFIX.$mapName]))
 			return self::$map[self::CONF_MAP_PREFIX.$mapName];
-		return false;
+		return null;
 	}
 
 	public function hasMap($key, $mapName) { return isset(self::$map[self::CONF_MAP_PREFIX.$mapName]); }
