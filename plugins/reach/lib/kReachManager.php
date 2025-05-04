@@ -800,24 +800,27 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	protected static function shouldAddEntryVendorTask($entry, $entryObjectType, $vendorCatalogItem)
 	{
-		if($entryObjectType == KalturaEntryObjectType::ENTRY)
+		switch ($entryObjectType)
 		{
-			//Check if the entry is temporary, if so, dont create the task
-			if($entry->getIsTemporary())
-			{
-				KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
-				return false;
-			}
+			case KalturaEntryObjectType::ENTRY:
+				//Check if the entry is temporary, if so, dont create the task
+				if($entry->getIsTemporary())
+				{
+					KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
+					return false;
+				}
 
-			//Check if static content and the catalog item is excluding static content, if so, dont create the task
-			if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entry->getAdminTagsArr()))
-			{
-				KalturaLog::debug("Entry [{$entry->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
+				//Check if static content and the catalog item is excluding static content, if so, dont create the task
+				if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entry->getAdminTagsArr()))
+				{
+					KalturaLog::debug("Entry [{$entry->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
+					return false;
+				}
+				return true;
+
+			default:
 				return false;
-			}
 		}
-
-		return true;
 	}
 
 	protected static function getEntryVendorTaskStatus($reachProfile, $vendorCatalogItem, $entry, $entryObjectType, $validateModeration)
