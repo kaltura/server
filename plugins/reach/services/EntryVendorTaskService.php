@@ -98,6 +98,21 @@ class EntryVendorTaskService extends KalturaBaseService
 
 	public function addEntryVendorTaskImpl($entryVendorTask, $taskVersion, $dbEntry, $dbReachProfile, $dbVendorCatalogItem, $taskDuration = null)
 	{
+		$this->handlingExistingTasks($entryVendorTask, $dbVendorCatalogItem, $taskVersion);
+
+		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $entryVendorTask->entryObjectType, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion, null, EntryVendorTaskCreationMode::MANUAL, $taskDuration);
+		if(!$dbEntryVendorTask)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::TASK_NOT_CREATED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
+		}
+
+		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
+		self::tryToSave($dbEntryVendorTask);
+		return $dbEntryVendorTask;
+	}
+
+	protected function handlingExistingTasks($entryVendorTask, $dbVendorCatalogItem, $taskVersion)
+	{
 		$existingTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
 		if ($existingTask)
 		{
@@ -122,16 +137,6 @@ class EntryVendorTaskService extends KalturaBaseService
 				}
 			}
 		}
-
-		$dbEntryVendorTask = kReachManager::addEntryVendorTask($dbEntry, $dbReachProfile, $dbVendorCatalogItem, !kCurrentContext::$is_admin_session, $taskVersion, null, EntryVendorTaskCreationMode::MANUAL, $taskDuration);
-		if(!$dbEntryVendorTask)
-		{
-			throw new KalturaAPIException(KalturaReachErrors::TASK_NOT_CREATED, $entryVendorTask->entryId, $entryVendorTask->catalogItemId);
-		}
-
-		$entryVendorTask->toInsertableObject($dbEntryVendorTask);
-		self::tryToSave($dbEntryVendorTask);
-		return $dbEntryVendorTask;
 	}
 	
 	/**

@@ -93,7 +93,8 @@ class KalturaReachErrors implements kReachErrors
 	const TOO_LONG_SCHEDULED_TASK = "TOO_LONG_SCHEDULED_TASK;TASK_DURATION,DURATION_LIMIT,CATALOG_ITEM_ID;The task duration [@TASK_DURATION@] is exceeding the limit [@DURATION_LIMIT@] defined in catalogItem [@CATALOG_ITEM_ID@]";
 
 	const REQUIRE_CAPTION = "REQUIRE_CAPTION;CATALOG_ITEM_ID;Caption Asset must be provided for catalog item [@CATALOG_ITEM_ID@]";
-	
+	const ENTRY_OBJECT_TYPE_NOT_SUPPORTED = "ENTRY_OBJECT_TYPE_NOT_SUPPORTED;ENTRY_OBJECT_TYPE;Entry object type [@ENTRY_OBJECT_TYPE@] is not supported";
+
 	/* Credit */
 	
 	const OVERAGE_CREDIT_CANNOT_BE_NEGATIVE = "OVERAGE_CREDIT_CANNOT_BE_NEGATIVE;;Overage credit value cannot be negative";
