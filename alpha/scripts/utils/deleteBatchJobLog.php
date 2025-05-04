@@ -37,6 +37,7 @@ $loopLimit = 1000; // Number of logs to process in each batch
 
 do {
 	$c = new Criteria();
+	$c->addSelectColumn(BatchJobLogPeer::ID);
 	$c->addAnd(BatchJobLogPeer::PARTNER_ID, $partnerId);
 	$c->addAscendingOrderByColumn(BatchJobLogPeer::ID);
 	$c->setLimit($loopLimit);
