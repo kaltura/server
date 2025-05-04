@@ -64,6 +64,9 @@ do {
 	// Clear memory to avoid performance issues
 	kMemoryManager::clearMemory();
 
+	// Sleep for 10 seconds after processing 1000 logs
+	sleep(10);
+
 } while ($count == $loopLimit); // Continue while batches are still full (i.e., 1000 logs)
 
 echo '-- Done --' . PHP_EOL;
