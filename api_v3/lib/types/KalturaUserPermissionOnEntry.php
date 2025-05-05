@@ -11,7 +11,7 @@ class KalturaUserPermissionOnEntry extends KalturaObject
 	 */
 	public $userPermission;
 
-	public function _construct()
+	public function __construct()
 	{
 		$this->userPermission = KalturaUserPermissionOnEntryEnum::NONE;
 	}
