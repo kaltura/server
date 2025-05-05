@@ -5,7 +5,6 @@
  * @subpackage model
  */
 
-
 class VendorSignLanguageCatalogItem extends VendorCatalogItem
 {
     public function applyDefaultValues()

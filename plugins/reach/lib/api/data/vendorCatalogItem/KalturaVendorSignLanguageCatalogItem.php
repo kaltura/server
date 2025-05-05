@@ -25,6 +25,7 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
 	(
 		'targetLanguage',
 		'requireSource',
+		'outputFormat',
 	);
 
     protected function getServiceFeature()
@@ -43,7 +44,9 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
     public function toInsertableObject($object_to_fill = null, $props_to_skip = array())
     {
         if (is_null($object_to_fill))
-            $object_to_fill = new VendorSignLanguageCatalogItem();
+		{
+			$object_to_fill = new VendorSignLanguageCatalogItem();
+		}
 
         return parent::toInsertableObject($object_to_fill, $props_to_skip);
     }
@@ -60,6 +63,7 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
 
         return parent::toObject($sourceObject, $propertiesToSkip);
     }
+
 	protected function validateTargetLanguage(VendorCatalogItem $sourceObject = null)
 	{
 		if ($this->targetLanguage == KalturaCatalogItemLanguage::AUTO_DETECT)
@@ -71,12 +75,12 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
 	protected function validate(VendorCatalogItem $sourceObject = null)
 	{
 		$this->validateTargetLanguage($sourceObject);
-		return parent::validate($sourceObject);
+		parent::validate($sourceObject);
 	}
 
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull(array("targetLanguage"));
-		return parent::validateForInsert($propertiesToSkip);
+		parent::validateForInsert($propertiesToSkip);
 	}
 }
