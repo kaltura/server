@@ -29,7 +29,7 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
 
     protected function getServiceFeature()
     {
-        return VendorServiceFeature::SIGN_LANGUAGE;
+        return KalturaVendorServiceFeature::SIGN_LANGUAGE;
     }
 
 	public function getMapBetweenObjects()
