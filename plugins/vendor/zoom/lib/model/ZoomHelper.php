@@ -277,4 +277,30 @@ class ZoomHelper
 		}
 		return $filesByRecordingType;
 	}
+
+	/**
+	 * Create categories for integration from a string of comma separated values
+	 * @param string $categoryNames
+	 * @param ZoomVendorIntegration $zoomIntegration
+	 * @return array List of created categories
+	 * @throws PropelException
+	 */
+	public static function createCategoriesForIntegration($categoryNames, $zoomIntegration)
+	{
+		$categoriesList = explode(',', $categoryNames);
+		$createdCategories = array();
+		foreach ($categoriesList as $category)
+		{
+			$category = trim($category);
+			if (!$category)
+			{
+				continue;
+			}
+			if (VendorHelper::createCategoryForVendorIntegration($zoomIntegration->getPartnerId(), $category, $zoomIntegration))
+			{
+				$createdCategories[] = $category;
+			}
+		}
+		return $createdCategories;
+	}
 }
