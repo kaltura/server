@@ -106,7 +106,12 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 * @insertonly
 	 */
 	public $entryObjectType;
-	
+
+	/**
+	 * @var float
+	 */
+	public $unitsUsed;
+
 	/**
 	 * The user ID that approved this task for execution (in case moderation is requested)
 	 * @var string
@@ -234,6 +239,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'price',
 		'userId',
 		'entryObjectType',
+		'unitsUsed',
 		'moderatingUser',
 		'errDescription',
 		'accessKey',

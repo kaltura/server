@@ -81,6 +81,11 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return $pricing;
 	}
 
+	public function requiresPayment()
+	{
+		return $this->getPricing() && $this->getPricing()->getPricePerUnit();
+	}
+
 	public function setBulkUploadId($bulkUploadId)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_BULK_UPLOAD_ID ,$bulkUploadId);
@@ -189,10 +194,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 	
-	public function calculatePriceForEntry(entry $entry, $taskDuration = null)
+	public function calculatePriceForEntry($entry, $entryObjectType, $unitsForPricing = null)
 	{
-		$durationMsec = $taskDuration ? $taskDuration : $entry->getLengthInMsecs();
-		return call_user_func($this->getPricing()->getPriceFunction(), $durationMsec, $this->getPricing()->getPricePerUnit());
+		$units = $unitsForPricing ? $unitsForPricing : kReachUtils::getPricingUnitsFromEntryObject($entry, $entryObjectType);
+		return call_user_func($this->getPricing()->getPriceFunction(), $units, $this->getPricing()->getPricePerUnit());
 	}
 	
 	public function getTaskVersion($entryId, $entryObjectType = KalturaEntryObjectType::ENTRY, $jobData = null)
@@ -224,9 +229,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array("vendorCatalogItem:id=".strtolower($this->getId()));
 	}
 
-	public function isDuplicateTask(entry $entry)
+	public function isDuplicateTask($entry, $entryObjectType)
 	{
-		$version = $this->calculateEntryVendorTaskVersion($entry);
+		$version = $this->getTaskVersion($entry, $entryObjectType);
 
 		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartnerId(), $version);
 		if($activeTask)
@@ -237,20 +242,13 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return false;
 	}
 
-	public function calculateEntryVendorTaskVersion ($entry)
-	{
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
-
-		return !is_null($sourceFlavor) ? $sourceFlavor->getVersion() : 0;
-	}
-
 	public function isEntryTypeSupported($type, $mediaType = null)
 	{
 		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
 		$supported = in_array($type, $supportedTypes);
 		if($mediaType && $supported)
 		{
-			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO));
+			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO, entry::ENTRY_MEDIA_TYPE_AUDIO));
 		}
 
 		return $supported;
