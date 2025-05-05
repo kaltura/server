@@ -1000,6 +1000,7 @@ class BaseEntryService extends KalturaEntryService
 		}
 
 		$parentEntryId = $dbEntry->getSecurityParentId();
+		$originalEntry = $dbEntry;
 		if ($parentEntryId)
 		{
 			$dbEntry = $dbEntry->getParentEntry();
@@ -1025,7 +1026,7 @@ class BaseEntryService extends KalturaEntryService
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
 		}
 
-		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset);
+		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset, $originalEntry);
 
 		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
 			$accessControlScope = $dbEntry->getAccessControl()->getScope();
