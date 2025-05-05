@@ -23,7 +23,7 @@ class kESearchTermQuery extends kESearchBaseFieldQuery
 	public function getFinalQuery()
 	{
 		$query = array();
-		if (count($this->searchTerm) > 1)
+		if (is_array($this->searchTerm))
 		{
 			$query[self::TERMS_KEY][$this->fieldName] = $this->searchTerm;
 		}
