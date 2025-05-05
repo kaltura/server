@@ -125,8 +125,15 @@ abstract class kBaseSearch
 
 		if($objectId)
 		{
-			$id = elasticSearchUtils::formatSearchTerm($objectId);
-			$idQuery = new kESearchTermQuery('_id', $id);
+			$objectIds = explode(',', $objectId);
+			$objectIds = array_unique($objectIds);
+			$objectIdsArr = array ();
+			foreach ($objectIds as $singleObjectId)
+			{
+				$objectIdsArr[] = elasticSearchUtils::formatSearchTerm($singleObjectId);
+			}
+
+			$idQuery = new kESearchTermQuery('_id', $objectIdsArr);
 			$this->mainBoolQuery->addToFilter($idQuery);
 		}
 

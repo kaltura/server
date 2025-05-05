@@ -15,10 +15,15 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 	 */
 	public $aggregations;
 
+	/**
+	 * @var string
+	 */
+	public $objectIds;
+
 
 	private static $mapBetweenObjects = array
 	(
-		"searchOperator","aggregations"
+		"searchOperator","aggregations","objectIds"
 	);
 
 	protected function initStatuses()
@@ -47,6 +52,13 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 		}
 
 		self::validateSearchOperator($this->searchOperator);
+
+		if ($this->objectId && $this->objectIds)
+		{
+			throw new KalturaAPIException(KalturaESearchErrors::OBJECTID_AND_OBJECTIDS_NOT_ALLOWED_SIMULTANEOUSLY);
+		}
+
+//		$this->objectId = isset($this->objectId) ? $this->objectId : $this->objectIds;
 
 		if (!empty($this->objectStatuses))
 		{
