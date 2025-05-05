@@ -6,6 +6,7 @@
 class kESearchTermQuery extends kESearchBaseFieldQuery
 {
 	const TERM_KEY = 'term';
+	const TERMS_KEY = 'terms';
 	const VALUE_KEY = 'value';
 
 	/**
@@ -22,9 +23,18 @@ class kESearchTermQuery extends kESearchBaseFieldQuery
 	public function getFinalQuery()
 	{
 		$query = array();
-		$query[self::TERM_KEY][$this->fieldName][self::VALUE_KEY] = $this->searchTerm;
-		if($this->getBoostFactor())
-			$query[self::TERM_KEY][$this->fieldName][self::BOOST_KEY] = $this->getBoostFactor();
+		if (count($this->searchTerm) > 1)
+		{
+			$query[self::TERMS_KEY][$this->fieldName] = $this->searchTerm;
+		}
+		else
+		{
+			$query[self::TERM_KEY][$this->fieldName][self::VALUE_KEY] = $this->searchTerm;
+			if ($this->getBoostFactor())
+			{
+				$query[self::TERM_KEY][$this->fieldName][self::BOOST_KEY] = $this->getBoostFactor();
+			}
+		}
 		
 		return $query;
 	}
