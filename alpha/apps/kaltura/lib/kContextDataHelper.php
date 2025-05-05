@@ -58,12 +58,6 @@ class kContextDataHelper
 	private $entry;
 
 	/**
-	 *
-	 * @var entry
-	 */
-	private $originalEntry;
-
-	/**
 	 * 
 	 * @var Partner
 	 */
@@ -80,19 +74,19 @@ class kContextDataHelper
 	private $streamerType = null;
 	
 	private $mediaProtocol = null;
-	
+
 	/**
 	 * 
 	 * @param entry $entry
 	 * @param Partner $partner
 	 * @param asset $asset
 	 */
-	public function __construct(entry $entry, Partner $partner, asset $asset = null, entry $originalEntry)
+	public function __construct(entry $entry, Partner $partner, asset $asset = null, $entryId)
 	{
 		$this->entry = $entry;
 		$this->partner = $partner;
 		$this->asset = $asset;
-		$this->originalEntry = $originalEntry;
+		$this->entryId = $entryId;
 	}
 	
 	/**
@@ -275,9 +269,9 @@ class kContextDataHelper
 		if (is_null($this->asset))
 		{
 			if($flavorParamsIds && count($flavorParamsIds))
-				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($this->originalEntry->getId(), $flavorParamsIds, $flavorParamsNotIn);
+				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($this->entryId, $flavorParamsIds, $flavorParamsNotIn);
 			else 
-				$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($this->originalEntry->getId(), null, array(flavorAsset::ASSET_STATUS_READY));
+				$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($this->entryId, null, array(flavorAsset::ASSET_STATUS_READY));
 			
 			if ($mediaEntryId != $this->entry->getId())
 			{
