@@ -1,4 +1,16 @@
 # Ursa-21.15.0
+## Add Folders Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25228
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableFoldersCapabilities.enabled = true
+moduls.enableFoldersCapabilities.permissionType = 2
+moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
+moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
+moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 ## Add new firebase notifications ##
 * Issue Type: Task
 * Issue ID: PLAT-25184
