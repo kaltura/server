@@ -145,5 +145,17 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		
 		return parent::doSelect($c, $con);
 	}
+
+	public static function doCount(Criteria $criteria, $distinct = false, PropelPDO $con = null)
+	{
+		$c = clone $criteria;
+
+		if($c instanceof KalturaCriteria)
+		{
+			$c->applyFilters();
+		}
+
+		return parent::doCount($c, $con);
+	}
 	
 } // EntryVendorTaskPeer
