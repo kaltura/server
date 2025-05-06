@@ -58,8 +58,6 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 			throw new KalturaAPIException(KalturaESearchErrors::OBJECTID_AND_OBJECTIDS_NOT_ALLOWED_SIMULTANEOUSLY);
 		}
 
-//		$this->objectId = isset($this->objectId) ? $this->objectId : $this->objectIds;
-
 		if (!empty($this->objectStatuses))
 		{
 			$this->objectStatuses = $this->initStatuses();
