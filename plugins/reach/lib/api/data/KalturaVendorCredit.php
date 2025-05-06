@@ -29,7 +29,7 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 	/**
 	 *  @var bool
 	 */
-	public $allowNegativeOverageCredit = false;
+	public $allowNegativeOverageCredit;
 
 	public function getMapBetweenObjects()
 	{

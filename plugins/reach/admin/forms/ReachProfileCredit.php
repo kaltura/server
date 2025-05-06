@@ -28,10 +28,12 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 			'validators' => array(),
 		));
 
-		$this->addElement('select', 'allowNegativeOverageCredit', array(
-			'label' => 'Allow Negative Overage Credit:',
-			'multiOptions' => array('true' => 'true', 'false' => 'false')
-		));
+		$allowNegativeOverageCredit = new Kaltura_Form_Element_EnumSelect('allowNegativeOverageCredit', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
+			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
+		$allowNegativeOverageCredit->setLabel('Allow Negative Overage Credit:');
+		$allowNegativeOverageCredit->setRequired(true);
+		$allowNegativeOverageCredit->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+		$this->addElement($allowNegativeOverageCredit);
 
 		$this->addElement('text', 'addOn', array(
 			'label' => 'AddOn Credit:',
@@ -58,7 +60,6 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 	public function populateFromObject($creditObject, $add_underscore = false)
 	{
 		$this->getElement("objectType")->setValue(get_class($creditObject));
-		$this->getElement("allowNegativeOverageCredit")->setValue(false);
 
 		if (is_null($creditObject))
 			return;
