@@ -1,6 +1,6 @@
 <?php
 /**
- *  VendorIntelligentTaggingCatalogItem
+ *  VendorSignLanguageCatalogItem
  * @package plugins.reach
  * @subpackage model
  */
