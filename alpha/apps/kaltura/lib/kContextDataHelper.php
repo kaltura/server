@@ -73,8 +73,8 @@ class kContextDataHelper
 	 *
 	 * @var string
 	 */
-	private $entryId;
-	
+	private $childEntryId;
+
 	private $storageProfilesXML = null;
 	
 	private $streamerType = null;
@@ -85,15 +85,15 @@ class kContextDataHelper
 	 * 
 	 * @param entry $entry
 	 * @param Partner $partner
-	 * @param string $entryId
 	 * @param asset $asset
+	 * @param string $childEntryId
 	 */
-	public function __construct(entry $entry, Partner $partner, string $entryId, asset $asset = null)
+	public function __construct(entry $entry, Partner $partner, asset $asset = null ,string $childEntryId = null)
 	{
 		$this->entry = $entry;
 		$this->partner = $partner;
-		$this->entryId = $entryId;
 		$this->asset = $asset;
+		$this->childEntryId = $childEntryId;
 	}
 	
 	/**
@@ -275,10 +275,11 @@ class kContextDataHelper
 		$flavorAssets = array();
 		if (is_null($this->asset))
 		{
+			$mediaEntryId = $this->childEntryId ?? $mediaEntryId;
 			if($flavorParamsIds && count($flavorParamsIds))
-				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($this->entryId, $flavorParamsIds, $flavorParamsNotIn);
+				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($mediaEntryId, $flavorParamsIds, $flavorParamsNotIn);
 			else 
-				$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($this->entryId, null, array(flavorAsset::ASSET_STATUS_READY));
+				$flavorAssets = assetPeer::retrieveFlavorsByEntryIdAndStatus($mediaEntryId, null, array(flavorAsset::ASSET_STATUS_READY));
 			
 			if ($mediaEntryId != $this->entry->getId())
 			{
