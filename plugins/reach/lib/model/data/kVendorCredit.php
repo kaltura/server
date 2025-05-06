@@ -28,7 +28,7 @@ class kVendorCredit
 	/**
 	 * @var bool
 	 */
-	protected $allowNegativeOverageCredit = false;
+	protected $allowNegativeOverageCredit;
 
 	/**
 	 * @var int
