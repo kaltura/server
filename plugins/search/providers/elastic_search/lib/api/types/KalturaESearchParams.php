@@ -52,7 +52,7 @@ abstract class KalturaESearchParams extends KalturaObject
 			$object_to_fill = new ESearchParams();
 		}
 
-		if ($this->objectId && $this->objectIds)
+		if (isset($this->objectId) && isset($this->objectIds))
 		{
 			throw new KalturaAPIException(KalturaESearchErrors::OBJECTID_AND_OBJECTIDS_NOT_ALLOWED_SIMULTANEOUSLY);
 		}

@@ -125,7 +125,7 @@ abstract class kBaseSearch
 
 		if($objectId)
 		{
-			if (str_contains($objectId, ','))
+			if (strpos($objectId, ',') !== false)
 			{
 				$objectIds = explode(',', $objectId);
 				$objectIds = array_unique($objectIds);
