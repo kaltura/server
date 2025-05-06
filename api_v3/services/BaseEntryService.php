@@ -987,6 +987,7 @@ class BaseEntryService extends KalturaEntryService
 	 */
 	function getPlaybackContextAction($entryId, KalturaPlaybackContextOptions $contextDataParams)
 	{
+		$childEntry = null;
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -1003,6 +1004,7 @@ class BaseEntryService extends KalturaEntryService
 		if ($parentEntryId)
 		{
 			$dbEntry = $dbEntry->getParentEntry();
+			$childEntry = $entryId;
 			if(!$dbEntry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
 		}
@@ -1025,7 +1027,7 @@ class BaseEntryService extends KalturaEntryService
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
 		}
 
-		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset);
+		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset, $childEntry);
 
 		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
 			$accessControlScope = $dbEntry->getAccessControl()->getScope();
