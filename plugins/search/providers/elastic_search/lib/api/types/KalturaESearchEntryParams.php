@@ -16,8 +16,6 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 	public $aggregations;
 
 
-
-
 	private static $mapBetweenObjects = array
 	(
 		"searchOperator","aggregations"
