@@ -35,6 +35,7 @@ None.
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
 
 Add script:
+
      - deployment/updates/scripts/xml/2025_03_17_addChannelMemberSubscribedEmailNotification.xml
      - php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_channel_member_subscribed.php
 
