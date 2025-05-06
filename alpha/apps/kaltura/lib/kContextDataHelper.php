@@ -68,6 +68,12 @@ class kContextDataHelper
 	 * @var asset
 	 */
 	private $asset;
+
+	/**
+	 *
+	 * @var string
+	 */
+	private $entryId;
 	
 	private $storageProfilesXML = null;
 	
@@ -79,14 +85,15 @@ class kContextDataHelper
 	 * 
 	 * @param entry $entry
 	 * @param Partner $partner
+	 * @param string $entryId
 	 * @param asset $asset
 	 */
-	public function __construct(entry $entry, Partner $partner, asset $asset = null, $entryId)
+	public function __construct(entry $entry, Partner $partner, string $entryId, asset $asset = null)
 	{
 		$this->entry = $entry;
 		$this->partner = $partner;
-		$this->asset = $asset;
 		$this->entryId = $entryId;
+		$this->asset = $asset;
 	}
 	
 	/**
