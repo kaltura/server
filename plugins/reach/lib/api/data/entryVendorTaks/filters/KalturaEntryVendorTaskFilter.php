@@ -51,7 +51,7 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 		$this->fixFilterUserId($c);
 		
 		$list = EntryVendorTaskPeer::doSelect($c);
-		$totalCount = EntryVendorTaskPeer::doCount($c);
+		$totalCount = $c->getRecordsCount();
 		
 		$response = new KalturaEntryVendorTaskListResponse();
 		$response->objects = KalturaEntryVendorTaskArray::fromDbArray($list, $responseProfile);
