@@ -1,4 +1,20 @@
 # Ursa-21.15.0
+## Add channel member subscribed email notification template  ##
+* Issue Type: Task
+* Issue ID: SUP-37427
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+     - deployment/updates/scripts/xml/2025_03_17_addChannelMemberSubscribedEmailNotification.xml
+     - php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_channel_member_subscribed.php
+
+
+# Ursa-21.15.0
 ## Add Folders Capabilities
 * Issue Type: Task
 * Issue ID: PLAT-25228
