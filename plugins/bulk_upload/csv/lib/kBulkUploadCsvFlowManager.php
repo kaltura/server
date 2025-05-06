@@ -23,6 +23,8 @@ class kBulkUploadCsvFlowManager implements kBatchJobStatusEventConsumer
 				}
 			}
 		}
+
+		return true;
 	}
 
 	public function shouldConsumeJobStatusEvent(BatchJob $dbBatchJob)
