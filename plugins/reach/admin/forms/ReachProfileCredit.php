@@ -58,7 +58,10 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 	public function populateFromObject($creditObject, $add_underscore = false)
 	{
 		$this->getElement("objectType")->setValue(get_class($creditObject));
-		$this->getElement("allowNegativeOverageCredit")->setValue(false);
+		if($this->getElement("allowNegativeOverageCredit"))
+		{
+			$this->getElement("allowNegativeOverageCredit")->setValue(false);
+		}
 
 		if (is_null($creditObject))
 			return;
