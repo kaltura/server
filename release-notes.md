@@ -18,11 +18,11 @@ moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
 ### Deployment ###
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
 
-    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_03_12_firebase_oauth2_notifications.template.xml
+    deployment/updates/scripts/xml/notifications/2025_03_12_firebase_oauth2_notifications.template.xml
 
 Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
 
-    php /opt/kaltura/app/deployment/updates/scripts/2025_03_12_deploy_firebase_oauth2_notifications.php
+    php deployment/updates/scripts/2025_03_12_deploy_firebase_oauth2_notifications.php
 
 ## Add channel member subscribed email notification template  ##
 * Issue Type: Task
@@ -34,10 +34,11 @@ None.
 ### Deployment scripts ###
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
 
-Add script:
+	deployment/updates/scripts/xml/2025_03_17_addChannelMemberSubscribedEmailNotification.template.xml
+ 
+Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
 
-     - deployment/updates/scripts/xml/2025_03_17_addChannelMemberSubscribedEmailNotification.xml
-     - php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_channel_member_subscribed.php
+	php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_channel_member_subscribed.php
 
 
 # Ursa-21.13.0
