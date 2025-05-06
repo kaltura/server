@@ -56,7 +56,7 @@ class kContextDataHelper
 	 * @var entry
 	 */
 	private $entry;
-	
+
 	/**
 	 * 
 	 * @var Partner
@@ -68,24 +68,32 @@ class kContextDataHelper
 	 * @var asset
 	 */
 	private $asset;
-	
+
+	/**
+	 *
+	 * @var string
+	 */
+	private $childEntryId;
+
 	private $storageProfilesXML = null;
 	
 	private $streamerType = null;
 	
 	private $mediaProtocol = null;
-	
+
 	/**
 	 * 
 	 * @param entry $entry
 	 * @param Partner $partner
 	 * @param asset $asset
+	 * @param string $childEntryId
 	 */
-	public function __construct(entry $entry, Partner $partner, asset $asset = null)
+	public function __construct(entry $entry, Partner $partner, asset $asset = null ,string $childEntryId = null)
 	{
 		$this->entry = $entry;
 		$this->partner = $partner;
 		$this->asset = $asset;
+		$this->childEntryId = $childEntryId;
 	}
 	
 	/**
@@ -267,6 +275,7 @@ class kContextDataHelper
 		$flavorAssets = array();
 		if (is_null($this->asset))
 		{
+			$mediaEntryId = $this->childEntryId ?? $mediaEntryId;
 			if($flavorParamsIds && count($flavorParamsIds))
 				$flavorAssets = assetPeer::retrieveReadyByEntryIdAndFlavorParams($mediaEntryId, $flavorParamsIds, $flavorParamsNotIn);
 			else 
