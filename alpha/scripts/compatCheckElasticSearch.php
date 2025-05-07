@@ -8,10 +8,10 @@ define('APIV3_START_MARKER', '[KalturaFrontController->run] DEBUG: Params [');
 define('APIV3_GETFEED_MARKER', '[syndicationFeedRenderer] [global] DEBUG: getFeed Params [');
 
 define('DB_HOST_NAME', 'DB_GOES_HERE');
-define('DB_USER_NAME', 'root');
-define('DB_PASSWORD', 'root');
-define('DB_PORT', 3306);
-define('DB_NAME','kaltura');
+define('DB_USER_NAME', 'USER_GOES_HERE');
+define('DB_PASSWORD', 'PASS_GOES_HERE');
+define('DB_PORT', 'PORT_GOES_HERE');
+define('DB_NAME','DB_NAME_GOES_HERE');
 
 define('IP_ADDRESS_SALT', '');
 
