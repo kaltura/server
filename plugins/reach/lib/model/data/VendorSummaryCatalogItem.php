@@ -10,7 +10,7 @@ class VendorSummaryCatalogItem extends VendorCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::SUMMARY);
 	}
 
-	public function isDuplicateTask($entry, $entryObjectType): bool
+	public function isDuplicateTask($entryId, $entryObjectType, $partnerId): bool
 	{
 		return false;
 	}

@@ -13,7 +13,7 @@ class VendorVideoAnalysisCatalogItem extends VendorCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::VIDEO_ANALYSIS);
 	}
 
-	public function isDuplicateTask($entry, $entryObjectType): bool
+	public function isDuplicateTask($entryId, $entryObjectType, $partnerId): bool
 	{
 		return false;
 	}

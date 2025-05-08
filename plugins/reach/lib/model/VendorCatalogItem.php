@@ -194,9 +194,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 	
-	public function calculateTaskPrice($entry, $entryObjectType, $unitsForPricing = null)
+	public function calculateTaskPrice($entryObject, $entryObjectType, $unitsForPricing = null)
 	{
-		$units = $unitsForPricing !== null ? $unitsForPricing : kReachUtils::getPricingUnitsFromEntryObject($entry, $entryObjectType);
+		$units = $unitsForPricing !== null ? $unitsForPricing : kReachUtils::getPricingUnitsFromEntryObject($entryObject, $entryObjectType);
 		return call_user_func($this->getPricing()->getPriceFunction(), $units, $this->getPricing()->getPricePerUnit());
 	}
 	
@@ -229,11 +229,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array("vendorCatalogItem:id=".strtolower($this->getId()));
 	}
 
-	public function isDuplicateTask($entry, $entryObjectType)
+	public function isDuplicateTask($entryId, $entryObjectType, $partnerId)
 	{
-		$version = $this->getTaskVersion($entry->getId(), $entryObjectType);
-
-		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartnerId(), $version);
+		$version = $this->getTaskVersion($entryId, $entryObjectType);
+		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryId, $this->getId(), $partnerId, $version);
 		if($activeTask)
 		{
 			return true;

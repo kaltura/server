@@ -77,12 +77,12 @@ class kReachUtils
 		return $dbTaskData ? $dbTaskData->getEntryDuration() : null;
 	}
 
-	public static function getPricingUnitsFromEntryObject($entry, $entryObjectType)
+	public static function getPricingUnitsFromEntryObject($entryObject, $entryObjectType)
 	{
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
-				return $entry->getLengthInMsecs();
+				return $entryObject->getLengthInMsecs();
 
 			default:
 				return null;
@@ -109,7 +109,7 @@ class kReachUtils
 	 * @param $taskDuration
 	 * @return bool
 	 */
-	public static function isEnoughCreditLeft($entry, $entryObjectType, VendorCatalogItem $catalogItem, ReachProfile $reachProfile, $unitsForPricing = null)
+	public static function isEnoughCreditLeft($entryObject, $entryObjectType, VendorCatalogItem $catalogItem, ReachProfile $reachProfile, $unitsForPricing = null)
 	{
 		$creditUsed = $reachProfile->getUsedCredit();
 		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
@@ -118,7 +118,7 @@ class kReachUtils
 			return true;
 		}
 
-		$entryTaskPrice = $catalogItem->calculateTaskPrice($entry, $entryObjectType, $unitsForPricing);
+		$entryTaskPrice = $catalogItem->calculateTaskPrice($entryObject, $entryObjectType, $unitsForPricing);
 
 		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice);
 	}

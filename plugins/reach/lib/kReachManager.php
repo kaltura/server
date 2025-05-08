@@ -697,17 +697,18 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	public static function addEntryVendorTaskByObjectIds(entry $entry, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
 	{
 		$entryId = $entry->getId();
+		$partnerId = $entry->getPartnerId();
 		$vendorCatalogItemId = $vendorCatalogItem->getId();
 
 		$targetVersion = $vendorCatalogItem->getTaskVersion($entryId, $entryObjectType);
-		if ($vendorCatalogItem->isDuplicateTask($entry, $entryObjectType))
+		if ($vendorCatalogItem->isDuplicateTask($entryId, $entryObjectType, $partnerId))
 		{
 			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$targetVersion]");
 			return true;
 		}
 		else
 		{
-			kReachUtils::tryToCancelOldTasks($entryId, $vendorCatalogItemId, $entry->getPartnerId());
+			kReachUtils::tryToCancelOldTasks($entryId, $vendorCatalogItemId, $partnerId);
 		}
 
 		//check if credit has expired
@@ -718,7 +719,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 		$unitsForPricing = null;
-		if(!kReachUtils::isPayPerUse($vendorCatalogItem))
+		if(!$reachProfile->getAllowsNegativeOverages())
 		{
 			$unitsForPricing = kReachUtils::getPricingUnitsFromTaskData($taskJobData);
 			if (!kReachUtils::isEnoughCreditLeft($entry, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsForPricing))
@@ -781,9 +782,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	}
 
-	public static function addEntryVendorTask($entry, $entryObjectType, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $unitsForPricing = null)
+	public static function addEntryVendorTask($entryObject, $entryObjectType, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $unitsForPricing = null)
 	{
-		if(!kReachManager::shouldAddEntryVendorTask($entry, $entryObjectType, $vendorCatalogItem))
+		if(!kReachManager::shouldAddEntryVendorTask($entryObject, $entryObjectType, $vendorCatalogItem))
 		{
 			return null;
 		}
@@ -792,12 +793,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask = new EntryVendorTask();
 
 		//Assign default parameters
-		$entryVendorTask->setEntryId($entry->getId());
+		$entryVendorTask->setEntryId($entryObject->getId());
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setReachProfileId($reachProfile->getId());
 		$entryVendorTask->setPartnerId($reachProfile->getPartnerId());
-		$entryVendorTask->setKuserId(self::getTaskKuserId($entry, $entryObjectType));
-		$entryVendorTask->setUserId(self::getTaskPuserId($entry, $entryObjectType));
+		$entryVendorTask->setKuserId(self::getTaskKuserId($entryObject, $entryObjectType));
+		$entryVendorTask->setUserId(self::getTaskPuserId($entryObject, $entryObjectType));
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
 		$entryVendorTask->setVersion($version);
 		$entryVendorTask->setEntryObjectType($entryObjectType);
@@ -816,7 +817,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if(!kReachUtils::isPayPerUse($vendorCatalogItem))
 		{
-			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entry, $entryObjectType, $unitsForPricing);
+			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, $unitsForPricing);
 			$entryVendorTask->setPrice($taskPrice);
 		}
 
@@ -835,7 +836,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$entryVendorTask->setIsRequestModerated(true);
 		}
 
-		$status = self::getEntryVendorTaskStatus($reachProfile, $vendorCatalogItem, $entry, $entryObjectType, $validateModeration);
+		$status = self::getEntryVendorTaskStatus($reachProfile, $vendorCatalogItem, $entryObject, $entryObjectType, $validateModeration);
 		$entryVendorTask->setStatus($status);
 
 		$dictionary = $reachProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
@@ -847,22 +848,23 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	protected static function shouldAddEntryVendorTask($entry, $entryObjectType, $vendorCatalogItem)
+	protected static function shouldAddEntryVendorTask($entryObject, $entryObjectType, $vendorCatalogItem)
 	{
 		switch ($entryObjectType)
 		{
 			case KalturaEntryObjectType::ENTRY:
+				/** @var $entryObject entry */
 				//Check if the entry is temporary, if so, dont create the task
-				if($entry->getIsTemporary())
+				if($entryObject->getIsTemporary())
 				{
-					KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
+					KalturaLog::debug("Entry [{$entryObject->getId()}] is temporary, entry vendor task object wont be created for it");
 					return false;
 				}
 
 				//Check if static content and the catalog item is excluding static content, if so, dont create the task
-				if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entry->getAdminTagsArr()))
+				if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entryObject->getAdminTagsArr()))
 				{
-					KalturaLog::debug("Entry [{$entry->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
+					KalturaLog::debug("Entry [{$entryObject->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
 					return false;
 				}
 				return true;
