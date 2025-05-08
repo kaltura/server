@@ -64,6 +64,10 @@
                         <value>
                         {
                             "message": {
+                                "notification": {
+                                "title": "New Media was added",
+                                "body": "{entry_name} was added to {category_name}",
+                                },
                                 "data": {
                                     "entry_id": "{entry_id}",
                                     "category_id": "{category_id}",
@@ -149,8 +153,6 @@
                                 "notification": {
                                     "title": "New Media was added",
                                     "body": "{entry_name} was added to {category_name}",
-                                    "badge": 1,
-                                    "e":0
                                 },
                                 "data": {
                                     "entry_id": "{entry_id}",
