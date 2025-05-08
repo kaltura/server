@@ -66,7 +66,7 @@
                             "message": {
                                 "notification": {
                                 "title": "New Media was added",
-                                "body": "{entry_name} was added to {category_name}",
+                                "body": "{entry_name} was added to {category_name}"
                                 },
                                 "data": {
                                     "entry_id": "{entry_id}",
@@ -152,7 +152,7 @@
                             "message": {
                                 "notification": {
                                     "title": "New Media was added",
-                                    "body": "{entry_name} was added to {category_name}",
+                                    "body": "{entry_name} was added to {category_name}"
                                 },
                                 "data": {
                                     "entry_id": "{entry_id}",
