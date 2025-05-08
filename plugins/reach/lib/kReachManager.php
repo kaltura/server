@@ -694,10 +694,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds(entry $entry, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
+	public static function addEntryVendorTaskByObjectIds($entryObject, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
 	{
-		$entryId = $entry->getId();
-		$partnerId = $entry->getPartnerId();
+		$entryId = $entryObject->getId();
+		$partnerId = $entryObject->getPartnerId();
 		$vendorCatalogItemId = $vendorCatalogItem->getId();
 
 		$targetVersion = $vendorCatalogItem->getTaskVersion($entryId, $entryObjectType);
@@ -712,29 +712,29 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 		//check if credit has expired
-		if(kReachUtils::hasCreditExpired($reachProfile) && $vendorCatalogItem->getPricing() && $vendorCatalogItem->getPricing()->getPricePerUnit())
+		if(kReachUtils::hasCreditExpired($reachProfile) && $vendorCatalogItem->requiresPayment())
 		{
 			KalturaLog::log("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 			return true;
 		}
 
 		$unitsForPricing = null;
-		if(!$reachProfile->getAllowsNegativeOverages())
+		if(!$reachProfile->getAllowsNegativeOverages() && $vendorCatalogItem->requiresPayment())
 		{
-			$unitsForPricing = kReachUtils::getPricingUnitsFromTaskData($taskJobData);
-			if (!kReachUtils::isEnoughCreditLeft($entry, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsForPricing))
+			$unitsForPricing = kReachUtils::getPricingUnitsFromTaskData($vendorCatalogItem->getPricing()->getPriceFunction(), $entryObjectType, $taskJobData);
+			if (!kReachUtils::isEnoughCreditLeft($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsForPricing))
 			{
 				KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 				return true;
 			}
 		}
 
-		if(!self::shouldAddEntryVendorTaskByObject($entry, $entryObjectType, $vendorCatalogItem, $reachProfile))
+		if(!self::shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile))
 		{
 			return true;
 		}
 
-		$entryVendorTask = self::addEntryVendorTask($entry, $entryObjectType, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $unitsForPricing);
+		$entryVendorTask = self::addEntryVendorTask($entryObject, $entryObjectType, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $unitsForPricing);
 		if($entryVendorTask)
 		{
 			if ($taskJobData)
@@ -746,32 +746,32 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	public static function shouldAddEntryVendorTaskByObject($entry, $entryObjectType, $vendorCatalogItem, $reachProfile)
+	public static function shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile)
 	{
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
-				if (!$vendorCatalogItem->isEntryTypeSupported($entry->getType(), $entry->getMediaType()))
+				if (!$vendorCatalogItem->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType()))
 				{
-					KalturaLog::log("Entry of type [{$entry->getType()}] is not supported by Reach");
+					KalturaLog::log("Entry of type [{$entryObject->getType()}] is not supported by Reach");
 					return false;
 				}
 
-				if (!kReachUtils::areFlavorsReady($entry, $reachProfile))
+				if (!kReachUtils::areFlavorsReady($entryObject, $reachProfile))
 				{
 					KalturaLog::log("Not all flavor params IDs [{$reachProfile->getFlavorParamsIds()}] are ready yet");
 					return false;
 				}
 
-				if($entry->getParentEntryId())
+				if($entryObject->getParentEntryId())
 				{
-					KalturaLog::log("Entry [{$entry->getId()}] is a child entry, entry vendor task object wont be created for it");
+					KalturaLog::log("Entry [{$entryObject->getId()}] is a child entry, entry vendor task object wont be created for it");
 					return false;
 				}
 
-				if ($vendorCatalogItem->isEntryDurationExceeding($entry))
+				if ($vendorCatalogItem->isEntryDurationExceeding($entryObject))
 				{
-					KalturaLog::log("Entry [{$entry->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
+					KalturaLog::log("Entry [{$entryObject->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
 					return false;
 				}
 				return true;
@@ -782,7 +782,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	}
 
-	public static function addEntryVendorTask($entryObject, $entryObjectType, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $unitsForPricing = null)
+	public static function addEntryVendorTask($entryObject, $entryObjectType, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $unitsUsed = null)
 	{
 		if(!kReachManager::shouldAddEntryVendorTask($entryObject, $entryObjectType, $vendorCatalogItem))
 		{
@@ -817,7 +817,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if(!kReachUtils::isPayPerUse($vendorCatalogItem))
 		{
-			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, $unitsForPricing);
+			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, $unitsUsed);
 			$entryVendorTask->setPrice($taskPrice);
 		}
 

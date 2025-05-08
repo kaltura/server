@@ -194,10 +194,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 	
-	public function calculateTaskPrice($entryObject, $entryObjectType, $unitsForPricing = null)
+	public function calculateTaskPrice($entryObject, $entryObjectType, $unitsUsed = null)
 	{
-		$units = $unitsForPricing !== null ? $unitsForPricing : kReachUtils::getPricingUnitsFromEntryObject($entryObject, $entryObjectType);
-		return call_user_func($this->getPricing()->getPriceFunction(), $units, $this->getPricing()->getPricePerUnit());
+		if(!$this->getPricing())
+		{
+			return null;
+		}
+		$priceFunction = $this->getPricing()->getPriceFunction();
+		$pricePerUnit = $this->getPricing()->getPricePerUnit();
+		$units = $unitsUsed !== null ? $unitsUsed : kReachUtils::getPricingUnitsFromEntryObject($priceFunction, $entryObject, $entryObjectType);
+		return call_user_func($priceFunction, $units, $pricePerUnit);
 	}
 	
 	public function getTaskVersion($entryId, $entryObjectType = KalturaEntryObjectType::ENTRY, $jobData = null)

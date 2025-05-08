@@ -72,17 +72,42 @@ class kReachUtils
 		return kReachUtils::isPayPerUse($dbVendorCatalogItem);
 	}
 
-	public static function getPricingUnitsFromTaskData($dbTaskData)
+	public static function shouldGetEntryDuration($priceFunction, $entryObjectType)
 	{
-		return $dbTaskData ? $dbTaskData->getEntryDuration() : null;
+		$entryDurationFunctions = array(
+			VendorCatalogItemPriceFunction::PRICE_PER_HOUR,
+			VendorCatalogItemPriceFunction::PRICE_PER_MINUTE,
+			VendorCatalogItemPriceFunction::PRICE_PER_SECOND
+		);
+
+		switch($entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				return in_array($priceFunction, $entryDurationFunctions);
+
+			default:
+				return false;
+		}
 	}
 
-	public static function getPricingUnitsFromEntryObject($entryObject, $entryObjectType)
+	public static function getPricingUnitsFromTaskData($priceFunction, $entryObjectType, $taskData)
 	{
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
-				return $entryObject->getLengthInMsecs();
+				return kReachUtils::shouldGetEntryDuration($priceFunction, $entryObjectType) ? $taskData->getEntryDuration() : null;
+
+			default:
+				return null;
+		}
+	}
+
+	public static function getPricingUnitsFromEntryObject($priceFunction, $entryObjectType, $entryObject)
+	{
+		switch($entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				return kReachUtils::shouldGetEntryDuration($priceFunction, $entryObjectType) ? $entryObject->getLengthInMsecs() : null;
 
 			default:
 				return null;
