@@ -194,7 +194,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_ENTRY_OBJECT_TYPE, null, KalturaEntryObjectType::ENTRY);
 	}
 
-	public function getUnitsUsed($v)
+	public function getUnitsUsed()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_UNITS_USED);
 	}

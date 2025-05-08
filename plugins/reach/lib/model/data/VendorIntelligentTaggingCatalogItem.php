@@ -13,7 +13,7 @@ class VendorIntelligentTaggingCatalogItem extends VendorCatalogItem
         $this->setServiceFeature(VendorServiceFeature::INTELLIGENT_TAGGING);
     }
 
-    public function isDuplicateTask(entry $entry)
+    public function isDuplicateTask($entry, $entryObjectType)
     {
         return false;
     }

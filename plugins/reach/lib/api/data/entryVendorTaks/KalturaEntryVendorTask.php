@@ -108,7 +108,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	public $entryObjectType;
 
 	/**
-	 * @var float
+	 * @var int
 	 */
 	public $unitsUsed;
 

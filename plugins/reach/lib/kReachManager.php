@@ -76,7 +76,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
-			if(!kReachUtils::isFeatureTypeSupportedForEntry($entry, $entryObjectType, $featureType, $catalogItemToAdd))
+			if(!$catalogItemToAdd->isFeatureTypeSupportedForEntry($entry, $entryObjectType))
 			{
 				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for entry Id $entryId");
 				continue;
@@ -522,7 +522,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			if(!kReachUtils::isPayPerUse($dbVendorCatalogItem) && $pendingEntryReadyTask->getPrice() == 0)
 			{
 				$taskDuration = $pendingEntryReadyTask->getTaskJobData() ? $pendingEntryReadyTask->getTaskJobData()->getEntryDuration() : null;
-				$pendingEntryReadyTask->setPrice(kReachUtils::calculateTaskPrice($object, $pendingEntryReadyTask->getCatalogItem(), $taskDuration));
+				$vendorCatalogItem = $pendingEntryReadyTask->getCatalogItem();
+				$pendingEntryReadyTask->setPrice($vendorCatalogItem->calculateTaskPrice($object, $pendingEntryReadyTask->getEntryObjectType(), $taskDuration));
 			}
 			$pendingEntryReadyTask->save();
 		}
@@ -648,7 +649,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 			$oldPrice = $pendingEntryVendorTask->getPrice();
 			$taskDuration = $pendingEntryVendorTask->getTaskJobData() ? $pendingEntryVendorTask->getTaskJobData()->getEntryDuration() : null;
-			$newPrice = kReachUtils::calculateTaskPrice($entry, $pendingEntryVendorTask->getCatalogItem(), $taskDuration);
+			$vendorCatalogItem = $pendingEntryVendorTask->getCatalogItem();
+			$newPrice = $vendorCatalogItem->calculateTaskPrice($entry, $pendingEntryVendorTask->getEntryObjectType(), $taskDuration);
 			$priceDiff = $newPrice - $oldPrice;
 			
 			if(!$priceDiff)
@@ -697,7 +699,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryId = $entry->getId();
 		$vendorCatalogItemId = $vendorCatalogItem->getId();
 
-		$targetVersion = $vendorCatalogItem->getTaskVersion($entry, $entryObjectType);
+		$targetVersion = $vendorCatalogItem->getTaskVersion($entryId, $entryObjectType);
 		if ($vendorCatalogItem->isDuplicateTask($entry, $entryObjectType))
 		{
 			KalturaLog::log("Trying to insert a duplicate entry vendor task for entry [$entryId], catalog item [$vendorCatalogItemId] and entry version [$targetVersion]");
@@ -814,7 +816,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if(!kReachUtils::isPayPerUse($vendorCatalogItem))
 		{
-			$taskPrice = kReachUtils::calculateTaskPrice($entry, $entryObjectType, $vendorCatalogItem, $unitsForPricing);
+			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entry, $entryObjectType, $unitsForPricing);
 			$entryVendorTask->setPrice($taskPrice);
 		}
 

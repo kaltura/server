@@ -10,7 +10,7 @@ class VendorClipsCatalogItem extends VendorCatalogItem
         $this->setServiceFeature(VendorServiceFeature::CLIPS);
     }
 
-    public function isDuplicateTask(entry $entry): bool
+    public function isDuplicateTask($entry, $entryObjectType): bool
     {
         return false;
     }

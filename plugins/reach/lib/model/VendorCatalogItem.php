@@ -194,9 +194,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 	
-	public function calculatePriceForEntry($entry, $entryObjectType, $unitsForPricing = null)
+	public function calculateTaskPrice($entry, $entryObjectType, $unitsForPricing = null)
 	{
-		$units = $unitsForPricing ? $unitsForPricing : kReachUtils::getPricingUnitsFromEntryObject($entry, $entryObjectType);
+		$units = $unitsForPricing !== null ? $unitsForPricing : kReachUtils::getPricingUnitsFromEntryObject($entry, $entryObjectType);
 		return call_user_func($this->getPricing()->getPriceFunction(), $units, $this->getPricing()->getPricePerUnit());
 	}
 	
@@ -231,7 +231,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 	public function isDuplicateTask($entry, $entryObjectType)
 	{
-		$version = $this->getTaskVersion($entry, $entryObjectType);
+		$version = $this->getTaskVersion($entry->getId(), $entryObjectType);
 
 		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartnerId(), $version);
 		if($activeTask)
@@ -333,6 +333,19 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		}
 		
 		return array_map("trim", explode(',', $adminTagsToExclude));
+	}
+
+	public function isFeatureTypeSupportedForEntry($entryObject, $entryObjectType)
+	{
+		switch ($entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				$supportedType = $this->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType());
+				return !$this->isEntryDurationExceeding($entryObject) && $supportedType;
+
+			default:
+				return false;
+		}
 	}
 
 	public function isEntryDurationExceeding(entry $entry)

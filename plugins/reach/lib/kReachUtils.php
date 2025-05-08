@@ -40,11 +40,6 @@ class kReachUtils
 		return $tokens * $pricePerUnit;
 	}
 
-	public static function calculateTaskPrice($entry, $entryObjectType, VendorCatalogItem $vendorCatalogItem, $unitsForPricing = null)
-	{
-		return $vendorCatalogItem->calculatePriceForEntry($entry, $entryObjectType, $unitsForPricing);
-	}
-
 	public static function retrieveEntryObject(KalturaEntryVendorTask $entryVendorTask)
 	{
 		switch($entryVendorTask->entryObjectType)
@@ -123,8 +118,8 @@ class kReachUtils
 			return true;
 		}
 
-		$entryTaskPrice = self::calculateTaskPrice($entry, $entryObjectType, $catalogItem, $unitsForPricing);
-		
+		$entryTaskPrice = $catalogItem->calculateTaskPrice($entry, $entryObjectType, $unitsForPricing);
+
 		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice);
 	}
 
@@ -222,25 +217,6 @@ class kReachUtils
 		$entryVendorTask->setErrDescription('Aborted following cancel request');
 
 		EntryVendorTaskService::tryToSave($entryVendorTask);
-	}
-
-	public static function isFeatureTypeSupportedForEntry($entryObject, $entryObjectType, $featureType, VendorCatalogItem $dbVendorCatalogItem)
-	{
-		switch ($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				if(in_array($featureType, array(VendorServiceFeature::AUDIO_DESCRIPTION, VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION)))
-				{
-					if($entryObject->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($entryObject->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
-					{
-						return false;
-					}
-				}
-				return $dbVendorCatalogItem->isEntryDurationExceeding($entryObject);
-
-			default:
-				return false;
-		}
 	}
 
 	public static function verifyRequiredSource($dbVendorCatalogItem, $dbTaskData)

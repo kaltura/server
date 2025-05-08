@@ -58,9 +58,9 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($entryVendorTask->catalogItemId);
 		kReachUtils::validateProfileAndCatalogItemOverages($dbVendorCatalogItem, $dbReachProfile);
 
-		$featureType = $dbVendorCatalogItem->getServiceFeature();
-		if (!kReachUtils::isFeatureTypeSupportedForEntry($entryObject, $entryVendorTask->entryObjectType, $featureType, $dbVendorCatalogItem))
+		if (!$dbVendorCatalogItem->isFeatureTypeSupportedForEntry($entryObject, $entryVendorTask->entryObjectType))
 		{
+			$featureType = $dbVendorCatalogItem->getServiceFeature();
 			throw new KalturaAPIException(KalturaReachErrors::FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY, $featureType, $entryVendorTask->entryId);
 		}
 
@@ -225,15 +225,15 @@ class EntryVendorTaskService extends KalturaBaseService
 		}
 
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($dbEntryVendorTask->getCatalogItemId());
-		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && kReachUtils::isPayPerUse($dbVendorCatalogItem) && !$entryVendorTask->unitsUsed)
+		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && kReachUtils::isPayPerUse($dbVendorCatalogItem))
 		{
-			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
-		}
-
-		if(kReachUtils::isPayPerUse($dbVendorCatalogItem))
-		{
+			$unitsUsed = $entryVendorTask->unitsUsed !== null ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
+			if($unitsUsed === null)
+			{
+				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
+			}
 			$entryObject = $dbEntryVendorTask->retrieveEntryObject();
-			$taskPrice = kReachUtils::calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), $dbVendorCatalogItem, $entryVendorTask->unitsUsed);
+			$taskPrice = $dbVendorCatalogItem->calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), $unitsUsed);
 			$dbEntryVendorTask->setPrice($taskPrice);
 		}
 
