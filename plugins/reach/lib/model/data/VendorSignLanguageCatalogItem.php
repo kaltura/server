@@ -1,16 +1,15 @@
 <?php
 /**
- *  VendorIntelligentTaggingCatalogItem
+ *  VendorSignLanguageCatalogItem
  * @package plugins.reach
  * @subpackage model
  */
 
-
-class VendorIntelligentTaggingCatalogItem extends VendorCatalogItem
+class VendorSignLanguageCatalogItem extends VendorCatalogItem
 {
     public function applyDefaultValues()
     {
-        $this->setServiceFeature(VendorServiceFeature::INTELLIGENT_TAGGING);
+        $this->setServiceFeature(VendorServiceFeature::SIGN_LANGUAGE);
     }
 
     public function isDuplicateTask(entry $entry)
@@ -18,25 +17,20 @@ class VendorIntelligentTaggingCatalogItem extends VendorCatalogItem
         return false;
     }
 
-    public function calculateVersion(entry $entry)
-    {
-        return $entry->getVersion();
-    }
-
     public function requiresEntryReady()
     {
-        return false;
+        return true;
     }
 
     /**
      * @param $object
-     * @return kIntelligentTaggingVendorTaskData|null
+     * @return kSignLanguageVendorTaskData|null
      */
     public function getTaskJobData($object)
     {
         if($object instanceof asset)
         {
-            $taskJobData = new kIntelligentTaggingVendorTaskData();
+            $taskJobData = new kSignLanguageVendorTaskData();
             $taskJobData->assetId = $object->getId();
             return $taskJobData;
         }
