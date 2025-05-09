@@ -34,12 +34,119 @@ class kReachUtils
 	{
 		return ceil($durationMsec/1000/dateUtils::HOUR) * $pricePerUnit;
 	}
-	
-	public static function calculateTaskPrice(entry $entry, VendorCatalogItem $vendorCatalogItem, $taskDuration = null)
+
+	public static function calcPricePerToken($tokens, $pricePerUnit)
 	{
-		return $vendorCatalogItem->calculatePriceForEntry($entry, $taskDuration);
+		return $tokens * $pricePerUnit;
 	}
-	
+
+	public static function retrieveEntryObject(KalturaEntryVendorTask $entryVendorTask)
+	{
+		switch($entryVendorTask->entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				return entryPeer::retrieveByPK($entryVendorTask->entryId);
+
+			default:
+				return null;
+		}
+	}
+
+	public static function validateEntryObjectExists(EntryVendorTask $dbEntryVendorTask)
+	{
+		$dbEntry = $dbEntryVendorTask->retrieveEntryObject();
+		if (!$dbEntry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
+		}
+	}
+
+	public static function isPayPerUse(VendorCatalogItem $dbVendorCatalogItem)
+	{
+		return $dbVendorCatalogItem->getRequiresOverages() && $dbVendorCatalogItem->requiresPayment();
+	}
+
+	public static function isPayPerUseTask(EntryVendorTask $entryVendorTask)
+	{
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($entryVendorTask->getCatalogItemId());
+		return kReachUtils::isPayPerUse($dbVendorCatalogItem);
+	}
+
+	public static function shouldGetEntryDuration($priceFunction, $entryObjectType)
+	{
+		$entryDurationFunctions = array(
+			VendorCatalogItemPriceFunction::PRICE_PER_HOUR,
+			VendorCatalogItemPriceFunction::PRICE_PER_MINUTE,
+			VendorCatalogItemPriceFunction::PRICE_PER_SECOND
+		);
+
+		switch($entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				return in_array($priceFunction, $entryDurationFunctions);
+
+			default:
+				return false;
+		}
+	}
+
+	public static function getPricingUnits($dbVendorCatalogItem, $entryObject, $entryObjectType, $taskData, $unitsUsed = null)
+	{
+		if($unitsUsed !== null)
+		{
+			return $unitsUsed;
+		}
+
+		if(!$dbVendorCatalogItem->getPricing())
+		{
+			return null;
+		}
+
+		$priceFunction = $dbVendorCatalogItem->getPricing()->getPriceFunction();
+		$units = kReachUtils::getPricingUnitsFromTaskData($priceFunction, $entryObjectType, $taskData);
+		return $units !== null ? $units : kReachUtils::getPricingUnitsFromEntryObject($priceFunction, $entryObjectType, $entryObject);
+	}
+
+	public static function getPricingUnitsFromTaskData($priceFunction, $entryObjectType, $taskData)
+	{
+		switch($entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				if(kReachUtils::shouldGetEntryDuration($priceFunction, $entryObjectType))
+				{
+					return $taskData ? $taskData->getEntryDuration() : null;
+				}
+
+			default:
+				return null;
+		}
+	}
+
+	public static function getPricingUnitsFromEntryObject($priceFunction, $entryObjectType, $entryObject)
+	{
+		switch($entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				return kReachUtils::shouldGetEntryDuration($priceFunction, $entryObjectType) ? $entryObject->getLengthInMsecs() : null;
+
+			default:
+				return null;
+		}
+	}
+
+	public static function tryToCancelOldTasks($entryId, $vendorCatalogItemId, $partnerId)
+	{
+		$activeStatuses = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PENDING_ENTRY_READY);
+		$activeTasksOnOlderVersion  = EntryVendorTaskPeer::retrieveTasksByStatus($entryId, $vendorCatalogItemId, $partnerId, null, $activeStatuses);
+		if($activeTasksOnOlderVersion)
+		{
+			foreach ($activeTasksOnOlderVersion as $activeTaskOnOlderVersion)
+			{
+				kReachUtils::tryToCancelTask($activeTaskOnOlderVersion);
+			}
+		}
+	}
+
 	/**
 	 * @param $entry
 	 * @param $catalogItem
@@ -47,18 +154,18 @@ class kReachUtils
 	 * @param $taskDuration
 	 * @return bool
 	 */
-	public static function isEnoughCreditLeft($entry, VendorCatalogItem $catalogItem, ReachProfile $reachProfile, $taskDuration = null)
+	public static function isEnoughCreditLeft($entryObject, $entryObjectType, VendorCatalogItem $catalogItem, ReachProfile $reachProfile, $unitsForPricing = null)
 	{
 		$creditUsed = $reachProfile->getUsedCredit();
 		$allowedCredit = $reachProfile->getCredit()->getCurrentCredit();
-		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT )
+		if ($allowedCredit == ReachProfileCreditValues::UNLIMITED_CREDIT)
 		{
 			return true;
 		}
 
-		$entryTaskPrice = self::calculateTaskPrice($entry, $catalogItem, $taskDuration);
-		
-		return self::isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice);
+		$entryTaskPrice = $catalogItem->calculateTaskPrice($entryObject, $entryObjectType, null, $unitsForPricing);
+
+		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice);
 	}
 
 	public static function areFlavorsReady(entry $entry, ReachProfile $reachProfile)
@@ -115,10 +222,10 @@ class kReachUtils
 		$creditUsed = $reachProfile->getUsedCredit();
 		$entryTaskPrice = $entryVendorTask->getPrice();
 		
-		return self::isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice);
+		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice);
 	}
 	
-	public static function isOrderAllowed($allowedCredit, $creditUsed, $entryTaskPrice)
+	public static function isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice)
 	{
 		//If task price is 0 there is no reason to check remaining credit
 		//This will allow jobs to run also in cases that due to race condition the used credit is larger than allowed credit
@@ -155,18 +262,6 @@ class kReachUtils
 		$entryVendorTask->setErrDescription('Aborted following cancel request');
 
 		EntryVendorTaskService::tryToSave($entryVendorTask);
-	}
-
-	public static function isFeatureTypeSupportedForEntry($entry, $featureType)
-	{
-		if(in_array($featureType, array(VendorServiceFeature::AUDIO_DESCRIPTION, VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION)))
-		{
-			if($entry->getType() != KalturaEntryType::MEDIA_CLIP || !in_array($entry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
-			{
-				return false;
-			}
-		}
-		return true;
 	}
 
 	public static function verifyRequiredSource($dbVendorCatalogItem, $dbTaskData)
@@ -412,11 +507,14 @@ class kReachUtils
 
 	public static function refundTask(EntryVendorTask $entryVendorTask)
 	{
-		ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
+		if(!kReachUtils::isPayPerUseTask($entryVendorTask))
+		{
+			ReachProfilePeer::updateUsedCredit($entryVendorTask->getReachProfileId(), -$entryVendorTask->getPrice());
 
-		//Reset task price so that reports will be aligned with the total used credit
-		$entryVendorTask->setOldPrice($entryVendorTask->getPrice());
-		$entryVendorTask->setPrice(0);
+			//Reset task price so that reports will be aligned with the total used credit
+			$entryVendorTask->setOldPrice($entryVendorTask->getPrice());
+			$entryVendorTask->setPrice(0);
+		}
 		$entryVendorTask->save();
 	}
 
