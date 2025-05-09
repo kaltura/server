@@ -163,7 +163,7 @@ class kReachUtils
 			return true;
 		}
 
-		$entryTaskPrice = $catalogItem->calculateTaskPrice($entryObject, $entryObjectType, $unitsForPricing);
+		$entryTaskPrice = $catalogItem->calculateTaskPrice($entryObject, $entryObjectType, null, $unitsForPricing);
 
 		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice);
 	}
