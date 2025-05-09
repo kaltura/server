@@ -90,12 +90,32 @@ class kReachUtils
 		}
 	}
 
+	public static function getPricingUnits($dbVendorCatalogItem, $entryObject, $entryObjectType, $taskData, $unitsUsed = null)
+	{
+		if($unitsUsed !== null)
+		{
+			return $unitsUsed;
+		}
+
+		if(!$dbVendorCatalogItem->getPricing())
+		{
+			return null;
+		}
+
+		$priceFunction = $dbVendorCatalogItem->getPricing()->getPriceFunction();
+		$units = kReachUtils::getPricingUnitsFromTaskData($priceFunction, $entryObjectType, $taskData);
+		return $units !== null ? $units : kReachUtils::getPricingUnitsFromEntryObject($priceFunction, $entryObjectType, $entryObject);
+	}
+
 	public static function getPricingUnitsFromTaskData($priceFunction, $entryObjectType, $taskData)
 	{
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
-				return kReachUtils::shouldGetEntryDuration($priceFunction, $entryObjectType) ? $taskData->getEntryDuration() : null;
+				if(kReachUtils::shouldGetEntryDuration($priceFunction, $entryObjectType))
+				{
+					return $taskData ? $taskData->getEntryDuration() : null;
+				}
 
 			default:
 				return null;

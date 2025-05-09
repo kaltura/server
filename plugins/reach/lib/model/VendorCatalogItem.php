@@ -194,7 +194,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 	
-	public function calculateTaskPrice($entryObject, $entryObjectType, $unitsUsed = null)
+	public function calculateTaskPrice($entryObject, $entryObjectType, $taskData, $unitsUsed = null)
 	{
 		if(!$this->getPricing())
 		{
@@ -202,7 +202,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		}
 		$priceFunction = $this->getPricing()->getPriceFunction();
 		$pricePerUnit = $this->getPricing()->getPricePerUnit();
-		$units = $unitsUsed !== null ? $unitsUsed : kReachUtils::getPricingUnitsFromEntryObject($priceFunction, $entryObject, $entryObjectType);
+		$units = kReachUtils::getPricingUnits($this, $entryObject, $entryObjectType, $taskData, $unitsUsed);
 		return call_user_func($priceFunction, $units, $pricePerUnit);
 	}
 	

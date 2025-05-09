@@ -521,9 +521,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$pendingEntryReadyTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
 			if(!kReachUtils::isPayPerUse($dbVendorCatalogItem) && $pendingEntryReadyTask->getPrice() == 0)
 			{
-				$taskDuration = $pendingEntryReadyTask->getTaskJobData() ? $pendingEntryReadyTask->getTaskJobData()->getEntryDuration() : null;
 				$vendorCatalogItem = $pendingEntryReadyTask->getCatalogItem();
-				$pendingEntryReadyTask->setPrice($vendorCatalogItem->calculateTaskPrice($object, $pendingEntryReadyTask->getEntryObjectType(), $taskDuration));
+				$taskPrice = $vendorCatalogItem->calculateTaskPrice($object, $pendingEntryReadyTask->getEntryObjectType(), $pendingEntryReadyTask->getTaskJobData());
+				$pendingEntryReadyTask->setPrice($taskPrice);
 			}
 			$pendingEntryReadyTask->save();
 		}
@@ -648,9 +648,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				continue;
 			}
 			$oldPrice = $pendingEntryVendorTask->getPrice();
-			$taskDuration = $pendingEntryVendorTask->getTaskJobData() ? $pendingEntryVendorTask->getTaskJobData()->getEntryDuration() : null;
 			$vendorCatalogItem = $pendingEntryVendorTask->getCatalogItem();
-			$newPrice = $vendorCatalogItem->calculateTaskPrice($entry, $pendingEntryVendorTask->getEntryObjectType(), $taskDuration);
+			$newPrice = $vendorCatalogItem->calculateTaskPrice($entry, $pendingEntryVendorTask->getEntryObjectType(), $pendingEntryVendorTask->getTaskJobData());
 			$priceDiff = $newPrice - $oldPrice;
 			
 			if(!$priceDiff)
@@ -711,30 +710,30 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			kReachUtils::tryToCancelOldTasks($entryId, $vendorCatalogItemId, $partnerId);
 		}
 
-		//check if credit has expired
-		if(kReachUtils::hasCreditExpired($reachProfile) && $vendorCatalogItem->requiresPayment())
+		$unitsUsed = null;
+		if($vendorCatalogItem->requiresPayment())
 		{
-			KalturaLog::log("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
-			return true;
-		}
+			if(kReachUtils::hasCreditExpired($reachProfile))
+			{
+				KalturaLog::log("Credit cycle has expired, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
+				return true;
+			}
 
-		$unitsForPricing = null;
-		if(!$reachProfile->getAllowsNegativeOverages() && $vendorCatalogItem->requiresPayment())
-		{
-			$unitsForPricing = kReachUtils::getPricingUnitsFromTaskData($vendorCatalogItem->getPricing()->getPriceFunction(), $entryObjectType, $taskJobData);
-			if (!kReachUtils::isEnoughCreditLeft($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsForPricing))
+			$unitsUsed = kReachUtils::getPricingUnits($vendorCatalogItem, $entryObject, $entryObjectType, $taskJobData, $unitsUsed);
+			if (!$reachProfile->getAllowsNegativeOverages() && !kReachUtils::isEnoughCreditLeft($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsUsed))
 			{
 				KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 				return true;
 			}
 		}
 
+
 		if(!self::shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile))
 		{
 			return true;
 		}
 
-		$entryVendorTask = self::addEntryVendorTask($entryObject, $entryObjectType, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $unitsForPricing);
+		$entryVendorTask = self::addEntryVendorTask($entryObject, $entryObjectType, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $unitsUsed);
 		if($entryVendorTask)
 		{
 			if ($taskJobData)
@@ -817,8 +816,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if(!kReachUtils::isPayPerUse($vendorCatalogItem))
 		{
-			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, $unitsUsed);
+			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, null, $unitsUsed);
 			$entryVendorTask->setPrice($taskPrice);
+		}
+
+		if($unitsUsed !== null)
+		{
+			$entryVendorTask->setUnitsUsed($unitsUsed);
 		}
 
 		if ($context)
