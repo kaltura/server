@@ -10,11 +10,6 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
 	 * @filter eq,in
 	 */
 	public $targetLanguage;
-
-	/**
-	 * @var bool
-	 */
-	public $requireSource;
 	/**
 	 * @var KalturaVendorCatalogItemSignLanguageOutputFormat
 	 * @filter eq,in
@@ -24,7 +19,6 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
 	private static $map_between_objects = array
 	(
 		'targetLanguage',
-		'requireSource',
 		'outputFormat',
 	);
 
