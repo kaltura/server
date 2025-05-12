@@ -16,17 +16,9 @@ class KalturaSentimentAnalysisVendorTaskData extends KalturaVendorTaskData
 	 */
 	public $language;
 
-	/**
-	 * JSON string containing the summary output.
-	 *
-	 * @var string
-	 */
-	public $sentimentAnalysisOutputJson;
-
 
 	private static $map_between_objects = array(
 		'language',
-		'sentimentAnalysisOutputJson',
 	);
 
 	public function getMapBetweenObjects()
