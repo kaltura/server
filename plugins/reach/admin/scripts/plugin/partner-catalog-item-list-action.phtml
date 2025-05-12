@@ -28,12 +28,13 @@
 			<th><?php echo $this->translate('Contract'); ?></th>
 			<th><?php echo $this->translate('Notes'); ?></th>
 			<th><?php echo $this->translate('Default Reach Profile ID'); ?></th>
+			<th><?php echo $this->translate('Requires Overages'); ?></th>
 			<th><?php echo $this->translate('Action'); ?></th>
 		</tr>
 		</thead>
 		<tfoot>
 		<tr>
-			<td colspan="17">
+			<td colspan="19">
 				<?php echo $this->paginator; ?>
 			</td>
 		</tr>
@@ -71,6 +72,7 @@
                 <td><?php echo $catalogItem->contract; ?></td>
                 <td><?php echo $catalogItem->notes; ?></td>
                 <td><?php echo $catalogItem->defaultReachProfileId; ?></td>
+                <td><?php echo $catalogItem->requiresOverages; ?></td>
 				<td>
 					<select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id;?>, <?php echo $catalogItem->partnerId; ?>)">
 						<option value=""><?php echo $this->translate('Select Action'); ?></option>

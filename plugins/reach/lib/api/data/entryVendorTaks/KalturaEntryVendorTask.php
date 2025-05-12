@@ -99,6 +99,13 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 * @readonly
 	 */
 	public $userId;
+
+	/**
+	 * @var KalturaEntryObjectType
+	 * @filter eq,in,notin
+	 * @insertonly
+	 */
+	public $entryObjectType;
 	
 	/**
 	 * The user ID that approved this task for execution (in case moderation is requested)
@@ -226,6 +233,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'catalogItemId',
 		'price',
 		'userId',
+		'entryObjectType',
 		'moderatingUser',
 		'errDescription',
 		'accessKey',
@@ -297,8 +305,9 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	{
 		$this->validatePropertyNotNull("catalogItemId");
 		$this->validatePropertyNotNull("entryId");
-		$this->validateEntryId();
-		
+
+		$this->validateEntryObjectId();
+
 		if(!kString::checkIsValidJson($this->partnerData))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
@@ -340,6 +349,24 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+
+	protected function validateEntryObjectId()
+	{
+		if(!$this->entryObjectType)
+		{
+			$this->entryObjectType = KalturaEntryObjectType::ENTRY;
+		}
+
+		switch ($this->entryObjectType)
+		{
+			case KalturaEntryObjectType::ENTRY:
+				$this->validateEntryId();
+				return;
+
+			default:
+				throw new KalturaAPIException(KalturaReachErrors::ENTRY_OBJECT_TYPE_NOT_SUPPORTED, $this->entryObjectType);
+		}
 	}
 	
 	private function validateEntryId()

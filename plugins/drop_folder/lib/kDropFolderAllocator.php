@@ -102,6 +102,10 @@ class kDropFolderAllocator
 	private static function lockDropFolder($dropFolderId, $maxTimeForWatch)
 	{
 		$lock = kLock::create(self::getLockKeyForDropFolder($dropFolderId));
+		if (!$lock)
+		{
+			return null;
+		}
 		return $lock->lock(1, $maxTimeForWatch); // 1 is the lockGrabTimeout (seconds)
 	}
 

@@ -82,9 +82,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				continue;
 			}
 
+			if($catalogItemToAdd->getRequiresOverages() && !$reachProfile->getAllowsNegativeOverages())
+			{
+				KalturaLog::log("Reach Profile ID $profileId does not allow negative overages for catalog item with ID $catalogItemIdToAdd");
+				continue;
+			}
+
 			//Pass the object Id as the context of the task
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
-			self::addEntryVendorTaskByObjectIds($entry, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
+			self::addEntryVendorTaskByObjectIds($entry, EntryObjectType::ENTRY, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
 		}
 	}
 
@@ -664,7 +670,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds(entry $entry, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
+	public static function addEntryVendorTaskByObjectIds(entry $entry, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
 	{
 		$entryId = $entry->getId();
 		$vendorCatalogItemId = $vendorCatalogItem->getId();
@@ -725,7 +731,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
-		$entryVendorTask = self::addEntryVendorTask($entry, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $taskDuration);
+		$entryVendorTask = self::addEntryVendorTask($entry, $entryObjectType, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $taskDuration);
 		if($entryVendorTask)
 		{
 			if ($taskJobData)
@@ -737,19 +743,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	public static function addEntryVendorTask(entry $entry, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $taskDuration = null)
+	public static function addEntryVendorTask($entry, $entryObjectType, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $taskDuration = null)
 	{
-		//Check if the entry is temporary, if so, dont create the task
-		if($entry->getIsTemporary())
+		if(!kReachManager::shouldAddEntryVendorTask($entry, $entryObjectType, $vendorCatalogItem))
 		{
-			KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
-			return null;
-		}
-		
-		//Check if static content and the catalog item is excluding static content, if so, dont create the task
-		if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entry->getAdminTagsArr()))
-		{
-			KalturaLog::debug("Entry [{$entry->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
 			return null;
 		}
 		
@@ -760,11 +757,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setEntryId($entry->getId());
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setReachProfileId($reachProfile->getId());
-		$entryVendorTask->setPartnerId($entry->getPartnerId());
-		$entryVendorTask->setKuserId(self::getTaskKuserId($entry));
-		$entryVendorTask->setUserId(self::getTaskPuserId($entry));
+		$entryVendorTask->setPartnerId($reachProfile->getPartnerId());
+		$entryVendorTask->setKuserId(self::getTaskKuserId($entry, $entryObjectType));
+		$entryVendorTask->setUserId(self::getTaskPuserId($entry, $entryObjectType));
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
 		$entryVendorTask->setVersion($version);
+		$entryVendorTask->setEntryObjectType($entryObjectType);
 		$entryVendorTask->setQueueTime(null);
 		$entryVendorTask->setFinishTime(null);
 
@@ -780,60 +778,119 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());
 
 		if ($context)
+		{
 			$entryVendorTask->setContext($context);
+		}
 
 		if ($creationMode)
+		{
 			$entryVendorTask->setCreationMode($creationMode);
+		}
 
-		$status = EntryVendorTaskStatus::PENDING;
 		if ($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
 		{
 			$entryVendorTask->setIsRequestModerated(true);
+		}
+
+		$status = self::getEntryVendorTaskStatus($reachProfile, $vendorCatalogItem, $entry, $entryObjectType, $validateModeration);
+		$entryVendorTask->setStatus($status);
+
+		$dictionary = $reachProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
+		if ($dictionary)
+		{
+			$entryVendorTask->setDictionary($dictionary->getData());
+		}
+
+		return $entryVendorTask;
+	}
+
+	protected static function shouldAddEntryVendorTask($entry, $entryObjectType, $vendorCatalogItem)
+	{
+		switch ($entryObjectType)
+		{
+			case KalturaEntryObjectType::ENTRY:
+				//Check if the entry is temporary, if so, dont create the task
+				if($entry->getIsTemporary())
+				{
+					KalturaLog::debug("Entry [{$entry->getId()}] is temporary, entry vendor task object wont be created for it");
+					return false;
+				}
+
+				//Check if static content and the catalog item is excluding static content, if so, dont create the task
+				if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entry->getAdminTagsArr()))
+				{
+					KalturaLog::debug("Entry [{$entry->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
+					return false;
+				}
+				return true;
+
+			default:
+				return false;
+		}
+	}
+
+	protected static function getEntryVendorTaskStatus($reachProfile, $vendorCatalogItem, $entry, $entryObjectType, $validateModeration)
+	{
+		$status = EntryVendorTaskStatus::PENDING;
+
+		if ($validateModeration && $reachProfile->shouldModerate($vendorCatalogItem->getServiceType()))
+		{
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
 		}
-		
-		if($vendorCatalogItem->requiresEntryReady() && $entry->getStatus() != entryStatus::READY)
+
+		if($entryObjectType == KalturaEntryObjectType::ENTRY)
 		{
-			$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
-		}
-		
-		//Kaltura Recorded entries are ready on creation so make sure the vendors wont fetch the job until it gets its assets
-		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $vendorCatalogItem->requiresEntryReady())
-		{
-			$entryAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
-			if(!count($entryAssets))
+			if($vendorCatalogItem->requiresEntryReady() && $entry->getStatus() != entryStatus::READY)
 			{
 				$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
 			}
-		}
-		
-		$dictionary = $reachProfile->getDictionaryByLanguage($vendorCatalogItem->getSourceLanguage());
-		if ($dictionary)
-			$entryVendorTask->setDictionary($dictionary->getData());
 
-		$entryVendorTask->setStatus($status);
-		return $entryVendorTask;
+			//Kaltura Recorded entries are ready on creation so make sure the vendors wont fetch the job until it gets its assets
+			if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE && $vendorCatalogItem->requiresEntryReady())
+			{
+				$entryAssets = assetPeer::retrieveReadyFlavorsByEntryId($entry->getId());
+				if(!count($entryAssets))
+				{
+					$status = EntryVendorTaskStatus::PENDING_ENTRY_READY;
+				}
+			}
+		}
+
+		return $status;
 	}
 	
-	//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-	protected static function getTaskKuserId(entry $entry)
+	protected static function getTaskKuserId($entryObject, $entryObjectType)
 	{
 		$kuserId = kCurrentContext::getCurrentKsKuserId();
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
-			$kuserId = $entry->getKuserId();
+			switch ($entryObjectType)
+			{
+				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
+				case KalturaEntryObjectType::ENTRY:
+					return $entryObject->getKuserId();
+
+				default:
+					return null;
+			}
 		}
-		
 		return $kuserId;
 	}
 	
-	//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-	protected static function getTaskPuserId(entry $entry)
+	protected static function getTaskPuserId($entryObject, $entryObjectType)
 	{
 		$puserId = kCurrentContext::$ks_uid;
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
-			$puserId = $entry->getPuserId();
+			switch ($entryObjectType)
+			{
+				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
+				case KalturaEntryObjectType::ENTRY:
+					return $entryObject->getPuserId();
+
+				default:
+					return null;
+			}
 		}
 		
 		return $puserId;

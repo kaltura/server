@@ -11,8 +11,7 @@ class kApcWrapper
 		if (function_exists('apc_fetch'))
 			return apc_fetch($key, $success);
 		if (function_exists('apcu_fetch'))
-			return apcu_fetch($key, $sy
-			);
+			return apcu_fetch($key, $success);
 		
 		return false;
 	}

@@ -33,6 +33,9 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 		"contextEqual" => "_eq_context",
 		"expectedFinishTimeGreaterThanOrEqual" => "_gte_expected_finish_time",
 		"expectedFinishTimeLessThanOrEqual" => "_lte_expected_finish_time",
+		"entryObjectTypeEqual" => "_eq_entry_object_type",
+		"entryObjectTypeIn" => "_in_entry_object_type",
+		"entryObjectTypeNotIn" => "_notin_entry_object_type",
 	);
 
 	static private $order_by_map = array
@@ -184,4 +187,19 @@ abstract class KalturaEntryVendorTaskBaseFilter extends KalturaRelatedFilter
 	 * @var time
 	 */
 	public $expectedFinishTimeLessThanOrEqual;
+
+	/**
+	 * @var KalturaEntryObjectType
+	 */
+	public $entryObjectTypeEqual;
+
+	/**
+	 * @var string
+	 */
+	public $entryObjectTypeIn;
+
+	/**
+	 * @var string
+	 */
+	public $entryObjectTypeNotIn;
 }

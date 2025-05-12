@@ -65,6 +65,7 @@ class PartnerCatalogItemService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $defaultReachProfileId);
 			}
+			kReachUtils::validateProfileAndCatalogItemOverages($dbVendorCatalogItem, $dbReachProfile);
 			$partnerCatalogItem->setDefaultReachProfileId($defaultReachProfileId);
 		}
 

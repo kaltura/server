@@ -48,6 +48,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_CREATED_BY = 'createdBy';
 	const CUSTOM_DATA_NOTES = 'notes';
 	const CUSTOM_ADMIN_TAGS_TO_EXCLUDE = 'admin_tags_to_exclude';
+	const CUSTOM_ADMIN_REQUIRES_OVERAGES = 'requiresOverages';
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -194,10 +195,17 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return call_user_func($this->getPricing()->getPriceFunction(), $durationMsec, $this->getPricing()->getPricePerUnit());
 	}
 	
-	public function getTaskVersion($entryId, $jobData = null)
+	public function getTaskVersion($entryId, $entryObjectType = KalturaEntryObjectType::ENTRY, $jobData = null)
 	{
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
-		return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+		switch ($entryObjectType)
+		{
+			case KalturaEntryObjectType::ENTRY:
+				$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
+				return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+
+			default:
+				return 0;
+		}
 	}
 
 	public static function translateServiceFeatureEnum($catalogItemId)
@@ -276,6 +284,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	public function getContract()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CONTRACT);
+	}
+
+	public function setRequiresOverages($v)
+	{
+		$this->putInCustomData(self::CUSTOM_ADMIN_REQUIRES_OVERAGES, $v);
+	}
+
+	public function getRequiresOverages()
+	{
+		return $this->getFromCustomData(self::CUSTOM_ADMIN_REQUIRES_OVERAGES, null, false);
 	}
 
 	public function setCreatedBy($v)
