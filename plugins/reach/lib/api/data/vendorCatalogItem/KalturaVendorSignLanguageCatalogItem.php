@@ -64,17 +64,8 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
         return parent::toObject($sourceObject, $propertiesToSkip);
     }
 
-	protected function validateTargetLanguage(VendorCatalogItem $sourceObject = null)
-	{
-		if ($this->targetLanguage == KalturaCatalogItemLanguage::AUTO_DETECT)
-		{
-			throw new KalturaAPIException(KalturaReachErrors::TARGET_LANGUAGE_NOT_SUPPORTED, $this->targetLanguage);
-		}
-	}
-
 	protected function validate(VendorCatalogItem $sourceObject = null)
 	{
-		$this->validateTargetLanguage($sourceObject);
 		parent::validate($sourceObject);
 	}
 
