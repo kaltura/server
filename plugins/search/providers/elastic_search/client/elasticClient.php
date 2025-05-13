@@ -94,7 +94,7 @@ class elasticClient
 		}
 		KalturaLog::debug("Setting elastic version to [$elasticVersion]");
 		$this->elasticVersion = $elasticVersion;
-		
+
 		$this->ch = curl_init();
 		
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
