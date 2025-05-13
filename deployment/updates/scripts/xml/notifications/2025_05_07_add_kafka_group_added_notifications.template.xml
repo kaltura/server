@@ -56,7 +56,7 @@
                 <eventType>7</eventType>
                 <!-- EventNotificationEventType::OBJECT_CREATED -->
                 <eventObjectType>44</eventObjectType>
-                <!-- EventNotificationEventObjectType::GROUP_USER -->
+                <!-- EventNotificationEventObjectType::GROUP -->
                 <topicName>user_json</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>

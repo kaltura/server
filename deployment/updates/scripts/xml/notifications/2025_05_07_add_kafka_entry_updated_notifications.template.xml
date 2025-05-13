@@ -37,21 +37,23 @@
                                 <code>$scope->getObject() instanceof entry</code>
                             </field>
                         </item>
-                        <item objectType="KalturaEventObjectChangedCondition">
-                            <description>Check if userId on entry changed</description>
-                            <modifiedColumns>entry.USER_ID</modifiedColumns>
-                        </item>
-                        <item objectType="KalturaEventObjectChangedCondition">
-                            <description>Co-editors changed on the entry</description>
-                            <modifiedColumns>entitledUserPuserEdit</modifiedColumns>
-                        </item>
-                        <item objectType="KalturaEventObjectChangedCondition">
-                            <description>Co-editors changed on the entry</description>
-                            <modifiedColumns>entitledUserPuserPublish</modifiedColumns>
-                        </item>
-                        <item objectType="KalturaEventObjectChangedCondition">
-                            <description>Co-editors changed on the entry</description>
-                            <modifiedColumns>entitledUserPuserView</modifiedColumns>
+                        <item objectType="KalturaOrCondition">
+                            <item objectType="KalturaEventObjectChangedCondition">
+                                <description>Check if userId on entry changed</description>
+                                <modifiedColumns>entry.USER_ID</modifiedColumns>
+                            </item>
+                            <item objectType="KalturaEventObjectChangedCondition">
+                                <description>Co-editors changed on the entry</description>
+                                <modifiedColumns>entitledUserPuserEdit</modifiedColumns>
+                            </item>
+                            <item objectType="KalturaEventObjectChangedCondition">
+                                <description>Co-editors changed on the entry</description>
+                                <modifiedColumns>entitledUserPuserPublish</modifiedColumns>
+                            </item>
+                            <item objectType="KalturaEventObjectChangedCondition">
+                                <description>Co-editors changed on the entry</description>
+                                <modifiedColumns>entitledUserPuserView</modifiedColumns>
+                            </item>
                         </item>
                     </conditions>
                 </eventConditions>
@@ -70,7 +72,7 @@
                 <description>Kafka notification template to be sent when entry is deleted</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>7</eventType>
-                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <!-- EventNotificationEventType::OBJECT_DELETED -->
                 <eventObjectType>1</eventObjectType>
                 <!-- EventNotificationEventObjectType::ENTRY -->
                 <topicName>entry</topicName>
