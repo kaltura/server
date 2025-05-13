@@ -80,20 +80,21 @@ class elasticClient
 
 		if (is_null($elasticVersion))
 		{
-			$elasticVersion = kConf::get('elasticVersion', 'elastic', self::ELASTIC_MAJOR_VERSION_5);
+			// add support for opensearch distribution, if 'opensearch' is set in the config we will use elastic 7+ syntax
+			$distribution = kConf::get('distribution', 'elastic', null);
+			if ($distribution === self::OPENSEARCH_DISTRIBUTION)
+			{
+				KalturaLog::debug("Found distribution config value [$distribution] - using elastic 7 syntax");
+				$elasticVersion = self::ELASTIC_MAJOR_VERSION_7;
+			}
+			else
+			{
+				$elasticVersion = kConf::get('elasticVersion', 'elastic', self::ELASTIC_MAJOR_VERSION_5);
+			}
 		}
 		KalturaLog::debug("Setting elastic version to [$elasticVersion]");
 		$this->elasticVersion = $elasticVersion;
 		
-		// add support for opensearch distribution, if 'opensearch' is set in the config we will use elastic 7+ syntax
-		$distribution = kConf::get('distribution', 'elastic', null);
-		if ($distribution === self::OPENSEARCH_DISTRIBUTION)
-		{
-			KalturaLog::debug("Found distribution config value [$distribution] - using elastic 7 syntax");
-			$this->elasticVersion = self::ELASTIC_MAJOR_VERSION_7;
-		}
-		
-
 		$this->ch = curl_init();
 		
 		curl_setopt($this->ch, CURLOPT_FORBID_REUSE, true);
