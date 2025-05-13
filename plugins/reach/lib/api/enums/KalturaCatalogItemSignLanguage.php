@@ -5,6 +5,6 @@
  */
 class KalturaCatalogItemSignLanguage extends KalturaStringEnum
 {
-	const EN_US = KalturaLanguage::EN_US;
-	const EN_GB = KalturaLanguage::EN_GB;
+	const ENGLISH_ASL = "English (ASL)";
+	const ENGLISH_BSL = "English (BSL)";
 }
