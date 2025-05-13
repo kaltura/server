@@ -1,8 +1,5 @@
 <?php
 
-namespace data;
-use kVendorTaskData;
-
 /**
  * @package plugins.reach
  * @subpackage model

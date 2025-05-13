@@ -1,7 +1,5 @@
 <?php
 
-use data\kSentimentAnalysisVendorTaskData;
-
 /**
  * @package plugins.reach
  * @subpackage api.objects
