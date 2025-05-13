@@ -28,7 +28,7 @@ class VendorSignLanguageCatalogItem extends VendorCatalogItem
      */
     public function getTaskJobData($object)
     {
-        if($object instanceof asset)
+        if($object instanceof flavorAsset)
         {
             $taskJobData = new kSignLanguageVendorTaskData();
             $taskJobData->assetId = $object->getId();
