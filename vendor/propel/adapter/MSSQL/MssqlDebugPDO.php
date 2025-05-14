@@ -13,12 +13,13 @@ class MssqlDebugPDO extends DebugPDO
 	 * It is necessary to override the abstract PDO transaction functions here, as
 	 * the PDO driver for MSSQL does not support transactions.
 	 */
-	public function beginTransaction()
+	public function beginTransaction(): bool
 	{
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
 		if ( $opcount === 0 ) {
-			$return = self::exec('BEGIN TRANSACTION');
+			$execResult = self::exec('BEGIN TRANSACTION');
+			$return = ($execResult !== false);
 			$this->isUncommitable = false;
 		}
 		$this->incrementNestedTransactionCount();
@@ -31,7 +32,7 @@ class MssqlDebugPDO extends DebugPDO
 	 * It is necessary to override the abstract PDO transaction functions here, as
 	 * the PDO driver for MSSQL does not support transactions.
 	 */
-  public function commit()
+  public function commit(): bool
 	{
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
@@ -40,7 +41,8 @@ class MssqlDebugPDO extends DebugPDO
 				if ($this->isUncommitable) {
 					throw new PropelException('Cannot commit because a nested transaction was rolled back');
 				} else {
-					$return = self::exec('COMMIT TRANSACTION');
+					$execResult = self::exec('COMMIT TRANSACTION');
+					$return = ($execResult !== false);
 				}
 			}
 			$this->decrementNestedTransactionCount();
@@ -54,13 +56,14 @@ class MssqlDebugPDO extends DebugPDO
 	 * It is necessary to override the abstract PDO transaction functions here, as
 	 * the PDO driver for MSSQL does not support transactions.
 	 */
-	public function rollBack()
+	public function rollBack(): bool
 	{
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
 		if ($opcount > 0) {
 			if ($opcount === 1) { 
-				$return = self::exec('ROLLBACK TRANSACTION'); 
+				$execResult = self::exec('ROLLBACK TRANSACTION');
+				$return = ($execResult !== false);
 			} else {
 				$this->isUncommitable = true;
 			}
@@ -76,14 +79,15 @@ class MssqlDebugPDO extends DebugPDO
 	 * It is necessary to override the abstract PDO transaction functions here, as
 	 * the PDO driver for MSSQL does not support transactions.
 	 */
-	public function forceRollBack()
+	public function forceRollBack(): bool
 	{
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
 		if ($opcount > 0) {
 			// If we're in a transaction, always roll it back
 			// regardless of nesting level.
-			$return = self::exec('ROLLBACK TRANSACTION');
+			$execReturn = self::exec('ROLLBACK TRANSACTION');
+			$return = ($execReturn !== false);
 			
 			// reset nested transaction count to 0 so that we don't
 			// try to commit (or rollback) the transaction outside this scope.
@@ -92,18 +96,18 @@ class MssqlDebugPDO extends DebugPDO
 		return $return;
 	}
 
-	public function lastInsertId($seqname = null)
+	public function lastInsertId($seqname = null): int
 	{
 		$result = self::query('SELECT SCOPE_IDENTITY()');
 		return (int)$result->fetchColumn();
 	}
 	
-	public function quoteIdentifier($text)
+	public function quoteIdentifier($text): string
 	{
 		return '[' . $text . ']';
 	}
 	
-	public function useQuoteIdentifier()
+	public function useQuoteIdentifier(): bool
 	{
 		return true;
 	}

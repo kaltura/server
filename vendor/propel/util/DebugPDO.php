@@ -287,9 +287,9 @@ class DebugPDO extends PropelPDO
 	 * 
 	 * @param      string $sql This must be a valid SQL statement for the target database server.
 	 * @param      array One or more key=>value pairs to set attribute values for the PDOStatement object that this method returns.
-	 * @return     PDOStatement
+	 * @return     false|PDOStatement
 	 */
-	public function prepare($sql, $driver_options = array())
+	public function prepare($sql, $driver_options = array()): false|PDOStatement
 	{
 		$debug	= $this->getDebugSnapshot();
 		$return	= parent::prepare($sql, $driver_options);
@@ -306,7 +306,7 @@ class DebugPDO extends PropelPDO
 	 * 
 	 * @return     int
 	 */
-	public function exec($sql)
+	public function exec($sql): false|int
 	{
 		$debug	= $this->getDebugSnapshot();
 		$return	= parent::exec($sql);
@@ -325,7 +325,7 @@ class DebugPDO extends PropelPDO
 	 * Overridden for query counting and logging.
 	 * 
 	 * @see        http://php.net/manual/en/pdo.query.php for a description of the possible parameters.
-	 * @return     PDOStatement
+	 * @return     false|PDOStatement
 	 */
 	public function query()
 	{
