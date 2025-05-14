@@ -41,7 +41,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask->validateForInsert();
 
 		$entryId = $entryVendorTask->entryId;
-		$entryObject = kReachUtils::retrieveEntryObject($entryVendorTask);
+		$entryObject = kReachUtils::retrieveEntryObject($entryVendorTask->entryObjectType, $entryId);
 		if (!$entryObject)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -247,7 +247,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			{
 				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
 			}
-			$entryObject = $dbEntryVendorTask->retrieveEntryObject();
+			$entryObject = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
 			$taskPrice = $dbVendorCatalogItem->calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), null, $unitsUsed);
 			$dbEntryVendorTask->setPrice($taskPrice);
 		}

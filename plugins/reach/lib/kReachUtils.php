@@ -40,12 +40,17 @@ class kReachUtils
 		return $tokens * $pricePerUnit;
 	}
 
-	public static function retrieveEntryObject(KalturaEntryVendorTask $entryVendorTask)
+	public static function retrieveEntryObject($entryObjectType, $entryId)
 	{
-		switch($entryVendorTask->entryObjectType)
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
+		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
-				return entryPeer::retrieveByPK($entryVendorTask->entryId);
+				return entryPeer::retrieveByPK($entryId);
 
 			default:
 				return null;
@@ -54,7 +59,7 @@ class kReachUtils
 
 	public static function validateEntryObjectExists(EntryVendorTask $dbEntryVendorTask)
 	{
-		$dbEntry = $dbEntryVendorTask->retrieveEntryObject();
+		$dbEntry = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
 		if (!$dbEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
@@ -79,6 +84,11 @@ class kReachUtils
 			VendorCatalogItemPriceFunction::PRICE_PER_MINUTE,
 			VendorCatalogItemPriceFunction::PRICE_PER_SECOND
 		);
+
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
 
 		switch($entryObjectType)
 		{
@@ -109,6 +119,11 @@ class kReachUtils
 
 	public static function getPricingUnitsFromTaskData($priceFunction, $entryObjectType, $taskData)
 	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
@@ -124,6 +139,11 @@ class kReachUtils
 
 	public static function getPricingUnitsFromEntryObject($priceFunction, $entryObjectType, $entryObject)
 	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:

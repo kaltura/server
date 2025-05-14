@@ -206,11 +206,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return call_user_func($priceFunction, $units, $pricePerUnit);
 	}
 	
-	public function getTaskVersion($entryId, $entryObjectType = KalturaEntryObjectType::ENTRY, $jobData = null)
+	public function getTaskVersion($entryId, $entryObjectType = EntryObjectType::ENTRY, $jobData = null)
 	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
 		switch ($entryObjectType)
 		{
-			case KalturaEntryObjectType::ENTRY:
+			case EntryObjectType::ENTRY:
 				$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
 				return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 
@@ -342,6 +347,11 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 	public function isFeatureTypeSupportedForEntry($entryObject, $entryObjectType)
 	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
 		switch ($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:

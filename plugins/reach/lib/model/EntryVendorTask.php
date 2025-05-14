@@ -528,18 +528,6 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		}
 	}
 
-	public function retrieveEntryObject()
-	{
-		switch($this->getEntryObjectType())
-		{
-			case EntryObjectType::ENTRY:
-				return entryPeer::retrieveByPK($this->getEntryId());
-
-			default:
-				return null;
-		}
-	}
-
 	protected function removeFeature($liveFeatureName)
 	{
 		/* @var $taskData kScheduledVendorTaskData */

@@ -747,6 +747,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	public static function shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile)
 	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
@@ -854,9 +859,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	protected static function shouldAddEntryVendorTask($entryObject, $entryObjectType, $vendorCatalogItem)
 	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
 		switch ($entryObjectType)
 		{
-			case KalturaEntryObjectType::ENTRY:
+			case EntryObjectType::ENTRY:
 				/** @var $entryObject entry */
 				//Check if the entry is temporary, if so, dont create the task
 				if($entryObject->getIsTemporary())
@@ -887,7 +897,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$status = EntryVendorTaskStatus::PENDING_MODERATION;
 		}
 
-		if($entryObjectType == KalturaEntryObjectType::ENTRY)
+		if(!$entryObjectType || $entryObjectType == KalturaEntryObjectType::ENTRY)
 		{
 			if($vendorCatalogItem->requiresEntryReady() && $entry->getStatus() != entryStatus::READY)
 			{
@@ -913,10 +923,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$kuserId = kCurrentContext::getCurrentKsKuserId();
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
+			if(!$entryObjectType)
+			{
+				$entryObjectType = EntryObjectType::ENTRY;
+			}
+
 			switch ($entryObjectType)
 			{
 				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-				case KalturaEntryObjectType::ENTRY:
+				case EntryObjectType::ENTRY:
 					return $entryObject->getKuserId();
 
 				default:
@@ -931,10 +946,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$puserId = kCurrentContext::$ks_uid;
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
+			if(!$entryObjectType)
+			{
+				$entryObjectType = EntryObjectType::ENTRY;
+			}
+
 			switch ($entryObjectType)
 			{
 				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-				case KalturaEntryObjectType::ENTRY:
+				case EntryObjectType::ENTRY:
 					return $entryObject->getPuserId();
 
 				default:
