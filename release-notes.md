@@ -1,3 +1,18 @@
+# Ursa-21.16.0
+## Add Kafka Event Notifications for Folders
+* Issue Type: Task
+* Issue ID: PLAT-25225
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_entry_updated_notifications.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_update_kafka_kuser_notifications.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_groupuser_added_notifications.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_group_updated_notifications.template.xml
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_05_07_eventNotification_update_requiresPermissions_permission.php
+	php /opt/kaltura/app/deployment/updates/scripts/2025_05_07_deploy_kafka_folder_events.php.php
+
 # Ursa-21.15.0
 ## Add Folders Capabilities
 * Issue Type: Task

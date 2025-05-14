@@ -35,9 +35,6 @@ if (!isset($kafkaConfig['brokers']) && !(isset($kafkaConfig['host']) && isset($k
 	return;
 }
 
-$user = realpath(dirname(__FILE__) . "/../../updates/scripts/xml/notifications/2025_05_07_update_kafka_kuser_events.xml"); //TODO remove
-passthru("php $script $user"); //TODO remove
-
 passthru("php $script $entryUpdate");
 passthru("php $script $userDelete");
 passthru("php $script $groupUserAddUpdate");
