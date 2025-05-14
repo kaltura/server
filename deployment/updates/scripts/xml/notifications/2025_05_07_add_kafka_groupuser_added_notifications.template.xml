@@ -22,8 +22,8 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>5</eventType>
                 <!-- EventNotificationEventType::OBJECT_CREATED -->
-                <eventObjectType>43</eventObjectType>
-                <!-- EventNotificationEventObjectType::GROUP_USER -->
+                <eventObjectType>8</eventObjectType>
+                <!-- EventNotificationEventObjectType::KUSER -->
                 <topicName>group_user</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
@@ -49,9 +49,9 @@
                 <description>Kafka notification template for groupUser deletion</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>7</eventType>
-                <!-- EventNotificationEventType::OBJECT_CREATED -->
-                <eventObjectType>43</eventObjectType>
-                <!-- EventNotificationEventObjectType::GROUP_USER -->
+                <!-- EventNotificationEventType::OBJECT_DELETED -->
+                <eventObjectType>8</eventObjectType>
+                <!-- EventNotificationEventObjectType::KUSER -->
                 <topicName>group_user</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
@@ -69,7 +69,5 @@
                 </eventConditions>
             </template>
         </request>
-
-
     </multirequest>
 </xml>
