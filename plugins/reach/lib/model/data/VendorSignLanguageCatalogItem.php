@@ -45,4 +45,13 @@ class VendorSignLanguageCatalogItem extends VendorCatalogItem
 
         return in_array($type, $supportedTypes);
     }
+
+	protected function getPrivileges($entryId, $shouldModerateOutput)
+	{
+		$privileges = parent::getPrivileges($entryId, $shouldModerateOutput);
+
+		$privileges .= ',' . kSessionBase::PRIVILEGE_EDIT_ADMIN_TAGS . ':' . $entryId;
+
+		return $privileges;
+	}
 }
