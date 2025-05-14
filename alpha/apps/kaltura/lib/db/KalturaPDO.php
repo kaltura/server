@@ -113,7 +113,7 @@ class KalturaPDO extends PropelPDO
 	/* (non-PHPdoc)
 	 * @see PropelPDO::prepare()
 	 */
-	public function prepare($sql, $driver_options = array())
+	public function prepare($sql, $driver_options = array()): false|PDOStatement
 	{
 		$comment = $this->getCommentWrapped();
 		$sql = $comment . $sql;
@@ -124,7 +124,7 @@ class KalturaPDO extends PropelPDO
 	/* (non-PHPdoc)
 	 * @see PDO::exec()
 	 */
-	public function exec($sql)
+	public function exec($sql): int|false
 	{
 		$comment = $this->getCommentWrapped();
 		$sql = $comment . $sql;
@@ -185,7 +185,7 @@ class KalturaPDO extends PropelPDO
 	/* (non-PHPdoc)
 	 * @see PDO::query()
 	 */
-	public function query($statement, $mode = PDO::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args)
+	public function query($statement, $mode = PDO::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args): false|PDOStatement
 	{
 		kApiCache::disableConditionalCache();
 	
@@ -225,7 +225,7 @@ class KalturaPDO extends PropelPDO
 		return null;
 	}
 	
-	public function beginTransaction()
+	public function beginTransaction(): bool
 	{
 		if($this->getKalturaOption(KalturaPDO::KALTURA_ATTR_NO_TRANSACTION))
 			return true;
