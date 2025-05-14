@@ -24,14 +24,21 @@ class kESearchTermQuery extends kESearchBaseFieldQuery
 	{
 		$query = array();
 		$term = self::TERM_KEY;
-		if(is_array($this->searchTerm) && count($this->searchTerm) > 1)
+		if (is_array($this->searchTerm))
 		{
-			$term = self::TERMS_KEY;
-			$query[$term][$this->fieldName] = $this->searchTerm;
+			if (count($this->searchTerm) > 1)
+			{
+				$term = self::TERMS_KEY;
+				$query[$term][$this->fieldName] = $this->searchTerm;
+			}
+			elseif (count($this->searchTerm) === 1)
+			{
+				$query[$term][$this->fieldName][self::VALUE_KEY] = $this->searchTerm[0];
+			}
 		}
 		else
 		{
-			$query[$term][$this->fieldName][self::VALUE_KEY] = $this->searchTerm[0];
+			$query[$term][$this->fieldName][self::VALUE_KEY] = $this->searchTerm;
 		}
 
 		if ($this->getBoostFactor())
