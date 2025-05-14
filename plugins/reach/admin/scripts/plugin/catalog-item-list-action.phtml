@@ -57,10 +57,10 @@
                 </td>
                 <td><?php if (isset($catalogItem->outputFormat))
 					{
-                        if($catalogItem instanceof Kaltura_Client_Reach_Type_VendorSignLanguageCatalogItem)
+                        if($catalogItem->serviceFeature === Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE)
 						{
-                            echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat', $catalogItem->outputFormat);
-                        }
+							echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat', $catalogItem->outputFormat);
+						}
 						else
 						{
                             echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat);
