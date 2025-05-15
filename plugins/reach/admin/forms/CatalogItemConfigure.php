@@ -211,11 +211,11 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'placement' => 'prepend',
 		));
 
-		$requiresOverages = new Kaltura_Form_Element_EnumSelect('requiresOverages', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
+		$payPerUse = new Kaltura_Form_Element_EnumSelect('payPerUse', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
-		$requiresOverages->setLabel('Requires Overages:');
-		$requiresOverages->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
-		$this->addElement($requiresOverages);
+		$payPerUse->setLabel('Pay Per Use:');
+		$payPerUse->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+		$this->addElement($payPerUse);
 
 		$liveCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION, Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION);
 		if (in_array($this->catalogItemType, $liveCatalogItemTypesArray))
