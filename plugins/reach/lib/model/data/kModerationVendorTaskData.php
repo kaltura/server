@@ -8,6 +8,7 @@ class kModerationVendorTaskData extends kVendorTaskData
 {
 	protected string $ruleIds = "";
 	protected string $policyIds = "";
+	protected string $categoryIds = "";
 	protected string $moderationOutputJson = "";
 
 	public function getRuleIds(): string
@@ -28,6 +29,16 @@ class kModerationVendorTaskData extends kVendorTaskData
 	public function setPolicyIds(string $policyIds): void
 	{
 		$this->policyIds = $policyIds;
+	}
+
+	public function getCategoryIds(): string
+	{
+		return $this->categoryIds;
+	}
+
+	public function setCategoryIds(string $categoryIds): void
+	{
+		$this->categoryIds = $categoryIds;
 	}
 
 	public function getModerationOutputJson(): string
