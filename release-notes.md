@@ -1,4 +1,16 @@
 # Ursa-21.15.0
+## Add Folders Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25228
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableFoldersCapabilities.enabled = true
+moduls.enableFoldersCapabilities.permissionType = 2
+moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
+moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
+moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 ## Add new firebase notifications ##
 * Issue Type: Task
 * Issue ID: PLAT-25184
@@ -6,11 +18,28 @@
 ### Deployment ###
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
 
-    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_03_12_firebase_oauth2_notifications.template.xml
+    deployment/updates/scripts/xml/notifications/2025_03_12_firebase_oauth2_notifications.template.xml
 
 Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
 
-    php /opt/kaltura/app/deployment/updates/scripts/2025_03_12_deploy_firebase_oauth2_notifications.php
+    php deployment/updates/scripts/2025_03_12_deploy_firebase_oauth2_notifications.php
+
+## Add channel member subscribed email notification template  ##
+* Issue Type: Task
+* Issue ID: SUP-37427
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+	deployment/updates/scripts/xml/2025_03_17_addChannelMemberSubscribedEmailNotification.template.xml
+ 
+Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
+
+	php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_channel_member_subscribed.php
+
 
 # Ursa-21.13.0
 ## Update Subscriber added to channel email event notification template ##

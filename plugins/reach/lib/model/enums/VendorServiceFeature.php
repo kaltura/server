@@ -21,4 +21,5 @@ interface VendorServiceFeature extends BaseEnum
 	const VIDEO_ANALYSIS                  = 14;
 	const MODERATION                      = 15;
 	const METADATA_ENRICHMENT             = 16;
+	const SENTIMENT_ANALYSIS              = 17;
 }

@@ -7780,4 +7780,23 @@ class kKavaReportsMgr extends kKavaBase
 		return min(floor($value), 100);
 	}
 
+	// use this function as 'report_table_finalize_func' when using __time dimension and day granularity
+	protected static function formatTimestampToDay(&$result, $input_filter)
+	{
+		$headers = $result[0];
+
+		$timePosition = array_search('time', $headers);
+		if ($timePosition === false)
+		{
+			return;
+		}
+
+		foreach ($result[1] as &$row)
+		{
+			$timestamp = $row[$timePosition];
+			$tz = self::getPhpTimezone($input_filter->timeZoneOffset);
+			$timestamp = self::timestampToDateId($timestamp, $tz);
+			$row[$timePosition] = $timestamp;
+		}
+	}
 }

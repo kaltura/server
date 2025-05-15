@@ -21,17 +21,13 @@ $c->add(assetPeer::ID, $entryIdsArray, Criteria::IN);
 assetPeer::setUseCriteriaFilter(false);
 $assets = assetPeer::doSelect($c);
 foreach($assets as $deletedAsset){
-	echo('LOG: Changing status of asset '. $deletedAsset->getId().' to: '. asset::ASSET_STATUS_READY.".\n");
-	$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
-	$deletedAsset->save();
-	assetPeer::clearInstancePool();
-	FileSyncPeer::setUseCriteriaFilter(false);	
+	FileSyncPeer::setUseCriteriaFilter(false);
 	$assetSyncKey = $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 	$assetfileSyncs = FileSyncPeer::retrieveAllByFileSyncKey($assetSyncKey);
 	foreach ($assetfileSyncs as $assetfileSync) {
 		if ($assetfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_DELETED || $assetfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_PURGED) {
 			$file_full_path=$assetfileSync->getFullPath();
-			if (file_exists($file_full_path)){
+			if (kFile::checkFileExists($file_full_path)){
 				echo('LOG: Changing status of file_sync '. $assetfileSync->getId().' to: '. FileSync::FILE_SYNC_STATUS_READY.".\n");
 				$assetfileSync->setStatus (FileSync::FILE_SYNC_STATUS_READY);
 				$assetfileSync->save();
@@ -47,7 +43,7 @@ foreach($assets as $deletedAsset){
 	foreach ($assetConvertLogfileSyncs as $assetConvertLogfileSync) {
 		if ($assetConvertLogfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_DELETED || $assetConvertLogfileSync->getStatus () == FileSync::FILE_SYNC_STATUS_PURGED) {
 			$file_full_path=$assetConvertLogfileSync->getFullPath();
-			if (file_exists($file_full_path)){
+			if (kFile::checkFileExists($file_full_path)){
 				$assetConvertLogfileSync->setStatus (FileSync::FILE_SYNC_STATUS_READY);
 				$assetConvertLogfileSync->save();
 			}else{
@@ -55,4 +51,9 @@ foreach($assets as $deletedAsset){
 			}
 		}
 	}
+
+	echo('LOG: Changing status of asset '. $deletedAsset->getId().' to: '. asset::ASSET_STATUS_READY.".\n");
+	$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
+	$deletedAsset->save();
+	assetPeer::clearInstancePool();
 }

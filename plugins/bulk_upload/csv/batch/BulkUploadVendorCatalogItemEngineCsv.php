@@ -375,6 +375,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			VendorServiceFeature::SUMMARY => new KalturaVendorSummaryCatalogItem(),
 			VendorServiceFeature::VIDEO_ANALYSIS => new KalturaVendorVideoAnalysisCatalogItem(),
 			VendorServiceFeature::MODERATION => new KalturaVendorModerationCatalogItem(),
+			VendorServiceFeature::SENTIMENT_ANALYSIS => new KalturaVendorSentimentAnalysisCatalogItem(),
 			default => new KalturaVendorCaptionsCatalogItem(),
 		};
 	}

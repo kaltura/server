@@ -63,7 +63,6 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'reach_profile_id' => 'reachProfileId',
 				'kuser_id' => 'kuserId',
 				'user_id' => 'userId',
-				'entry_object_type' => 'entryObjectType',
 				'context' => 'context',
 				'notes' => 'notes',
 				'expected_finish_time' => 'expectedFinishTime',
@@ -93,7 +92,6 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'reach_profile_id' => IIndexable::FIELD_TYPE_STRING,
 				'kuser_id' => IIndexable::FIELD_TYPE_STRING,
 				'user_id' => IIndexable::FIELD_TYPE_STRING,
-				'entry_object_type' => IIndexable::FIELD_TYPE_UINT,
 				'context' => IIndexable::FIELD_TYPE_STRING,
 				'notes' => IIndexable::FIELD_TYPE_STRING,
 				'catalog_item_data' => IIndexable::FIELD_TYPE_STRING,
@@ -137,7 +135,6 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				'entry_vendor_task.KUSER_ID' => 'kuser_id',
 				'entry_vendor_task.USER_ID' => 'user_id',
 				'entry_vendor_task.CONTEXT' => 'context',
-				'entry_vendor_task.ENTRY_OBJECT_TYPE' => 'entry_object_type',
 				'entry_vendor_task.NOTES' => 'notes',
 				'entry_vendor_task.CATALOG_ITEM_DATA' => 'catalog_item_data',
 				'entry_vendor_task.EXPECTED_FINISH_TIME' => 'expected_finish_time',
@@ -184,7 +181,6 @@ class EntryVendorTaskIndex extends BaseIndexObject
 				"user_id",
 				"context",
 				"notes",
-				"entry_object_type",
 			);
 		}
 		return self::$matchableFields;

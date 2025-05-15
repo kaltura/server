@@ -26,7 +26,6 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 	 */
 	public $addOn;
 
-
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
