@@ -66,15 +66,10 @@ class kReachUtils
 		}
 	}
 
-	public static function isPayPerUse(VendorCatalogItem $dbVendorCatalogItem)
-	{
-		return $dbVendorCatalogItem->getRequiresOverages() && $dbVendorCatalogItem->requiresPayment();
-	}
-
 	public static function isPayPerUseTask(EntryVendorTask $entryVendorTask)
 	{
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($entryVendorTask->getCatalogItemId());
-		return kReachUtils::isPayPerUse($dbVendorCatalogItem);
+		return $dbVendorCatalogItem->getPayPerUse();
 	}
 
 	public static function shouldGetEntryDuration($priceFunction, $entryObjectType)
@@ -107,7 +102,7 @@ class kReachUtils
 			return $unitsUsed;
 		}
 
-		if(!$dbVendorCatalogItem->getPricing())
+		if(!$dbVendorCatalogItem->getPricing() || $dbVendorCatalogItem->getPayPerUse())
 		{
 			return null;
 		}
@@ -168,10 +163,11 @@ class kReachUtils
 	}
 
 	/**
-	 * @param $entry
+	 * @param $entryObject
+	 * @param $entryObjectType
 	 * @param $catalogItem
 	 * @param $reachProfile
-	 * @param $taskDuration
+	 * @param $unitsForPricing
 	 * @return bool
 	 */
 	public static function isEnoughCreditLeft($entryObject, $entryObjectType, VendorCatalogItem $catalogItem, ReachProfile $reachProfile, $unitsForPricing = null)
@@ -185,7 +181,7 @@ class kReachUtils
 
 		$entryTaskPrice = $catalogItem->calculateTaskPrice($entryObject, $entryObjectType, null, $unitsForPricing);
 
-		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice);
+		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice, $catalogItem->getPayPerUse());
 	}
 
 	public static function areFlavorsReady(entry $entry, ReachProfile $reachProfile)
@@ -240,24 +236,23 @@ class kReachUtils
 		}
 
 		$creditUsed = $reachProfile->getUsedCredit();
-		$entryTaskPrice = $entryVendorTask->getPrice();
-		
-		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice);
+		$payPerUseTask = kReachUtils::isPayPerUseTask($entryVendorTask);
+		$entryTaskPrice = $payPerUseTask ? 0 : $entryVendorTask->getPrice();
+		return self::isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice, $payPerUseTask);
 	}
 	
-	public static function isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice)
+	public static function isOrderAllowedByRemainingCredit($allowedCredit, $creditUsed, $entryTaskPrice, $payPerUse = false)
 	{
-		//If task price is 0 there is no reason to check remaining credit
 		//This will allow jobs to run also in cases that due to race condition the used credit is larger than allowed credit
-		if($entryTaskPrice == 0)
+		if(!$payPerUse && $entryTaskPrice == 0)
 		{
 			return true;
 		}
 		
-		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$creditUsed] entryTaskPrice [$entryTaskPrice]");
+		KalturaLog::debug("allowedCredit [$allowedCredit] creditUsed [$creditUsed] entryTaskInitialPrice [$entryTaskPrice] payPerUse [$payPerUse]");
 		$remainingCredit = $allowedCredit - ($creditUsed  + $entryTaskPrice);
 		
-		return $remainingCredit >= 0 ? true : false;
+		return $payPerUse ? $remainingCredit > 0 : $remainingCredit >= 0;
 	}
 	
 	public static function checkPriceAddon($entryVendorTask, $taskPriceDiff)
@@ -553,13 +548,5 @@ class kReachUtils
 		$dbEvent = $event->toInsertableObject();
 		$dbEvent->save();
 		return $dbEvent;
-	}
-
-	public static function validateProfileAndCatalogItemOverages($dbVendorCatalogItem, $dbReachProfile)
-	{
-		if($dbVendorCatalogItem->getRequiresOverages() && !$dbReachProfile->getAllowsNegativeOverages())
-		{
-			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_DOES_NOT_ALLOW_NEGATIVE_OVERAGES, $dbReachProfile->getId());
-		}
 	}
 }

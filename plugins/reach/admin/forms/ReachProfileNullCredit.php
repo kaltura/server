@@ -10,7 +10,6 @@ class Form_ReachProfileNullCredit extends Form_ReachProfileCredit
  		parent::init();
  		$this->removeElement("credit");
 		$this->removeElement("overageCredit");
-		$this->removeElement("allowNegativeOverageCredit");
 		$this->removeElement("fromDate");
 
 		$this->addElement('hidden', 'type', array(

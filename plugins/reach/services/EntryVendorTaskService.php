@@ -56,9 +56,7 @@ class EntryVendorTaskService extends KalturaBaseService
 
 		$dbReachProfile = $entryVendorTask->getValidateForInsertReachProfile($partnerCatalogItem);
 		$entryVendorTask->reachProfileId = $dbReachProfile->getId();
-
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
-		kReachUtils::validateProfileAndCatalogItemOverages($dbVendorCatalogItem, $dbReachProfile);
 
 		if (!$dbVendorCatalogItem->isFeatureTypeSupportedForEntry($entryObject, $entryVendorTask->entryObjectType))
 		{
@@ -96,17 +94,14 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CREDIT_EXPIRED, $entryId, $dbVendorCatalogItem->getId());
 		}
 
-		if(!kReachUtils::isPayPerUse($dbVendorCatalogItem) && $unitsUsed === null)
+		if(!$dbVendorCatalogItem->getPayPerUse() && $unitsUsed === null)
 		{
 			throw new KalturaAPIException(KalturaInteractivityErrors::MISSING_MANDATORY_PARAMETER, "unitsUsed");
 		}
 
-		if(!$dbReachProfile->getAllowsNegativeOverages())
+		if (!kReachUtils::isEnoughCreditLeft($entryObject, $entryVendorTask->entryObjectType, $dbVendorCatalogItem, $dbReachProfile, $unitsUsed))
 		{
-			if (!kReachUtils::isEnoughCreditLeft($entryObject, $entryVendorTask->entryObjectType, $dbVendorCatalogItem, $dbReachProfile, $unitsUsed))
-			{
-				throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED, $entryId,  $dbVendorCatalogItem->getId());
-			}
+			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED, $entryId,  $dbVendorCatalogItem->getId());
 		}
 	}
 
@@ -240,7 +235,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		}
 
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($dbEntryVendorTask->getCatalogItemId());
-		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && kReachUtils::isPayPerUse($dbVendorCatalogItem))
+		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && $dbVendorCatalogItem->getPayPerUse())
 		{
 			$unitsUsed = $entryVendorTask->unitsUsed !== null ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
 			if($unitsUsed === null)
@@ -289,7 +284,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_APPROVE_NOT_MODERATED_TASK);
 		}
 
-		if (!kReachUtils::isPayPerUseTask($dbEntryVendorTask) && !kReachUtils::checkCreditForApproval($dbEntryVendorTask))
+		if (!kReachUtils::checkCreditForApproval($dbEntryVendorTask))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::EXCEEDED_MAX_CREDIT_ALLOWED, $dbEntryVendorTask->getEntryId(), $dbEntryVendorTask->getCatalogItem());
 		}

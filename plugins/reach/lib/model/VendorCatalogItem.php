@@ -48,7 +48,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_CREATED_BY = 'createdBy';
 	const CUSTOM_DATA_NOTES = 'notes';
 	const CUSTOM_ADMIN_TAGS_TO_EXCLUDE = 'admin_tags_to_exclude';
-	const CUSTOM_ADMIN_REQUIRES_OVERAGES = 'requiresOverages';
+	const CUSTOM_DATA_PAY_PER_USE = 'payPerUse';
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -294,14 +294,14 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return $this->getFromCustomData(self::CUSTOM_DATA_CONTRACT);
 	}
 
-	public function setRequiresOverages($v)
+	public function setPayPerUse($v)
 	{
-		$this->putInCustomData(self::CUSTOM_ADMIN_REQUIRES_OVERAGES, $v);
+		$this->putInCustomData(self::CUSTOM_DATA_PAY_PER_USE, $v);
 	}
 
-	public function getRequiresOverages()
+	public function getPayPerUse()
 	{
-		return $this->getFromCustomData(self::CUSTOM_ADMIN_REQUIRES_OVERAGES, null, false);
+		return $this->getFromCustomData(self::CUSTOM_DATA_PAY_PER_USE, null, false);
 	}
 
 	public function setCreatedBy($v)

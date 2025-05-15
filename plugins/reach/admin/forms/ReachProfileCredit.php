@@ -28,11 +28,6 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 			'validators' => array(),
 		));
 
-		$this->addElement('select', 'allowNegativeOverageCredit', array(
-			'label' => 'Allow Negative Overage Credit:',
-			'multiOptions' => array('true' => 'true', 'false' => 'false')
-		));
-
 		$this->addElement('text', 'addOn', array(
 			'label' => 'AddOn Credit:',
 			'filters' => array('StringTrim'),
@@ -58,7 +53,6 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 	public function populateFromObject($creditObject, $add_underscore = false)
 	{
 		$this->getElement("objectType")->setValue(get_class($creditObject));
-		$this->getElement("allowNegativeOverageCredit")->setValue(false);
 
 		if (is_null($creditObject))
 			return;

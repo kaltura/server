@@ -82,12 +82,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				continue;
 			}
 
-			if($catalogItemToAdd->getRequiresOverages() && !$reachProfile->getAllowsNegativeOverages())
-			{
-				KalturaLog::log("Reach Profile ID $profileId does not allow negative overages for catalog item with ID $catalogItemIdToAdd");
-				continue;
-			}
-
 			//Pass the object Id as the context of the task
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
 			self::addEntryVendorTaskByObjectIds($entry, $entryObjectType, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
@@ -515,11 +509,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($pendingEntryReadyTask->getCatalogItemId());
 			if (!$dbVendorCatalogItem)
 			{
-				KalturaLog::log("Catalog item [$pendingEntryReadyTask->getCatalogItemId()] don't exist");
+				KalturaLog::log("Catalog item [" . $pendingEntryReadyTask->getCatalogItemId() . " not found] ");
 				continue;
 			}
 			$pendingEntryReadyTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
-			if(!kReachUtils::isPayPerUse($dbVendorCatalogItem) && $pendingEntryReadyTask->getPrice() == 0)
+			if(!$dbVendorCatalogItem->getPayPerUse() && $pendingEntryReadyTask->getPrice() == 0)
 			{
 				$vendorCatalogItem = $pendingEntryReadyTask->getCatalogItem();
 				$taskPrice = $vendorCatalogItem->calculateTaskPrice($object, $pendingEntryReadyTask->getEntryObjectType(), $pendingEntryReadyTask->getTaskJobData());
@@ -720,7 +714,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 
 			$unitsUsed = kReachUtils::getPricingUnits($vendorCatalogItem, $entryObject, $entryObjectType, $taskJobData, $unitsUsed);
-			if (!$reachProfile->getAllowsNegativeOverages() && !kReachUtils::isEnoughCreditLeft($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsUsed))
+			if (!kReachUtils::isEnoughCreditLeft($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsUsed))
 			{
 				KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 				return true;
@@ -819,7 +813,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());
 
-		if(!kReachUtils::isPayPerUse($vendorCatalogItem))
+		if(!$vendorCatalogItem->getPayPerUse())
 		{
 			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, null, $unitsUsed);
 			$entryVendorTask->setPrice($taskPrice);
