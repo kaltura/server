@@ -122,24 +122,27 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 				$partnerCatalogItems = $formData['catalogItemsCheckBoxes'];
 			}
 
-			$this->client = Infra_ClientHelper::getClient();
-			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-			Infra_ClientHelper::impersonate($partnerId);
-
-			$catalogItemsLimit = 500;
-			if(count($partnerCatalogItems) > $catalogItemsLimit)
+			if($partnerCatalogItems)
 			{
-				throw new Exception("exceeded the limit of [$catalogItemsLimit] for adding catalog items at once");
-			}
-			$this->validateReachProfileId($formData, $partnerCatalogItems, $reachPluginClient);
+				$this->client = Infra_ClientHelper::getClient();
+				$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+				Infra_ClientHelper::impersonate($partnerId);
 
-			$this->client->startMultiRequest();
-			foreach ($partnerCatalogItems as $partnerCatalogItem)
-			{
-				$reachProfileId = $formData["defaultReachProfileId-$partnerCatalogItem"];
-				$reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem, $reachProfileId);
+				$catalogItemsLimit = 500;
+				if(count($partnerCatalogItems) > $catalogItemsLimit)
+				{
+					throw new Exception("exceeded the limit of [$catalogItemsLimit] for adding catalog items at once");
+				}
+				$this->validateReachProfileId($formData, $partnerCatalogItems, $reachPluginClient);
+
+				$this->client->startMultiRequest();
+				foreach ($partnerCatalogItems as $partnerCatalogItem)
+				{
+					$reachProfileId = $formData["defaultReachProfileId-$partnerCatalogItem"];
+					$reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem, $reachProfileId);
+				}
+				$this->client->doMultiRequest();
 			}
-			$this->client->doMultiRequest();
 		}
 
 		$form->setAttrib('class', 'valid');
