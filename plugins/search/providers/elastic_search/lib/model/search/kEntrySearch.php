@@ -29,12 +29,12 @@ class kEntrySearch extends kBaseESearch
         }
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectId = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectId = null, $objectIdsNotIn = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
     {
         kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
-        $this->initQuery($entriesStatus, $objectId, $pager, $order, $aggregations);
+        $this->initQuery($entriesStatus, $objectId, $objectIdsNotIn, $pager, $order, $aggregations);
         $this->initEntitlement($eSearchOperator, $objectId);
         $result = $this->execSearch($eSearchOperator);
         return $result;
@@ -50,7 +50,7 @@ class kEntrySearch extends kBaseESearch
 
         KalturaLog::debug("Index -" . $indexName);
 
-        parent::initQuery($statuses, $objectId, $pager, $order, $aggregations);
+        parent::initQuery($statuses, $objectId, $pager, $order, $aggregations, $objectIdsNotIn);
     }
 
     protected function initEntitlement(ESearchOperator $eSearchOperator, $objectId)

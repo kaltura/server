@@ -112,7 +112,7 @@ abstract class kBaseSearch
 		return $sortConditions;
 	}
 
-	protected function initBaseFilter($partnerId, array $statuses, $objectId)
+	protected function initBaseFilter($partnerId, array $statuses, $objectId, $objectIdsNotIn = null)
 	{
 		$partnerStatus = array();
 		foreach ($statuses as $status)
@@ -125,20 +125,28 @@ abstract class kBaseSearch
 
 		if($objectId)
 		{
-			$objectIds = explode(',', $objectId);
-			$objectIds = array_unique($objectIds);
-			$objectIdsArr = array ();
-			foreach ($objectIds as $singleObjectId)
-			{
-				$objectIdsArr[] = elasticSearchUtils::formatSearchTerm($singleObjectId);
-			}
-			$idQuery = new kESearchTermQuery('_id', $objectIdsArr);
+			$this->mainBoolQuery->addToFilter($this->prepareObjectIdsArrayForSearchTerms($objectId));
+		}
+		if($objectIdsNotIn)
+		{
 
-			$this->mainBoolQuery->addToFilter($idQuery);
 		}
 
 		//return only the object id
 		$this->query['body']['_source'] = false;
+	}
+
+	protected function prepareObjectIdsArrayForSearchTerms($objectIds)
+	{
+		$objectIds = explode(',', $objectIds);
+		$objectIds = array_unique($objectIds);
+		$objectIdsArr = array ();
+		foreach ($objectIds as $singleObjectId)
+		{
+			$objectIdsArr[] = elasticSearchUtils::formatSearchTerm($singleObjectId);
+		}
+
+		return new kESearchTermQuery('_id', $objectIdsArr);
 	}
 
 	protected function applyElasticSearchConditions()
@@ -146,10 +154,11 @@ abstract class kBaseSearch
 		$this->query['body']['query'] = $this->mainBoolQuery->getFinalQuery();
 	}
 
-	protected function initQueryAttributes($partnerId, $objectId)
+	protected function initQueryAttributes($partnerId, $objectId, $objectIdsNotIn)
 	{
 		$this->initPartnerLanguagesSynonym($partnerId);
 		$this->queryAttributes->setObjectId($objectId);
+		$this->queryAttributes->setObjectIdsNotIn($objectIdsNotIn);
 		$this->initOverrideInnerHits($objectId);
 	}
 
@@ -175,15 +184,18 @@ abstract class kBaseSearch
 		}
 	}
 
-	protected function initOverrideInnerHits($objectId)
+	protected function initOverrideInnerHits($objectId, $objectIdsNotIn = null)
 	{
-		if(!$objectId && !$this->forceInnerHitsSizeOverride)
+		if(!$objectId && !$objectIdsNotIn && !$this->forceInnerHitsSizeOverride)
 		{
 			return;
 		}
 
 		$innerHitsConfig = kConf::get('innerHits', 'elastic');
+
 		$overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;
+		$this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
+		$overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectIdsNotIn']) ? $innerHitsConfig['innerHitsWithObjectIdsNotIn'] : null;
 		$this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
 	}
 

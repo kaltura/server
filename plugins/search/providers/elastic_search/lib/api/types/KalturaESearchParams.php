@@ -30,13 +30,19 @@ abstract class KalturaESearchParams extends KalturaObject
 	 */
 	public $objectIds;
 
+	/**
+	 * @var string
+	 */
+	public $objectIdsNotIn;
+
 	private static $mapBetweenObjects = array
 	(
 		"objectStatuses",
 		"objectId",
 		"orderBy",
 		"ignoreSynonym",
-		"objectIds"
+		"objectIds",
+		"objectIdsNotIn"
 	);
 
 	public function getMapBetweenObjects()
