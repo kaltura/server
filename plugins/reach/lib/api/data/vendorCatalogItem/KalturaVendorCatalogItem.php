@@ -95,7 +95,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	/**
 	 * @var bool
 	 */
-	public $requiresOverages = false;
+	public $payPerUse = false;
 
 	/**
 	 * @var string
@@ -157,7 +157,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'pricing',
 		'engineType',
 		'allowResubmission',
-		'requiresOverages',
+		'payPerUse',
 		'sourceLanguage',
 		'vendorData',
 		'stage',

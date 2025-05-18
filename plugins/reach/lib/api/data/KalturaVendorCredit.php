@@ -26,11 +26,6 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 	 */
 	public $addOn;
 
-	/**
-	 *  @var bool
-	 */
-	public $allowNegativeOverageCredit;
-
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -41,7 +36,6 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 		'fromDate',
 		'overageCredit',
 		'addOn',
-		'allowNegativeOverageCredit'
 	);
 
 	/* (non-PHPdoc)

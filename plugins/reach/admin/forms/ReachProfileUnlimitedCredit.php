@@ -10,7 +10,6 @@ class Form_ReachProfileUnlimitedCredit extends Form_ReachProfileCredit
 		parent::init();
 		$this->removeElement("credit");
 		$this->removeElement("overageCredit");
-		$this->removeElement("allowNegativeOverageCredit");
 		$this->removeElement("addOn");
 	}
 }

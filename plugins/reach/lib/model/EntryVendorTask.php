@@ -20,6 +20,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_ERR_DESCRIPTION = 	'err_description';
 	const CUSTOM_DATA_USER_ID = 			'user_id';
 	const CUSTOM_DATA_ENTRY_OBJECT_TYPE = 	'entry_object_type';
+	const CUSTOM_DATA_UNITS_USED = 			'units_used';
 	const CUSTOM_DATA_MODERATING_USER = 	'moderating_user';
 	const CUSTOM_DATA_ACCURACY 	= 			'accuracy';
 	const CUSTOM_DATA_OUTPUT_OBJECT_ID = 	'output_object_id';
@@ -78,6 +79,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function setEntryObjectType($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_ENTRY_OBJECT_TYPE, $v);
+	}
+
+	public function setUnitsUsed($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_UNITS_USED, $v);
 	}
 	
 	public function setAccuracy($v)
@@ -188,14 +194,14 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 		return $this->getFromCustomData(self::CUSTOM_DATA_ENTRY_OBJECT_TYPE, null, KalturaEntryObjectType::ENTRY);
 	}
 
+	public function getUnitsUsed()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_UNITS_USED);
+	}
+
 	public function getReachProfile()
 	{
 		return ReachProfilePeer::retrieveByPK($this->getReachProfileId());
-	}
-	
-	public function getEntry()
-	{
-		return entryPeer::retrieveByPK($this->getEntryId());
 	}
 	
 	public function getCatalogItem()
