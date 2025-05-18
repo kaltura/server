@@ -59,11 +59,6 @@
                 </eventConditions>
             </template>
         </request>
-        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-            <id>{1:result:id}</id>
-            <status>1</status>
-            <!-- EventNotificationTemplateStatus::DISABLED -->
-        </request>
 
         <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
             <template objectType="KalturaKafkaNotificationTemplate">
@@ -101,11 +96,6 @@
                     </conditions>
                 </eventConditions>
             </template>
-        </request>
-        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
-            <id>{3:result:id}</id>
-            <status>1</status>
-            <!-- EventNotificationTemplateStatus::DISABLED -->
         </request>
     </multirequest>
 </xml>

@@ -7,7 +7,6 @@
 	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_entry_updated_notifications.template.xml
     /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_update_kafka_kuser_notifications.template.xml
     /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_groupuser_added_notifications.template.xml
-    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_group_updated_notifications.template.xml
 
 ### Deployment scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_05_07_eventNotification_update_requiresPermissions_permission.php
