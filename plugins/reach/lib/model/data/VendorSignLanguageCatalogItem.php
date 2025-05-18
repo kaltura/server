@@ -50,7 +50,7 @@ class VendorSignLanguageCatalogItem extends VendorCatalogItem
 	{
 		$privileges = parent::getPrivileges($entryId, $shouldModerateOutput);
 
-		$privileges .= ',' . kSessionBase::PRIVILEGE_EDIT_ADMIN_TAGS;
+		$privileges .= ',' . kSessionBase::PRIVILEGE_EDIT_ADMIN_TAGS. ':*';
 
 		return $privileges;
 	}
