@@ -405,7 +405,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $this->catalogItemId);
 		}
 
-		$featureToDataMap = array(VendorServiceFeature::LIVE_CAPTION => 'KalturaScheduledVendorTaskData');
+		$featureToDataMap = [];
 		$featureType = $vendorCatalogItem->getServiceFeature();
 
 		if (key_exists($featureType, $featureToDataMap))
