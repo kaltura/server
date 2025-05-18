@@ -411,21 +411,18 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $this->catalogItemId);
 		}
 
-		$featureToDataMap = array(VendorServiceFeature::LIVE_CAPTION => 'KalturaScheduledVendorTaskData');
+		$forceDataFeatureType = [];
 		$featureType = $vendorCatalogItem->getServiceFeature();
 
-		if (key_exists($featureType, $featureToDataMap))
+		if (in_array($featureType, $forceDataFeatureType))
 		{
 			$this->validatePropertyNotNull('taskJobData');
-			if (!$this->taskJobData instanceof $featureToDataMap[$featureType])
-			{
-				throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($vendorCatalogItem), get_class($this->taskJobData));
-			}
 		}
 
 		if (isset($this->taskJobData))
 		{
 			$this->taskJobData->validateCatalogLimitations($vendorCatalogItem);
+			// need to validate CATALOG_ITEM_AND_JOB_DATA_MISMATCH
 		}
 	}
 	
