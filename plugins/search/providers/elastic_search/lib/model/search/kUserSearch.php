@@ -12,7 +12,7 @@ class kUserSearch extends kBaseESearch
         parent::__construct();
     }
     
-    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null, $objectIdsNotIn = null)
     {
         kUserElasticEntitlement::init();
         if (!count($statuses))
@@ -22,7 +22,7 @@ class kUserSearch extends kBaseESearch
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null, $objectIdsNotIn = null)
     {
         $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_KUSER_INDEX, kCurrentContext::getCurrentPartnerId());
         $this->query = array(

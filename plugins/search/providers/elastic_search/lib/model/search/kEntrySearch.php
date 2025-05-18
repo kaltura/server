@@ -29,18 +29,18 @@ class kEntrySearch extends kBaseESearch
         }
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectId = null, $objectIdsNotIn = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectId = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
     {
         kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
-        $this->initQuery($entriesStatus, $objectId, $objectIdsNotIn, $pager, $order, $aggregations);
+        $this->initQuery($entriesStatus, $objectId, $pager, $order, $aggregations, $objectIdsNotIn);
         $this->initEntitlement($eSearchOperator, $objectId);
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
+    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
     {
         $indexName = kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_ENTRY_INDEX, kCurrentContext::getCurrentPartnerId());
         $this->query = array(

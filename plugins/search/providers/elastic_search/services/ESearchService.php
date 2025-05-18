@@ -100,7 +100,7 @@ class ESearchService extends KalturaBaseService
 			$coreSearchObject->setIgnoreSynonymFromQuery(true);
 			$coreSearchObject->getQueryAttributes()->setIgnoreSynonymOnPartner($ignoreSynonym);
 		}
-		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectIds, $objectIdsNotIn, $coreOrder, $aggregations);
+		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectIds, $coreOrder, $aggregations, $objectIdsNotIn);
 
 		list($coreResults, $objectCount, $aggregationsResult) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject);
 		return array($coreResults, $objectCount, $aggregationsResult);
