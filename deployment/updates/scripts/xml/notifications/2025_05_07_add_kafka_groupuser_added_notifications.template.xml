@@ -22,8 +22,8 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>5</eventType>
                 <!-- EventNotificationEventType::OBJECT_CREATED -->
-                <eventObjectType>8</eventObjectType>
-                <!-- EventNotificationEventObjectType::KUSER -->
+                <eventObjectType>43</eventObjectType>
+                <!-- EventNotificationEventObjectType::GROUPUSER -->
                 <topicName>group_user</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
@@ -50,8 +50,36 @@
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>7</eventType>
                 <!-- EventNotificationEventType::OBJECT_DELETED -->
-                <eventObjectType>8</eventObjectType>
-                <!-- EventNotificationEventObjectType::KUSER -->
+                <eventObjectType>43</eventObjectType>
+                <!-- EventNotificationEventObjectType::GROUPUSER -->
+                <topicName>group_user</topicName>
+                <partitionKey>id</partitionKey>
+                <messageFormat>1</messageFormat>
+                <apiObjectType>KalturaGroupUser</apiObjectType>
+                <requiresPermissions>FEATURE_ENABLE_FOLDERS_CAPABILITIES</requiresPermissions>
+                <eventConditions objectType="array">
+                    <conditions objectType="array">
+                        <item objectType="KalturaEventFieldCondition">
+                            <description>Group User</description>
+                            <field objectType="KalturaEvalBooleanField">
+                                <code>$scope->getObject() instanceof KuserKgroup</code>
+                            </field>
+                        </item>
+                    </conditions>
+                </eventConditions>
+            </template>
+        </request>
+
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="0">
+            <template objectType="KalturaKafkaNotificationTemplate">
+                <name>Group User Updated</name>
+                <systemName>KAFKA_GROUP_USER_UPDATED</systemName>
+                <description>Kafka notification template for groupUser update</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType>
+                <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>43</eventObjectType>
+                <!-- EventNotificationEventObjectType::GROUPUSER -->
                 <topicName>group_user</topicName>
                 <partitionKey>id</partitionKey>
                 <messageFormat>1</messageFormat>
