@@ -74,7 +74,8 @@ class KalturaModerationVendorTaskData extends KalturaVendorTaskData
 
 		foreach ($categoryIds as $categoryId) {
 			$category = CategoryPeer::retrieveByPK($categoryId);
-			if (!$category) {
+			if (!$category)
+			{
 				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
 			}
 			if ($category->getStatus() != CategoryStatus::ACTIVE) {
