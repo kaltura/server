@@ -1682,7 +1682,7 @@ class kFileSyncUtils implements kObjectChangedEventConsumer, kObjectAddedEventCo
 				}
 				else
 				{
-					$newStatus = FileSync::FILE_SYNC_STATUS_DELETED;
+					$newStatus = FileSync::FILE_SYNC_STATUS_PURGED;
 					self::convertLinksToFiles($file_sync);
 				}
 			}
