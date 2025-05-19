@@ -31,7 +31,7 @@ abstract class KalturaESearchParams extends KalturaObject
 	public $objectIds;
 
 	/**
-	 * @var string
+	 * @var KalturaNullableBoolean
 	 */
 	public $objectIdsNotIn;
 

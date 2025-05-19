@@ -129,7 +129,7 @@ abstract class kBaseSearch
 		}
 		if($objectIdsNotIn)
 		{
-			$this->mainBoolQuery->addToMustNot($this->prepareObjectIdsArrayForSearchTerms($objectIdsNotIn));
+			$this->mainBoolQuery->addToMustNot($this->prepareObjectIdsArrayForSearchTerms($objectId));
 		}
 
 		//return only the object id

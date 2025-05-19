@@ -46,7 +46,7 @@ class ESearchParams extends BaseObject
 	protected $objectIds;
 
 	/**
-	 * @var string
+	 * @var KalturaNullableBoolean
 	 */
 	protected $objectIdsNotIn;
 
