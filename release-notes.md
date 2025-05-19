@@ -10,7 +10,7 @@
 
 ### Deployment scripts ###
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_05_07_eventNotification_update_requiresPermissions_permission.php
-	php /opt/kaltura/app/deployment/updates/scripts/2025_05_07_deploy_kafka_folder_events.php.php
+	php /opt/kaltura/app/deployment/updates/scripts/2025_05_07_deploy_kafka_folder_events.php
 
 # Ursa-21.15.0
 ## Add Folders Capabilities
