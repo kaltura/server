@@ -33,8 +33,8 @@ while(!feof($f))
         }
 
         $descNum = $descs[$proxyDescription];
-        $record = pack("LLCC", ip2long($startIp), ip2long($endIp), $typeNum, $descNum);
-        $ips[ip2long($startIp)] = $record;
+        $record = pack("LLCC", ipToLong($startIp), ipToLong($endIp), $typeNum, $descNum);
+        $ips[ipToLong($startIp)] = $record;
 }
 
 echo implode(",", array_keys($types))."\n";
