@@ -25,7 +25,7 @@ abstract class kBaseSearch
 		$this->ignoreSynonymFromQuery = false;
 	}
 
-	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null, $objectIdsNotIn = null);
+	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null);
 
 	/**
 	 * @return ESearchQueryAttributes

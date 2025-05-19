@@ -21,7 +21,7 @@ class kScheduledResourceSearch extends kBaseSearch
 	}
 
 	public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null,
-							 ESearchOrderBy $order = null, $objectIdsNotIn = null)
+							 ESearchOrderBy $order = null)
 	{
 		kScheduledResourceSearchEntitlement::init();
 		$this->initQuery($statuses, $objectId, $pager, $order);

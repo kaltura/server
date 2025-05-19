@@ -116,7 +116,7 @@ class ESearchParams extends BaseObject
 	/**
 	 * @param string $objectIdsNotIn
 	 */
-	public function setObjectIdNotIn($objectIdsNotIn)
+	public function setObjectIdsNotIn($objectIdsNotIn)
 	{
 		$this->objectIdsNotIn = $objectIdsNotIn;
 	}
