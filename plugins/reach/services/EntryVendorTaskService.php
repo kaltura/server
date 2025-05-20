@@ -237,8 +237,8 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($dbEntryVendorTask->getCatalogItemId());
 		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && $dbVendorCatalogItem->getPayPerUse())
 		{
-			$unitsUsed = $entryVendorTask->unitsUsed !== null ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
-			if($unitsUsed === null)
+			$unitsUsed = is_numeric($entryVendorTask->unitsUsed) ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
+			if(!is_numeric($unitsUsed))
 			{
 				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
 			}
