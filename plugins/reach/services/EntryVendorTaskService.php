@@ -235,16 +235,10 @@ class EntryVendorTaskService extends KalturaBaseService
 		}
 
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($dbEntryVendorTask->getCatalogItemId());
-		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && $dbVendorCatalogItem->getPayPerUse())
+		$payPerUsePrice = self::getPayPerUsePrice($entryVendorTask, $dbEntryVendorTask, $dbVendorCatalogItem);
+		if($payPerUsePrice)
 		{
-			$unitsUsed = is_numeric($entryVendorTask->unitsUsed) ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
-			if(!is_numeric($unitsUsed))
-			{
-				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
-			}
-			$entryObject = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
-			$taskPrice = $dbVendorCatalogItem->calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), null, $unitsUsed);
-			$dbEntryVendorTask->setPrice($taskPrice);
+			$entryVendorTask->price = $payPerUsePrice;
 		}
 
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
@@ -380,6 +374,14 @@ class EntryVendorTaskService extends KalturaBaseService
 		$partnerId = $dbEntryVendorTask->getPartnerId();
 		$this->setPartnerFilters($partnerId);
 		kCurrentContext::$partner_id = $partnerId;
+
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($dbEntryVendorTask->getCatalogItemId());
+		$payPerUsePrice = self::getPayPerUsePrice($entryVendorTask, $dbEntryVendorTask, $dbVendorCatalogItem);
+		if($payPerUsePrice)
+		{
+			$entryVendorTask->price = $payPerUsePrice;
+		}
+
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
 		self::tryToSave($dbEntryVendorTask);
 
@@ -631,6 +633,20 @@ class EntryVendorTaskService extends KalturaBaseService
 		if (!in_array($dbEntryVendorTask->getStatus(), $allowedAbortStatuses))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_ABORT_NOT_MODERATED_TASK, $id);
+		}
+	}
+
+	protected static function getPayPerUsePrice($entryVendorTask, $dbEntryVendorTask, $dbVendorCatalogItem)
+	{
+		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && $dbVendorCatalogItem->getPayPerUse())
+		{
+			$unitsUsed = is_numeric($entryVendorTask->unitsUsed) ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
+			if(!is_numeric($unitsUsed))
+			{
+				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
+			}
+			$entryObject = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
+			return $dbVendorCatalogItem->calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), null, $unitsUsed);
 		}
 	}
 }
