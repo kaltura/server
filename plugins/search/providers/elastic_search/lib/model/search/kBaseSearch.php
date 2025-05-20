@@ -25,7 +25,7 @@ abstract class kBaseSearch
 		$this->ignoreSynonymFromQuery = false;
 	}
 
-	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null);
+	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectIdsCsvStr = null, ESearchOrderBy $order = null);
 
 	/**
 	 * @return ESearchQueryAttributes
@@ -41,7 +41,7 @@ abstract class kBaseSearch
 
 	protected abstract function execSearch(ESearchOperator $eSearchOperator);
 
-	protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null);
+	protected abstract function initQuery(array $statuses, $objectIdsCsvStr, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null);
 
 	protected function initPager(kPager $pager = null)
 	{
@@ -123,13 +123,16 @@ abstract class kBaseSearch
 		$partnerStatusQuery = new kESearchTermsQuery('partner_status', $partnerStatus);
 		$this->mainBoolQuery->addToFilter($partnerStatusQuery);
 
-		if($objectId)
+		if ($objectId)
 		{
-			$this->mainBoolQuery->addToFilter($this->prepareObjectIdsArrayForSearchTerms($objectId));
-		}
-		if($objectIdsNotIn)
-		{
-			$this->mainBoolQuery->addToMustNot($this->prepareObjectIdsArrayForSearchTerms($objectId));
+		    if ($objectIdsNotIn)
+			{
+		        $this->mainBoolQuery->addToMustNot($this->prepareObjectIdsArrayForSearchTerms($objectId));
+		    }
+			else
+			{
+		        $this->mainBoolQuery->addToFilter($this->prepareObjectIdsArrayForSearchTerms($objectId));
+		    }
 		}
 
 		//return only the object id
