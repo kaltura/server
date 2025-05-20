@@ -127,7 +127,7 @@ class ESearchQueryAttributes
 	}
 
 	/**
-	 * @param bool  $objectId
+	 * @param bool $objectId
 	 */
 	public function setObjectIdsNotIn($objectIdsNotIn)
 	{
