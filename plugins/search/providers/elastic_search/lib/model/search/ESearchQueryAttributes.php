@@ -21,7 +21,7 @@ class ESearchQueryAttributes
 	protected $objectId;
 
 	/**
-	 * @var KalturaNullableBoolean
+	 * @var bool
 	 */
 	protected $objectIdsNotIn;
 
