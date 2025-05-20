@@ -119,7 +119,7 @@ class ESearchQueryAttributes
 	}
 
 	/**
-	 * @return KalturaNullableBoolean
+	 * @return bool
 	 */
 	public function getObjectIdsNotIn()
 	{
@@ -127,7 +127,7 @@ class ESearchQueryAttributes
 	}
 
 	/**
-	 * @param KalturaNullableBoolean $objectId
+	 * @param bool  $objectId
 	 */
 	public function setObjectIdsNotIn($objectIdsNotIn)
 	{
