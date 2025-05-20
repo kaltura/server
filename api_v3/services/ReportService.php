@@ -214,6 +214,7 @@ class ReportService extends KalturaBaseService
 				KalturaReportType::VPAAS_USAGE,
 				KalturaReportType::ENTRY_USAGE,
 				KalturaReportType::PARTNER_USAGE,
+				KalturaReportType::PARTNER_USAGE_SF,
 			);
 
 			if (in_array($reportType, $partnerReports))
