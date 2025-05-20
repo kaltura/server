@@ -106,7 +106,7 @@ class ESearchParams extends BaseObject
 	}
 
 	/**
-	 * @return string
+	 * @return KalturaNullableBoolean
 	 */
 	public function getObjectIdsNotIn()
 	{
@@ -114,7 +114,7 @@ class ESearchParams extends BaseObject
 	}
 
 	/**
-	 * @param string $objectIdsNotIn
+	 * @param KalturaNullableBoolean $objectIdsNotIn
 	 */
 	public function setObjectIdsNotIn($objectIdsNotIn)
 	{

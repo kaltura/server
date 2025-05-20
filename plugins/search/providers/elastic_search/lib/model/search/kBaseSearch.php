@@ -112,7 +112,7 @@ abstract class kBaseSearch
 		return $sortConditions;
 	}
 
-	protected function initBaseFilter($partnerId, array $statuses, $objectId, $objectIdsNotIn = null)
+	protected function initBaseFilter($partnerId, array $statuses, $objectIdsCsvStr, $objectIdsNotIn = null)
 	{
 		$partnerStatus = array();
 		foreach ($statuses as $status)
@@ -123,15 +123,15 @@ abstract class kBaseSearch
 		$partnerStatusQuery = new kESearchTermsQuery('partner_status', $partnerStatus);
 		$this->mainBoolQuery->addToFilter($partnerStatusQuery);
 
-		if ($objectId)
+		if ($objectIdsCsvStr)
 		{
 		    if ($objectIdsNotIn)
 			{
-		        $this->mainBoolQuery->addToMustNot($this->prepareObjectIdsArrayForSearchTerms($objectId));
+		        $this->mainBoolQuery->addToMustNot($this->prepareObjectIdsArrayForSearchTerms($objectIdsCsvStr));
 		    }
 			else
 			{
-		        $this->mainBoolQuery->addToFilter($this->prepareObjectIdsArrayForSearchTerms($objectId));
+		        $this->mainBoolQuery->addToFilter($this->prepareObjectIdsArrayForSearchTerms($objectIdsCsvStr));
 		    }
 		}
 
