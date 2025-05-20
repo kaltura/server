@@ -292,6 +292,23 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		return $object_to_fill;
 	}
 
+	/* (non-PHPdoc)
+  * @see KalturaObject::toUpdatableObject()
+  */
+	public function toUpdatableObject($object_to_fill, $props_to_skip = array())
+	{
+		$object_to_fill = parent::toUpdatableObject($object_to_fill, $props_to_skip);
+
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($object_to_fill->getCatalogItemId());
+		$payPerUsePrice = kReachUtils::getPayPerUsePrice($this, $object_to_fill, $dbVendorCatalogItem);
+		if(is_numeric($payPerUsePrice))
+		{
+			$object_to_fill->setPrice($payPerUsePrice);
+		}
+
+		return $object_to_fill;
+	}
+
 	public function getValidateForInsertReachProfile($partnerCatalogItem)
 	{
 		if($this->isNull("reachProfileId"))
@@ -339,9 +356,17 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		);
 		
 		/* @var $sourceObject EntryVendorTask */
-		if($this->status && $this->status != $sourceObject->getStatus() && in_array($sourceObject->getStatus(), $closedStatuses))
+		if(in_array($sourceObject->getStatus(), $closedStatuses))
 		{
-			throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getStatus(), $this->status);
+			if($this->status && $this->status != $sourceObject->getStatus())
+			{
+				throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getStatus(), $this->status);
+			}
+
+			if($this->unitsUsed)
+			{
+				throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_UNIT_USED_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getUnitsUsed(), $this->unitsUsed);
+			}
 		}
 		
 		if(!kString::checkIsValidJson($this->partnerData))

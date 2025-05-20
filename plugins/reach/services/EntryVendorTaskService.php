@@ -234,19 +234,6 @@ class EntryVendorTaskService extends KalturaBaseService
 			self::isAbortAllowed($id, $dbEntryVendorTask);
 		}
 
-		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($dbEntryVendorTask->getCatalogItemId());
-		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && $dbVendorCatalogItem->getPayPerUse())
-		{
-			$unitsUsed = is_numeric($entryVendorTask->unitsUsed) ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
-			if(!is_numeric($unitsUsed))
-			{
-				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
-			}
-			$entryObject = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
-			$taskPrice = $dbVendorCatalogItem->calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), null, $unitsUsed);
-			$dbEntryVendorTask->setPrice($taskPrice);
-		}
-
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
 		self::tryToSave($dbEntryVendorTask);
 		
@@ -380,6 +367,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$partnerId = $dbEntryVendorTask->getPartnerId();
 		$this->setPartnerFilters($partnerId);
 		kCurrentContext::$partner_id = $partnerId;
+
 		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
 		self::tryToSave($dbEntryVendorTask);
 
