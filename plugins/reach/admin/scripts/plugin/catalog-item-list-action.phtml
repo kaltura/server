@@ -27,7 +27,7 @@
             <th><?php echo $this->translate('Created By'); ?></th>
             <th><?php echo $this->translate('Last Updated Date'); ?></th>
             <th><?php echo $this->translate('Last Bulk Update ID'); ?></th>
-            <th><?php echo $this->translate('Requires Overages'); ?></th>
+            <th><?php echo $this->translate('Pay Per Use'); ?></th>
             <th><?php echo $this->translate('Action'); ?></th>
         </tr>
         </thead>
@@ -57,9 +57,21 @@
                     echo null;?>
                 </td>
                 <td><?php if (isset($catalogItem->outputFormat))
-						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat);
+					{
+                        if($catalogItem->serviceFeature === Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE)
+						{
+							echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat', $catalogItem->outputFormat);
+						}
+						else
+						{
+                            echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat);
+                        }
+					}
 					else
-						echo null;?>
+                    {
+                        echo null;
+					}
+					?>
                 </td>
                 <td><?php if (isset($catalogItem->stage))
 						echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemStage', $catalogItem->stage);
@@ -72,7 +84,7 @@
                 <td><?php echo $catalogItem->createdBy; ?></td>
                 <td><?php echo date($this->translate('time format'), $catalogItem->updatedAt); ?></td>
                 <td><?php echo $catalogItem->lastBulkUpdateId; ?></td>
-                <td><?php echo $catalogItem->requiresOverages; ?></td>
+                <td><?php echo $catalogItem->payPerUse; ?></td>
                 <td>
                     <select class="options" onchange="doAction(this.value, <?php echo $catalogItem->id; ?>)">
                         <option value=""><?php echo $this->translate('Select Action'); ?></option>
@@ -504,6 +516,11 @@
             jQuery('#filterSourceLanguage').removeAttr('hidden');
             jQuery('#filterTargetLanguage').removeAttr('hidden');
         }
+
+		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE; ?>) {
+			jQuery('#filterSourceLanguage').removeAttr('hidden');
+			jQuery('#filterTargetLanguage').removeAttr('hidden');
+		}
 		
 		if (templateServiceFeature == <?php echo Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION; ?>) {
 			jQuery('#filterSourceLanguage').removeAttr('hidden');

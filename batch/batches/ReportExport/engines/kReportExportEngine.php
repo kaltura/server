@@ -42,7 +42,7 @@ abstract class kReportExportEngine
 		'avg_view_drop_off' => 'Average Drop-off Rate (Quartile Based)',
 		'count_viral' => 'Entry Shares Count',
 		'unique_viewers' => 'Unique Viewers Count',
-		'name' => 'Name',
+		'name' => 'ID',
 		'full_name' => 'Full Name',
 		'unique_videos' => 'Unique Videos Viewed Count',
 		'load_play_ratio' => 'Play-to-Impression Ratio',
@@ -115,6 +115,10 @@ abstract class kReportExportEngine
 		$title = $this->getTitle();
 		$this->writeRow("Report: $title");
 		$this->writeFilterData();
+		if ($this->reportItem->responseOptions->useFriendlyHeadersNames)
+		{
+			$this->writeRow("For detailed descriptions of all data points, visit the full metric guide in the Kaltura Knowledge Center:https://knowledge.kaltura.com/help/reports-containing-derived-metrics");
+		}
 		$this->writeRow("# ------------------------------------");
 	}
 

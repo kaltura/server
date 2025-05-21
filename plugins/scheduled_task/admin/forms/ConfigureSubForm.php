@@ -64,7 +64,7 @@ class ConfigureSubForm extends Zend_Form_SubForm
 			default:
 				if (strpos($type ,'Enum') > -1)
 					return $this->addEnumElement($name, $prefix, $type);
-				if (strpos($type ,'array') > -1)
+				if (strpos($type ,'array') > -1 || strpos($type ,'[]') > -1)
 					return $this->addArrayElement($name, $prefix);
 		}
 		return null;

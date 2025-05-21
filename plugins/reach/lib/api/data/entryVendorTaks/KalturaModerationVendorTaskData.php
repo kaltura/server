@@ -22,6 +22,13 @@ class KalturaModerationVendorTaskData extends KalturaVendorTaskData
 	public $policyIds;
 
 	/**
+	 * A comma seperated string of category IDs.
+	 *
+	 * @var string
+	 */
+	public $categoryIds;
+
+	/**
 	 * JSON string containing the moderation output.
 	 *
 	 * @var string
@@ -33,6 +40,7 @@ class KalturaModerationVendorTaskData extends KalturaVendorTaskData
 	(
 		'ruleIds',
 		'policyIds',
+		'categoryIds',
 		'moderationOutputJson'
 	);
 
@@ -49,5 +57,32 @@ class KalturaModerationVendorTaskData extends KalturaVendorTaskData
 		}
 
 		return parent::toObject($dbObject, $propsToSkip);
+	}
+
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		if($this->categoryIds)
+		{
+			$this->validateCategories();
+		}
+		return parent::validateForInsert($propertiesToSkip);
+	}
+
+	protected function validateCategories()
+	{
+		$categoryIds = explode(',', $this->categoryIds);
+
+		foreach ($categoryIds as $categoryId)
+		{
+			$category = CategoryPeer::retrieveByPK($categoryId);
+			if (!$category)
+			{
+				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryId);
+			}
+			if ($category->getStatus() != CategoryStatus::ACTIVE)
+			{
+				throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_ACTIVE, $categoryId);
+			}
+		}
 	}
 }

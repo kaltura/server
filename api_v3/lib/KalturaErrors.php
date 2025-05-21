@@ -416,6 +416,8 @@ class KalturaErrors extends APIErrors
 
 	const CATEGORY_NAME_CONTAINS_INVALID_CHARS = "CATEGORY_NAME_CONTAINS_INVALID_CHARS;;Category name contains invalid chars.";
 
+	const CATEGORY_NOT_ACTIVE = "CATEGORY_NOT_ACTIVE;;Category is not active";
+
 	/**
 	 * Batch Service
 	 */

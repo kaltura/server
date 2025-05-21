@@ -10,6 +10,7 @@ class KalturaESearchErrors extends KalturaErrors
     const SEARCH_TYPE_NOT_ALLOWED_ON_UNIFIED_SEARCH = 'SEARCH TYPE IS NOT ALLOWED ON UNIFIED SEARCH;TYPE; Type of search [@TYPE@] not allowed on unified search';
     const EMPTY_SEARCH_OPERATOR_NOT_ALLOWED = 'EMPTY SEARCH OPERATOR IS NOT ALLOWED;;empty search operator is not allowed';
     const EMPTY_SEARCH_ITEMS_NOT_ALLOWED = 'EMPTY SEARCH ITEMS ARE NOT ALLOWED;;empty search items are not allowed';
+	const OBJECTID_AND_OBJECTIDS_NOT_ALLOWED_SIMULTANEOUSLY = 'OBJECTID AND OBJECTIDS NOT ALLOWED SIMULTANEOUSLY;;objectId and objectIds are not allowed to use simultaneously';
     const MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM = 'MISSING MANDATORY PARAMETERS IN ORDER ITEM;;missing mandatory parameters in order item';
     const MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED = 'MIXED SEARCH ITEMS IN NESTED OPERATOR NOT ALLOWED;;mixed search items in nested operator not allowed';
     const MISSING_OPERATOR_TYPE = 'MISSING OPERATOR TYPE;;missing operator type';

@@ -37,6 +37,9 @@ $englishArray = array(
 	'Kaltura_Client_Enum_NullableBoolean::NULL_VALUE' => "NULL VALUE",
 	'Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE' => "TRUE",
 
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_16_9' => "16:9",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_4_3' => "4:3",
+
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::VTT' => "VTT",
@@ -52,6 +55,7 @@ $englishArray = array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_HOUR' => "Price Per Hour",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE' => "Price Per Minute",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_SECOND' => "Price Per Second",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_TOKEN' => "Price Per Token",
 
 	'Kaltura_Client_Reach_Enum_ReachProfileType::FREE_TRIAL' => "Free Trial",
 	'Kaltura_Client_Reach_Enum_ReachProfileType::PAID' => "Paid",
@@ -168,6 +172,9 @@ $englishArray = array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_CN' => "Simplified Chinese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_HK' => "Traditional Chinese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AUTO_DETECT' => "Auto Detect",
+
+	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_ASL' => "English (ASL)",
+	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_BSL' => "English (BSL)",
 
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',

@@ -66,7 +66,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		}
 		elseif ($this->catalogItemIdEqual)
 		{
-			return $this->listPartnersWithVendorCatalogItem($pager, $c);
+			return $this->listPartnersWithVendorCatalogItem($pager, $type);
 		}
 
 		$list = VendorCatalogItemPeer::doSelect($c);
@@ -113,7 +113,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		return $this->getTypeListResponse($pager, $responseProfile);
 	}
 
-	protected function listPartnersWithVendorCatalogItem($pager, $vendorCatalogItemCriteria)
+	protected function listPartnersWithVendorCatalogItem($pager, $type)
 	{
 		$partnerCatalogItemCriteria = new Criteria();
 		$partnerCatalogItemCriteria->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $this->catalogItemIdEqual);
@@ -132,6 +132,11 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 			$totalCount = PartnerCatalogItemPeer::doCount($partnerCatalogItemCriteria);
 		}
 
+		$vendorCatalogItemCriteria = new Criteria();
+		if ($type)
+		{
+			$vendorCatalogItemCriteria->add(VendorCatalogItemPeer::SERVICE_FEATURE, $type);
+		}
 		$vendorCatalogItemCriteria->add(VendorCatalogItemPeer::ID, $this->catalogItemIdEqual);
 		$catalogItem = VendorCatalogItemPeer::doSelectOne($vendorCatalogItemCriteria);
 

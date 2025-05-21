@@ -10,7 +10,7 @@ class VendorMetadataEnrichmentCatalogItem extends VendorCatalogItem
         $this->setServiceFeature(VendorServiceFeature::METADATA_ENRICHMENT);
     }
 
-    public function isDuplicateTask(entry $entry): bool
+    public function isDuplicateTask($entryId, $entryObjectType, $partnerId): bool
     {
         return false;
     }

@@ -1899,6 +1899,142 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
 			self::REPORT_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
 			self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB),
+		),
+
+		ReportType::PARTNER_USAGE_SF => array(
+			self::REPORT_JOIN_GRAPHS => array(
+				// bandwidth
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_BANDWIDTH_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_BANDWIDTH_SIZE_MB, self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB),
+				),
+
+				// transcoding
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_TRANSCODING_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_SIZE_MB),
+				),
+
+				// storage
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_ADDED_MB, self::METRIC_STORAGE_DELETED_MB),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_STORAGE_USAGE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_STORAGE_TOTAL_MB),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedStorageGraphs',
+				),
+
+				// media entries
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_LIVE_STREAM)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_ADDED, self::METRIC_ENTRIES_DELETED),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(
+						self::DRUID_DIMENSION => self::DIMENSION_MEDIA_TYPE,
+						self::DRUID_VALUES => array(self::MEDIA_TYPE_VIDEO, self::MEDIA_TYPE_AUDIO, self::MEDIA_TYPE_IMAGE, self::MEDIA_TYPE_LIVE_STREAM)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_ENTRIES_TOTAL),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedEntriesGraphs',
+				),
+
+				// named users
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_ADDED, self::METRIC_USERS_DELETED),
+				),
+
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_USER_LIFECYCLE,
+					self::REPORT_INTERVAL => self::INTERVAL_BASE_TO_START,
+					self::REPORT_FILTER => array(		// can exclude logical deltas in this report
+						self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+						self::DRUID_VALUES => array(self::EVENT_TYPE_STATUS, self::EVENT_TYPE_PHYSICAL_ADD, self::EVENT_TYPE_PHYSICAL_DELETE)
+					),
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_USERS_TOTAL),
+					self::REPORT_GRAPH_ACCUMULATE_FUNC => 'kKavaReportsMgr::addAggregatedUsersGraphs',
+				),
+
+				// plays
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_HISTORICAL,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::EVENT_TYPE_PLAYER_IMPRESSION, self::EVENT_TYPE_PLAYMANIFEST, self::METRIC_LIVE_VIEW_PERIOD_PLAY_TIME),
+				),
+
+				// transcoding entries duration (minutes)
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_ENTRY_LIFECYCLE,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION),
+				),
+				// meeting view time
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_MEETING_HISTORICAL,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_METRICS => array(self::METRIC_MEETING_VIEW_TIME),
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_MEETING_VIEW_TIME),
+				),
+			),
+			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
+			self::REPORT_GRAPH_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedLiveViewTimeGraph',
+			self::REPORT_TABLE_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedLiveViewTimeColumn',
+
+			self::REPORT_COLUMN_MAP => array(
+				'total_plays' => self::EVENT_TYPE_PLAY,
+				'bandwidth_consumption' => self::METRIC_BANDWIDTH_SIZE_MB,
+				'average_storage' => self::METRIC_AVERAGE_STORAGE_MB,
+				'transcoding_consumption' => self::METRIC_TRANSCODING_SIZE_MB,
+				'total_media_entries' => self::METRIC_PEAK_ENTRIES,
+				'total_end_users' => self::METRIC_PEAK_USERS,
+				'total_views' => self::EVENT_TYPE_PLAYER_IMPRESSION,
+				'origin_bandwidth_consumption' => self::METRIC_ORIGIN_BANDWIDTH_SIZE_MB,
+				'added_storage' => self::METRIC_STORAGE_ADDED_MB,
+				'deleted_storage' => self::METRIC_STORAGE_DELETED_MB,
+				'peak_storage' => self::METRIC_PEAK_STORAGE_MB,
+				'video_streams' => self::EVENT_TYPE_PLAYMANIFEST,
+				'transcoding_duration' => self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION,
+				'live_view_time' => self::METRIC_COMBINED_LIVE_VIEW_TIME,
+			),
 		)
 	);
 

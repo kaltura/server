@@ -565,14 +565,4 @@ class ReachProfile extends BaseReachProfile
 		return array("reachProfile:id=".strtolower($this->getId()));
 	}
 
-	public function getAllowsNegativeOverages()
-	{
-		$credit = $this->getCredit();
-		if($credit instanceof kUnlimitedVendorCredit)
-		{
-			return true;
-		}
-		return $credit->getAllowNegativeOverageCredit();
-	}
-
 } // ReachProfile

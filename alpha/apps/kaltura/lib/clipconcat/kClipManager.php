@@ -952,7 +952,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				}
 			}
 
-			if($mediaInfoObj->getVideoWidth() < $mediaInfoObj->getVideoHeight())
+			$actualWidth = $mediaInfoObj->getVideoWidth();
+			$actualHeight = $mediaInfoObj->getVideoHeight();
+			$rotate = $mediaInfoObj->getVideoRotation() ? $mediaInfoObj->getVideoRotation() : 0;
+			if(($rotate/90) % 2 == 1)
+			{
+				$actualWidth = $mediaInfoObj->getVideoHeight();
+				$actualHeight = $mediaInfoObj->getVideoWidth();
+			}
+
+			if($actualWidth < $actualHeight)
 			{
 				$currentConversionParams[self::INVERTED_SOURCE] = true;
 				$currentConversionParams[self::TARGET_WIDTH] = $targetWidth;
