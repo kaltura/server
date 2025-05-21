@@ -12,6 +12,14 @@
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_05_07_eventNotification_update_requiresPermissions_permission.php
 	php /opt/kaltura/app/deployment/updates/scripts/2025_05_07_deploy_kafka_folder_events.php
 
+## Add action replaceOutput to EntryVendorTask service 
+* Issue Type: Task
+* Issue ID: PLAT-25283
+### Deployment ###
+Add the following to admin.ini
+
+    php deployment/updates/scripts/add_permissions/2025_05_19_add_entryvendortask_replace_output.php
+
 # Ursa-21.15.0
 ## Add Folders Capabilities
 * Issue Type: Task
@@ -46,11 +54,11 @@ Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be r
 None.
 
 ### Deployment scripts ###
-First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+First replace all tokens in the XML file below and remove ".template" from the file name.
 
 	deployment/updates/scripts/xml/2025_03_17_addChannelMemberSubscribedEmailNotification.template.xml
- 
-Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
+
+Run the php deployment script.
 
 	php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_channel_member_subscribed.php
 

@@ -621,4 +621,65 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_ABORT_NOT_MODERATED_TASK, $id);
 		}
 	}
+
+	/**
+	 * @action replaceOutput
+	 * @param int $id vendor task id
+	 * @param string $newOutput
+	 * @return KalturaEntryVendorTask
+	 */
+	public function replaceOutputAction($id, $newOutput)
+	{
+		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
+		if (!$dbEntryVendorTask)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		}
+
+		if (!kCurrentContext::$is_admin_session && kCurrentContext::$ks_uid != $dbEntryVendorTask->getUserId())
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ACTION_NOT_ALLOWED, $id, kCurrentContext::$ks_uid);
+		}
+
+		if ($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::READY)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED, 'Entry vendor task must be with status ready');
+		}
+
+		if (!kString::checkIsValidJson($newOutput))
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED, 'Error in JSON format');
+		}
+
+		$entryVendorTask = new KalturaEntryVendorTask();
+
+		$serviceFeature = $dbEntryVendorTask->getServiceFeature();
+		switch ($serviceFeature)
+		{
+			case KalturaVendorServiceFeature::CLIPS:
+				$entryVendorTask->taskJobData = new KalturaClipsVendorTaskData();
+				$entryVendorTask->taskJobData->clipsOutputJson = $newOutput;
+				break;
+
+			case KalturaVendorServiceFeature::QUIZ:
+				$entryVendorTask->taskJobData = new KalturaQuizVendorTaskData();
+				$entryVendorTask->taskJobData->quizOutput = $newOutput;
+				break;
+
+			case KalturaVendorServiceFeature::METADATA_ENRICHMENT:
+				$entryVendorTask->taskJobData = new KalturaMetadataEnrichmentVendorTaskData();
+				$entryVendorTask->taskJobData->outputJson = $newOutput;
+				break;
+
+			default:
+				throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_ITEM_COULD_NOT_BE_UPDATED, "Entry vendor task of type [$serviceFeature] does not support replacing output");
+		}
+
+		$dbEntryVendorTask = $entryVendorTask->toUpdatableObject($dbEntryVendorTask);
+		$dbEntryVendorTask->save();
+
+		$entryVendorTask->fromObject($dbEntryVendorTask, $this->getResponseProfile());
+
+		return $entryVendorTask;
+	}
 }
