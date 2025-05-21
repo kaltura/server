@@ -25,6 +25,15 @@ abstract class KalturaESearchParams extends KalturaObject
 	 */
 	public $ignoreSynonym;
 
+	/**
+	 * @var string
+	 */
+	public $objectIds;
+
+	/**
+	 * @var KalturaNullableBoolean
+	 */
+	public $objectIdsNotIn;
 
 	private static $mapBetweenObjects = array
 	(
@@ -32,6 +41,8 @@ abstract class KalturaESearchParams extends KalturaObject
 		"objectId",
 		"orderBy",
 		"ignoreSynonym",
+		"objectIds",
+		"objectIdsNotIn"
 	);
 
 	public function getMapBetweenObjects()
@@ -44,6 +55,11 @@ abstract class KalturaESearchParams extends KalturaObject
 		if (!$object_to_fill)
 		{
 			$object_to_fill = new ESearchParams();
+		}
+
+		if (isset($this->objectId) && isset($this->objectIds))
+		{
+			throw new KalturaAPIException(KalturaESearchErrors::OBJECTID_AND_OBJECTIDS_NOT_ALLOWED_SIMULTANEOUSLY);
 		}
 
 		return parent::toObject($object_to_fill, $props_to_skip);

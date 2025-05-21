@@ -95,26 +95,24 @@ class ZoomVendorService extends KalturaBaseService
 			$permissions = $client->retrieveTokenZoomUserPermissions();
 			$user = $client->retrieveTokenZoomUser();
 			$accountId = $user[ZoomHelper::ACCOUNT_ID];
-			$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
-			if(!$zoomIntegration)
-			{
-				$zoomIntegration = new ZoomVendorIntegration();
-				$zoomIntegration->setAccountId($accountId);
-				ZoomHelper::setZoomIntegration($zoomIntegration);
-			}
-			else if ($zoomIntegration->getStatus() == VendorIntegrationStatus::ACTIVE && $zoomIntegration->getPartnerId() != $ks->getPartnerId())
-			{
-				throw new KalturaAPIException(KalturaZoomErrors::INTEGRATION_ALREADY_EXIST, $zoomIntegration->getPartnerId());
-			}
-			
-			$zoomIntegration->setTokensData($tokens);
-			$zoomIntegration->save();
 			$permissions = $permissions['permissions'];
 			$isAdmin = ZoomHelper::canConfigureEventSubscription($permissions);
 			if($isAdmin)
 			{
 				if($ks)
 				{
+					$zoomIntegration = ZoomHelper::getZoomIntegrationByAccountId($accountId, true);
+					if(!$zoomIntegration)
+					{
+						$zoomIntegration = new ZoomVendorIntegration();
+						$zoomIntegration->setAccountId($accountId);
+						ZoomHelper::setZoomIntegration($zoomIntegration);
+					}
+					else if ($zoomIntegration->getStatus() == VendorIntegrationStatus::ACTIVE && $zoomIntegration->getPartnerId() != $ks->getPartnerId())
+					{
+						throw new KalturaAPIException(KalturaZoomErrors::INTEGRATION_ALREADY_EXIST, $zoomIntegration->getPartnerId());
+					}
+					$zoomIntegration->setTokensData($tokens);
 					$zoomIntegration->setPartnerId($ks->getPartnerId());
 					$zoomIntegration->setVendorType(VendorTypeEnum::ZOOM_ACCOUNT);
 					$zoomIntegration->save();
@@ -292,9 +290,10 @@ class ZoomVendorService extends KalturaBaseService
 	{
 		if ($integrationSetting->zoomCategory)
 		{
-			if (VendorHelper::createCategoryForVendorIntegration($zoomIntegration->getPartnerId(), $integrationSetting->zoomCategory, $zoomIntegration))
+			$createdCategories = ZoomHelper::createCategoriesForIntegration($integrationSetting->zoomCategory, $zoomIntegration);
+			if ($createdCategories)
 			{
-				$zoomIntegration->setZoomCategory($integrationSetting->zoomCategory);
+				$zoomIntegration->setZoomCategory(implode(',', $createdCategories));
 			}
 		}
 		else
@@ -304,9 +303,10 @@ class ZoomVendorService extends KalturaBaseService
 		
 		if ($integrationSetting->zoomWebinarCategory)
 		{
-			if (VendorHelper::createCategoryForVendorIntegration($zoomIntegration->getPartnerId(), $integrationSetting->zoomWebinarCategory, $zoomIntegration))
+			$createdCategories = ZoomHelper::createCategoriesForIntegration($integrationSetting->zoomWebinarCategory, $zoomIntegration);
+			if ($createdCategories)
 			{
-				$zoomIntegration->setZoomWebinarCategory($integrationSetting->zoomWebinarCategory);
+				$zoomIntegration->setZoomWebinarCategory(implode(',', $createdCategories));
 			}
 		}
 		else

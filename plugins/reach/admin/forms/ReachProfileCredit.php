@@ -50,7 +50,6 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 		$this->getElement("objectType")->setAttrib('options', $options);
 	}
 
-
 	public function populateFromObject($creditObject, $add_underscore = false)
 	{
 		$this->getElement("objectType")->setValue(get_class($creditObject));

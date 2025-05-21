@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <config>
+        <serviceUrl>@SERVICE_URL@</serviceUrl>
+        <partnerId>-2</partnerId>
+        <clientTag>Stand alone php 1.0.0</clientTag>
+        <curlTimeout>30</curlTimeout>
+        <userAgent>Stand alone php 1.0.0</userAgent>
+    </config>
+    <session>
+        <partnerId>-2</partnerId>
+        <secret>@ADMIN_CONSOLE_PARTNER_ADMIN_SECRET@</secret>
+        <sessionType>2</sessionType>
+    </session>
+
+    <multirequest>
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="{prompt:partner Id:}">
+            <template objectType="KalturaEmailNotificationTemplate">
+                <name>Channel Member Subscribed</name>
+                <systemName>CHANNEL_MEMBER_SUBSCRIBED</systemName>
+                <description>Email notification template to be sent when an existing channel member subscribed to the channel</description>
+                <automaticDispatchEnabled>1</automaticDispatchEnabled>
+                <eventType>3</eventType> <!-- EventNotificationEventType::OBJECT_CHANGED -->
+                <eventObjectType>12</eventObjectType> <!-- EventNotificationEventObjectType::CAETGORYKUSER -->
+                <eventConditions objectType="array">
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>PermissionNames field modified</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>in_array(categoryKuserPeer::PERMISSION_NAMES, $scope->getEvent()->getModifiedColumns())</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>PermissionNames contains subscribe permission</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>in_array('CATEGORY_SUBSCRIBE', explode(',',$scope->getObject()->getPermissionNames()))</code>
+                        </field>
+                    </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Old value of PermissionNames did not contain subscribe permission</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>!in_array('CATEGORY_SUBSCRIBE', explode(',',$scope->getEvent()->getObject()->getColumnsOldValue(categoryKuserPeer::PERMISSION_NAMES)))</code>
+                        </field>
+                    </item>
+
+                </eventConditions>
+                <format>1</format>
+                <subject>[AppTitle] - {user_name}, a member of category {category_name}, has subscribed to the category.</subject>
+                <body>Replace this text with desired email body. You can use {category_name}, {category_id}, {user_name} and {user_email} as variables.</body>
+                <fromEmail>{from_email}</fromEmail>
+                <fromName>{from_name}</fromName>
+                <bcc objectType="KalturaEmailNotificationCategoryRecipientProvider">
+                    <categoryId objectType="KalturaEvalStringField">
+                        <code>$scope->getObject()->getCategoryId()</code>
+                    </categoryId>
+                    <categoryUserFilter objectType="KalturaCategoryUserProviderFilter">
+                        <permissionNamesMatchAnd>CATEGORY_EDIT,CATEGORY_MODERATE</permissionNamesMatchAnd>
+                    </categoryUserFilter>
+                </bcc>
+                <contentParameters objectType="array">
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_email</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_email")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>from_name</key>
+                        <value objectType="KalturaEvalStringField">
+                            <code>kConf::get("partner_notification_name")</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name</key>
+                        <description>Category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>categoryPeer::retrieveByPk($scope->getEvent()->getObject()->getCategoryId())->getName()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_id</key>
+                        <description>Category ID</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getObject()->getCategoryId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_name</key>
+                        <description>User name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getObject()->getPuserId()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>user_email</key>
+                        <description>User Email</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>$scope->getEvent()->getObject()->getKuser()->getEmail()</code>
+                        </value>
+                    </item>
+                    <item objectType="KalturaEventNotificationParameter">
+                        <key>category_name_encoded</key>
+                        <description>Encoded category name</description>
+                        <value objectType="KalturaEvalStringField">
+                            <code>urlencode(!is_null(categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())) ? categoryPeer::retrieveByPk($scope->getObject()->getCategoryId())->getName() : '')</code>
+                        </value>
+                    </item>
+                </contentParameters>
+            </template>
+        </request>
+        <request service="eventNotificationTemplate" action="updateStatus" plugin="eventNotification" partnerId="0">
+            <id>{1:result:id}</id>
+            <status>1</status><!-- EventNotificationTemplateStatus::DISABLED -->
+        </request>
+    </multirequest>
+</xml>

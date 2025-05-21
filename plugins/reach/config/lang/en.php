@@ -55,6 +55,7 @@ $englishArray = array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_HOUR' => "Price Per Hour",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE' => "Price Per Minute",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_SECOND' => "Price Per Second",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_TOKEN' => "Price Per Token",
 
 	'Kaltura_Client_Reach_Enum_ReachProfileType::FREE_TRIAL' => "Free Trial",
 	'Kaltura_Client_Reach_Enum_ReachProfileType::PAID' => "Paid",

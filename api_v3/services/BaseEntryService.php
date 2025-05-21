@@ -999,10 +999,12 @@ class BaseEntryService extends KalturaEntryService
 			kApiCache::setExpiry(60);
 		}
 
+		$childEntryId = null;
 		$parentEntryId = $dbEntry->getSecurityParentId();
 		if ($parentEntryId)
 		{
 			$dbEntry = $dbEntry->getParentEntry();
+			$childEntryId = $entryId;
 			if(!$dbEntry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
 		}
@@ -1025,7 +1027,7 @@ class BaseEntryService extends KalturaEntryService
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
 		}
 
-		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset);
+		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset, $childEntryId);
 
 		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
 			$accessControlScope = $dbEntry->getAccessControl()->getScope();
@@ -1146,40 +1148,5 @@ class BaseEntryService extends KalturaEntryService
 		$entry->save();
 		
 		return $this->getEntry($entryId);
-	}
-
-	/**
-	 * Return the user's permission on an entry
-	 *
-	 * @action getUserPermission
-	 * @param string $entryId
-	 * @return KalturaUserPermissionOnEntry
-	 * @throws KalturaAPIException
-	 */
-	public function getUserPermissionAction($entryId)
-	{
-		$userPermission = new KalturaUserPermissionOnEntry();
-
-		$kuserId = kCurrentContext::getCurrentKsKuserId();
-		$entry = entryPeer::retrieveByPK($entryId);
-		if (!$kuserId || !$entry)
-		{
-			return $userPermission;
-		}
-
-		if ($entry->isEntitledKuserEdit($kuserId))
-		{
-			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::EDIT;
-		}
-		elseif ($entry->isEntitledKuserPublish($kuserId))
-		{
-			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::PUBLISH;
-		}
-		elseif ($entry->isEntitledKuserView($kuserId))
-		{
-			$userPermission->userPermission = KalturaUserPermissionOnEntryEnum::VIEW;
-		}
-
-		return $userPermission;
 	}
 }

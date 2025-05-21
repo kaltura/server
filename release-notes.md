@@ -1,13 +1,61 @@
-# Ursa-21.14.0
-## Add getUserPermission action to BaseEntry service ##
+# Ursa-21.16.0
+## Add Kafka Event Notifications for Folders
 * Issue Type: Task
-* Issue ID: PLAT-25216
+* Issue ID: PLAT-25225
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_entry_updated_notifications.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_update_kafka_kuser_notifications.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_groupuser_added_notifications.template.xml
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_05_07_eventNotification_update_requiresPermissions_permission.php
+	php /opt/kaltura/app/deployment/updates/scripts/2025_05_07_deploy_kafka_folder_events.php
+
+# Ursa-21.15.0
+## Add Folders Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25228
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableFoldersCapabilities.enabled = true
+moduls.enableFoldersCapabilities.permissionType = 2
+moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
+moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
+moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add new firebase notifications ##
+* Issue Type: Task
+* Issue ID: PLAT-25184
 
 ### Deployment ###
-    php deployment/updates/scripts/add_permissions/2025_04_20_add_getuserpermission_baseentry.php
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+    deployment/updates/scripts/xml/notifications/2025_03_12_firebase_oauth2_notifications.template.xml
+
+Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
+
+    php deployment/updates/scripts/2025_03_12_deploy_firebase_oauth2_notifications.php
+
+## Add channel member subscribed email notification template  ##
+* Issue Type: Task
+* Issue ID: SUP-37427
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+	deployment/updates/scripts/xml/2025_03_17_addChannelMemberSubscribedEmailNotification.template.xml
+ 
+Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
+
+	php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_channel_member_subscribed.php
+
 
 # Ursa-21.13.0
-
 ## Update Subscriber added to channel email event notification template ##
 * Issue Type: Task
 * Issue ID: SUP-37427
@@ -35,8 +83,8 @@ Update script:
 - Issue ID: PLAT-25095
 ### Deployment scripts ###
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
-``deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php``
 
+    php deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php
 
 # Ursa-21.11.0
 ## Add demoteAdmin action to User service ##

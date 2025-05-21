@@ -93,6 +93,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	public $allowResubmission = false;
 
 	/**
+	 * @var bool
+	 */
+	public $payPerUse = false;
+
+	/**
 	 * @var string
 	 */
 	public $vendorData;
@@ -152,6 +157,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'pricing',
 		'engineType',
 		'allowResubmission',
+		'payPerUse',
 		'sourceLanguage',
 		'vendorData',
 		'stage',

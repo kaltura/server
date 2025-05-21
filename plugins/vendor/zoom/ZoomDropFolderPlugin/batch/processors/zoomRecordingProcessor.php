@@ -130,12 +130,21 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		return $entry;
 	}
 	
-	public function addEntryToCategory($categoryName, $entryId)
+	public function addEntryToCategory($categoryNames, $entryId)
 	{
-		$categoryId = $this->findCategoryIdByName($categoryName);
-		if ($categoryId)
+		$categoriesList = explode(',', $categoryNames);
+		foreach ($categoriesList as $category)
 		{
-			$this->addCategoryEntry($categoryId, $entryId);
+			$category = trim($category);
+			if (!$category)
+			{
+				continue;
+			}
+			$categoryId = $this->findCategoryIdByName($category);
+			if ($categoryId)
+			{
+				$this->addCategoryEntry($categoryId, $entryId);
+			}
 		}
 	}
 	

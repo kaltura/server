@@ -35,7 +35,7 @@ class KalturaVendorCredit extends KalturaBaseVendorCredit
 		'credit',
 		'fromDate',
 		'overageCredit',
-		'addOn'
+		'addOn',
 	);
 
 	/* (non-PHPdoc)

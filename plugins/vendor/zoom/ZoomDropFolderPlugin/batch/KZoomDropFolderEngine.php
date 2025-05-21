@@ -184,18 +184,15 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function getMeetings($resultZoomList)
 	{
-		$meetings = $resultZoomList[self::MEETINGS];
-		if ($meetings)
-		{
-			KalturaLog::log('Found ['.count($meetings).'] in the folder');
-		}
-		else
+		if (!isset($resultZoomList[self::MEETINGS]) || empty($resultZoomList[self::MEETINGS]))
 		{
 			KalturaLog::info('No physical files found for drop folder id ['.$this->dropFolder->id.']');
-			$meetings = array();
+			return array();
 		}
-		
-		KalturaLog::info('physical files: ');
+
+		$meetings = $resultZoomList[self::MEETINGS];
+
+		KalturaLog::info('Found ['.count($meetings).'] files in the folder:');
 		foreach ($meetings as $meeting)
 		{
 			KalturaLog::info('Meeting UUID: '. $meeting[self::UUID]);

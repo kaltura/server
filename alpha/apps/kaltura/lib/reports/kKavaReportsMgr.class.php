@@ -147,6 +147,9 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_MEETING_MIC_UNMUTED_VIEW_TIME = 'meeting_mic_unmuted_view_time';
 	const METRIC_MEETING_CAMERA_ON_VIEW_TIME_SEC = 'meeting_camera_on_view_time_sec';
 	const METRIC_MEETING_CAMERA_ON_VIEW_TIME = 'meeting_camera_on_view_time';
+	const METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC = 'transcoding_added_entries_duration_sec';
+	const METRIC_TRANSCODING_ADDED_ENTRIES_DURATION = 'transcoding_added_entries_duration';
+
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -1498,6 +1501,17 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
 				self::getInFilter(self::DIMENSION_USER_ENGAGEMENT, self::$mic_unmuted_engagement))),
 			self::getLongSumAggregator(self::METRIC_MEETING_MIC_UNMUTED_VIEW_TIME_SEC, self::METRIC_VIEW_TIME_SUM));
+
+		self::$aggregations_def[self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PHYSICAL_ADD),
+				self::getNotFilter(self::getInFilter(self::DIMENSION_SOURCE_TYPE, array('Recorded Live Stream'))))),
+			self::getLongSumAggregator(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC, self::METRIC_DURATION_SEC));
+
+		self::$metrics_def[self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION, self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC, '60'));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -7780,4 +7794,23 @@ class kKavaReportsMgr extends kKavaBase
 		return min(floor($value), 100);
 	}
 
+	// use this function as 'report_table_finalize_func' when using __time dimension and day granularity
+	protected static function formatTimestampToDay(&$result, $input_filter)
+	{
+		$headers = $result[0];
+
+		$timePosition = array_search('time', $headers);
+		if ($timePosition === false)
+		{
+			return;
+		}
+
+		foreach ($result[1] as &$row)
+		{
+			$timestamp = $row[$timePosition];
+			$tz = self::getPhpTimezone($input_filter->timeZoneOffset);
+			$timestamp = self::timestampToDateId($timestamp, $tz);
+			$row[$timePosition] = $timestamp;
+		}
+	}
 }

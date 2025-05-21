@@ -48,6 +48,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_CREATED_BY = 'createdBy';
 	const CUSTOM_DATA_NOTES = 'notes';
 	const CUSTOM_ADMIN_TAGS_TO_EXCLUDE = 'admin_tags_to_exclude';
+	const CUSTOM_DATA_PAY_PER_USE = 'payPerUse';
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -78,6 +79,11 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 			$pricing = unserialize($pricing);
 		
 		return $pricing;
+	}
+
+	public function requiresPayment()
+	{
+		return $this->getPricing() && $this->getPricing()->getPricePerUnit();
 	}
 
 	public function setBulkUploadId($bulkUploadId)
@@ -188,16 +194,34 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return max($ksExpiry, dateUtils::DAY * 7);
 	}
 	
-	public function calculatePriceForEntry(entry $entry, $taskDuration = null)
+	public function calculateTaskPrice($entryObject, $entryObjectType, $taskData, $unitsUsed = null)
 	{
-		$durationMsec = $taskDuration ? $taskDuration : $entry->getLengthInMsecs();
-		return call_user_func($this->getPricing()->getPriceFunction(), $durationMsec, $this->getPricing()->getPricePerUnit());
+		if(!$this->getPricing())
+		{
+			return null;
+		}
+		$priceFunction = $this->getPricing()->getPriceFunction();
+		$pricePerUnit = $this->getPricing()->getPricePerUnit();
+		$units = kReachUtils::getPricingUnits($this, $entryObject, $entryObjectType, $taskData, $unitsUsed);
+		return call_user_func($priceFunction, $units, $pricePerUnit);
 	}
 	
-	public function getTaskVersion($entryId, $jobData = null)
+	public function getTaskVersion($entryId, $entryObjectType = EntryObjectType::ENTRY, $jobData = null)
 	{
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
-		return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
+		switch ($entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
+				return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+
+			default:
+				return 0;
+		}
 	}
 
 	public static function translateServiceFeatureEnum($catalogItemId)
@@ -216,11 +240,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array("vendorCatalogItem:id=".strtolower($this->getId()));
 	}
 
-	public function isDuplicateTask(entry $entry)
+	public function isDuplicateTask($entryId, $entryObjectType, $partnerId)
 	{
-		$version = $this->calculateEntryVendorTaskVersion($entry);
-
-		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entry->getId(), $this->getId(), $entry->getPartnerId(), $version);
+		$version = $this->getTaskVersion($entryId, $entryObjectType);
+		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryId, $this->getId(), $partnerId, $version);
 		if($activeTask)
 		{
 			return true;
@@ -229,20 +252,13 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return false;
 	}
 
-	public function calculateEntryVendorTaskVersion ($entry)
-	{
-		$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entry->getId());
-
-		return !is_null($sourceFlavor) ? $sourceFlavor->getVersion() : 0;
-	}
-
 	public function isEntryTypeSupported($type, $mediaType = null)
 	{
 		$supportedTypes = KalturaPluginManager::getExtendedTypes(entryPeer::OM_CLASS, entryType::MEDIA_CLIP);
 		$supported = in_array($type, $supportedTypes);
 		if($mediaType && $supported)
 		{
-			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO,entry::ENTRY_MEDIA_TYPE_AUDIO));
+			$supported = $supported && in_array($mediaType, array(entry::ENTRY_MEDIA_TYPE_VIDEO, entry::ENTRY_MEDIA_TYPE_AUDIO));
 		}
 
 		return $supported;
@@ -276,6 +292,16 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	public function getContract()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CONTRACT);
+	}
+
+	public function setPayPerUse($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_PAY_PER_USE, $v);
+	}
+
+	public function getPayPerUse()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_PAY_PER_USE, null, false);
 	}
 
 	public function setCreatedBy($v)
@@ -317,6 +343,24 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		}
 		
 		return array_map("trim", explode(',', $adminTagsToExclude));
+	}
+
+	public function isFeatureTypeSupportedForEntry($entryObject, $entryObjectType)
+	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
+		switch ($entryObjectType)
+		{
+			case EntryObjectType::ENTRY:
+				$supportedType = $this->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType());
+				return !$this->isEntryDurationExceeding($entryObject) && $supportedType;
+
+			default:
+				return false;
+		}
 	}
 
 	public function isEntryDurationExceeding(entry $entry)

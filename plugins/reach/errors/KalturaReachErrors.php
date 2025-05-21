@@ -34,6 +34,7 @@ class KalturaReachErrors implements kReachErrors
 	/* Reach Profile */
 
 	const REACH_PROFILE_NOT_FOUND = "REACH_PROFILE_NOT_FOUND;ID;Reach profile with id provided not found [@ID@]";
+	const REACH_PROFILE_DOES_NOT_ALLOW_NEGATIVE_OVERAGES = "REACH_PROFILE_DOES_NOT_ALLOW_NEGATIVE_OVERAGES;ID;Reach profile id [@ID@] does not allow negative overages";
 
 	const DICTIONARY_LANGUAGE_DUPLICATION = "DICTIONARY_LANGUAGE_DUPLICATION;LANGUAGE;Vendor profile configuration error - not allowed duplicate dictionaries for language [@LANGUAGE@] ";
 	const TARGET_LANGUAGE_NOT_SUPPORTED = "TARGET_LANGUAGE_NOT_SUPPORTED;LANGUAGE;Cannot set [@LANGUAGE@] as target language";
@@ -66,9 +67,11 @@ class KalturaReachErrors implements kReachErrors
 	const CANNOT_ABORT_NOT_MODERATED_TASK = "CANNOT_ABORT_NOT_MODERATED_TASK;;Cannot abort task which is not pending moderation";
 	
 	const PARTNER_DATA_NOT_VALID_JSON_STRING = "PARTNER_DATA_NOT_VALID_JSON_STRING;;Partner data must be a vlaid json string";
-	
+
 	const CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE = "CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE;ID,OLD_STATUS,NEW_STATUS;Cannot update status from [@OLD_STATUS@] to [@NEW_STATUS@] for task with id [@ID@], since task is in final status";
-	
+
+	const CANNOT_UPDATE_UNIT_USED_OF_TASK_WHICH_IS_IN_FINAL_STATE = "CANNOT_UPDATE_UNIT_USED_OF_TASK_WHICH_IS_IN_FINAL_STATE;ID,OLD_UNITS_USED,NEW_UNITS_USED;Cannot update unitsUsed from [@OLD_UNITS_USED@] to [@NEW_UNITS_USED@] for task with id [@ID@], since task is in final state";
+
 	const ENTRY_TYPE_NOT_SUPPORTED = "ENTRY_TYPE_NOT_SUPPORTED;TYPE;Requesting tasks for entry type [@TYPE@] is not supported";
 
 	const FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY = "FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY;FEATURE,ID;Requesting tasks of feature [@FEATURE@] for entry id [@ID@] is not supported";
@@ -92,7 +95,8 @@ class KalturaReachErrors implements kReachErrors
 	const TOO_LONG_SCHEDULED_TASK = "TOO_LONG_SCHEDULED_TASK;TASK_DURATION,DURATION_LIMIT,CATALOG_ITEM_ID;The task duration [@TASK_DURATION@] is exceeding the limit [@DURATION_LIMIT@] defined in catalogItem [@CATALOG_ITEM_ID@]";
 
 	const REQUIRE_CAPTION = "REQUIRE_CAPTION;CATALOG_ITEM_ID;Caption Asset must be provided for catalog item [@CATALOG_ITEM_ID@]";
-	
+	const ENTRY_OBJECT_TYPE_NOT_SUPPORTED = "ENTRY_OBJECT_TYPE_NOT_SUPPORTED;ENTRY_OBJECT_TYPE;Entry object type [@ENTRY_OBJECT_TYPE@] is not supported";
+
 	/* Credit */
 	
 	const OVERAGE_CREDIT_CANNOT_BE_NEGATIVE = "OVERAGE_CREDIT_CANNOT_BE_NEGATIVE;;Overage credit value cannot be negative";

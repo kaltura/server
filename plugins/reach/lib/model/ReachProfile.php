@@ -564,4 +564,5 @@ class ReachProfile extends BaseReachProfile
 	{
 		return array("reachProfile:id=".strtolower($this->getId()));
 	}
+
 } // ReachProfile
