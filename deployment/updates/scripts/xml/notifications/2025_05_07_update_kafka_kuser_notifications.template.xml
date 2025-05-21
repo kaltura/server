@@ -40,7 +40,7 @@
             </pager>
         </request>
         <request service="eventNotificationTemplate" action="update" plugin="eventNotification" partnerId="0">
-            <id>{3:result:objects:0:id}</id>
+            <id>{1:result:objects:0:id}</id>
             <template objectType="KalturaKafkaNotificationTemplate">
                 <requiresPermissions>VIRTUALEVENT_PLUGIN_PERMISSION,FEATURE_ALLOW_CNC_PERMISSION,GAME_PLUGIN_PERMISSION,FEATURE_CERTIFICATIONS,FEATURE_ENABLE_FOLDERS_CAPABILITIES</requiresPermissions>
             </template>
