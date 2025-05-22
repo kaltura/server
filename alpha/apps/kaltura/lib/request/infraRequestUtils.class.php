@@ -263,13 +263,14 @@ class infraRequestUtils
 			'127.0.0.0|127.255.255.255',
 		);
 		
-		$longIp = ip2long($ip);
+		$longIp = kIpAddressUtils::ipToLong($ip);
 		if ($longIp && $longIp != -1)
 		{
 			foreach ($privateRanges as $range)
 			{
 				list($start, $end) = explode('|', $range);
-				if ($longIp >= ip2long($start) && $longIp <= ip2long($end)) {
+				// Replace ip2long with ipToLong to support both IPv4 and IPv6
+				if ($longIp >= self::ipToLong($start) && $longIp <= self::ipToLong($end)) {
 					return true;
 				}
 			}

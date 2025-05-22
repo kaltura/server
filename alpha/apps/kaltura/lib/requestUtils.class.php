@@ -312,7 +312,7 @@ class requestUtils extends infraRequestUtils
 	public static function validateIp( $required_ip , &$remote_addr)
 	{
 		$remote_addr = self::getRemoteAddress();
-		$longIP = ip2long( $remote_addr );// to convert back, use long2ip
+		$longIP = kIpAddressUtils::ipToLong($remote_addr);// to convert back, use long2ip
 		return  ( $required_ip == $remote_addr || $required_ip == $longIP );
 	}
 	
