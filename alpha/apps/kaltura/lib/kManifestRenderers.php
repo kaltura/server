@@ -993,7 +993,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		{
 			// Sperate audio flavors from video flavors
 			if ( isset($flavor['audioLanguage']) || isset($flavor['audioLabel']) ) {
-				if(count($audioFlavorsArr) == 0) {
+				if(count($audioFlavorsArr) == 0) {//TODO add logic to change default audio stream when feature is on
 					$isFirstAudioStream = "YES";
 					$firstAudioStream = $flavor;
 				}
