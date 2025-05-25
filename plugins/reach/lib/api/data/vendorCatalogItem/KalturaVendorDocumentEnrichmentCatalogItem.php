@@ -5,6 +5,12 @@
  */
 class KalturaVendorDocumentEnrichmentCatalogItem extends KalturaVendorCatalogItem
 {
+	/**
+	 * @var KalturaVendorDocumentEnrichmentType
+	 */
+	public $documentEnrichmentType;
+
+
 	protected function getServiceFeature(): int
 	{
 		return VendorServiceFeature::DOCUMENT_ENRICHMENT;
