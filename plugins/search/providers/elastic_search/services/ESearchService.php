@@ -93,14 +93,14 @@ class ESearchService extends KalturaBaseService
 	 */
 	protected function initAndSearch($coreSearchObject, $searchParams, $pager)
 	{
-		list($coreSearchOperator, $objectStatusesArr, $objectIdsCsvStr, $objectIdsNotIn, $kPager, $coreOrder, $aggregations, $ignoreSynonym) =
+		list($coreSearchOperator, $objectStatusesArr, $objectIds, $kPager, $coreOrder, $aggregations, $ignoreSynonym) =
 			self::initSearchActionParams($searchParams, $pager);
 		if (isset($ignoreSynonym))
 		{
 			$coreSearchObject->setIgnoreSynonymFromQuery(true);
 			$coreSearchObject->getQueryAttributes()->setIgnoreSynonymOnPartner($ignoreSynonym);
 		}
-		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectIdsCsvStr, $coreOrder, $aggregations, $objectIdsNotIn);
+		$elasticResults = $coreSearchObject->doSearch($coreSearchOperator, $kPager, $objectStatusesArr, $objectIds, $coreOrder, $aggregations);
 
 		list($coreResults, $objectCount, $aggregationsResult) = kESearchCoreAdapter::transformElasticToCoreObject($elasticResults, $coreSearchObject);
 		return array($coreResults, $objectCount, $aggregationsResult);
@@ -137,7 +137,7 @@ class ESearchService extends KalturaBaseService
 			$ignoreSynonym = true;
 		}
 
-		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $coreParams->getObjectIdsNotIn(), $kPager, $coreParams->getOrderBy(), $coreParams->getAggregations(), $ignoreSynonym);
+		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $kPager, $coreParams->getOrderBy(), $coreParams->getAggregations(), $ignoreSynonym);
 	}
 
 }

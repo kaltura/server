@@ -25,7 +25,7 @@ abstract class kBaseSearch
 		$this->ignoreSynonymFromQuery = false;
 	}
 
-	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectIdsCsvStr = null, ESearchOrderBy $order = null);
+	public abstract function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null);
 
 	/**
 	 * @return ESearchQueryAttributes
@@ -41,7 +41,7 @@ abstract class kBaseSearch
 
 	protected abstract function execSearch(ESearchOperator $eSearchOperator);
 
-	protected abstract function initQuery(array $statuses, $objectIdsCsvStr, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null);
+	protected abstract function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null);
 
 	protected function initPager(kPager $pager = null)
 	{
@@ -112,7 +112,7 @@ abstract class kBaseSearch
 		return $sortConditions;
 	}
 
-	protected function initBaseFilter($partnerId, array $statuses, $objectIdsCsvStr, $objectIdsNotIn = null)
+	protected function initBaseFilter($partnerId, array $statuses, $objectId)
 	{
 		$partnerStatus = array();
 		foreach ($statuses as $status)
@@ -123,33 +123,22 @@ abstract class kBaseSearch
 		$partnerStatusQuery = new kESearchTermsQuery('partner_status', $partnerStatus);
 		$this->mainBoolQuery->addToFilter($partnerStatusQuery);
 
-		if ($objectIdsCsvStr)
+		if($objectId)
 		{
-		    if ($objectIdsNotIn)
+			$objectIds = explode(',', $objectId);
+			$objectIds = array_unique($objectIds);
+			$objectIdsArr = array ();
+			foreach ($objectIds as $singleObjectId)
 			{
-		        $this->mainBoolQuery->addToMustNot($this->prepareObjectIdsArrayForSearchTerms($objectIdsCsvStr));
-		    }
-			else
-			{
-		        $this->mainBoolQuery->addToFilter($this->prepareObjectIdsArrayForSearchTerms($objectIdsCsvStr));
-		    }
+				$objectIdsArr[] = elasticSearchUtils::formatSearchTerm($singleObjectId);
+			}
+			$idQuery = new kESearchTermQuery('_id', $objectIdsArr);
+
+			$this->mainBoolQuery->addToFilter($idQuery);
 		}
 
 		//return only the object id
 		$this->query['body']['_source'] = false;
-	}
-
-	protected function prepareObjectIdsArrayForSearchTerms($objectIds)
-	{
-		$objectIds = explode(',', $objectIds);
-		$objectIds = array_unique($objectIds);
-		$objectIdsArr = array ();
-		foreach ($objectIds as $singleObjectId)
-		{
-			$objectIdsArr[] = elasticSearchUtils::formatSearchTerm($singleObjectId);
-		}
-
-		return new kESearchTermQuery('_id', $objectIdsArr);
 	}
 
 	protected function applyElasticSearchConditions()
@@ -157,11 +146,10 @@ abstract class kBaseSearch
 		$this->query['body']['query'] = $this->mainBoolQuery->getFinalQuery();
 	}
 
-	protected function initQueryAttributes($partnerId, $objectId, $objectIdsNotIn = null)
+	protected function initQueryAttributes($partnerId, $objectId)
 	{
 		$this->initPartnerLanguagesSynonym($partnerId);
 		$this->queryAttributes->setObjectId($objectId);
-		$this->queryAttributes->setObjectIdsNotIn($objectIdsNotIn);
 		$this->initOverrideInnerHits($objectId);
 	}
 
@@ -195,7 +183,6 @@ abstract class kBaseSearch
 		}
 
 		$innerHitsConfig = kConf::get('innerHits', 'elastic');
-
 		$overrideInnerHitsSize = isset($innerHitsConfig['innerHitsWithObjectId']) ? $innerHitsConfig['innerHitsWithObjectId'] : null;
 		$this->queryAttributes->setOverrideInnerHitsSize($overrideInnerHitsSize);
 	}

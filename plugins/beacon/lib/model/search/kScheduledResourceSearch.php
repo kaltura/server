@@ -20,21 +20,21 @@ class kScheduledResourceSearch extends kBaseSearch
 		$this->elasticClient = new elasticClient($host, $port, $elasticVersion);
 	}
 
-	public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectIdsCsvStr = null,
+	public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null,
 							 ESearchOrderBy $order = null)
 	{
 		kScheduledResourceSearchEntitlement::init();
-		$this->initQuery($statuses, $objectIdsCsvStr, $pager, $order);
+		$this->initQuery($statuses, $objectId, $pager, $order);
 		$this->initEntitlement();
 		$result = $this->execSearch($eSearchOperator);
 		return $result;
 	}
 
-	protected function initQuery(array $statuses, $objectIdsCsvStr, kPager $pager = null, ESearchOrderBy $order = null,  ESearchAggregations $aggregations=null, $objectIdsNotIn = null)
+	protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null,  ESearchAggregations $aggregations=null)
 	{
 		$this->query = array(elasticClient::ELASTIC_INDEX_KEY => BeaconIndexName::SCHEDULED_RESOURCE_INDEX);
 		$partnerId = kBaseElasticEntitlement::$partnerId;
-		$this->initQueryAttributes($partnerId, $objectIdsCsvStr);
+		$this->initQueryAttributes($partnerId, $objectId);
 		$this->initPager($pager);
 		$this->initOrderBy($order);
 	}
