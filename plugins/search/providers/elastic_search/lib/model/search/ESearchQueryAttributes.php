@@ -21,11 +21,6 @@ class ESearchQueryAttributes
 	protected $objectId;
 
 	/**
-	 * @var bool
-	 */
-	protected $objectIdsNotIn;
-
-	/**
 	 * @var ESearchBaseQueryFilterAttributes
 	 */
 	protected $queryFilterAttributes;
@@ -116,22 +111,6 @@ class ESearchQueryAttributes
 	public function setObjectId($objectId)
 	{
 		$this->objectId = $objectId;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getObjectIdsNotIn()
-	{
-		return $this->objectIdsNotIn;
-	}
-
-	/**
-	 * @param bool $objectId
-	 */
-	public function setObjectIdsNotIn($objectIdsNotIn)
-	{
-		$this->objectIdsNotIn = $objectIdsNotIn;
 	}
 
 	/**
