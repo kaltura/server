@@ -118,7 +118,18 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
         $searchItems = $eSearchOperator->getSearchItems();
         $filteredCategoryIds = array();
-        $filteredEntryId = $objectId ? array($objectId) : array();
+	    $filteredEntryId = array();
+	    if ($objectId)
+	    {
+		    if(strpos($objectId, ',') !== false)
+		    {
+			    $filteredEntryId = explode(',', $objectId);
+		    }
+		    else
+		    {
+			    $filteredEntryId = array($objectId);
+		    }
+	    }
         foreach ($searchItems as $searchItem)
         {
             $filteredObjectId = $searchItem->getFilteredObjectId();
@@ -134,7 +145,7 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
         }
 
         $filteredCategoriesByEntryId = self::getCategoryIdsForEntryId($filteredEntryId);
-        $filteredCategoryIds = array_merge($filteredCategoryIds, $filteredCategoriesByEntryId);
+        $filteredCategoryIds = array_unique(array_merge($filteredCategoryIds, $filteredCategoriesByEntryId));
         self::$filteredCategoryIds = $filteredCategoryIds;
     }
 
@@ -143,14 +154,16 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
         $filteredCategoryIds = array();
         $filteredEntriesIds = array_unique($filteredEntryId);
         $filteredEntriesIds = array_values($filteredEntriesIds);
-        if (count($filteredEntriesIds) == 1)
+        if (count($filteredEntriesIds) >= 1)
         {
-            $categoryEntries = categoryEntryPeer::selectByEntryId($filteredEntriesIds[0]);
+            $categoryEntries = categoryEntryPeer::selectByEntryIds($filteredEntriesIds);
             foreach ($categoryEntries as $categoryEntry)
             {
                 $filteredCategoryIds[] = $categoryEntry->getCategoryId();
             }
         }
+
+
         return $filteredCategoryIds;
     }
 
