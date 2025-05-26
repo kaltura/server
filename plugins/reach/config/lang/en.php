@@ -184,6 +184,7 @@ $englishArray = array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStage::QA' => 'QA',
 
 	'Kaltura_Client_Reach_Enum_VendorVideoAnalysisType::OCR' => 'OCR',
+	'Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType::MD_CONVERSION' => 'Markdown Conversion',
 );
 
 
