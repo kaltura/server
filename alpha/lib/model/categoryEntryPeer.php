@@ -196,13 +196,11 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
 		return self::doSelect($c);
 	}
 
-	public static function selectByEntryIds($entryIds)
+	public static function selectByEntryIds(array $entryIds, $privacyContext)
 	{
-		if(!is_array($entryIds) || count($entryIds) == 0)
-			return array();
-
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryIds, Criteria::IN);
+		$c->add(self::PRIVACY_CONTEXT, $privacyContext, Criteria::EQUAL);
 
 		return self::doSelect($c);
 	}

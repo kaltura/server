@@ -111,25 +111,15 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
         }
     }
 
-    public static function setFilteredCategoryIds(ESearchOperator $eSearchOperator, $objectId)
+    public static function setFilteredCategoryIds(ESearchOperator $eSearchOperator, $objectId, $objectIdsNotIn = null)
     {
-        if($eSearchOperator->getOperator() != ESearchOperatorType::AND_OP)
+        if(($eSearchOperator->getOperator() != ESearchOperatorType::AND_OP) || $objectIdsNotIn)
             return;
 
         $searchItems = $eSearchOperator->getSearchItems();
         $filteredCategoryIds = array();
-	    $filteredEntryId = array();
-	    if ($objectId)
-	    {
-		    if(strpos($objectId, ',') !== false)
-		    {
-			    $filteredEntryId = explode(',', $objectId);
-		    }
-		    else
-		    {
-			    $filteredEntryId = array($objectId);
-		    }
-	    }
+	    $filteredEntryId = $objectId ? explode(',', $objectId) : array();
+
         foreach ($searchItems as $searchItem)
         {
             $filteredObjectId = $searchItem->getFilteredObjectId();
@@ -156,7 +146,7 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
         $filteredEntriesIds = array_values($filteredEntriesIds);
         if (count($filteredEntriesIds) >= 1)
         {
-            $categoryEntries = categoryEntryPeer::selectByEntryIds($filteredEntriesIds);
+            $categoryEntries = categoryEntryPeer::selectByEntryIds($filteredEntriesIds, self::$privacyContext);
             foreach ($categoryEntries as $categoryEntry)
             {
                 $filteredCategoryIds[] = $categoryEntry->getCategoryId();
