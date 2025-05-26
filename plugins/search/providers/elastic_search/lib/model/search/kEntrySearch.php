@@ -35,7 +35,7 @@ class kEntrySearch extends kBaseESearch
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus, $objectIdsCsvStr, $pager, $order, $aggregations, $objectIdsNotIn);
-        $this->initEntitlement($eSearchOperator, $objectId);
+        $this->initEntitlement($eSearchOperator, $objectIdsCsvStr);
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
