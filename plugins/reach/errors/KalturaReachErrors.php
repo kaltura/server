@@ -66,8 +66,8 @@ class KalturaReachErrors implements kReachErrors
 	
 	const CANNOT_ABORT_NOT_MODERATED_TASK = "CANNOT_ABORT_NOT_MODERATED_TASK;;Cannot abort task which is not pending moderation";
 	
-	const PARTNER_DATA_NOT_VALID_JSON_STRING = "PARTNER_DATA_NOT_VALID_JSON_STRING;;Partner data must be a vlaid json string";
-
+	const PARTNER_DATA_NOT_VALID_JSON_STRING = "PARTNER_DATA_NOT_VALID_JSON_STRING;;Partner data must be a valid json string";
+  
 	const CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE = "CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE;ID,OLD_STATUS,NEW_STATUS;Cannot update status from [@OLD_STATUS@] to [@NEW_STATUS@] for task with id [@ID@], since task is in final status";
 
 	const CANNOT_UPDATE_UNIT_USED_OF_TASK_WHICH_IS_IN_FINAL_STATE = "CANNOT_UPDATE_UNIT_USED_OF_TASK_WHICH_IS_IN_FINAL_STATE;ID,OLD_UNITS_USED,NEW_UNITS_USED;Cannot update unitsUsed from [@OLD_UNITS_USED@] to [@NEW_UNITS_USED@] for task with id [@ID@], since task is in final state";

@@ -14,7 +14,7 @@
     </session>
 
     <multirequest>
-        <request service="eventNotificationTemplate" action="add" plugin="eventNotification" partnerId="{prompt:partner Id:}">
+        <request service="eventNotificationTemplate" action="add" plugin="eventNotification"  partnerId="0">
             <template objectType="KalturaEmailNotificationTemplate">
                 <name>Channel Member Subscribed</name>
                 <systemName>CHANNEL_MEMBER_SUBSCRIBED</systemName>
