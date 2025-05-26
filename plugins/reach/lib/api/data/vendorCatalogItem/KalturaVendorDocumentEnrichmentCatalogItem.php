@@ -10,6 +10,18 @@ class KalturaVendorDocumentEnrichmentCatalogItem extends KalturaVendorCatalogIte
 	 */
 	public $documentEnrichmentType;
 
+	private static $map_between_objects = array
+	(
+		'documentEnrichmentType',
+	);
+
+	/* (non-PHPdoc)
+	 * @see KalturaCuePoint::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
 
 	protected function getServiceFeature(): int
 	{
