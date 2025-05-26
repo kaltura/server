@@ -217,6 +217,271 @@ class flavorAsset extends exportableAsset
 	{
 		return $this->getBitrate();
 	}
+
+	public function getCodecString()
+	{
+		$videoStream = null;
+		$audioStream = null;
+		
+		$mediaInfo = $this->getMediaInfo();
+		$contentStreams = json_decode($mediaInfo->getContentStreams(), true);
+		
+		if(!$contentStreams)
+		{
+			return '';
+		}
+		
+		foreach ($contentStreams as $key => $value)
+		{
+			if($key == "video")
+			{
+				$videoStream = $value[0];
+			}
+			elseif($key == "audio")
+			{
+				$audioStream = $value[0];
+			}
+		}
+		
+		if(!$videoStream['extradata'])
+		{
+			return '';
+		}
+		
+		// Handle video codec
+		$videoCodecString = '';
+		if ($videoStream)
+		{
+			$vCodec = strtolower($videoStream['videoFormat']);
+			
+			switch ($vCodec)
+			{
+				case 'h264':
+					$videoCodecString = $this->getAvc1Codec($videoStream['extradata'] ?? '');
+					break;
+				
+				case 'hevc':
+				case 'h265':
+					$videoCodecString = $this->getHvc1Codec($videoStream['extradata'] ?? '');
+					break;
+				
+				case 'av1':
+					$videoCodecString = $this->getAv1Codec($videoStream);
+					break;
+			}
+		}
+		
+		// Handle audio codec
+		$audioCodecString = '';
+		if ($audioStream)
+		{
+			$aCodec = strtolower($audioStream['audioFormat']);
+			$aProfile = $audioStream['containerProfile'] ?? '';
+			$audioCodecString = $this->getAudioCodec($aCodec, $aProfile, $videoStream['extradata'] ?? '');
+		}
+		
+		return implode(',', array_filter(array($videoCodecString, $audioCodecString)));
+	}
+	
+	/**
+	 * Get AVC1 codec string
+	 * @param string $extraDataRaw
+	 * @return string|null
+	 */
+	private function getAvc1Codec(string $extraDataRaw)
+	{
+		$bytes = $this->hexStringToBytes($extraDataRaw);
+		
+		$pos = strpos($bytes, "\x67");
+		if ($pos === false)
+			return null;  // no SPS found
+		
+		// Check length to avoid reading past buffer
+		$profile_idc = isset($bytes[$pos + 1]) ? ord($bytes[$pos + 1]) : 0x42;
+		$constraint_flags = isset($bytes[$pos + 2]) ? ord($bytes[$pos + 2]) : 0x00;
+		$level_idc = isset($bytes[$pos + 3]) ? ord($bytes[$pos + 3]) : 0x1e;
+		
+		// Format as two-digit hex lowercase
+		$profileHex = sprintf('%02x', $profile_idc);
+		$constraintsHex = sprintf('%02x', $constraint_flags);
+		$levelHex = sprintf('%02x', $level_idc);
+		
+		return "avc1." . $profileHex . $constraintsHex . $levelHex;
+	}
+	
+	/**
+	 * Get HVC1 codec string
+	 * @param string $extraDataRaw
+	 * @return string|null
+	 */
+	private function getHvc1Codec(string $extraDataRaw)
+	{
+		$bytes = $this->hexStringToBytes($extraDataRaw);
+		
+		// Check if conversion was successful
+		if ($bytes === false || strlen($bytes) < 19)
+		{
+			return null; // Invalid hex string or too short
+		}
+		
+		// ✅ Extract the first 19 bytes
+		$profile_tier_level = ord($bytes[1]);
+		
+		// ✅ Extract the profile IDC (first 5 bits of byte[1])
+		$profile_idc = $profile_tier_level & 0x1F;
+		
+		// ✅ Extract the correct nibble (first nibble of byte[2])
+		$profile_compat_byte = (ord($bytes[2]) >> 4); // e.g. 0x60 >> 4 = 6
+		
+		// ✅ Extract the tier flag (bit 5 of byte[1])
+		$tier_flag = ($profile_tier_level & 0x20) ? 'H' : 'L';
+		
+		// ✅ Extract the level IDC (byte[12])
+		$level_idc = ord($bytes[12]);
+		
+		// Constraint Indicator Flags: bytes 6–11
+		$constraint_bytes = unpack('C6', substr($bytes, 6, 6));
+		$constraint_flags = '';
+		
+		// Iterate through the constraint bytes and convert to hex
+		foreach ($constraint_bytes as $byte)
+		{
+			if ($byte !== 0 || $constraint_flags !== '')
+			{
+				$constraint_flags .= sprintf('%02X', $byte);
+			}
+		}
+		
+		// Limit to 4 characters
+		$constraint_flags = strtolower(substr($constraint_flags, 0, 2));
+		
+		return sprintf("hvc1.%d.%d.%s%d.%s", $profile_idc, $profile_compat_byte, $tier_flag, $level_idc, $constraint_flags);
+	}
+	
+	/**
+	 * Get AV1 codec string
+	 * @param array $stream
+	 * @return string
+	 */
+	private function getAv1Codec($stream)
+	{
+		$profileMap = [
+			'Main' => 0,
+			'High' => 1,
+			'Professional' => 2
+		];
+		
+		$profile = $profileMap[$stream['profile']] ?? 0;
+		$level = $stream['videoLevel'] ?? 8; // Level 4.0
+		$tier = 'M'; // assume Main tier; you could add ffprobe tier_flag later
+		$bitDepth = $stream['bit_depth'] ?? 8;
+		
+		// Ensure two-digit level and bit depth
+		$levelStr = str_pad($level, 2, '0', STR_PAD_LEFT);
+		$bitDepthStr = str_pad($bitDepth, 2, '0', STR_PAD_LEFT);
+		
+		return "av01.{$profile}.{$levelStr}{$tier}.{$bitDepthStr}";
+	}
+	
+	/**
+	 * Convert a hex string to binary data
+	 * @param string $extraDataRaw
+	 * @return string|false
+	 */
+	private function hexStringToBytes($extraDataRaw)
+	{
+		// Assuming the extraDataRaw is in hex format, we need to parse it
+		$lines = explode("\n", $extraDataRaw);
+		$hexString = '';
+		foreach ($lines as $line) {
+			// Match the hex values after the offset
+			if (preg_match('/^[0-9a-f]+:\s+([0-9a-f\s]+)/i', $line, $matches)) {
+				$hexString .= str_replace(' ', '', $matches[1]);  // Remove spaces and concatenate
+			}
+		}
+		
+		// Convert hex string to binary
+		$hex = preg_replace('/\s+/', '', $hexString);
+		
+		// Convert hex to binary
+		return hex2bin($hex);
+	}
+	
+	private function getAudioCodec(string $codecName, string $profile = '', ?string $extraData = null)
+	{
+		switch (strtolower($codecName))
+		{
+			case 'aac':
+				switch (strtolower($profile))
+				{
+					case 'lc':
+					case 'low complexity':
+						return 'mp4a.40.2';
+					case 'he-aac':
+					case 'high efficiency aac':
+						return 'mp4a.40.5';
+					case 'he-aacv2':
+						return 'mp4a.40.29';
+					case 'main':
+						return 'mp4a.40.1';
+					default:
+						// Optional: fallback to extradata parsing
+						if ($extraData)
+						{
+							return $this->parseAacFromExtraData($extraData) ?? 'mp4a.40.2';
+						}
+						return 'mp4a.40.2';
+				}
+			
+			case 'mp3':
+				return 'mp4a.69'; // MPEG-1 Layer III
+			
+			case 'ac3':
+				return 'ac-3';
+			
+			case 'eac3':
+				return 'ec-3';
+			
+			case 'opus':
+				return 'opus';
+			
+			case 'vorbis':
+				return 'vorbis';
+			
+			case 'flac':
+				return 'flac';
+			
+			case 'alac':
+				return 'alac';
+			
+			default:
+				return ''; // Unknown or unsupported codec
+		}
+	}
+	
+	private function parseAacFromExtraData(string $hexData): ?string
+	{
+		$bytes = $this->hexStringToBytes($hexData);
+		if (!$bytes || strlen($bytes) < 2)
+			return null;
+		
+		// AudioSpecificConfig (ISO/IEC 14496-3)
+		// First 5 bits = audioObjectType
+		$byte1 = ord($bytes[0]);
+		$byte2 = ord($bytes[1]);
+		
+		$audioObjectType = ($byte1 >> 3) & 0x1F;
+		
+		// Optional: handle extended AOTs, not shown here
+		switch ($audioObjectType)
+		{
+			case 1: return 'mp4a.40.1';  // Main
+			case 2: return 'mp4a.40.2';  // LC
+			case 5: return 'mp4a.40.5';  // SBR (HE-AAC)
+			case 29: return 'mp4a.40.29';// HE-AACv2
+			default: return 'mp4a.40.2'; // fallback to LC
+		}
+	}
 	
 	public function getServeFlavorUrl($previewLength = null, $fileName = null, $urlManager = null, $isDir = false)
 	{

@@ -4,8 +4,6 @@ class DeliveryProfileVodPackagerHlsManifest extends DeliveryProfileVodPackagerHl
 
 	const MASTER_MANIFEST_STR = '/master';
 	const M3U8_SUFFIX = '.m3u8';
-	const AUDIO_CODEC = 'audioCodec';
-	const AUDIO_LANGUAGE_NAME = 'audioLanguageName';
 	
 	function __construct() 
 	{

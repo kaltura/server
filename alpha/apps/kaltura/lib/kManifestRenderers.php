@@ -991,7 +991,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		$flavorsArr = array();
 		foreach($this->flavors as $flavor)
 		{
-			// Sperate audio flavors from video flavors
+			// Separate audio flavors from video flavors
 			if ( isset($flavor['audioLanguage']) || isset($flavor['audioLabel']) ) {
 				if(count($audioFlavorsArr) == 0) {
 					$isFirstAudioStream = "YES";
@@ -1044,9 +1044,11 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 
 	private function addExtXStreamInf($flavor, $audio)
 	{
-		$bitrate = $this->calculateBitRate($flavor);
 		$codecs = "";
-		$resolution = '';
+		$resolution = "";
+		$frameRate = "";
+		$bitrate = $this->calculateBitRate($flavor);
+		
 		if(isset($flavor['width']) && isset($flavor['height']) &&
 			(($flavor['width'] > 0) || ($flavor['height'] > 0)))
 		{
@@ -1055,9 +1057,16 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			if ($width && $height)
 				$resolution = ",RESOLUTION={$width}x{$height}";
 		}
-		else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
+		
+		if(isset($flavor['frameRate']) && $flavor['frameRate'] > 0)
 		{
-			$codecs = ',CODECS="mp4a.40.2"';
+			$frameRateNumberFormat = number_format($flavor['frameRate'], 3, '.', '');
+			$frameRate = ",FRAME-RATE={$frameRateNumberFormat}";
+		}
+		
+		if(isset($flavor['codecs']) && $flavor['codecs'] != '')
+		{
+			$codecs = ",CODECS=\"{$flavor['codecs']}\"";
 		}
 
 		$closedCaption = '';
@@ -1066,7 +1075,7 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 			$closedCaption = ",CLOSED-CAPTIONS=\"CC\"";
 		}
 
-		$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$codecs}{$audio}{$closedCaption}\n";
+		$content = "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH={$bitrate}{$resolution}{$frameRate}{$codecs}{$audio}{$closedCaption}\n";
 		$content .= $flavor['url'];
 		return $content;
 	}
