@@ -118,14 +118,14 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
         $searchItems = $eSearchOperator->getSearchItems();
         $filteredCategoryIds = array();
-	    $filteredEntryId = $objectId ? explode(',', $objectId) : array();
+	    $filteredEntryIds = $objectId ? explode(',', $objectId) : array();
 
         foreach ($searchItems as $searchItem)
         {
             $filteredObjectId = $searchItem->getFilteredObjectId();
             if ($filteredObjectId)
             {
-                $filteredEntryId[] = $filteredObjectId;
+	            $filteredEntryIds[] = $filteredObjectId;
             }
             $FilteredCategoryId = $searchItem->getFilteredCategoryId();
             if ($FilteredCategoryId)
@@ -134,8 +134,8 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
             }
         }
 
-        $filteredCategoriesByEntryId = self::getCategoryIdsForEntryId($filteredEntryId);
-        $filteredCategoryIds = array_unique(array_merge($filteredCategoryIds, $filteredCategoriesByEntryId));
+        $filteredCategoriesByEntryIds = self::getCategoryIdsForEntryId($filteredEntryIds);
+        $filteredCategoryIds = array_unique(array_merge($filteredCategoryIds, $filteredCategoriesByEntryIds));
         self::$filteredCategoryIds = $filteredCategoryIds;
     }
 
