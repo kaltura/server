@@ -850,17 +850,18 @@ class MediaService extends KalturaEntryService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
 		$this->approveReplace($dbEntry);
-
-		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
-		foreach ($childEntries as $childEntry)
+		if ($dbEntry->getReplacingEntryId())
 		{
-			if ($childEntry->getId() != $entryId)
+			$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
+			foreach ($childEntries as $childEntry)
 			{
-				$this->validateEntryForReplace($childEntry->getId(), $childEntry);
-				$this->approveReplace($childEntry);
+				if ($childEntry->getId() != $entryId)
+				{
+					$this->validateEntryForReplace($childEntry->getId(), $childEntry);
+					$this->approveReplace($childEntry);
+				}
 			}
 		}
-
 		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
 	}
 

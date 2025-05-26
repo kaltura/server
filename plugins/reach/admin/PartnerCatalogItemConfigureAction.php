@@ -122,21 +122,68 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 				$partnerCatalogItems = $formData['catalogItemsCheckBoxes'];
 			}
 
-			$this->client = Infra_ClientHelper::getClient();
-			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-			Infra_ClientHelper::impersonate($partnerId);
-			$this->client->startMultiRequest();
-			foreach ($partnerCatalogItems as $partnerCatalogItem)
+			if($partnerCatalogItems)
 			{
-				$reachProfileId = $formData["defaultReachProfileId-$partnerCatalogItem"];
-				$reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem, is_numeric($reachProfileId) ? $reachProfileId : null);
+				$this->client = Infra_ClientHelper::getClient();
+				$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+				Infra_ClientHelper::impersonate($partnerId);
+
+				$catalogItemsLimit = 500;
+				if(count($partnerCatalogItems) > $catalogItemsLimit)
+				{
+					throw new Exception("exceeded the limit of [$catalogItemsLimit] for adding catalog items at once");
+				}
+				$this->validateReachProfileId($formData, $partnerCatalogItems, $reachPluginClient);
+
+				$this->client->startMultiRequest();
+				foreach ($partnerCatalogItems as $partnerCatalogItem)
+				{
+					$reachProfileId = $formData["defaultReachProfileId-$partnerCatalogItem"];
+					$reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem, $reachProfileId);
+				}
+				$this->client->doMultiRequest();
 			}
-			$this->client->doMultiRequest();
 		}
 
 		$form->setAttrib('class', 'valid');
 		$action->view->formValid = true;
 		return $form;
+	}
+
+	protected function validateReachProfileId($formData, $partnerCatalogItems, $reachPluginClient)
+	{
+		$reachProfileIds = array();
+		foreach ($partnerCatalogItems as $partnerCatalogItem)
+		{
+			$reachProfileId = $formData["defaultReachProfileId-$partnerCatalogItem"];
+			if($reachProfileId && trim($reachProfileId) != "" && !in_array($reachProfileId, $reachProfileIds))
+			{
+				$reachProfileIds[] = $reachProfileId;
+			}
+		}
+
+		$pager = new Kaltura_Client_Type_FilterPager();
+		$pager->pageIndex = 1;
+		$pager->pageSize = 500;
+
+		$filter = new Kaltura_Client_Reach_Type_ReachProfileFilter();
+		$filter->idIn = implode(",", $reachProfileIds);
+		$result = $reachPluginClient->reachProfile->listAction($filter, $pager);
+
+		$foundProfileIds = array();
+		foreach ($result->objects as $resultItem)
+		{
+			if($resultItem->id)
+			{
+				$foundProfileIds[] = $resultItem->id;
+			}
+		}
+
+		$diff = array_diff($reachProfileIds, $foundProfileIds);
+		if(count($diff) > 0)
+		{
+			throw new Exception("reach profile Ids (" . implode(",", $diff) . ") not found");
+		}
 	}
 
 	protected function getAvailableCatalogItems($partnerId)

@@ -28,13 +28,6 @@ class Form_ReachProfileCredit extends Zend_Form_SubForm
 			'validators' => array(),
 		));
 
-		$allowNegativeOverageCredit = new Kaltura_Form_Element_EnumSelect('allowNegativeOverageCredit', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
-			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
-		$allowNegativeOverageCredit->setLabel('Allow Negative Overage Credit:');
-		$allowNegativeOverageCredit->setRequired(true);
-		$allowNegativeOverageCredit->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
-		$this->addElement($allowNegativeOverageCredit);
-
 		$this->addElement('text', 'addOn', array(
 			'label' => 'AddOn Credit:',
 			'filters' => array('StringTrim'),

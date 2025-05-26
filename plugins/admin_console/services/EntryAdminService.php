@@ -9,6 +9,7 @@
 class EntryAdminService extends KalturaBaseService
 {
 	const GET_TRACKS_LIMIT = 30;
+	const PURGED_SUFFIX = "_purged";
 
 	public function initService($serviceId, $serviceName, $actionName)
 	{
@@ -249,7 +250,8 @@ class EntryAdminService extends KalturaBaseService
 			if (!in_array($fileSync->getStatus(),array(FileSync::FILE_SYNC_STATUS_DELETED, FileSync::FILE_SYNC_STATUS_PURGED))) {
 				return false;
 			}
-			if ($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_DELETED) {
+			if ($fileSync->getStatus() == FileSync::FILE_SYNC_STATUS_DELETED && !str_ends_with($fileSync->getFilePath(), self::PURGED_SUFFIX))
+			{
 				$atLeastOneDeletedFileSync = true;
 			}
 		}

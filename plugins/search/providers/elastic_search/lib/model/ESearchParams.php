@@ -41,6 +41,18 @@ class ESearchParams extends BaseObject
 	protected $ignoreSynonym;
 
 	/**
+	 * @var string
+	 */
+	protected $objectIds;
+
+	/**
+	 * @var bool
+	 */
+	protected $objectIdsNotIn;
+
+
+
+	/**
 	 * @return ESearchOperator
 	 */
 	public function getSearchOperator()
@@ -77,7 +89,7 @@ class ESearchParams extends BaseObject
 	 */
 	public function getObjectId()
 	{
-		return $this->objectId;
+		return isset($this->objectId) ? $this->objectId : $this->objectIds;
 	}
 
 	/**
@@ -86,6 +98,27 @@ class ESearchParams extends BaseObject
 	public function setObjectId($objectId)
 	{
 		$this->objectId = $objectId;
+	}
+
+	public function setObjectIds($objectIds)
+	{
+		$this->objectIds = $objectIds;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getObjectIdsNotIn()
+	{
+		return $this->objectIdsNotIn;
+	}
+
+	/**
+	 * @param bool $objectIdsNotIn
+	 */
+	public function setObjectIdsNotIn($objectIdsNotIn)
+	{
+		$this->objectIdsNotIn = $objectIdsNotIn;
 	}
 
 	/**

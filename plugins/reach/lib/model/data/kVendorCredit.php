@@ -26,11 +26,6 @@ class kVendorCredit
 	protected $overageCredit;
 
 	/**
-	 * @var bool
-	 */
-	protected $allowNegativeOverageCredit;
-
-	/**
 	 * @var int
 	 */
 	protected $addOn;
@@ -67,14 +62,6 @@ class kVendorCredit
 	public function getOverageCredit()
 	{
 		return $this->overageCredit;
-	}
-
-	/**
-	 * @return bool $allowNegativeOverageCredit
-	 */
-	public function getAllowNegativeOverageCredit()
-	{
-		return $this->allowNegativeOverageCredit;
 	}
 
 
@@ -117,14 +104,6 @@ class kVendorCredit
 	public function setOverageCredit($overageCredit)
 	{
 		$this->overageCredit = $overageCredit;
-	}
-
-	/**
-	 * @param bool $allowNegativeOverageCredit
-	 */
-	public function setAllowNegativeOverageCredit($allowNegativeOverageCredit)
-	{
-		$this->allowNegativeOverageCredit = $allowNegativeOverageCredit;
 	}
 
 	/**
@@ -202,10 +181,10 @@ class kVendorCredit
 	 * @param $includeOverages should return current credit including overageCredit info or not (Default is true)
 	 * @return int
 	 */
-	public function getCurrentCredit($includeOverages = true)
+	public function getCurrentCredit($includeOverages = true, $validateActive = true)
 	{
 		$now = time();
-		if ( $now < $this->fromDate)
+		if ($validateActive && $now < $this->fromDate)
 		{
 				KalturaLog::debug("Current date [$now] is not in credit time Range [ from - $this->fromDate ] ");
 				return 0;
@@ -213,11 +192,15 @@ class kVendorCredit
 		
 		$credit = $this->credit;
 		if($includeOverages && $this->overageCredit)
+		{
 			$credit += $this->overageCredit;
+		}
 
 		if($this->addOn)
+		{
 			$credit += $this->addOn;
-		
+		}
+
 		return $credit;
 	}
 

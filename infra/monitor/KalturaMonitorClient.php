@@ -50,6 +50,7 @@ class KalturaMonitorClient
 	const FIELD_UNIQUE_ID =			'u';
 	const FIELD_EXECUTION_TIME = 	'x';
 	const FIELD_FILE_SIZE = 		'z';
+	const FIELD_ENV =    			'g';
 
 	const SESSION_COUNTERS_SECRET_HEADER = 'HTTP_X_KALTURA_SESSION_COUNTERS';
 	
@@ -240,6 +241,12 @@ class KalturaMonitorClient
 			self::FIELD_ACTION			=> $action,
 			self::FIELD_CLIENT_TAG		=> strval($clientTag),
 		);
+		
+		$envName = getenv('ENV_NAME');
+		if($envName)
+		{
+			self::$basicEventInfo[self::FIELD_ENV] = $envName;
+		}
 		
 		if (!$cached)
 		{
