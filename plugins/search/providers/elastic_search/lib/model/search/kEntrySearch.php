@@ -53,9 +53,9 @@ class kEntrySearch extends kBaseESearch
         parent::initQuery($statuses, $objectIdsCsvStr, $pager, $order, $aggregations, $objectIdsNotIn);
     }
 
-    protected function initEntitlement(ESearchOperator $eSearchOperator, $objectId, $objectIdsNotIn = null)
+    protected function initEntitlement(ESearchOperator $eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn = null)
     {
-        kEntryElasticEntitlement::setFilteredCategoryIds($eSearchOperator, $objectId, $objectIdsNotIn);
+        kEntryElasticEntitlement::setFilteredCategoryIds($eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn);
         $contributors = kEntryElasticEntitlement::getEntitlementContributors();
         foreach ($contributors as $contributor)
         {

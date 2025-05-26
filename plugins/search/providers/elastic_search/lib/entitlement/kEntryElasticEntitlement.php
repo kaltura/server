@@ -111,14 +111,14 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
         }
     }
 
-    public static function setFilteredCategoryIds(ESearchOperator $eSearchOperator, $objectId, $objectIdsNotIn = null)
+    public static function setFilteredCategoryIds(ESearchOperator $eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn = null)
     {
         if(($eSearchOperator->getOperator() != ESearchOperatorType::AND_OP) || $objectIdsNotIn)
             return;
 
         $searchItems = $eSearchOperator->getSearchItems();
         $filteredCategoryIds = array();
-	    $filteredEntryIds = $objectId ? explode(',', $objectId) : array();
+	    $filteredEntryIds = $objectIdsCsvStr ? explode(',', $objectIdsCsvStr) : array();
 
         foreach ($searchItems as $searchItem)
         {
@@ -134,12 +134,12 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
             }
         }
 
-        $filteredCategoriesByEntryIds = self::getCategoryIdsForEntryId($filteredEntryIds);
+        $filteredCategoriesByEntryIds = self::getCategoryIdsForEntryIds($filteredEntryIds);
         $filteredCategoryIds = array_unique(array_merge($filteredCategoryIds, $filteredCategoriesByEntryIds));
         self::$filteredCategoryIds = $filteredCategoryIds;
     }
 
-    protected static function getCategoryIdsForEntryId($filteredEntryId)
+    protected static function getCategoryIdsForEntryIds($filteredEntryId)
     {
         $filteredCategoryIds = array();
         $filteredEntriesIds = array_unique($filteredEntryId);
