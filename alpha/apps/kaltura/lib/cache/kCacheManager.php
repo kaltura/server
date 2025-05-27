@@ -42,6 +42,7 @@ class kCacheManager
 	const CACHE_TYPE_PLAYS_VIEWS = 'playsViews';
 	const CACHE_TYPE_AVRO_SCHEMAS = 'avroSchemas';
 	const CACHE_TYPE_MICROSERVICES = 'microservices';
+	const CACHE_TYPE_VOLUME_MAP = 'volumeMap';
 
 	protected static $caches = array();
 	

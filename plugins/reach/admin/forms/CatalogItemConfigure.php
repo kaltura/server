@@ -148,6 +148,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'placement' => 'prepend',
 			));
 		}
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::DOCUMENT_ENRICHMENT)
+		{
+			$documentEnrichmentType = new Kaltura_Form_Element_EnumSelect('documentEnrichmentType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType'));
+			$documentEnrichmentType->setLabel('Document Enrichment Type:');
+			$documentEnrichmentType->setRequired(true);
+			$documentEnrichmentType->setValue(Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType::MD_CONVERSION);
+			$this->addElement($documentEnrichmentType);
+		}
 		
 		$audioCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION,
 											Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION,

@@ -2170,17 +2170,36 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$flavorId = $flavorAsset->getId();
 		$entryId = $flavorAsset->getEntryId();
 
-		$packagerRetries = 3;
 		$content = null;
+
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_VOLUME_MAP);
+		$cacheKey = $entryId . '_volumeMap';
+		if ($cacheStore)
+		{
+			$content = $cacheStore->get($cacheKey);
+			if ($content)
+			{
+				header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
+				return new kRendererString($content, 'text/csv');
+			}
+		}
+
+		$packagerRetries = 3;
+
 		while ($packagerRetries && !$content)
 		{
 			$content = myPackagerUtils::retrieveVolumeMapFromPackager($flavorAsset);
 			$packagerRetries--;
 		}
 
-		if(!$content)
+		if (!$content)
 		{
 			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED);
+		}
+
+		if ($cacheStore)
+		{
+			$cacheStore->set($cacheKey, $content, kTimeConversion::HOUR);
 		}
 
 		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
