@@ -224,8 +224,12 @@ class flavorAsset extends exportableAsset
 		$audioStream = null;
 		
 		$mediaInfo = $this->getMediaInfo();
-		$contentStreams = json_decode($mediaInfo->getContentStreams(), true);
+		if(!$mediaInfo)
+		{
+			return '';
+		}
 		
+		$contentStreams = json_decode($mediaInfo->getContentStreams(), true);
 		if(!$contentStreams)
 		{
 			return '';
