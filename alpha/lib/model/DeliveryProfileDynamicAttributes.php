@@ -217,6 +217,11 @@ class DeliveryProfileDynamicAttributes {
 	 * @var string
 	 */
 	protected $muxedAudioLanguage = null;
+	
+	/**
+	 * @var int
+	 */
+	private $simuliveEventId = null;
 
 	/**
 	 * @return the $addThumbnailExtension
@@ -848,6 +853,22 @@ class DeliveryProfileDynamicAttributes {
 	{
 		$this->muxedAudioLanguage = $muxedAudioLanguage;
 	}
+	
+	/**
+	 * @return int
+	 */
+	public function getSimuliveEventId()
+	{
+		return $this->simuliveEventId;
+	}
+	
+	/**
+	 * @param int $simuliveEventId
+	 */
+	public function setSimuliveEventId($simuliveEventId)
+	{
+		$this->simuliveEventId = $simuliveEventId;
+	}
 
 	/**
 	 * 
@@ -907,6 +928,7 @@ class DeliveryProfileDynamicAttributes {
 		$this->minBitrate = $newObj->getMinBitrate();
 		$this->maxBitrate = $newObj->getMaxBitrate();
 		$this->muxedAudioLanguage = $newObj->getMuxedAudioLanguage();
+		$this->simuliveEventId = $newObj->getSimuliveEventId();
 	}
 }
 

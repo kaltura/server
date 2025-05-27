@@ -29,7 +29,20 @@ class kSimuliveUtils
 		{
 			return null;
 		}
-
+		
+		list($durations, $assets, $startTime, $endTime, $sourceEntryLabels, $eventLabel) = self::getEventDetailsByEvent($currentEvent);
+		if (self::shouldLiveInterrupt($entry, $currentEvent))
+		{
+			// endTime null will cause "expirationTime" to be added to the json
+			KalturaLog::log("EndTime was {$endTime} - reseting to null as interrupt");
+			$endTime = null;
+		}
+		
+		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs, $sourceEntryLabels, $eventLabel);
+	}
+	
+	public static function getEventDetailsByEvent($currentEvent)
+	{
 		/* @var $currentEvent ILiveStreamScheduleEvent */
 		$sourceEntry = kSimuliveUtils::getSourceEntry($currentEvent);
 		if(!$sourceEntry)
@@ -38,14 +51,14 @@ class kSimuliveUtils
 		}
 		// all times should be in ms
 		$startTime = $currentEvent->getCalculatedStartTime() * self::SECOND_IN_MILLISECONDS;
-
+		
 		$sourceEntries = $sourceEntry->getType() == entryType::PLAYLIST ? myPlaylistUtils::retrieveStitchedPlaylistEntries($sourceEntry) : array($sourceEntry);
 		$sourceEntryLabels = array();
 		foreach ($sourceEntries as $source)
 		{
 			$sourceEntryLabels[] = "content" . self::LABEL_SEPARATOR . $source->getEntryId();
 		}
-
+		
 		// getting the preStart assets (only if the preStartEntry exists)
 		$preStartEntry = kSimuliveUtils::getPreStartEntry($currentEvent);
 		if ($preStartEntry)
@@ -53,7 +66,7 @@ class kSimuliveUtils
 			array_unshift($sourceEntries, $preStartEntry);
 			array_unshift($sourceEntryLabels, "preStartContent" . self::LABEL_SEPARATOR . $preStartEntry->getEntryId());
 		}
-
+		
 		// getting the postEnd assets (only if the postEndEntry exists)
 		$postEndEntry = kSimuliveUtils::getPostEndEntry($currentEvent);
 		if ($postEndEntry)
@@ -61,33 +74,26 @@ class kSimuliveUtils
 			$sourceEntries[] = $postEndEntry;
 			$sourceEntryLabels[] = "postEntryContent" . self::LABEL_SEPARATOR . $postEndEntry->getEntryId();
 		}
-
+		
 		list($entriesFlavorAssets, $entriesCaptionAssets, $entriesAudioAssets) = self::getSourceAssets($sourceEntries);
 		$durations = self::getSourceDurations($sourceEntries, $currentEvent);
-
+		
 		$endTime = $startTime + array_sum($durations);
 		self::addTimestamps($sourceEntryLabels, $startTime, $durations);
-
-		if (self::shouldLiveInterrupt($entry, $currentEvent))
-		{
-			// endTime null will cause "expirationTime" to be added to the json
-			KalturaLog::log("EndTime was {$endTime} - reseting to null as interrupt");
-			$endTime = null;
-		}
-
+		
 		// creating the flavorAssets array (array of arrays s.t each array contain the flavor assets of all the entries exist)
 		$flavorAssets = array();
 		foreach ($entriesFlavorAssets as $entryAssets)
 		{
 			$flavorAssets = self::mergeAssetArrays($flavorAssets, $entryAssets);
 		}
-
+		
 		$captionAssets = self::createPaddedAssetsArray($entriesCaptionAssets);
 		$audioAssets = self::createPaddedAssetsArray($entriesAudioAssets);
-
+		
 		$assets = array_merge($flavorAssets, $captionAssets, $audioAssets);
 		$eventLabel = self::addParamToId('eventId', $currentEvent->getId());
-		return array($durations, $assets, $startTime, $endTime, $dvrWindowMs, $sourceEntryLabels, $eventLabel);
+		return array($durations, $assets, $startTime, $endTime, $sourceEntryLabels, $eventLabel);
 	}
 
 	/**

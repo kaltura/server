@@ -91,6 +91,17 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 
 		$parentFlavors = parent::buildHttpFlavorsArray();
 		$this->serveAsFmp4 = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
+		if($this->params->getSimuliveEventId())
+		{
+			$simuliveEvent = ScheduleEventPeer::retrieveByPK($this->params->getSimuliveEventId());
+			if($simuliveEvent)
+			{
+				$res = kSimuliveUtils::getEventDetailsByEvent($simuliveEvent);
+				$assets = array_values(array_map((function($assets) { return $assets[0]; }), $res[1] ));
+				$this->serveAsFmp4 = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($assets);
+			}
+		}
+		
 		if($this->serveAsFmp4)
 		{
 			foreach ($parentFlavors as &$parentFlavor)
