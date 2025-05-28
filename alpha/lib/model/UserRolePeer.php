@@ -34,12 +34,20 @@ class UserRolePeer extends BaseUserRolePeer
 	 * Function that will not allow a user to have 0 roles.
 	 * @param string $idsString
 	 * @throws kPermissionException::ROLE_ID_MISSING
-	 * @throws kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED
+	 * @throws kPermissionException::INVALID_PARTNER_ID
 	 */
 	public static function testValidRolesForUser($idsString, $partnerId)
 	{
 		if(!$idsString)
+		{
+			KalturaLog::warning("Role IDs string is empty.");
 			return true;
+		}
+
+		if (empty($partnerId))
+		{
+			throw new kPermissionException("Partner ID is missing or invalid.", kPermissionException::INVALID_PARTNER_ID);
+		}
 		
 		$ids = explode(',', trim($idsString));
 		
