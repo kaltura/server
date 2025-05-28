@@ -23,4 +23,5 @@ interface VendorServiceFeature extends BaseEnum
 	const METADATA_ENRICHMENT             = 16;
 	const SENTIMENT_ANALYSIS              = 17;
 	const DOCUMENT_ENRICHMENT             = 18;
+	const SIGN_LANGUAGE          		  = 19;
 }
