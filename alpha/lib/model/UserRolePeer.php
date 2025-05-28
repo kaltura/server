@@ -31,7 +31,7 @@ class UserRolePeer extends BaseUserRolePeer
 	
 	
 	/**
-	 * Temporary function that will not allow a user to have 0 or more than 1 role.
+	 * Function that will not allow a user to have 0 roles.
 	 * @param string $idsString
 	 * @throws kPermissionException::ROLE_ID_MISSING
 	 * @throws kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED
@@ -42,11 +42,6 @@ class UserRolePeer extends BaseUserRolePeer
 			return true;
 		
 		$ids = explode(',', trim($idsString));
-		
-		if (count($ids) > 1)
-		{
-			throw new kPermissionException('', kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED);
-		}
 		
 		foreach ($ids as $id)
 		{

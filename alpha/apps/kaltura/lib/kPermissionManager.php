@@ -730,9 +730,43 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				$roleMap = self::getPermissions($roleId);
 				
 				// merge current role map to the global map
-				self::$map = array_merge_recursive(self::$map, $roleMap);
+				self::$map = self::mergeMapsUniquely(self::$map, $roleMap);
 			}
 		}
+	}
+
+	protected static function mergeMapsUniquely($map1, $map2)
+	{
+	    foreach ($map2 as $key => $value)
+		{
+	        if (is_array($value))
+			{
+	            if (!isset($map1[$key]))
+				{
+	                $map1[$key] = $value;
+	            }
+				else
+				{
+	                if (is_array($map1[$key]))
+					{
+	                    // For arrays containing strings, use array_unique to remove duplicates
+	                    if ($key === self::PERMISSION_NAMES_ARRAY)
+						{
+	                        $map1[$key] = array_unique(array_merge($map1[$key], $value));
+	                    }
+						else
+						{
+	                        $map1[$key] = self::mergeMapsUniquely($map1[$key], $value);
+	                    }
+	                }
+	            }
+	        }
+			else
+			{
+	            $map1[$key] = $value;
+	        }
+	    }
+	    return $map1;
 	}
 
 	protected static function removeLimitedPermissions($restrictingRole)
