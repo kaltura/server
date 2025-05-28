@@ -1,7 +1,7 @@
 # Ursa-21.17.0
 ## Add 4K flavor params support flag
-* Issue Type: Task
-* Issue ID: SUP-46741
+* Issue Type: Feature
+* Issue ID: PLAT-25201
 
 ### Deployment ###
 Add the following to admin.ini
