@@ -1,7 +1,13 @@
 # Ursa-21.17.0
+
 ## Add 4K flavor params support flag
 * Issue Type: Feature
-* Issue ID: PLAT-25201
+* Issue ID: PLAT-25201 
+
+Note that for this to work you need to make sure to add the appropriate support on the delivery server as well.
+In our case we use: https://github.com/kaltura/nginx-vod-module
+When using 4k h265 flavors the serveFlavor will add /container/fmp4/ to the serveFlavor url's.
+The vod module location in this case will force serving the segments as fmp4 and forcing serving it in unmuxed mode.
 
 ### Deployment ###
 Add the following to admin.ini
@@ -17,6 +23,7 @@ moduls.4kFlavorSet.group = GROUP_ENABLE_DISABLE_FEATURES
 
 ### Deployment scripts ### 
     php /opt/kaltura/app/deployment/updates/scripts/2025_05_29_deploy_4k_flavor_params.php
+
 
 # Ursa-21.16.0
 ## Add Kafka Event Notifications for Folders
