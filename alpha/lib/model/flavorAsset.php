@@ -279,9 +279,10 @@ class flavorAsset extends exportableAsset
 		$audioCodecString = '';
 		if ($audioStream)
 		{
-			$aCodec = strtolower($audioStream['audioFormat']);
-			$aProfile = $audioStream['containerProfile'] ?? '';
-			$audioCodecString = $this->getAudioCodec($aCodec, $aProfile, $videoStream['extradata'] ?? '');
+			$aCodec = isset($audioStream['audioFormat']) ?  strtolower($audioStream['audioFormat']) : '';
+			$aProfile = isset($audioStream['containerProfile']) ?  strtolower($audioStream['containerProfile']) : '';
+			$extraData = isset($audioStream['extradata']) ? $audioStream['extradata'] : null;
+			$audioCodecString = $this->getAudioCodec($aCodec, $aProfile, $extraData);
 		}
 		
 		return implode(',', array_filter(array($videoCodecString, $audioCodecString)));
@@ -411,58 +412,62 @@ class flavorAsset extends exportableAsset
 		return hex2bin($hex);
 	}
 	
-	private function getAudioCodec(string $codecName, string $profile = '', ?string $extraData = null)
+	/**
+	 * Get audio codec string based on codec name and profile
+	 * @param string $codecName
+	 * @param string $profile
+	 * @param string|null $extraData
+	 * @return string
+	 */
+	private function getAudioCodec(string $codecName, string $profile = '', string $extraData = null)
 	{
-		switch (strtolower($codecName))
+		if ($codecName === 'aac')
 		{
-			case 'aac':
-				switch (strtolower($profile))
+			$profileMap = array(
+				'lc' => 'mp4a.40.2',
+				'low complexity' => 'mp4a.40.2',
+				'he-aac' => 'mp4a.40.5',
+				'high efficiency aac' => 'mp4a.40.5',
+				'he-aacv2' => 'mp4a.40.29',
+				'main' => 'mp4a.40.1',
+			);
+			
+			if (isset($profileMap[$profile]))
+			{
+				return $profileMap[$profile];
+			}
+			
+			if ($extraData)
+			{
+				$parsed = $this->parseAacFromExtraData($extraData);
+				if ($parsed !== null)
 				{
-					case 'lc':
-					case 'low complexity':
-						return 'mp4a.40.2';
-					case 'he-aac':
-					case 'high efficiency aac':
-						return 'mp4a.40.5';
-					case 'he-aacv2':
-						return 'mp4a.40.29';
-					case 'main':
-						return 'mp4a.40.1';
-					default:
-						// Optional: fallback to extradata parsing
-						if ($extraData)
-						{
-							return $this->parseAacFromExtraData($extraData) ?? 'mp4a.40.2';
-						}
-						return 'mp4a.40.2';
+					return $parsed;
 				}
+			}
 			
-			case 'mp3':
-				return 'mp4a.69'; // MPEG-1 Layer III
-			
-			case 'ac3':
-				return 'ac-3';
-			
-			case 'eac3':
-				return 'ec-3';
-			
-			case 'opus':
-				return 'opus';
-			
-			case 'vorbis':
-				return 'vorbis';
-			
-			case 'flac':
-				return 'flac';
-			
-			case 'alac':
-				return 'alac';
-			
-			default:
-				return ''; // Unknown or unsupported codec
+			// Default fallback
+			return 'mp4a.40.2';
 		}
+		
+		$codecMap = array(
+			'mp3'    => 'mp4a.69',
+			'ac3'    => 'ac-3',
+			'eac3'   => 'ec-3',
+			'opus'   => 'opus',
+			'vorbis' => 'vorbis',
+			'flac'   => 'flac',
+			'alac'   => 'alac',
+		);
+		
+		return isset($codecMap[$codecName]) ? $codecMap[$codecName] : '';
 	}
-	
+
+	/**
+	 * Parse AAC codec from extra data hex string
+	 * @param string $hexData
+	 * @return string|null
+	 */
 	private function parseAacFromExtraData(string $hexData): ?string
 	{
 		$bytes = $this->hexStringToBytes($hexData);
