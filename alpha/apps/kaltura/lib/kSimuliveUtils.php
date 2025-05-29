@@ -388,6 +388,12 @@ class kSimuliveUtils
 	{
 		try
 		{
+			//$ksString would be empty if no KS was passed on the request
+			if(empty($ksString))
+			{
+				return false;
+			}
+			
 			$ks = kSessionUtils::crackKs($ksString);
 			return $ks->isAdmin();
 		}
