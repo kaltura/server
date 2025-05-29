@@ -735,38 +735,46 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 	}
 
-	protected static function mergeMapsUniquely($map1, $map2)
+	protected static function mergeMapsUniquely($currentMap, $roleMap)
 	{
-	    foreach ($map2 as $key => $value)
+		// Iterate through each key-value pair in the second map
+		foreach ($roleMap as $key => $value)
 		{
-	        if (is_array($value))
+			// Check if the value is an array
+			if (is_array($value))
 			{
-	            if (!isset($map1[$key]))
+				// If the key does not exist in the first map, add it
+				if (!isset($currentMap[$key]))
 				{
-	                $map1[$key] = $value;
-	            }
+					$currentMap[$key] = $value;
+				}
 				else
 				{
-	                if (is_array($map1[$key]))
+					// If the key exists and both values are arrays, merge them
+					if (is_array($currentMap[$key]))
 					{
-	                    // For arrays containing strings, use array_unique to remove duplicates
-	                    if ($key === self::PERMISSION_NAMES_ARRAY)
+						// Special handling for the PERMISSION_NAMES_ARRAY key
+						// Use array_unique to remove duplicate values
+						if ($key === self::PERMISSION_NAMES_ARRAY)
 						{
-	                        $map1[$key] = array_unique(array_merge($map1[$key], $value));
-	                    }
+							$currentMap[$key] = array_unique(array_merge($currentMap[$key], $value));
+						}
 						else
 						{
-	                        $map1[$key] = self::mergeMapsUniquely($map1[$key], $value);
-	                    }
-	                }
-	            }
-	        }
+							// Recursively merge the arrays for other keys
+							$currentMap[$key] = self::mergeMapsUniquely($currentMap[$key], $value);
+						}
+					}
+				}
+			}
 			else
 			{
-	            $map1[$key] = $value;
-	        }
-	    }
-	    return $map1;
+				// If the value is not an array, overwrite or add it to the first map
+				$currentMap[$key] = $value;
+			}
+		}
+		// Return the merged map
+		return $currentMap;
 	}
 
 	protected static function removeLimitedPermissions($restrictingRole)
