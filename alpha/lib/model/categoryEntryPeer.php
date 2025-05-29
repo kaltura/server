@@ -204,7 +204,7 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
 		{
 			$c->add(self::PRIVACY_CONTEXT, $privacyContext, Criteria::EQUAL);
 		}
-		
+
 		return self::doSelect($c);
 	}
 		
