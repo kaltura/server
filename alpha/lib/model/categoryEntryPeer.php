@@ -200,8 +200,11 @@ class categoryEntryPeer extends BasecategoryEntryPeer implements IRelatedObjectP
 	{
 		$c = new Criteria();
 		$c->add(self::ENTRY_ID, $entryIds, Criteria::IN);
-		$c->add(self::PRIVACY_CONTEXT, $privacyContext, Criteria::EQUAL);
-
+		if (!empty($privacyContext) && $privacyContext != '')
+		{
+			$c->add(self::PRIVACY_CONTEXT, $privacyContext, Criteria::EQUAL);
+		}
+		
 		return self::doSelect($c);
 	}
 		
