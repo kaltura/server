@@ -737,6 +737,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 
 	/**
 	 * Merge two permission maps recursively, ensuring unique values in the PERMISSION_NAMES_ARRAY
+	 * This function is to handle duplicated permission names when a user has multiple roles caused by th array_merge_recursive function.
 	 * @param array $currentMap The current permission map
 	 * @param array $roleMap The role permission map to merge
 	 * @return array The merged permission map
