@@ -735,46 +735,34 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 	}
 
+	/**
+	 * Merge two permission maps recursively, ensuring unique values in the PERMISSION_NAMES_ARRAY
+	 * @param array $currentMap The current permission map
+	 * @param array $roleMap The role permission map to merge
+	 * @return array The merged permission map
+	 */
 	protected static function mergeMapsUniquely($currentMap, $roleMap)
 	{
-		// Iterate through each key-value pair in the second map
-		foreach ($roleMap as $key => $value)
+		// Merge the two maps recursively, combining their values
+		$mergedMap = array_merge_recursive($currentMap, $roleMap);
+
+		// Check if the PERMISSION_NAMES_ARRAY key exists in the merged map and is an array
+		if (isset($mergedMap[self::PERMISSION_NAMES_ARRAY]) && is_array($mergedMap[self::PERMISSION_NAMES_ARRAY]))
 		{
-			// Check if the value is an array
-			if (is_array($value))
+			// Iterate over each key-value pair in the PERMISSION_NAMES_ARRAY
+			foreach ($mergedMap[self::PERMISSION_NAMES_ARRAY] as $key => $value)
 			{
-				// If the key does not exist in the first map, add it
-				if (!isset($currentMap[$key]))
+				// If the value is an array, reset it to the key
+				// This ensures that duplicate keys are not nested as arrays
+				if (is_array($value))
 				{
-					$currentMap[$key] = $value;
+					$mergedMap[self::PERMISSION_NAMES_ARRAY][$key] = $key;
 				}
-				else
-				{
-					// If the key exists and both values are arrays, merge them
-					if (is_array($currentMap[$key]))
-					{
-						// Special handling for the PERMISSION_NAMES_ARRAY key
-						// Use array_unique to remove duplicate values
-						if ($key === self::PERMISSION_NAMES_ARRAY)
-						{
-							$currentMap[$key] = array_unique(array_merge($currentMap[$key], $value));
-						}
-						else
-						{
-							// Recursively merge the arrays for other keys
-							$currentMap[$key] = self::mergeMapsUniquely($currentMap[$key], $value);
-						}
-					}
-				}
-			}
-			else
-			{
-				// If the value is not an array, overwrite or add it to the first map
-				$currentMap[$key] = $value;
 			}
 		}
-		// Return the merged map
-		return $currentMap;
+
+		// Return the final merged map
+		return $mergedMap;
 	}
 
 	protected static function removeLimitedPermissions($restrictingRole)
