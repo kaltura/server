@@ -12,11 +12,6 @@ class VendorSignLanguageCatalogItem extends VendorCatalogItem
         $this->setServiceFeature(VendorServiceFeature::SIGN_LANGUAGE);
     }
 
-    public function isDuplicateTask(entry $entry)
-    {
-        return false;
-    }
-
     public function requiresEntryReady()
     {
         return true;
