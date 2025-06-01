@@ -5,7 +5,7 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-class KalturaMetadataEnrichmentVendorTaskData extends KalturaVendorTaskData
+class KalturaMetadataEnrichmentVendorTaskData extends KalturaLocalizedVendorTaskData
 {
 	/**
 	 * The level of detail for the metadata enrichment process.
