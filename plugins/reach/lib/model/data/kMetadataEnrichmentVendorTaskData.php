@@ -4,7 +4,7 @@
  * @package plugins.reach
  * @subpackage model
  */
-class kMetadataEnrichmentVendorTaskData extends kVendorTaskData
+class kMetadataEnrichmentVendorTaskData extends kLocalizedVendorTaskData
 {
 	public string $detailLevel = "";
 

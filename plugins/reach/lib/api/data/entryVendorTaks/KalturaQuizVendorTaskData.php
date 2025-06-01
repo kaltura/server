@@ -5,7 +5,7 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-class KalturaQuizVendorTaskData extends KalturaVendorTaskData
+class KalturaQuizVendorTaskData extends KalturaLocalizedVendorTaskData
 {
 	/**
 	 * Number Of Questions.
