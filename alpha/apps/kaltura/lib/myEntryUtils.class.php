@@ -2165,7 +2165,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $relatedEntries;
 	}
 
-	protected static function resampleVolumeMap(string $csvText, int $desiredLines, float $durationSeconds): string {
+	protected static function resampleVolumeMap(string $csvText, int $desiredLines, float $durationSeconds): string
+	{
 		$resampledData = self::resampleVolumeMapAsJson($csvText, $desiredLines, $durationSeconds);
 		if (empty($resampledData))
 		{
@@ -2182,7 +2183,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $output;
 	}
 
-	protected static function resampleVolumeMapAsJson(string $csvText, int $desiredLines, float $durationSeconds): array {
+	protected static function resampleVolumeMapAsJson(string $csvText, int $desiredLines, float $durationSeconds): array
+	{
 		$lines = array_filter(array_map('trim', explode("\n", $csvText)));
 		$data = [];
 		// Skip header if present
