@@ -96,7 +96,7 @@ class MssqlDebugPDO extends DebugPDO
 		return $return;
 	}
 
-	public function lastInsertId($seqname = null): int
+	public function lastInsertId($seqname = null)
 	{
 		$result = self::query('SELECT SCOPE_IDENTITY()');
 		return (int)$result->fetchColumn();
