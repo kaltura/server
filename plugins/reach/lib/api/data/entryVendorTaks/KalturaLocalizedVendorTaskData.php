@@ -10,12 +10,12 @@ class KalturaLocalizedVendorTaskData extends KalturaVendorTaskData
 	/**
 	 * Language code
 	 *
-	 * @var KalturaLanguageCode
+	 * @var KalturaLanguage
 	 */
-	public $language;
+	public $outputLanguage;
 
 	private static $map_between_objects = array(
-		'language',
+		'outputLanguage',
 	);
 
 	public function getMapBetweenObjects()
@@ -27,7 +27,7 @@ class KalturaLocalizedVendorTaskData extends KalturaVendorTaskData
 	{
 		if (!$dbObject)
 		{
-			$dbObject = new kLanguageVendorTaskData();
+			$dbObject = new kLocalizedVendorTaskData();
 		}
 
 		return parent::toObject($dbObject, $propsToSkip);
