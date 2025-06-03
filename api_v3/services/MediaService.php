@@ -1263,7 +1263,7 @@ class MediaService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
 		}
 
-		$content = myEntryUtils::getVolumeMapContent($flavorAsset, $desiredLines, $dbEntry->getDurationInt());
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset, $desiredLines, $dbEntry->getDuration());
 		return $content;
 	}
 }
