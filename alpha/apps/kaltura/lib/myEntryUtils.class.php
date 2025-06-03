@@ -2165,7 +2165,95 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $relatedEntries;
 	}
 
-	public static function getVolumeMapContent($flavorAsset)
+	protected static function resampleVolumeMap(string $csvText, int $desiredLines, float $durationSeconds): string {
+		$resampledData = self::resampleVolumeMapAsJson($csvText, $desiredLines, $durationSeconds);
+		if (empty($resampledData))
+		{
+			return '';
+		}
+
+		// Convert to CSV format
+		$output = "pts,rms_level\n";
+		foreach ($resampledData as $point)
+		{
+			$output .= "{$point['pts']},{$point['rms']}\n";
+		}
+
+		return $output;
+	}
+
+	protected static function resampleVolumeMapAsJson(string $csvText, int $desiredLines, float $durationSeconds): array {
+		$lines = array_filter(array_map('trim', explode("\n", $csvText)));
+		$data = [];
+		// Skip header if present
+		if (stripos($lines[0], 'pts') !== false)
+		{
+			array_shift($lines);
+		}
+
+		if($desiredLines < 2 || $durationSeconds <= 0)
+		{
+			return [];
+		}
+
+		// Parse data into [pts => rms]
+		foreach ($lines as $line)
+		{
+			[$pts, $rms] = explode(',', $line);
+			$data[] = ['pts' => (float)$pts, 'rms' => (float)$rms];
+		}
+
+		if (count($data) === 0)
+		{
+			return [];
+		}
+
+		// Total duration in milliseconds
+		$durationMs = $durationSeconds * 1000;
+		$step = $durationMs / ($desiredLines - 1);
+		$resampled = [];
+		for ($i = 0; $i < $desiredLines; $i++)
+		{
+			$targetPts = $i * $step;
+
+			// Find surrounding points
+			$before = null;
+			$after = null;
+
+			foreach ($data as $point)
+			{
+				if ($point['pts'] <= $targetPts)
+				{
+					$before = $point;
+				}
+				if ($point['pts'] >= $targetPts)
+				{
+					$after = $point;
+					break;
+				}
+			}
+
+			// Handle edges
+			if (!$before) $before = $data[0];
+			if (!$after) $after = end($data);
+
+			// Linear interpolation
+			if ($after['pts'] == $before['pts'])
+			{
+				$rms = $before['rms'];
+			}
+			else
+			{
+				$ratio = ($targetPts - $before['pts']) / ($after['pts'] - $before['pts']);
+				$rms = $before['rms'] + $ratio * ($after['rms'] - $before['rms']);
+			}
+			$resampled[] = ['pts' => round($targetPts), 'rms' => round($rms, 2)];
+		}
+
+		return $resampled;
+	}
+
+	public static function getVolumeMapContent($flavorAsset, $mapScale = null, $duration = null)
 	{
 		$flavorId = $flavorAsset->getId();
 		$entryId = $flavorAsset->getEntryId();
@@ -2195,6 +2283,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if (!$content)
 		{
 			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED);
+		}
+
+		//reduce volume based on
+		if ($mapScale && $duration)
+		{
+			$content = self::resampleVolumeMap($content, $mapScale, $duration);
 		}
 
 		if ($cacheStore)
