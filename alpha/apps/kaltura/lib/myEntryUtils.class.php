@@ -2295,7 +2295,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		if ($cacheStore)
 		{
-			$cacheStore->set($cacheKey, $content, kTimeConversion::HOUR);
+			$cacheStore->set($cacheKey, $content, kTimeConversion::DAY);
 		}
 
 		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
