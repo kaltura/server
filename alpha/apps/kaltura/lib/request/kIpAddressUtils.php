@@ -215,7 +215,22 @@ class kIpAddressUtils
 				$fromIp = self::ipToLong($rangeIp);
 				$isIPv6 = filter_var($rangeIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
 				$bits = $isIPv6 ? 128 : 32;
-				$toIp = $fromIp + (1 << ($bits - $rangeMask)) - 1;
+				if ($isIPv6) {
+					// Use GMP for 128-bit math
+					if (function_exists('gmp_init')) {
+						$fromGmp = gmp_init($fromIp);
+						$add = gmp_sub(gmp_pow(2, $bits - $rangeMask), 1);
+						$toIp = gmp_strval(gmp_add($fromGmp, $add));
+					} elseif (extension_loaded('bcmath')) {
+						$add = bcsub(bcpow('2', (string)($bits - $rangeMask)), '1');
+						$toIp = bcadd($fromIp, $add);
+					} else {
+						// Fallback: not supported
+						$toIp = $fromIp;
+					}
+				} else {
+					$toIp = $fromIp + (1 << ($bits - $rangeMask)) - 1;
+				}
 				break;
 		}
 		
@@ -333,25 +348,52 @@ class kIpAddressUtils
 		return $bits;
 	}
 
-	private static function compareIp($ip1, $ip2)
+    public static function ipToLong($ip)
+    {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return (string)ip2long($ip);
+        } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $bin = inet_pton($ip);
+            if (function_exists('gmp_import')) {
+                $gmp = gmp_import($bin);
+                return gmp_strval($gmp);
+            } elseif (extension_loaded('gmp')) {
+                $hex = bin2hex($bin);
+                $gmp = gmp_init($hex, 16);
+                return gmp_strval($gmp);
+            } elseif (extension_loaded('bcmath')) {
+                $hex = bin2hex($bin);
+                $dec = '0';
+                for ($i = 0; $i < strlen($hex); $i += 4) {
+                    $chunk = substr($hex, $i, 4);
+                    $dec = bcmul($dec, bcpow('16', strlen($chunk)));
+                    $dec = bcadd($dec, hexdec($chunk));
+                }
+                return $dec;
+            } else {
+                // Fallback: return as hex string
+                return bin2hex($bin);
+            }
+        }
+        return false; // Invalid IP
+    }
+
+    private static function compareIp($ip1, $ip2)
 	{
 		$bin1 = self::inetToBits($ip1);
 		$bin2 = self::inetToBits($ip2);
-		return strcmp($bin1, $bin2);
-	}
-
-	public static function ipToLong($ip)
-	{
-		if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-			return ip2long($ip);
-		} elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-			$bin = inet_pton($ip);
-			$long = 0;
-			foreach (unpack('C*', $bin) as $byte) {
-				$long = ($long << 8) | $byte;
+		// Use GMP for IPv6, string compare for IPv4
+		if (filter_var($ip1, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) || filter_var($ip2, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+			$long1 = self::ipToLong($ip1);
+			$long2 = self::ipToLong($ip2);
+			if (function_exists('gmp_cmp')) {
+				return gmp_cmp(gmp_init($long1), gmp_init($long2));
+			} elseif (extension_loaded('bcmath')) {
+				return bccomp($long1, $long2);
+			} else {
+				return strcmp($long1, $long2);
 			}
-			return $long;
 		}
-		return false; // Invalid IP
+		return strcmp($bin1, $bin2);
 	}
 }

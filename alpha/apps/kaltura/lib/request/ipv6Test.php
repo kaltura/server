@@ -24,43 +24,43 @@ class ipv6Test {
     public static function testIpToLongWithIPv4() {
         $ip = '10.0.0.1';
         $result = kIpAddressUtils::ipToLong($ip);
-        assert($result !== null, "IPv4 address should be converted to long.");
+        assert($result !== false && $result !== null, "IPv4 address should be converted to long.");
     }
 
     public static function testIpToLongWithIPv6() {
         $ip = 'fe80::1ff:fe23:4567:890a';
         $result = kIpAddressUtils::ipToLong($ip);
-        assert($result !== null, "IPv6 address should be converted to long.");
+        assert($result !== false && $result !== null, "IPv6 address should be converted to long.");
     }
 
     public static function testIsIpInRangeWithIPv4() {
         $ip = '10.0.0.1';
         $range = '10.0.0.0/8';
         $result = kIpAddressUtils::isIpInRange($ip, $range);
-        assert($result === true, "IPv4 address should be in range.");
+        assert($result == true, "IPv4 address should be in range.");
     }
 
     public static function testIsIpInRangeWithIPv6() {
         $ip = 'fe80::1ff:fe23:4567:890a';
         $range = 'fe80::/10';
         $result = kIpAddressUtils::isIpInRange($ip, $range);
-        assert($result === true, "IPv6 address should be in range.");
+        assert($result == true, "IPv6 address should be in range.");
     }
 
     public static function testGetAddressType() {
         echo "Testing getAddressType...\n";
 
         // Test IPv4 single
-        assert(kIpAddressUtils::getAddressType('192.168.1.1') === kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE);
+        assert(kIpAddressUtils::getAddressType('192.168.1.1') == kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE);
 
         // Test IPv4 CIDR
-        assert(kIpAddressUtils::getAddressType('192.168.1.1/24') === kIpAddressUtils::IP_ADDRESS_TYPE_MASK_CIDR);
+        assert(kIpAddressUtils::getAddressType('192.168.1.1/24') == kIpAddressUtils::IP_ADDRESS_TYPE_MASK_CIDR);
 
         // Test IPv6 single
-        assert(kIpAddressUtils::getAddressType('2001:db8::1') === kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE);
+        assert(kIpAddressUtils::getAddressType('2001:db8::1') == kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE);
 
         // Test IPv6 CIDR
-        assert(kIpAddressUtils::getAddressType('2001:db8::1/64') === kIpAddressUtils::IP_ADDRESS_TYPE_MASK_CIDR);
+        assert(kIpAddressUtils::getAddressType('2001:db8::1/64') == kIpAddressUtils::IP_ADDRESS_TYPE_MASK_CIDR);
 
         echo "getAddressType tests passed!\n";
     }
@@ -69,26 +69,24 @@ class ipv6Test {
         echo "Testing parseIpRange...\n";
 
         // Test IPv4 range
-        assert(kIpAddressUtils::parseIpRange('192.168.1.1-192.168.1.10') === [
-            kIpAddressUtils::ipToLong('192.168.1.1'),
-            kIpAddressUtils::ipToLong('192.168.1.10')
-        ]);
+        $range = kIpAddressUtils::parseIpRange('192.168.1.1-192.168.1.10');
+        assert((string)$range[0] == (string)kIpAddressUtils::ipToLong('192.168.1.1'));
+        assert((string)$range[1] == (string)kIpAddressUtils::ipToLong('192.168.1.10'));
 
         // Test IPv6 range
-        assert(kIpAddressUtils::parseIpRange('2001:db8::1-2001:db8::10') === [
-            kIpAddressUtils::ipToLong('2001:db8::1'),
-            kIpAddressUtils::ipToLong('2001:db8::10')
-        ]);
+        $range = kIpAddressUtils::parseIpRange('2001:db8::1-2001:db8::10');
+        assert((string)$range[0] == (string)kIpAddressUtils::ipToLong('2001:db8::1'));
+        assert((string)$range[1] == (string)kIpAddressUtils::ipToLong('2001:db8::10'));
 
         // Test IPv4 CIDR
         $cidrRange = kIpAddressUtils::parseIpRange('192.168.1.0/24');
-        assert($cidrRange[0] === kIpAddressUtils::ipToLong('192.168.1.0'));
-        assert($cidrRange[1] === kIpAddressUtils::ipToLong('192.168.1.255'));
+        assert((string)$cidrRange[0] == (string)kIpAddressUtils::ipToLong('192.168.1.0'));
+        assert((string)$cidrRange[1] == (string)kIpAddressUtils::ipToLong('192.168.1.255'));
 
         // Test IPv6 CIDR
         $cidrRange = kIpAddressUtils::parseIpRange('2001:db8::/64');
-        assert($cidrRange[0] === kIpAddressUtils::ipToLong('2001:db8::'));
-        assert($cidrRange[1] === kIpAddressUtils::ipToLong('2001:db8::ffff:ffff:ffff:ffff'));
+        assert((string)$cidrRange[0] == (string)kIpAddressUtils::ipToLong('2001:db8::'));
+        assert((string)$cidrRange[1] == (string)kIpAddressUtils::ipToLong('2001:db8::ffff:ffff:ffff:ffff'));
 
         echo "parseIpRange tests passed!\n";
     }
@@ -97,12 +95,12 @@ class ipv6Test {
         echo "Testing isIpInRanges...\n";
 
         // Test IPv4 ranges
-        assert(kIpAddressUtils::isIpInRanges('192.168.1.5', '192.168.1.1-192.168.1.10,192.168.2.1-192.168.2.10') === true);
-        assert(kIpAddressUtils::isIpInRanges('192.168.3.5', '192.168.1.1-192.168.1.10,192.168.2.1-192.168.2.10') === false);
+        assert(kIpAddressUtils::isIpInRanges('192.168.1.5', '192.168.1.1-192.168.1.10,192.168.2.1-192.168.2.10') == true);
+        assert(kIpAddressUtils::isIpInRanges('192.168.3.5', '192.168.1.1-192.168.1.10,192.168.2.1-192.168.2.10') == false);
 
         // Test IPv6 ranges
-        assert(kIpAddressUtils::isIpInRanges('2001:db8::5', '2001:db8::1-2001:db8::10,2001:db9::1-2001:db9::10') === true);
-        assert(kIpAddressUtils::isIpInRanges('2001:db10::5', '2001:db8::1-2001:db8::10,2001:db9::1-2001:db9::10') === false);
+        assert(kIpAddressUtils::isIpInRanges('2001:db8::5', '2001:db8::1-2001:db8::10,2001:db9::1-2001:db9::10') == true);
+        assert(kIpAddressUtils::isIpInRanges('2001:db10::5', '2001:db8::1-2001:db8::10,2001:db9::1-2001:db9::10') == false);
 
         echo "isIpInRanges tests passed!\n";
     }
@@ -111,20 +109,20 @@ class ipv6Test {
         echo "Testing isIpInRange...\n";
 
         // Test IPv4 range
-        assert(kIpAddressUtils::isIpInRange('192.168.1.5', '192.168.1.1-192.168.1.10') === true);
-        assert(kIpAddressUtils::isIpInRange('192.168.2.5', '192.168.1.1-192.168.1.10') === false);
+        assert(kIpAddressUtils::isIpInRange('192.168.1.5', '192.168.1.1-192.168.1.10') == true);
+        assert(kIpAddressUtils::isIpInRange('192.168.2.5', '192.168.1.1-192.168.1.10') == false);
 
         // Test IPv6 range
-        assert(kIpAddressUtils::isIpInRange('2001:db8::5', '2001:db8::1-2001:db8::10') === true);
-        assert(kIpAddressUtils::isIpInRange('2001:db8::15', '2001:db8::1-2001:db8::10') === false);
+        assert(kIpAddressUtils::isIpInRange('2001:db8::5', '2001:db8::1-2001:db8::10') == true);
+        assert(kIpAddressUtils::isIpInRange('2001:db8::15', '2001:db8::1-2001:db8::10') == false);
 
         // Test IPv4 CIDR
-        assert(kIpAddressUtils::isIpInRange('192.168.1.5', '192.168.1.0/24') === true);
-        assert(kIpAddressUtils::isIpInRange('192.168.2.5', '192.168.1.0/24') === false);
+        assert(kIpAddressUtils::isIpInRange('192.168.1.5', '192.168.1.0/24') == true);
+        assert(kIpAddressUtils::isIpInRange('192.168.2.5', '192.168.1.0/24') == false);
 
         // Test IPv6 CIDR
-        assert(kIpAddressUtils::isIpInRange('2001:db8::5', '2001:db8::/64') === true);
-        assert(kIpAddressUtils::isIpInRange('2001:db9::5', '2001:db8::/64') === false);
+        assert(kIpAddressUtils::isIpInRange('2001:db8::5', '2001:db8::/64') == true);
+        assert(kIpAddressUtils::isIpInRange('2001:db9::5', '2001:db8::/64') == false);
 
         echo "isIpInRange tests passed!\n";
     }
@@ -243,11 +241,11 @@ class ipv6Test {
 
         // Test IPv4 validation
         $ipIPv4 = '192.168.1.1';
-        assert(kIpAddressUtils::getAddressType($ipIPv4) === kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE, "IPv4 validation failed.");
+        assert(kIpAddressUtils::getAddressType($ipIPv4) == kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE, "IPv4 validation failed.");
 
         // Test IPv6 validation
         $ipIPv6 = '2001:db8::1';
-        assert(kIpAddressUtils::getAddressType($ipIPv6) === kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE, "IPv6 validation failed.");
+        assert(kIpAddressUtils::getAddressType($ipIPv6) == kIpAddressUtils::IP_ADDRESS_TYPE_SINGLE, "IPv6 validation failed.");
 
         echo "Zend Validate IP tests passed!\n";
     }
