@@ -6,20 +6,21 @@
  */
 class kLocalizedVendorTaskData extends kVendorTaskData
 {
-	protected $language;
+	protected $outputLanguage;
 
 	public function __construct()
 	{
-		$this->language = null;
+		$this->outputLanguage = null;
 	}
 
-	public function getLanguage()
+	public function getOutputLanguage()
 	{
-		return $this->language;
+
+		return $this->outputLanguage;
 	}
 
-	public function setLanguage($language): void
+	public function setOutputLanguage($language): void
 	{
-		$this->language = $language;
+		$this->outputLanguage = $language;
 	}
 }
