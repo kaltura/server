@@ -2288,7 +2288,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		//reduce volume based on
-		if ($mapScale && $duration)
+		if ($mapScale)
 		{
 			$content = self::resampleVolumeMap($content, $mapScale, $duration);
 		}
