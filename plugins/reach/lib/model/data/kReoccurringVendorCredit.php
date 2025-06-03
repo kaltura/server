@@ -65,10 +65,10 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		$syncedCredit = parent::syncCredit($reachProfileId, $partnerId);
 		if ($this->getLastSyncTime() > $this->periodEndDate)
 		{
-			$dbReachProfile = ReachProfilePeer::retrieveActiveByPk($this->reachProfileId);
+			$dbReachProfile = ReachProfilePeer::retrieveActiveByPk($reachProfileId);
 			if (!$dbReachProfile)
 			{
-				throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $this->reachProfileId);
+				throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
 			}
 			$allowedCredit = $dbReachProfile->getCredit()->getCurrentCredit(true, false);
 			// in pay per use, if used credit exceeded the allowed credit, move the excess to next cycle
