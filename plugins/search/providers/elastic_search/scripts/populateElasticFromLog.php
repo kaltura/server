@@ -43,12 +43,25 @@ if (empty($config))
 		exit(-1);
 	}
 	$config = parse_ini_file($configFile);
+	KalturaLog::debug("Configuration file [$configFile] loaded successfully - values: " . print_r($config, true));
 }
 
 $elasticCluster = $config['elasticCluster'];
 $elasticServer = $config['elasticServer'];
 $elasticPort = (isset($config['elasticPort']) ? $config['elasticPort'] : 9200);
-$elasticVersion = isset($config['elasticVersion']) ? $config['elasticVersion'] : elasticClient::ELASTIC_MAJOR_VERSION_5;
+
+// add support for opensearch distribution, if 'opensearch' is set in the config we will use elastic 7+ syntax
+$distribution = $config['distribution'] ?? null;
+if ($distribution === elasticClient::OPENSEARCH_DISTRIBUTION)
+{
+	KalturaLog::debug("Found distribution config value [$distribution] - using opensearch syntax");
+	$elasticVersion = elasticClient::ELASTIC_MAJOR_VERSION_7;
+}
+else
+{
+	$elasticVersion = isset($config['elasticVersion']) ? $config['elasticVersion'] : elasticClient::ELASTIC_MAJOR_VERSION_5;
+}
+
 $processScriptUpdates = (isset($config['processScriptUpdates']) ? $config['processScriptUpdates'] : false);
 $systemSettings = kConf::getMap('system');
 $shouldUseMaster = (isset($config['shouldUseMaster']) ? $config['shouldUseMaster'] : true);
