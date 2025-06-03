@@ -2263,7 +2263,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$content = null;
 
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_VOLUME_MAP);
-		$cacheKey = $entryId . '_volumeMap';
+		$cacheKey = $entryId . '_volumeMap' . $mapScale;
 		if ($cacheStore)
 		{
 			$content = $cacheStore->get($cacheKey);
@@ -2295,7 +2295,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 		if ($cacheStore)
 		{
-			$cacheStore->set($cacheKey, $content, kTimeConversion::HOUR);
+			$cacheStore->set($cacheKey, $content, kTimeConversion::DAY);
 		}
 
 		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
