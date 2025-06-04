@@ -238,7 +238,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
 			return true;
 
-		if($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
+		if(($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType())) ||
+			($object instanceof LiveStreamScheduleEvent && $object->getTemplateEntryId()))
 		{
 			$event = new kObjectCreatedEvent($object);
 
@@ -271,6 +272,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			if ($this->shouldConsumeEvent($event))
 				return true;
+
 			if (in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns))
 			{
 				return true;
@@ -279,6 +281,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				return true;
 			}
+		}
+
+		if (($object instanceof LiveStreamScheduleEvent && $object->getStatus() != ScheduleEventStatus::DELETED &&  $object->getTemplateEntryId()))
+		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			if ($this->shouldConsumeEvent($event))
+				return true;
 		}
 
 		if ($object instanceof flavorAsset
@@ -360,7 +369,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
-		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
+		if (($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType())) ||
+			($object instanceof LiveStreamScheduleEvent && $object->getTemplateEntryId()))
 		{
 			$this->initReachProfileForPartner($object->getPartnerId());
 			if (count(self::$booleanNotificationTemplatesFulfilled))
@@ -472,7 +482,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			$this->consumeEvent($event);
+		}
 
+		if (($object instanceof LiveStreamScheduleEvent && $object->getStatus() != ScheduleEventStatus::DELETED &&  $object->getTemplateEntryId()))
+		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			$this->consumeEvent($event);
 		}
 
 		return true;
