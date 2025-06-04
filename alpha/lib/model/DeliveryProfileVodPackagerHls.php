@@ -102,6 +102,12 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 			}
 		}
 		
+		//TO-DO: Once we verify codecs are well calculated, we can remove this check, until than include only when serveAsFmp4 is true
+		if(!$this->serveAsFmp4)
+		{
+			$this->removeCodecsString($parentFlavors);
+		}
+		
 		if($this->serveAsFmp4)
 		{
 			foreach ($parentFlavors as &$parentFlavor)
@@ -151,6 +157,16 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 		}
 		
 		return array_merge($audioFlavors, $videoFlavors);
+	}
+	
+	private function removeCodecsString($flavors)
+	{
+		foreach ($flavors as &$flavor)
+		{
+			$flavor['codecs'] = '';
+		}
+		
+		return $flavors;
 	}
 
 }

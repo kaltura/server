@@ -1068,6 +1068,10 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 		{
 			$codecs = ",CODECS=\"{$flavor['codecs']}\"";
 		}
+		else if ($bitrate && $bitrate <= self::AUDIO_CODECS_BITRATE_THRESHOLD)
+		{
+			$codecs = ',CODECS="mp4a.40.2"';
+		}
 
 		$closedCaption = '';
 		if($this->closedCaptions && $this->shouldUseClosedCaptions())
