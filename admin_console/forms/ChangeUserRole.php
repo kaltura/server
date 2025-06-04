@@ -31,26 +31,6 @@ class Form_ChangeUserRole extends Infra_Form
 			'readonly'		=> true,
 			'ignore' 		=> true,
 		));
-		
-//		// Add a new role element
-//		$this->addElement('select', 'role', array(
-//			'label'			=> 'Role:',
-//			'filters'		=> array('StringTrim'),
-//			'required'		=> true,
-//		));
-
-
-
-//		$client = Infra_ClientHelper::getClient();
-//		$filter = new Kaltura_Client_Type_UserRoleFilter();
-//		$filter->tagsMultiLikeAnd = 'admin_console';
-//		$userRoles = $client->userRole->listAction($filter);
-//		if ($userRoles && isset($userRoles->objects)) {
-//			$userRoles = $userRoles->objects;
-//			foreach($userRoles as $role) {
-//				$element->addMultiOption($role->id, $role->name);
-//			}
-//		}
 
 		// Add a new multi-checkbox element for user roles
         $this->addElement('multiCheckbox', 'roles_checkbox', array(
@@ -58,20 +38,30 @@ class Form_ChangeUserRole extends Infra_Form
             'filters' => array('StringTrim'),
             'required' => false,
         ));
-        $checkboxElement = $this->getElement('roles_checkbox');
-        // Populate the checkbox with the same user roles
-        $client = Infra_ClientHelper::getClient();
-        $filter = new Kaltura_Client_Type_UserRoleFilter();
-        $filter->tagsMultiLikeAnd = 'admin_console';
-        $userRoles = $client->userRole->listAction($filter);
-        if ($userRoles && isset($userRoles->objects))
+
+		// Retrieve the 'roles_checkbox' element from the form
+		$checkboxElement = $this->getElement('roles_checkbox');
+		$client = Infra_ClientHelper::getClient();
+		$filter = new Kaltura_Client_Type_UserRoleFilter();
+		$filter->tagsMultiLikeAnd = 'admin_console';
+
+		// Fetch the list of user roles using the filter
+		$userRoles = $client->userRole->listAction($filter);
+
+		// Check if the response contains user roles
+		if ($userRoles && isset($userRoles->objects))
 		{
-            $userRoles = $userRoles->objects;
-            foreach($userRoles as $role)
+			// Extract the user roles objects
+			$userRoles = $userRoles->objects;
+			$options = array();
+			// Iterate through each role and map its ID to its name
+			foreach ($userRoles as $role)
 			{
-                $checkboxElement->addMultiOption($role->id, $role->name);
-            }
-        }
-	
+				$options[$role->id] = $role->name;
+			}
+
+			// Add the role options to the 'roles_checkbox' element
+			$checkboxElement->addMultiOptions($options);
+		}
 	}
 }
