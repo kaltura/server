@@ -77,6 +77,10 @@ class KDeletingUserGroupSubscribtionEngine extends KDeletingEngine
 				}, $groupCategories);
 
 				// Create a new filter for user subscriptions
+				if (empty($categoryIds)) {
+					KalturaLog::debug("No categories found for groupId [$groupId]");
+					break;
+				}
 				$categoryUserFilter = new KalturaCategoryUserFilter();
 				$categoryUserFilter->statusEqual = KalturaCategoryUserStatus::ACTIVE;
 				$categoryUserFilter->userIdEqual = $userId;
