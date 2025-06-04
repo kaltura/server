@@ -2263,7 +2263,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$content = null;
 
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_VOLUME_MAP);
-		$cacheKey =  $entryId . '_volumeMap_' . $flavorAsset->getVersion() .'_' .$mapScale;
+		$cacheKey =  $entryId . '_volumeMap_' . $flavorAsset->getVersion() . ($mapScale ? '_' . $mapScale : '');;
 		if ($cacheStore)
 		{
 			$content = $cacheStore->get($cacheKey);
