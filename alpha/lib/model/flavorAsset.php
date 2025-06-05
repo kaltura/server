@@ -329,19 +329,19 @@ class flavorAsset extends exportableAsset
 			return null; // Invalid hex string or too short
 		}
 		
-		// ✅ Extract the first 19 bytes
+		//Extract the first 19 bytes
 		$profile_tier_level = ord($bytes[1]);
 		
-		// ✅ Extract the profile IDC (first 5 bits of byte[1])
+		//Extract the profile IDC (first 5 bits of byte[1])
 		$profile_idc = $profile_tier_level & 0x1F;
 		
-		// ✅ Extract the correct nibble (first nibble of byte[2])
+		//Extract the correct nibble (first nibble of byte[2])
 		$profile_compat_byte = (ord($bytes[2]) >> 4); // e.g. 0x60 >> 4 = 6
 		
-		// ✅ Extract the tier flag (bit 5 of byte[1])
+		//Extract the tier flag (bit 5 of byte[1])
 		$tier_flag = ($profile_tier_level & 0x20) ? 'H' : 'L';
 		
-		// ✅ Extract the level IDC (byte[12])
+		//Extract the level IDC (byte[12])
 		$level_idc = ord($bytes[12]);
 		
 		// Constraint Indicator Flags: bytes 6–11
