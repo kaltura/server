@@ -95,7 +95,7 @@ class elasticClient
 		$this->initBulkBuffer();
 	}
 	
-	public static function getElasticVersion(): int
+	public static function getElasticVersion()
 	{
 		$distribution = kConf::get('distribution', 'elastic', null);
 		if ($distribution === self::OPENSEARCH_DISTRIBUTION)
