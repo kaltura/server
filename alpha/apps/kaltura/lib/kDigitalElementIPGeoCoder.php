@@ -57,7 +57,7 @@ class kDigitalElementIPGeocoder extends kGeoCoder
 				self::$lastRecord = (filesize($dbFilePath) - self::$dataOffset) / self::RECORD_LEN - 1;
 			}
 
-			$ipAddr = ip2long($ip);
+			$ipAddr = kIpAddressUtils::ipToLong($ip);
 			$low = 0;
 			$high = self::$lastRecord;
 			while($high >= $low)
