@@ -111,20 +111,21 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
         }
     }
 
-    public static function setFilteredCategoryIds(ESearchOperator $eSearchOperator, $objectId)
+    public static function setFilteredCategoryIds(ESearchOperator $eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn = null)
     {
-        if($eSearchOperator->getOperator() != ESearchOperatorType::AND_OP)
+        if(($eSearchOperator->getOperator() != ESearchOperatorType::AND_OP) || $objectIdsNotIn)
             return;
 
         $searchItems = $eSearchOperator->getSearchItems();
         $filteredCategoryIds = array();
-        $filteredEntryId = $objectId ? array($objectId) : array();
+	    $filteredEntryIds = $objectIdsCsvStr ? explode(',', $objectIdsCsvStr) : array();
+
         foreach ($searchItems as $searchItem)
         {
             $filteredObjectId = $searchItem->getFilteredObjectId();
             if ($filteredObjectId)
             {
-                $filteredEntryId[] = $filteredObjectId;
+	            $filteredEntryIds[] = $filteredObjectId;
             }
             $FilteredCategoryId = $searchItem->getFilteredCategoryId();
             if ($FilteredCategoryId)
@@ -133,24 +134,26 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
             }
         }
 
-        $filteredCategoriesByEntryId = self::getCategoryIdsForEntryId($filteredEntryId);
-        $filteredCategoryIds = array_merge($filteredCategoryIds, $filteredCategoriesByEntryId);
+        $filteredCategoriesByEntryIds = self::getCategoryIdsForEntryIds($filteredEntryIds);
+        $filteredCategoryIds = array_unique(array_merge($filteredCategoryIds, $filteredCategoriesByEntryIds));
         self::$filteredCategoryIds = $filteredCategoryIds;
     }
 
-    protected static function getCategoryIdsForEntryId($filteredEntryId)
+    protected static function getCategoryIdsForEntryIds($filteredEntryId)
     {
         $filteredCategoryIds = array();
         $filteredEntriesIds = array_unique($filteredEntryId);
         $filteredEntriesIds = array_values($filteredEntriesIds);
-        if (count($filteredEntriesIds) == 1)
+        if (count($filteredEntriesIds) >= 1)
         {
-            $categoryEntries = categoryEntryPeer::selectByEntryId($filteredEntriesIds[0]);
+            $categoryEntries = categoryEntryPeer::selectByEntryIds($filteredEntriesIds, self::$privacyContext);
             foreach ($categoryEntries as $categoryEntry)
             {
                 $filteredCategoryIds[] = $categoryEntry->getCategoryId();
             }
         }
+
+
         return $filteredCategoryIds;
     }
 
