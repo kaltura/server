@@ -589,6 +589,10 @@ class KalturaErrors extends APIErrors
 	const SETTING_SSO_PER_USER_NOT_ALLOWED = "SETTING_SSO_PER_USER_NOT_ALLOWED;;Setting SSO per user is not allowed for this partner";
 
 	const EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS = "EMAIL_DOMAIN_IS_NOT_ALLOWED_FOR_ADMINS;;Email domain is not allowed for admins on this partner";
+	
+	const APPLICATIVE_USER_TYPE_CANNOT_BE_UPDATED = "APPLICATIVE_USER_TYPE_CANNOT_BE_UPDATED;;Applicative user type cannot be updated";
+	
+	const USER_TYPE_CANNOT_BE_UPDATED = "USER_TYPE_CANNOT_BE_UPDATED;;User type cannot be updated";
 
 	/**
 	 * categoryUser service
@@ -612,6 +616,8 @@ class KalturaErrors extends APIErrors
 	const CANNOT_UPDATE_CATEGORY_USER_OWNER = "CANNOT_UPDATE_CATEGORY_USER_OWNER;;Cannot change CategoryUser object for category Owner";
 
 	const CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY = "CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY;;Cannot add applicative group to category";
+	
+	const APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED = "APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED;;Applicative group association to category is not allowed";
 
 	/**
 	 * entry

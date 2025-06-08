@@ -227,6 +227,19 @@ class KalturaUser extends KalturaBaseUser
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validateNames($sourceObject, self::$names);
+		
+		//TODO: User type change is not a valid operation, once logs reviewed block instead of debug
+		if(isset($this->type) && $sourceObject->getType() != $this->type)
+		{
+			KalturaLog::debug("User type change detected. Old type: " . $sourceObject->getType() . ", new type: " . $this->type);
+			//throw new KalturaAPIException(KalturaErrors::USER_TYPE_CANNOT_BE_UPDATED);
+		}
+		
+		if(isset($this->type) && $sourceObject->getType() == KalturaUserType::APPLICATIVE_GROUP && $this->type != KalturaUserType::APPLICATIVE_GROUP)
+		{
+			throw new KalturaAPIException(KalturaErrors::APPLICATIVE_USER_TYPE_CANNOT_BE_UPDATED);
+		}
+		
 		parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 }
