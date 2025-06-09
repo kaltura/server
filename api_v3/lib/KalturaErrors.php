@@ -617,7 +617,7 @@ class KalturaErrors extends APIErrors
 
 	const CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY = "CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY;;Cannot add applicative group to category";
 	
-	const APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED = "APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED;;Applicative group association to category is not allowed";
+	const APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED = "APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED;;Applicative group association to category with permission level other than None is not allowed";
 
 	/**
 	 * entry
