@@ -85,10 +85,6 @@ while (count($partners))
 
     kMemoryManager::clearMemory();
 
-    $c = new Criteria();
-    $c->addAscendingOrderByColumn(PartnerPeer::ID);
-    $c->addAnd(PartnerPeer::STATUS, 1, Criteria::EQUAL);
-    $c->setLimit($countLimitEachLoop);
     $c->setOffset($offset);
     
     $partners = PartnerPeer::doSelect($c, $con);
