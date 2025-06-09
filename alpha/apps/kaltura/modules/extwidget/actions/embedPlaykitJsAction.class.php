@@ -52,7 +52,7 @@ class embedPlaykitJsAction extends sfAction
 	private $playerConfig = null;
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
-	private $includeSourceMap = "false";
+	private $includeSourceMap = 'false';
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
 
 	public function execute()
@@ -106,10 +106,10 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " wrong config object");
 		}
 
-		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) .
-			"&name=" . $context->bundle_name .
-			"&source=" . base64_encode($context->sourcesPath) .
-			"&includeSourceMap=" . $context->includeSourceMap;
+		$url = $context->bundlerUrl . '/build?config=' . base64_encode($config) .
+			'&name=' . $context->bundle_name .
+			'&source=' . base64_encode($context->sourcesPath) .
+			'&includeSourceMap=' . $context->includeSourceMap;
 		
 		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'), true);
 
@@ -825,7 +825,7 @@ class embedPlaykitJsAction extends sfAction
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
 		
 		//Should we include player source map in the request result
-		$this->includeSourceMap = $this->getRequestParameter(self::INCLUDE_SOURCE_MAP_PARAM_NAME, "false");
+		$this->includeSourceMap = $this->getRequestParameter(self::INCLUDE_SOURCE_MAP_PARAM_NAME, 'false');
 
 		//Get the list of partner 0 uiconf tags for uiconfs that contain {latest} and {beta} lists
 		$embedPlaykitConf = kConf::getMap(kConfMapNames::EMBED_PLAYKIT);
