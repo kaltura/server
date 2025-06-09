@@ -321,6 +321,11 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		$mediaInfo->videoBitRateMode; // FIXME
 		$mediaInfo->videoWidth = isset($stream->width)? trim($stream->width): null;
 		$mediaInfo->videoHeight = isset($stream->height)? trim($stream->height): null;
+		$mediaInfo->containerProfile = isset($stream->profile)? trim($stream->profile): null;
+		$mediaInfo->videoLevel = isset($stream->level)? trim($stream->level): null;
+		$mediaInfo->extradata = isset($stream->extradata) ? trim($stream->extradata): null;
+		
+		//
 			/*
 			 * Extract 'videoFrameRate' from the ffprobe::r_frame_rate.
 			 * If the 'r_frame_rate' is missing or abnormally high (>120), 
@@ -452,6 +457,8 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($stream->tags) && isset($stream->tags->language)){
 			$mediaInfo->audioLanguage = trim($stream->tags->language);
 		}
+		$mediaInfo->containerProfile = isset($stream->profile)? trim($stream->profile): null;
+		$mediaInfo->extradata = isset($stream->extradata) ? trim($stream->extradata): null;
 		return $mediaInfo;
 	}
 	
