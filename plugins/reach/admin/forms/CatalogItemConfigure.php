@@ -115,6 +115,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$targetLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
 			$this->addElement($targetLanguage);
 		}
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE)
+		{
+			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage'));
+			$targetLanguage->setLabel('Target Language:');
+			$targetLanguage->setRequired(true);
+			$targetLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_ASL);
+			$this->addElement($targetLanguage);
+		}
 		
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 		{
@@ -139,6 +148,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'placement' => 'prepend',
 			));
 		}
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::DOCUMENT_ENRICHMENT)
+		{
+			$documentEnrichmentType = new Kaltura_Form_Element_EnumSelect('documentEnrichmentType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType'));
+			$documentEnrichmentType->setLabel('Document Enrichment Type:');
+			$documentEnrichmentType->setRequired(true);
+			$documentEnrichmentType->setValue(Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType::MD_CONVERSION);
+			$this->addElement($documentEnrichmentType);
+		}
 		
 		$audioCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION,
 											Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION,
@@ -161,7 +179,8 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		}
 		
 		if (($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION) &&
-			($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING))
+			($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING) &&
+			($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE))
 		{
 			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'), array( null => "PartnerDefault"));
 			$outputFormat->setLabel('Output Format:');
@@ -183,6 +202,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			                                                    array(null => "PartnerDefault"));
 			$outputFormat->setLabel('Output Format:');
 			$outputFormat->setValue(VendorCatalogItemOutputFormat::VTT);
+			$this->addElement($outputFormat);
+		}
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE)
+		{
+			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat',
+																array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat'));
+			$outputFormat->setLabel('Output Format(Aspect ratio):');
+			$outputFormat->setValue(Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_16_9);
 			$this->addElement($outputFormat);
 		}
 

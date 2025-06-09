@@ -1245,10 +1245,11 @@ class MediaService extends KalturaEntryService
 	 *
 	 * @action getVolumeMap
 	 * @param string $entryId Entry id
+	 * @param int $desiredLines Desired Lines
 	 * @return file
 	 * @throws KalturaAPIException
 	 */
-	function getVolumeMapAction($entryId)
+	function getVolumeMapAction($entryId, $desiredLines = null)
 	{
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
@@ -1262,7 +1263,7 @@ class MediaService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
 		}
 
-		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset, $desiredLines, $dbEntry->getDuration());
 		return $content;
 	}
 }

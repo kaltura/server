@@ -37,6 +37,9 @@ $englishArray = array(
 	'Kaltura_Client_Enum_NullableBoolean::NULL_VALUE' => "NULL VALUE",
 	'Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE' => "TRUE",
 
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_16_9' => "16:9",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_4_3' => "4:3",
+
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::VTT' => "VTT",
@@ -170,6 +173,9 @@ $englishArray = array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_HK' => "Traditional Chinese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AUTO_DETECT' => "Auto Detect",
 
+	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_ASL' => "English (ASL)",
+	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_BSL' => "English (BSL)",
+
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PROCESSING' => 'Processing',
@@ -184,6 +190,7 @@ $englishArray = array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStage::QA' => 'QA',
 
 	'Kaltura_Client_Reach_Enum_VendorVideoAnalysisType::OCR' => 'OCR',
+	'Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType::MD_CONVERSION' => 'Markdown Conversion',
 );
 
 

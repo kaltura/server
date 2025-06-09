@@ -90,14 +90,19 @@ class PartnerCatalogItemService extends KalturaBaseService
 	{
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($id);
 		if (!$dbVendorCatalogItem)
+		{
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
+		}
 
 		//Check if catalog item already enabled
 		$dbPartnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id, kCurrentContext::getCurrentPartnerId());
 		if (!$dbPartnerCatalogItem)
+		{
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_CATALOG_ITEM_NOT_FOUND, $id);
+		}
 
 		$dbPartnerCatalogItem->setStatus(VendorCatalogItemStatus::DELETED);
+		$dbPartnerCatalogItem->setDefaultReachProfileId(null);
 		$dbPartnerCatalogItem->save();
 	}
 }

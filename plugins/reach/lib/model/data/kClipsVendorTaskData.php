@@ -4,7 +4,7 @@
  * @package plugins.reach
  * @subpackage model
  */
-class kClipsVendorTaskData extends kVendorTaskData
+class kClipsVendorTaskData extends kLocalizedVendorTaskData
 {
 	public $clipsDuration = 0;
 	public $eventSessionContextId = null;

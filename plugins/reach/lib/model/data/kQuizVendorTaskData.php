@@ -4,7 +4,7 @@
  * @package plugins.reach
  * @subpackage model
  */
-class kQuizVendorTaskData extends kVendorTaskData
+class kQuizVendorTaskData extends kLocalizedVendorTaskData
 {
 	public $numberOfQuestions = 0;
 	public $questionsType = null;

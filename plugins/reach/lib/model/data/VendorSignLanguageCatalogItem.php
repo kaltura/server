@@ -1,42 +1,31 @@
 <?php
 /**
- *  VendorIntelligentTaggingCatalogItem
+ *  VendorSignLanguageCatalogItem
  * @package plugins.reach
  * @subpackage model
  */
 
-
-class VendorIntelligentTaggingCatalogItem extends VendorCatalogItem
+class VendorSignLanguageCatalogItem extends VendorCatalogItem
 {
     public function applyDefaultValues()
     {
-        $this->setServiceFeature(VendorServiceFeature::INTELLIGENT_TAGGING);
-    }
-
-    public function isDuplicateTask($entryId, $entryObjectType, $partnerId): bool
-    {
-        return false;
-    }
-
-    public function calculateVersion(entry $entry)
-    {
-        return $entry->getVersion();
+        $this->setServiceFeature(VendorServiceFeature::SIGN_LANGUAGE);
     }
 
     public function requiresEntryReady()
     {
-        return false;
+        return true;
     }
 
     /**
      * @param $object
-     * @return kIntelligentTaggingVendorTaskData|null
+     * @return kSignLanguageVendorTaskData|null
      */
     public function getTaskJobData($object)
     {
-        if($object instanceof asset)
+        if($object instanceof flavorAsset)
         {
-            $taskJobData = new kIntelligentTaggingVendorTaskData();
+            $taskJobData = new kSignLanguageVendorTaskData();
             $taskJobData->assetId = $object->getId();
             return $taskJobData;
         }
@@ -51,4 +40,13 @@ class VendorIntelligentTaggingCatalogItem extends VendorCatalogItem
 
         return in_array($type, $supportedTypes);
     }
+
+	protected function getPrivileges($entryId, $shouldModerateOutput)
+	{
+		$privileges = parent::getPrivileges($entryId, $shouldModerateOutput);
+
+		$privileges .= ',' . kSessionBase::PRIVILEGE_EDIT_ADMIN_TAGS. ':*';
+
+		return $privileges;
+	}
 }

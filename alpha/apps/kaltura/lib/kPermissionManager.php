@@ -730,9 +730,40 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				$roleMap = self::getPermissions($roleId);
 				
 				// merge current role map to the global map
-				self::$map = array_merge_recursive(self::$map, $roleMap);
+				self::$map = self::mergeMapsUniquely(self::$map, $roleMap);
 			}
 		}
+	}
+
+	/**
+	 * Merge two permission maps recursively, ensuring unique values in the PERMISSION_NAMES_ARRAY
+	 * This function is to handle duplicated permission names when a user has multiple roles caused by th array_merge_recursive function.
+	 * @param array $currentMap The current permission map
+	 * @param array $roleMap The role permission map to merge
+	 * @return array The merged permission map
+	 */
+	protected static function mergeMapsUniquely($currentMap, $roleMap)
+	{
+		// Merge the two maps recursively, combining their values
+		$mergedMap = array_merge_recursive($currentMap, $roleMap);
+
+		// Check if the PERMISSION_NAMES_ARRAY key exists in the merged map and is an array
+		if (isset($mergedMap[self::PERMISSION_NAMES_ARRAY]) && is_array($mergedMap[self::PERMISSION_NAMES_ARRAY]))
+		{
+			// Iterate over each key-value pair in the PERMISSION_NAMES_ARRAY
+			foreach ($mergedMap[self::PERMISSION_NAMES_ARRAY] as $key => $value)
+			{
+				// If the value is an array, reset it to the key
+				// This ensures that duplicate keys are not nested as arrays
+				if (is_array($value))
+				{
+					$mergedMap[self::PERMISSION_NAMES_ARRAY][$key] = $key;
+				}
+			}
+		}
+
+		// Return the final merged map
+		return $mergedMap;
 	}
 
 	protected static function removeLimitedPermissions($restrictingRole)
