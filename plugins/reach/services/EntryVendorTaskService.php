@@ -654,7 +654,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$serviceFeature = $dbEntryVendorTask->getServiceFeature();
 		$taskData = $dbEntryVendorTask->getTaskJobData();
 		$entryVendorTask = new KalturaEntryVendorTask();
-		$entryVendorTask->taskJobData = KalturaClipsVendorTaskData::getInstance($taskData);
+		$entryVendorTask->taskJobData = KalturaVendorTaskData::getInstance($taskData);
 
 		switch ($serviceFeature)
 		{
