@@ -1,7 +1,6 @@
 # GitHub Copilot Code Review Instructions
 
 ## Project Overview
-## Project Overview
 
 The Kaltura Server repository implements the core PHP backend for the Kaltura media platform. 
 It exposes versioned REST-style APIs (under `api_v3`) for media ingestion, metadata management, playback configuration and analytics. 
