@@ -323,6 +323,9 @@ class KalturaMonitorClient
 		$partnerId = isset($params['partner_id']) && ctype_digit($params['partner_id']) ? $params['partner_id'] : null;
 
 		self::monitorApiStart(false, $action, $partnerId, $sessionType, $clientTag);
+		
+		list($service, $action) = explode('.', $action, 2);
+		self::checkApiRateLimit($partnerId, $service, $action, $params);
 	}
 
 	public static function monitorApiEnd($errorCode)
@@ -806,37 +809,17 @@ class KalturaMonitorClient
 		self::writeDeferredEvent($data);
 	}
 	
-	public static function checkApiRateLimit()
+	public static function checkApiRateLimit($partnerId, $service, $action, $params)
 	{
-		$uri = isset($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : '';
-		if(!$uri)
+		if(!isset($partnerId))
 		{
 			return;
 		}
 		
-		preg_match('#/p/([^/]+)/sp/([^/]+)#', $uri, $matches);
-		if(!$matches || !count($matches))
-		{
-			return;
-		}
-		
-		$p = isset($matches[1]) ? $matches[1] : (isset($matches[2]) ? $matches[2] : null);
-		if(!$p)
-		{
-			return;
-		}
-		
-		$context = sfContext::getInstance();
-		$request = $context->getRequest();
-		
-		$service = $request->getParameter('module');
-		$action = $request->getParameter('action');
-		
-		$params = infraRequestUtils::getRequestParams();
 		$params['service'] = $service;
 		$params['action'] = $action;
 		
-		if(!KalturaResponseCacher::rateLimit($service, $action, $params, $p))
+		if(!KalturaResponseCacher::rateLimit($service, $action, $params, $partnerId))
 		{
 			KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
 		}
