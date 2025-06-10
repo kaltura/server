@@ -92,14 +92,16 @@ A concise reference for maintaining consistent, readable, and maintainable PHP c
     
        7. Control Structures
        - Braces always, even for single statements:
-         if ($value) {
-         print('Yes');
+         if ($value) 
+         {
+             print('Yes');
          }
     
        - Indent inside braces for multi-line blocks:
-         if (a != b) {
-         print("boo");
-         print("moo");
+         if (a != b) 
+         {
+             print("boo");
+             print("moo");
          }
     
        8. Constants and Literals
