@@ -2268,7 +2268,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$stepsProgress = 0;
 		while ($stepsProgress < $firstPoint['pts'])
 		{
-			$nonEmptyData [] = ['pts' => $stepsProgress, 'rms' => -96.00];
+			$nonEmptyData [] = ['pts' => $stepsProgress, 'rms' => self::SILENCE_RMS_LEVEL];
 			// Fill silence points before the first point
 			$stepsProgress += $step;
 		}
