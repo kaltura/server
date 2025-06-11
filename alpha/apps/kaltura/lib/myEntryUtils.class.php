@@ -2213,8 +2213,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// Total duration in milliseconds
 		$durationMs = $durationSeconds * 1000;
 		$step = $durationMs / ($desiredLines - 1);
-		$resampled = self::fillSilence($data, $step);
-		for ($i = 0; $i < $desiredLines; $i++)
+		$resampled = self::fillSilence($data, round($step));
+		for ($i = count($resampled); $i < $desiredLines; $i++)
 		{
 			$targetPts = $i * $step;
 
@@ -2261,12 +2261,12 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	{
 		$nonEmptyData = [];
 		$firstPoint = $data[0];
-		$stepsProgress = $step;
+		$stepsProgress = 0;
 		while ($stepsProgress < $firstPoint['pts'])
 		{
+			$nonEmptyData [] = ['pts' => $stepsProgress, 'rms' => -96.00];
 			// Fill silence points before the first point
 			$stepsProgress += $step;
-			$nonEmptyData [] = ['pts' => $stepsProgress, 'rms' => -96.00];
 		}
 		return $nonEmptyData;
 	}
