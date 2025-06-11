@@ -2261,7 +2261,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 
 	// Fill silence before the first point
-	protected  static function fillSilence($data, $step)
+	protected static function fillSilence(array $data, int $step): array
 	{
 		$nonEmptyData = [];
 		if ($step <= 0 || count($data) === 0)
