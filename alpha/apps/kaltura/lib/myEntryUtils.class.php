@@ -8,6 +8,8 @@ class myEntryUtils
 	const ENTRY_ID_REGEX = "/^\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
 	const CACHED_THUMB_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
+	const SILENCE_RMS_LEVEL = -96; // -96 dBFS
+
 
 	static private $liveSourceType = array
 	(
