@@ -2213,7 +2213,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// Total duration in milliseconds
 		$durationMs = $durationSeconds * 1000;
 		$step = $durationMs / ($desiredLines - 1);
-		$resampled = [];
+		$resampled = self::fillSilence($data, $step);
 		for ($i = 0; $i < $desiredLines; $i++)
 		{
 			$targetPts = $i * $step;
@@ -2253,6 +2253,22 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		return $resampled;
+	}
+
+
+	// Fill silence before the first point
+	protected  static function fillSilence($data, $step)
+	{
+		$nonEmptyData = [];
+		$firstPoint = $data[0];
+		$stepsProgress = $step;
+		while ($stepsProgress < $firstPoint['pts'])
+		{
+			// Fill silence points before the first point
+			$stepsProgress += $step;
+			$nonEmptyData [] = ['pts' => $stepsProgress, 'rms' => -96.00];
+		}
+		return $nonEmptyData;
 	}
 
 	public static function getVolumeMapContent($flavorAsset, $mapScale = null, $duration = null)
