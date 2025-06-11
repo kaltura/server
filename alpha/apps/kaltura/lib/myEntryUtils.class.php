@@ -2260,7 +2260,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	protected  static function fillSilence($data, $step)
 	{
 		$nonEmptyData = [];
-		if($step <= 0 || count($data) == 0)
+		if ($step <= 0 || count($data) === 0)
 		{
 			return $nonEmptyData;
 		}
