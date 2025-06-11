@@ -2260,6 +2260,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	protected  static function fillSilence($data, $step)
 	{
 		$nonEmptyData = [];
+		if($step <= 0 || count($data) == 0)
+		{
+			return $nonEmptyData;
+		}
 		$firstPoint = $data[0];
 		$stepsProgress = 0;
 		while ($stepsProgress < $firstPoint['pts'])
