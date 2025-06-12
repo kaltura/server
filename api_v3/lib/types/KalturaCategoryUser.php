@@ -168,7 +168,7 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 		}
 		
 		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userId);
-		if ($kuser->getType() == KuserType::APPLICATIVE_GROUP && isset($this->permissionLevel) && $this->permissionLevel != CategoryKuserPermissionLevel::NONE)
+		if ($kuser->getType() == KalturaUserType::APPLICATIVE_GROUP && isset($this->permissionLevel) && $this->permissionLevel != CategoryKuserPermissionLevel::NONE)
 		{
 			throw new KalturaAPIException(KalturaErrors::APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED);
 		}
