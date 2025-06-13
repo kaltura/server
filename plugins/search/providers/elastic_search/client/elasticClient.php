@@ -60,7 +60,7 @@ class elasticClient
 	 * @param null $host
 	 * @param null $port
 	 * @param null $elasticVersion
-	 * @param null $curlTimeout - timeout in seconds
+	 * @param null $curlTimeout - timeout in milliseconds
 	 */
 	public function __construct($host = null, $port = null, $elasticVersion = null, $curlTimeout = null)
 	{
@@ -88,7 +88,7 @@ class elasticClient
 		curl_setopt($this->ch, CURLOPT_PORT, $this->elasticPort);
 		
 		if (!$curlTimeout)
-			$curlTimeout = kConf::get('elasticClientCurlTimeout', 'elastic', 10);
+			$curlTimeout = kConf::get('elasticClientCurlTimeout', 'elastic', 10000);
 		$this->setTimeout($curlTimeout);
 
 		$this->bulkSize = kConf::get('bulkSize', 'elastic', self::DEFAULT_BULK_SIZE);
@@ -144,12 +144,12 @@ class elasticClient
 	}
 
 	/**
-	 * @param int $seconds
+	 * @param int $milliseconds
 	 * @return boolean
 	 */
-	public function setTimeout($seconds)
+	public function setTimeout($milliseconds)
 	{
-		return curl_setopt($this->ch, CURLOPT_TIMEOUT, $seconds);
+		return curl_setopt($this->ch, CURLOPT_TIMEOUT_MS, $milliseconds);
 	}
 	
 	protected function getQueryParams(&$params)
@@ -475,6 +475,19 @@ class elasticClient
 		$cmd = $this->elasticHost;
 		$response = $this->sendRequest($cmd, self::GET, null, false, self::ELASTIC_ACTION_PING, self::MONITOR_NO_INDEX);
 		return $response;
+	}
+	
+	/**
+	 * get elastic cluster name
+	 * @return mixed|string
+	 */
+	public function getElasticClusterName()
+	{
+		$response = $this->ping();
+		
+		// this is backward compatible with the old method:
+		// $elasticClusterName = kConf::get('elasticCluster', 'elastic', 0);
+		return isset($response['cluster_name']) ? $response['cluster_name'] : 0;
 	}
 
 	/**
