@@ -1584,5 +1584,7 @@ class playManifestAction extends kalturaAction
 			//live delivery profile is defined according to source entry
 			$this->deliveryAttributes->setEntryId($sourceEntry->getEntryId());
 		}
+		
+		$this->deliveryAttributes->setSimuliveEventId($event->getId());
 	}
 }
