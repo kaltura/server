@@ -108,6 +108,7 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 	    
 		if (is_null ( $dbObject ))
 			$dbObject = new categoryKuser ();
+		
 		/* @var $dbObject categoryKuser */
 		if (!$this->permissionNames && !is_null($this->permissionLevel) && $this->permissionLevel !== $dbObject->getPermissionLevel())
 		{
@@ -135,11 +136,13 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the CategoryKuser object (on the right)  
 	 */
-	public function getMapBetweenObjects() {
+	public function getMapBetweenObjects()
+	{
 		return array_merge ( parent::getMapBetweenObjects (), self::$mapBetweenObjects );
 	}
 	
-	public function getExtraFilters() {
+	public function getExtraFilters()
+	{
 		return array ();
 	}
 	
@@ -153,8 +156,22 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 	public function validateForInsert($propertiesToSkip = array()) 
 	{
 		$category = categoryPeer::retrieveByPK ( $this->categoryId );
-		if (! $category)
+		if (!$category)
+		{
 			throw new KalturaAPIException ( KalturaErrors::CATEGORY_NOT_FOUND, $this->categoryId );
+		}
+		
+		$maxUserPerCategory = kConf::get('max_users_per_category');
+		if($category->getMembersCount() >= $maxUserPerCategory)
+		{
+			throw new KalturaAPIException(KalturaErrors::CATEGORY_MAX_USER_REACHED, $maxUserPerCategory);
+		}
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userId);
+		if ($kuser->getType() == KalturaUserType::APPLICATIVE_GROUP && isset($this->permissionLevel) && $this->permissionLevel != CategoryKuserPermissionLevel::NONE)
+		{
+			throw new KalturaAPIException(KalturaErrors::APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED);
+		}
 		
 		if ($category->getInheritanceType () == InheritanceType::INHERIT)
 			throw new KalturaAPIException ( KalturaErrors::CATEGORY_INHERIT_MEMBERS, $this->categoryId );
@@ -164,8 +181,7 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 		    throw new KalturaAPIException ( KalturaErrors::INVALID_USER_ID);
 		$this->validatePropertyMinLength('userId',1);
 		
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$kuser = kuserPeer::getKuserByPartnerAndUid ($partnerId , $this->userId );
 		if($kuser)
 		{
@@ -220,6 +236,14 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 		$category = categoryPeer::retrieveByPK($sourceObject->getCategoryId());
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $sourceObject->getCategoryId());
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userId);
+		if(isset($this->permissionLevel) && $this->permissionLevel != $sourceObject->getPermissionLevel() &&
+			$sourceObject->getPermissionLevel() == CategoryKuserPermissionLevel::NONE &&
+			$kuser->getType() == KuserType::APPLICATIVE_GROUP)
+		{
+			throw new KalturaAPIException(KalturaErrors::APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED);
+		}
 			
 		if ($this->permissionNames && $this->permissionNames != $sourceObject->getPermissionNames())
 		{
@@ -235,7 +259,9 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 		$currentKuserCategoryKuser = categoryKuserPeer::retrievePermittedKuserInCategory($sourceObject->getCategoryId(), kCurrentContext::getCurrentKsKuserId());
 		if(kEntitlementUtils::getEntitlementEnforcement() && 
 		(!$currentKuserCategoryKuser || !$currentKuserCategoryKuser->hasPermission(PermissionName::CATEGORY_EDIT)))
+		{
 			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_CATEGORY_USER, $sourceObject->getCategoryId());
+		}
 			
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}

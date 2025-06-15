@@ -18,20 +18,8 @@ class CategoryUserService extends KalturaBaseService
 	{
 		$dbCategoryKuser = $categoryUser->toInsertableObject();
 		/* @var $dbCategoryKuser categoryKuser */
+		
 		$category = categoryPeer::retrieveByPK($categoryUser->categoryId);
-		if (!$category)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $categoryUser->categoryId);
-
-		$maxUserPerCategory=kConf::get('max_users_per_category');
-		if($category->getMembersCount() >= $maxUserPerCategory)
-			throw new KalturaAPIException(KalturaErrors::CATEGORY_MAX_USER_REACHED,$maxUserPerCategory);
-
-		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $categoryUser->userId);
-		if ($kuser->getType() == KuserType::APPLICATIVE_GROUP)
-		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY);
-		}
-
 		$lockKey = 'categoryUser_add_' . $categoryUser->categoryId . '_' . $categoryUser->userId;
 		$dbCategoryKuser = kLock::runLocked($lockKey, array($this, 'addCategoryUserImpl'), array($categoryUser, $dbCategoryKuser, $category));
 
@@ -117,7 +105,7 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function updateAction($categoryId, $userId, KalturaCategoryUser $categoryUser, $override = false)
 	{
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);
@@ -132,7 +120,6 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CANNOT_OVERRIDE_MANUAL_CHANGES);
 		
 		$dbCategoryKuser = $categoryUser->toUpdatableObject($dbCategoryKuser);
-				
 		$dbCategoryKuser->save();
 		
 		$categoryUser->fromObject($dbCategoryKuser, $this->getResponseProfile());
