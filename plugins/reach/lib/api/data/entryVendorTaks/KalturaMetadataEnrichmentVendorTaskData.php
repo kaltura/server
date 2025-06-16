@@ -23,19 +23,10 @@ class KalturaMetadataEnrichmentVendorTaskData extends KalturaLocalizedVendorTask
 	 */
 	public $instruction;
 
-	/**
-	 * Metadata enrichment result as JSON string.
-	 * For example: {"titles": ["The first title", "The second title"], "descriptions": ["The first description"], "tags": ["Tag1", "Tag2"]}
-	 *
-	 * @var string
-	 */
-	public $outputJson;
-
 	private static $map_between_objects = array
 	(
 		'detailLevel',
 		'instruction',
-		'outputJson',
 	);
 
 	public function getMapBetweenObjects()

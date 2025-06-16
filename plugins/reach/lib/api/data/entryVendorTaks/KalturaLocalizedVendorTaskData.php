@@ -14,8 +14,16 @@ class KalturaLocalizedVendorTaskData extends KalturaVendorTaskData
 	 */
 	public $outputLanguage;
 
+	/**
+	 * JSON string.
+	 *
+	 * @var string
+	 */
+	public $outputJson;
+
 	private static $map_between_objects = array(
 		'outputLanguage',
+		'outputJson',
 	);
 
 	public function getMapBetweenObjects()
