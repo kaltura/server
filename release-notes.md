@@ -6,13 +6,13 @@
 
 ### Configuration ###
     Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
-	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2024_12_12_add_kafka_schedule_event_events.template.xml
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_16_add_kafka_schedule_event_events.template.xml
 
     Make sure the following plugin is enabled in your plugins.ini file:
 	ScheduleEventNotifications
 
 ### Deployment scripts ###
-	php /opt/kaltura/app/deployment/updates/scripts/2024_12_12_add_schedule_event_events.php
+	php /opt/kaltura/app/deployment/updates/scripts/2025_06_16_add_schedule_event_events.php
 
 # Ursa-21.16.0
 
