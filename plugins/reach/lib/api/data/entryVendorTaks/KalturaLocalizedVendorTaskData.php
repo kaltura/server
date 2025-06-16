@@ -15,7 +15,7 @@ class KalturaLocalizedVendorTaskData extends KalturaVendorTaskData
 	public $outputLanguage;
 
 	/**
-	 * JSON string.
+	 * result as JSON string.
 	 *
 	 * @var string
 	 */
