@@ -40,7 +40,7 @@
             <template objectType="KalturaKafkaNotificationTemplate">
                 <name>Schedule Event Updated</name>
                 <systemName>KAFKA_SCHEDULE_EVENT_UPDATED</systemName>
-                <description>Kafka notification template to be sent when a new schedule event is updated</description>
+                <description>Kafka notification template to be sent when a schedule event is updated</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>3</eventType>
                 <!-- EventNotificationEventType::OBJECT_CHANGED -->
@@ -62,7 +62,7 @@
             <template objectType="KalturaKafkaNotificationTemplate">
                 <name>Schedule Event Deleted</name>
                 <systemName>KAFKA_SCHEDULE_EVENT_DELETED</systemName>
-                <description>Kafka notification template to be sent when a new schedule event is deleted</description>
+                <description>Kafka notification template to be sent when a schedule event is deleted</description>
                 <automaticDispatchEnabled>1</automaticDispatchEnabled>
                 <eventType>7</eventType>
                 <!-- EventNotificationEventType::OBJECT_DELETED -->
