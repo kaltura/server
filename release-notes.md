@@ -2,7 +2,7 @@
 
 ## Add kafka event notification for schedule event create/update/delete ##
 - Issue Type: Task
-- Issue ID: FOUN-1370
+- Issue ID: MCRSRV-281
 
 ### Configuration ###
     Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
