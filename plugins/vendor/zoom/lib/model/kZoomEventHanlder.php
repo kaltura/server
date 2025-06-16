@@ -135,26 +135,51 @@ class kZoomEventHanlder
 			return $zoomVendorIntegration->getCreateUserIfNotExist() ? $userId : $zoomVendorIntegration->getDefaultUserEMail();
 		}
 		$puserId = self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomClient);
-		$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-		if (!$user)
+
+		KalturaLog::debug('Finding Zoom user name: ' . $puserId);
+		switch ($zoomVendorIntegration->getUserSearchMethod())
 		{
-			$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
-			if (!$user)
+			case kZoomUsersSearchMethod::EMAIL:
 			{
-				if ($zoomVendorIntegration->getCreateUserIfNotExist())
+				KalturaLog::debug('Searching by email');
+				$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
+				break;
+			}
+			case kZoomUsersSearchMethod::ID:
+			{
+				KalturaLog::debug('Searching by puser_id');
+				$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+				break;
+			}
+			case kZoomUsersSearchMethod::ALL:
+			default:
+			{
+				KalturaLog::debug('Searching by both puser_id and email');
+				$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+				if (!$user)
 				{
-					$userId = $puserId;
+					$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
 				}
-				else if ($zoomVendorIntegration->getDefaultUserEMail())
+				else
 				{
-					$userId = $zoomVendorIntegration->getDefaultUserEMail();
+					$userId = $user->getPuserId();
 				}
+				break;
 			}
 		}
-		else
+
+		if (!$user)
 		{
-			$userId = $user->getPuserId();
+			if ($zoomVendorIntegration->getCreateUserIfNotExist())
+			{
+				$userId = $puserId;
+			}
+			else if ($zoomVendorIntegration->getDefaultUserEMail())
+			{
+				$userId = $zoomVendorIntegration->getDefaultUserEMail();
+			}
 		}
+
 		return $userId;
 	}
 	
