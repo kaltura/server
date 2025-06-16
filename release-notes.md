@@ -1,4 +1,21 @@
+# Ursa-21.18.0
+
+## Add kafka event notification for schedule event create/update/delete ##
+- Issue Type: Task
+- Issue ID: MCRSRV-281
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_16_add_kafka_schedule_event_events.template.xml
+
+    Make sure the following plugin is enabled in your plugins.ini file:
+	ScheduleEventNotifications
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_06_16_add_schedule_event_events.php
+
 # Ursa-21.16.0
+
 ## Add Kafka Event Notifications for Folders
 * Issue Type: Task
 * Issue ID: PLAT-25225
@@ -235,6 +252,7 @@ add kava_external_client_tags section to local.ini with:
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2024_10_31_add_ai_partner.php
 
 # Ursa-21.3.0
+
 ## Enable embed & social stream in EP ##
 * Issue Type: Task
 * Issue ID: PLAT-24999
