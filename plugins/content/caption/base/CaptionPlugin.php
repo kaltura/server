@@ -522,7 +522,18 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 				//retrieve the current working partner's captions according to the entryId,
 				//if the entry type is playlist return all the captions for the inner entries
+				//if the entry type is live return all webVTT captions
 				$entry = entryPeer::retrieveByPK($config->entryId);
+				if ($entry->getType() == entryType::LIVE_STREAM)
+				{
+					$liveCaptions = self::getLiveCaptionArray($entry->getEntryId(), $config->deliveryProfile);
+					if (count($liveCaptions))
+					{
+						$contributor->captions = $liveCaptions;
+						$contributors[] = $contributor;
+						return $contributors;
+					}
+				}
 				$c = new Criteria();
 				if ($entry->getType() == entryType::PLAYLIST)
 				{
@@ -565,7 +576,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					/* @var $captionAsset CaptionAsset */
 					$captionAssetObj = array();
 
-					if (($captionAsset->getContainerFormat() == CaptionType::WEBVTT) || $config->hasSequence || ($entry->getType() == entryType::PLAYLIST))
+					if ($config->hasSequence || ($entry->getType() == entryType::PLAYLIST))
 					{
 						// pass null as storageId in order to support any storage profile and not the one selected by the current video flavors
 						$url = $captionAsset->getExternalUrl(null);
@@ -644,6 +655,65 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		return $contributors;
 	}
 
+	protected static function getLiveCaptionArray($entryId, $deliveryProfile): array
+	{
+		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entryId);
+		if(!count($liveEntryServerNodes))
+		{
+			return array();
+		}
+
+		$webVTTStreams = self::getWebVTTStreams($liveEntryServerNodes[0]);
+		if(!count($webVTTStreams))
+		{
+			return array();
+		}
+
+		$liveCaptions = array();
+		$baseUrl = $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]);
+		$url = parse_url($baseUrl, PHP_URL_PATH);
+		$prefix = substr($baseUrl, 0, strpos($baseUrl, $url));
+		foreach ($webVTTStreams as $stream)
+		{
+			/* @var $stream kLiveStreamParams */
+			$streamLang = $stream->getLanguage() ?? 'Unknown';
+
+			$caption = [
+				'tokenizer'=> $deliveryProfile->getTokenizer(),
+				'urlPrefix'=> $prefix,
+				'url'=> $url . 'index-s' . $stream->getFlavorId() . '-t.m3u8',
+				'label'=> languageCodeManager::getFullLanguageNameFromThreeCode($streamLang),
+				'default'=> 'NO',
+				'language'=> $streamLang
+			];
+
+			$liveCaptions[] = $caption;
+		}
+		return $liveCaptions;
+	}
+
+	protected static function getWebVTTStreams($entryServerNode): array
+	{
+		$entryServerNodeStreams = $entryServerNode->getStreams();
+		if(!count($entryServerNodeStreams))
+		{
+			KalturaLog::info("entry server node does not have streams");
+			return array();
+		}
+		$webVTTStreams = array();
+
+		foreach($entryServerNodeStreams as $stream)
+		{
+		    /* @var $stream kLiveStreamParams */
+		    if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
+			{
+				KalturaLog::info("Stream has a webvtt codec - flavorId " . print_r($stream->getFlavorId(), true));
+				$webVTTStreams[] = $stream;
+			}
+		}
+		return $webVTTStreams;
+	}
+
 	public function contributeToPlaybackContextDataResult(entry $entry, kPlaybackContextDataParams $entryPlayingDataParams, kPlaybackContextDataResult $result, kContextDataHelper $contextDataHelper)
 	{
 		if ($entryPlayingDataParams->getType() == self::getPluginName())
@@ -671,7 +741,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				try
 				{
 
-					$url = $assetDb->getDownloadUrl(true, false, null, null, false);
+					$url = $assetDb->getDownloadUrl(true, false, null, null, true);
 					if ($url)
 					{
 						$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentIndex/-1/version/' . $assetDb->getVersion() . '/captions.vtt';

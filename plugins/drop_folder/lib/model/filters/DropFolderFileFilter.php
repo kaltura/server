@@ -10,6 +10,7 @@ class DropFolderFileFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id",
 			"_in_id",
+			"_gte_id",
 			"_eq_partner_id",
 			"_in_partner_id",
 			"_eq_entry_id",

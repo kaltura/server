@@ -93,6 +93,11 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	public $allowResubmission = false;
 
 	/**
+	 * @var bool
+	 */
+	public $payPerUse = false;
+
+	/**
 	 * @var string
 	 */
 	public $vendorData;
@@ -127,6 +132,16 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 	 */
 	public $partnerId;
 
+	/**
+	 * @var int
+	 */
+	public $defaultReachProfileId;
+	
+	/**
+	 * @var string
+	 */
+	public $adminTagsToExclude;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -142,6 +157,7 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'pricing',
 		'engineType',
 		'allowResubmission',
+		'payPerUse',
 		'sourceLanguage',
 		'vendorData',
 		'stage',
@@ -149,6 +165,8 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
 		'contract',
 		'createdBy',
 		'notes',
+		'adminTagsToExclude',
+		'defaultReachProfileId'
 	);
 
 	abstract protected function getServiceFeature();
@@ -245,66 +263,17 @@ abstract class KalturaVendorCatalogItem extends KalturaObject implements IRelate
  	 */
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$object = null;
+		$object = new KalturaVendorCaptionsCatalogItem();
 		switch ($sourceObject->getServiceFeature())
 		{
-			case VendorServiceFeature::CAPTIONS:
-				$object = new KalturaVendorCaptionsCatalogItem();
-				break;
-
-			case VendorServiceFeature::TRANSLATION:
-				$object = new KalturaVendorTranslationCatalogItem();
-				break;
-
-			case VendorServiceFeature::ALIGNMENT:
-				$object = new KalturaVendorAlignmentCatalogItem();
-				break;
-
-			case VendorServiceFeature::AUDIO_DESCRIPTION:
-				$object = new KalturaVendorAudioDescriptionCatalogItem();
-				break;
-
-			case VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
-				$object = new KalturaVendorExtendedAudioDescriptionCatalogItem();
-				break;
-
-			case VendorServiceFeature::CHAPTERING:
-				$object = new KalturaVendorChapteringCatalogItem();
-				break;
-
-			case VendorServiceFeature::DUBBING:
-				$object = new KalturaVendorDubbingCatalogItem();
-				break;
-
-			case VendorServiceFeature::INTELLIGENT_TAGGING:
-				$object = new KalturaVendorIntelligentTaggingCatalogItem();
-				break;
-
-			case VendorServiceFeature::LIVE_CAPTION:
-				$object = new KalturaVendorLiveCaptionCatalogItem();
-				break;
-
-			case VendorServiceFeature::CLIPS:
-				$object = new KalturaVendorClipsCatalogItem();
-				break;
-
-			case VendorServiceFeature::LIVE_TRANSLATION:
-				$object = new KalturaVendorLiveTranslationCatalogItem();
-				break;
-        
-			case VendorServiceFeature::QUIZ:
-				$object = new KalturaVendorQuizCatalogItem();
-        break;
-
 			default:
-				$object = new KalturaVendorCaptionsCatalogItem();
-				break;
+				$catalogItemName = ReachPlugin::getCatalogItemName($sourceObject->getServiceFeature());
+				if($catalogItemName != "KalturaVendorCatalogItem")
+				{
+					$object = new $catalogItemName();
+				}
 		}
 
-		if (!$object)
-			return null;
-
-		/* @var $object KalturaVendorCatalogItem */
 		$object->fromObject($sourceObject, $responseProfile);
 		return $object;
 	}

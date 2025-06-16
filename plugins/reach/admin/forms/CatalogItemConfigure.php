@@ -115,6 +115,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$targetLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN);
 			$this->addElement($targetLanguage);
 		}
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE)
+		{
+			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage'));
+			$targetLanguage->setLabel('Target Language:');
+			$targetLanguage->setRequired(true);
+			$targetLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_ASL);
+			$this->addElement($targetLanguage);
+		}
 		
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)
 		{
@@ -123,6 +132,30 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$requireSource->setRequired(true);
 			$requireSource->setValue(Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE);
 			$this->addElement($requireSource);
+		}
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS)
+		{
+			$videoAnalysisType = new Kaltura_Form_Element_EnumSelect('videoAnalysisType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorVideoAnalysisType'));
+			$videoAnalysisType->setLabel('Analysis Type:');
+			$videoAnalysisType->setRequired(true);
+			$videoAnalysisType->setValue(Kaltura_Client_Reach_Enum_VendorVideoAnalysisType::OCR);
+			$this->addElement($videoAnalysisType);
+
+			$this->addElement('text', 'maxVideoDuration', array(
+				'label' => 'Max Video Duration Limit (sec):',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+			));
+		}
+
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::DOCUMENT_ENRICHMENT)
+		{
+			$documentEnrichmentType = new Kaltura_Form_Element_EnumSelect('documentEnrichmentType', array('enum' => 'Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType'));
+			$documentEnrichmentType->setLabel('Document Enrichment Type:');
+			$documentEnrichmentType->setRequired(true);
+			$documentEnrichmentType->setValue(Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType::MD_CONVERSION);
+			$this->addElement($documentEnrichmentType);
 		}
 		
 		$audioCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION,
@@ -146,7 +179,8 @@ class Form_CatalogItemConfigure extends ConfigureForm
 		}
 		
 		if (($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION) &&
-			($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING))
+			($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING) &&
+			($this->catalogItemType != Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE))
 		{
 			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat', array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat'), array( null => "PartnerDefault"));
 			$outputFormat->setLabel('Output Format:');
@@ -171,6 +205,15 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$this->addElement($outputFormat);
 		}
 
+		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE)
+		{
+			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat',
+																array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat'));
+			$outputFormat->setLabel('Output Format(Aspect ratio):');
+			$outputFormat->setValue(Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_16_9);
+			$this->addElement($outputFormat);
+		}
+
 		$allowResubmission = new Kaltura_Form_Element_EnumSelect('allowResubmission', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$allowResubmission->setLabel('Allow Resubmission:');
@@ -189,6 +232,18 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			'filters' => array('StringTrim'),
 			'placement' => 'prepend',
 		));
+		
+		$this->addElement('text', 'adminTagsToExclude', array(
+			'label'	  => 'Admin tags to exclude:',
+			'filters' => array('StringTrim'),
+			'placement' => 'prepend',
+		));
+
+		$payPerUse = new Kaltura_Form_Element_EnumSelect('payPerUse', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
+			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
+		$payPerUse->setLabel('Pay Per Use:');
+		$payPerUse->setValue(Kaltura_Client_Enum_NullableBoolean::FALSE_VALUE);
+		$this->addElement($payPerUse);
 
 		$liveCatalogItemTypesArray = array(Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION, Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION);
 		if (in_array($this->catalogItemType, $liveCatalogItemTypesArray))
@@ -209,6 +264,20 @@ class Form_CatalogItemConfigure extends ConfigureForm
 
 			$this->addElement('text', 'minimalOrderTime', array(
 				'label' => 'Minimal Order Time:',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'readonly' => $this->disableAttributes,
+			));
+
+			$this->addElement('text', 'startTimeBuffer', array(
+				'label' => 'Start Time Buffer (seconds):',
+				'filters' => array('StringTrim'),
+				'placement' => 'prepend',
+				'readonly' => $this->disableAttributes,
+			));
+
+			$this->addElement('text', 'endTimeBuffer', array(
+				'label' => 'End Time Buffer (seconds):',
 				'filters' => array('StringTrim'),
 				'placement' => 'prepend',
 				'readonly' => $this->disableAttributes,

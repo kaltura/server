@@ -21,6 +21,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		{
 			/* @var $notificationTemplate EventNotificationTemplate */
 			$scope = $event->getScope();
+			$this->setPartnerIdInScope($scope, $event);
 			$notificationTemplate->dispatch($scope);
 		}
 		return true;
@@ -90,18 +91,36 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		return get_class($object);
 	}
 
+	protected function setPartnerIdInScope(&$scope, $event)
+	{
+		if (!$scope->getPartnerId())
+		{
+			$object = $event->getObject();
+			$partnerId = $object->getLastLoginPartnerId() ?: $object->getConfigPartnerId();
+			if ($partnerId)
+			{
+				$scope->setPartnerId($partnerId);
+			}
+		}
+	}
+
 	/**
 	 * Events that are excluded from isAllowedPartner are defined here,
 	 * specific event that needs to be activated regardless of partner affiliation
 	 * @param KalturaEvent $event
 	 * @return bool is new Partner Object
 	 */
-	protected function fireEventWithoutPartnerCheck($event, $partnerId)
+	protected function fireEventWithoutPartnerCheck($event, &$scope, $partnerId)
 	{
 		/** event kObjectAddedEvent with partner object -> create new partner  */
 		if($event instanceof kObjectAddedEvent && $event->getObject() instanceof Partner &&  $partnerId > 0)
 			return true;
 
+		if ($event instanceof kObjectChangedEvent && $event->getObject() instanceof UserLoginData && in_array('user_login_data.LOGIN_BLOCKED_UNTIL', $event->getModifiedColumns()))
+		{
+			$this->setPartnerIdInScope($scope, $event);
+			return true;
+		}
 		return false;
 	}
 
@@ -155,7 +174,7 @@ class kEventNotificationFlowManager implements kGenericEventConsumer
 		$partnerId = $scope->getPartnerId();
 		$ksPartnerId = kCurrentContext::$ks_partner_id;
 
-		$fireEventWithoutPartnerCheck = $this->fireEventWithoutPartnerCheck($event, $partnerId);
+		$fireEventWithoutPartnerCheck = $this->fireEventWithoutPartnerCheck($event, $scope, $partnerId);
 		if (!$fireEventWithoutPartnerCheck)
 		{
 			if ( (($ksPartnerId && $ksPartnerId == Partner::MEDIA_SERVER_PARTNER_ID) || $partnerId <= 0 ||

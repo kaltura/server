@@ -12,6 +12,11 @@ class KalturaReportExportParams extends KalturaObject
 	public $recipientEmail;
 
 	/**
+	 * @var string
+	 */
+	public $recipientName;
+
+	/**
 	 * Time zone offset in minutes (between client to UTC)
 	 * @var int
 	 */
@@ -35,6 +40,7 @@ class KalturaReportExportParams extends KalturaObject
 	private static $map_between_objects = array
 	(
 		"recipientEmail",
+		"recipientName",
 		"reportItems",
 		"reportsItemsGroup",
 		"baseUrl"

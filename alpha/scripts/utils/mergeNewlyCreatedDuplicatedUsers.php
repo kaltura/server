@@ -1,6 +1,8 @@
 <?php
-if ($argc < 3){
-	die ($argv[0]. " <last_run_file_path> <sent_to> <dryrun>.\n");
+
+if ($argc < 3)
+{
+	die ("$argv[0] <last_run_file_path> <sent_to> <dryrun>");
 }
 
 require_once(__DIR__ . '/../bootstrap.php');
@@ -10,6 +12,7 @@ define('MAX_RECORDS', 100);
 define('K1_KUSER', 'k1');
 define('K2_KUSER', 'k2');
 define ('MAX_USERS_TO_HANDLE', 10000);
+define('DEFAULT_PROM_FILE', '/etc/node_exporter/data/mergeNewlyCreatedDuplicatedUsers.prom');
 
 try
 {
@@ -31,12 +34,15 @@ try
 	}
 
 	mergeNewDuplicatedUsers($lastRunFilePath);
+	writeSuccess();
 
 	flock($fp, LOCK_UN);
 }
 catch(Exception $e)
 {
 	KalturaLog::err($e);
+	writeFailure($e);
+	
 	if($address)
 	{
 		sendMail(array($address), "Error in mergeNewlyCreatedDuplicatedUsers.php script", $e, 'Kaltura');
@@ -239,5 +245,44 @@ function sendMail($toArray, $subject, $body, $sender = null)
 	{
 		KalturaLog::err( $e );
 		return false;
+	}
+}
+
+function writeSuccess($filePath = null): void
+{
+	$filePath = $filePath ?? DEFAULT_PROM_FILE;
+	createDirPath($filePath);
+	
+	$description = 'Successfully finished mergeNewlyCreatedDuplicatedUsers.php script';
+	$timestamp = time();
+	$date = date("Y-m-d H:i:s", $timestamp);
+	$hostname = gethostname();
+	$data = "merge_newly_created_duplicate_users{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", success=\"true\"} $timestamp".PHP_EOL;
+
+	file_put_contents($filePath, $data, LOCK_EX);
+}
+
+function writeFailure($e, $filePath = null): void
+{
+	$filePath = $filePath ?? DEFAULT_PROM_FILE;
+	createDirPath($filePath);
+
+	$description = 'Error in mergeNewlyCreatedDuplicatedUsers.php script';
+	$timestamp = time();
+	$date = date("Y-m-d H:i:s", $timestamp);
+	$message = $e->getMessage();
+	$code = $e->getCode();
+	$hostname = gethostname();
+	$data = "merge_newly_created_duplicate_users{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", success=\"false\", message=\"$message\", code=\"$code\"} $timestamp".PHP_EOL;
+
+	file_put_contents($filePath, $data, LOCK_EX);
+}
+
+function createDirPath($filePath): void
+{
+	$dirPath = dirname($filePath);
+	if (!is_dir($dirPath))
+	{
+		mkdir($dirPath, 0775, true);
 	}
 }

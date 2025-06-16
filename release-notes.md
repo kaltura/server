@@ -1,3 +1,239 @@
+# Ursa-21.16.0
+## Add Kafka Event Notifications for Folders
+* Issue Type: Task
+* Issue ID: PLAT-25225
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_entry_updated_notifications.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_update_kafka_kuser_notifications.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_05_07_add_kafka_groupuser_added_notifications.template.xml
+
+### Deployment scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_05_07_eventNotification_update_requiresPermissions_permission.php
+	php /opt/kaltura/app/deployment/updates/scripts/2025_05_07_deploy_kafka_folder_events.php
+
+## Add action replaceOutput to EntryVendorTask service 
+* Issue Type: Task
+* Issue ID: PLAT-25283
+### Deployment ###
+Add the following to admin.ini
+
+    php deployment/updates/scripts/add_permissions/2025_05_19_add_entryvendortask_replace_output.php
+
+# Ursa-21.15.0
+## Add Folders Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25228
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableFoldersCapabilities.enabled = true
+moduls.enableFoldersCapabilities.permissionType = 2
+moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
+moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
+moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add new firebase notifications ##
+* Issue Type: Task
+* Issue ID: PLAT-25184
+
+### Deployment ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+    deployment/updates/scripts/xml/notifications/2025_03_12_firebase_oauth2_notifications.template.xml
+
+Please note this file contains the token @FIREBASE_PROJECT_ID@, this should be replaced with the Project ID from your Firebase account.
+
+    php deployment/updates/scripts/2025_03_12_deploy_firebase_oauth2_notifications.php
+
+## Add channel member subscribed email notification template  ##
+* Issue Type: Task
+* Issue ID: SUP-37427
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name.
+
+	deployment/updates/scripts/xml/2025_03_17_addChannelMemberSubscribedEmailNotification.template.xml
+
+Run the php deployment script.
+
+	php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_channel_member_subscribed.php
+
+
+# Ursa-21.13.0
+## Update Subscriber added to channel email event notification template ##
+* Issue Type: Task
+* Issue ID: SUP-37427
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+
+     - deployment/updates/scripts/xml/2025_03_17_addSubscriberAddedToChannelEmailNotification.template.xml
+     - php deployment/updates/scripts/2025_03_17_deploy_add_email_event_notification_subscriber_added_to_channel.php
+
+Update script:
+
+     - deployment/updates/scripts/xml/2025_03_17_updateSubscriberAddedToChannelEmailNotification.template.xml
+     - php deployment/updates/scripts/2025_03_17_deploy_update_email_event_notification_subscriber_added_to_channel.php
+
+
+## X failed login attempts notification 
+- Issue Type: Task
+- Issue ID: PLAT-25095
+### Deployment scripts ###
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script
+
+    php deployment/updates/scripts/2025_03_05_deploy_add_email_event_notification_User_Blocked.php
+
+# Ursa-21.11.0
+## Add demoteAdmin action to User service ##
+* Issue Type: Task
+* Issue ID: PLAT-25145
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2025_03_03_user_demoteAdmin_permissions.php
+
+## S3 Drop Folder - add support for ARN Role (AWS Deployments only) ##
+- Issue Type: Task
+- Issue ID: VCP-19989
+### Configurations ###
+Add the following section to `runtime_config` map:
+* Replace AWS_ACCOUNT_ID with AWS account
+* Replace ROLE_NAME with AWS Role name
+```
+[s3_drop_folder]
+s3Arn = 'arn:aws:iam::AWS_ACCOUNT_ID:role/ROLE_NAME'
+```
+### Deployment ###
+On-Prem / All-In-One Only  
+Generate Clients (Replace @path_to_server@ with your path):
+- Build new clients:  
+  ``php @path_to_server@/generator/generate.php``
+- Clear Cache  
+  ``find @path_to_server@/cache -type cache -delete``
+- Restart Apache2  
+  ``service apache2 restart``
+
+### Enable ###
+1. The EC2 running `KAsyncDropFolderWatcherRemoteS3` & `KAsyncDropFolderContentProcessor` workers should allow the `s3Arn` role to be assumed
+2. The EC2 that batch is sending the api calls to (defined at `batch.ini` map `serviceUrl` param) should allow the `s3Arn` role to be assumed
+3. The `s3Arn` role policy should allow to Get, List and Delete from the destination bucket (or '*' for all buckets)
+4. The `s3Arn` ‘Maximum session duration’ must be set to 12 hours
+5. The S3 Bucket Policy should allow the `s3Arn` to operate it  
+The Bucket Policy should include the following:
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::AWS_ACCOUNT_ID:role/ROLE_NAME"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::BUCKET_NAME",
+                "arn:aws:s3:::BUCKET_NAME/*"
+            ]
+        }
+    ]
+}
+```
+6. In S3 Drop Folder (Kaltura Admin Console):  
+   6.1. Leave User & Password Empty  
+   6.2. Tick 'Bucket Policy Allows Access' checkbox
+
+# Ursa-21.10.0
+## Rsvp Plugin ##
+* Issue Type: Task
+* Issue ID: PLAT-25025
+
+### Configuration ###
+To enable this plugin add the following to your plugins.ini file:
+
+	- Rsvp
+
+### Deployment ###
+    php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+
+## Enable ScheduleEventNotificationPlugin
+- Issue Type: Task
+- Issue ID: PSVAMB-69071
+#### Deployment ####
+- Ensure existence of ```ScheduleEventNotifications``` in local plugins.ini configuration file
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/base/scripts/installPlugins.php
+
+## Add getAllChildJobs action to Batch service
+- Issue Type: Task
+- Issue ID: SUP-46309
+
+#### Deployment ####
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_02_03_update_batch_permissions.php
+
+# Ursa-21.9.0
+## Add option do disable generation of iCal files in new format
+* Issue Type: Task
+* Issue ID: SUP-46741
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.disableNewIcalStandard.enabled = true
+moduls.disableNewIcalStandard.permissionType = 2
+moduls.disableNewIcalStandard.label = "Disable new iCal standard"
+moduls.disableNewIcalStandard.permissionName = FEATURE_DISABLE_NEW_ICAL_STANDARD
+moduls.disableNewIcalStandard.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+## Add option to delay notifications ##
+* Issue Type: Task
+* Issue ID: PLAT-25045
+### Deployment script ### 
+    php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
+# Ursa-21.4.0
+## Kava - redirect external client tags to dedicated druid url ##
+- Issue Type: Story
+- Issue ID: AN-23399
+### configuration ###
+add kava_external_client_tags section to local.ini with:
+0 = @CLIENT_TAG@
+
+## Create KMS Restricted Role on partner 0 ##
+* Issue Type: Task
+* Issue ID: PLAT-25018
+
+### Deployment ###
+    php deployment/updates/scripts/add_permissions/2024_11_13_create_kms_restricted_role.php
+
+## Add partner for AI framework ##
+
+* Issue Type: Task
+* Issue ID: FOUN
+
+### Configuration ###
+	Replace all tokens from the ini file (under connectors-framework section) and remove".template" from the file name: 
+	/opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2024_10_31_add_ai_partner.php
+
 # Ursa-21.3.0
 
 ## Add kafka event notification for schedule event create/update/delete ##

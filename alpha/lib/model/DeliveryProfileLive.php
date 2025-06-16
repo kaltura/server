@@ -117,42 +117,17 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$this->initManualLiveStreamConfiguration($entry);
 			return;
 		}
-		$status = array(EntryServerNodeStatus::PLAYABLE);
-		if($this->getDynamicAttributes()->getServeVodFromLive())
-			$status[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
 
 		$entryId = $this->getDynamicAttributes()->getEntryId();
-		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $status);
+		$liveEntryServerNodes = $this->getSortedLiveEntryServerNodes($entryId);
 		if(!count($liveEntryServerNodes))
 			return;
-
-		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
-		$dcInMaintenance = $this->getIsMaintenanceFromCache($entryId);
-		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
-		$liveEntryServerNodes = $this->filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance);
-		if (empty($liveEntryServerNodes))
-			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
-
-		//sort the entryServerNode array by weight from the heaviest to lowest
-		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
-		
 		$liveEntryServerNode = array_shift($liveEntryServerNodes); // after sort first is the primary
 		
 		// If min/max bitrate was requested, add the constraint to the array of flavorParamsIds in the profile's attributes.
 		
 		$streams = $liveEntryServerNode->getStreams();
 		$this->sanitizeAndFilterStreamIdsByBitrate($streams);
-
-		foreach($streams as $stream)
-		{
-			if ($stream->getCodec() == flavorParams::SUBTITLE_CODEC_WEBVTT)
-			{
-				KalturaLog::debug("Stream has live caption - redirecting to live packager");
-				$this->shouldRedirect = true;
-				$this->getDynamicAttributes()->setFlavorParamIds(array());
-				break;
-			}
-		}
 
 		$this->liveStreamConfig->setUrl($this->getHttpUrl($liveEntryServerNode));
 		$this->liveStreamConfig->setPrimaryStreamInfo($liveEntryServerNode->getStreams());
@@ -167,6 +142,33 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			$this->liveStreamConfig->setBackupUrl($this->getHttpUrl($liveEntryServerNode));
 			$this->liveStreamConfig->setBackupStreamInfo($liveEntryServerNode->getStreams());
 		}
+	}
+
+	public function getSortedLiveEntryServerNodes($entryId): array
+	{
+		$statuses = array(EntryServerNodeStatus::PLAYABLE);
+		$dynamicAttributes = $this->getDynamicAttributes();
+		if($dynamicAttributes && $dynamicAttributes->getServeVodFromLive())
+			$statuses[] = EntryServerNodeStatus::MARKED_FOR_DELETION;
+
+		$liveEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entryId, $statuses);
+		if(!count($liveEntryServerNodes))
+		{
+			return array();
+		}
+
+		$requestedServerType = $this->getDynamicAttributes()->getStreamType();
+		$dcInMaintenance = $this->getIsMaintenanceFromCache($entryId);
+		KalturaLog::debug("Having requested-Server-Type of [$requestedServerType] and DC in maintenance of [$dcInMaintenance]");
+		$liveEntryServerNodes = $this->filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance);
+		if (empty($liveEntryServerNodes))
+		{
+			KExternalErrors::dieError(KExternalErrors::ENTRY_NOT_LIVE, "Entry [$entryId] is not broadcasting on stream type [$requestedServerType]");
+		}
+
+		//sort the entryServerNode array by weight from the heaviest to lowest
+		usort($liveEntryServerNodes, function ($a, $b) {return $b->weight - $a->weight;});
+		return $liveEntryServerNodes;
 	}
 
 	private function filterAndSet($liveEntryServerNodes, $requestedServerType, $dcInMaintenance)
@@ -502,6 +504,11 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		$entry = $this->getDynamicAttributes()->getEntry();
 		/* @var $entry LiveEntry */
 		return in_array($entry->getSource(), array(EntrySourceType::MANUAL_LIVE_STREAM, EntrySourceType::AKAMAI_UNIVERSAL_LIVE));
+	}
+
+	public function getPackagerUrl( $entryServerNode ): string
+	{
+		return $this->getLivePackagerUrl($entryServerNode);
 	}
 
 }

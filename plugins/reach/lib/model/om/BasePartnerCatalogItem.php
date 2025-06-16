@@ -10,7 +10,6 @@
  */
 abstract class BasePartnerCatalogItem extends BaseObject  implements Persistent {
 
-
 	/**
 	 * The Peer class.
 	 * Instance provides a convenient way of calling static methods on a class

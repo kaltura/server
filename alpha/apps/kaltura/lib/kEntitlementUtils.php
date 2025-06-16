@@ -257,7 +257,7 @@ class kEntitlementUtils
 			if($kuserId)
 			{
 				// get the groups that the user belongs to in case she is not associated to the category directly
-				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId);
+				$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuserId, false);
 				$kgroupIds[] = $kuserId;
 				$membersCrit = $c->getNewCriterion ( categoryPeer::MEMBERS , $kgroupIds, KalturaCriteria::IN_LIKE);
 				$membersCrit->addOr($crit);
@@ -527,7 +527,7 @@ class kEntitlementUtils
 		$privacyContexts[] = self::ENTRY_PRIVACY_CONTEXT;
 
 		// get the groups that the user belongs to in case she is not associated to the category directly
-		$kuserIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId(kCurrentContext::getCurrentKsKuserId());
+		$kuserIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId(kCurrentContext::getCurrentKsKuserId(), false);
 		$kuserIds[] = kCurrentContext::getCurrentKsKuserId();
 		foreach ($privacyContexts as $privacyContext){
 			foreach ( $kuserIds as $kuserId){
@@ -628,6 +628,12 @@ class kEntitlementUtils
 		$categoryEntry = categoryEntryPeer::retrieveOneActiveByEntryId($entry->getId());
 		if (!$categoryEntry)
 		{
+			if (PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NO_CATEGORY_ENTRY_ENTITLEMENT_CHECK, kCurrentContext::getCurrentPartnerId())
+				&& self::entryHasAccessControlRules($entry))
+			{
+				KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] not entitled: entry does not belong to any category - blocked by configuration');
+				return false;
+			}
 			KalturaLog::info('Entry [' . print_r($entry->getId(), true) . '] entitled: entry does not belong to any category');
 			return true;
 		}
@@ -664,5 +670,26 @@ class kEntitlementUtils
 		}
 
 		return self::isMemberOfCategory($allCategoriesEntry, $entry, $partner, $kuserId, $ks, $ksPrivacyContexts);
+	}
+
+	protected static function entryHasAccessControlRules(entry $entry)
+	{
+		$accessControlId = $entry->getAccessControlId();
+		if (!$accessControlId)
+		{
+			return false;
+		}
+		$accessControl = accessControlPeer::retrieveByPK($accessControlId);
+		if (!$accessControl)
+		{
+			return false;
+		}
+
+		if ($accessControl->getRules())
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

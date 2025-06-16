@@ -13,6 +13,18 @@
  * @package plugins.reach
  * @subpackage model
  */
-class PartnerCatalogItem extends BasePartnerCatalogItem {
+class PartnerCatalogItem extends BasePartnerCatalogItem
+{
+	const DEFAULT_REACH_PROFILE_ID = "defaultReachProfileId";
+
+	public function setDefaultReachProfileId($value)
+	{
+		$this->putInCustomData(self::DEFAULT_REACH_PROFILE_ID, $value);
+	}
+
+	public function getDefaultReachProfileId()
+	{
+		return $this->getFromCustomData(self::DEFAULT_REACH_PROFILE_ID);
+	}
 
 } // PartnerCatalogItem

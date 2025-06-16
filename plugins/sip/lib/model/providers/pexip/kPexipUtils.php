@@ -509,7 +509,7 @@ class kPexipUtils
 	 */
 	protected static function getVirtualRoomId($url, $headerData)
 	{
-		$locationPattern = "(?<=Location: $url)(.*)(?=/)";
+		$locationPattern = "(?<=[Ll]ocation: $url)(.*)(?=/)";
 		$locationPattern = str_replace('/', '\/', $locationPattern);
 		foreach ($headerData as $part)
 		{

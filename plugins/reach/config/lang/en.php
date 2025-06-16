@@ -1,19 +1,13 @@
 <?php
-return array(
 
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS' => 'CAPTIONS',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION' => 'TRANSLATION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT' => 'ALIGNMENT',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION' => 'AUDIO_DESCRIPTION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION' => 'EXTENDED_AUDIO_DESCRIPTION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS' => 'CLIPS',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING' => 'CHAPTERING',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING' => 'DUBBING',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING' => 'INTELLIGENT_TAGGING',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION' => 'LIVE_CAPTION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION' => 'LIVE_TRANSLATION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ' => 'QUIZ',
+$serviceFeatureNames = ReachPlugin::getServiceFeatureNames();
+$englishServiceNames = array();
+foreach ($serviceFeatureNames as $serviceFeatureName)
+{
+	$englishServiceNames["Kaltura_Client_Reach_Enum_VendorServiceFeature::$serviceFeatureName"] = $serviceFeatureName;
+}
 
+$englishArray = array(
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',
 
@@ -43,6 +37,9 @@ return array(
 	'Kaltura_Client_Enum_NullableBoolean::NULL_VALUE' => "NULL VALUE",
 	'Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE' => "TRUE",
 
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_16_9' => "16:9",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_4_3' => "4:3",
+
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::VTT' => "VTT",
@@ -58,6 +55,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_HOUR' => "Price Per Hour",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE' => "Price Per Minute",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_SECOND' => "Price Per Second",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_TOKEN' => "Price Per Token",
 
 	'Kaltura_Client_Reach_Enum_ReachProfileType::FREE_TRIAL' => "Free Trial",
 	'Kaltura_Client_Reach_Enum_ReachProfileType::PAID' => "Paid",
@@ -147,7 +145,36 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SL' => "Slovenian",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TE' => "Telugu",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::UG' => "Uyghur",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_AU' => "English (Australian)",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AZ' => "Azerbaijani",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::BN' => "Bengali",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::MY' => "Burmese",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::BS' => "Bosnian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::KA' => "Georgian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::GU' => "Gujarati",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::JV' => "Javanese",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::KN' => "Kannada",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::KK' => "Kazakh",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::KM' => "Khmer",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::LO' => "Lao",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::MK' => "Macedonian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::NE' => "Nepali",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::FA_IR' => "Persian (Iran)",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::PA' => "Punjabi",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SR' => "Serbian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SI' => "Sinhala",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SK_SK' => "Slovakian",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SU' => "Sudanese",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::SW' => "Swahili",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::TL' => "Tagalog (Filipino)",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::UZ' => "Uzbek",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::XH' => "Xhosa",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_CN' => "Simplified Chinese",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_HK' => "Traditional Chinese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AUTO_DETECT' => "Auto Detect",
+
+	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_ASL' => "English (ASL)",
+	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_BSL' => "English (BSL)",
 
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',
@@ -161,4 +188,10 @@ return array(
 
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStage::PRODUCTION' => 'Production',
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStage::QA' => 'QA',
+
+	'Kaltura_Client_Reach_Enum_VendorVideoAnalysisType::OCR' => 'OCR',
+	'Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType::MD_CONVERSION' => 'Markdown Conversion',
 );
+
+
+return array_merge($englishServiceNames, $englishArray);

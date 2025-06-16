@@ -99,7 +99,19 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 * @readonly
 	 */
 	public $userId;
-	
+
+	/**
+	 * @var KalturaEntryObjectType
+	 * @filter eq,in,notin
+	 * @insertonly
+	 */
+	public $entryObjectType;
+
+	/**
+	 * @var int
+	 */
+	public $unitsUsed;
+
 	/**
 	 * The user ID that approved this task for execution (in case moderation is requested)
 	 * @var string
@@ -226,6 +238,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'catalogItemId',
 		'price',
 		'userId',
+		'entryObjectType',
+		'unitsUsed',
 		'moderatingUser',
 		'errDescription',
 		'accessKey',
@@ -277,14 +291,46 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		
 		return $object_to_fill;
 	}
+
+	/* (non-PHPdoc)
+  * @see KalturaObject::toUpdatableObject()
+  */
+	public function toUpdatableObject($object_to_fill, $props_to_skip = array())
+	{
+		$object_to_fill = parent::toUpdatableObject($object_to_fill, $props_to_skip);
+
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($object_to_fill->getCatalogItemId());
+		$payPerUsePrice = kReachUtils::getPayPerUsePrice($this, $object_to_fill, $dbVendorCatalogItem);
+		if(is_numeric($payPerUsePrice))
+		{
+			$object_to_fill->setPrice($payPerUsePrice);
+		}
+
+		return $object_to_fill;
+	}
+
+	public function getValidateForInsertReachProfile($partnerCatalogItem)
+	{
+		if($this->isNull("reachProfileId"))
+		{
+			$this->reachProfileId = $partnerCatalogItem->getDefaultReachProfileId();
+		}
+		$this->validatePropertyNotNull("reachProfileId");
+		$dbReachProfile = ReachProfilePeer::retrieveActiveByPk($this->reachProfileId);
+		if (!$dbReachProfile)
+		{
+			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $this->reachProfileId);
+		}
+		return $dbReachProfile;
+	}
 	
 	public function validateForInsert($propertiesToSkip = array())
 	{
-		$this->validatePropertyNotNull("reachProfileId");
 		$this->validatePropertyNotNull("catalogItemId");
 		$this->validatePropertyNotNull("entryId");
-		$this->validateEntryId();
-		
+
+		$this->validateEntryObjectId();
+
 		if(!kString::checkIsValidJson($this->partnerData))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::PARTNER_DATA_NOT_VALID_JSON_STRING);
@@ -310,9 +356,17 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		);
 		
 		/* @var $sourceObject EntryVendorTask */
-		if($this->status && $this->status != $sourceObject->getStatus() && in_array($sourceObject->getStatus(), $closedStatuses))
+		if(in_array($sourceObject->getStatus(), $closedStatuses))
 		{
-			throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getStatus(), $this->status);
+			if($this->status && $this->status != $sourceObject->getStatus())
+			{
+				throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_STATUS_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getStatus(), $this->status);
+			}
+
+			if($this->unitsUsed)
+			{
+				throw new KalturaAPIException(KalturaReachErrors::CANNOT_UPDATE_UNIT_USED_OF_TASK_WHICH_IS_IN_FINAL_STATE, $sourceObject->getId(), $sourceObject->getUnitsUsed(), $this->unitsUsed);
+			}
 		}
 		
 		if(!kString::checkIsValidJson($this->partnerData))
@@ -326,6 +380,24 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		}
 		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+
+	protected function validateEntryObjectId()
+	{
+		if(!$this->entryObjectType)
+		{
+			$this->entryObjectType = KalturaEntryObjectType::ENTRY;
+		}
+
+		switch ($this->entryObjectType)
+		{
+			case KalturaEntryObjectType::ENTRY:
+				$this->validateEntryId();
+				return;
+
+			default:
+				throw new KalturaAPIException(KalturaReachErrors::ENTRY_OBJECT_TYPE_NOT_SUPPORTED, $this->entryObjectType);
+		}
 	}
 	
 	private function validateEntryId()
@@ -364,21 +436,18 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $this->catalogItemId);
 		}
 
-		$featureToDataMap = array(VendorServiceFeature::LIVE_CAPTION => 'KalturaScheduledVendorTaskData');
+		$forceDataFeatureType = [];
 		$featureType = $vendorCatalogItem->getServiceFeature();
 
-		if (key_exists($featureType, $featureToDataMap))
+		if (in_array($featureType, $forceDataFeatureType))
 		{
 			$this->validatePropertyNotNull('taskJobData');
-			if (!$this->taskJobData instanceof $featureToDataMap[$featureType])
-			{
-				throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_AND_JOB_DATA_MISMATCH, get_class($vendorCatalogItem), get_class($this->taskJobData));
-			}
 		}
 
 		if (isset($this->taskJobData))
 		{
 			$this->taskJobData->validateCatalogLimitations($vendorCatalogItem);
+			// need to validate CATALOG_ITEM_AND_JOB_DATA_MISMATCH
 		}
 	}
 	

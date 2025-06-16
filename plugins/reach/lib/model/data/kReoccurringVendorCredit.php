@@ -65,7 +65,14 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 		$syncedCredit = parent::syncCredit($reachProfileId, $partnerId);
 		if ($this->getLastSyncTime() > $this->periodEndDate)
 		{
-			$syncedCredit = 0;
+			$dbReachProfile = ReachProfilePeer::retrieveActiveByPk($reachProfileId);
+			if (!$dbReachProfile)
+			{
+				throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $reachProfileId);
+			}
+			$allowedCredit = $dbReachProfile->getCredit()->getCurrentCredit(true, false);
+			// in pay per use, if used credit exceeded the allowed credit, move the excess to next cycle
+			$syncedCredit = $allowedCredit - $syncedCredit < 0 ? -1 * ($allowedCredit - $syncedCredit) : 0;
 			$this->calculateNextPeriodDates( $this->periodEndDate, $this->getLastSyncTime());
 			$this->setSyncedCredit($syncedCredit);
 			$this->overageCredit = $this->initialOverageCredit;
@@ -111,10 +118,10 @@ class kReoccurringVendorCredit extends kTimeRangeVendorCredit
 	 * @param $date
 	 * @return int
 	 */
-	public function getCurrentCredit($includeOverages = true)
+	public function getCurrentCredit($includeOverages = true, $validateActive = true)
 	{
 		$now = time();
-		if ($now < $this->periodStartDate || $now > $this->periodEndDate)
+		if ($validateActive && ($now < $this->periodStartDate || $now > $this->periodEndDate))
 		{
 			KalturaLog::debug("Current date [$now] is not in credit time range  [from - $this->periodStartDate , to - $this->periodEndDate] ");
 			return 0;

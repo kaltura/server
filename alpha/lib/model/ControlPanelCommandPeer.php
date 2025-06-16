@@ -10,10 +10,10 @@
  */ 
 class ControlPanelCommandPeer extends BaseControlPanelCommandPeer
 {
-	public static function deleteBySchedulerConfigId($schedulerId)
+	public static function deleteBySchedulerConfigId($schedulerConfiguredId)
 	{
 		$criteria = new Criteria();
-		$criteria->add(ControlPanelCommandPeer::SCHEDULER_CONFIGURED_ID, $schedulerId);
+		$criteria->add(ControlPanelCommandPeer::SCHEDULER_CONFIGURED_ID, $schedulerConfiguredId);
 
 		ControlPanelCommandPeer::doDelete($criteria);
 	}

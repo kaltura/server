@@ -43,6 +43,14 @@ abstract class EntryScheduleEvent extends ScheduleEvent
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ENTRY_IDS);
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getEntryId()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_TEMPLATE_ENTRY_ID);
+	}
 	
 	/**
 	 * @param string $v

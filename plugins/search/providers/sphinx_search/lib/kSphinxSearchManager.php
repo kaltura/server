@@ -127,8 +127,10 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function shouldConsumeUpdatedEvent(BaseObject $object)
 	{
-		if($object instanceof IIndexable)
+		if ($object instanceof IIndexable)
+		{
 			return true;
+		}
 			
 		return false;
 	}
@@ -138,8 +140,10 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
     public function shouldConsumeReadyForIndexEvent(BaseObject $object)
 	{
-		if($object instanceof IIndexable)
+		if ($object instanceof IIndexable)
+		{
 			return true;
+		}
 			
 		return false;
 	}
@@ -168,8 +172,10 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if($object instanceof IIndexable)
+		if ($object instanceof IIndexable)
+		{
 			return true;
+		}
 		
 		return false;
 	}
@@ -506,7 +512,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$indexSplitFactor = array_count_values($tableNames);
 			if($indexSplitFactor[$indexName] > 1)
 			{
-				$indexId = intval($object->getPartnerId()/10)%$indexSplitFactor[$indexName];
+				$indexId = abs(intval($object->getPartnerId()/10))%$indexSplitFactor[$indexName];
 				$splitIndexName = $indexName . '_' . $indexId;
 			}
 		}
@@ -624,7 +630,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
      */
     public function shouldConsumeErasedEvent (BaseObject $object)
     {
-		if($object instanceof IIndexable)
+		if ($object instanceof IIndexable)
 		{
 			return true;
 		}

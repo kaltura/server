@@ -20,7 +20,7 @@ class kUnlimitedVendorCredit extends kVendorCredit
 	 * @param bool $includeOverages
 	 * @return int
 	 */
-	public function getCurrentCredit($includeOverages = true)
+	public function getCurrentCredit($includeOverages = true, $validateActive = true)
 	{
 		return $this->credit;
 	}

@@ -19,21 +19,7 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 		8 => "PENDING_ENTRY_READY",
 		9 => "SCHEDULED",
 	);
-	
-	static private $serviceFeatureEnumTranslate = array(
-		1 => "CAPTIONS",
-		2 => "TRANSLATION",
-		3 => "ALIGNMENT",
-		4 => "AUDIO_DESCRIPTION",
-		5 => "CHAPTERING",
-		7 => "DUBBING",
-		9 => "EXTENDED_AUDIO_DESCRIPTION",
-		10 => "CLIPS",
-		11 => "LIVE_TRANSLATION",
-		12 => "QUIZ",
-		"N/A" => "N/A",
-	);
-	
+
 	static private $serviceTypeEnumTranslate = array(
 		1 => "HUMAN",
 		2 => "MACHINE",
@@ -218,16 +204,13 @@ class KExportEntryVendorTaskEngine extends KObjectExportEngine
 	
 	protected function translateEnumsToHumanReadable($enumName, $enumValue)
 	{
-		$mapName = $enumName . "EnumTranslate";
+		$enumMap = isset(self::${$enumName . "EnumTranslate"}) ? self::${$enumName . "EnumTranslate"} : null;
+		if(!$enumMap && $enumName == "serviceFeature")
+		{
+			$enumMap = array_merge(ReachPlugin::getServiceFeatureNames(), array("N/A" => "N/A"));
+		}
 		
-		if (!self::${$enumName . "EnumTranslate"})
-			return null;
-		
-		if (!isset(self::${$enumName . "EnumTranslate"}[$enumValue]))
-			return null;
-		
-		return self::${$enumName . "EnumTranslate"}[$enumValue];
-		
+		return isset($enumMap[$enumValue]) ? $enumMap[$enumValue] : null;
 	}
 	
 	protected function getCatalogItemDataById($id)

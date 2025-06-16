@@ -43,7 +43,7 @@ clonekshow					|			|2		|1	|1		|1		|1		|rw	|		|	|   |
 cloneroughcut				|			|2		|1	|1		|1		|1		|rw	|		|	|   |
 cloneuiconf					|			|2		|1	|0		|0		|1		|rw	|		|1	|   |app-studio
 collectstats				|			|1		|1	|0		|0		|1		|	|		|	|   |
-contactsalesforce			|			|0		|1	|0		|0		|1		|r	|		|	|	|kmc
+contactsalesforce			|			|2		|1	|0		|0		|1		|r	|		|	|	|kmc
 deletedataentry				|			|2		|1	|1		|0		|1		|	|		|	|   |
 deleteentry					|			|2		|1	|1		|0		|1		|	|		|	|   |
 deletekshow					|			|2		|1	|1		|0		|1		|	|		|	|   |

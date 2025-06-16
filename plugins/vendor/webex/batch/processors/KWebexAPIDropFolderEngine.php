@@ -48,7 +48,7 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 		while ($nextPageLink);
 		
 		$this->updateDropFolderLastFileTimestamp();
-		$this->handleDropFolderFiles();
+		$this->handleExistingDropFolderFiles(self::DEFAULT_WEBEX_QUERY_TIME_RANGE);
 		$this->findTranscriptsForExistingEntries();
 	}
 	
@@ -239,30 +239,6 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			$this->dropFolderPlugin->dropFolder->update($this->dropFolder->id, $updateDropFolder);
 			KalturaLog::debug("Last handled meeting time is: {$this->lastFileTimestamp}");
 		}
-	}
-	
-	protected function handleDropFolderFiles()
-	{
-		$pager = new KalturaFilterPager();
-		$pager->pageIndex = 0;
-		$pager->pageSize = 500;
-		if (KBatchBase::$taskConfig && KBatchBase::$taskConfig->params->pageSize)
-		{
-			$pager->pageSize = KBatchBase::$taskConfig->params->pageSize;
-		}
-		
-		$fromCreatedAt = time() - self::DEFAULT_WEBEX_QUERY_TIME_RANGE;
-		do
-		{
-			$pager->pageIndex++;
-			$dropFolderFiles = $this->loadDropFolderFilesByPage($pager, $fromCreatedAt);
-			foreach ($dropFolderFiles as $dropFolderFile)
-			{
-				KalturaLog::info("Handle drop folder file: {$dropFolderFile->fileName}");
-				$this->handleExistingDropFolderFile($dropFolderFile);
-			}
-			
-		} while (count($dropFolderFiles) >= $pager->pageSize);
 	}
 	
 	protected function handleExistingDropFolderFile(KalturaDropFolderFile $dropFolderFile)
@@ -568,7 +544,8 @@ class KWebexAPIDropFolderEngine extends KVendorDropFolderEngine
 			if (!isset($participantsList['items']))
 			{
 				KalturaLog::warning("Error getting meeting participants from Webex for meeting id [$meetingId], response: " . print_r($participantsList, true));
-				continue;
+				// When getting an empty list we should break the while loop as it won't do anything to continue and try again
+				break;
 			}
 			KalturaLog::info("Webex meeting id [$meetingId] has [" . count($participantsList['items']) . '] participants');
 			list($parsedCoHosts, $parsedUsers) = $this->parseAdditionalUsers($participantsList['items']);

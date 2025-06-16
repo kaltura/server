@@ -32,6 +32,16 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 	{
 		return $this->getFromCustomData("allowFairplayOffline", null, false);
 	}
+	
+	public function setSupportFmp4($v)
+	{
+		$this->putInCustomData("support_fmp4", $v);
+	}
+	
+	public function getSupportFmp4()
+	{
+		return $this->getFromCustomData("support_fmp4", null, false);
+	}
 
 	/**
 	 * @return array
@@ -57,14 +67,17 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		}
 
 		$parentFlavors = parent::buildHttpFlavorsArray();
-		$assetsRequireFMP4layback = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
-		if($assetsRequireFMP4layback)
+		
+		$dpSupportFmp4Playback = $this->getSupportFmp4();
+		$assetsRequireFMP4Playback = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
+		if($dpSupportFmp4Playback && $assetsRequireFMP4Playback)
 		{
 			foreach ($parentFlavors as &$parentFlavor)
 			{
 				$parentFlavor['url'] = "container/fmp4/" . $parentFlavor['url'];
 			}
 		}
+		
 		$mergedFlavors = array_merge($flavors, $parentFlavors);
 		return $mergedFlavors;
 

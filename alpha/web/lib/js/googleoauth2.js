@@ -19,14 +19,24 @@
 			$el.find('.error').text('');
 			var $email = $el.find('input[name=email]');
 			var $password = $el.find('input[name=password]');
+			var $otpLabel = $el.find('#otp-label');
+			var $otpInput = $otpLabel.find('input[name=otp]');
+			var isHidden = $otpLabel.hasClass('hidden');
 			$email.removeClass('invalid');
 			$password.removeClass('invalid');
+			if(!isHidden && $otpInput.hasClass('invalid') ) {
+				$otpInput.removeClass('invalid');
+			}
 			if (!$email.val()) {
 				$email.addClass('invalid');
 				return false;
 			}
 			if (!$password.val()) {
 				$password.addClass('invalid');
+				return false;
+			}
+			if (!isHidden && !$otpInput.val()) {
+				$otpInput.addClass('invalid');
 				return false;
 			}
 
@@ -44,6 +54,9 @@
 				    password: $password.val(),
 				    partnerId: partnerId
 				};
+				if ($otpInput.val()){
+					data.otp = $otpInput.val();
+				}
 				callApi(data, onLoginApiSuccess, onLoginApiError);
 			}
 			return false;
@@ -63,6 +76,10 @@
 		function onLoginApiSuccess(data) {
 			$('body').removeClass('wait');
 			if (data.code && data.message) {
+				if(data.code === "MISSING_OTP" && data.message === "OTP is missing"){
+					var $otp = $el.find('#otp-label');
+					$otp.removeClass('hidden');
+				}
 				$el.find('.error').text(data.message);
 				return;
 			}

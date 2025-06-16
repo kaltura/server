@@ -23,10 +23,11 @@ class KalturaMonitorClient
 	const EVENT_CURL           = 'curl';
 	const EVENT_AXEL           = 'axel';
 	const EVENT_RABBIT         = 'rabbit';
-	const EVENT_KAFKA         = 'kafka';
+	const EVENT_KAFKA          = 'kafka';
 	const EVENT_SLEEP          = 'sleep';
 	const EVENT_UPLOAD         = 'upload';
 	const EVENT_EXEC           = 'exec';
+	const EVENT_ERROR          = 'error';
 
 
 	const FIELD_ACTION = 			'a';
@@ -49,6 +50,7 @@ class KalturaMonitorClient
 	const FIELD_UNIQUE_ID =			'u';
 	const FIELD_EXECUTION_TIME = 	'x';
 	const FIELD_FILE_SIZE = 		'z';
+	const FIELD_ENV =    			'g';
 
 	const SESSION_COUNTERS_SECRET_HEADER = 'HTTP_X_KALTURA_SESSION_COUNTERS';
 	
@@ -240,6 +242,12 @@ class KalturaMonitorClient
 			self::FIELD_CLIENT_TAG		=> strval($clientTag),
 		);
 		
+		$envName = getenv('ENV_NAME');
+		if($envName)
+		{
+			self::$basicEventInfo[self::FIELD_ENV] = $envName;
+		}
+		
 		if (!$cached)
 		{
 			require_once(__DIR__ . '/../log/UniqueId.php');
@@ -322,6 +330,9 @@ class KalturaMonitorClient
 		$partnerId = isset($params['partner_id']) && ctype_digit($params['partner_id']) ? $params['partner_id'] : null;
 
 		self::monitorApiStart(false, $action, $partnerId, $sessionType, $clientTag);
+		
+		list($service, $action) = explode('.', $action, 2);
+		self::checkApiRateLimit($partnerId, $service, $action, $params);
 	}
 
 	public static function monitorApiEnd($errorCode)
@@ -790,5 +801,34 @@ class KalturaMonitorClient
 		}
 
 		self::writeDeferredEvent($data);
+	}
+	
+	public static function sendErrorEvent($errorCode)
+	{
+		if (!self::$stream)
+			return;
+		
+		$data = array_merge(self::$basicEventInfo, self::$basicApiInfo, array(
+			self::FIELD_EVENT_TYPE 		=> self::EVENT_ERROR,
+			self::FIELD_ERROR_CODE	    => $errorCode,
+		));
+		
+		self::writeDeferredEvent($data);
+	}
+	
+	public static function checkApiRateLimit($partnerId, $service, $action, $params)
+	{
+		if(!isset($partnerId))
+		{
+			return;
+		}
+		
+		$params['service'] = $service;
+		$params['action'] = $action;
+		
+		if(!KalturaResponseCacher::rateLimit($service, $action, $params, $partnerId))
+		{
+			KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
+		}
 	}
 }

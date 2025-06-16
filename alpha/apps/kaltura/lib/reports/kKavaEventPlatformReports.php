@@ -180,31 +180,50 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'user_id' => self::DIMENSION_KUSER_ID,
 				'user_name' => self::DIMENSION_KUSER_ID,
 				'email' => self::DIMENSION_KUSER_ID,
+				'title' => self::DIMENSION_KUSER_ID,
+				'company' => self::DIMENSION_KUSER_ID,
+				'country' => self::DIMENSION_KUSER_ID,
+				'role' => self::DIMENSION_KUSER_ID,
+				'industry' => self::DIMENSION_KUSER_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name', 'email'),
-				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUserIdAndFullNameWithFallback',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('EMAIL'),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('user_id', 'user_name', 'email', 'title', 'company', 'country'),
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUserIdAndFullNameWithFallback',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('EMAIL', 'CUSTOM_DATA.title', 'CUSTOM_DATA.company', 'COUNTRY'),
+					)
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('role', 'industry'),
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfoFromUserProfile',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'info_fields' => array('profileData.userRole', 'profileData.industry'),
+					),
+					self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER => array("virtual_event_id" => "virtual_event_ids")
 				)
 			),
 			self::REPORT_JOIN_REPORTS => array(
 				array(
 					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND),
-					self::REPORT_TOTAL_METRICS => array(self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND),
+					self::REPORT_METRICS => array(self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
 				),
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
-					self::REPORT_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED),
-					self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED),
+					self::REPORT_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED, self::EVENT_TYPE_GROUP_MESSAGE_SENT, self::EVENT_TYPE_POLL_ANSWERED, self::METRIC_Q_AND_A_THREADS_COUNT),
+					self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED, self::EVENT_TYPE_GROUP_MESSAGE_SENT, self::EVENT_TYPE_POLL_ANSWERED, self::METRIC_Q_AND_A_THREADS_COUNT),
 				),
 			),
 			self::REPORT_COLUMN_MAP => array(
 				'live_view_time' => self::METRIC_UNION_LIVE_MEETING_VIEW_TIME,
 				'count_reaction_clicked' => self::EVENT_TYPE_REACTION_CLICKED,
 				'count_raise_hand_clicked' => self::EVENT_TYPE_MEETING_RAISE_HAND,
-				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO
+				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
+				'count_group_chat_messages_sent' => self::EVENT_TYPE_GROUP_MESSAGE_SENT,
+				'count_poll_answered' => self::EVENT_TYPE_POLL_ANSWERED,
+				'count_q_and_a_threads' =>  self::METRIC_Q_AND_A_THREADS_COUNT,
+				'count_download_attachment_clicked' => self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED
 			),
 		),
 
@@ -244,25 +263,38 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'title' => self::DIMENSION_KUSER_ID,
 				'company' => self::DIMENSION_KUSER_ID,
 				'email' => self::DIMENSION_KUSER_ID,
+				'country' => self::DIMENSION_KUSER_ID,
+				'role' => self::DIMENSION_KUSER_ID,
+				'industry' => self::DIMENSION_KUSER_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => array('first_name', 'last_name', 'title', 'company', 'email'),
-				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo',
-				self::REPORT_ENRICH_CONTEXT => array(
-					'columns' => array('FIRST_NAME', 'LAST_NAME', 'CUSTOM_DATA.title', 'CUSTOM_DATA.company', 'EMAIL'),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('first_name', 'last_name', 'title', 'company', 'email', 'country'),
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfo',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('FIRST_NAME', 'LAST_NAME', 'CUSTOM_DATA.title', 'CUSTOM_DATA.company', 'EMAIL', 'COUNTRY'),
+					),
 				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('role', 'industry'),
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getUsersInfoFromUserProfile',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'info_fields' => array('profileData.userRole', 'profileData.industry'),
+					),
+					self::REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER => array("virtual_event_id" => "virtual_event_ids")
+				)
 			),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_JOIN_REPORTS => array(
 				array(
 					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO),
-					self::REPORT_TOTAL_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO),
+					self::REPORT_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
 				),
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
-					self::REPORT_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED),
-					self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED)
+					self::REPORT_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED, self::EVENT_TYPE_GROUP_MESSAGE_SENT, self::EVENT_TYPE_POLL_ANSWERED, self::METRIC_Q_AND_A_THREADS_COUNT),
+					self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_REACTION_CLICKED, self::EVENT_TYPE_GROUP_MESSAGE_SENT, self::EVENT_TYPE_POLL_ANSWERED, self::METRIC_Q_AND_A_THREADS_COUNT)
 				),
 			),
 			self::REPORT_COLUMN_MAP => array(
@@ -273,7 +305,11 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'engagement_rate' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO,
 				'count_reaction_clicked' => self::EVENT_TYPE_REACTION_CLICKED,
 				'count_raise_hand_clicked' => self::EVENT_TYPE_MEETING_RAISE_HAND,
-				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO
+				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
+				'count_group_chat_messages_sent' => self::EVENT_TYPE_GROUP_MESSAGE_SENT,
+				'count_poll_answered' => self::EVENT_TYPE_POLL_ANSWERED,
+				'count_q_and_a_threads' =>  self::METRIC_Q_AND_A_THREADS_COUNT,
+				'count_download_attachment_clicked' => self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED
 			),
 		),
 
@@ -284,7 +320,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 
 		ReportType::EP_VIEWTIME => array(
 			self::REPORT_UNION_DATA_SOURCES =>  array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-			self::REPORT_GRAPH_METRICS => array(self::METRIC_VIEW_PERIOD_PLAY_TIME),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME),
 		),
 
 		ReportType::EP_TOP_MOMENTS => array(

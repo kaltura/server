@@ -17,6 +17,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 {
 	const GROUP_USER_CREATION_MODE = 'creation_mode';
 	const GROUP_USER_ROLE = 'user_role';
+	const GROUP_TYPE = 'group_type';
 
 	public function setPuserId($puserId)
 	{
@@ -43,7 +44,7 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 
 		$partnerId = kCurrentContext::getCurrentPartnerId();
 
-		$kgroup = kuserPeer::getKuserByPartnerAndUid($partnerId, $pgroupId, false, KuserType::GROUP);
+		$kgroup = kuserPeer::getKuserByPartnerAndUid($partnerId, $pgroupId, false);
 		if (!$kgroup)
 			throw new kCoreException("Invalid group Id [{$pgroupId}]", kCoreException::INVALID_USER_ID );
 
@@ -93,5 +94,15 @@ class KuserKgroup extends BaseKuserKgroup implements IRelatedObject
 	public function getUserRole()
 	{
 		return $this->getFromCustomData(self::GROUP_USER_ROLE, null, GroupUserRole::MEMBER);
+	}
+
+	public function setGroupType($v)
+	{
+		$this->putInCustomData(self::GROUP_TYPE, $v);
+	}
+
+	public function getGroupType()
+	{
+		return $this->getFromCustomData(self::GROUP_TYPE, null, GroupType::GROUP);
 	}
 }

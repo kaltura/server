@@ -139,7 +139,7 @@ class VodPackagerDeliveryUtils
 	
 	public static function doAssetsRequireFMP4Playback($flavorAssets)
 	{
-		$assetsRequireFMP4layback = false;
+		$assetsRequireFMP4Playback = false;
 		
 		$flavorParamIds = array_values(array_map((function(asset $asset) { return $asset->getFlavorParamsId(); }), $flavorAssets ));
 		if(count($flavorParamIds))
@@ -154,11 +154,11 @@ class VodPackagerDeliveryUtils
 				count(array_intersect(array(flavorParams::VIDEO_CODEC_H265,flavorParams::VIDEO_CODEC_AV1),
 					$assetVideoCodecs)))
 			{
-				$assetsRequireFMP4layback = true;
+				$assetsRequireFMP4Playback = true;
 			}
 		}
 		
-		KalturaLog::debug("doAssetsRequireFMP4Playback [$assetsRequireFMP4layback]");
-		return $assetsRequireFMP4layback;
+		KalturaLog::debug("doAssetsRequireFMP4Playback [$assetsRequireFMP4Playback]");
+		return $assetsRequireFMP4Playback;
 	}
 }

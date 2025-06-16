@@ -12,19 +12,19 @@ class kCategorySearch extends kBaseESearch
         parent::__construct();
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectId = null, ESearchOrderBy $order = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $statuses = array(), $objectIdsCsvStr = null, ESearchOrderBy $order = null)
     {
         kCategoryElasticEntitlement::init();
         if (!count($statuses))
             $statuses = array(CategoryStatus::ACTIVE);
 
-        $this->initQuery($statuses, $objectId, $pager, $order);
+        $this->initQuery($statuses, $objectIdsCsvStr, $pager, $order);
         $this->initEntitlement();
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null)
+    protected function initQuery(array $statuses, $objectIdsCsvStr, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations=null, $objectIdsNotIn = null)
     {
         $indexName = kBaseESearch::getElasticIndexNamePerPartner( ElasticIndexMap::ELASTIC_CATEGORY_INDEX, kCurrentContext::getCurrentPartnerId());
         $this->query = array(
@@ -34,7 +34,7 @@ class kCategorySearch extends kBaseESearch
 
         KalturaLog::debug("Index -" . $indexName);
 
-        parent::initQuery($statuses, $objectId, $pager, $order);
+        parent::initQuery($statuses, $objectIdsCsvStr, $pager, $order);
     }
 
     private function initEntitlement()

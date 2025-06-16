@@ -24,7 +24,16 @@ class KClipConcatCloser extends KJobCloserWorker
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
-		return $this->checkTimeout($job);
+		$children = KBatchBase::$kClient->batch->getAllChildJobs($job->id);
+		$doneStatuses = array(KalturaBatchJobStatus::FINISHED, KalturaBatchJobStatus::FAILED, KalturaBatchJobStatus::ABORTED);
+		foreach ($children as $child)
+		{
+             if (!in_array($child->status, $doneStatuses))
+             {
+ 				return $this->checkTimeout($job);
+             }
+         }
+		return $this->closeJob($job, null, null, null, KalturaBatchJobStatus::FINISHED);
 	}
 
 	private function checkTimeout(KalturaBatchJob $job)

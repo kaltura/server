@@ -50,7 +50,10 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		// Dont filter on partner if requesting partner id is admin console or has the vendor permission
 		elseif (!$this->partnerIdEqual && kCurrentContext::$ks_partner_id != Partner::ADMIN_CONSOLE_PARTNER_ID && strtolower(kCurrentContext::$action) !== 'getjobs')
 		{
-			$partnerIdEqual = kCurrentContext::$ks_partner_id;
+			if (!$this->idEqual)
+			{
+				$partnerIdEqual = kCurrentContext::$ks_partner_id;
+			}
 		}
 			
 		if ($partnerIdEqual)
@@ -58,10 +61,12 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 			$c->add(PartnerCatalogItemPeer::PARTNER_ID, $partnerIdEqual);
 			$c->add(PartnerCatalogItemPeer::STATUS, VendorCatalogItemStatus::ACTIVE);
 			$c->addJoin(PartnerCatalogItemPeer::CATALOG_ITEM_ID, VendorCatalogItemPeer::ID, Criteria::INNER_JOIN);
+			VendorCatalogItemPeer::addSelectColumns($c);
+			$c->addSelectColumn(PartnerCatalogItemPeer::CUSTOM_DATA);
 		}
 		elseif ($this->catalogItemIdEqual)
 		{
-			return $this->listPartnersWithVendorCatalogItem($pager, $c);
+			return $this->listPartnersWithVendorCatalogItem($pager, $type);
 		}
 
 		$list = VendorCatalogItemPeer::doSelect($c);
@@ -78,11 +83,19 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		}
 
 		$responseObjects = KalturaVendorCatalogItemArray::fromDbArray($list, $responseProfile);
-		if ($this->partnerIdEqual && kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		if ($this->partnerIdEqual)
 		{
+			$catalogItemFields = VendorCatalogItemPeer::doSelectStmt($c);
 			foreach ($responseObjects as $responseObject)
 			{
-				$responseObject->partnerId = $partnerIdEqual;
+				if(kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
+				{
+					$responseObject->partnerId = $partnerIdEqual;
+				}
+				$catalogItemCustomData = $catalogItemFields->fetchColumn(14);
+				$partnerCatalogItem = new PartnerCatalogItem();
+				$partnerCatalogItem->setCustomData($catalogItemCustomData);
+				$responseObject->defaultReachProfileId = $partnerCatalogItem->getDefaultReachProfileId() ? $partnerCatalogItem->getDefaultReachProfileId() : null;
 			}
 		}
 
@@ -100,7 +113,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		return $this->getTypeListResponse($pager, $responseProfile);
 	}
 
-	protected function listPartnersWithVendorCatalogItem($pager, $vendorCatalogItemCriteria)
+	protected function listPartnersWithVendorCatalogItem($pager, $type)
 	{
 		$partnerCatalogItemCriteria = new Criteria();
 		$partnerCatalogItemCriteria->add(PartnerCatalogItemPeer::CATALOG_ITEM_ID, $this->catalogItemIdEqual);
@@ -119,6 +132,11 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 			$totalCount = PartnerCatalogItemPeer::doCount($partnerCatalogItemCriteria);
 		}
 
+		$vendorCatalogItemCriteria = new Criteria();
+		if ($type)
+		{
+			$vendorCatalogItemCriteria->add(VendorCatalogItemPeer::SERVICE_FEATURE, $type);
+		}
 		$vendorCatalogItemCriteria->add(VendorCatalogItemPeer::ID, $this->catalogItemIdEqual);
 		$catalogItem = VendorCatalogItemPeer::doSelectOne($vendorCatalogItemCriteria);
 
@@ -127,6 +145,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		{
 			$catalogItemWithPartnerId = KalturaVendorCatalogItem::getInstance($catalogItem);
 			$catalogItemWithPartnerId->partnerId = $partnerCatalogItem->getPartnerId();
+			$catalogItemWithPartnerId->defaultReachProfileId = $partnerCatalogItem->getDefaultReachProfileId();
 			$catalogItemsList[] = $catalogItemWithPartnerId;
 		}
 

@@ -125,7 +125,8 @@ class GroupService extends KalturaBaseUserService
 	protected function getGroup($groupId)
 	{
 		$dbGroup = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $groupId);
-		if(!$dbGroup || $dbGroup->getType() != KuserType::GROUP)
+		$groupTypes = array(KuserType::GROUP, KuserType::APPLICATIVE_GROUP);
+		if(!$dbGroup || !in_array($dbGroup->getType(), $groupTypes))
 		{
 			throw new KalturaAPIException(KalturaGroupErrors::INVALID_GROUP_ID);
 		}
@@ -178,9 +179,18 @@ class GroupService extends KalturaBaseUserService
 		$groupTypeItem->setItemType(ESearchItemType::EXACT_MATCH);
 		$groupTypeItem->setFieldName(ESearchUserFieldName::TYPE);
 
+		$applicativeGroupTypeItem = new ESearchUserItem();
+		$applicativeGroupTypeItem->setSearchTerm(KuserType::APPLICATIVE_GROUP);
+		$applicativeGroupTypeItem->setItemType(ESearchItemType::EXACT_MATCH);
+		$applicativeGroupTypeItem->setFieldName(ESearchUserFieldName::TYPE);
+
+		$orOperator = new ESearchOperator();
+		$orOperator->setOperator(ESearchOperatorType::OR_OP);
+		$orOperator->setSearchItems(array($groupTypeItem, $applicativeGroupTypeItem));
+
 		$baseOperator = new ESearchOperator();
 		$baseOperator->setOperator(ESearchOperatorType::AND_OP);
-		$baseOperator->setSearchItems(array($coreParams->getSearchOperator(), $groupTypeItem));
+		$baseOperator->setSearchItems(array($coreParams->getSearchOperator(), $orOperator));
 
 		$objectStatusesArr = array();
 		$objectStatuses = $coreParams->getObjectStatuses();
