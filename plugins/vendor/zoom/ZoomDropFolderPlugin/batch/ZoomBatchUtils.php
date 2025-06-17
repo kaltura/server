@@ -132,6 +132,7 @@ class ZoomBatchUtils
 			KalturaLog::debug('Found user with id [' . $kalturaUser->objects[0]->id . ']');
 			return $kalturaUser->objects[0];
 		}
+		KalturaLog::debug('Could not find user');
 		return null;
 	}
 
