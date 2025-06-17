@@ -553,66 +553,29 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
-			// Create if not exists a div with the id of targetId
-			$createTargetDivJs = '
-			// Ensure target div exists before player initialization
-			function ensureTargetDivExists(targetId) {
-				// If the element already exists, no need to create it
-				if (document.getElementById(targetId)) {
-					return;
-				}
-				
-				// Create the player container div
-				var playerDiv = document.createElement("div");
-				playerDiv.id = targetId;
-				
-				// Function to insert the div when possible
-				function insertDiv() {
-					try {
-						if (document.body) {
-							document.body.appendChild(playerDiv);
-							console.log("Player container created with ID: " + targetId);
-						} else {
-							// Try again in 50ms if body isn not available yet
-							setTimeout(insertDiv, 50);
-						}
-					} catch (e) {
-						console.error("Error creating player container:", e);
-					}
-				}
-				
-				// Start the insertion process
-				insertDiv();
-			}
-			
-			// Call the function with the target ID
-			ensureTargetDivExists(config.targetId);';
 		}
 		$kalturaPlayer = "KalturaPlayer.setup(config);";
 		if($iframe_embed_type === self::RAPT)
 		{
 			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
 		}
-
+		
 		$autoEmbedCode = "
-		// Initialize player when DOM is ready
-		function initKalturaPlayer() {
-			try {
-				var config=$config;
-				$v2tov7ConfigJs
-				$createTargetDivJs
+		try {
+			var config=$config;
+			$v2tov7ConfigJs
+			// Create if not exists a div with the id of targetId
+			window.onload = function() {
+				if (!document.getElementById(config.targetId)) {
+					var playerDiv = document.createElement('div');
+					playerDiv.id = config.targetId;
+					document.body.appendChild(playerDiv);
+				}
 				var kalturaPlayer = $kalturaPlayer
 				$loadContentMethod
-			} catch (e) {
-				console.error('Kaltura player initialization error:', e);
-			}
-		}
-		
-		// Execute when DOM is ready
-		if (document.readyState === 'loading') {
-			document.addEventListener('DOMContentLoaded', initKalturaPlayer);
-		} else {
-			initKalturaPlayer();
+			};
+		} catch (e) {
+			console.error(e.message);
 		}
 		";
 
