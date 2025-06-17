@@ -547,33 +547,42 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
-
-		$v2tov7ConfigJs='';
-		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
-		{
-			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
-			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
-		}
+		
+		// Player setup
 		$kalturaPlayer = "KalturaPlayer.setup(config);";
 		if($iframe_embed_type === self::RAPT)
 		{
 			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
 		}
 		
+		// Player content loading
+		$loadPlayerJs = "
+			var kalturaPlayer = $kalturaPlayer;
+			$loadContentMethod
+		";
+
+		$v2tov7ConfigJs='';
+		$createTargetDivJs = '';
+		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
+		{
+			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
+			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
+			// Create if not exists a div with the id of targetId
+			$createTargetDivJs = "addEventListener('load', (event) => {
+				if (!document.getElementById(config.targetId)) {
+					const playerDiv = document.createElement('div');
+					playerDiv.id = config.targetId;
+					document.body.appendChild(playerDiv);
+					$loadPlayerJs
+				}
+			});";
+		}
+		
 		$autoEmbedCode = "
 		try {
 			var config=$config;
 			$v2tov7ConfigJs
-			// Create if not exists a div with the id of targetId
-			window.onload = function() {
-				if (!document.getElementById(config.targetId)) {
-					var playerDiv = document.createElement('div');
-					playerDiv.id = config.targetId;
-					document.body.appendChild(playerDiv);
-				}
-				var kalturaPlayer = $kalturaPlayer
-				$loadContentMethod
-			};
+			" . ($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME) ? $createTargetDivJs : $loadPlayerJs) . "
 		} catch (e) {
 			console.error(e.message);
 		}
