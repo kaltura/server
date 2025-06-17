@@ -129,6 +129,7 @@ class ZoomBatchUtils
 		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
 		if($kalturaUser->objects)
 		{
+			KalturaLog::debug('Found user with id [' . $kalturaUser->objects[0]->id . ']');
 			return $kalturaUser->objects[0];
 		}
 		return null;

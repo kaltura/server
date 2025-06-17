@@ -173,11 +173,17 @@ class kZoomEventHanlder
 			if ($zoomVendorIntegration->getCreateUserIfNotExist())
 			{
 				$userId = $puserId;
+				KalturaLog::debug('User not found. Creating new user with id [' . $userId . ']');
 			}
 			else if ($zoomVendorIntegration->getDefaultUserEMail())
 			{
 				$userId = $zoomVendorIntegration->getDefaultUserEMail();
+				KalturaLog::debug('User not found. Returning default with id [' . $userId . ']');
 			}
+		}
+		else
+		{
+			KalturaLog::debug('Found user with id [' . $userId . ']');
 		}
 
 		return $userId;
