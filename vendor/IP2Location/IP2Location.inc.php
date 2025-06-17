@@ -408,7 +408,7 @@ function IP2Location_bytes2int ($bindata) {
 
 function IP2Location_ip2no ($ipaddr) {
 	global $unpack_workaround;
-	$long_ip = ip2long($ipaddr);
+	$long_ip = ipToLong($ipaddr);
 	if ($long_ip < 0) {
 		$long_ip += pow(2,32);
 	}
