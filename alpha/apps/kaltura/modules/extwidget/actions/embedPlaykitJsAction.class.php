@@ -562,13 +562,12 @@ class embedPlaykitJsAction extends sfAction
 		";
 
 		$v2tov7ConfigJs='';
-		$createTargetDivJs = '';
 		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
 			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
 			// Create if not exists a div with the id of targetId
-			$createTargetDivJs = "addEventListener('load', (event) => {
+			$loadPlayerJs = "addEventListener('load', (event) => {
 				if (!document.getElementById(config.targetId)) {
 					const playerDiv = document.createElement('div');
 					playerDiv.id = config.targetId;
@@ -582,7 +581,7 @@ class embedPlaykitJsAction extends sfAction
 		try {
 			var config=$config;
 			$v2tov7ConfigJs
-			" . ($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME) ? $createTargetDivJs : $loadPlayerJs) . "
+			$loadPlayerJs
 		} catch (e) {
 			console.error(e.message);
 		}
