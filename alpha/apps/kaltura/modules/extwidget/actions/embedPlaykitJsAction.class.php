@@ -189,21 +189,11 @@ class embedPlaykitJsAction extends sfAction
 			if ($this->getRequestParameter(self::EMBED_FACTORY_PARAM_NAME, false))
 			{
 				$configAsJson = $this->getPlayerConfigAsJson($i18nContent, $extraModulesNames);
-
-
-				$bundleContent = "function getNamespacedKalturaPlayer() {
-										$bundleContent
-										return KalturaPlayer;
-									};
-								const kalturaPlayerFactory = getNamespacedKalturaPlayer();
-								export { kalturaPlayerFactory }";
-
-				$sourceCodeBundle = $bundleContentParts[1];
 				$bundleContent = 'window.KalturaPlayers=(window.KalturaPlayers||{});' .
 								 "\nwindow.KalturaPlayers[$this->uiconfId]={};" .
 								 "\nwindow.KalturaPlayers[$this->uiconfId]['config'] = $configAsJson;" .
 								 "\nwindow.KalturaPlayers[$this->uiconfId]['lib'] = (() =>{
-								 	$sourceCodeBundle
+								 	$bundleContentParts[1]
 									return KalturaPlayer;
 									})()";
 			}
