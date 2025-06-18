@@ -19,6 +19,7 @@ class ZoomVendorIntegration extends VendorIntegration
 	const GROUP_PARTICIPATION_TYPE = 'groupParticipationType';
 	const HANDLE_COHOSTS_MODE = 'handleCohostsMode';
 	const HANDLE_ALTERNATIVE_HOST_MODE = 'handleAlternativeHostsMode';
+	const USERS_SEARCH_METHOD = 'users_search_method';
 
 	public function setZoomAuthType($v)	{ $this->putInCustomData ( self::ZOOM_AUTH_TYPE, $v); }
 	public function getZoomAuthType()	{ return $this->getFromCustomData(self::ZOOM_AUTH_TYPE, null, kZoomAuthTypes::OAUTH); }
@@ -162,4 +163,15 @@ class ZoomVendorIntegration extends VendorIntegration
 		$this->setAccessToken($tokensDataAsArray[kOAuth::ACCESS_TOKEN]);
 		$this->save();
 	}
+
+	public function getUserSearchMethod()
+	{
+		return $this->getFromCustomData(self::USERS_SEARCH_METHOD, null, kZoomUsersSearchMethod::ALL);
+	}
+
+	public function setUserSearchMethod($v)
+	{
+		$this->putInCustomData(self::USERS_SEARCH_METHOD, $v);
+	}
+
 }

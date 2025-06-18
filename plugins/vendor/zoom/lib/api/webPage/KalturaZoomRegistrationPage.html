@@ -32,6 +32,7 @@
             let handleParticipantsMode = $('[name=handleParticipantsMode]:checked').val();
             let zoomUserMatchingMode = $('[name=zoomUserMatchingMode]:checked').val();
             let createUserIfNotExist = $('#createUserIfNotExist').is(':checked');
+			let userSearchMethod = $('[name=userSearchMethod]:checked').val();
             if($('[name=recordingOwner]:checked').val()==RECORDING_OWNER_BASED_ON_ZOOM_USER_ID) {
                 zoomUserMatchingMode = CMS_USER_ID;
             }
@@ -53,6 +54,7 @@
                     'integrationSetting:enableWebinarUploads':enableWebinarUploads,
                     'integrationSetting:enableZoomTranscription':enableZoomTranscription,
                     'integrationSetting:createUserIfNotExist':createUserIfNotExist,
+                    'integrationSetting:userSearchMethod':userSearchMethod,
 
                     'format': 1 },
                 success : function(res) {
@@ -132,6 +134,7 @@
             $('input:radio[name=zoomUserMatchingMode]').val(['0']).prop('checked',true);
             $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
             $('#createUserIfNotExist').prop('checked',true);
+	        $('input:radio[name=userSearchMethod]').val(['2']).prop('checked',true);
         }
         function loadParameters(p) {
          jQuery.each(p, function(i,v) {
@@ -167,9 +170,10 @@
                         }
                     }
                     break;
-                    case 'handleParticipantsMode':
-                        $('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
-                        break;
+	                case 'handleParticipantsMode':
+					case 'userSearchMethod':
+						$('input:radio[name=' + i + '][value='+v+']').prop('checked', true);
+						break;
                 }
 
             });
@@ -273,6 +277,22 @@
                     <input type='radio'  id='recordingOwnerBasedOnCmsUserId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(!this.checked)' value='1'>
                     Based on cms_user_id (SAML mapping)</label>
             </div>
+	        <p class='form-check-label'>Find users by:</p>
+	        <div class='form-check-inline'>
+		        <label class='form-check-label'>
+			        <input type='radio' class='form-check-input'
+			               name='userSearchMethod' value='0'>User ID </label>
+	        </div>
+	        <div class='form-check-inline'>
+		        <label class='form-check-label'>
+			        <input type='radio' class='form-check-input'
+			               name='userSearchMethod' value='1'>User Email </label>
+	        </div>
+	        <div class='form-check-inline'>
+		        <label class='form-check-label'>
+			        <input type='radio' class='form-check-input'
+			               name='userSearchMethod' value='2'>Both </label>
+	        </div>
         </div>
         <div class='form-group container p-2 my-2 border'>
             <p class='form-check-label'><h7>How meeting participants should be handled:</h7></p>
