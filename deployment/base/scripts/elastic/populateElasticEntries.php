@@ -17,7 +17,7 @@ if($argc > 3)
 	}
 	elseif(strpos($argv[3], '-') !== false) 
 	{
-		list($minId, $maxId) = explode('-', $argv[3]);
+		list($minId, $maxId) = explode('-', $argv[3], 2);
 		if(is_numeric($minId) && is_numeric($maxId)) {
 			$c->add(entryPeer::INT_ID, $minId, Criteria::GREATER_EQUAL);
 			$c->addAnd(entryPeer::INT_ID, $maxId, Criteria::LESS_THAN);
