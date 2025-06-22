@@ -102,20 +102,20 @@ class ZoomBatchUtils
 
 		switch ($userSearchMethod)
 		{
-			case kZoomUsersSearchMethod::ID:
+			case KalturaZoomUsersSearchMethod::ID:
 			{
 				KalturaLog::debug('Searching by puser_id');
 				$filter->idEqual = $kZoomUser->getProcessedName();
 				break;
 			}
-			case kZoomUsersSearchMethod::EMAIL:
+			case KalturaZoomUsersSearchMethod::EMAIL:
 			{
 				KalturaLog::debug('Searching by email');
 				$email = $kZoomUser->getOriginalName();
 				$filter->emailStartsWith = $email;
 				break;
 			}
-			case kZoomUsersSearchMethod::ALL:
+			case KalturaZoomUsersSearchMethod::ALL:
 			default:
 			{
 				KalturaLog::debug('Searching by both puser_id and email');
