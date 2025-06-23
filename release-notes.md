@@ -7,6 +7,7 @@
 ### Configuration ###
     Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
 	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_19_add_kafka_category_entry_events.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_19_update_kafka_entry_notifications.template.xml
 
     Add the following to admin.ini
     moduls.enableAgents.enabled = true
@@ -17,6 +18,7 @@
 
 ### Deployment scripts ###
 	php /opt/kaltura/app/deployment/updates/scripts/2025_06_19_add_categorey_entry_kafka_events.php
+    php /opt/kaltura/app/deployment/updates/scripts/2025_06_19_update_user_kafka_events.php 
 
 # Ursa-21.18.0
 
