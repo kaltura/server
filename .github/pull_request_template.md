@@ -8,6 +8,7 @@ General notes -
 - [ ] I have updated documentation where needed.
 - [ ] I have added comments to complex code.
 - [ ] This PR follows the coding style guidelines.
+- [ ] I have updated release notes with new feature
 
 New Kaltura Types
 - [ ] I have created new clients
