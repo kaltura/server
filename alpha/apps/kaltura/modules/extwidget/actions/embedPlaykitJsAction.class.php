@@ -560,12 +560,7 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
-			// Create if not exists a div with the id of targetId
-			$createTargetDivJs = 'if (!document.getElementById(config.targetId)) {
-				var playerDiv = document.createElement("div");
-				playerDiv.id = config.targetId;
-				document.body.appendChild(playerDiv);
-			}';
+
 		}
 		$kalturaPlayer = "KalturaPlayer.setup(config);";
 		if($iframe_embed_type === self::RAPT)
@@ -577,7 +572,6 @@ class embedPlaykitJsAction extends sfAction
 		try {
 			var config=$config;
 			$v2tov7ConfigJs
-			$createTargetDivJs
 			var kalturaPlayer = $kalturaPlayer
 			$loadContentMethod
 		} catch (e) {
@@ -664,7 +658,7 @@ class embedPlaykitJsAction extends sfAction
 			$loadVersionTagMapFromKConf = kConf::get("loadFromKConf_".$tag, kConfMapNames::EMBED_PLAYKIT, null);
 			if($loadVersionMapFromKConf || $loadVersionTagMapFromKConf)
 			{
-				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);
+				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);	
 			}
 			else
 			{
