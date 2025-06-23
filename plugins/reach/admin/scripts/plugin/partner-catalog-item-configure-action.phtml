@@ -61,7 +61,7 @@
 					    echo null;?>
 					</td>
 					<td><?php if (isset($catalogItem->outputFormat))
-					    echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat);
+					    echo $this->enumTranslate( $catalogItem->serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE ? 'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat' : 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat);
 					else
 					    echo null;?>
 					</td>

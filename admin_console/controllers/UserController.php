@@ -358,7 +358,7 @@ document.querySelector(".login-form").submit();
 		$form = new Form_ChangeUserRole();
 		$form->getElement('name')->setValue($user->fullName);
 		$form->getElement('email')->setValue($user->email);
-		$form->getElement('role')->setValue($user->roleIds);
+		$form->getElement('roles_checkbox')->setValue(explode(',', $user->roleIds));
 				
 		if ($request->isPost())
 		{
@@ -509,10 +509,10 @@ document.querySelector(".login-form").submit();
 				$client = Infra_ClientHelper::getClient();
 				
 				$userId = $request->getParam('userId');
-				$roleId = $request->getPost('role');
+				$roleIds = $request->getPost('roles_checkbox');
 				
 				$user = new Kaltura_Client_Type_User();
-				$user->roleIds = $roleId;
+				$user->roleIds = $roleIds ? implode(',', $roleIds) : '';
 				$client->user->update($userId, $user); // call api user->update
 				$this->_helper->redirector('index');
 			}

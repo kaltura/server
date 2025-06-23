@@ -8,6 +8,10 @@ class myEntryUtils
 	const ENTRY_ID_REGEX = "/^\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
 	const CACHED_THUMB_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
+	const SILENCE_RMS_LEVEL = -96; // -96 dBFS
+	const PTS = 'pts';
+	const RMS = 'rms';
+
 
 	static private $liveSourceType = array
 	(
@@ -2177,7 +2181,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$output = "pts,rms_level\n";
 		foreach ($resampledData as $point)
 		{
-			$output .= "{$point['pts']},{$point['rms']}\n";
+			$output .= "{$point[self::PTS]},{$point[self::RMS]}\n";
 		}
 
 		return $output;
@@ -2188,7 +2192,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$lines = array_filter(array_map('trim', explode("\n", $csvText)));
 		$data = [];
 		// Skip header if present
-		if (stripos($lines[0], 'pts') !== false)
+		if (stripos($lines[0], self::PTS) !== false)
 		{
 			array_shift($lines);
 		}
@@ -2202,7 +2206,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		foreach ($lines as $line)
 		{
 			[$pts, $rms] = explode(',', $line);
-			$data[] = ['pts' => (float)$pts, 'rms' => (float)$rms];
+			$data[] = [self::PTS => (float)$pts, self::RMS => (float)$rms];
 		}
 
 		if (count($data) === 0)
@@ -2213,8 +2217,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		// Total duration in milliseconds
 		$durationMs = $durationSeconds * 1000;
 		$step = $durationMs / ($desiredLines - 1);
-		$resampled = [];
-		for ($i = 0; $i < $desiredLines; $i++)
+		$resampled = self::fillSilence($data, round($step));
+		for ($i = count($resampled); $i < $desiredLines; $i++)
 		{
 			$targetPts = $i * $step;
 
@@ -2224,11 +2228,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 
 			foreach ($data as $point)
 			{
-				if ($point['pts'] <= $targetPts)
+				if ($point[self::PTS] <= $targetPts)
 				{
 					$before = $point;
 				}
-				if ($point['pts'] >= $targetPts)
+				if ($point[self::PTS] >= $targetPts)
 				{
 					$after = $point;
 					break;
@@ -2240,19 +2244,39 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			if (!$after) $after = end($data);
 
 			// Linear interpolation
-			if ($after['pts'] == $before['pts'])
+			if ($after[self::PTS] == $before[self::PTS])
 			{
-				$rms = $before['rms'];
+				$rms = $before[self::RMS];
 			}
 			else
 			{
-				$ratio = ($targetPts - $before['pts']) / ($after['pts'] - $before['pts']);
-				$rms = $before['rms'] + $ratio * ($after['rms'] - $before['rms']);
+				$ratio = ($targetPts - $before[self::PTS]) / ($after[self::PTS] - $before[self::PTS]);
+				$rms = $before[self::RMS] + $ratio * ($after[self::RMS] - $before[self::RMS]);
 			}
-			$resampled[] = ['pts' => round($targetPts), 'rms' => round($rms, 2)];
+			$resampled[] = [self::PTS => round($targetPts), self::RMS => round($rms, 2)];
 		}
 
 		return $resampled;
+	}
+
+
+	// Fill silence before the first point
+	protected static function fillSilence(array $data, int $step): array
+	{
+		$nonEmptyData = [];
+		if ($step <= 0 || count($data) === 0)
+		{
+			return $nonEmptyData;
+		}
+		$firstPoint = $data[0];
+		$stepsProgress = 0;
+		while ($stepsProgress < $firstPoint[self::PTS])
+		{
+			$nonEmptyData [] = [self::PTS => $stepsProgress, self::RMS => self::SILENCE_RMS_LEVEL];
+			// Fill silence points before the first point
+			$stepsProgress += $step;
+		}
+		return $nonEmptyData;
 	}
 
 	public static function getVolumeMapContent($flavorAsset, $mapScale = null, $duration = null)
@@ -2263,7 +2287,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$content = null;
 
 		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_VOLUME_MAP);
-		$cacheKey = $entryId . '_volumeMap' . $mapScale;
+		$cacheKey =  $entryId . '_volumeMap_' . $flavorAsset->getVersion() . ($mapScale ? '_' . $mapScale : '');;
 		if ($cacheStore)
 		{
 			$content = $cacheStore->get($cacheKey);
