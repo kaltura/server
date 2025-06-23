@@ -554,26 +554,41 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
-
+		
+		// Player setup
+		$kalturaPlayer = "KalturaPlayer.setup(config);";
+		if($iframe_embed_type === self::RAPT)
+		{
+			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
+		}
+		
+		// Player content loading
+		$loadPlayerJs = "
+			var kalturaPlayer = $kalturaPlayer;
+			$loadContentMethod
+		";
+		
 		$v2tov7ConfigJs='';
 		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
 			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
-
-		}
-		$kalturaPlayer = "KalturaPlayer.setup(config);";
-		if($iframe_embed_type === self::RAPT)
-		{
-			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
+			$originalLoadPlayerJs = $loadPlayerJs;
+			$loadPlayerJs = "addEventListener('load', (event) => {
+				if (!document.getElementById(config.targetId)) {
+					const playerDiv = document.createElement('div');
+					playerDiv.id = config.targetId;
+					document.body.appendChild(playerDiv);
+					$originalLoadPlayerJs
+				}
+			});";
 		}
 
 		$autoEmbedCode = "
 		try {
 			var config=$config;
 			$v2tov7ConfigJs
-			var kalturaPlayer = $kalturaPlayer
-			$loadContentMethod
+			$loadPlayerJs
 		} catch (e) {
 			console.error(e.message);
 		}
@@ -658,7 +673,7 @@ class embedPlaykitJsAction extends sfAction
 			$loadVersionTagMapFromKConf = kConf::get("loadFromKConf_".$tag, kConfMapNames::EMBED_PLAYKIT, null);
 			if($loadVersionMapFromKConf || $loadVersionTagMapFromKConf)
 			{
-				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);	
+				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);
 			}
 			else
 			{
