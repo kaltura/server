@@ -188,12 +188,14 @@ class embedPlaykitJsAction extends sfAction
 			//Embed factory is only relevant in dynamic embed
 			if ($this->getRequestParameter(self::EMBED_FACTORY_PARAM_NAME, false))
 			{
-				$bundleContent = "function getNamespacedKalturaPlayer() {
-										$bundleContent
-										return KalturaPlayer;
-									};
-								const kalturaPlayerFactory = getNamespacedKalturaPlayer();
-								export { kalturaPlayerFactory }";
+				$configAsJson = $this->getPlayerConfigAsJson($i18nContent, $extraModulesNames);
+				$bundleContent = 'window.KalturaPlayers=(window.KalturaPlayers||{});' .
+								 "\nwindow.KalturaPlayers[$this->uiconfId]={};" .
+								 "\nwindow.KalturaPlayers[$this->uiconfId]['config'] = $configAsJson;" .
+								 "\nwindow.KalturaPlayers[$this->uiconfId]['lib'] = (() =>{
+								 	$bundleContentParts[1]
+									return KalturaPlayer;
+									})()";
 			}
 		}
 
@@ -213,15 +215,20 @@ class embedPlaykitJsAction extends sfAction
 		$uiConfData->uiConfData->name = $this->uiConf->getName();
 	}
 
-	private function appendConfig($content, $i18nContent, $extraModulesNames = null)
+	private function getPlayerConfigAsJson($i18nContent, $extraModulesNames = null)
 	{
 		$uiConf = $this->playerConfig;
 		$this->mergeEnvConfig($uiConf);
 		$this->mergeI18nConfig($uiConf, $i18nContent);
 		$this->mergeExtraModuleNames($uiConf, $extraModulesNames);
 		$this->addUiConfData($uiConf);
-		$uiConfJson = json_encode($uiConf);
+		return json_encode($uiConf);
 
+	}
+
+	private function appendConfig($content, $i18nContent, $extraModulesNames = null)
+	{
+		$uiConfJson = $this->getPlayerConfigAsJson($i18nContent, $extraModulesNames);
 
 		if ($uiConfJson === false)
 		{
