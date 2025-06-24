@@ -633,10 +633,11 @@ class Form_PartnerConfiguration extends Infra_Form
 		));
 		
 //--------------------------- Recycle Bin Settings ---------------------------
-		
-		$recycleBinRetentionPeriod = new Kaltura_Form_Element_EnumSelect('recycle_bin_retention_period', array('enum' => 'Kaltura_Client_Enum_RecycleBinRetentionPeriod'));
-		$recycleBinRetentionPeriod->setLabel('Recycle Bin retention period');
-		$this->addElements(array($recycleBinRetentionPeriod));
+
+		$this->addElement('text', 'recycle_bin_retention_period', array(
+			'label'			=> 'Recycle Bin retention period',
+			'filters'		=> array('Int'),
+		));
 		
 		//--------------------------- Enable/Disable Features ---------------------------
 		$moduls = Zend_Registry::get('config')->moduls;
