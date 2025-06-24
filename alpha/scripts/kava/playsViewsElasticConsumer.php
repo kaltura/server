@@ -60,6 +60,20 @@ $id = $argv[1];
 $consumerId = getenv(CLUSTER_ID_VAR . "_$id");
 $bulkSize = getenv(BULK_SIZE_VAR);
 
+// Since
+$host = null;
+$port = null;
+$version = null;
+
+$overrideDefaults = getenv("OVERRIDE_$id");
+if ($overrideDefaults)
+{
+	KalturaLog::log("Overriding elasticClient defaults for id [ $id ]");
+	$host = getenv("HOST_$id");
+	$port = getenv("PORT_$id");
+	$version = getenv("VERSION_$id");
+}
+
 try
 {
 	$topicsPath = kConf::get(CONF_TOPICS_PATH);
@@ -73,7 +87,7 @@ catch (Exception $ex)
 Utils::writeLog('Info: started, pid=' . getmypid());
 
 // connect to elastic
-$elasticClient = new elasticClient();
+$elasticClient = new elasticClient($host, $port, $version);
 $elasticClient->setBulkSize($bulkSize);
 
 //read dedicated indices config
