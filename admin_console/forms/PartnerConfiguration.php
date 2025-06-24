@@ -635,7 +635,7 @@ class Form_PartnerConfiguration extends Infra_Form
 //--------------------------- Recycle Bin Settings ---------------------------
 
 		$this->addElement('text', 'recycle_bin_retention_period', array(
-			'label'			=> 'Recycle Bin retention period',
+			'label'			=> 'Recycle Bin retention period (In Days)',
 			'filters'		=> array('Int'),
 		));
 		
