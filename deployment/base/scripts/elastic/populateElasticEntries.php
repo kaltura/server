@@ -9,7 +9,7 @@ if($argc > 1 && is_numeric($argv[1]))
 	$c->add(entryPeer::UPDATED_AT, $argv[1], Criteria::GREATER_EQUAL);
 if($argc > 2 && is_numeric($argv[2]))
 	$c->add(entryPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
-if($argc > 3) 
+if($argc > 3)
 {
 	if(is_numeric($argv[3]))
 	{
