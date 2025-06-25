@@ -20,6 +20,7 @@ class AssetFilter extends baseObjectFilter
 			"_in_partner_id",
 			"_eq_format",
 			"_in_format",
+			"_notin_format",
 			"_eq_container_format",
 			"_in_container_format",
 			"_eq_status",

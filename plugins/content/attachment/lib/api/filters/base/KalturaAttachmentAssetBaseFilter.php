@@ -11,6 +11,7 @@ abstract class KalturaAttachmentAssetBaseFilter extends KalturaAssetFilter
 	(
 		"formatEqual" => "_eq_format",
 		"formatIn" => "_in_format",
+		"formatNotIn" => "_notin_format",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
 		"statusNotIn" => "_notin_status",
@@ -40,6 +41,12 @@ abstract class KalturaAttachmentAssetBaseFilter extends KalturaAssetFilter
 	 * @var string
 	 */
 	public $formatIn;
+
+	/**
+	 * @dynamicType KalturaAttachmentType
+	 * @var string
+	 */
+	public $formatNotIn;
 
 	/**
 	 * @var KalturaAttachmentAssetStatus

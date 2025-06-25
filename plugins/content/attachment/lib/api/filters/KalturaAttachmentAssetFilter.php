@@ -10,6 +10,16 @@ class KalturaAttachmentAssetFilter extends KalturaAttachmentAssetBaseFilter
 	 */
 	public function getTypeListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null, array $types = null)
 	{
+		if(!$this->formatIn && !$this->formatEqual)
+		{
+			// if no format is specified, exclude Markdown
+			$excludedFormats = array(
+				KalturaAttachmentType::MARKDOWN
+			);
+			
+			$this->formatNotIn = implode(',', $excludedFormats);
+		}
+		
 		list($list, $totalCount) = $this->doGetListResponse($pager, $types);
 		
 		$response = new KalturaAttachmentAssetListResponse();

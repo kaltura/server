@@ -21,7 +21,7 @@ class KalturaAttachmentAsset extends KalturaAsset
 	/**
 	 * The attachment format
 	 * @var KalturaAttachmentType
-	 * @filter eq,in
+	 * @filter eq,in,notin
 	 */
 	public $format;
 	
@@ -60,4 +60,3 @@ class KalturaAttachmentAsset extends KalturaAsset
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 }
-	
