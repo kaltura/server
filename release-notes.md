@@ -1,4 +1,25 @@
 # Ursa-21.19.0
+
+## Add kafka event notification for category entry create/update/delete and support pushign entry events when agents are enabled ##
+- Issue Type: Task
+- Issue ID: KAM-6
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_19_add_kafka_category_entry_events.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_19_update_kafka_entry_notifications.template.xml
+
+    Add the following to admin.ini
+    moduls.enableAgents.enabled = true
+    moduls.enableAgents.permissionType = 2
+    moduls.enableAgents.label = "Enable Agents Framework"
+    moduls.enableAgents.permissionName = FEATURE_AGENTS_FRAMEWORK_PERMISSION
+    moduls.enableAgents.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_06_19_add_categorey_entry_kafka_events.php
+    php /opt/kaltura/app/deployment/updates/scripts/2025_06_19_update_user_kafka_events.php 
+
 ## Add 4K flavor params support flag
 * Issue Type: Feature
 * Issue ID: PLAT-25201
