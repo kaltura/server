@@ -213,7 +213,7 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbCaptionAsset->getEntryId());
 
-		if( $captionAsset->isDefault )
+		if($captionAsset->isDefault && !$dbCaptionAsset->getDefault())
 		{
 			$this->setAsDefaultAction($dbCaptionAsset->getId());
 		}
