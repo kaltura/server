@@ -70,7 +70,7 @@ class ZoomBatchUtils
 		$zoomUser->setProcessedName(self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomClient));
 		KBatchBase::impersonate($partnerId);
 		/* @var $user KalturaUser */
-		$user = self::getKalturaUser($partnerId, $zoomUser);
+		$user = self::getKalturaUser($partnerId, $zoomUser, $zoomVendorIntegration->userSearchMethod);
 		KBatchBase::unimpersonate();
 		$userId = '';
 		if ($user)
@@ -91,33 +91,48 @@ class ZoomBatchUtils
 		return $userId;
 	}
 
-	public static function getKalturaUser($partnerId, $kZoomUser)
+	public static function getKalturaUser($partnerId, $kZoomUser, $userSearchMethod = null)
 	{
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 1;
 		$pager->pageIndex = 1;
-		
+
 		$filter = new KalturaUserFilter();
 		$filter->partnerIdEqual = $partnerId;
-		$filter->idEqual = $kZoomUser->getProcessedName();
-		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
-		if (!$kalturaUser->objects)
+
+		switch ($userSearchMethod)
 		{
-			$email = $kZoomUser->getOriginalName();
-			$filterUser = new KalturaUserFilter();
-			$filterUser->partnerIdEqual = $partnerId;
-			$filterUser->emailStartsWith = $email;
-			$kalturaUser = KBatchBase::$kClient->user->listAction($filterUser, $pager);
-			if (!$kalturaUser->objects || strcasecmp($kalturaUser->objects[0]->email, $email) != 0)
+			case KalturaZoomUsersSearchMethod::ID:
 			{
-				return null;
+				KalturaLog::debug('Searching by puser_id');
+				$filter->idEqual = $kZoomUser->getProcessedName();
+				break;
+			}
+			case KalturaZoomUsersSearchMethod::EMAIL:
+			{
+				KalturaLog::debug('Searching by email');
+				$email = $kZoomUser->getOriginalName();
+				$filter->emailStartsWith = $email;
+				break;
+			}
+			case KalturaZoomUsersSearchMethod::ALL:
+			default:
+			{
+				KalturaLog::debug('Searching by both puser_id and email');
+				$filter->idEqual = $kZoomUser->getProcessedName();
+				$email = $kZoomUser->getOriginalName();
+				$filter->emailStartsWith = $email;
+				break;
 			}
 		}
-		
+
+		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
 		if($kalturaUser->objects)
 		{
+			KalturaLog::debug('Found user with id [' . $kalturaUser->objects[0]->id . ']');
 			return $kalturaUser->objects[0];
 		}
+		KalturaLog::debug('Could not find user');
 		return null;
 	}
 

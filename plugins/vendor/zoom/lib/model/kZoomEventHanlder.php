@@ -135,26 +135,57 @@ class kZoomEventHanlder
 			return $zoomVendorIntegration->getCreateUserIfNotExist() ? $userId : $zoomVendorIntegration->getDefaultUserEMail();
 		}
 		$puserId = self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomClient);
-		$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+
+		KalturaLog::debug('Finding Zoom user name: ' . $puserId);
+		switch ($zoomVendorIntegration->getUserSearchMethod())
+		{
+			case kZoomUsersSearchMethod::EMAIL:
+			{
+				KalturaLog::debug('Searching by email');
+				$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
+				break;
+			}
+			case kZoomUsersSearchMethod::ID:
+			{
+				KalturaLog::debug('Searching by puser_id');
+				$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+				break;
+			}
+			case kZoomUsersSearchMethod::ALL:
+			default:
+			{
+				KalturaLog::debug('Searching by both puser_id and email');
+				$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+				if (!$user)
+				{
+					$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
+				}
+				else
+				{
+					$userId = $user->getPuserId();
+				}
+				break;
+			}
+		}
+
 		if (!$user)
 		{
-			$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
-			if (!$user)
+			if ($zoomVendorIntegration->getCreateUserIfNotExist())
 			{
-				if ($zoomVendorIntegration->getCreateUserIfNotExist())
-				{
-					$userId = $puserId;
-				}
-				else if ($zoomVendorIntegration->getDefaultUserEMail())
-				{
-					$userId = $zoomVendorIntegration->getDefaultUserEMail();
-				}
+				$userId = $puserId;
+				KalturaLog::debug('User not found. Creating new user with id [' . $userId . ']');
+			}
+			else if ($zoomVendorIntegration->getDefaultUserEMail())
+			{
+				$userId = $zoomVendorIntegration->getDefaultUserEMail();
+				KalturaLog::debug('User not found. Returning default with id [' . $userId . ']');
 			}
 		}
 		else
 		{
-			$userId = $user->getPuserId();
+			KalturaLog::debug('Found user with id [' . $userId . ']');
 		}
+
 		return $userId;
 	}
 	

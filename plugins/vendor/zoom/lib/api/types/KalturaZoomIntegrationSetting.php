@@ -69,6 +69,11 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 	 * @var KalturaHandleParticipantsMode
 	 */
 	public $handleAlternativeHostsMode;
+
+	/**
+	 * @var KalturaZoomUsersSearchMethod
+	 */
+	public $userSearchMethod;
 	
 	
 	/*
@@ -89,6 +94,7 @@ class KalturaZoomIntegrationSetting extends KalturaIntegrationSetting
 		'optOutGroupNames',
 		'handleCohostsMode',
 		'handleAlternativeHostsMode',
+		'userSearchMethod',
 	);
 
 	public function getMapBetweenObjects()
