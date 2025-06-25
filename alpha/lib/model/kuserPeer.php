@@ -459,7 +459,6 @@ class kuserPeer extends BasekuserPeer implements IRelatedObjectPeer
 	 * @throws kUserException::LOGIN_ID_ALREADY_USED
 	 * @throws kUserException::PASSWORD_STRUCTURE_INVALID
 	 * @throws kPermissionException::ROLE_ID_MISSING
-	 * @throws kPermissionException::ONLY_ONE_ROLE_PER_USER_ALLOWED
 	 */
 	public static function addUser(kuser $user, $password = null, $checkPasswordStructure = true, $sendEmail = null)
 	{

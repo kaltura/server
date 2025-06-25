@@ -4,13 +4,11 @@
  * @package plugins.reach
  * @subpackage model
  */
-class kMetadataEnrichmentVendorTaskData extends kVendorTaskData
+class kMetadataEnrichmentVendorTaskData extends kLocalizedVendorTaskData
 {
 	public string $detailLevel = "";
 
 	public string $instruction = "";
-
-	public ?string $outputJson = null;
 
 	public function getDetailLevel(): string
 	{
@@ -30,15 +28,5 @@ class kMetadataEnrichmentVendorTaskData extends kVendorTaskData
 	public function setInstruction(string $instruction): void
 	{
 		$this->instruction = $instruction;
-	}
-
-	public function getOutputJson(): ?string
-	{
-		return $this->outputJson;
-	}
-
-	public function setOutputJson(?string $outputJson): void
-	{
-		$this->outputJson = $outputJson;
 	}
 }

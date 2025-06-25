@@ -120,7 +120,7 @@ class PropelPDO extends PDO {
 	/**
 	 * Overrides PDO::beginTransaction() to prevent errors due to already-in-progress transaction.
 	 */
-	public function beginTransaction()
+	public function beginTransaction(): bool
 	{
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
@@ -136,7 +136,7 @@ class PropelPDO extends PDO {
 	 * Overrides PDO::commit() to only commit the transaction if we are in the outermost
 	 * transaction nesting level.
 	 */
-	public function commit()
+	public function commit(): bool
 	{
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
@@ -158,7 +158,7 @@ class PropelPDO extends PDO {
 	 * transaction nesting level
 	 * @return     boolean Whether operation was successful.
 	 */
-	public function rollBack()
+	public function rollBack(): bool
 	{
 		$return = true;
 		$opcount = $this->getNestedTransactionCount();
@@ -203,14 +203,14 @@ class PropelPDO extends PDO {
 	 * @param      int $attribute The attribute to set (e.g. PropelPDO::PROPEL_ATTR_CACHE_PREPARES).
 	 * @param      mixed $value The attribute value.
 	 */
-	public function setAttribute($attribute, $value)
+	public function setAttribute($attribute, $value): bool
 	{
 		switch($attribute) {
 			case self::PROPEL_ATTR_CACHE_PREPARES:
 				$this->cachePreparedStatements = $value;
-				break;
+				return true;
 			default:
-				parent::setAttribute($attribute, $value);
+				return parent::setAttribute($attribute, $value);
 		}
 	}
 
@@ -222,12 +222,11 @@ class PropelPDO extends PDO {
 	 *
 	 * @param      int $attribute The attribute to get (e.g. PropelPDO::PROPEL_ATTR_CACHE_PREPARES).
 	 */
-	public function getAttribute($attribute)
+	public function getAttribute($attribute): mixed
 	{
 		switch($attribute) {
 			case self::PROPEL_ATTR_CACHE_PREPARES:
 				return $this->cachePreparedStatements;
-				break;
 			default:
 				return parent::getAttribute($attribute);
 		}
@@ -241,7 +240,7 @@ class PropelPDO extends PDO {
 	 * @param      array
 	 * @return     PDOStatement
 	 */
-	public function prepare($sql, $driver_options = array())
+	public function prepare($sql, $driver_options = array()): false|PDOStatement
 	{
 		if ($this->cachePreparedStatements) {
 			$key = $sql;

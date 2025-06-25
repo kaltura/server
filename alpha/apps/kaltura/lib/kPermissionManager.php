@@ -509,6 +509,9 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			if (!$ipAllowed)
 				throw new kCoreException("Admin console partner used from an unallowed address", kCoreException::PARTNER_BLOCKED);
 		}
+
+		self::checkImpersonatedAccessAllowed();
+
 		self::$ksUserId = !self::isEmpty(kCurrentContext::$ks_uid) ? kCurrentContext::$ks_uid : null;
 		if (self::$ksPartnerId != Partner::BATCH_PARTNER_ID)
 			self::$kuser = !self::isEmpty(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser() : null;
@@ -539,7 +542,57 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		return true;
 	}
-	
+
+	public static function checkImpersonatedAccessAllowed()
+	{
+		$enforceInternalPartnerAccess = kConf::get('enforce_internal_partner_access', kConfMapNames::SECURITY, null);
+		$internalPartnerAccessAllowedIps = kConf::get('internal_partner_access_allowed_ips', kConfMapNames::SECURITY, null);
+		$excludePartnerIds = kConf::get('enforce_internal_exclude_partner_ids', kConfMapNames::SECURITY, array());
+		if(!$internalPartnerAccessAllowedIps)
+		{
+			KalturaLog::debug("internalPartnerAccessAllowedIps not defined");
+			return;
+		}
+
+		$ipAddress = $_SERVER['REMOTE_ADDR'];
+		KalturaLog::debug("ipAddress [$ipAddress] internalPartnerAccessAllowedIps [" . print_r($internalPartnerAccessAllowedIps, true) . "]");
+
+		$ksPartnerId = !self::isEmpty(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
+		$softImpersonatedPartnerId = !self::isEmpty(kCurrentContext::$partner_id) ? kCurrentContext::$partner_id : null;
+		$impersonatingPartnerId = !self::isEmpty(kCurrentContext::$master_partner_id) ? kCurrentContext::$master_partner_id : null;
+		KalturaLog::debug("ksPartnerId [$ksPartnerId], softImpersonatedPartnerId [$softImpersonatedPartnerId], impersonatingPartnerId [$impersonatingPartnerId]");
+
+		if (in_array($ksPartnerId, $excludePartnerIds) || in_array($impersonatingPartnerId, $excludePartnerIds))
+		{
+			KalturaLog::debug("Impersonate used from an excluded partner");
+			return;
+		}
+
+		if (kCurrentContext::$is_admin_session &&
+			(($impersonatingPartnerId && $impersonatingPartnerId < 0) || ($ksPartnerId && $ksPartnerId < 0)))
+		{
+			$ipAllowed = false;
+			$ipRanges = explode(',', $internalPartnerAccessAllowedIps);
+			foreach ($ipRanges as $curRange)
+			{
+				if (kIpAddressUtils::isIpInRange($ipAddress, $curRange))
+				{
+					$ipAllowed = true;
+					break;
+				}
+			}
+			if (!$ipAllowed)
+			{
+				KalturaLog::debug("Impersonate used from an un-allowed address");
+				KalturaMonitorClient::sendErrorEvent("BLOCKED_IMPERSONATE_INTERNAL_PARTNER");
+				if($enforceInternalPartnerAccess)
+				{
+					throw new kCoreException("Impersonate used from an un-allowed address", kCoreException::ACCESS_UNAUTHORIZED);
+				}
+			}
+		}
+	}
+
 	public static function getRoleIds(Partner $operatingPartner = null, kuser $kuser = null)
 	{
 		$roleIds = null;
@@ -730,9 +783,40 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				$roleMap = self::getPermissions($roleId);
 				
 				// merge current role map to the global map
-				self::$map = array_merge_recursive(self::$map, $roleMap);
+				self::$map = self::mergeMapsUniquely(self::$map, $roleMap);
 			}
 		}
+	}
+
+	/**
+	 * Merge two permission maps recursively, ensuring unique values in the PERMISSION_NAMES_ARRAY
+	 * This function is to handle duplicated permission names when a user has multiple roles caused by th array_merge_recursive function.
+	 * @param array $currentMap The current permission map
+	 * @param array $roleMap The role permission map to merge
+	 * @return array The merged permission map
+	 */
+	protected static function mergeMapsUniquely($currentMap, $roleMap)
+	{
+		// Merge the two maps recursively, combining their values
+		$mergedMap = array_merge_recursive($currentMap, $roleMap);
+
+		// Check if the PERMISSION_NAMES_ARRAY key exists in the merged map and is an array
+		if (isset($mergedMap[self::PERMISSION_NAMES_ARRAY]) && is_array($mergedMap[self::PERMISSION_NAMES_ARRAY]))
+		{
+			// Iterate over each key-value pair in the PERMISSION_NAMES_ARRAY
+			foreach ($mergedMap[self::PERMISSION_NAMES_ARRAY] as $key => $value)
+			{
+				// If the value is an array, reset it to the key
+				// This ensures that duplicate keys are not nested as arrays
+				if (is_array($value))
+				{
+					$mergedMap[self::PERMISSION_NAMES_ARRAY][$key] = $key;
+				}
+			}
+		}
+
+		// Return the final merged map
+		return $mergedMap;
 	}
 
 	protected static function removeLimitedPermissions($restrictingRole)
@@ -1046,7 +1130,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	/**
-	 * @return return current permission names
+	 * @return array current permission names
 	 */
 	public static function getCurrentPermissions()
 	{

@@ -330,6 +330,9 @@ class KalturaMonitorClient
 		$partnerId = isset($params['partner_id']) && ctype_digit($params['partner_id']) ? $params['partner_id'] : null;
 
 		self::monitorApiStart(false, $action, $partnerId, $sessionType, $clientTag);
+		
+		list($service, $action) = explode('.', $action, 2);
+		self::checkApiRateLimit($partnerId, $service, $action, $params);
 	}
 
 	public static function monitorApiEnd($errorCode)
@@ -811,5 +814,21 @@ class KalturaMonitorClient
 		));
 		
 		self::writeDeferredEvent($data);
+	}
+	
+	public static function checkApiRateLimit($partnerId, $service, $action, $params)
+	{
+		if(!isset($partnerId))
+		{
+			return;
+		}
+		
+		$params['service'] = $service;
+		$params['action'] = $action;
+		
+		if(!KalturaResponseCacher::rateLimit($service, $action, $params, $partnerId))
+		{
+			KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
+		}
 	}
 }

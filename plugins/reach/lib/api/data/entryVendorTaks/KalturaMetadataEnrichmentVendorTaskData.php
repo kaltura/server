@@ -5,7 +5,7 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-class KalturaMetadataEnrichmentVendorTaskData extends KalturaVendorTaskData
+class KalturaMetadataEnrichmentVendorTaskData extends KalturaLocalizedVendorTaskData
 {
 	/**
 	 * The level of detail for the metadata enrichment process.
@@ -23,19 +23,10 @@ class KalturaMetadataEnrichmentVendorTaskData extends KalturaVendorTaskData
 	 */
 	public $instruction;
 
-	/**
-	 * Metadata enrichment result as JSON string.
-	 * For example: {"titles": ["The first title", "The second title"], "descriptions": ["The first description"], "tags": ["Tag1", "Tag2"]}
-	 *
-	 * @var string
-	 */
-	public $outputJson;
-
 	private static $map_between_objects = array
 	(
 		'detailLevel',
 		'instruction',
-		'outputJson',
 	);
 
 	public function getMapBetweenObjects()

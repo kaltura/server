@@ -154,7 +154,7 @@ class ESearchGroupUserItem extends ESearchItem
 	 */
 	public static function createGroupIdsTermsQuery($fieldName, $kuserId, $indexName)
 	{
-		$elasticVersion = kConf::get('elasticVersion', 'elastic', elasticClient::ELASTIC_MAJOR_VERSION_5);
+		$elasticVersion = elasticClient::getElasticVersion();
 		$terms = array('index' => $indexName,
 				'id' => "$kuserId",
 				'path' => ESearchUserFieldName::GROUP_IDS);

@@ -166,8 +166,10 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 	     switch ($type)
 	     {
 	         case KalturaAssetType::FLAVOR:
-	             $object = new KalturaFlavorAsset();
-	             break;
+	         {
+				 $object = new KalturaFlavorAsset();
+				 break;
+	         }
 	         case KalturaAssetType::LIVE:
 	             $object = new KalturaLiveAsset();
 	             break;

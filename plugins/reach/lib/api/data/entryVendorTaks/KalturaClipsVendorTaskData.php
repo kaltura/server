@@ -5,7 +5,7 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-class KalturaClipsVendorTaskData extends KalturaVendorTaskData
+class KalturaClipsVendorTaskData extends KalturaLocalizedVendorTaskData
 {
 	/**
 	 * Estimated duration of the clips, in seconds.

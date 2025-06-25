@@ -19,6 +19,7 @@ class embedPlaykitJsAction extends sfAction
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const IFRAME_EMBED_TYPE = "iframeEmbedType";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
+	const INCLUDE_SOURCE_MAP_PARAM_NAME = 'includeSourceMap';
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
 	const CANARY = "{canary}";
@@ -51,6 +52,7 @@ class embedPlaykitJsAction extends sfAction
 	private $playerConfig = null;
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
+	private $includeSourceMap = 'false';
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
 
 	public function execute()
@@ -104,7 +106,11 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " wrong config object");
 		}
 
-		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
+		$url = $context->bundlerUrl . '/build?config=' . base64_encode($config) .
+			'&name=' . $context->bundle_name .
+			'&source=' . base64_encode($context->sourcesPath) .
+			'&includeSourceMap=' . $context->includeSourceMap;
+		
 		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'), true);
 
 		if (!$content)
@@ -182,12 +188,14 @@ class embedPlaykitJsAction extends sfAction
 			//Embed factory is only relevant in dynamic embed
 			if ($this->getRequestParameter(self::EMBED_FACTORY_PARAM_NAME, false))
 			{
-				$bundleContent = "function getNamespacedKalturaPlayer() {  
-										$bundleContent
-										return KalturaPlayer;
-									}; 
-								const kalturaPlayerFactory = getNamespacedKalturaPlayer();
-								export { kalturaPlayerFactory }";
+				$configAsJson = $this->getPlayerConfigAsJson($i18nContent, $extraModulesNames);
+				$bundleContent = 'window.KalturaPlayers=(window.KalturaPlayers||{});' .
+								 "\nwindow.KalturaPlayers[$this->uiconfId]={};" .
+								 "\nwindow.KalturaPlayers[$this->uiconfId]['config'] = $configAsJson;" .
+								 "\nwindow.KalturaPlayers[$this->uiconfId]['lib'] = (() =>{
+								 	$bundleContentParts[1]
+									return KalturaPlayer;
+									})()";
 			}
 		}
 
@@ -207,15 +215,20 @@ class embedPlaykitJsAction extends sfAction
 		$uiConfData->uiConfData->name = $this->uiConf->getName();
 	}
 
-	private function appendConfig($content, $i18nContent, $extraModulesNames = null)
+	private function getPlayerConfigAsJson($i18nContent, $extraModulesNames = null)
 	{
 		$uiConf = $this->playerConfig;
 		$this->mergeEnvConfig($uiConf);
 		$this->mergeI18nConfig($uiConf, $i18nContent);
 		$this->mergeExtraModuleNames($uiConf, $extraModulesNames);
 		$this->addUiConfData($uiConf);
-		$uiConfJson = json_encode($uiConf);
+		return json_encode($uiConf);
 
+	}
+
+	private function appendConfig($content, $i18nContent, $extraModulesNames = null)
+	{
+		$uiConfJson = $this->getPlayerConfigAsJson($i18nContent, $extraModulesNames);
 
 		if ($uiConfJson === false)
 		{
@@ -541,26 +554,41 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
-
+		
+		// Player setup
+		$kalturaPlayer = "KalturaPlayer.setup(config);";
+		if($iframe_embed_type === self::RAPT)
+		{
+			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
+		}
+		
+		// Player content loading
+		$loadPlayerJs = "
+			var kalturaPlayer = $kalturaPlayer;
+			$loadContentMethod
+		";
+		
 		$v2tov7ConfigJs='';
 		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
 			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
-
-		}
-		$kalturaPlayer = "KalturaPlayer.setup(config);";
-		if($iframe_embed_type === self::RAPT)
-		{
-			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
+			$originalLoadPlayerJs = $loadPlayerJs;
+			$loadPlayerJs = "addEventListener('load', (event) => {
+				if (!document.getElementById(config.targetId)) {
+					const playerDiv = document.createElement('div');
+					playerDiv.id = config.targetId;
+					document.body.appendChild(playerDiv);
+					$originalLoadPlayerJs
+				}
+			});";
 		}
 
 		$autoEmbedCode = "
 		try {
 			var config=$config;
 			$v2tov7ConfigJs
-			var kalturaPlayer = $kalturaPlayer
-			$loadContentMethod
+			$loadPlayerJs
 		} catch (e) {
 			console.error(e.message);
 		}
@@ -645,7 +673,7 @@ class embedPlaykitJsAction extends sfAction
 			$loadVersionTagMapFromKConf = kConf::get("loadFromKConf_".$tag, kConfMapNames::EMBED_PLAYKIT, null);
 			if($loadVersionMapFromKConf || $loadVersionTagMapFromKConf)
 			{
-				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);	
+				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);
 			}
 			else
 			{
@@ -817,6 +845,9 @@ class embedPlaykitJsAction extends sfAction
 
 		//Get should force regenration
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
+		
+		//Should we include player source map in the request result
+		$this->includeSourceMap = $this->getRequestParameter(self::INCLUDE_SOURCE_MAP_PARAM_NAME, 'false');
 
 		//Get the list of partner 0 uiconf tags for uiconfs that contain {latest} and {beta} lists
 		$embedPlaykitConf = kConf::getMap(kConfMapNames::EMBED_PLAYKIT);

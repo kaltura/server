@@ -344,10 +344,12 @@ class MediaRepurposingUtils
 	{
 		switch ($type) {
 			case 'KalturaIntegerValue':
+			case 'Kaltura_Client_Type_IntegerValue[]':
 				$elem = new Kaltura_Client_Type_IntegerValue();
 				$elem->value = intval($params[0]);
 				return $elem;
 			case 'KalturaKeyValue':
+			case 'Kaltura_Client_Type_KeyValue[]':
 				$elem = new Kaltura_Client_Type_KeyValue();
 				$elem->key = $params[0];
 				$elem->value = $params[1];
@@ -361,8 +363,10 @@ class MediaRepurposingUtils
 	{
 		switch ($type) {
 			case 'KalturaIntegerValue':
+			case 'Kaltura_Client_Type_IntegerValue[]':
 				return $elem->value;
 			case 'KalturaKeyValue':
+			case 'Kaltura_Client_Type_KeyValue[]':
 				return $elem->key . ":" . $elem->value;
 			default:
 				return null;
@@ -376,13 +380,13 @@ class MediaRepurposingUtils
 			{
 				return null;
 			}
-			else if(strpos($type ,'array') > -1)
+			else if(strpos($type ,'array') > -1 || strpos($type ,'[]') > -1)
 			{
 				$arr = array();
-				$elemType = explode(" ", $type); // template is 'array of XXX';
+				$elemType = strpos($type ,'array') ? explode(" ", $type) : $type; // template is 'array of XXX' or 'Kaltura_Client_Type_xxx[]" as per client generator
 				foreach (explode(",", $value) as $val)
 				{
-					$arr[] = self::elementTypeCreator($elemType[2], explode(":", $val));
+					$arr[] = self::elementTypeCreator($elemType, explode(":", $val));
 				}
 
 				return $arr;
@@ -393,13 +397,13 @@ class MediaRepurposingUtils
 	}
 
 	private static function setValueToString($value, $type) {
-		if (strpos($type ,'array') > -1)
+		if (strpos($type ,'array') > -1 || strpos($type ,'[]') > -1 )
 		{
 			$values = '';
-			$elemType = explode(" ", $type); // template is 'array of XXX';
+			$elemType = strpos($type ,'array') ? explode(" ", $type) : $type; // template is 'array of XXX' or 'Kaltura_Client_Type_xxx[]" as per client generator
 			if ($value && is_array($value))
 				foreach($value as $elem)
-					$values .= self::getValueFromElement($elemType[2], $elem) . ",";
+					$values .= self::getValueFromElement($elemType, $elem) . ",";
 			return rtrim($values, ',');
 		}
 

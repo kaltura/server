@@ -24,4 +24,5 @@ class kPermissionException extends kCoreException
 	const ROLE_NOT_FOUND = 'ROLE_NOT_FOUND';	
 	
 	const ROLE_IS_BEING_USED = 'ROLE_IS_BEING_USED';
+	const INVALID_PARTNER_ID = 'INVALID_PARTNER_ID';
 }
