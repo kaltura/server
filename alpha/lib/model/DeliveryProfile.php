@@ -592,12 +592,12 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 
 	public function setIsNonDRM($v)
 	{
-		$this->putInCustomData("isNonDRM", $v);
+		$this->putInCustomData('isNonDRM', $v);
 	}
 
 	public function getIsNonDRM()
 	{
-		return $this->getFromCustomData("isNonDRM", null, false);
+		return $this->getFromCustomData('isNonDRM', null, false);
 	}
 
 	public function getRegionPrice($region)
