@@ -88,7 +88,7 @@ $port = $config['elasticPort'] ?? null;		// the port to connect
 $distribution = $config['distribution'] ?? null;
 if ($distribution === elasticClient::OPENSEARCH_DISTRIBUTION)
 {
-	KalturaLog::debug("Found distribution config value [$distribution] - using opensearch syntax");
+	KalturaLog::debug("Found distribution config value [$distribution] - using elastic 7 syntax");
 	$version = elasticClient::ELASTIC_MAJOR_VERSION_7;
 }
 else
