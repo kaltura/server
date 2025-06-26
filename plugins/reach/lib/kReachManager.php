@@ -527,7 +527,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				KalturaLog::log("Catalog item [" . $pendingEntryReadyTask->getCatalogItemId() . " not found] ");
 				continue;
 			}
-			$pendingEntryReadyTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
+			$pendingEntryReadyTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry(), $pendingEntryReadyTask->getEntryObjectType()));
 			if(!$dbVendorCatalogItem->getPayPerUse() && $pendingEntryReadyTask->getPrice() == 0)
 			{
 				$vendorCatalogItem = $pendingEntryReadyTask->getCatalogItem();
@@ -823,7 +823,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$accessKeyExpiry = $vendorCatalogItem->getKsExpiry();
 		$entryVendorTask->setIsOutputModerated($shouldModerateOutput);
 		$entryVendorTask->setAccessKeyExpiry($accessKeyExpiry);
-		$entryVendorTask->setAccessKey($vendorCatalogItem->generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry));
+		$entryVendorTask->setAccessKey($vendorCatalogItem->generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, $entryVendorTask->getEntryObjectType()));
 		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());
@@ -892,6 +892,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				}
 				return true;
 
+			case EntryObjectType::ASSET:
+				return true;
+
 			default:
 				return false;
 		}
@@ -943,6 +946,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				case EntryObjectType::ENTRY:
 					return $entryObject->getKuserId();
 
+				case EntryObjectType::ASSET:
+					$entryId = $entryObject->getEntryId();
+					$entry = entryPeer::retrieveByPK($entryId);
+					return $entry->getKuserId();
+
 				default:
 					return null;
 			}
@@ -965,6 +973,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
 				case EntryObjectType::ENTRY:
 					return $entryObject->getPuserId();
+
+				case EntryObjectType::ASSET:
+
+					$entryId = $entryObject->getEntryId();
+					$entry = entryPeer::retrieveByPK($entryId);
+					return $entry->getPuserId();
 
 				default:
 					return null;

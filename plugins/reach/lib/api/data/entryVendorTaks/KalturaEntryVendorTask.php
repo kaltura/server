@@ -395,6 +395,10 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 				$this->validateEntryId();
 				return;
 
+			case KalturaEntryObjectType::ASSET:
+				$this->validateAssetId();
+				return;
+
 			default:
 				throw new KalturaAPIException(KalturaReachErrors::ENTRY_OBJECT_TYPE_NOT_SUPPORTED, $this->entryObjectType);
 		}
@@ -425,6 +429,15 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			{
 				throw new KalturaAPIException(KalturaReachErrors::TASK_EVENT_ENTRY_ID_MISMATCH, $this->entryId, $connectedEvent->getId());
 			}
+		}
+	}
+
+	private function validateAssetId()
+	{
+		$dbAsset = assetPeer::retrieveById($this->entryId);
+		if (!$dbAsset)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		}
 	}
 

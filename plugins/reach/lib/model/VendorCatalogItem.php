@@ -162,14 +162,26 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	}
 
 	/**
-	 * @param $entryId
+	 * @param $objectId
 	 * @param $shouldModerateOutput
 	 * @param $turnaroundTime
 	 * @return string
 	 * @throws Exception
 	 */
-	public function generateReachVendorKs($entryId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $disableDefaultEntryFilter = false)
+	public function generateReachVendorKs($objectId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $entryObjectType=EntryObjectType::ENTRY, $disableDefaultEntryFilter = false)
 	{
+		$entryId = $objectId;
+
+		if($entryObjectType == EntryObjectType::ASSET)
+		{
+			$asset = assetPeer::retrieveByIdNoFilter($objectId);
+			if (!$asset)
+			{
+				throw new Exception("Asset Id [$objectId] not Found to create REACH Vendor limited session");
+			}
+			$entryId = $asset->getEntryId();
+		}
+
 		$entry = $disableDefaultEntryFilter ? entryPeer::retrieveByPKNoFilter($entryId) : entryPeer::retrieveByPK($entryId);
 		if (!$entry)
 			throw new Exception("Entry Id [$entryId] not Found to create REACH Vendor limited session");
@@ -219,6 +231,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
 				return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 
+			case EntryObjectType::ASSET:
+				$sourceFlavor = assetPeer::retrieveById($entryId);
+				return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+
 			default:
 				return 0;
 		}
@@ -262,6 +278,11 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		}
 
 		return $supported;
+	}
+
+	public function isAssetSupported($asset): bool
+	{
+		return false;
 	}
 
 	public function getTaskJobData($object)
@@ -357,6 +378,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 			case EntryObjectType::ENTRY:
 				$supportedType = $this->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType());
 				return !$this->isEntryDurationExceeding($entryObject) && $supportedType;
+
+			case EntryObjectType::ASSET:
+				return $this->isAssetSupported($entryObject);
 
 			default:
 				return false;
