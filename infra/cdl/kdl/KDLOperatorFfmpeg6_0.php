@@ -238,7 +238,7 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 			}
 		}
 		if (count($videoFilterKeys) > 1)
-			self::mergeFilterLines($cmdValsArr, $videoFilterKeys, $count);
+			self::mergeVideoFilterLines($cmdValsArr, $videoFilterKeys, $count);
 		if(count($videoFilterKeys) > 0)
 			$target->keyVidFilters = $videoFilterKeys[0];
 		return true;
@@ -278,7 +278,7 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 	}
 	protected static function mergeVideoFilterLines(array &$cmdValsArr, $videoFilterKeys, $count)
 	{
-		return $this->mergeFilterCommands($cmdValsArr, $videoFilterKeys, null, "vflt");
+		return self::mergeFilterCommands($cmdValsArr, $videoFilterKeys, null, "vflt");
 	}
 	
 	/**
