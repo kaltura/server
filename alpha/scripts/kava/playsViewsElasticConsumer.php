@@ -4,6 +4,9 @@ require_once(__DIR__ . '/../../../../../kava-utils/lib/StreamQueue.php');
 require_once(__DIR__ . '/../bootstrap.php');
 require_once(__DIR__ . '/playsViewsCommon.php');
 
+define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
+define('DEFAULT_PROM_FILE', '/etc/node_exporter/data/playsViewsElasticConsumer.prom'); // preparation for node exporter metrics
+
 class playsViewsElasticConsumer extends BaseConsumer
 {
 	protected function processMessage($message)
@@ -49,6 +52,7 @@ class playsViewsElasticConsumer extends BaseConsumer
 	}
 }
 
+/* =============================== MAIN =============================== */
 // parse the command line
 if ($argc < 2)
 {
@@ -60,20 +64,63 @@ $id = $argv[1];
 $consumerId = getenv(CLUSTER_ID_VAR . "_$id");
 $bulkSize = getenv(BULK_SIZE_VAR);
 
+// load cluster configurations
+$hostname = $_SERVER["HOSTNAME"] ?? gethostname();
+$config = kConf::get('elasticPopulateSettings', 'elastic_populate', array());
+if (empty($config))
+{
+	$configFile = ROOT_DIR . "/configurations/elastic/populate/$hostname.ini";
+	
+	if (!file_exists($configFile) && !generateConfigFile($configFile))
+	{
+		KalturaLog::err("Configuration file [$configFile] not found.");
+		exit(1);
+	}
+	
+	$config = parse_ini_file($configFile);
+	KalturaLog::debug("Configuration file [$configFile] loaded successfully - values: " . print_r($config, true));
+}
+
+$host = $config['elasticServer'] ?? null;	// the host endpoint
+$port = $config['elasticPort'] ?? null;		// the port to connect
+
+// add support for opensearch distribution, if 'opensearch' is set in the config we will use elastic 7+ syntax
+$distribution = $config['distribution'] ?? null;
+if ($distribution === elasticClient::OPENSEARCH_DISTRIBUTION)
+{
+	KalturaLog::debug("Found distribution config value [$distribution] - using opensearch syntax");
+	$version = elasticClient::ELASTIC_MAJOR_VERSION_7;
+}
+else
+{
+	$version = $config['elasticVersion'] ?? null;
+}
+
+// validate the configuration - all values must be set
+if (is_null($host) || is_null($port) || is_null($version))
+{
+	KalturaLog::err("Missing configuration values: host [$host], port [$port], version [$version]");
+	exit(1);
+}
+
 try
 {
 	$topicsPath = kConf::get(CONF_TOPICS_PATH);
 }
 catch (Exception $ex)
 {
-	Utils::errorLog('Missing topics path config');
+	KalturaLog::err('Missing topics path config');
 	exit(1);
 }
 
-Utils::writeLog('Info: started, pid=' . getmypid());
+KalturaLog::info('Started, pid=' . getmypid());
+KalturaLog::log("Starting playsViewsElasticConsumer with consumerId [$consumerId] and bulkSize [$bulkSize]");
+KalturaLog::log("Elastic Client host [$host] port [$port] version [$version]");
+
+// todo add node exporter
 
 // connect to elastic
-$elasticClient = new elasticClient();
+$elasticClient = new elasticClient($host, $port, $version);
 $elasticClient->setBulkSize($bulkSize);
 
 //read dedicated indices config
@@ -126,4 +173,4 @@ catch(Exception $e)
 {
 	KalturaLog::err($e->getMessage());
 }
-Utils::writeLog('Info: done');
+KalturaLog::log('Info: done');
