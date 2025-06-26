@@ -437,7 +437,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$dbAsset = assetPeer::retrieveById($this->entryId);
 		if (!$dbAsset)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
+			throw new KalturaAPIException(KalturaErrors::ASSET_ID_NOT_FOUND, $this->entryId);
 		}
 	}
 
