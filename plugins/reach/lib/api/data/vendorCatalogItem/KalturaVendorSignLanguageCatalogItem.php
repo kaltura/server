@@ -10,16 +10,10 @@ class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
 	 * @filter eq,in
 	 */
 	public $targetLanguage;
-	/**
-	 * @var KalturaVendorCatalogItemSignLanguageOutputFormat
-	 * @filter eq,in
-	 */
-	public $outputFormat;
 
 	private static $map_between_objects = array
 	(
-		'targetLanguage',
-		'outputFormat',
+		'targetLanguage'
 	);
 
     protected function getServiceFeature()
