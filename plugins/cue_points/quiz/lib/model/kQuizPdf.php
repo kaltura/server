@@ -111,10 +111,12 @@ class kQuizPdf
 		$this->pdf->AddFont(self::DEJAVU_FONT,'','DejaVuSans.ttf',true);
 	}
 
-	protected function reverseMultibyteString($input) {
+	protected function reverseMultibyteString($input)
+	{
 		$length = mb_strlen($input, 'UTF-8');
 		$reversed = '';
-		for ($i = $length - 1; $i >= 0; $i--) {
+		for ($i = $length - 1; $i >= 0; $i--)
+		{
 			$reversed .= mb_substr($input, $i, 1, 'UTF-8');
 		}
 		return $reversed;
