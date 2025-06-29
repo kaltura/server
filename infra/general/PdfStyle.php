@@ -19,7 +19,7 @@ class PdfStyle
     private $rowHeight = 5;
     private $rowIndent = 'L';
     private $x = 0; //set the beginning of the line
-	protected $r2l = false; // right to left text direction
+	protected $r2l = false; // indicate if the text is right to left (for example Hebrew or Arabic)
 
     public function __construct($sName, $fName, $fSize=12, $fStyle='', $addLineBefore=false, $addLineAfter=false, $rowI = 'L',
                                 $xx=0, $fColor='', $rowH=5, $r2l = false)

@@ -131,6 +131,7 @@ class PdfGenerator extends tfpdf
             return;
         }
 
+		// In case the style is of a right to left language, reverse the numbering position of the list item
         $text = $style->getR2L() ? $text . " ." . $sign : $sign.". ".$text;
 
         $this->addText($text, $style);

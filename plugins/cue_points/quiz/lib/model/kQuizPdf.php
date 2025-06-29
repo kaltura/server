@@ -169,17 +169,30 @@ class kQuizPdf
 		$this->pdf->addList($sign, $text, $style);
 	}
 
-	protected function handleR2LText($text, PdfStyle $stylePrefix)
+	/**
+	 * If the provided text is in right to left style, this function will handle the line's
+	 * indentation if needed and will reverse the sentence to support right to left languages
+	 *
+	 * @param string $text The text to add.
+	 * @param PdfStyle $style The style to apply to the text.
+	 */
+	protected function handleR2LText($text, PdfStyle $style)
 	{
-		if ($stylePrefix->getR2L())
+		if ($style->getR2L())
 		{
-			$wantedIndentation = !is_null($stylePrefix->getX()) ? $stylePrefix->getX() : 0;
+			$wantedIndentation = !is_null($style->getX()) ? $style->getX() : 0;
 			$this->pdf->SetMargins($this->margins['left'],$this->margins['top'],$this->margins['right'] + $wantedIndentation);
 			return $this->reverseSentence($text);
 		}
 		return $text;
 	}
 
+	/**
+	 * Returns the style prefix based on the detected language of the provided text.
+	 *
+	 * @param string|null $text The text to analyze for language detection.
+	 * @return string The style prefix corresponding to the detected language.
+	 */
 	private function getStylePrefix($text)
 	{
 		$stylePrefix = self::NOTO_STYLE_PREFIX;
@@ -211,6 +224,13 @@ class kQuizPdf
 		return $this->pdf->Submit();
 	}
 
+	/**
+	 * Detects if the given text matches any of the provided language patterns.
+	 *
+	 * @param string $text The text to check.
+	 * @param array $languagePatterns An associative array where keys are language codes and values are regex patterns.
+	 * @return bool True if the text matches any pattern, false otherwise.
+	 */
 	protected function detectLanguage($text, $languagePatterns)
 	{
 		// Check if the text matches any language pattern
@@ -224,6 +244,12 @@ class kQuizPdf
 		return false;
 	}
 
+	/**
+	 * Reverses the order of words in a sentence while preserving numeric values at the start and end.
+	 *
+	 * @param string $input The input sentence to reverse.
+	 * @return string The reversed sentence.
+	 */
 	protected function reverseSentence($input)
 	{
 		$sentence = explode(' ', $input);
@@ -252,6 +278,14 @@ class kQuizPdf
 		return implode(' ', $reversedOrder);
 	}
 
+	/**
+	 * Prepares the final reversed array by concatenating the first numeric, reversed middle section, and last numeric.
+	 *
+	 * @param mixed $firstNumeric The first numeric value or null.
+	 * @param mixed $lastNumeric The last numeric value or null.
+	 * @param array $noneNumericMiddleSection The middle section of non-numeric words.
+	 * @return array The final reversed array.
+	 */
 	protected function prepareFinalReversedArray($firstNumeric, $lastNumeric, $noneNumericMiddleSection)
 	{
 		$reversedOrder = array_reverse($noneNumericMiddleSection);
@@ -271,6 +305,12 @@ class kQuizPdf
 		return $result;
 	}
 
+	/**
+	 * Reverses a single word by iterating through its characters in reverse order.
+	 *
+	 * @param string $input The input word to reverse.
+	 * @return string The reversed word.
+	 */
 	protected function reverseSingleWord($input)
 	{
 		$length = mb_strlen($input, 'UTF-8');
