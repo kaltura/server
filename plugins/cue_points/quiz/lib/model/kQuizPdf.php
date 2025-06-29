@@ -46,7 +46,7 @@ class kQuizPdf
 
 		'ber-ma' => '/[\x{2D30}-\x{2D7F}]+/u', // Berber (Morocco) - Tifinagh script
 		'hy' => '/[\x{0531}-\x{0556}\x{0561}-\x{0587}]+/u', // Armenian / Azerbaijani (Iran) - Armenian script
-		'iu' => '/[\x{1400}-\x{167F}]+/u', // Inuktitut - Unified Canadian Aboriginal Syllabics
+		'iu' => '/[\x{1400}-\x{167F}]+/u', // Inuktitut - Unified Canadian Aboriginal Syllabic
 		'ka' => '/[\x{10A0}-\x{10FF}]+/u', // Georgian
 		'lo' => '/[\x{0E80}-\x{0EFF}]+/u', // Lao
 	];
