@@ -139,7 +139,7 @@ class kQuizPdf
 			$questNum +=1;
 			$stylePrefix = $this->getStylePrefix($question->getName());
 			$questionName = $this->handleR2LText($question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
-			$this->pdf->addList($questNum, $questionName, $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE], $stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE);
+			$this->pdf->addList($questNum, $questionName, $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE], self::RIGHT_2_LEFT_STYLE_PREFIX);
 			$alphabet = range('A', 'Z');
 			$ansIdx = 0;
 			if($question->getQuestionType() !== QuestionType::OPEN_QUESTION)
@@ -151,7 +151,7 @@ class kQuizPdf
 						$text = $optionalAnswer->getText();
 						$stylePrefix = $this->getStylePrefix($text);
 						$text = $this->handleR2LText($text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
-						$this->pdf->addList($alphabet[$ansIdx], $text, $this->styles[$stylePrefix . self::INDENT_LIST_STYLE], $stylePrefix . self::INDENT_LIST_STYLE);
+						$this->pdf->addList($alphabet[$ansIdx], $text, $this->styles[$stylePrefix . self::INDENT_LIST_STYLE], self::RIGHT_2_LEFT_STYLE_PREFIX);
 						$ansIdx += 1;
 					}
 				}
@@ -206,7 +206,7 @@ class kQuizPdf
 		return $this->pdf->Submit();
 	}
 
-	function detectNoneLatinLanguage($text) {
+	protected function detectNoneLatinLanguage($text) {
 		// Check if the text matches any language pattern
 		foreach ($this->noneLatineLanguagePatterns as $language => $pattern) {
 			if (preg_match($pattern, $text)) {

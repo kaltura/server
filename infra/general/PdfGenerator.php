@@ -131,7 +131,7 @@ class PdfGenerator extends tfpdf
             return;
         }
 
-		$r2l = (strpos($r2lStylePrefix, $style->getStyleName()) !== false && $style->getRowIndent() == 'R') ??  false;
+		$r2l = (!empty($r2lStylePrefix) && strpos($style->getStyleName(), $r2lStylePrefix) !== false && $style->getRowIndent() == 'R') ??  false;
         if (is_numeric($sign))
         {
             $text = $r2l ? $text . " ." . $sign : $sign.". ".$text;
