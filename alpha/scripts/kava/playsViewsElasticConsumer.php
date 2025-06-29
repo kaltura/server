@@ -5,7 +5,8 @@ require_once(__DIR__ . '/../bootstrap.php');
 require_once(__DIR__ . '/playsViewsCommon.php');
 
 define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
-define('DEFAULT_PROM_FILE', '/etc/node_exporter/data/playsViewsElasticConsumer.prom'); // preparation for node exporter metrics
+
+const DEFAULT_PROM_FILE = '/etc/node_exporter/data/playsViewsElasticConsumer.prom';
 
 class playsViewsElasticConsumer extends BaseConsumer
 {
@@ -56,22 +57,21 @@ class playsViewsElasticConsumer extends BaseConsumer
 // parse the command line
 if ($argc < 2)
 {
-	echo "Usage:\n\t" . basename(__file__) . " <id>\n";
+	echo "Usage:\n\t" . basename(__file__) . " <bulk_size>\n";
 	exit(1);
 }
 
-$id = $argv[1];
-$consumerId = getenv(CLUSTER_ID_VAR . "_$id");
-$bulkSize = getenv(BULK_SIZE_VAR);
+// get the bulk size from the command line argument or use the default value
+$bulkSize = is_numeric($argv[1]) ? intval($argv[1]) : 250;
 
 // load cluster configurations
-$hostname = $_SERVER["HOSTNAME"] ?? gethostname();
 $config = kConf::get('elasticPopulateSettings', 'elastic_populate', array());
 if (empty($config))
 {
+	$hostname = $_SERVER["HOSTNAME"] ?? gethostname();
 	$configFile = ROOT_DIR . "/configurations/elastic/populate/$hostname.ini";
 	
-	if (!file_exists($configFile) && !generateConfigFile($configFile))
+	if (!file_exists($configFile))
 	{
 		KalturaLog::err("Configuration file [$configFile] not found.");
 		exit(1);
@@ -81,8 +81,9 @@ if (empty($config))
 	KalturaLog::debug("Configuration file [$configFile] loaded successfully - values: " . print_r($config, true));
 }
 
-$host = $config['elasticServer'] ?? null;	// the host endpoint
-$port = $config['elasticPort'] ?? null;		// the port to connect
+$consumerId = $config['elasticCluster'] ?? null;	// the consumer id to use
+$host = $config['elasticServer'] ?? null;			// the host endpoint
+$port = $config['elasticPort'] ?? null;				// the port to connect
 
 // add support for opensearch distribution, if 'opensearch' is set in the config we will use elastic 7+ syntax
 $distribution = $config['distribution'] ?? null;
@@ -97,9 +98,9 @@ else
 }
 
 // validate the configuration - all values must be set
-if (is_null($host) || is_null($port) || is_null($version))
+if (is_null($consumerId) || is_null($host) || is_null($port) || is_null($version))
 {
-	KalturaLog::err("Missing configuration values: host [$host], port [$port], version [$version]");
+	KalturaLog::err("Missing configuration values: consumerId [$consumerId] host [$host], port [$port], version [$version]");
 	exit(1);
 }
 
@@ -114,7 +115,7 @@ catch (Exception $ex)
 }
 
 KalturaLog::info('Started, pid=' . getmypid());
-KalturaLog::log("Starting playsViewsElasticConsumer with consumerId [$consumerId] and bulkSize [$bulkSize]");
+KalturaLog::log("Starting playsViewsElasticConsumer for consumerId [$consumerId] and bulkSize [$bulkSize]");
 KalturaLog::log("Elastic Client host [$host] port [$port] version [$version]");
 
 // todo add node exporter
@@ -171,6 +172,49 @@ try
 }
 catch(Exception $e)
 {
+	writeFailure($e);
 	KalturaLog::err($e->getMessage());
 }
+
+writeSuccess();
 KalturaLog::log('Info: done');
+
+/* =============================== FUNCTIONS =============================== */
+function writeSuccess($filePath = null): void
+{
+	$filePath = $filePath ?? DEFAULT_PROM_FILE;
+	createDirPath($filePath);
+	
+	$description = 'Successfully finished playsViewsElasticConsumer.php script';
+	$timestamp = time();
+	$date = date("Y-m-d H:i:s", $timestamp);
+	$hostname = gethostname();
+	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", success=\"true\"} $timestamp" . PHP_EOL;
+	
+	file_put_contents($filePath, $data, LOCK_EX);
+}
+
+function writeFailure($e, $filePath = null): void
+{
+	$filePath = $filePath ?? DEFAULT_PROM_FILE;
+	createDirPath($filePath);
+	
+	$description = 'Error in playsViewsElasticConsumer.php script';
+	$timestamp = time();
+	$date = date("Y-m-d H:i:s", $timestamp);
+	$message = $e->getMessage();
+	$code = $e->getCode();
+	$hostname = gethostname();
+	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", success=\"false\", message=\"$message\", code=\"$code\"} $timestamp" . PHP_EOL;
+	
+	file_put_contents($filePath, $data, LOCK_EX);
+}
+
+function createDirPath($filePath): void
+{
+	$dirPath = dirname($filePath);
+	if (!is_dir($dirPath))
+	{
+		mkdir($dirPath, 0775, true);
+	}
+}
