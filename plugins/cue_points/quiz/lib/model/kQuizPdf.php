@@ -89,10 +89,12 @@ class kQuizPdf
 		$styles[self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('ListWithAddLineBefore', self::TIMES_FONT, 12, 'I', true);
 		$styles[self::ASIAN_STYLE_PREFIX.self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('AsianListWithAddLineBefore', self::ASIAN_FONT, 12,
 			'', true);
-		$styles[self::NOTO_STYLE_PREFIX.self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('NotoListWithAddLineBefore', self::NOTO_SANS_FONT, 12, 'I', true);
+		$styles[self::NOTO_STYLE_PREFIX.self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('NotoListWithAddLineBefore', self::NOTO_SANS_FONT,
+			12, 'I', true);
 
 		$styles[self::TITLE_STYLE] = new PdfStyle('Title', 'Arial', 14, 'BU', true, false, 'C');
-		$styles[self::NOTO_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NotoTitle', self::NOTO_SANS_FONT, 14, 'BU', true, false, 'C');
+		$styles[self::NOTO_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NotoTitle',
+			self::NOTO_SANS_FONT, 14, 'BU', true, false, 'C');
 		$styles[self::ASIAN_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('AsianTitle', 'Arial', 14, 'U', true, false, 'C');
 
 		$styles[self::NATIVE_LANGUAGE_SCRIPT_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NativeLanguageScriptTitle', self::DEJAVU_FONT, 14, 'BU', true, false, 'C');
@@ -124,17 +126,6 @@ class kQuizPdf
 		$this->pdf->AddFont(self::NOTO_SANS_FONT,'BI','NotoSans-BoldItalic.ttf',true);
 		$this->pdf->AddFont(self::NOTO_SANS_FONT,'I','NotoSans-Italic.ttf',true);
 		$this->pdf->AddFont(self::DEJAVU_FONT,'','DejaVuSans.ttf',true);
-	}
-
-	protected function reverseMultibyteString($input)
-	{
-		$length = mb_strlen($input, 'UTF-8');
-		$reversed = '';
-		for ($i = $length - 1; $i >= 0; $i--)
-		{
-			$reversed .= mb_substr($input, $i, 1, 'UTF-8');
-		}
-		return $reversed;
 	}
 
 	public function createQuestionPdf()
@@ -184,7 +175,7 @@ class kQuizPdf
 		{
 			$wantedIndentation = !is_null($stylePrefix->getX()) ? $stylePrefix->getX() : 0;
 			$this->pdf->SetMargins($this->margins['left'],$this->margins['top'],$this->margins['right'] + $wantedIndentation);
-			return $this->reverseMultibyteString($text);
+			return $this->reverseSentence($text);
 		}
 		return $text;
 	}
@@ -231,5 +222,63 @@ class kQuizPdf
 			}
 		}
 		return false;
+	}
+
+	protected function reverseSentence($input)
+	{
+		$sentence = explode(' ', $input);
+
+		// Check if the first and last elements are numeric - if so, save them
+		$firstNumeric = is_numeric($sentence[0]) ? $sentence[0] : null;
+		$lastNumeric = is_numeric(end($sentence)) ? end($sentence) : null;
+
+		// Determine the start and end indices for slicing
+		$noneNumStart = $firstNumeric !== null ? 1 : 0;
+		$noneNumEnd = $lastNumeric !== null ? count($sentence) - 1 : count($sentence);
+
+		// Reverse each none numeric word in the array
+		foreach ($sentence as &$word)
+		{
+			$word = is_numeric($word) ? $word : $this->reverseSingleWord($word);
+		}
+
+		// Obtain the sub array that contains the middle section of the words (excluding first and last numeric words)
+		$noneNumericMiddleSection = array_slice($sentence, $noneNumStart, $noneNumEnd - $noneNumStart);
+
+		// Reverse the order of the array
+		$reversedOrder = $this->prepareFinalReversedArray($firstNumeric, $lastNumeric, $noneNumericMiddleSection);
+
+		// Implode the array into a new string
+		return implode(' ', $reversedOrder);
+	}
+
+	protected function prepareFinalReversedArray($firstNumeric, $lastNumeric, $noneNumericMiddleSection)
+	{
+		$reversedOrder = array_reverse($noneNumericMiddleSection);
+
+		// Concatenate the array while preserving numeric first and/or last cells
+		$result = [];
+		if ($firstNumeric !== null)
+		{
+			$result[] = $firstNumeric;
+		}
+		$result = array_merge($result, $reversedOrder);
+		if ($lastNumeric !== null)
+		{
+			$result[] = $lastNumeric;
+		}
+
+		return $result;
+	}
+
+	protected function reverseSingleWord($input)
+	{
+		$length = mb_strlen($input, 'UTF-8');
+		$reversed = '';
+		for ($i = $length - 1; $i >= 0; $i--)
+		{
+			$reversed .= mb_substr($input, $i, 1, 'UTF-8');
+		}
+		return $reversed;
 	}
 }
