@@ -93,8 +93,8 @@ class kQuizPdf
 			12, 'I', true);
 
 		$styles[self::TITLE_STYLE] = new PdfStyle('Title', 'Arial', 14, 'BU', true, false, 'C');
-		$styles[self::NOTO_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NotoTitle',
-			self::NOTO_SANS_FONT, 14, 'BU', true, false, 'C');
+		$styles[self::NOTO_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NotoTitle', self::NOTO_SANS_FONT, 14, 'BU', true,
+			false, 'C');
 		$styles[self::ASIAN_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('AsianTitle', 'Arial', 14, 'U', true, false, 'C');
 
 		$styles[self::NATIVE_LANGUAGE_SCRIPT_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NativeLanguageScriptTitle', self::DEJAVU_FONT, 14, 'BU', true, false, 'C');
