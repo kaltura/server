@@ -18,7 +18,7 @@ class PdfStyle
     private $fColor = ''; //currently not supported
     private $rowHeight = 5;
     private $rowIndent = 'L';
-    private $x = 0; //set the beginig of the line
+    private $x = 0; //set the beginning of the line
 	protected $r2l = false; // right to left text direction
 
     public function __construct($sName, $fName, $fSize=12, $fStyle='', $addLineBefore=false, $addLineAfter=false, $rowI = 'L',

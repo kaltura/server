@@ -57,9 +57,13 @@ class kQuizPdf
 	];
 
 	protected $asianLanguages = [
-		'zh' => '/\p{Han}+/u', // Chinese
-//		'ja' => '/\p{Hiragana}|\p{Katakana}|\p{Han}+/u', // Japanese
-//		'ko' => '/\p{Hangul}+/u' // Korean
+		'ja' => '/\p{Hiragana}|\p{Katakana}|\p{Han}+/u', // Japanese - Chinese
+	];
+
+	protected $margins = [
+		'left' => 10,
+		'top' => 15,
+		'right' => 10
 	];
 
 	public function __construct($entryId)
@@ -105,7 +109,7 @@ class kQuizPdf
 	private function initPDF()
 	{
 		$this->pdf = new PdfGenerator('Thank You', 'Questionnaire', '','Questionnaire','Questionnaire', '');
-		$this->pdf->SetMargins(10,15,10);
+		$this->pdf->SetMargins($this->margins['left'],$this->margins['top'],$this->margins['right']);
 		$this->pdf->AliasNbPages();
 		$this->pdf->AddPage();
 		$this->pdf->SetAutoPageBreak(true, 20);
@@ -149,8 +153,7 @@ class kQuizPdf
 		{
 			$questNum +=1;
 			$stylePrefix = $this->getStylePrefix($question->getName());
-			$questionName = $this->handleR2LText($question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
-			$this->pdf->addList($questNum, $questionName, $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
+			$this->addListText($questNum, $question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
 			$alphabet = range('A', 'Z');
 			$ansIdx = 0;
 			if($question->getQuestionType() !== QuestionType::OPEN_QUESTION)
@@ -161,8 +164,7 @@ class kQuizPdf
 					{
 						$text = $optionalAnswer->getText();
 						$stylePrefix = $this->getStylePrefix($text);
-						$text = $this->handleR2LText($text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
-						$this->pdf->addList($alphabet[$ansIdx], $text, $this->styles[$stylePrefix . self::INDENT_LIST_STYLE]);
+						$this->addListText($alphabet[$ansIdx], $text, $this->styles[$stylePrefix . self::INDENT_LIST_STYLE]);
 						$ansIdx += 1;
 					}
 				}
@@ -170,12 +172,18 @@ class kQuizPdf
 		}
 	}
 
+	protected function addListText($sign, $text, $style)
+	{
+		$text = $this->handleR2LText($text, $style);
+		$this->pdf->addList($sign, $text, $style);
+	}
+
 	protected function handleR2LText($text, PdfStyle $stylePrefix)
 	{
 		if ($stylePrefix->getR2L())
 		{
 			$wantedIndentation = !is_null($stylePrefix->getX()) ? $stylePrefix->getX() : 0;
-			$this->pdf->SetMargins(10,15,10 + $wantedIndentation);
+			$this->pdf->SetMargins($this->margins['left'],$this->margins['top'],$this->margins['right'] + $wantedIndentation);
 			return $this->reverseMultibyteString($text);
 		}
 		return $text;
@@ -190,7 +198,6 @@ class kQuizPdf
 		}
 
 		if($this->detectLanguage($text, $this->asianLanguages))
-//		if(preg_match("/\p{Han}+/u", $text)) //contain chinese/japanese letters
 		{
 			return self::ASIAN_STYLE_PREFIX;
 		}
@@ -220,9 +227,9 @@ class kQuizPdf
 		{
 			if (preg_match($pattern, $text))
 			{
-				return true; // Return the language code if matched
+				return true;
 			}
 		}
-		return false; // Return null if no match found
+		return false;
 	}
 }
