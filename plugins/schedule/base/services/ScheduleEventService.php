@@ -276,6 +276,7 @@ class ScheduleEventService extends KalturaBaseService
 	 */
 	public function updateLiveFeatureAction($scheduledEventId, $featureName, KalturaLiveFeature $liveFeature)
 	{
+		$lock = kLock::create("schedule_event" . $scheduledEventId);
 		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
 		if(!$dbScheduleEvent)
 		{
@@ -306,6 +307,11 @@ class ScheduleEventService extends KalturaBaseService
 
 		$dbScheduleEvent->setLiveFeatures($featureList);
 		$dbScheduleEvent->save();
+
+		if ($lock)
+		{
+			$lock->unlock();
+		}
 
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());
