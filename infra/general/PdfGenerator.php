@@ -124,20 +124,21 @@ class PdfGenerator extends tfpdf
      * @param string $text - the question that should be printed
      * @param PdfStyle $style
      */
-    public function addList($sign, $text, PdfStyle $style)
+    public function addList($sign, $text, PdfStyle $style, $r2lStylePrefix = null)
     {
         if (!isset($text) || !strlen($text) > 0)
         {
             return;
         }
 
+		$r2l = (strpos($r2lStylePrefix, $style->getStyleName()) !== false && $style->getRowIndent() == 'R') ??  false;
         if (is_numeric($sign))
         {
-            $text = $sign.". ".$text;
+            $text = $r2l ? $text . " ." . $sign : $sign.". ".$text;
         }
         else
         {
-            $text = $sign." ".$text;
+            $text = $r2l ? $text . " ." . $sign : $sign.". ".$text;
         }
 
         $this->addText($text, $style);

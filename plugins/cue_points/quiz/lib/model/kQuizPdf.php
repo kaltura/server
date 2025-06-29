@@ -9,16 +9,19 @@
 class kQuizPdf
 {
 	const ASIAN_FONT = 'AsianFont';
-	const NOTO_SANS_FONT = 'notoSansFont';
+	const DEJAVU_FONT = 'DejaVuSansFont';
+	const NOTO_SANS_FONT = 'NotoSansFont';
 	const TIMES_FONT = 'Times';
-	const NORMAL_STYLE = 'normalStyle';
-	const INDENT_LIST_STYLE = 'indentListStyle';
-	const LIST_WITH_ADD_LINE_BEFORE_STYLE = 'listWithAddLineBeforeStyle';
-	const INDENTED_LIST_WITH_ADD_LINE_BEFORE = 'indentedListWithAddLineBefore';
-	const TITLE_STYLE = 'titleStyle';
-	const HEADING6_STYLE = 'heading6Style';
-	const ASIAN_STYLE_PREFIX = 'asian';
-	const NOTO_STYLE_PREFIX = 'noto';
+	const NORMAL_STYLE = 'NormalStyle';
+	const INDENT_LIST_STYLE = 'IndentListStyle';
+	const LIST_WITH_ADD_LINE_BEFORE_STYLE = 'ListWithAddLineBeforeStyle';
+	const INDENTED_LIST_WITH_ADD_LINE_BEFORE = 'IndentedListWithAddLineBefore';
+	const TITLE_STYLE = 'TitleStyle';
+	const HEADING6_STYLE = 'Heading6Style';
+	const ASIAN_STYLE_PREFIX = 'Asian';
+	const NOTO_STYLE_PREFIX = 'Noto';
+	const NON_LATIN_STYLE_PREFIX = 'NonLatin';
+	const RIGHT_2_LEFT_STYLE_PREFIX = 'Right2Left';
 
 	/**
 	 * @var PdfGenerator
@@ -38,6 +41,15 @@ class kQuizPdf
 
 	//db entry id
 	protected $entryId;
+
+	protected $noneLatineLanguagePatterns = [
+
+		'ber-ma' => '/[\x{2D30}-\x{2D7F}]+/u', // Berber (Morocco) - Tifinagh script
+		'hy' => '/[\x{0531}-\x{0556}\x{0561}-\x{0587}]+/u', // Armenian
+		'iu' => '/[\x{1400}-\x{167F}]+/u', // Inuktitut - Unified Canadian Aboriginal Syllabics
+		'ka' => '/[\x{10A0}-\x{10FF}]+/u', // Georgian
+		'lo' => '/[\x{0E80}-\x{0EFF}]+/u', // Lao
+	];
 
 	public function __construct($entryId)
 	{
@@ -62,13 +74,19 @@ class kQuizPdf
 		$styles[self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('ListWithAddLineBefore', self::TIMES_FONT, 12, 'I', true);
 		$styles[self::ASIAN_STYLE_PREFIX.self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('AsianListWithAddLineBefore', self::ASIAN_FONT, 12,
 			'', true);
-		$styles[self::NOTO_STYLE_PREFIX.self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('NotoListWithAddLineBefore', self::NOTO_SANS_FONT,
-			12, 'I', true);
+		$styles[self::NOTO_STYLE_PREFIX.self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('NotoListWithAddLineBefore', self::NOTO_SANS_FONT, 12, 'I', true);
 
 		$styles[self::TITLE_STYLE] = new PdfStyle('Title', 'Arial', 14, 'BU', true, false, 'C');
-		$styles[self::NOTO_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NotoTitle', self::NOTO_SANS_FONT, 14, 'BU', true,
-			false, 'C');
+		$styles[self::NOTO_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NotoTitle', self::NOTO_SANS_FONT, 14, 'BU', true, false, 'C');
 		$styles[self::ASIAN_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('AsianTitle', 'Arial', 14, 'U', true, false, 'C');
+
+		$styles[self::NON_LATIN_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('NonLatinTitle', self::DEJAVU_FONT, 14, 'BU', true, false, 'C');
+		$styles[self::NON_LATIN_STYLE_PREFIX.self::INDENT_LIST_STYLE] = new PdfStyle('NonLatinIndentList', self::DEJAVU_FONT, 12, '', false, false, 'L', 5);
+		$styles[self::NON_LATIN_STYLE_PREFIX.self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('NonLatinListWithAddLineBefore', self::DEJAVU_FONT, 12, '', true);
+
+		$styles[self::RIGHT_2_LEFT_STYLE_PREFIX.self::TITLE_STYLE] = new PdfStyle('Right2LeftTitle', self::DEJAVU_FONT, 14, 'BU', true, false, 'R');
+		$styles[self::RIGHT_2_LEFT_STYLE_PREFIX.self::INDENT_LIST_STYLE] = new PdfStyle('Right2LeftIndentList', self::DEJAVU_FONT, 12, '', false, false, 'R', 5);
+		$styles[self::RIGHT_2_LEFT_STYLE_PREFIX.self::LIST_WITH_ADD_LINE_BEFORE_STYLE] = new PdfStyle('Right2LeftListWithAddLineBefore', self::DEJAVU_FONT, 12, '', true, false, 'R');
 
 		$this->styles = $styles;
 	}
@@ -90,6 +108,16 @@ class kQuizPdf
 		$this->pdf->AddFont(self::NOTO_SANS_FONT,'B','NotoSans-Bold.ttf',true);
 		$this->pdf->AddFont(self::NOTO_SANS_FONT,'BI','NotoSans-BoldItalic.ttf',true);
 		$this->pdf->AddFont(self::NOTO_SANS_FONT,'I','NotoSans-Italic.ttf',true);
+		$this->pdf->AddFont(self::DEJAVU_FONT,'','DejaVuSans.ttf',true);
+	}
+
+	protected function reverseMultibyteString($input) {
+		$length = mb_strlen($input, 'UTF-8');
+		$reversed = '';
+		for ($i = $length - 1; $i >= 0; $i--) {
+			$reversed .= mb_substr($input, $i, 1, 'UTF-8');
+		}
+		return $reversed;
 	}
 
 	public function createQuestionPdf()
@@ -108,7 +136,8 @@ class kQuizPdf
 		{
 			$questNum +=1;
 			$stylePrefix = $this->getStylePrefix($question->getName());
-			$this->pdf->addList($questNum, $question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
+			$questionName = $this->handleR2LText($question->getName(), $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE]);
+			$this->pdf->addList($questNum, $questionName, $this->styles[$stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE], $stylePrefix.self::LIST_WITH_ADD_LINE_BEFORE_STYLE);
 			$alphabet = range('A', 'Z');
 			$ansIdx = 0;
 			if($question->getQuestionType() !== QuestionType::OPEN_QUESTION)
@@ -119,12 +148,27 @@ class kQuizPdf
 					{
 						$text = $optionalAnswer->getText();
 						$stylePrefix = $this->getStylePrefix($text);
-						$this->pdf->addList($alphabet[$ansIdx] . '.', $text, $this->styles[$stylePrefix . self::INDENT_LIST_STYLE]);
+						$text = $this->handleR2LText($text, $this->styles[$stylePrefix.self::INDENT_LIST_STYLE]);
+						$this->pdf->addList($alphabet[$ansIdx], $text, $this->styles[$stylePrefix . self::INDENT_LIST_STYLE], $stylePrefix . self::INDENT_LIST_STYLE);
 						$ansIdx += 1;
 					}
 				}
 			}
 		}
+	}
+
+	protected function handleR2LText($text, PdfStyle &$stylePrefix)
+	{
+		$styleName = $stylePrefix->getStyleName();
+		$r2lStylePrefix = self::RIGHT_2_LEFT_STYLE_PREFIX;
+		$wantedIndentation = 0;
+		if (strpos($styleName, $r2lStylePrefix) !== false && $stylePrefix->getRowIndent())
+		{
+			$wantedIndentation = !is_null($stylePrefix->getX()) ? $stylePrefix->getX() : 0;
+			$this->pdf->SetMargins(10,15,10 + $wantedIndentation);
+			return $this->reverseMultibyteString($text);
+		}
+		return $text;
 	}
 
 	private function getStylePrefix($text)
@@ -134,17 +178,40 @@ class kQuizPdf
 		{
 			return $stylePrefix;
 		}
-		
+
 		if(preg_match("/\p{Han}+/u", $text)) //contain chinese/japanese letters
 		{
 			$stylePrefix = self::ASIAN_STYLE_PREFIX;
 		}
-		
+
+		if(preg_match("/\p{Hebrew}+/u", $text) ||
+			preg_match("/\p{Arabic}+/u", $text) ||
+			preg_match("/[\x{0531}-\x{0556}\x{0561}-\x{0587}]+/u", $text)) //contain chinese/japanese letters
+		{
+			$stylePrefix = self::RIGHT_2_LEFT_STYLE_PREFIX;
+		}
+
+		if($this->detectNoneLatinLanguage($text))
+		{
+			$stylePrefix = self::NON_LATIN_STYLE_PREFIX;
+		}
+
 		return $stylePrefix;
 	}
 
 	public function submitDocument()
 	{
 		return $this->pdf->Submit();
+	}
+
+	function detectNoneLatinLanguage($text) {
+		// Check if the text matches any language pattern
+		foreach ($this->noneLatineLanguagePatterns as $language => $pattern) {
+			if (preg_match($pattern, $text)) {
+				return true; // Return the language code if matched
+			}
+		}
+
+		return false; // Return null if no match found
 	}
 }
