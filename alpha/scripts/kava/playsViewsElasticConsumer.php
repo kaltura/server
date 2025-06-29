@@ -117,7 +117,7 @@ catch (Exception $e)
 	exit(1);
 }
 
-KalturaLog::info('Started, pid=' . getmypid());
+KalturaLog::log('Started, pid=' . getmypid());
 KalturaLog::log("Starting playsViewsElasticConsumer for consumerId [$consumerId] and bulkSize [$bulkSize]");
 KalturaLog::log("Elastic Client host [$host] port [$port] version [$version]");
 
@@ -178,7 +178,7 @@ catch(Exception $e)
 }
 
 writeSuccess();
-KalturaLog::log('Info: done');
+KalturaLog::log('done');
 
 /* =============================== FUNCTIONS =============================== */
 function writeSuccess($filePath = null): void
