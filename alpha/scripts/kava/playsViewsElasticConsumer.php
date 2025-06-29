@@ -73,7 +73,9 @@ if (empty($config))
 	
 	if (!file_exists($configFile))
 	{
-		KalturaLog::err("Configuration file [$configFile] not found.");
+		$message = "Configuration file [$configFile] not found";
+		KalturaLog::err($message);
+		writeFailure($message);
 		exit(1);
 	}
 	
@@ -97,28 +99,27 @@ else
 	$version = $config['elasticVersion'] ?? null;
 }
 
-// validate the configuration - all values must be set
-if (is_null($consumerId) || is_null($host) || is_null($port) || is_null($version))
-{
-	KalturaLog::err("Missing configuration values: consumerId [$consumerId] host [$host], port [$port], version [$version]");
-	exit(1);
-}
-
 try
 {
+	// kConf will throw Exception if paramName not found
 	$topicsPath = kConf::get(CONF_TOPICS_PATH);
+	
+	// validate the configuration values
+	if (is_null($consumerId) || is_null($host) || is_null($port) || is_null($version))
+	{
+		throw new Exception("Missing configuration values: consumerId [$consumerId] host [$host], port [$port], version [$version]");
+	}
 }
-catch (Exception $ex)
+catch (Exception $e)
 {
-	KalturaLog::err('Missing topics path config');
+	KalturaLog::err($e->getMessage());
+	writeFailure($e);
 	exit(1);
 }
 
 KalturaLog::info('Started, pid=' . getmypid());
 KalturaLog::log("Starting playsViewsElasticConsumer for consumerId [$consumerId] and bulkSize [$bulkSize]");
 KalturaLog::log("Elastic Client host [$host] port [$port] version [$version]");
-
-// todo add node exporter
 
 // connect to elastic
 $elasticClient = new elasticClient($host, $port, $version);
@@ -172,8 +173,8 @@ try
 }
 catch(Exception $e)
 {
-	writeFailure($e);
 	KalturaLog::err($e->getMessage());
+	writeFailure($e);
 }
 
 writeSuccess();
@@ -202,9 +203,9 @@ function writeFailure($e, $filePath = null): void
 	$description = 'Error in playsViewsElasticConsumer.php script';
 	$timestamp = time();
 	$date = date("Y-m-d H:i:s", $timestamp);
-	$message = $e->getMessage();
-	$code = $e->getCode();
 	$hostname = gethostname();
+	$message = $e instanceof Exception ? $e->getMessage() : $e;
+	$code = $e instanceof Exception ? $e->getCode() : 0;
 	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", success=\"false\", message=\"$message\", code=\"$code\"} $timestamp" . PHP_EOL;
 	
 	file_put_contents($filePath, $data, LOCK_EX);
