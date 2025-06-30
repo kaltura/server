@@ -168,7 +168,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	 * @return string
 	 * @throws Exception
 	 */
-	public function generateReachVendorKs($objectId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $entryObjectType=EntryObjectType::ENTRY, $disableDefaultEntryFilter = false)
+	public function generateReachVendorKs($objectId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $entryObjectType = EntryObjectType::ENTRY, $disableDefaultEntryFilter = false)
 	{
 		$entryId = $objectId;
 
