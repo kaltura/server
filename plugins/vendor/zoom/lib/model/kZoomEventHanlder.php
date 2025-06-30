@@ -142,7 +142,7 @@ class kZoomEventHanlder
 			case kZoomUsersSearchMethod::EMAIL:
 			{
 				KalturaLog::debug('Searching by email');
-				$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
+				$user = kuserPeer::getKuserByEmail($puserId, $partnerId);
 				break;
 			}
 			case kZoomUsersSearchMethod::ID:
@@ -158,7 +158,7 @@ class kZoomEventHanlder
 				$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
 				if (!$user)
 				{
-					$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
+					$user = kuserPeer::getKuserByEmail($puserId, $partnerId);
 				}
 				else
 				{

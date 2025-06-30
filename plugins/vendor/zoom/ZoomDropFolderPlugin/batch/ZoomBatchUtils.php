@@ -99,6 +99,7 @@ class ZoomBatchUtils
 
 		$filter = new KalturaUserFilter();
 		$filter->partnerIdEqual = $partnerId;
+		$kalturaUser = null;
 
 		switch ($userSearchMethod)
 		{
@@ -111,8 +112,7 @@ class ZoomBatchUtils
 			case KalturaZoomUsersSearchMethod::EMAIL:
 			{
 				KalturaLog::debug('Searching by email');
-				$email = $kZoomUser->getOriginalName();
-				$filter->emailStartsWith = $email;
+				$filter->emailStartsWith = $kZoomUser->getProcessedName();
 				break;
 			}
 			case KalturaZoomUsersSearchMethod::ALL:
@@ -120,13 +120,18 @@ class ZoomBatchUtils
 			{
 				KalturaLog::debug('Searching by both puser_id and email');
 				$filter->idEqual = $kZoomUser->getProcessedName();
-				$email = $kZoomUser->getOriginalName();
-				$filter->emailStartsWith = $email;
+				$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
+				if($kalturaUser)
+				{
+					KalturaLog::debug('User found by id');
+					break;
+				}
+				$filter->emailStartsWith =  $kZoomUser->getProcessedName();
 				break;
 			}
 		}
 
-		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
+		$kalturaUser = !$kalturaUser ? KBatchBase::$kClient->user->listAction($filter, $pager) : $kalturaUser;
 		if($kalturaUser->objects)
 		{
 			KalturaLog::debug('Found user with id [' . $kalturaUser->objects[0]->id . ']');
