@@ -214,6 +214,7 @@ class ReportService extends KalturaBaseService
 				KalturaReportType::VPAAS_USAGE,
 				KalturaReportType::ENTRY_USAGE,
 				KalturaReportType::PARTNER_USAGE,
+				KalturaReportType::PARTNER_USAGE_SF,
 			);
 
 			if (in_array($reportType, $partnerReports))
@@ -440,20 +441,15 @@ class ReportService extends KalturaBaseService
 	public function exportToCsvAction(KalturaReportExportParams $params)
 	{
 		$this->validateReportExportParams($params);
-
+		$kuser = kCurrentContext::getCurrentKsKuser();
+		$partner = PartnerPeer::retrieveByPK(kCurrentContext::getCurrentPartnerId());
 		if (!$params->recipientEmail)
 		{
-			$kuser = kCurrentContext::getCurrentKsKuser();
-			if ($kuser)
-			{
-				$params->recipientEmail = $kuser->getEmail();
-			}
-			else
-			{
-				$partnerId = kCurrentContext::getCurrentPartnerId();
-				$partner = PartnerPeer::retrieveByPK($partnerId);
-				$params->recipientEmail = $partner->getAdminEmail();
-			}
+			$params->recipientEmail = $kuser ? $kuser->getEmail() : $partner->getAdminEmail();
+		}
+		if (!$params->recipientName)
+		{
+			$params->recipientName = $kuser ? $kuser->getFullName() : $partner->getName();
 		}
 
 		if (!is_null($params->reportsItemsGroup) && strlen($params->reportsItemsGroup) > self::MAX_EXPORT_GROUP_NAME_LENGTH)

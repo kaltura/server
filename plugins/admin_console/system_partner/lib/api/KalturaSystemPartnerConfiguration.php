@@ -520,7 +520,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 	 * @var string
 	 */
 	public $allowedEmailDomainsForAdmins;
-	
+
 	
 	private static $map_between_objects = array
 	(
@@ -990,7 +990,12 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		{
 			$object_to_fill->setAllowedEmailDomainsForAdmins('');
 		}
-		
+
+		if ($this->recycleBinRetentionPeriod <= 0)
+		{
+			$object_to_fill->setRecycleBinRetentionPeriod(RecycleBinRetentionPeriod::DAYS_30);
+		}
+
 		return $object_to_fill;
 	}
 	

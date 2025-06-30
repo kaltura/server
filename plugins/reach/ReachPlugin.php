@@ -188,8 +188,10 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 		$bulkUploadDependency = new KalturaDependency(BulkUploadPlugin::getPluginName());
 		$captionPluginDependency = new KalturaDependency(CaptionPlugin::getPluginName());
 		$scheduledEventDependency = new KalturaDependency(SchedulePlugin::getPluginName());
+		$scheduledEventNotificationDependency = new KalturaDependency(ScheduleEventNotificationsPlugin::getPluginName());
+		$transcriptPluginDependency = new KalturaDependency(TranscriptPlugin::getPluginName());
 
-		return array($eventNotificationDependency, $bulkUploadDependency, $captionPluginDependency, $scheduledEventDependency);
+		return array($eventNotificationDependency, $bulkUploadDependency, $captionPluginDependency, $scheduledEventDependency, $scheduledEventNotificationDependency, $transcriptPluginDependency);
 	}
 	
 	/**
@@ -369,9 +371,73 @@ class ReachPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPer
 
 	public static function isEntryTypeSupportedForReach($entryType)
 	{
-		$supportedEntryTypes = kConf::get('reach_supported_entry_types', kConfMapNames::RUNTIME_CONFIG, array(entryType::MEDIA_CLIP, entryType::LIVE_STREAM));
+		$supportedEntryTypes = kConf::get('reach_supported_entry_types', kConfMapNames::RUNTIME_CONFIG, array(entryType::MEDIA_CLIP, entryType::LIVE_STREAM, entryType::DOCUMENT));
 
 		return in_array($entryType, $supportedEntryTypes);
 	}
 
+	public static function getServiceFeatureName($serviceFeature)
+	{
+		$constantNames = ReachPlugin::getServiceFeatureNames();
+		return isset($constantNames[$serviceFeature]) ? $constantNames[$serviceFeature] : "";
+	}
+
+	public static function getServiceFeatureNames()
+	{
+		$reflector = new ReflectionClass('VendorServiceFeature');
+		return array_flip($reflector->getConstants());
+	}
+
+	public static function getTranslatedServiceFeature($serviceFeature)
+	{
+		$serviceFeatureName = ReachPlugin::getServiceFeatureName($serviceFeature);
+		return str_replace("_", " ", strtolower($serviceFeatureName));
+	}
+
+	public static function getServiceFeatureClassName($serviceFeature)
+	{
+		$serviceFeatureName = ReachPlugin::getServiceFeatureName($serviceFeature);
+		$finalName = '';
+		if($serviceFeatureName)
+		{
+			$serviceFeatureWords = explode("_", strtolower($serviceFeatureName));
+			foreach ($serviceFeatureWords as $serviceFeatureWord)
+			{
+				if(strlen($serviceFeatureWord) > 0)
+				{
+					$capitalFirstChar = strtoupper(substr($serviceFeatureWord, 0, 1));
+					$finalName .= $capitalFirstChar . substr($serviceFeatureWord, 1);
+				}
+			}
+		}
+		return $finalName;
+	}
+
+	public static function getCatalogItemCoreName($serviceFeature)
+	{
+		switch ($serviceFeature)
+		{
+			default:
+				$serviceFeatureNameInClass = ReachPlugin::getServiceFeatureClassName($serviceFeature);
+				return "Vendor" . $serviceFeatureNameInClass . "CatalogItem";
+		}
+	}
+
+	public static function getCatalogItemName($serviceFeature)
+	{
+		switch ($serviceFeature)
+		{
+			default:
+				return "Kaltura" . ReachPlugin::getCatalogItemCoreName($serviceFeature);
+		}
+	}
+
+	public static function getCatalogItemCoreFilterName($serviceFeature)
+	{
+		switch ($serviceFeature)
+		{
+			default:
+				return ReachPlugin::getCatalogItemCoreName($serviceFeature) . "Filter";
+		}
+	}
 }

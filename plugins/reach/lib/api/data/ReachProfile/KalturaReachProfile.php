@@ -237,7 +237,7 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 			$rule->validateForUpdate($rule->toObject(), $propertiesToSkip);
 		}
 
-		return parent::validateForUpdate($sourceObject, array('credit'));
+		return parent::validateForUpdate($sourceObject);
 	}
 
 	private function validateDictionaryLength($data)

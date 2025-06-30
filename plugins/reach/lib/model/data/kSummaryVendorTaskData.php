@@ -4,21 +4,16 @@
  * @package plugins.reach
  * @subpackage model
  */
-class kSummaryVendorTaskData extends kVendorTaskData
+class kSummaryVendorTaskData extends kLocalizedVendorTaskData
 {
-	protected String $typeOfSummary;
-
-	protected String  $writingStyle;
-
-	protected ?String $language;
-
-	protected ?string $summaryOutputJson = null;
+	protected $typeOfSummary;
+	protected $writingStyle;
+	protected $summaryOutputJson = null;
 
 	public function __construct()
 	{
 		$this->typeOfSummary = TypeOfSummaryTaskData::CONCISE;
 		$this->writingStyle = SummaryWritingStyleTaskData::FORMAL;
-		$this->language = null;
 	}
 
 	public function getTypeOfSummary()
@@ -39,16 +34,6 @@ class kSummaryVendorTaskData extends kVendorTaskData
 	public function setWritingStyle( $writingStyle): void
 	{
 		$this->writingStyle = $writingStyle;
-	}
-
-	public function getLanguage()
-	{
-		return $this->language;
-	}
-
-	public function setLanguage($language): void
-	{
-		$this->language = $language;
 	}
 
 	public function getSummaryOutputJson(): ?string

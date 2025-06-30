@@ -8,6 +8,10 @@ class myEntryUtils
 	const ENTRY_ID_REGEX = "/^\d_[A-Za-z0-9]{8}/";
 	const THUMB_ENTITY_NAME_PREFIX = 'entry/';
 	const CACHED_THUMB_EXISTS_HEADER = 'X-Kaltura:cached-thumb-exists,';
+	const SILENCE_RMS_LEVEL = -96; // -96 dBFS
+	const PTS = 'pts';
+	const RMS = 'rms';
+
 
 	static private $liveSourceType = array
 	(
@@ -1742,12 +1746,16 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  		
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
 
-		if ( $entry->getStatus() != entryStatus::READY ) {
-			$entry->addClonePendingEntry($newEntry->getId());
-			$entry->save();
-		} else {
+		if (in_array($entry->getStatus(), [entryStatus::READY, entryStatus::NO_CONTENT]))
+		{
 			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
 		}
+
+	    if ( $entry->getStatus() != entryStatus::READY )
+		{
+		    $entry->addClonePendingEntry($newEntry->getId());
+		    $entry->save();
+	    }
 
  	    //if entry is a static playlist, link between it and its new child entries
 		if ($entry->getType() == entryType::PLAYLIST)
@@ -2161,22 +2169,157 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return $relatedEntries;
 	}
 
-	public static function getVolumeMapContent($flavorAsset)
+	protected static function resampleVolumeMap(string $csvText, int $desiredLines, float $durationSeconds): string
+	{
+		$resampledData = self::resampleVolumeMapAsJson($csvText, $desiredLines, $durationSeconds);
+		if (empty($resampledData))
+		{
+			return '';
+		}
+
+		// Convert to CSV format
+		$output = "pts,rms_level\n";
+		foreach ($resampledData as $point)
+		{
+			$output .= "{$point[self::PTS]},{$point[self::RMS]}\n";
+		}
+
+		return $output;
+	}
+
+	protected static function resampleVolumeMapAsJson(string $csvText, int $desiredLines, float $durationSeconds): array
+	{
+		$lines = array_filter(array_map('trim', explode("\n", $csvText)));
+		$data = [];
+		// Skip header if present
+		if (stripos($lines[0], self::PTS) !== false)
+		{
+			array_shift($lines);
+		}
+
+		if($desiredLines < 2 || $durationSeconds <= 0)
+		{
+			return [];
+		}
+
+		// Parse data into [pts => rms]
+		foreach ($lines as $line)
+		{
+			[$pts, $rms] = explode(',', $line);
+			$data[] = [self::PTS => (float)$pts, self::RMS => (float)$rms];
+		}
+
+		if (count($data) === 0)
+		{
+			return [];
+		}
+
+		// Total duration in milliseconds
+		$durationMs = $durationSeconds * 1000;
+		$step = $durationMs / ($desiredLines - 1);
+		$resampled = self::fillSilence($data, round($step));
+		for ($i = count($resampled); $i < $desiredLines; $i++)
+		{
+			$targetPts = $i * $step;
+
+			// Find surrounding points
+			$before = null;
+			$after = null;
+
+			foreach ($data as $point)
+			{
+				if ($point[self::PTS] <= $targetPts)
+				{
+					$before = $point;
+				}
+				if ($point[self::PTS] >= $targetPts)
+				{
+					$after = $point;
+					break;
+				}
+			}
+
+			// Handle edges
+			if (!$before) $before = $data[0];
+			if (!$after) $after = end($data);
+
+			// Linear interpolation
+			if ($after[self::PTS] == $before[self::PTS])
+			{
+				$rms = $before[self::RMS];
+			}
+			else
+			{
+				$ratio = ($targetPts - $before[self::PTS]) / ($after[self::PTS] - $before[self::PTS]);
+				$rms = $before[self::RMS] + $ratio * ($after[self::RMS] - $before[self::RMS]);
+			}
+			$resampled[] = [self::PTS => round($targetPts), self::RMS => round($rms, 2)];
+		}
+
+		return $resampled;
+	}
+
+
+	// Fill silence before the first point
+	protected static function fillSilence(array $data, int $step): array
+	{
+		$nonEmptyData = [];
+		if ($step <= 0 || count($data) === 0)
+		{
+			return $nonEmptyData;
+		}
+		$firstPoint = $data[0];
+		$stepsProgress = 0;
+		while ($stepsProgress < $firstPoint[self::PTS])
+		{
+			$nonEmptyData [] = [self::PTS => $stepsProgress, self::RMS => self::SILENCE_RMS_LEVEL];
+			// Fill silence points before the first point
+			$stepsProgress += $step;
+		}
+		return $nonEmptyData;
+	}
+
+	public static function getVolumeMapContent($flavorAsset, $mapScale = null, $duration = null)
 	{
 		$flavorId = $flavorAsset->getId();
 		$entryId = $flavorAsset->getEntryId();
 
-		$packagerRetries = 3;
 		$content = null;
+
+		$cacheStore = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_VOLUME_MAP);
+		$cacheKey =  $entryId . '_volumeMap_' . $flavorAsset->getVersion() . ($mapScale ? '_' . $mapScale : '');;
+		if ($cacheStore)
+		{
+			$content = $cacheStore->get($cacheKey);
+			if ($content)
+			{
+				header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");
+				return new kRendererString($content, 'text/csv');
+			}
+		}
+
+		$packagerRetries = 3;
+
 		while ($packagerRetries && !$content)
 		{
 			$content = myPackagerUtils::retrieveVolumeMapFromPackager($flavorAsset);
 			$packagerRetries--;
 		}
 
-		if(!$content)
+		if (!$content)
 		{
 			throw new KalturaAPIException(KalturaErrors::RETRIEVE_VOLUME_MAP_FAILED);
+		}
+
+		//reduce volume based on
+		if ($mapScale)
+		{
+			$content = self::resampleVolumeMap($content, $mapScale, $duration);
+		}
+
+		if ($cacheStore)
+		{
+			$cacheStore->set($cacheKey, $content, kTimeConversion::DAY);
 		}
 
 		header("Content-Disposition: attachment; filename=".$entryId.'_'.$flavorId."_volumeMap.csv");

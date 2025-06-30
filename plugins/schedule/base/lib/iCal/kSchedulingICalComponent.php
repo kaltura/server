@@ -238,7 +238,7 @@ abstract class kSchedulingICalComponent
 		return $ret;
 	}
 
-	public function begin()
+	public function begin($newIcalStandard = null)
 	{
 		return $this->writeField('BEGIN', $this->getType());
 	}
@@ -252,17 +252,18 @@ abstract class kSchedulingICalComponent
 	{
 		$ret = '';
 
-		$this->addVtimeZoneBlockIfApplicable($object, $timeZoneBlockArray);
-		$ret .= $this->begin();
+		$newIcalStandard = !PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_NEW_ICAL_STANDARD, $object->partnerId);
+		$this->addVtimeZoneBlockIfApplicable($newIcalStandard, $object, $timeZoneBlockArray);
+		$ret .= $this->begin($newIcalStandard);
 		$ret .= $this->writeBody();
 		$ret .= $this->end();
 
 		return $ret;
 	}
 
-	protected function addVtimeZoneBlockIfApplicable($object = null, &$timeZoneBlockArray = null): void
+	protected function addVtimeZoneBlockIfApplicable($newIcalStandard, $object = null, &$timeZoneBlockArray = null): void
 	{
-		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId())
+		if ($this->getType() === kSchedulingICal::TYPE_EVENT && $this instanceof kSchedulingICalEvent && $this->getTimeZoneId() && $newIcalStandard)
 		{
 			$this->addVtimeZoneBlock($object, $timeZoneBlockArray);
 		}

@@ -62,15 +62,14 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 
 		if ($action->view->allowed)
 		{
-			$partnerCatalogItems = $this->getPartnerCatalogItems($partnerId);
-
 			Infra_ClientHelper::unimpersonate();// to get all catalog items from partner 0
 			// init filter
-			$catalogItemProfileFilter = $this->getCatalogItemFilter($serviceFeature);
+			$catalogItemFilterName = "Kaltura_Client_Reach_Type_" . ReachPlugin::getCatalogItemCoreFilterName($serviceFeature);
+			$catalogItemProfileFilter = new $catalogItemFilterName();
 			$catalogItemProfileFilter->orderBy = "-createdAt";
 			$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 			$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;
-			$catalogItemProfileFilter->idNotIn = implode(',', $partnerCatalogItems);
+			$catalogItemProfileFilter->idNotIn = implode(',', $this->getPartnerCatalogItems($partnerId));
 			$catalogItemProfileFilter->sourceLanguageEqual = $sourceLanguage;
 			$catalogItemProfileFilter->vendorPartnerIdEqual = $vendorPartnerId;
 			$catalogItemProfileFilter->statusEqual =  Kaltura_Client_Reach_Enum_VendorCatalogItemStatus::ACTIVE;
@@ -98,43 +97,6 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		return $form;
 	}
 
-	protected function getCatalogItemFilter($serviceFeature)
-	{
-		switch ($serviceFeature)
-		{
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS:
-				return new Kaltura_Client_Reach_Type_VendorCaptionsCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION:
-				return new Kaltura_Client_Reach_Type_VendorTranslationCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT:
-				return new Kaltura_Client_Reach_Type_VendorAlignmentCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION:
-				return new Kaltura_Client_Reach_Type_VendorAudioDescriptionCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING:
-				return new Kaltura_Client_Reach_Type_VendorChapteringCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING:
-				return new Kaltura_Client_Reach_Type_VendorIntelligentTaggingCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING:
-				return new Kaltura_Client_Reach_Type_VendorDubbingCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION:
-				return new Kaltura_Client_Reach_Type_VendorLiveCaptionCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION:
-				return new Kaltura_Client_Reach_Type_VendorExtendedAudioDescriptionCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS:
-				return new Kaltura_Client_Reach_Type_VendorClipsCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION:
-				return new Kaltura_Client_Reach_Type_VendorLiveTranslationCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ:
-				return new Kaltura_Client_Reach_Type_VendorQuizCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY:
-				return new Kaltura_Client_Reach_Type_VendorSummaryCatalogItemFilter();
-			case Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS:
-				return new Kaltura_Client_Reach_Type_VendorVideoAnalysisCatalogItemFilter();
-			default:
-				return new Kaltura_Client_Reach_Type_VendorCatalogItemFilter();
-		}
-	}
-
 	/***
 	 * @param $action
 	 * @param ConfigureForm $form
@@ -152,22 +114,76 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 			$formData = $action->getRequest()->getPost();
 			$partnerCatalogItems = null;
 			if (isset($formData['selectAllItemsCheckbox']))
+			{
 				$partnerCatalogItems = $this->getAvailableCatalogItems($partnerId);
+			}
 			elseif (isset($formData['catalogItemsCheckBoxes']))
+			{
 				$partnerCatalogItems = $formData['catalogItemsCheckBoxes'];
+			}
 
-			$this->client = Infra_ClientHelper::getClient();
-			$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
-			Infra_ClientHelper::impersonate($partnerId);
-			$this->client->startMultiRequest();
-			foreach ($partnerCatalogItems as $partnerCatalogItem)
-				$partnerCatalogItem = $reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem);
-			$result = $this->client->doMultiRequest();
+			if($partnerCatalogItems)
+			{
+				$this->client = Infra_ClientHelper::getClient();
+				$reachPluginClient = Kaltura_Client_Reach_Plugin::get($this->client);
+				Infra_ClientHelper::impersonate($partnerId);
+
+				$catalogItemsLimit = 500;
+				if(count($partnerCatalogItems) > $catalogItemsLimit)
+				{
+					throw new Exception("exceeded the limit of [$catalogItemsLimit] for adding catalog items at once");
+				}
+				$this->validateReachProfileId($formData, $partnerCatalogItems, $reachPluginClient);
+
+				$this->client->startMultiRequest();
+				foreach ($partnerCatalogItems as $partnerCatalogItem)
+				{
+					$reachProfileId = $formData["defaultReachProfileId-$partnerCatalogItem"];
+					$reachPluginClient->PartnerCatalogItem->add($partnerCatalogItem, $reachProfileId);
+				}
+				$this->client->doMultiRequest();
+			}
 		}
 
 		$form->setAttrib('class', 'valid');
 		$action->view->formValid = true;
 		return $form;
+	}
+
+	protected function validateReachProfileId($formData, $partnerCatalogItems, $reachPluginClient)
+	{
+		$reachProfileIds = array();
+		foreach ($partnerCatalogItems as $partnerCatalogItem)
+		{
+			$reachProfileId = $formData["defaultReachProfileId-$partnerCatalogItem"];
+			if($reachProfileId && trim($reachProfileId) != "" && !in_array($reachProfileId, $reachProfileIds))
+			{
+				$reachProfileIds[] = $reachProfileId;
+			}
+		}
+
+		$pager = new Kaltura_Client_Type_FilterPager();
+		$pager->pageIndex = 1;
+		$pager->pageSize = 500;
+
+		$filter = new Kaltura_Client_Reach_Type_ReachProfileFilter();
+		$filter->idIn = implode(",", $reachProfileIds);
+		$result = $reachPluginClient->reachProfile->listAction($filter, $pager);
+
+		$foundProfileIds = array();
+		foreach ($result->objects as $resultItem)
+		{
+			if($resultItem->id)
+			{
+				$foundProfileIds[] = $resultItem->id;
+			}
+		}
+
+		$diff = array_diff($reachProfileIds, $foundProfileIds);
+		if(count($diff) > 0)
+		{
+			throw new Exception("reach profile Ids (" . implode(",", $diff) . ") not found");
+		}
 	}
 
 	protected function getAvailableCatalogItems($partnerId)
@@ -185,7 +201,9 @@ class PartnerCatalogItemConfigureAction extends KalturaApplicationPlugin
 		$targetLanguage = $this->_getParam('targetLanguage') != "" ? $this->_getParam('targetLanguage') : null;
 		$vendorPartnerId = $this->_getParam('vendorPartnerId') != "" ? $this->_getParam('vendorPartnerId') : null;
 
-		$catalogItemProfileFilter = $this->getCatalogItemFilter($serviceFeature);
+		$catalogItemFilterName = "Kaltura_Client_Reach_Type_" . ReachPlugin::getCatalogItemCoreFilterName($serviceFeature);
+		$catalogItemProfileFilter = new $catalogItemFilterName();
+
 		$catalogItemProfileFilter->orderBy = "-createdAt";
 		$catalogItemProfileFilter->serviceTypeEqual = $ServiceType;
 		$catalogItemProfileFilter->turnAroundTimeEqual = $turnAround;

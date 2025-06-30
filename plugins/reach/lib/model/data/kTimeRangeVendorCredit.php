@@ -41,10 +41,10 @@ class kTimeRangeVendorCredit extends kVendorCredit
 	 * @param bool $includeOverages
 	 * @return int
 	 */
-	public function getCurrentCredit($includeOverages = true)
+	public function getCurrentCredit($includeOverages = true, $validateActive = true)
 	{
 		$now = time();
-		if ( $now < $this->fromDate || $now > $this->toDate )
+		if ($validateActive && ($now < $this->fromDate || $now > $this->toDate))
 		{
 			KalturaLog::debug("Current date [$now] is not in credit time range  [from - $this->fromDate , to - $this->toDate] ");
 			return 0;

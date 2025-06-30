@@ -2967,6 +2967,42 @@ class kFlowHelper
 			$entry->save();
 		}
 	}
+
+	public static function handleDelayedNotification($object)
+	{
+		$delayedJobLocks = [];
+		if ($object instanceof entry)
+		{
+			$delayedJobLocks = BatchJobLockPeer::retrieveByEntryIdAndStatus($object->getEntryId(), BatchJob::BATCHJOB_STATUS_DELAYED);
+		}
+
+		foreach ($delayedJobLocks as $jobLock)
+		{
+			/* @var $jobLock BatchJobLock */
+			$delayedJob = BatchJobPeer::retrieveByPK($jobLock->getId());
+			/* @var $delayedJob BatchJob */
+			if ($delayedJob)
+			{
+				$jobData = $delayedJob->getData();
+				if ($jobData && $jobData instanceof kEventNotificationDispatchJobData)
+				{
+					/* @var $jobData kEventNotificationDispatchJobData */
+					switch (true)
+					{
+						case ($jobData->getEventDelayedCondition() == EventNotificationDelayedCondition::PENDING_ENTRY_READY):
+							{
+								kJobsManager::updateBatchJob($delayedJob, BatchJob::BATCHJOB_STATUS_PENDING);
+								break;
+							}
+					}
+				}
+			}
+			else
+			{
+				KalturaLog::err('Batch Job [' . $jobLock->getId() . '] is in Lock table but not in Sep table.');
+			}
+		}
+	}
 	
 	/**
 	 * @param entry $entry
@@ -3294,12 +3330,12 @@ class kFlowHelper
 		$expiryInDays = $expiry / 60 / 60 / 24;
 		if ($expiryInDays >= 1)
 		{
-			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, self::DAYS, $validUntil);
+			$params = array($data->getRecipientName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInDays, self::DAYS, $validUntil);
 		}
 		else
 		{
 			$expiryInHours = $expiry / 60 / 60;
-			$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInHours, self::HOURS, $validUntil);
+			$params = array($data->getRecipientName(), $time, $dbBatchJob->getId(), implode('<BR>', $links), $expiryInHours, self::HOURS, $validUntil);
 		}
 		$titleParams = array($data->getReportsGroup(), $time);
 
@@ -3313,7 +3349,8 @@ class kFlowHelper
 			kConf::get("report_sender_name"),
 			$data->getRecipientEmail(),
 			$params,
-			$titleParams
+			$titleParams,
+			$data->getRecipientName()
 		);
 		return $dbBatchJob;
 	}
@@ -3322,7 +3359,7 @@ class kFlowHelper
 	{
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_FAILURE;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId(),
+		$params = array($data->getRecipientName(), $time, $dbBatchJob->getId(),
 			$dbBatchJob->getErrType(), $dbBatchJob->getErrNumber());
 		$titleParams = array($data->getReportsGroup(), $time);
 
@@ -3336,7 +3373,8 @@ class kFlowHelper
 			kConf::get("report_sender_name"),
 			$data->getRecipientEmail(),
 			$params,
-			$titleParams
+			$titleParams,
+			$data->getRecipientName()
 		);
 		return $dbBatchJob;
 	}
@@ -3345,7 +3383,7 @@ class kFlowHelper
 	{
 		$time = date("m-d-y H:i", $data->getTimeReference() + $data->getTimeZoneOffset());
 		$email_id = MailType::MAIL_TYPE_REPORT_EXPORT_ABORT;
-		$params = array($dbBatchJob->getPartner()->getName(), $time, $dbBatchJob->getId());
+		$params = array($data->getRecipientName(), $time, $dbBatchJob->getId());
 		$titleParams = array($data->getReportsGroup(), $time);
 
 		kJobsManager::addMailJob(
@@ -3358,7 +3396,8 @@ class kFlowHelper
 			kConf::get("report_sender_name"),
 			$data->getRecipientEmail(),
 			$params,
-			$titleParams
+			$titleParams,
+			$data->getRecipientName()
 		);
 		return $dbBatchJob;
 	}
@@ -3577,19 +3616,43 @@ class kFlowHelper
 
 	public static function handleKuserKgroupStatusUpdate($kuserkgroup)
 	{
-		if ($kuserkgroup->getStatus() == KuserKgroupStatus::DELETED)
+		if ($kuserkgroup->getStatus() != KuserKgroupStatus::DELETED) 
 		{
-			$kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
-			//Validate group exists to avoid exception
-			if(!$kgroup)
-			{
-				return;
-			}
-
-			$numberOfUsersPerGroup = $kgroup->getMembersCount();
-			$kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
-			$kgroup->save();
+			return;
 		}
+
+		self::updateKgroupMembersCount($kuserkgroup);
+		self::handleUserDeletion($kuserkgroup);
+	}
+
+	public static function updateKgroupMembersCount($kuserkgroup)
+	{
+		$kgroup = kuserPeer::retrieveByPK($kuserkgroup->getKgroupId());
+
+		// Validate group exists to avoid exception
+		if (!$kgroup) 
+		{
+			return;
+		}
+
+		$numberOfUsersPerGroup = $kgroup->getMembersCount();
+		$kgroup->setMembersCount(max(0, $numberOfUsersPerGroup - 1));
+		$kgroup->save();
+	}
+
+	public static function handleUserDeletion($kuserkgroup)
+	{
+		$kuser = kuserPeer::retrieveByPK($kuserkgroup->getKuserId());
+
+		if (!$kuser)
+		{
+			return;
+		}
+
+		$filter = new KuserKgroupFilter();
+		$filter->setGroupIdEqual($kuserkgroup->getPgroupId());
+		$filter->setUserIdEqual($kuserkgroup->getPuserId());
+		kJobsManager::addDeleteJob($kuserkgroup->getPartnerId(), DeleteObjectType::USER_GROUP_SUBSCRIPTION, $filter);
 	}
 
 	public static function addPeriodicStorageExports($entryId, $partner, $periodicStorageProfiles)

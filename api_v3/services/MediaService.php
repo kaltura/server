@@ -850,17 +850,18 @@ class MediaService extends KalturaEntryService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		$this->validateEntryForReplace($entryId, $dbEntry, KalturaEntryType::MEDIA_CLIP);
 		$this->approveReplace($dbEntry);
-
-		$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
-		foreach ($childEntries as $childEntry)
+		if ($dbEntry->getReplacingEntryId())
 		{
-			if ($childEntry->getId() != $entryId)
+			$childEntries = entryPeer::retrieveChildEntriesByEntryIdAndPartnerId($entryId, $dbEntry->getPartnerId());
+			foreach ($childEntries as $childEntry)
 			{
-				$this->validateEntryForReplace($childEntry->getId(), $childEntry);
-				$this->approveReplace($childEntry);
+				if ($childEntry->getId() != $entryId)
+				{
+					$this->validateEntryForReplace($childEntry->getId(), $childEntry);
+					$this->approveReplace($childEntry);
+				}
 			}
 		}
-
 		return $this->getEntry($entryId, -1, KalturaEntryType::MEDIA_CLIP);
 	}
 
@@ -1244,10 +1245,11 @@ class MediaService extends KalturaEntryService
 	 *
 	 * @action getVolumeMap
 	 * @param string $entryId Entry id
+	 * @param int $desiredLines Desired Lines
 	 * @return file
 	 * @throws KalturaAPIException
 	 */
-	function getVolumeMapAction($entryId)
+	function getVolumeMapAction($entryId, $desiredLines = null)
 	{
 		$dbEntry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$dbEntry || $dbEntry->getType() != KalturaEntryType::MEDIA_CLIP)
@@ -1261,7 +1263,7 @@ class MediaService extends KalturaEntryService
 			throw new KalturaAPIException(KalturaErrors::GIVEN_ID_NOT_SUPPORTED);
 		}
 
-		$content = myEntryUtils::getVolumeMapContent($flavorAsset);
+		$content = myEntryUtils::getVolumeMapContent($flavorAsset, $desiredLines, $dbEntry->getDuration());
 		return $content;
 	}
 }

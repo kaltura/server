@@ -77,6 +77,7 @@ class KalturaBaseUser extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * @var string
+	 * @maxLength 8192
 	 */
 	public $description;
 

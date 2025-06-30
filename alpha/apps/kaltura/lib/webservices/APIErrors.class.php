@@ -265,6 +265,8 @@ class APIErrors
 	const SERVICE_FORBIDDEN = "SERVICE_FORBIDDEN;SERVICE;The access to service [@SERVICE@] is forbidden";
 	
 	const SERVICE_FORBIDDEN_CONTENT_BLOCKED = "SERVICE_FORBIDDEN_CONTENT_BLOCKED;;The access to this service is forbidden since the specified partner is blocked";
+
+	const ACCESS_UNAUTHORIZED = "ACCESS_UNAUTHORIZED;;Access unauthorized";
 	
 	const SERVICE_FORBIDDEN_FULLY_BLOCKED = "SERVICE_FORBIDDEN_FULLY_BLOCKED;;The access to this service is forbidden since the specified partner is fully blocked";
 	
@@ -430,6 +432,8 @@ class APIErrors
 	const ONLY_ONE_ROLE_PER_USER_ALLOWED = "ONLY_ONE_ROLE_PER_USER_ALLOWED;;User cannot have more than one role";
 	
 	const CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN = "CANNOT_SET_ROOT_ADMIN_AS_NO_ADMIN;;Root admin user cannot be set to not admin";
+
+	const DEMOTE_ONLY_ADMIN = "DEMOTE_ONLY_ADMIN;;Demote can only be used on an admin user";
 
 	const CANNOT_CHANGE_OWN_ROLE = "CANNOT_CHANGE_OWN_ROLE;;User cannot change his own role";
 

@@ -111,7 +111,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 				if($actionInfo->serverOnly)
 					continue;
 					
-				if (strpos($actionInfo->clientgenerator, "ignore") !== false)
+				if ($actionInfo->clientgenerator && strpos($actionInfo->clientgenerator, "ignore") !== false)
 					continue;
 					
 				$serviceActionElement = $this->getServiceActionElement($actionReflector);
@@ -641,9 +641,7 @@ class XmlClientGenerator extends ClientGeneratorFromPhp
 	
 	private function fixDescription($description)
 	{
-		$description = str_replace("\r", '', trim($description, " \t\r\n"));
-		//$description = substr($description, 0, strlen($description) - 1);
-		return $description;
+		return isset($description) ? str_replace("\r", '', trim($description, " \t\r\n")) : '';
 	}
 	
 	protected function writeHeader() { }

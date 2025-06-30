@@ -8,6 +8,32 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 
 	const SRT_TIMECODE_PATTERN = '#^((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\,[0-9]{3}) --> ((?:[0-9]{2}:)?[0-9]{2}:[0-9]{2}\,[0-9]{3})( .*)?$#';
 
+	protected function customPregMatchAll($pattern, $subject, &$matches)
+	{
+		$matches = [];
+		$offset = 0;
+		$allMatches = [];
+
+		while (preg_match($pattern, $subject, $match, PREG_OFFSET_CAPTURE, $offset))
+		{
+			$allMatches[] = $match;
+			$offset = $match[0][1] + strlen($match[0][0]);
+		}
+
+		 if (!empty($allMatches))
+		 {
+			 foreach ($allMatches as $match)
+			 {
+				 foreach ($match as $key => $value)
+				 {
+					 $matches[$key][] = $value[0];
+				 }
+			 }
+		 }
+
+		 return count($allMatches);
+	}
+
 	/* (non-PHPdoc)
 	 * @see kCaptionsContentManager::parse()
 	 */
@@ -24,7 +50,9 @@ class srtCaptionsContentManager extends kCaptionsContentManager
 		
 		$matches = null;
 		$regex = '/(?P<index>\d+)\s*\r?\n\s*(?P<startHours>\d{1,2}):(?P<startMinutes>\d{1,2}):(?P<startSeconds>\d{1,2})[,\.](?P<startMilliseconds>\d{1,3})\s*-->\s*(?P<endHours>\d{1,2}):(?P<endMinutes>\d{1,2}):(?P<endSeconds>\d{1,2})[,\.](?P<endMilliseconds>\d{1,3})\s*\r?\n((?P<content>.+)\r?(\n|$))?\s*\r?(\n|$)/sU';
-		if(!preg_match_all($regex, $content, $matches) || !count($matches) || !count($matches[0]))
+
+		$pregMatchAll = $this->customPregMatchAll($regex, $content, $matches);
+		if(!$pregMatchAll || !count($matches) || !count($matches[0]))
 		{
 			KalturaLog::err("Content regex not found");
 			return array();

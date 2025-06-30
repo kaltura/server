@@ -576,7 +576,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 					/* @var $captionAsset CaptionAsset */
 					$captionAssetObj = array();
 
-					if (($captionAsset->getContainerFormat() == CaptionType::WEBVTT) || $config->hasSequence || ($entry->getType() == entryType::PLAYLIST))
+					if ($config->hasSequence || ($entry->getType() == entryType::PLAYLIST))
 					{
 						// pass null as storageId in order to support any storage profile and not the one selected by the current video flavors
 						$url = $captionAsset->getExternalUrl(null);
@@ -657,7 +657,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 
 	protected static function getLiveCaptionArray($entryId, $deliveryProfile): array
 	{
-		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entryId, array(EntryServerNodeStatus::PLAYABLE, EntryServerNodeStatus::MARKED_FOR_DELETION));
+		$liveEntryServerNodes = $deliveryProfile->getSortedLiveEntryServerNodes($entryId);
 		if(!count($liveEntryServerNodes))
 		{
 			return array();
@@ -670,17 +670,21 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		}
 
 		$liveCaptions = array();
+		$baseUrl = $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]);
+		$url = parse_url($baseUrl, PHP_URL_PATH);
+		$prefix = substr($baseUrl, 0, strpos($baseUrl, $url));
 		foreach ($webVTTStreams as $stream)
 		{
 			/* @var $stream kLiveStreamParams */
-            $streamLang = $stream->getLanguage() ?? 'Unknown';
+			$streamLang = $stream->getLanguage() ?? 'Unknown';
+
 			$caption = [
-                'tokenizer'=> $deliveryProfile->getTokenizer(),
-                'urlPrefix'=> $deliveryProfile->getPackagerUrl($liveEntryServerNodes[0]),
-                'url'=> 'index-s' . $stream->getFlavorId() . '-t.m3u8',
-                'label'=> languageCodeManager::getFullLanguageNameFromThreeCode($streamLang),
-                'default'=> 'NO',
-                'language'=> $streamLang
+				'tokenizer'=> $deliveryProfile->getTokenizer(),
+				'urlPrefix'=> $prefix,
+				'url'=> $url . 'index-s' . $stream->getFlavorId() . '-t.m3u8',
+				'label'=> languageCodeManager::getFullLanguageNameFromThreeCode($streamLang),
+				'default'=> 'NO',
+				'language'=> $streamLang
 			];
 
 			$liveCaptions[] = $caption;
@@ -737,7 +741,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 				try
 				{
 
-					$url = $assetDb->getDownloadUrl(true, false, null, null, false);
+					$url = $assetDb->getDownloadUrl(true, false, null, null, true);
 					if ($url)
 					{
 						$webVttUrl = myPartnerUtils::getCdnHost($assetDb->getPartnerId()) . self::SERVE_WEBVTT_URL_PREFIX . '/captionAssetId/' . $assetDb->getId() . '/segmentIndex/-1/version/' . $assetDb->getVersion() . '/captions.vtt';

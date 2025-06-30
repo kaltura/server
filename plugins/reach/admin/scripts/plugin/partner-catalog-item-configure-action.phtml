@@ -32,12 +32,13 @@
 				<th><?php echo $this->translate('Source Language'); ?></th>
 				<th><?php echo $this->translate('Target Language'); ?></th>
 				<th><?php echo $this->translate('Output Format'); ?></th>
+				<th><?php echo $this->translate('Default Reach Profile ID'); ?></th>
+				<th><?php echo $this->translate('Pay Per Use'); ?></th>
 			</tr>
 			</thead>
 			<tfoot>
 			<tr>
-				<td colspan="13">
-				</td>
+				<td colspan="15"></td>
 			</tr>
 			</tfoot>
 			<tbody>
@@ -60,10 +61,12 @@
 					    echo null;?>
 					</td>
 					<td><?php if (isset($catalogItem->outputFormat))
-					    echo $this->enumTranslate('Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat);
+					    echo $this->enumTranslate( $catalogItem->serviceFeature == Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE ? 'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat' : 'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat', $catalogItem->outputFormat);
 					else
 					    echo null;?>
 					</td>
+					<td><input name="defaultReachProfileId-<?php echo $catalogItem->id; ?>" /></td>
+					<td><?php echo $catalogItem->payPerUse; ?></td>
 				</tr>
 			<?php endforeach;?>
 			</tbody>

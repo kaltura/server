@@ -1,21 +1,13 @@
 <?php
-return array(
 
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CAPTIONS' => 'CAPTIONS',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION' => 'TRANSLATION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::ALIGNMENT' => 'ALIGNMENT',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::AUDIO_DESCRIPTION' => 'AUDIO_DESCRIPTION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::EXTENDED_AUDIO_DESCRIPTION' => 'EXTENDED_AUDIO_DESCRIPTION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CLIPS' => 'CLIPS',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::CHAPTERING' => 'CHAPTERING',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::DUBBING' => 'DUBBING',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::INTELLIGENT_TAGGING' => 'INTELLIGENT_TAGGING',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_CAPTION' => 'LIVE_CAPTION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::LIVE_TRANSLATION' => 'LIVE_TRANSLATION',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::QUIZ' => 'QUIZ',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::SUMMARY' => 'SUMMARY',
-	'Kaltura_Client_Reach_Enum_VendorServiceFeature::VIDEO_ANALYSIS' => 'VIDEO_ANALYSIS',
+$serviceFeatureNames = ReachPlugin::getServiceFeatureNames();
+$englishServiceNames = array();
+foreach ($serviceFeatureNames as $serviceFeatureName)
+{
+	$englishServiceNames["Kaltura_Client_Reach_Enum_VendorServiceFeature::$serviceFeatureName"] = $serviceFeatureName;
+}
 
+$englishArray = array(
 	'Kaltura_Client_Reach_Enum_VendorServiceType::HUMAN' => 'HUMAN',
 	'Kaltura_Client_Reach_Enum_VendorServiceType::MACHINE' => 'MACHINE',
 
@@ -45,6 +37,9 @@ return array(
 	'Kaltura_Client_Enum_NullableBoolean::NULL_VALUE' => "NULL VALUE",
 	'Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE' => "TRUE",
 
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_16_9' => "16:9",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_4_3' => "4:3",
+
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::VTT' => "VTT",
@@ -60,6 +55,7 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_HOUR' => "Price Per Hour",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_MINUTE' => "Price Per Minute",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_SECOND' => "Price Per Second",
+	'Kaltura_Client_Reach_Enum_VendorCatalogItemPriceFunction::PRICE_PER_TOKEN' => "Price Per Token",
 
 	'Kaltura_Client_Reach_Enum_ReachProfileType::FREE_TRIAL' => "Free Trial",
 	'Kaltura_Client_Reach_Enum_ReachProfileType::PAID' => "Paid",
@@ -177,6 +173,9 @@ return array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_HK' => "Traditional Chinese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AUTO_DETECT' => "Auto Detect",
 
+	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_ASL' => "English (ASL)",
+	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_BSL' => "English (BSL)",
+
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PROCESSING' => 'Processing',
@@ -191,4 +190,8 @@ return array(
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemStage::QA' => 'QA',
 
 	'Kaltura_Client_Reach_Enum_VendorVideoAnalysisType::OCR' => 'OCR',
+	'Kaltura_Client_Reach_Enum_VendorDocumentEnrichmentType::MD_CONVERSION' => 'Markdown Conversion',
 );
+
+
+return array_merge($englishServiceNames, $englishArray);

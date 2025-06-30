@@ -33,12 +33,19 @@ class KalturaQuizUserEntry extends KalturaUserEntry{
 	 */
 	public $version;
 
+	/**
+	 * @var KalturaUserEntryExtendedStatus
+	 * @filter eq,in,notin
+	 */
+	public $extendedStatus;
+
 	private static $map_between_objects = array
 	(
 		"score",
 		"feedback",
 		"version",
 		"calculatedScore",
+		"extendedStatus",
 	);
 
 	public function getMapBetweenObjects ( )

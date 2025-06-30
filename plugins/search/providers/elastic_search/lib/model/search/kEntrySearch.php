@@ -29,18 +29,18 @@ class kEntrySearch extends kBaseESearch
         }
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectId = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectIdsCsvStr = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
     {
         kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
-        $this->initQuery($entriesStatus, $objectId, $pager, $order, $aggregations);
-        $this->initEntitlement($eSearchOperator, $objectId);
+        $this->initQuery($entriesStatus, $objectIdsCsvStr, $pager, $order, $aggregations, $objectIdsNotIn);
+        $this->initEntitlement($eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn);
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
 
-    protected function initQuery(array $statuses, $objectId, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null)
+    protected function initQuery(array $statuses, $objectIdsCsvStr, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
     {
         $indexName = kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_ENTRY_INDEX, kCurrentContext::getCurrentPartnerId());
         $this->query = array(
@@ -50,12 +50,12 @@ class kEntrySearch extends kBaseESearch
 
         KalturaLog::debug("Index -" . $indexName);
 
-        parent::initQuery($statuses, $objectId, $pager, $order, $aggregations);
+        parent::initQuery($statuses, $objectIdsCsvStr, $pager, $order, $aggregations, $objectIdsNotIn);
     }
 
-    protected function initEntitlement(ESearchOperator $eSearchOperator, $objectId)
+    protected function initEntitlement(ESearchOperator $eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn = null)
     {
-        kEntryElasticEntitlement::setFilteredCategoryIds($eSearchOperator, $objectId);
+        kEntryElasticEntitlement::setFilteredCategoryIds($eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn);
         $contributors = kEntryElasticEntitlement::getEntitlementContributors();
         foreach ($contributors as $contributor)
         {

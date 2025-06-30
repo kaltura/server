@@ -9,6 +9,7 @@ class kCacheManager
 	// cache types
 	const CACHE_TYPE_PLAY_MANIFEST = 'playManifest';
 	const CACHE_TYPE_FILE_SYNC = 'fileSync';
+	const CACHE_TYPE_SMALL_FILE_SYNC = 'smallFileSync';
 	const CACHE_TYPE_PERMISSION_MANAGER = 'permissionManager';
 	const CACHE_TYPE_QUERY_CACHE_KEYS = 'queryCacheKeys';
 	const CACHE_TYPE_QUERY_CACHE_QUERIES = 'queryCacheQueries';
@@ -41,6 +42,7 @@ class kCacheManager
 	const CACHE_TYPE_PLAYS_VIEWS = 'playsViews';
 	const CACHE_TYPE_AVRO_SCHEMAS = 'avroSchemas';
 	const CACHE_TYPE_MICROSERVICES = 'microservices';
+	const CACHE_TYPE_VOLUME_MAP = 'volumeMap';
 
 	protected static $caches = array();
 	

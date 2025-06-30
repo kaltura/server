@@ -468,6 +468,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 		$bitrate = ($flavor && is_callable(array($flavor, 'getVideoBitrate')) ? $flavor->getVideoBitrate() : 0);
 		$frameRate = ($flavor && is_callable(array($flavor, 'getFrameRate')) ? $flavor->getFrameRate() : 0);
+		$codecString = ($flavor && is_callable(array($flavor, 'getCodecString')) ? $flavor->getCodecString() : '');
 		$width =   ($flavor ? $flavor->getWidth()   : 0);
 		$height =  ($flavor ? $flavor->getHeight()  : 0);
 
@@ -485,6 +486,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'defaultAudio' => $isDefaultAudio,
 				'type' => $type,
 				'frameRate' => $frameRate,
+				'codecs' => $codecString
 			);
 	}
 	
@@ -588,6 +590,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	public function getPricingProfile()
 	{
 		return $this->getFromCustomData("pricingProfile");
+	}
+
+	public function setIsNonDRM($v)
+	{
+		$this->putInCustomData('isNonDRM', $v);
+	}
+
+	public function getIsNonDRM()
+	{
+		return $this->getFromCustomData('isNonDRM', null, false);
 	}
 
 	public function getRegionPrice($region)

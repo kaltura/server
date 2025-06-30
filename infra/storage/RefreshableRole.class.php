@@ -20,9 +20,14 @@ class RefreshableRole
 	const ROLE_SESSION_NAME_PREFIX = "kaltura_s3_access_";
 	const ASSUME_ROLE_CREDENTIALS_EXPIRY_TIME = 43200;
 
-	public static function getCacheCredentialsProvider($roleArn, $s3Region = null)
+	public static function getCacheCredentialsProvider($roleArn, $s3Region = null, $dirnameSuffix = null)
 	{
 		$credentialsCacheDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 's3_creds_cache_v3';
+		
+		if ($dirnameSuffix)
+		{
+			$credentialsCacheDir .= "_$dirnameSuffix";
+		}
 
 		$profile = new InstanceProfileProvider();
 		$cache = new DoctrineCacheAdapter(new FilesystemCache($credentialsCacheDir));

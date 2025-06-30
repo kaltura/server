@@ -33,6 +33,7 @@ class s3Mgr extends kFileTransferMgr
 	protected $endPoint = null;
 	protected $storageClass = null;
 	protected $s3Arn = null;
+	protected $dirnameSuffix = null;
 
 	const SIZE = 'Size';
 	const LAST_MODIFICATION = 'LastModified';
@@ -79,14 +80,24 @@ class s3Mgr extends kFileTransferMgr
 		{
 			$this->storageClass = $options['storageClass'];
 		}
-
-		if (class_exists('KBatchBase'))
+		
+		if($options && isset($options['s3Arn']))
 		{
-			$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
+			$this->s3Arn = $options['s3Arn'];
+			$this->dirnameSuffix = 'dropFolderWatcherRemoteS3';
 		}
 		else
 		{
-			$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
+			if (class_exists('KBatchBase'))
+			{
+				$this->s3Arn = kBatchUtils::getKconfParam('arnRole', true);
+			}
+			else
+			{
+				$this->s3Arn = kConf::get('s3Arn', 'cloud_storage', null);
+			}
+			
+			$this->dirnameSuffix = 's3Mgr';
 		}
 
 		// do nothing
@@ -109,7 +120,7 @@ class s3Mgr extends kFileTransferMgr
 	{
 		return 1;
 	}
-
+	
 	// login to an existing connection with given user/pass (ftp_passive_mode is irrelevant)
 	//
 	// S3 Signature is required to be V4 for SSE-KMS support. Newer S3 regions also require V4.
@@ -124,7 +135,8 @@ class s3Mgr extends kFileTransferMgr
 
 		if($this->s3Arn && (!isset($sftp_user) || !$sftp_user) && (!isset($sftp_pass) || !$sftp_pass))
 		{
-			KalturaLog::debug('Found env VAR from config- ' . $this->s3Arn);
+			KalturaLog::debug("Login using ARN [ {$this->s3Arn} ] and region [ {$this->s3Region} ]");
+			
 			if(!class_exists('Aws\Sts\StsClient'))
 			{
 				KalturaLog::err('Class Aws\S3\StsClient was not found!!');
@@ -145,7 +157,7 @@ class s3Mgr extends kFileTransferMgr
 
 	private function generateCachedCredentialsS3Client()
 	{
-		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn);
+		$cacheProviderCredentials = RefreshableRole::getCacheCredentialsProvider($this->s3Arn, $this->s3Region, $this->dirnameSuffix);
 		$config = $this->getBaseClientConfig();
 		$config['credentials'] = $cacheProviderCredentials;
 		$this->s3 = S3Client::factory($config);

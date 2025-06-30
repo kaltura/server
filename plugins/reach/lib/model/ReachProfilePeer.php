@@ -26,12 +26,17 @@ class ReachProfilePeer extends BaseReachProfilePeer
 		self::$s_criteria_filter->setFilter($c);
 	}
 	
-	public static function retrieveActiveByPk($pk)
+	public static function retrieveActiveByPk($pk, $partnerId = null)
 	{
 		$c = new Criteria();
 		$c->add(ReachProfilePeer::ID, $pk);
 		$c->add(ReachProfilePeer::STATUS, ReachProfileStatus::ACTIVE);
-		
+
+		if($partnerId)
+		{
+			$c->add(ReachProfilePeer::PARTNER_ID, $partnerId);
+		}
+
 		return ReachProfilePeer::doSelectOne($c);
 	}
 	

@@ -45,6 +45,7 @@ class elasticClient
 	const DEFAULT_BULK_SIZE = 500;
 	const ELASTIC_MAJOR_VERSION_5 = 5;
 	const ELASTIC_MAJOR_VERSION_7 = 7;
+	const OPENSEARCH_DISTRIBUTION = 'opensearch';
 
 	protected $elasticHost;
 	protected $elasticPort;
@@ -76,11 +77,8 @@ class elasticClient
 		}
 		KalturaLog::debug("Setting elastic port $port");
 		$this->elasticPort = $port;
-
-		if (is_null($elasticVersion))
-		{
-			$elasticVersion = kConf::get('elasticVersion', 'elastic', self::ELASTIC_MAJOR_VERSION_5);
-		}
+		
+		$elasticVersion = $elasticVersion ?? self::getElasticVersion();
 		KalturaLog::debug("Setting elastic version to [$elasticVersion]");
 		$this->elasticVersion = $elasticVersion;
 
@@ -95,6 +93,22 @@ class elasticClient
 
 		$this->bulkSize = kConf::get('bulkSize', 'elastic', self::DEFAULT_BULK_SIZE);
 		$this->initBulkBuffer();
+	}
+	
+	public static function getElasticVersion()
+	{
+		$distribution = kConf::get('distribution', 'elastic', null);
+		if ($distribution === self::OPENSEARCH_DISTRIBUTION)
+		{
+			KalturaLog::debug("Found distribution config value [$distribution] - using elastic 7 syntax");
+			$elasticVersion = self::ELASTIC_MAJOR_VERSION_7;
+		}
+		else
+		{
+			$elasticVersion = kConf::get('elasticVersion', 'elastic', self::ELASTIC_MAJOR_VERSION_5);
+		}
+		
+		return $elasticVersion;
 	}
 	
 	public function setBulkSize($bulkSize)

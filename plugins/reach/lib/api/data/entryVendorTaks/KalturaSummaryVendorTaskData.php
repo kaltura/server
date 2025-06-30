@@ -5,7 +5,7 @@
  * @subpackage api.objects
  * @relatedService EntryVendorTaskService
  */
-class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
+class KalturaSummaryVendorTaskData extends KalturaLocalizedVendorTaskData
 {
 	/**
 	 * Type of summary.
@@ -22,13 +22,6 @@ class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
 	public $writingStyle;
 
 	/**
-	 * Language code
-	 *
-	 * @var KalturaLanguageCode
-	 */
-	public $language;
-
-	/**
 	 * JSON string containing the summary output.
 	 *
 	 * @var string
@@ -38,7 +31,6 @@ class KalturaSummaryVendorTaskData extends KalturaVendorTaskData
 	private static $map_between_objects = array(
 		'typeOfSummary',
 		'writingStyle',
-		'language',
 		'summaryOutputJson',
 	);
 

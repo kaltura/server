@@ -96,7 +96,7 @@ abstract class kFileTransferMgr
 	 * @return the connection resource identifier
 	 */
 	abstract protected function doConnect($server, &$port);
-
+	
 	/**
 	 * Should login to a previous initiatied connection with the user / pass given.
 	 *
@@ -272,8 +272,7 @@ abstract class kFileTransferMgr
 	{
 		return $this->connection_id;
 	}
-
-
+	
 	/**
 	 * Connect & authenticate on the given server, using the given username & password.
 	 *
