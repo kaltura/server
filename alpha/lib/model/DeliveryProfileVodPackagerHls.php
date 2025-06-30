@@ -98,7 +98,7 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 			{
 				$res = kSimuliveUtils::getEventDetailsByEvent($simuliveEvent);
 				$assets = array_values(array_map((function($assets) { return $assets[0]; }), $res[1] ));
-				$this->serveAsFmp4 = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($assets);
+				$this->serveAsFmp4 = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback(array_filter($assets));
 			}
 		}
 		
