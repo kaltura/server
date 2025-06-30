@@ -287,35 +287,42 @@ class ScheduleEventService extends KalturaBaseService
 		try
 		{
 			$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
-			if (!$dbScheduleEvent) {
+			if (!$dbScheduleEvent)
+			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduledEventId);
 			}
 
-			if (!$dbScheduleEvent instanceof LiveStreamScheduleEvent) {
+			if (!$dbScheduleEvent instanceof LiveStreamScheduleEvent)
+			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_SCHEDULE_EVENT_TYPE, $scheduledEventId);
 			}
 
 			$featureFound = false;
 			$featureList = $dbScheduleEvent->getLiveFeatures();
-			foreach ($featureList as $index => $feature) {
-				if ($feature->getSystemName() == $featureName) {
+			foreach ($featureList as $index => $feature)
+			{
+				if ($feature->getSystemName() == $featureName)
+				{
 					$featureList[$index] = $liveFeature->toUpdatableObject($feature);
 					$featureFound = true;
 					break;
 				}
 			}
 
-			if (!$featureFound) {
+			if (!$featureFound)
+			{
 				throw new KalturaAPIException(KalturaErrors::FEATURE_NAME_NOT_FOUND, $featureName);
 			}
 
 			$dbScheduleEvent->setLiveFeatures($featureList);
 			$dbScheduleEvent->save();
-		} catch(Exception $e)
+		}
+		catch(Exception $e)
 		{
 			KalturaLog::err('Error in updateLiveFeatureAction');
 			throw new KalturaAPIException("");
-		} finally
+		}
+		finally
 		{
 			if ($lock)
 			{
