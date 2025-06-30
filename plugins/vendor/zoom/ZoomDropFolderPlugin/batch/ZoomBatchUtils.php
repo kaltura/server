@@ -126,11 +126,13 @@ class ZoomBatchUtils
 					KalturaLog::debug('User found by id');
 					break;
 				}
+				// If the user was not found by id, search by email
 				$filter->emailStartsWith =  $kZoomUser->getProcessedName();
 				break;
 			}
 		}
 
+		// Search only if there is no previous value in the argument, or it holds an empty list from an earlier call
 		$kalturaUser = (!$kalturaUser || !$kalturaUser->objects || count($kalturaUser->objects) == 0) ? KBatchBase::$kClient->user->listAction($filter, $pager) : $kalturaUser;
 		if($kalturaUser->objects)
 		{
