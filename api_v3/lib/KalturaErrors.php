@@ -115,6 +115,8 @@ class KalturaErrors extends APIErrors
 
 	const INVALID_SCHEDULE_EVENT_TYPE = "INVALID_SCHEDULE_EVENT_TYPE;ID;Schedule Event id [@ID@] is of inappropriate type for action";
 
+	const CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE = "CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE;;cannot update feature name [@NAME@] on schedule event";
+
 	const FEATURE_NAME_NOT_FOUND = "FEATURE_NAME_NOT_FOUND;NAME;LiveFeature with name [@NAME@] not found";
 
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";

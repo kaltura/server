@@ -281,7 +281,7 @@ class ScheduleEventService extends KalturaBaseService
 		if ($lock && !$lock->lock())
 		{
 			KalturaLog::err('Could not lock ' . $lockName);
-			throw new KalturaAPIException("");
+			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE, $featureName);
 		}
 
 		try
@@ -320,7 +320,7 @@ class ScheduleEventService extends KalturaBaseService
 		catch(Exception $e)
 		{
 			KalturaLog::err('Error in updateLiveFeatureAction');
-			throw new KalturaAPIException("");
+			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE, $featureName);
 		}
 		finally
 		{
