@@ -320,7 +320,7 @@ class ScheduleEventService extends KalturaBaseService
 		catch(Exception $e)
 		{
 			KalturaLog::err('Error in updateLiveFeatureAction');
-			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE, $featureName);
+			throw $e;
 		}
 		finally
 		{
