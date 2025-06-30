@@ -254,55 +254,17 @@ class kQuizPdf
 	{
 		$sentence = explode(' ', $input);
 
-		// Check if the first and last elements are numeric - if so, save them
-		$firstNumeric = is_numeric($sentence[0]) ? $sentence[0] : null;
-		$lastNumeric = is_numeric(end($sentence)) ? end($sentence) : null;
-
-		// Determine the start and end indices for slicing
-		$noneNumStart = $firstNumeric !== null ? 1 : 0;
-		$noneNumEnd = $lastNumeric !== null ? count($sentence) - 1 : count($sentence);
-
 		// Reverse each none numeric word in the array
 		foreach ($sentence as &$word)
 		{
 			$word = is_numeric($word) ? $word : $this->reverseSingleWord($word);
 		}
 
-		// Obtain the sub array that contains the middle section of the words (excluding first and last numeric words)
-		$noneNumericMiddleSection = array_slice($sentence, $noneNumStart, $noneNumEnd - $noneNumStart);
-
 		// Reverse the order of the array
-		$reversedOrder = $this->prepareFinalReversedArray($firstNumeric, $lastNumeric, $noneNumericMiddleSection);
+		$reversedOrder = array_reverse($sentence);
 
 		// Implode the array into a new string
 		return implode(' ', $reversedOrder);
-	}
-
-	/**
-	 * Prepares the final reversed array by concatenating the first numeric, reversed middle section, and last numeric.
-	 *
-	 * @param mixed $firstNumeric The first numeric value or null.
-	 * @param mixed $lastNumeric The last numeric value or null.
-	 * @param array $noneNumericMiddleSection The middle section of non-numeric words.
-	 * @return array The final reversed array.
-	 */
-	protected function prepareFinalReversedArray($firstNumeric, $lastNumeric, $noneNumericMiddleSection)
-	{
-		$reversedOrder = array_reverse($noneNumericMiddleSection);
-
-		// Concatenate the array while preserving numeric first and/or last cells
-		$result = [];
-		if ($firstNumeric !== null)
-		{
-			$result[] = $firstNumeric;
-		}
-		$result = array_merge($result, $reversedOrder);
-		if ($lastNumeric !== null)
-		{
-			$result[] = $lastNumeric;
-		}
-
-		return $result;
 	}
 
 	/**
