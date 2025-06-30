@@ -276,7 +276,12 @@ class ScheduleEventService extends KalturaBaseService
 	 */
 	public function updateLiveFeatureAction($scheduledEventId, $featureName, KalturaLiveFeature $liveFeature)
 	{
-		$lock = kLock::create("schedule_event" . $scheduledEventId);
+		$lockName = "schedule_event" . $scheduledEventId;
+		$lock = kLock::create($lockName);
+		if ($lock && !$lock->lock())
+		{
+			KalturaLog::debug('Could not lock ' . $lockName);
+		}
 		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
 		if(!$dbScheduleEvent)
 		{
