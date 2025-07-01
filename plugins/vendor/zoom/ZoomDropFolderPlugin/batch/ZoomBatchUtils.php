@@ -121,7 +121,7 @@ class ZoomBatchUtils
 				KalturaLog::debug('Searching by both puser_id and email [' . $kZoomUser->getProcessedName() . ']');
 				$filter->idEqual = $kZoomUser->getProcessedName();
 				$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
-				if($kalturaUser && $kalturaUser->objects && count($kalturaUser->objects) > 0)
+				if(isset($kalturaUser->objects[0]))
 				{
 					KalturaLog::debug('User found by id');
 					break;
@@ -133,8 +133,8 @@ class ZoomBatchUtils
 		}
 
 		// Search only if there is no previous value in the argument, or it holds an empty list from an earlier call
-		$kalturaUser = (!$kalturaUser || !$kalturaUser->objects || count($kalturaUser->objects) == 0) ? KBatchBase::$kClient->user->listAction($filter, $pager) : $kalturaUser;
-		if($kalturaUser->objects)
+		$kalturaUser = (!isset($kalturaUser->objects[0])) ? KBatchBase::$kClient->user->listAction($filter, $pager) : $kalturaUser;
+		if(isset($kalturaUser->objects[0]))
 		{
 			KalturaLog::debug('Found user with id [' . $kalturaUser->objects[0]->id . ']');
 			return $kalturaUser->objects[0];
