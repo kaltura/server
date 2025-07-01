@@ -502,28 +502,15 @@ class kString
 	public static function compareStringWithRegex($string, $regex)
 	{
 		$regexLength = strlen($regex);
-		if($regexLength > 0)
+		if ($regexLength > 0 && !kString::endsWith($regex, '/'))
 		{
-			$slashCount = substr_count($regex, '/');
-			switch ($slashCount)
-			{
-				case 0:
-					$regex = '/' . $regex . '/';
-					break;
-				case 1:
-					if (kString::beginsWith($regex, '/'))
-					{
-						$regex .= '/';
-					}
-					else
-					{
-						$regex = '/' . $regex;
-					}
-					break;
-				default:
-					break;
-			}
+			$regex = $regex . '/';
 		}
+		if (!kString::beginsWith($regex, '/'))
+		{
+			$regex = '/' . $regex;
+		}
+		
 		return preg_match($regex, $string);
 	}
 	

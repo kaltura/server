@@ -23,10 +23,36 @@ class KalturaMetadataEnrichmentVendorTaskData extends KalturaLocalizedVendorTask
 	 */
 	public $instruction;
 
+	/**
+	 * Indicates whether the metadata enrichment results should be automatically applied on the task entry.
+	 * Default is false.
+	 *
+	 * @var bool
+	 */
+	public $shouldApply;
+
+	/**
+	 * Specifies how metadata fields should be applied during enrichment.
+	 * If 'FILL_EMPTY_AND_OVERRIDE_LIST', use overrideFields to specify which fields to override.
+	 *
+	 * @var KalturaMetadataEnrichmentApplyMode
+	 */
+	public $applyMode;
+
+	/**
+	 * List of entry fields to override when applyMode is set to 'FILL_EMPTY_AND_OVERRIDE_LIST'.
+	 *
+	 * @var KalturaStringArray
+	 */
+	public $overrideFields;
+
 	private static $map_between_objects = array
 	(
 		'detailLevel',
 		'instruction',
+		'shouldApply',
+		'applyMode',
+		'overrideFields',
 	);
 
 	public function getMapBetweenObjects()
