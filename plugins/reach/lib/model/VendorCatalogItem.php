@@ -165,37 +165,63 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	 * @param $objectId
 	 * @param $shouldModerateOutput
 	 * @param $turnaroundTime
+	 * @param $entryObjectType
+	 * @param $disableDefaultEntryFilter
 	 * @return string
 	 * @throws Exception
 	 */
 	public function generateReachVendorKs($objectId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $entryObjectType = EntryObjectType::ENTRY, $disableDefaultEntryFilter = false)
 	{
-		$entryId = $objectId;
-
-		if($entryObjectType == EntryObjectType::ASSET)
+		switch ($entryObjectType)
 		{
-			$asset = assetPeer::retrieveByIdNoFilter($objectId);
-			if (!$asset)
-			{
-				throw new Exception("Asset Id [$objectId] not Found to create REACH Vendor limited session");
-			}
-			$entryId = $asset->getEntryId();
+			case EntryObjectType::ASSET:
+			case EntryObjectType::ENTRY:
+				$entryId = self::getEntryId($objectId, $entryObjectType);
+				$entry = $disableDefaultEntryFilter ? entryPeer::retrieveByPKNoFilter($entryId) : entryPeer::retrieveByPK($entryId);
+				if (!$entry)
+				{
+					throw new Exception("Entry Id [$entryId] not Found to create REACH Vendor limited session");
+				}
+				$partner = $entry->getPartner();
+				$privileges = $this->getPrivileges($entryId, $shouldModerateOutput);
+				$puser_id = $this->getPuserId($entry);
+				break;
+
+			default:
+				throw new Exception("Failed to get user and privileges for unsupported Entry Object Type [$entryObjectType] Object Id [$objectId]");
 		}
-
-		$entry = $disableDefaultEntryFilter ? entryPeer::retrieveByPKNoFilter($entryId) : entryPeer::retrieveByPK($entryId);
-		if (!$entry)
-			throw new Exception("Entry Id [$entryId] not Found to create REACH Vendor limited session");
-
-		$partner = $entry->getPartner();
-		$privileges = $this->getPrivileges($entryId, $shouldModerateOutput);
-		$puser_id = $this->getPuserId($entry);
 
 		$limitedKs = '';
 		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), $puser_id, $limitedKs, $turnaroundTime, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null, false);
 		if ($result < 0)
+		{
 			throw new Exception('Failed to create REACH Vendor limited session for partner '.$partner->getId());
+		}
 
 		return $limitedKs;
+	}
+
+	protected function getEntryId($objectId, $entryObjectType)
+	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
+		switch ($entryObjectType)
+		{
+			case EntryObjectType::ASSET:
+				$asset = assetPeer::retrieveByIdNoFilter($objectId);
+				if (!$asset)
+				{
+					throw new Exception("Asset Id [$objectId] not Found to create REACH Vendor limited session");
+				}
+				return $asset->getEntryId();
+
+			case EntryObjectType::ENTRY:
+				return $objectId;
+
+		}
 	}
 	
 	public function getKsExpiry()
