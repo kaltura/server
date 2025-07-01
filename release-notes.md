@@ -1,4 +1,16 @@
 # Ursa-21.19.0
+# Add partner and permissions for Agents Manager ##
+- Issue Type: Task
+- Issue ID: KAM-61
+
+### Configuration ###
+First replace all tokens from the ini file below (under Agents Manager section) and remove ".template" from the file name:
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_06_30_agents_manager_add_partner.php
+
 
 ## Add kafka event notification for category entry create/update/delete and support pushign entry events when agents are enabled ##
 - Issue Type: Task
