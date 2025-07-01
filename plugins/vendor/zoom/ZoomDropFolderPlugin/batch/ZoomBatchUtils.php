@@ -99,35 +99,42 @@ class ZoomBatchUtils
 
 		$filter = new KalturaUserFilter();
 		$filter->partnerIdEqual = $partnerId;
+		$kalturaUser = null;
 
 		switch ($userSearchMethod)
 		{
 			case KalturaZoomUsersSearchMethod::ID:
 			{
-				KalturaLog::debug('Searching by puser_id');
+				KalturaLog::debug('Searching by puser_id [' . $kZoomUser->getProcessedName() . ']');
 				$filter->idEqual = $kZoomUser->getProcessedName();
 				break;
 			}
 			case KalturaZoomUsersSearchMethod::EMAIL:
 			{
-				KalturaLog::debug('Searching by email');
-				$email = $kZoomUser->getOriginalName();
-				$filter->emailStartsWith = $email;
+				KalturaLog::debug('Searching by email [' . $kZoomUser->getProcessedName() . ']');
+				$filter->emailStartsWith = $kZoomUser->getProcessedName();
 				break;
 			}
 			case KalturaZoomUsersSearchMethod::ALL:
 			default:
 			{
-				KalturaLog::debug('Searching by both puser_id and email');
+				KalturaLog::debug('Searching by both puser_id and email [' . $kZoomUser->getProcessedName() . ']');
 				$filter->idEqual = $kZoomUser->getProcessedName();
-				$email = $kZoomUser->getOriginalName();
-				$filter->emailStartsWith = $email;
+				$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
+				if(isset($kalturaUser->objects[0]))
+				{
+					KalturaLog::debug('User found by id');
+					break;
+				}
+				// If the user was not found by id, search by email
+				$filter->emailStartsWith =  $kZoomUser->getProcessedName();
 				break;
 			}
 		}
 
-		$kalturaUser = KBatchBase::$kClient->user->listAction($filter, $pager);
-		if($kalturaUser->objects)
+		// Search only if there is no previous value in the argument, or it holds an empty list from an earlier call
+		$kalturaUser = (!isset($kalturaUser->objects[0])) ? KBatchBase::$kClient->user->listAction($filter, $pager) : $kalturaUser;
+		if(isset($kalturaUser->objects[0]))
 		{
 			KalturaLog::debug('Found user with id [' . $kalturaUser->objects[0]->id . ']');
 			return $kalturaUser->objects[0];
