@@ -290,12 +290,17 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				return true;
 		}
 
-		if ($object instanceof flavorAsset
-			&& in_array(assetPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == asset::ASSET_STATUS_READY
-			&& myEntryUtils::isEntryReady($object->getEntryId()))
+		if ($object instanceof asset && in_array(assetPeer::STATUS, $modifiedColumns))
 		{
+
+			if ($object instanceof CaptionAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::ASSET_STATUS_READY)
+			{
+				$event = new kObjectChangedEvent($object,$modifiedColumns);
+				return $this->shouldConsumeEvent($event);
+			}
+
 			return true;
+
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -303,12 +308,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
-		}
-
-		if ($object instanceof CaptionAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::ASSET_STATUS_READY)
-		{
-			$event = new kObjectChangedEvent($object,$modifiedColumns);
-			return $this->shouldConsumeEvent($event);
 		}
 
 		return false;
@@ -458,14 +457,21 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				}
 				if(in_array($object->getStatus(), array(entryStatus::DELETED, entryStatus::ERROR_CONVERTING, entryStatus::ERROR_CONVERTING)))
 				{
-					return $this->abortTasks($object);
+					return $this->abortEntryTasks($object);
 				}
 			}
 		}
 
-		if ($object instanceof flavorAsset && !$object->getentry()->getBlockAutoTranscript())
+		if ($object instanceof flavorAsset && !$object->getentry()->getBlockAutoTranscript()
+			&& $object->getStatus() == asset::ASSET_STATUS_READY
+			&& myEntryUtils::isEntryReady($object->getEntryId()))
 		{
 			return $this->handleEntryReady($object->getentry());
+		}
+
+		if ($object instanceof AttachmentAsset && in_array($object->getStatus(), array(asset::ASSET_STATUS_DELETED, asset::ASSET_STATUS_ERROR, asset::ASSET_STATUS_NOT_APPLICABLE)))
+		{
+			return $this->abortAssetTasks()($object);
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -1016,17 +1022,30 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	private function abortTasks(entry $entry)
+	private function abortEntryTasks(entry $entry)
 	{
-		//Delete all pending tasks
 		$entryStatusErrorMessage = $this->getAbortEntryStatusMessage($entry->getStatus());
-		$pendingModerationTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId());
-		foreach ($pendingModerationTasks as $pendingModerationTask)
+		$pendingEntryTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId());
+		$this->abortTasks($entry->getEntryId(), $pendingEntryTasks, $entryStatusErrorMessage);
+	}
+
+	private function abortAssetTasks(asset $asset)
+	{
+		$assetStatusErrorMessage = $this->getAbortAssetStatusMessage()($asset->getStatus());
+		$assetPendingTasks = EntryVendorTaskPeer::retrievePendingByEntryId($asset->getId(), $asset->getPartnerId());
+		$this->abortTasks($asset->getId(), $assetPendingTasks, $assetStatusErrorMessage);
+	}
+
+	private function abortTasks($objectId, $pendingTasks, $errorMessage)
+	{
+		foreach ($pendingTasks as $pendingTask)
 		{
-			/* @var $pendingModerationTask EntryVendorTask */
-			$pendingModerationTask->setStatus(EntryVendorTaskStatus::ABORTED);
-			$pendingModerationTask->setErrDescription("Task was aborted by server, associated entry [{$entry->getId()}] $entryStatusErrorMessage");
-			$pendingModerationTask->save();
+			//Delete all pending tasks
+			
+			/* @var $pendingTask EntryVendorTask */
+			$pendingTask->setStatus(EntryVendorTaskStatus::ABORTED);
+			$pendingTask->setErrDescription("Task was aborted by server, associated object [{$objectId}] $errorMessage");
+			$pendingTask->save();
 		}
 	}
 
@@ -1040,6 +1059,21 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				return "error occurred while converting";
 			case entryStatus::ERROR_IMPORTING:
 				return "error occurred while importing";
+			default:
+				return "invalid status provided";
+		}
+	}
+
+	private function getAbortAssetStatusMessage($status)
+	{
+		switch ($status)
+		{
+			case entryStatus::DELETED:
+				return "deleted";
+			case asset::ASSET_STATUS_ERROR:
+				return "error occurred";
+			case ASSET::ASSET_STATUS_NOT_APPLICABLE:
+				return "asset not applicable";
 			default:
 				return "invalid status provided";
 		}
