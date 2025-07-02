@@ -159,7 +159,7 @@ index kaltura_entry:kaltura_base
   rt_field          = tags
   rt_field          = categories
   rt_field          = flavor_params
-  rt_field         = source_link
+  rt_field          = source_link
   rt_field          = kshow_id
   rt_field          = group_id
   rt_field          = description
@@ -461,7 +461,7 @@ searchd
   query_log_format    = sphinxql
   read_timeout        = 5
   listen_backlog      = 1000
-  max_children       = 30
+  max_children        = 30
   pid_file            = @BASE_DIR@/sphinx/searchd.pid
   max_matches         = 10000
   preopen_indexes     = 0
