@@ -104,6 +104,13 @@ try
 	// kConf will throw Exception if paramName not found
 	$topicsPath = kConf::get(CONF_TOPICS_PATH);
 	
+	// this should be a valid AWS region, e.g. 'us-east-1' - we load it as an environment variable (via bash) before calling the script
+	$region = getenv(KAVA_AWS_REGION);
+	if (empty($region))
+	{
+		throw new Exception("AWS region environment variable [" . KAVA_AWS_REGION . "] is not set or empty");
+	}
+
 	// validate the configuration values
 	if (is_null($consumerId) || is_null($host) || is_null($port) || is_null($version))
 	{
