@@ -421,24 +421,55 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		return $loginData;
 	}
-	
+
+	// Retrieves all partner IDs where the kuser associated with the given loginDataId is active.
+	public static function getPartnerIdsByLoginData($loginDataId)
+	{
+		if (!$loginDataId) 
+		{
+			return array();
+		}
+
+		$criteria = new Criteria();
+		$criteria->addSelectColumn(kuserPeer::PARTNER_ID);
+		$criteria->add(kuserPeer::LOGIN_DATA_ID, $loginDataId);
+		$criteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
+		kuserPeer::setUseCriteriaFilter(false);
+		$partnerIds = kuserPeer::doSelectStmt($criteria)->fetchAll(PDO::FETCH_COLUMN);
+		kuserPeer::setUseCriteriaFilter(true);
+
+		return $partnerIds;
+	}
+
 	public static function setInitialPassword($hashKey, $newPassword)
 	{
 		// might throw exception
 		$hashKey = str_replace('.','=', $hashKey);
 		$loginData = self::isHashKeyValid($hashKey);
-		
+
 		if (!$loginData) {
 			throw new kUserException ('', kUserException::NEW_PASSWORD_HASH_KEY_INVALID);
 		}
-		
+
 		self::checkPasswordValidation($newPassword, $loginData);
-		
+
 		$loginData->resetPassword($newPassword);
 		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
 
 		kuserPeer::setUseCriteriaFilter(false);
-		$dbUser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $loginData->getConfigPartnerId());
+		$partner_id = $loginData->getLastLoginPartnerId();
+		$dbUser = null;
+		if($partner_id)
+		{
+			$dbUser = kuserPeer::getByLoginDataAndPartner($loginData->getId(),$partner_id);
+		}
+		if (!$partner_id || !$dbUser){
+			$valid_partner_ids= self::getPartnerIdsByLoginData($loginData->getId());
+			if(count($valid_partner_ids))
+			{
+				$dbUser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $valid_partner_ids[0]);
+			}
+		}
 		kuserPeer::setUseCriteriaFilter(true);
 		if (!$dbUser)
 		{
@@ -453,7 +484,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		return true;
 	}
-	
+
 	public static function getPassResetLink($hashKey, $linkType = resetPassLinkType::KMC, $dynamicLink = null)
 	{
 		if (!$hashKey) {
