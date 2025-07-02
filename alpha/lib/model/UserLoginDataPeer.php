@@ -425,7 +425,8 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	// Retrieves all partner IDs where the kuser associated with the given loginDataId is active.
 	public static function getPartnerIdsByLoginData($loginDataId)
 	{
-		if (!$loginDataId) {
+		if (!$loginDataId) 
+		{
 			return array();
 		}
 
@@ -433,7 +434,6 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$criteria->addSelectColumn(kuserPeer::PARTNER_ID);
 		$criteria->add(kuserPeer::LOGIN_DATA_ID, $loginDataId);
 		$criteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
-		//$c->addAnd(kuserPeer::IS_ADMIN, true, Criteria::EQUAL);
 		kuserPeer::setUseCriteriaFilter(false);
 		$partnerIds = kuserPeer::doSelectStmt($criteria)->fetchAll(PDO::FETCH_COLUMN);
 		kuserPeer::setUseCriteriaFilter(true);
