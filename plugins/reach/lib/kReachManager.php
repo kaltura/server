@@ -471,7 +471,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if ($object instanceof AttachmentAsset && in_array($object->getStatus(), array(asset::ASSET_STATUS_DELETED, asset::ASSET_STATUS_ERROR, asset::ASSET_STATUS_NOT_APPLICABLE)))
 		{
-			return $this->abortAssetTasks()($object);
+			return $this->abortAssetTasks($object);
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -1031,7 +1031,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function abortAssetTasks(asset $asset)
 	{
-		$assetStatusErrorMessage = $this->getAbortAssetStatusMessage()($asset->getStatus());
+		$assetStatusErrorMessage = $this->getAbortAssetStatusMessage($asset->getStatus());
 		$assetPendingTasks = EntryVendorTaskPeer::retrievePendingByEntryId($asset->getId(), $asset->getPartnerId());
 		$this->abortTasks($asset->getId(), $assetPendingTasks, $assetStatusErrorMessage);
 	}
@@ -1041,7 +1041,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		foreach ($pendingTasks as $pendingTask)
 		{
 			//Delete all pending tasks
-			
+
 			/* @var $pendingTask EntryVendorTask */
 			$pendingTask->setStatus(EntryVendorTaskStatus::ABORTED);
 			$pendingTask->setErrDescription("Task was aborted by server, associated object [{$objectId}] $errorMessage");
