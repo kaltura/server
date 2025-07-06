@@ -95,7 +95,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 
 	public function getRequiresPermissions()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_REQUIRES_PERMISSIONS);
+		return $this->getFromCustomData(self::CUSTOM_DATA_REQUIRES_PERMISSIONS, null, "");
 	}
 	
 	public function dispatch(kScope $scope)
