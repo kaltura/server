@@ -1,32 +1,37 @@
 <?php
 require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
-echo "Starting script to update entriesCount for category ";
+echo "Starting script to update entriesCount for category\n";
 
-if ($argc < 3 )
-	die("Usage: php $argv[0] update entriesCount for category <realrun | dryrun>" . "\n");
+if($argc < 3)
+	die("Usage: php $argv[0] categoryID <realrun | dryrun> \n");
 
 $categoryId = $argv[1];
-$newEntriesCount =  $argv[2];
 
 $dryrun = true;
-if ($argc == 4 && $argv[3] == 'realrun') {
+if ($argc == 3 && $argv[2] == 'realrun') {
 	$dryrun = false;
 }
 
 KalturaStatement::setDryRun($dryrun);
-KalturaLog::debug('dryrun value: [' . $dryrun . ']');
+KalturaLog::debug("dryrun value: [$dryrun]\n");
 
 $category = categoryPeer::retrieveByPK($categoryId);
 $currentEntriesCount = $category->getEntriesCount();
-KalturaLog::debug("Current entries count for category with ID $categoryId is $currentEntriesCount\n");
 
-if ($currentEntriesCount == $newEntriesCount) {
+$c = new Criteria();
+$c->add(categoryEntryPeer::CATEGORY_ID, $categoryId);
+$c->add(categoryEntryPeer::STATUS, CategoryEntryStatus::ACTIVE, Criteria::EQUAL);
+$numOfActiveCategoryEntries = categoryEntryPeer::doCount($c);
+KalturaLog::debug("Current category entries for category with ID $categoryId is $numOfActiveCategoryEntries\n");
+
+if ($currentEntriesCount == $numOfActiveCategoryEntries)
+{
 	KalturaLog::debug("No update needed, current entries count is already $currentEntriesCount\n");
 	exit(0);
 }
 
-$category->setEntriesCount($newEntriesCount);
+$category->setEntriesCount($numOfActiveCategoryEntries);
 $category->save();
 
-KalturaLog::debug("Updated entriesCount to $newEntriesCount for category with ID $categoryId\n");
+KalturaLog::debug("Updated entriesCount to $numOfActiveCategoryEntries for category with ID $categoryId\n");
 
