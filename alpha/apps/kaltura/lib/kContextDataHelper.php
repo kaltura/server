@@ -294,7 +294,7 @@ class kContextDataHelper
 		else
 		{
 			$flavorAllowed = true;	
-			if($flavorParamsIds && count($flavorParamsIds)) //PHP 8 throws exception on count if $flavorParamsIds is null
+			if (is_array($flavorParamsIds) && count($flavorParamsIds)) //PHP 8 throws exception on count if $flavorParamsIds is null
 				$flavorAllowed = $this->isFlavorAllowed($this->asset->getFlavorParamsId(), $flavorParamsIds, $flavorParamsNotIn); 	
 			if($flavorAllowed)
 				$flavorAssets[] = $this->asset;
