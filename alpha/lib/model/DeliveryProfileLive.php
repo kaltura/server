@@ -511,5 +511,17 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 		return $this->getLivePackagerUrl($entryServerNode);
 	}
 
+	public static function hasH264Codec($streams)
+	{
+		foreach($streams as $stream)
+		{
+			if ($stream->getCodec() == flavorParams::VIDEO_CODEC_H265)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 }
 

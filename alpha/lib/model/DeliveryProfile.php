@@ -16,6 +16,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	const DYNAMIC_ATTRIBUTES_FULL_SUPPORT = 0;		// the profile fully supports the required attirbutes
 	const DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT = 1;	// the profile may support the required attirbutes however its better to try and find a more suitable profile
 	const DYNAMIC_ATTRIBUTES_NO_SUPPORT = 2;		// the profile doesn't support the required attirbutes
+
+	const AUDIO_CODEC = 'audioCodec';
+	const AUDIO_LANGUAGE_NAME = 'audioLanguageName';
 	
 	/**
 	 * @var DeliveryProfileDynamicAttributes
@@ -634,5 +637,40 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$dpPath = parse_url($dp->getUrl(), PHP_URL_PATH);
 		
 		return $path === $dpPath;
+	}
+
+	protected function hasAudioOnlyFlavor($flavors)
+	{
+		foreach ($flavors as $flavor)
+		{
+			if(!isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]))
+				continue;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	protected function forceUnmuxedSegments($flavors)
+	{
+		//Order audio flavors after video flavors and serve them as unmuxed segments
+		$audioflavors = array();
+		$videoflavors = array();
+		foreach ($flavors as $flavor)
+		{
+			if (!isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]))
+			{
+				$this->generateUrl(true, $flavor);
+				$videoFlavors[] = $flavor;
+			}
+			else
+			{
+				$this->generateUrl(false, $flavor);
+				$audioFlavors[] = $flavor;
+			}
+		}
+
+		return array_merge($audioFlavors, $videoFlavors);
 	}
 }
