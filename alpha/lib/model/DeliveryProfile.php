@@ -661,7 +661,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			$this->updateFlavorUrl($flavor);
 			$newFlavors[] = $flavor;
 		}
-		KalturaLog::info('lala' . print_r($newFlavors, true) . 'kaka');
+
 		return $newFlavors;
 	}
 }
