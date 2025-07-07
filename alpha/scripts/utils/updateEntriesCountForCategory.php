@@ -3,7 +3,7 @@ require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
 echo "Starting script to update entriesCount for category\n";
 
 if($argc < 3)
-	die("Usage: php $argv[0] categoryID <realrun | dryrun> \n");
+	die("Usage: php $argv[0] <categoryID> [<realrun | dryrun>] \n");
 
 $categoryId = $argv[1];
 
