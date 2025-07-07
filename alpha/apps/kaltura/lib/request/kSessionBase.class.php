@@ -59,6 +59,7 @@ class kSessionBase
 	const PRIVILEGE_VIRTUAL_EVENT_ID = "virtualeventid";
 	const PRIVILEGE_SEARCH_CONTEXT = "searchcontext";
 	const WIDGET_PRIVILEGE = 'view:*,widget:1';
+	const WIDGET_PRIVILEGE_TAG = 'widget:1';
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 	
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';

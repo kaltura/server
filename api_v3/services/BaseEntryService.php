@@ -1041,8 +1041,18 @@ class BaseEntryService extends KalturaEntryService
 
 		$isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
 		if (!($isScheduledNow) && $this->getKs() ){
-			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
-			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+			if
+			(
+				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW) &&
+				(
+					$this->getKs()->verifyPrivileges(ks::WIDGET_PRIVILEGE_TAG) ||
+					$this->getKs()->verifyPrivileges(ks::WIDGET_PRIVILEGE)
+				)
+			)
+			{
+				$isScheduledNow = false;
+			}
+			elseif ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
 				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
 				$isScheduledNow = true;
 			}
