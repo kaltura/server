@@ -303,9 +303,9 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 	}
 
-	protected function generateUrl($isVideo, &$flavor)
+	protected function updateFlavorUrl(&$flavor)
 	{
-		KalturaLog::log("lala kaka");
+		$isVideo = !isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]);
 		$flavor['urlPrefix'] = str_replace(".m3u8", "-" . ($isVideo ? "v" : "a") . ".m3u8", $flavor['urlPrefix']);
 	}
 

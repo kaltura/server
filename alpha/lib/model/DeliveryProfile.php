@@ -655,22 +655,13 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	protected function forceUnmuxedSegments($flavors)
 	{
 		//Order audio flavors after video flavors and serve them as unmuxed segments
-		$audioflavors = array();
-		$videoflavors = array();
+		$newFlavors = array();
 		foreach ($flavors as $flavor)
 		{
-			if (!isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]))
-			{
-				$this->generateUrl(true, $flavor);
-				$videoFlavors[] = $flavor;
-			}
-			else
-			{
-				$this->generateUrl(false, $flavor);
-				$audioFlavors[] = $flavor;
-			}
+			$this->updateFlavorUrl($flavor);
+			$newFlavors[] = $flavor;
 		}
-
-		return array_merge($audioFlavors, $videoFlavors);
+		KalturaLog::info('lala' . print_r($newFlavors, true) . 'kaka');
+		return $newFlavors;
 	}
 }
