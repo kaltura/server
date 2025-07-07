@@ -1,5 +1,62 @@
-# Ursa-21.18.0
+# Ursa-21.19.0
+# Add partner and permissions for Agents Manager ##
+- Issue Type: Task
+- Issue ID: KAM-61
 
+### Configuration ###
+First replace all tokens from the ini file below (under Agents Manager section) and remove ".template" from the file name:
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_06_30_agents_manager_add_partner.php
+
+
+## Add kafka event notification for category entry create/update/delete and support pushign entry events when agents are enabled ##
+- Issue Type: Task
+- Issue ID: KAM-6
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_19_add_kafka_category_entry_events.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_19_update_kafka_entry_notifications.template.xml
+
+    Add the following to admin.ini
+    moduls.enableAgents.enabled = true
+    moduls.enableAgents.permissionType = 2
+    moduls.enableAgents.label = "Enable Agents Framework"
+    moduls.enableAgents.permissionName = FEATURE_AGENTS_FRAMEWORK_PERMISSION
+    moduls.enableAgents.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_06_19_add_categorey_entry_kafka_events.php
+    php /opt/kaltura/app/deployment/updates/scripts/2025_06_19_update_user_kafka_events.php 
+
+## Add 4K flavor params support flag
+* Issue Type: Feature
+* Issue ID: PLAT-25201
+
+Note that for this to work you need to make sure to add the appropriate support on the delivery server as well.
+In our case we use: https://github.com/kaltura/nginx-vod-module
+When using 4k h265 flavors the serveFlavor will add /container/fmp4/ to the serveFlavor url's.
+The vod module location in this case will force serving the segments as fmp4 and forcing serving it in unmuxed mode.
+
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.4kFlavorSet.enabled = true
+moduls.4kFlavorSet.permissionType = 2
+moduls.4kFlavorSet.label = V2 flavor set - Enable 4K
+moduls.4kFlavorSet.permissionName = FEATURE_4K_FLAVORS
+moduls.4kFlavorSet.basePermissionType =
+moduls.4kFlavorSet.basePermissionName =
+moduls.4kFlavorSet.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+### Deployment scripts ### 
+    php /opt/kaltura/app/deployment/updates/scripts/2025_05_29_deploy_4k_flavor_params.php
+
+# Ursa-21.18.0
 ## Add kafka event notification for schedule event create/update/delete ##
 - Issue Type: Task
 - Issue ID: MCRSRV-281
@@ -15,7 +72,6 @@
 	php /opt/kaltura/app/deployment/updates/scripts/2025_06_16_add_schedule_event_events.php
 
 # Ursa-21.16.0
-
 ## Add Kafka Event Notifications for Folders
 * Issue Type: Task
 * Issue ID: PLAT-25225

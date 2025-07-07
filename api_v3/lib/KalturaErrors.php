@@ -115,6 +115,8 @@ class KalturaErrors extends APIErrors
 
 	const INVALID_SCHEDULE_EVENT_TYPE = "INVALID_SCHEDULE_EVENT_TYPE;ID;Schedule Event id [@ID@] is of inappropriate type for action";
 
+	const CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE = "CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE;;cannot update feature name [@NAME@] on schedule event";
+
 	const FEATURE_NAME_NOT_FOUND = "FEATURE_NAME_NOT_FOUND;NAME;LiveFeature with name [@NAME@] not found";
 
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
@@ -201,7 +203,8 @@ class KalturaErrors extends APIErrors
 	const CYCLE_IN_PARENTAGE = "CYCLE_IN_PARENTAGE;;Invalid cycle detected in the parent child connection of this entry";
 
 	const CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION = "CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION;MAX_DURATION;clips durations exceeded max allowed duration \"@MAX_DURATION@\" in seconds";
-	const RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;clips durations exceeded max allowed duration \"@MAX_COUNT@\" in seconds";
+
+	const RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;count of clip resources exceeded limit of \"@MAX_COUNT@\"";
 
 
 	/**

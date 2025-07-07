@@ -653,6 +653,10 @@ class kPlaybackContextDataHelper
 	 */
 	private static function getDrmData(entry $dbEntry, $flavorAssets, $deliveryProfile, $contextDataHelper)
 	{
+		if ($deliveryProfile->getIsNonDRM())
+		{
+			return array(null, $flavorAssets);
+		}
 		$playbackContextDataParams = new kPlaybackContextDataParams();
 		$playbackContextDataParams->setDeliveryProfile($deliveryProfile);
 		$playbackContextDataParams->setFlavors(array_values($flavorAssets));
