@@ -573,8 +573,9 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
-			$originalLoadPlayerJs = $loadPlayerJs;
-			$loadPlayerJs = "addEventListener('load', (event) => {
+			if ($this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME)) {
+				$originalLoadPlayerJs = $loadPlayerJs;
+				$loadPlayerJs = "addEventListener('load', (event) => {
 				if (!document.getElementById(config.targetId)) {
 					const playerDiv = document.createElement('div');
 					playerDiv.id = config.targetId;
@@ -582,6 +583,7 @@ class embedPlaykitJsAction extends sfAction
 					$originalLoadPlayerJs
 				}
 			});";
+			}
 		}
 
 		$autoEmbedCode = "
