@@ -1040,19 +1040,8 @@ class BaseEntryService extends KalturaEntryService
 			KalturaResponseCacher::disableCache();
 
 		$isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		if (!($isScheduledNow) && $this->getKs() ){
-			if
-			(
-				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW) &&
-				(
-					$this->getKs()->verifyPrivileges(ks::WIDGET_PRIVILEGE_TAG) ||
-					$this->getKs()->verifyPrivileges(ks::WIDGET_PRIVILEGE)
-				)
-			)
-			{
-				$isScheduledNow = false;
-			}
-			elseif ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+		if (!($isScheduledNow) && $this->getKs() && !$this->getKs()->isWidgetSession()){
+			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
 				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
 				$isScheduledNow = true;
 			}
