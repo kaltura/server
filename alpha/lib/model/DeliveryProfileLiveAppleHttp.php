@@ -296,7 +296,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		if($hasAudioOnlyFlavor && $hasH265)
 		{
 			//If audio flavors are present and fmp4 is supported, force unmuxed segments
-			$flavors = $this->forceUnmuxedSegments($flavors, "urlPrefix");
+			$flavors = $this->forceUnmuxedSegments($flavors);
 		}
 
 		return $flavors;

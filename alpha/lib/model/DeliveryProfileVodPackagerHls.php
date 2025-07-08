@@ -16,7 +16,7 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 		if($hasAudioOnlyFlavor && $this->serveAsFmp4)
 		{
 			//If audio flavors are present and fmp4 is supported, force unmuxed segments
-			$flavors = $this->forceUnmuxedSegments($flavors, "url");
+			$flavors = $this->forceUnmuxedSegments($flavors);
 		}
 		
 		return $flavors;

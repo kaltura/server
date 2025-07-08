@@ -649,23 +649,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		foreach ($flavors as $flavor)
 		{
 			if ($this->isAudioFlavor($flavor))
+			{
 				return true;
+			}
 		}
 
 		return false;
 	}
 
-	private function sortFlavors($a, $b)
-	{
-		if ($this->isAudioFlavor($a))
-			return -1;
-		else
-			return 1;
-	}
-
 	protected function forceUnmuxedSegments($flavors)
 	{
-		//Order audio flavors after video flavors and serve them as unmuxed segments
 		$newFlavors = array();
 		foreach ($flavors as $flavor)
 		{
@@ -673,7 +666,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			$newFlavors[] = $flavor;
 		}
 
-		usort($newFlavors, [$this, 'sortFlavors']);
+		//Order audio flavors after video flavors and serve them as unmuxed segments
+		usort($newFlavors, function ($a, $b) {return $this->isAudioFlavor($a) ? -1 : 1;});
 
 		return $newFlavors;
 	}
