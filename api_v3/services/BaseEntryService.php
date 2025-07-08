@@ -1052,7 +1052,7 @@ class BaseEntryService extends KalturaEntryService
 
 		$playbackContextDataHelper = new kPlaybackContextDataHelper();
 		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
-		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry);
+		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry, $this->getKs()->isWidgetSession());
 
 		$result = new KalturaPlaybackContext();
 		$result->fromObject($playbackContextDataHelper->getPlaybackContext());
