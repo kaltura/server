@@ -305,8 +305,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 	protected function updateFlavorUrl(&$flavor)
 	{
-		$isVideo = !isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]);
-		$flavor['urlPrefix'] = str_replace(".m3u8", "-" . ($isVideo ? "v" : "a") . ".m3u8", $flavor['urlPrefix']);
+		$flavor['urlPrefix'] = str_replace(".m3u8", "-" . ($this->isAudioFlavor($flavor) ? "a" : "v") . ".m3u8", $flavor['urlPrefix']);
 	}
 
 	public function getRenderer($flavors)

@@ -639,17 +639,28 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $path === $dpPath;
 	}
 
+	protected function isAudioFlavor($flavor)
+	{
+		return isset($flavor[self::AUDIO_CODEC]) || isset($flavor[self::AUDIO_LANGUAGE_NAME]);
+	}
+
 	protected function hasAudioOnlyFlavor($flavors)
 	{
 		foreach ($flavors as $flavor)
 		{
-			if(!isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]))
-				continue;
-
-			return true;
+			if ($this->isAudioFlavor($flavor))
+				return true;
 		}
 
 		return false;
+	}
+
+	private function sortFlavors($a, $b)
+	{
+		if ($this->isAudioFlavor($a))
+			return -1;
+		else
+			return 1;
 	}
 
 	protected function forceUnmuxedSegments($flavors)
@@ -661,6 +672,8 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			$this->updateFlavorUrl($flavor);
 			$newFlavors[] = $flavor;
 		}
+
+		usort($newFlavors, [$this, 'sortFlavors']);
 
 		return $newFlavors;
 	}

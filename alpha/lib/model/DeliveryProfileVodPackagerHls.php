@@ -24,8 +24,7 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 
 	protected function updateFlavorUrl(&$flavor)
 	{
-		$isVideo = !isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]);
-		$flavor['url'] .= "/index-" . ($isVideo ? "v" : "a") . "1.m3u8";
+		$flavor['url'] .= "/index-" . ($this->isAudioFlavor($flavor) ? "a" : "v") . "1.m3u8";
 	}
 	
 	protected function doGetFlavorAssetUrl(asset $flavorAsset) 
