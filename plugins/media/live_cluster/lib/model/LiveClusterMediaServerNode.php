@@ -126,7 +126,7 @@ class LiveClusterMediaServerNode extends MediaServerNode
 
 		$streams = $liveEntryServerNode->getStreams();
 
-		if (DeliveryProfileLive::hasH264Codec($streams))
+		if (DeliveryProfileLive::hasH265Codec($streams))
 		{
 			KalturaLog::debug("Stream has h265 video codec - force fmp4 container");
 			$res .= self::CONTAINER_URL_PARAM . '/fmp4/';

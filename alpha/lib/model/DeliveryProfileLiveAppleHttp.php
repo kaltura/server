@@ -269,7 +269,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$edgeServerIds = $this->params->getEdgeServerIds();
 		$this->addFallbackM3u8Flavors($edgeServerIds, $flavors, $primaryManifestUrl, $primaryStreamInfo );
 		$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo);
-		$hasH265 = DeliveryProfileLive::hasH264Codec($primaryStreamInfo);
+		$hasH265 = DeliveryProfileLive::hasH265Codec($primaryStreamInfo);
 		if($backupManifestUrl && ($this->getForceProxy() || count($flavors) == 0))
 		{
 			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primary and backup streams
@@ -277,7 +277,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 			$this->addFallbackM3u8Flavors($edgeServerIds, $flavors, $backupManifestUrl, $backupStreamInfo, $primaryFlavorBitrateInfo);
 			$this->buildM3u8Flavors($backupManifestUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
-			$hasH265 = $hasH265 || DeliveryProfileLive::hasH264Codec($backupStreamInfo);
+			$hasH265 = $hasH265 || DeliveryProfileLive::hasH265Codec($backupStreamInfo);
 		}
 
 		foreach ($flavors as $index => $flavor)
