@@ -575,10 +575,12 @@ class embedPlaykitJsAction extends sfAction
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
 			if ($this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME)) {
 				$originalLoadPlayerJs = $loadPlayerJs;
-				$loadPlayerJs = "addEventListener('load', (event) => {
+				$loadPlayerJs = "document.addEventListener('DOMContentLoaded', (event) => {
 				if (!document.getElementById(config.targetId)) {
 					const playerDiv = document.createElement('div');
 					playerDiv.id = config.targetId;
+					playerDiv.style.width = '560px';
+					playerDiv.style.height = '395px';
 					document.body.appendChild(playerDiv);
 					$originalLoadPlayerJs
 				}
