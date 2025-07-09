@@ -2,9 +2,6 @@
 
 class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 {
-	const AUDIO_CODEC = 'audioCodec';
-	const AUDIO_LANGUAGE_NAME = 'audioLanguageName';
-	
 	protected $serveAsFmp4 = false;
 	
 	/**
@@ -23,6 +20,11 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 		}
 		
 		return $flavors;
+	}
+
+	protected function updateFlavorUrl(&$flavor)
+	{
+		$flavor['url'] .= "/index-" . ($this->isAudioFlavor($flavor) ? "a" : "v") . "1.m3u8";
 	}
 	
 	protected function doGetFlavorAssetUrl(asset $flavorAsset) 
@@ -118,45 +120,6 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
 		
 		$mergedFlavors = array_merge($flavors, $parentFlavors);
 		return $mergedFlavors;
-	}
-	
-	private function hasAudioOnlyFlavor($flavors)
-	{
-		foreach ($flavors as $flavor)
-		{
-			if(!isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]))
-				continue;
-			
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * @param $flavors
-	 * @return array
-	 */
-	protected function forceUnmuxedSegments($flavors)
-	{
-		//Order audio flavors after video flavors and serve them as unmuxed segments
-		$audioflavors = array();
-		$videoflavors = array();
-		foreach ($flavors as $flavor)
-		{
-			if (!isset($flavor[self::AUDIO_CODEC]) && !isset($flavor[self::AUDIO_LANGUAGE_NAME]))
-			{
-				$flavor['url'] .= "/index-v1.m3u8";
-				$videoFlavors[] = $flavor;
-			}
-			else
-			{
-				$flavor['url'] .= "/index-a1.m3u8";
-				$audioFlavors[] = $flavor;
-			}
-		}
-		
-		return array_merge($audioFlavors, $videoFlavors);
 	}
 	
 	private function removeCodecsString($flavors)
