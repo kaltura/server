@@ -231,6 +231,7 @@ interface ReportType extends BaseEnum
    const EP_TOP_MOMENTS = 60016;
    const EP_TOP_SESSIONS = 60017;
    const EP_WEBCAST_ENGAGEMENT_OVER_TIME = 60018;
+   const EP_LATEST_DOWNLOADED_ATTACHMENTS = 60019;
 
    const CNC_PARTICIPATION = 70001;
 }
