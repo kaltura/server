@@ -666,7 +666,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 			$newFlavors[] = $flavor;
 		}
 
-		//Order audio flavors after video flavors and serve them as unmuxed segments
+		//Order video flavors after audio flavors and serve them as unmuxed segments
 		usort($newFlavors, function ($a, $b) {return $this->isAudioFlavor($a) ? -1 : 1;});
 
 		return $newFlavors;
