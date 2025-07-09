@@ -1076,11 +1076,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		switch ($status)
 		{
-			case entryStatus::DELETED:
+			case asset::ASSET_STATUS_DELETED:
 				return "deleted";
 			case asset::ASSET_STATUS_ERROR:
 				return "error occurred";
-			case ASSET::ASSET_STATUS_NOT_APPLICABLE:
+			case asset::ASSET_STATUS_NOT_APPLICABLE:
 				return "asset not applicable";
 			default:
 				return "invalid status provided";
