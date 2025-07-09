@@ -23,11 +23,6 @@ class MarkdownAsset extends TextualAsset
 
 	public function setAccuracy($v)     {$this->putInCustomData(self::CUSTOM_DATA_FIELD_ACCURACY, $v);}
 	public function setProviderType($v)     {$this->putInCustomData(self::CUSTOM_DATA_FIELD_PROVIDER_TYPE, $v);}
-	
-	public function getName()
-	{
-		return $this->getFilename();
-	}
 
 	public function getTypeFolderName()
 	{
