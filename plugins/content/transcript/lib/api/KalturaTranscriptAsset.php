@@ -20,8 +20,6 @@ class KalturaTranscriptAsset extends KalturaTextualAttachmentAsset
 	private static $map_between_objects = array
 	(
 		"accuracy",
-		"humanVerified",
-		"language",
 		"providerType",
 	);
 	
