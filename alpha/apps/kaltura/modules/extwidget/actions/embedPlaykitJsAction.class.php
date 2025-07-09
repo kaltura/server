@@ -577,17 +577,17 @@ class embedPlaykitJsAction extends sfAction
 				$originalLoadPlayerJs = $loadPlayerJs;
 				$loadPlayerJs = "
 				document.addEventListener('DOMContentLoaded', (event) => {
-				if (!document.getElementById(config.targetId)) {
+				  if (!document.getElementById(config.targetId)) {
 					const playerDiv = document.createElement('div');
 					playerDiv.id = config.targetId;
 					playerDiv.style.width = '560px';
 					playerDiv.style.height = '395px';
 					document.body.appendChild(playerDiv);
 					$originalLoadPlayerJs
-				} else {
+				  } else {
 					$originalLoadPlayerJs
-				}
-			});";
+				  }
+			    });";
 			}
 		}
 
