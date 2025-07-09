@@ -293,7 +293,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof asset && in_array(assetPeer::STATUS, $modifiedColumns))
 		{
 
-			if ($object instanceof CaptionAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::ASSET_STATUS_READY)
+			if ($object instanceof CaptionAsset && $object->getStatus() == asset::ASSET_STATUS_READY)
 			{
 				$event = new kObjectChangedEvent($object,$modifiedColumns);
 				return $this->shouldConsumeEvent($event);

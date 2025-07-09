@@ -179,7 +179,6 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				}
 				$partner = $entry->getPartner();
 				$privileges = $this->getPrivileges($entryId, $shouldModerateOutput);
-				$puser_id = $this->getPuserId($entry);
 				break;
 
 			default:
