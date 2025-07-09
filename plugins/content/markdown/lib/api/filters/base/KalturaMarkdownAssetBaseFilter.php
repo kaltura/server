@@ -1,11 +1,11 @@
 <?php
 /**
- * @package plugins.transcript
+ * @package plugins.markdown
  * @relatedService AttachmentAssetService
  * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaTranscriptAssetBaseFilter extends KalturaTextualAttachmentAssetFilter
+abstract class KalturaMarkdownAssetBaseFilter extends KalturaTextualAttachmentAssetFilter
 {
 	static private $map_between_objects = array
 	(
