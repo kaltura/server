@@ -491,7 +491,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		
 		try
 		{
-			$dbEntryVendorTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($dbEntryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, true));
+			$dbEntryVendorTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($dbEntryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, $dbEntryVendorTask->getEntryObjectType(), true));
 			self::tryToSave($dbEntryVendorTask);
 		}
 		catch (Exception $e)

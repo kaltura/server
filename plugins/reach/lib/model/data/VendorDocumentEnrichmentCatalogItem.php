@@ -29,4 +29,10 @@ class VendorDocumentEnrichmentCatalogItem extends VendorCatalogItem
 		$supportedMediaTypes = [entry::ENTRY_MEDIA_TYPE_DOCUMENT, entry::ENTRY_MEDIA_TYPE_PDF];
 		return $type === entryType::DOCUMENT && in_array($mediaType, $supportedMediaTypes);
 	}
+
+	public function isAssetSupported($asset): bool
+	{
+		$supportedFileExts = ["pdf", "pptx", "docx", "ppt", "doc"];
+		return $asset instanceof AttachmentAsset && in_array($asset->getFileExt(), $supportedFileExts);
+	}
 }
