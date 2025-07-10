@@ -1,9 +1,10 @@
 <?php
+
 /**
  * @package plugins.attachment
  * @subpackage lib
  */
-class kAttachmentFlowManager implements kObjectDeletedEventConsumer, kObjectAddedEventConsumer
+class kMarkdownFlowManager implements kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
 
 	private function indexEntry(BaseObject $object)
@@ -26,10 +27,9 @@ class kAttachmentFlowManager implements kObjectDeletedEventConsumer, kObjectAdde
 
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
-		if (class_exists('AttachmentAsset') && $object instanceof AttachmentAsset
-			&& AttachmentPlugin::isAllowedPartner($object->getPartnerId())
-			&& $object->getStatus() == AttachmentAsset::ASSET_STATUS_READY &&
-			$object->getContainerFormat() == AttachmentType::MARKDOWN)
+		if (class_exists('MarkdownAsset') && $object instanceof MarkdownAsset
+			&& MarkdownPlugin::isAllowedPartner($object->getPartnerId())
+			&& $object->getStatus() == MarkdownAsset::ASSET_STATUS_READY)
 		{
 			return true;
 		}
@@ -44,9 +44,8 @@ class kAttachmentFlowManager implements kObjectDeletedEventConsumer, kObjectAdde
 
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
-		if (class_exists('AttachmentAsset') && $object instanceof AttachmentAsset
-			&& AttachmentPlugin::isAllowedPartner($object->getPartnerId()) &&
-			$object->getContainerFormat() == AttachmentType::MARKDOWN)
+		if (class_exists('MarkdownAsset') && $object instanceof MarkdownAsset
+			&& MarkdownPlugin::isAllowedPartner($object->getPartnerId()))
 		{
 			return true;
 		}

@@ -1,5 +1,18 @@
+# Ursa-21.20.0
+## Markdown Plugin ##
+* Issue Type: Feature
+* Issue ID: No-Plat
+
+### Configuration ###
+To enable this plugin add the following to your plugins.ini file:
+	- Markdown
+
+### Deployment ###
+    - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    - You would also need to generate new clients 
+
 # Ursa-21.19.0
-# Add partner and permissions for Agents Manager ##
+## Add partner and permissions for Agents Manager ##
 - Issue Type: Task
 - Issue ID: KAM-61
 
