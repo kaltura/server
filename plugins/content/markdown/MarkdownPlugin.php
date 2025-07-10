@@ -3,13 +3,14 @@
  * Enable markdown assets management for entry objects
  * @package plugins.markdown
  */
-class MarkdownPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaTypeExtender
+class MarkdownPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaTypeExtender, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'markdown';
 	const ENTRY_MARKDOWN_PREFIX = 'md_pref';
 	const ENTRY_MARKDOWN_SUFFIX = 'md_suf';
 	const SEARCH_TEXT_SUFFIX = 'mdend';
 	const PLUGINS_DATA = 'plugins_data';
+	const MARKDOWN_FLOW_MANAGER_CLASS = 'kMarkdownFlowManager';
 
 
     /* (non-PHPdoc)
@@ -95,5 +96,12 @@ class MarkdownPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	public static function getApiValue($valueName)
 	{
 		return self::getPluginName() . IKalturaEnumerator::PLUGIN_VALUE_DELIMITER . $valueName;
+	}
+
+	public static function getEventConsumers()
+	{
+		return array(
+			self::MARKDOWN_FLOW_MANAGER_CLASS,
+		);
 	}
 }
