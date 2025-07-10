@@ -500,7 +500,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 		return $this->eTagHash;
 	}
-	
+
 	private function getAutoEmbedCode($targetId = null)
 	{
 		$targetId = $targetId ? $targetId : $this->getRequestParameter('targetId');
@@ -508,7 +508,7 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Player target ID not defined");
 		}
-		
+
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
 		$playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
 		$external_source = $this->getRequestParameter(self::EXTERNAL_SOURCE_PARAM_NAME);
@@ -533,21 +533,21 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$config[$key] = json_decode($val);
 		}
-		
+
 		if (!isset($config["provider"]))
 		{
 			$config["provider"] = new stdClass();
 		}
-		
+
 		$config["provider"]->partnerId = $this->partnerId;
 		$config["provider"]->uiConfId = $this->uiconfId;
-		
+
 		$ks = $this->getRequestParameter(self::KS_PARAM_NAME);
 		if ($ks)
 		{
 			$config["provider"]->ks = $ks;
 		}
-		
+
 		$config["targetId"] = $targetId;
 		$config = json_encode($config);
 		if ($config === false)
@@ -583,17 +583,17 @@ class embedPlaykitJsAction extends sfAction
                   ";
 			}
 		}
-		
+
 		$autoEmbedCode = "
 		try {
-			 var config=$config;
-			 $v2tov7ConfigJs
-			 $loadPlayerJs
+			var config=$config;
+			$v2tov7ConfigJs
+			$loadPlayerJs
 		} catch (e) {
 			console.error(e.message);
 		}
 		";
-		
+
 		return $autoEmbedCode;
 	}
 
