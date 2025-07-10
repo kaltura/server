@@ -6,11 +6,6 @@
 class MarkdownPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaTypeExtender
 {
 	const PLUGIN_NAME = 'markdown';
-	const ENTRY_MARKDOWN_PREFIX = 'md_pref';
-	const ENTRY_MARKDOWN_SUFFIX = 'md_suf';
-	const SEARCH_TEXT_SUFFIX = 'mdend';
-	const PLUGINS_DATA = 'plugins_data';
-
 
     /* (non-PHPdoc)
      * @see IKalturaPlugin::getPluginName()
