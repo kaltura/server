@@ -28,7 +28,7 @@ class kMarkdownFlowManager implements kObjectDeletedEventConsumer, kObjectAddedE
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
 		if (class_exists('MarkdownAsset') && $object instanceof MarkdownAsset
-			&& AttachmentPlugin::isAllowedPartner($object->getPartnerId())
+			&& MarkdownPlugin::isAllowedPartner($object->getPartnerId())
 			&& $object->getStatus() == MarkdownAsset::ASSET_STATUS_READY)
 		{
 			return true;
@@ -45,7 +45,7 @@ class kMarkdownFlowManager implements kObjectDeletedEventConsumer, kObjectAddedE
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
 		if (class_exists('MarkdownAsset') && $object instanceof MarkdownAsset
-			&& AttachmentPlugin::isAllowedPartner($object->getPartnerId()))
+			&& MarkdownPlugin::isAllowedPartner($object->getPartnerId()))
 		{
 			return true;
 		}
