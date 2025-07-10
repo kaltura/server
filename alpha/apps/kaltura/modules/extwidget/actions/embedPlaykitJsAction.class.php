@@ -500,7 +500,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 		return $this->eTagHash;
 	}
-
+	
 	private function getAutoEmbedCode($targetId = null)
 	{
 		$targetId = $targetId ? $targetId : $this->getRequestParameter('targetId');
@@ -508,14 +508,14 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::MISSING_PARAMETER, "Player target ID not defined");
 		}
-
+		
 		$entry_id = $this->getRequestParameter(self::ENTRY_ID_PARAM_NAME);
 		$playlist_id = $this->getRequestParameter(self::PLAYLIST_ID_PARAM_NAME);
 		$external_source = $this->getRequestParameter(self::EXTERNAL_SOURCE_PARAM_NAME);
 		$iframe_embed_type = $this->getRequestParameter(self::IFRAME_EMBED_TYPE);
 		$loadContentMethod = "";
 		if (!is_null($entry_id)) {
-		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
+			$loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
 		} elseif (!is_null($playlist_id)) {
 			$loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
 			if($iframe_embed_type === self::RAPT) {
@@ -533,21 +533,21 @@ class embedPlaykitJsAction extends sfAction
 		{
 			$config[$key] = json_decode($val);
 		}
-
+		
 		if (!isset($config["provider"]))
 		{
 			$config["provider"] = new stdClass();
 		}
-
+		
 		$config["provider"]->partnerId = $this->partnerId;
 		$config["provider"]->uiConfId = $this->uiconfId;
-
+		
 		$ks = $this->getRequestParameter(self::KS_PARAM_NAME);
 		if ($ks)
 		{
 			$config["provider"]->ks = $ks;
 		}
-
+		
 		$config["targetId"] = $targetId;
 		$config = json_encode($config);
 		if ($config === false)
@@ -568,7 +568,7 @@ class embedPlaykitJsAction extends sfAction
 			$loadContentMethod
 		";
 		
-		$v2tov7ConfigJs='';
+		$v2tov7ConfigJs = '';
 		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
 			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
@@ -576,31 +576,24 @@ class embedPlaykitJsAction extends sfAction
 			if ($this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME)) {
 				$originalLoadPlayerJs = $loadPlayerJs;
 				$loadPlayerJs = "
-				document.addEventListener('DOMContentLoaded', (event) => {
-				  if (!document.getElementById(config.targetId)) {
-					const playerDiv = document.createElement('div');
-					playerDiv.id = config.targetId;
-					playerDiv.style.width = '560px';
-					playerDiv.style.height = '395px';
-					document.body.appendChild(playerDiv);
-					$originalLoadPlayerJs
-				  } else {
-					$originalLoadPlayerJs
-				  }
-			    });";
+                  if (!document.getElementById(config.targetId)) {
+                    document.write(`<div id='\${config.targetId}' style='width:560px; height:395px;'></div>`);
+                  }
+                  $originalLoadPlayerJs
+                  ";
 			}
 		}
-
+		
 		$autoEmbedCode = "
 		try {
-			var config=$config;
-			$v2tov7ConfigJs
-			$loadPlayerJs
+			 var config=$config;
+			 $v2tov7ConfigJs
+			 $loadPlayerJs
 		} catch (e) {
 			console.error(e.message);
 		}
 		";
-
+		
 		return $autoEmbedCode;
 	}
 
