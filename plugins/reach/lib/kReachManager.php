@@ -49,19 +49,32 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 
 		//If both the entry and reach profile don't exist, there's no need to hit the loop
-		$entry = entryPeer::retrieveByPK($entryId);
-		$entryObjectType = EntryObjectType::ENTRY;
+		if ($object instanceof asset)
+		{
+			$entryObjectType = EntryObjectType::ASSET;
+			$mainObject = $object;
+		}
+		else
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+			$mainObject = entryPeer::retrieveByPK($entryId);
+			$reachRestrainAdminTag = kConf::get("reach_restrain_admin_tag", kConfMapNames::RUNTIME_CONFIG, null);
+			if(!$mainObject)
+			{
+				KalturaLog::log('Not all mandatory objects were found, tasks will not be added');
+				return true;
+			}
+			if(in_array($reachRestrainAdminTag, $mainObject->getAdminTagsArr()))
+			{
+				KalturaLog::log("Entry has reach restraining admin tag [$reachRestrainAdminTag], tasks will not be added");
+				return true;
+			}
+
+		}
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
-		if(!$entry || !$reachProfile)
+		if(!$reachProfile)
 		{
 			KalturaLog::log('Not all mandatory objects were found, tasks will not be added');
-			return true;
-		}
-
-		$reachRestrainAdminTag = kConf::get("reach_restrain_admin_tag", kConfMapNames::RUNTIME_CONFIG, null);
-		if(in_array($reachRestrainAdminTag, $entry->getAdminTagsArr()))
-		{
-			KalturaLog::log("Entry has reach restraining admin tag [$reachRestrainAdminTag], tasks will not be added");
 			return true;
 		}
 
@@ -74,17 +87,16 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd could not be retrieved, skipping");
 				continue;
 			}
-
 			$featureType = $catalogItemToAdd->getServiceFeature();
-			if(!$catalogItemToAdd->isFeatureTypeSupportedForEntry($entry, $entryObjectType))
+			if(!$catalogItemToAdd->isFeatureTypeSupportedForEntry($mainObject, $entryObjectType))
 			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for entry Id $entryId");
+				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $entryId");
 				continue;
 			}
 
 			//Pass the object Id as the context of the task
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
-			self::addEntryVendorTaskByObjectIds($entry, $entryObjectType, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
+			self::addEntryVendorTaskByObjectIds($mainObject, $entryObjectType, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
 		}
 	}
 
@@ -227,6 +239,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			return true;
 		}
+
+		if ($object instanceof asset)
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -344,6 +361,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType())
 				&& $object->getStatus() == entryStatus::READY
 				&& $object->getLengthInMsecs())
+		{
+			$this->checkAutomaticRules($object, true);
+		}
+
+		if ($object instanceof asset)
 		{
 			$this->checkAutomaticRules($object, true);
 		}
@@ -712,10 +734,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds($entryObject, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
+	public static function addEntryVendorTaskByObjectIds($object, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
 	{
-		$entryId = $entryObject->getId();
-		$partnerId = $entryObject->getPartnerId();
+		$entryId = $object->getId();
+		$partnerId = $object->getPartnerId();
 		$vendorCatalogItemId = $vendorCatalogItem->getId();
 
 		$targetVersion = $vendorCatalogItem->getTaskVersion($entryId, $entryObjectType);
@@ -728,7 +750,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			kReachUtils::tryToCancelOldTasks($entryId, $vendorCatalogItemId, $partnerId);
 		}
-
 		$unitsUsed = null;
 		if($vendorCatalogItem->requiresPayment())
 		{
@@ -738,21 +759,19 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				return true;
 			}
 
-			$unitsUsed = kReachUtils::getPricingUnits($vendorCatalogItem, $entryObject, $entryObjectType, $taskJobData, $unitsUsed);
-			if (!kReachUtils::isEnoughCreditLeft($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsUsed))
+			$unitsUsed = kReachUtils::getPricingUnits($vendorCatalogItem, $object, $entryObjectType, $taskJobData, $unitsUsed);
+			if (!kReachUtils::isEnoughCreditLeft($object, $entryObjectType, $vendorCatalogItem, $reachProfile, $unitsUsed))
 			{
 				KalturaLog::log("Exceeded max credit allowed, Task could not be added for entry [$entryId] and catalog item [$vendorCatalogItemId]");
 				return true;
 			}
 		}
-
-
-		if(!self::shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile))
+		if(!self::shouldAddEntryVendorTaskByObject($object, $entryObjectType, $vendorCatalogItem, $reachProfile))
 		{
 			return true;
 		}
 
-		$entryVendorTask = self::addEntryVendorTask($entryObject, $entryObjectType, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $unitsUsed);
+		$entryVendorTask = self::addEntryVendorTask($object, $entryObjectType, $reachProfile, $vendorCatalogItem, false, $targetVersion, $context, EntryVendorTaskCreationMode::AUTOMATIC, $unitsUsed);
 		if($entryVendorTask)
 		{
 			if ($taskJobData)
@@ -764,37 +783,44 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	public static function shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile)
+	public static function shouldAddEntryVendorTaskByObject($object, $entryObjectType, $vendorCatalogItem, $reachProfile)
 	{
 		if(!$entryObjectType)
 		{
 			$entryObjectType = EntryObjectType::ENTRY;
 		}
-
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
-				if (!$vendorCatalogItem->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType()))
+				if (!$vendorCatalogItem->isEntryTypeSupported($object->getType(), $object->getMediaType()))
 				{
-					KalturaLog::log("Entry of type [{$entryObject->getType()}] is not supported by Reach");
+					KalturaLog::log("Entry of type [{$object->getType()}] is not supported by Reach");
 					return false;
 				}
 
-				if (!kReachUtils::areFlavorsReady($entryObject, $reachProfile))
+				if (!kReachUtils::areFlavorsReady($object, $reachProfile))
 				{
 					KalturaLog::log("Not all flavor params IDs [{$reachProfile->getFlavorParamsIds()}] are ready yet");
 					return false;
 				}
 
-				if($entryObject->getParentEntryId())
+				if($object->getParentEntryId())
 				{
-					KalturaLog::log("Entry [{$entryObject->getId()}] is a child entry, entry vendor task object wont be created for it");
+					KalturaLog::log("Entry [{$object->getId()}] is a child entry, entry vendor task object wont be created for it");
 					return false;
 				}
 
-				if ($vendorCatalogItem->isEntryDurationExceeding($entryObject))
+				if ($vendorCatalogItem->isEntryDurationExceeding($object))
 				{
-					KalturaLog::log("Entry [{$entryObject->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
+					KalturaLog::log("Entry [{$object->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
+					return false;
+				}
+				return true;
+
+			case EntryObjectType::ASSET:
+				if (!$vendorCatalogItem->isAssetSupported($object))
+				{
+					KalturaLog::log("assets are not supported");
 					return false;
 				}
 				return true;
