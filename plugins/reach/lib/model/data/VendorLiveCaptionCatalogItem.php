@@ -61,6 +61,7 @@ class VendorLiveCaptionCatalogItem extends VendorLiveCatalogItem
 			{
 				$data->setStartDate(intval($data->getStartDate()) - $this->getStartTimeBuffer());
 				$data->setEndDate(intval($data->getEndDate()) + $this->getEndTimeBuffer());
+				$data->setEntryDuration(($latestEvent->getDuration() + $this->getStartTimeBuffer() + $this->getEndTimeBuffer())*1000);
 			}
 		}
 
