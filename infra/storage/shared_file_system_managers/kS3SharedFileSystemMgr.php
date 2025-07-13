@@ -88,6 +88,7 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		$this->retriesNum = kConf::get('aws_client_retries', 'local', 3);
 		return $this->login();
 	}
+	
 	private function getClientUserAgent()
 	{
 		$appName = self::DEFAULT_S3_APP_NAME;
@@ -688,8 +689,13 @@ class kS3SharedFileSystemMgr extends kSharedFileSystemMgr
 		
 		$params = $this->initBasicS3Params($filePath);
 		
-		$cmd = $this->s3Client->getCommand('GetObject', $params);
-
+		$command = 'GetObject';
+		if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'HEAD')
+		{
+			$command = 'HeadObject';
+		}
+		
+		$cmd = $this->s3Client->getCommand($command, $params);
 		$request = $this->s3Client->createPresignedRequest($cmd, time() + 5 * 86400);
 		return (string)$request->getUri();;
 	}
