@@ -430,6 +430,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					),
 				),
 			),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_METRICS => array(self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
 			self::REPORT_ORDER_BY => array(
 				self::DRUID_DIMENSION => 'extract_time',
