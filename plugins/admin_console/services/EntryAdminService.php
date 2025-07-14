@@ -219,7 +219,10 @@ class EntryAdminService extends KalturaBaseService
 			if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE
 				|| $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
-				$shouldUnDelete = true;
+				if (kFile::checkFileExists($fileSync->getFullPath()))
+				{
+					$shouldUnDelete = true;
+				}
 			}
 			else if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK){
 				$linkedId = $fileSync->getLinkedId();
