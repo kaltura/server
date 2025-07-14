@@ -1,4 +1,14 @@
 # Ursa-21.20.0
+## Add the ability to find Zoom user @ kaltura
+- Issue Type: Task
+- Issue ID: PLAT-25290
+
+#### Deployment ####
+- Generate Clients
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_07_14_update_esearch_permissions.php
+
 ## Markdown Plugin ##
 * Issue Type: Feature
 * Issue ID: No-Plat
