@@ -623,7 +623,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 		'allowedEmailDomainsForAdmins',
 	);
 
-	const PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT = 1;
+	const PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT = 2;
 
 	public function getMapBetweenObjects()
 	{
@@ -768,7 +768,7 @@ class KalturaSystemPartnerConfiguration extends KalturaObject
 			$elasticClient = new elasticClient();
 			$results = $elasticClient->search($params, true);
 			$categoriesCount = $results['hits']['total'];
-			KalturaLog::notice('Categories with over [' . self::PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT . '] Privacy Context = ' . $categoriesCount);
+			KalturaLog::notice('Categories with [' . self::PRIVACY_CONTEX_THRESHOLD_FOR_CATEGORY_LIMIT . '] Privacy Context Or more = ' . $categoriesCount);
 			if ($categoriesCount > 0)
 			{
 				throw new KalturaAPIException(SystemPartnerErrors::PARTNER_CATEGORY_TOO_MANY_PRIVACY_CONTEXTS, $categoriesCount);
