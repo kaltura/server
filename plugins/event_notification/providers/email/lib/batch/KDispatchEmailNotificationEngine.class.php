@@ -404,6 +404,10 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 
 		$partnerId = $emailNotificationTemplate->partnerId;
 		$appGuid = $client->getAppGuid($partnerId);
+		if (!$appGuid)
+		{
+			throw new Exception("AppGuid is required for sending an email notification for partner id [$partnerId]");
+		}
 
 		$contentParameters = $this->getContentParameters($data);
 

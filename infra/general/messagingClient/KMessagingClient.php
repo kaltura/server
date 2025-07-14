@@ -58,6 +58,9 @@ class KMessagingClient
 	 */
 	protected $defaultSender;
 
+	/**
+	 * @throws Exception
+	 */
 	public function __construct()
 	{
 		$this->initClient();
@@ -174,6 +177,11 @@ class KMessagingClient
 	 * ---------------------------------
 	 */
 
+	/**
+	 * @param int $partnerId
+	 * @return string
+	 * @throws Exception
+	 */
 	public function addAppGuid($partnerId)
 	{
 		KalturaLog::info("Creating new appGuid for partner id [$partnerId]");
@@ -192,6 +200,12 @@ class KMessagingClient
 		return $appRegistration['id'];
 	}
 
+	/**
+	 * @param int $partnerId
+	 * @param bool $registerIfNotExist
+	 * @return string
+	 * @throws Exception
+	 */
 	public function getAppGuid($partnerId, $registerIfNotExist = true)
 	{
 		$data = array(
@@ -217,56 +231,83 @@ class KMessagingClient
 			return $this->addAppGuid($partnerId);
 		}
 
-		return null;
+		return '';
 	}
 
+	/**
+	 * @param MessagingClientEmailTemplate $emailTemplate
+	 * @return array
+	 * @throws Exception
+	 */
 	public function addEmailTemplate(MessagingClientEmailTemplate $emailTemplate)
 	{
 		KalturaLog::info('Adding email template: ' . print_r($emailTemplate, true));
 		$emailTemplateObject = $this->curlServiceAction(self::EMAIL_TEMPLATE_SERVICE, 'add', $emailTemplate);
 		if (!isset($emailTemplateObject['id']))
 		{
-			throw new Exception('Unable to add email template');
+			throw new Exception("Unable to add new email template for partner id [$emailTemplate->partnerId]");
 		}
 		return $emailTemplateObject;
 	}
 
-    public function getEmailTemplate($partnerId, $id)
+	/**
+	 * @param int $partnerId
+	 * @param int $id
+	 * @return array
+	 */
+	public function getEmailTemplate($partnerId, $id)
     {
         $data = array(
 			'partnerId' => $partnerId,
 			'filter' => array('idIn' => array($id)),
 		);
         $emailTemplates = $this->curlServiceListAction(self::EMAIL_TEMPLATE_SERVICE, $data);
-        return $emailTemplates ? $emailTemplates[0] : null;
+        return $emailTemplates ? $emailTemplates[0] : array();
     }
 
-    public function updateEmailTemplate($id, $emailTemplate)
+	/**
+	 * @param int $id
+	 * @param MessagingClientEmailTemplate $emailTemplate
+	 * @return array
+	 * @throws Exception
+	 */
+	public function updateEmailTemplate($id, MessagingClientEmailTemplate $emailTemplate)
     {
-        $emailTemplate['id'] = $id;
+        $emailTemplate->id = $id;
         $updatedEmailTemplateObject = $this->curlServiceAction(self::EMAIL_TEMPLATE_SERVICE, 'update', $emailTemplate);
         if (!$updatedEmailTemplateObject)
 		{
-            throw new Exception('Unable to update email template');
+            throw new Exception("Unable to update email template [$id] for partner id [$emailTemplate->partnerId]");
         }
         return $updatedEmailTemplateObject;
     }
 
-    public function sendEmail(MessagingClientEmailData $data)
+	/**
+	 * @param MessagingClientEmailData $data
+	 * @return string
+	 * @throws Exception
+	 */
+	public function sendEmail(MessagingClientEmailData $data)
     {
         $emailObject = $this->curlServiceAction(self::MESSAGING_SERVICE, 'send', $data);
         if (!$emailObject || !isset($emailObject['bulkId']))
 		{
-            throw new Exception('Failed sending email');
+            throw new Exception("Unable to send email for template id [$data->templateId], partner id [$data->partnerId]");
         }
         return $emailObject['bulkId'];
     }
 
-    public function getDefaultSender($partnerId, $appGuid)
+	/**
+	 * @param int $partnerId
+	 * @param string $appGuid
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getDefaultSender($partnerId, $appGuid)
     {
         if (!$appGuid)
 		{
-            throw new Exception("appGuid is required for email template of partner id $partnerId");
+            throw new Exception("AppGuid is required for email template of partner id [$partnerId]");
         }
 
         $data = array(
@@ -283,6 +324,10 @@ class KMessagingClient
         return $emailProvider['defaultSender'];
     }
 
+	/**
+	 * @param string $string
+	 * @return array
+	 */
 	public static function getMessageParamsFromString($string)
 	{
 		$params = array();
@@ -300,6 +345,10 @@ class KMessagingClient
 		return $params;
 	}
 
+	/**
+	 * @param string $string
+	 * @return array
+	 */
 	public static function formatMessageParamsInString($string)
 	{
 		return preg_replace_callback('/{([a-zA-Z0-9_]+)}/',

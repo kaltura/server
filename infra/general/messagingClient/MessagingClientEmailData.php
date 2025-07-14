@@ -6,12 +6,39 @@
 
 class MessagingClientEmailData
 {
+	/**
+	 * @var int
+	 */
 	public $partnerId;
+
+	/**
+	 * @var string
+	 */
 	public $appGuid;
+
+	/**
+	 * @var string
+	 */
 	public $templateId;
+
+	/**
+	 * @var string
+	 */
 	public $type;
+
+	/**
+	 * @var string
+	 */
 	public $receiverType;
+
+	/**
+	 * @var array
+	 */
 	public $userIds;
+
+	/**
+	 * @var array
+	 */
 	public $msgParams;
 
 	/**
