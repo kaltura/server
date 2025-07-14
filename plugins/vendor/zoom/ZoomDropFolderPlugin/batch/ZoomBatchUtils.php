@@ -93,6 +93,20 @@ class ZoomBatchUtils
 		return $userId;
 	}
 
+	protected static function getElasticSearchOperator($fieldName, $searchType, $searchTerm)
+	{
+		$searchParams = new KalturaESearchUserParams();
+		$searchParams->searchOperator = new KalturaESearchUserOperator();
+		$searchParams->searchOperator->searchItems = [];
+		$searchParams->searchOperator->searchItems[0] = new KalturaESearchUserItem();
+		$searchParams->searchOperator->searchItems[0]->fieldName = $fieldName;
+		$searchParams->searchOperator->searchItems[0]->searchTerm = $searchTerm;
+		$searchParams->searchOperator->searchItems[0]->itemType = $searchType;
+
+		return $searchParams;
+	}
+
+
 	public static function getKalturaUser($partnerId, $kZoomUser, $userSearchMethod = null)
 	{
 		$pager = new KalturaFilterPager();
@@ -101,19 +115,14 @@ class ZoomBatchUtils
 
 		KalturaLog::debug('Searching for user with id [' . $kZoomUser->getProcessedName() . ']');
 		$elasticSearchPlugin = KalturaElasticSearchClientPlugin::get(KBatchBase::$kClient);
-		$primarySearchParams = new KalturaESearchUserParams();
-		$primarySearchParams->searchOperator = new KalturaESearchUserOperator();
-		$primarySearchParams->searchOperator->searchItems = [];
-		$primarySearchParams->searchOperator->searchItems[0] = new KalturaESearchUserItem();
-		$primarySearchParams->searchOperator->searchItems[0]->fieldName = KalturaESearchUserFieldName::USER_ID;
-		$primarySearchParams->searchOperator->searchItems[0]->searchTerm = $kZoomUser->getProcessedName();
-		$primarySearchParams->searchOperator->searchItems[0]->itemType = KalturaESearchItemType::EXACT_MATCH;
-		$kalturaUser = $elasticSearchPlugin->eSearch->searchUser($primarySearchParams, $pager);
+		$primarySearchParams = self::getElasticSearchOperator(
+			KalturaESearchUserFieldName::USER_ID,
+			KalturaESearchItemType::EXACT_MATCH,
+			$kZoomUser->getProcessedName()
+		);
 
-		$secondarySearchParams = new KalturaESearchUserParams();
-		$secondarySearchParams->searchOperator = new KalturaESearchUserOperator();
-		$secondarySearchParams->searchOperator->searchItems = [];
-		$secondarySearchParams->searchOperator->searchItems[0] = new KalturaESearchUserItem();
+		$kalturaUser = $elasticSearchPlugin->eSearch->searchUser($primarySearchParams, $pager);
+		$secondarySearchParams = null;
 
 		KalturaLog::debug('Searching method [' . $userSearchMethod . ']');
 		if(!isset($kalturaUser->objects[0]))
@@ -124,18 +133,22 @@ class ZoomBatchUtils
 				case KalturaZoomUsersSearchMethod::EXTERNAL:
 				{
 					KalturaLog::debug('Searching by external_id [' . $kZoomUser->getProcessedName() . ']');
-					$secondarySearchParams->searchOperator->searchItems[0]->fieldName = KalturaESearchUserFieldName::EXTERNAL_ID;
-					$secondarySearchParams->searchOperator->searchItems[0]->searchTerm = $kZoomUser->getProcessedName();
-					$secondarySearchParams->searchOperator->searchItems[0]->itemType = KalturaESearchItemType::EXACT_MATCH;
+					$secondarySearchParams = self::getElasticSearchOperator(
+						KalturaESearchUserFieldName::EXTERNAL_ID,
+						KalturaESearchItemType::EXACT_MATCH,
+						$kZoomUser->getProcessedName()
+					);
 					break;
 				}
 				case KalturaZoomUsersSearchMethod::EMAIL:
 				default:
 				{
 					KalturaLog::debug('Searching by email [' . $kZoomUser->getProcessedName() . ']');
-					$secondarySearchParams->searchOperator->searchItems[0]->fieldName = KalturaESearchUserFieldName::EMAIL;
-					$secondarySearchParams->searchOperator->searchItems[0]->searchTerm = $kZoomUser->getOriginalName();
-					$secondarySearchParams->searchOperator->searchItems[0]->itemType = KalturaESearchItemType::STARTS_WITH;
+					$secondarySearchParams = self::getElasticSearchOperator(
+						KalturaESearchUserFieldName::EMAIL,
+						KalturaESearchItemType::STARTS_WITH,
+						$kZoomUser->getOriginalName()
+					);
 					break;
 				}
 			}

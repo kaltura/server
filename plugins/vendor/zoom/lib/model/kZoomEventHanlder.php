@@ -125,6 +125,33 @@ class kZoomEventHanlder
 		}
 		return false;
 	}
+
+	protected static function getKuserExternalId($externalId)
+	{
+		$userSearch = new kUserSearch();
+
+		$userItem = new ESearchUserItem();
+		$userItem->setFieldName(ESearchUserFieldName::EXTERNAL_ID);
+		$userItem->setItemType(ESearchItemType::EXACT_MATCH);
+		$userItem->setSearchTerm($externalId);
+
+		$operator = new ESearchOperator();
+		$operator->setOperator(ESearchOperatorType::AND_OP);
+		$operator->setSearchItems(array($userItem));
+
+		$pager = new kPager();
+		$pager->setPageSize(1);
+
+		$result = $userSearch->doSearch($operator, $pager);
+		$rawResult = kESearchCoreAdapter::transformElasticToCoreObject($result, $userSearch);
+		if (is_array($rawResult[0]) && isset($rawResult[0][0]) && !is_null($rawResult[0][0]))
+		{
+			$user = $rawResult[0][0]->getObject();
+			KalturaLog::debug('Found user with external id [' . $user->getExternalId() . ']');
+			return $user;
+		}
+		return null;
+	}
 	
 	protected static function getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomClient)
 	{
@@ -145,7 +172,7 @@ class kZoomEventHanlder
 				case kZoomUsersSearchMethod::EXTERNAL:
 				{
 					KalturaLog::debug('Could not find by id. Searching by external_id');
-					$user = kuserPeer::getKuserByPartnerAndExternalId($partnerId, $puserId);
+					$user = self::getKuserExternalId($puserId);
 					break;
 				}
 				case kZoomUsersSearchMethod::EMAIL:
@@ -173,6 +200,7 @@ class kZoomEventHanlder
 		}
 		else
 		{
+			$userId = $user->getPuserId();
 			KalturaLog::debug('Found user with id [' . $userId . ']');
 		}
 
