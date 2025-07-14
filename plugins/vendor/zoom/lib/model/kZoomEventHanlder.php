@@ -137,34 +137,24 @@ class kZoomEventHanlder
 		$puserId = self::processZoomUserName($hostEmail, $zoomVendorIntegration, $zoomClient);
 
 		KalturaLog::debug('Finding Zoom user name: ' . $puserId);
-		switch ($zoomVendorIntegration->getUserSearchMethod())
+		$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+		if (!$user)
 		{
-			case kZoomUsersSearchMethod::EMAIL:
+			switch ($zoomVendorIntegration->getUserSearchMethod())
 			{
-				KalturaLog::debug('Searching by email');
-				$user = kuserPeer::getKuserByEmail($puserId, $partnerId);
-				break;
-			}
-			case kZoomUsersSearchMethod::ID:
-			{
-				KalturaLog::debug('Searching by puser_id');
-				$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-				break;
-			}
-			case kZoomUsersSearchMethod::ALL:
-			default:
-			{
-				KalturaLog::debug('Searching by both puser_id and email');
-				$user = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
-				if (!$user)
+				case kZoomUsersSearchMethod::EXTERNAL:
 				{
-					$user = kuserPeer::getKuserByEmail($puserId, $partnerId);
+					KalturaLog::debug('Could not find by id. Searching by external_id');
+					$user = kuserPeer::getKuserByPartnerAndExternalId($partnerId, $puserId);
+					break;
 				}
-				else
+				case kZoomUsersSearchMethod::EMAIL:
+				default:
 				{
-					$userId = $user->getPuserId();
+					KalturaLog::debug('Could not find by id. Searching by email');
+					$user = kuserPeer::getKuserByEmail($hostEmail, $partnerId);
+					break;
 				}
-				break;
 			}
 		}
 

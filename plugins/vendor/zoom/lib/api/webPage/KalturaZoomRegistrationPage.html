@@ -134,7 +134,7 @@
             $('input:radio[name=zoomUserMatchingMode]').val(['0']).prop('checked',true);
             $('input:radio[name=handleParticipantsMode]').val(['2']).prop('checked',true);
             $('#createUserIfNotExist').prop('checked',true);
-	        $('input:radio[name=userSearchMethod]').val(['2']).prop('checked',true);
+	        $('input:radio[name=userSearchMethod]').val(['0']).prop('checked',true);
         }
         function loadParameters(p) {
          jQuery.each(p, function(i,v) {
@@ -277,21 +277,16 @@
                     <input type='radio'  id='recordingOwnerBasedOnCmsUserId' name='recordingOwner' class='form-check-input' onchange='recordingOwnerChanged(!this.checked)' value='1'>
                     Based on cms_user_id (SAML mapping)</label>
             </div>
-	        <p class='form-check-label'>Find users by:</p>
+	        <p class='form-check-label'>Find users by ID and:</p>
 	        <div class='form-check-inline'>
 		        <label class='form-check-label'>
 			        <input type='radio' class='form-check-input'
-			               name='userSearchMethod' value='0'>User ID </label>
+			               name='userSearchMethod' value='0'>Email </label>
 	        </div>
 	        <div class='form-check-inline'>
 		        <label class='form-check-label'>
 			        <input type='radio' class='form-check-input'
-			               name='userSearchMethod' value='1'>User Email </label>
-	        </div>
-	        <div class='form-check-inline'>
-		        <label class='form-check-label'>
-			        <input type='radio' class='form-check-input'
-			               name='userSearchMethod' value='2'>Both </label>
+			               name='userSearchMethod' value='1'>External ID (Use with SSO)</label>
 	        </div>
         </div>
         <div class='form-group container p-2 my-2 border'>
