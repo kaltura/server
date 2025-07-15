@@ -166,7 +166,7 @@ class ZoomVendorIntegration extends VendorIntegration
 
 	public function getUserSearchMethod()
 	{
-		return $this->getFromCustomData(self::USERS_SEARCH_METHOD, null, kZoomUsersSearchMethod::ALL);
+		return $this->getFromCustomData(self::USERS_SEARCH_METHOD, null, kZoomUsersSearchMethod::EMAIL);
 	}
 
 	public function setUserSearchMethod($v)

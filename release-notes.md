@@ -1,4 +1,11 @@
 # Ursa-21.20.0
+## Add ability to search Kaltura user by Zoom external ID
+- Issue Type: Task
+- Issue ID: PLAT-25290
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_07_14_update_esearch_permissions.php
+
 ## Markdown Plugin ##
 * Issue Type: Feature
 * Issue ID: No-Plat
