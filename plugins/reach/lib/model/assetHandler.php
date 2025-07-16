@@ -1,6 +1,7 @@
 <?php
 
-class AssetHandler implements VendorTaskObjectHandler {
+class AssetHandler implements VendorTaskObjectHandler
+{
 
 	public static function shouldAddEntryVendorTask($object, $vendorCatalogItem): bool
 	{
