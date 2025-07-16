@@ -39,9 +39,9 @@ class EntryVendorTaskService extends KalturaBaseService
 	public function addAction(KalturaEntryVendorTask $entryVendorTask)
 	{
 		$entryVendorTask->validateForInsert();
-
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryVendorTask->entryObjectType);
 		$entryId = $entryVendorTask->entryId;
-		$entryObject = kReachUtils::retrieveEntryObject($entryVendorTask->entryObjectType, $entryId);
+		$entryObject = $vendorTaskObjectHandler->retrieveObject($entryId);
 		if (!$entryObject)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
