@@ -843,19 +843,23 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 	protected static function getExcludedAdminRoleUsersNumber($partner)
 	{
-		$excludedRoleName = $partner->getExcludedAdminRoleName();
-		if (!$excludedRoleName || $excludedRoleName == '')
+		$numExcludedRoleUsers = 0;
+		$excludedRoleNames = $partner->getExcludedAdminRoleName();
+		if (!$excludedRoleNames || $excludedRoleNames == '')
 		{
 			return 0;
 		}
-		$excludedUserRole = UserRolePeer::getByNameAndPartnerId($excludedRoleName, $partner->getId());
-		if (!$excludedUserRole)
+		$excludedUserRoles = UserRolePeer::getByNamesAndPartnerId($excludedRoleNames, $partner->getId());
+		if (!$excludedUserRoles)
 		{
 			return 0;
 		}
 		try
 		{
-			$numExcludedRoleUsers = $excludedUserRole->countKuserToUserRoles();
+			foreach ($excludedUserRoles as $excludedUserRole)
+			{
+				$numExcludedRoleUsers += $excludedUserRole->countKuserToUserRoles();
+			}
 		}
 		catch (Exception $e)
 		{
