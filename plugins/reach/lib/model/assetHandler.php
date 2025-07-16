@@ -46,12 +46,10 @@ class AssetHandler implements VendorTaskObjectHandler
 			default:
 				return "invalid status provided";
 		}
-
 	}
 
-	public static function retrieveObject($objectId)
+	public static function retrieveObject($objectId): BaseObject
 	{
-
 		return assetPeer::retrieveById($objectId);
 	}
 }

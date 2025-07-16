@@ -20,7 +20,6 @@ class EntryHandler implements VendorTaskObjectHandler
 			return false;
 		}
 		return true;
-
 	}
 
 	public static function getTaskKuserId($object): int
@@ -61,7 +60,7 @@ class EntryHandler implements VendorTaskObjectHandler
 
 	}
 
-	public static function retrieveObject($objectId)
+	public static function retrieveObject($objectId): BaseObject
 	{
 		return entryPeer::retrieveByPK($objectId);
 	}

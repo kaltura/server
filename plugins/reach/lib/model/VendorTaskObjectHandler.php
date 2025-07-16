@@ -10,5 +10,5 @@ interface VendorTaskObjectHandler
 
 	public function getAbortStatusMessage($status): string;
 
-	public static function retrieveObject($objectId);
+	public static function retrieveObject($objectId): BaseObject;
 }
