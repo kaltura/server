@@ -1,4 +1,11 @@
 # Ursa-21.20.0
+## Update permissions for Agents Manager ##
+- Issue Type: Task
+- Issue ID: KAM-61
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_07_16_update_agent_manager_permissions.php
+
 ## Add ability to search Kaltura user by Zoom external ID
 - Issue Type: Task
 - Issue ID: PLAT-25290
