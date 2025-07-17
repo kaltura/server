@@ -80,7 +80,7 @@ class ZoomBatchUtils
 		   }
 		else
 		{
-			KalturaLog::debug('Not Found [' . $user->id . ']');
+			KalturaLog::debug('User Not Found [' . $hostEmail . ']');
 			if ($zoomVendorIntegration->createUserIfNotExist)
 			{
 				$userId = $zoomUser->getProcessedName();
