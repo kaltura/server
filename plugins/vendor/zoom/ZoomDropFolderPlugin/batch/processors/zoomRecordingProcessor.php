@@ -281,7 +281,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		{
 			/* @var $zoomUser kZoomUser */
 			/* @var $kUser KalturaUser */
-			$kUser = ZoomBatchUtils::getKalturaUser($partnerId, $zoomUser);
+			$kUser = ZoomBatchUtils::getKalturaUser($partnerId, $zoomUser, $this->dropFolder->zoomVendorIntegration->userSearchMethod);
 			if($kUser)
 			{
 			    	if ($kUser->status == KalturaUserStatus::BLOCKED)
