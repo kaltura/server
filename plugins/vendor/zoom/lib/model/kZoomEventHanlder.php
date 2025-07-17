@@ -126,7 +126,7 @@ class kZoomEventHanlder
 		return false;
 	}
 
-	protected static function getKuserExternalId($externalId)
+	public static function getKuserExternalId($externalId)
 	{
 		$userSearch = new kUserSearch();
 
