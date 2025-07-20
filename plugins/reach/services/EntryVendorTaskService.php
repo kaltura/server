@@ -58,7 +58,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask->reachProfileId = $dbReachProfile->getId();
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
 
-		if (!$dbVendorCatalogItem->isFeatureTypeSupportedForEntry($entryObject, $entryVendorTask->entryObjectType))
+		if (!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($entryObject, $dbVendorCatalogItem))
 		{
 			$featureType = $dbVendorCatalogItem->getServiceFeature();
 			throw new KalturaAPIException(KalturaReachErrors::FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY, $featureType, $entryId);

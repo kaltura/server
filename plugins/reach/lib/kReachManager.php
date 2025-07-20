@@ -49,19 +49,20 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 
 		//If both the entry and reach profile don't exist, there's no need to hit the loop
-		$entry = entryPeer::retrieveByPK($entryId);
-		$entryObjectType = EntryObjectType::ENTRY;
+
+		$entryObjectType = $object instanceof asset ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryObjectType);
+		$taskObject = $vendorTaskObjectHandler->retrieveObject($entryId);
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
-		if(!$entry || !$reachProfile)
+		if(!$taskObject || !$reachProfile)
 		{
 			KalturaLog::log('Not all mandatory objects were found, tasks will not be added');
 			return true;
 		}
 
-		$reachRestrainAdminTag = kConf::get("reach_restrain_admin_tag", kConfMapNames::RUNTIME_CONFIG, null);
-		if(in_array($reachRestrainAdminTag, $entry->getAdminTagsArr()))
+		if($vendorTaskObjectHandler->hasRestrainingAdminTag($taskObject, $profileId))
 		{
-			KalturaLog::log("Entry has reach restraining admin tag [$reachRestrainAdminTag], tasks will not be added");
+			KalturaLog::log("tasks will not be added");
 			return true;
 		}
 
@@ -76,15 +77,15 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
-			if(!$catalogItemToAdd->isFeatureTypeSupportedForEntry($entry, $entryObjectType))
+			if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
 			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for entry Id $entryId");
+				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $entryId");
 				continue;
 			}
 
 			//Pass the object Id as the context of the task
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
-			self::addEntryVendorTaskByObjectIds($entry, $entryObjectType, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
+			self::addEntryVendorTaskByObjectIds($taskObject, $entryObjectType, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
 		}
 	}
 
@@ -227,6 +228,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			return true;
 		}
+
+		if ($object instanceof asset)
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -344,6 +350,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType())
 				&& $object->getStatus() == entryStatus::READY
 				&& $object->getLengthInMsecs())
+		{
+			$this->checkAutomaticRules($object, true);
+		}
+
+		if ($object instanceof asset)
 		{
 			$this->checkAutomaticRules($object, true);
 		}
@@ -712,7 +723,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds($entryObject, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
+	public static function addEntryVendorTaskByObjectIds($entryObject, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, VendorTaskObjectHandler $vendorTaskObjectHandler, $context = null, $taskJobData = null)
 	{
 		$entryId = $entryObject->getId();
 		$partnerId = $entryObject->getPartnerId();
@@ -747,7 +758,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 
-		if(!self::shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile))
+		if(!$vendorTaskObjectHandler->shouldAddEntryVendorTaskByObject($entryObject, $vendorCatalogItem, $reachProfile))
 		{
 			return true;
 		}
@@ -762,47 +773,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$entryVendorTask->save();
 		}
 		return $entryVendorTask;
-	}
-
-	public static function shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile)
-	{
-		if(!$entryObjectType)
-		{
-			$entryObjectType = EntryObjectType::ENTRY;
-		}
-
-		switch($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				if (!$vendorCatalogItem->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType()))
-				{
-					KalturaLog::log("Entry of type [{$entryObject->getType()}] is not supported by Reach");
-					return false;
-				}
-
-				if (!kReachUtils::areFlavorsReady($entryObject, $reachProfile))
-				{
-					KalturaLog::log("Not all flavor params IDs [{$reachProfile->getFlavorParamsIds()}] are ready yet");
-					return false;
-				}
-
-				if($entryObject->getParentEntryId())
-				{
-					KalturaLog::log("Entry [{$entryObject->getId()}] is a child entry, entry vendor task object wont be created for it");
-					return false;
-				}
-
-				if ($vendorCatalogItem->isEntryDurationExceeding($entryObject))
-				{
-					KalturaLog::log("Entry [{$entryObject->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
-					return false;
-				}
-				return true;
-
-			default:
-				return false;
-		}
-
 	}
 
 	public static function addEntryVendorTask($entryObject, $entryObjectType, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $unitsUsed = null)
@@ -910,8 +880,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
 	{
 		$scope = new kScope();
-		$entryId = $object->getEntryId();
-		$scope->setEntryId($entryId);
+		$entryObjectType = $object instanceof asset ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryObjectType);
+		$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
+		$scope->setEntryId($taskObjectId);
 		$this->initReachProfileForPartner($object->getPartnerId());
 		if (self::$reachProfilesFilteredThatIncludesRegularRules)
 		{
@@ -929,7 +901,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
 					continue;
 				}
-				$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profile->getId(), $object);
+				$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object);
 			}
 		}
 		return true;
