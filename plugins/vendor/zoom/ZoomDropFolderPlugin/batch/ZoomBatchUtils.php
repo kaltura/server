@@ -74,19 +74,21 @@ class ZoomBatchUtils
 		KBatchBase::unimpersonate();
 		$userId = '';
 		if ($user)
-		   {
-			   KalturaLog::debug('Found [' . $user->id . ']');
-			   $userId = $user->id;
-		   }
+		{
+			KalturaLog::debug('Found [' . $user->id . ']');
+			$userId = $user->id;
+		}
 		else
 		{
 			KalturaLog::debug('User Not Found [' . $hostEmail . ']');
 			if ($zoomVendorIntegration->createUserIfNotExist)
 			{
+				KalturaLog::debug('creating new user: ' . $zoomUser->getProcessedName());
 				$userId = $zoomUser->getProcessedName();
 			}
 			else if ($zoomVendorIntegration->defaultUserId)
 			{
+				KalturaLog::debug('using default user: ' . $zoomVendorIntegration->defaultUserId);
 				$userId = $zoomVendorIntegration->defaultUserId;
 			}
 		}

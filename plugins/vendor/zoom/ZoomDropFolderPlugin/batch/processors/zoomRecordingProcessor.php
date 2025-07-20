@@ -53,7 +53,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			$hostEmail = $zoomUser[self::EMAIL];
 		}
 
-		$ownerId = ZoomBatchUtils::getEntryOwnerId($hostEmail, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration, $this->zoomClient);
+		$ownerId = ZoomBatchUtils::getEntryOwnerId($hostEmail, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration, $this->zoomClient); //returned zoom user after string processing
 		$validatedHosts = $this->getValidatedHosts($recording->meetingMetadata->meetingId, $ownerId);
 		$validatedAlternativeHosts = $this->getValidatedAlternativeHosts($recording->meetingMetadata->meetingId, $ownerId);
 		$extraUsers = $this->getAdditionalUsers($recording->meetingMetadata->meetingId, $ownerId);
@@ -211,7 +211,6 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	{
 		$entitledUsersPublishArray = array();
 		$entitledUsersEditArray = array();
-		
 		if ($validatedHosts && isset($this->dropFolder->zoomVendorIntegration->handleCohostsMode))
 		{
 			KalturaLog::debug("Handling co-hosts entitlements, users: " . print_r($validatedHosts, true));
@@ -225,6 +224,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		
 		KalturaLog::debug("Entitled users as co-publishers, users: " . print_r($entitledUsersPublishArray, true));
 		KalturaLog::debug("Entitled users as co-editors, users: " . print_r($entitledUsersEditArray, true));
+		KalturaLog::debug("Entitled users as co-viewers, users: " . print_r($validatedUsers, true));
 		$entry->entitledUsersPublish = implode(',', array_unique($entitledUsersPublishArray));
 		$entry->entitledUsersEdit = implode(',', array_unique($entitledUsersEditArray));
 		
@@ -271,6 +271,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 	
 	protected function getValidatedUsers($zoomUsers, $partnerId, $createIfNotFound, $userToExclude)
 	{
+		KalturaLog::debug('User to exclude: ' .$userToExclude);
 		$validatedUsers=array();
 		if(!$zoomUsers)
 		{
@@ -281,13 +282,18 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		{
 			/* @var $zoomUser kZoomUser */
 			/* @var $kUser KalturaUser */
+			KalturaLog::debug('User to process ' . $zoomUser->getProcessedName());
+			if (strtolower($zoomUser->getProcessedName()) === $userToExclude)
+			{
+				continue;
+			}
 			$kUser = ZoomBatchUtils::getKalturaUser($partnerId, $zoomUser, $this->dropFolder->zoomVendorIntegration->userSearchMethod);
 			if($kUser)
 			{
-			    	if ($kUser->status == KalturaUserStatus::BLOCKED)
-                		{
-                    			continue;
-                		}
+		        if ($kUser->status == KalturaUserStatus::BLOCKED)
+                {
+                    continue;
+                }
 				if (strtolower($kUser->id) !== $userToExclude)
 				{
 					$validatedUsers[] = $kUser->id;
@@ -295,26 +301,10 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			elseif($createIfNotFound)
 			{
-                		try
-                		{
-                    			$this->createNewUser($partnerId,$zoomUser->getProcessedName());
-                    			$validatedUsers[] = $zoomUser->getProcessedName();
-                		}
-                		catch (Exception $e)
-                		{
-                    			if ($e->getCode() === 'DUPLICATE_USER_BY_ID')
-                    			{
-						//User could already be created by another session, so consider it validated
-                        			$validatedUsers[] = $zoomUser->getProcessedName();
-                    			}
-                    			else
-                    			{
-                        			//Re-throw the exception if it's not related to duplicate user ID
-                        			throw $e;
-                    			}
-                		}
+				$validatedUsers[] = $zoomUser->getProcessedName();
 			}
 		}
+		KalturaLog::debug('Additional users : [' . print_r($validatedUsers, true) . ']');
 		KBatchBase::unimpersonate();
 		return $validatedUsers;
 	}
