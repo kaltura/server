@@ -49,6 +49,14 @@ class KalturaQuizVendorTaskData extends KalturaLocalizedVendorTaskData
 	 */
 	public $quizOutput;
 
+	/**
+	 * Instructions describing what should be taken into account during the quiz creation process.
+	 *
+	 * @insertonly
+	 * @var string
+	 */
+	public $instruction;
+
 	private static $map_between_objects = array
 	(
 		'numberOfQuestions',
@@ -57,6 +65,7 @@ class KalturaQuizVendorTaskData extends KalturaLocalizedVendorTaskData
 		'formalStyle',
 		'createQuiz',
 		'quizOutput',
+		'instruction'
 	);
 
 	public function getMapBetweenObjects()
