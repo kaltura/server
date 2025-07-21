@@ -205,15 +205,6 @@ class Form_CatalogItemConfigure extends ConfigureForm
 			$this->addElement($outputFormat);
 		}
 
-		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE)
-		{
-			$outputFormat = new Kaltura_Form_Element_EnumSelect('outputFormat',
-																array('enum' => 'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat'));
-			$outputFormat->setLabel('Output Format(Aspect ratio):');
-			$outputFormat->setValue(Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_16_9);
-			$this->addElement($outputFormat);
-		}
-
 		$allowResubmission = new Kaltura_Form_Element_EnumSelect('allowResubmission', array('enum' => 'Kaltura_Client_Enum_NullableBoolean', 'excludes' => array(
 			Kaltura_Client_Enum_NullableBoolean::NULL_VALUE)));
 		$allowResubmission->setLabel('Allow Resubmission:');

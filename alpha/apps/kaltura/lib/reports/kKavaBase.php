@@ -89,6 +89,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EVENT_SESSION_CONTEXT_ID = 'eventSessionContextId';
 	const DIMENSION_PLAYBACK_MODE = 'playbackMode';
 	const DIMENSION_COMPANY = 'company';
+	const DIMENSION_FLAVOR_ID = 'flavorId';
 
 	// metrics
 	const METRIC_COUNT = 'count';

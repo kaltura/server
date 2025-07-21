@@ -37,9 +37,6 @@ $englishArray = array(
 	'Kaltura_Client_Enum_NullableBoolean::NULL_VALUE' => "NULL VALUE",
 	'Kaltura_Client_Enum_NullableBoolean::TRUE_VALUE' => "TRUE",
 
-	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_16_9' => "16:9",
-	'Kaltura_Client_Reach_Enum_VendorCatalogItemSignLanguageOutputFormat::ASPECT_RATIO_4_3' => "4:3",
-
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::SRT' => "SRT",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::DFXP' => "DFXP",
 	'Kaltura_Client_Reach_Enum_VendorCatalogItemOutputFormat::VTT' => "VTT",

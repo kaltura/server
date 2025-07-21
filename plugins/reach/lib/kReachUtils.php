@@ -40,7 +40,7 @@ class kReachUtils
 		return $tokens * $pricePerUnit;
 	}
 
-	public static function retrieveEntryObject($entryObjectType, $entryId)
+	public static function retrieveEntryObject($entryObjectType, $objectId)
 	{
 		if(!$entryObjectType)
 		{
@@ -50,7 +50,10 @@ class kReachUtils
 		switch($entryObjectType)
 		{
 			case EntryObjectType::ENTRY:
-				return entryPeer::retrieveByPK($entryId);
+				return entryPeer::retrieveByPK($objectId);
+
+			case EntryObjectType::ASSET:
+				return assetPeer::retrieveById($objectId);
 
 			default:
 				return null;

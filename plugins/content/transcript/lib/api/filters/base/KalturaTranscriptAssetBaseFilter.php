@@ -5,7 +5,7 @@
  * @subpackage api.filters.base
  * @abstract
  */
-abstract class KalturaTranscriptAssetBaseFilter extends KalturaAttachmentAssetFilter
+abstract class KalturaTranscriptAssetBaseFilter extends KalturaTextualAttachmentAssetFilter
 {
 	static private $map_between_objects = array
 	(

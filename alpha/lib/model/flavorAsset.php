@@ -247,7 +247,7 @@ class flavorAsset extends exportableAsset
 			}
 		}
 		
-		if(!$videoStream['extradata'])
+		if(!isset($videoStream['extradata']))
 		{
 			return '';
 		}

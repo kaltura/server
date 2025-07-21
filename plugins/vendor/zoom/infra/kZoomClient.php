@@ -259,7 +259,7 @@ class kZoomClient extends kVendorClient
 
 	protected function generateContextualUrl($apiPath)
 	{
-		return $this->baseURL . $apiPath . '?';
+		return $this->baseURL . $apiPath;
 	}
 	
 	public function getRefreshToken()

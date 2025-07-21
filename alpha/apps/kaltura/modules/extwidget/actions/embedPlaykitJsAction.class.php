@@ -515,7 +515,7 @@ class embedPlaykitJsAction extends sfAction
 		$iframe_embed_type = $this->getRequestParameter(self::IFRAME_EMBED_TYPE);
 		$loadContentMethod = "";
 		if (!is_null($entry_id)) {
-		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
+			$loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
 		} elseif (!is_null($playlist_id)) {
 			$loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
 			if($iframe_embed_type === self::RAPT) {
@@ -568,20 +568,20 @@ class embedPlaykitJsAction extends sfAction
 			$loadContentMethod
 		";
 		
-		$v2tov7ConfigJs='';
+		$v2tov7ConfigJs = '';
 		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
 			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
 			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
-			$originalLoadPlayerJs = $loadPlayerJs;
-			$loadPlayerJs = "addEventListener('load', (event) => {
-				if (!document.getElementById(config.targetId)) {
-					const playerDiv = document.createElement('div');
-					playerDiv.id = config.targetId;
-					document.body.appendChild(playerDiv);
-					$originalLoadPlayerJs
-				}
-			});";
+			if ($this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME)) {
+				$originalLoadPlayerJs = $loadPlayerJs;
+				$loadPlayerJs = "
+                  if (!document.getElementById(config.targetId)) {
+                    document.write(`<div id='\${config.targetId}' style='width:560px; height:395px;'></div>`);
+                  }
+                  $originalLoadPlayerJs
+                  ";
+			}
 		}
 
 		$autoEmbedCode = "
