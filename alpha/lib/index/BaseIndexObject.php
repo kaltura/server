@@ -253,6 +253,23 @@ abstract class BaseIndexObject
 			return null;
 		}
 		
+		// Check if this partner has a dedicated index for this object type
+		$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
+		$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
+		
+		if (isset($dedicatedPartnerIndexMap[$originalValue]))
+		{
+			$indices = explode(',', $dedicatedPartnerIndexMap[$originalValue]);
+			foreach ($indices as $indexNameInConfig)
+			{
+				if ($indexName === trim($indexNameInConfig))
+				{
+					// Use Partner ID as the split index name
+					return $originalValue;
+				}
+			}
+		}
+		
 		$splitIndexFactor = self::getSplitIndexFactor($IndexObjectName);
 		if(!$splitIndexFactor)
 		{
