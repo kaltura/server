@@ -1,3 +1,17 @@
+# Venus-22.0.0
+## Add getActiveLiveEventTime API action to get live stream scheduled time
+- Issue Type: Feature
+- Issue ID: PLAT-25383
+
+### Configuration ###
+None.
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_07_22_update_live_stream_service.php
+
+### Known Issues & Limitations ###
+    The api is called without a widget KS to exploit CDN cache
+
 # Ursa-21.20.0
 ## Add ability to search Kaltura user by Zoom external ID
 - Issue Type: Task
