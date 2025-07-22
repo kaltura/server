@@ -17,6 +17,7 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 	const PRICING_PER_UNIT = 'pricing:pricePerUnit';
 	const PRICING_FUNCTION = 'pricing:priceFunction';
 	const UTF = 'UTF-8';
+	const CLEAR = 'CLEAR_FIELD';
 
 	private $columnToEnum = array(
 		'serviceFeature' => 'KalturaVendorServiceFeature',
@@ -79,7 +80,12 @@ class BulkUploadVendorCatalogItemEngineCsv extends BulkUploadEngineCsv
 			{
 				continue;
 			}
-			if (in_array($column, array_keys($this->columnToEnum)) && isset($values[$index]))
+			if ($values[$index] === self::CLEAR)
+			{
+				$bulkUploadResult->$column = '';
+				KalturaLog::info("Set value $column [ ]");
+			}
+			elseif (in_array($column, array_keys($this->columnToEnum)) && isset($values[$index]))
 			{
 				$this->handleEnumColumns($values[$index], $column, $bulkUploadResult);
 			}
