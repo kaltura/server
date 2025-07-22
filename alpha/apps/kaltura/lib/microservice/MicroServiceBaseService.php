@@ -49,13 +49,13 @@ abstract class MicroServiceBaseService
 	 */
 	public static function buildServiceUrl($hostName, $serviceName, $isApi = true)
 	{
-		$overrideName = 'override_' . str_replace('-','_',$hostName) . '_microservice';
+		$overrideName = 'override_' . str_replace('-', '_', $hostName) . '_microservice';
 		if (!empty($serviceName))
 		{
-			$overrideName = $overrideName . '_' . str_replace('-','_',$serviceName);
+			$overrideName = $overrideName . '_' . str_replace('-', '_', $serviceName);
 		}
 	
-		$overrideUrl = kConf::get($overrideName,'local', null);
+		$overrideUrl = kConf::get($overrideName, 'local', null);
 		if (!empty($overrideUrl))
 		{
 			// if override url is set, use it
