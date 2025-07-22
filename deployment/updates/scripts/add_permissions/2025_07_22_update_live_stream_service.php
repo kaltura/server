@@ -3,7 +3,7 @@
  * @package deployment
  * @subpackage falcon.roles_and_permissions
  *
- * Add permissions to caption asset
+ * Add permissions to live stream service
  */
 
 $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
