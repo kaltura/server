@@ -807,7 +807,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	public static function addEntryVendorTask($entryObject, $entryObjectType, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $unitsUsed = null)
 	{
-		if(!kReachManager::shouldAddEntryVendorTask($entryObject, $entryObjectType, $vendorCatalogItem))
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryObjectType);
+		if(!$vendorTaskObjectHandler::shouldAddEntryVendorTask($entryObject, $vendorCatalogItem))
 		{
 			return null;
 		}
@@ -820,8 +821,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setReachProfileId($reachProfile->getId());
 		$entryVendorTask->setPartnerId($reachProfile->getPartnerId());
-		$entryVendorTask->setKuserId(self::getTaskKuserId($entryObject, $entryObjectType));
-		$entryVendorTask->setUserId(self::getTaskPuserId($entryObject, $entryObjectType));
+		$entryVendorTask->setKuserId($vendorTaskObjectHandler->getTaskKuserId($entryObject));
+		$entryVendorTask->setUserId($vendorTaskObjectHandler->getTaskPuserId($entryObject));
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
 		$entryVendorTask->setVersion($version);
 		$entryVendorTask->setEntryObjectType($entryObjectType);
@@ -876,40 +877,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	protected static function shouldAddEntryVendorTask($entryObject, $entryObjectType, $vendorCatalogItem)
-	{
-		if(!$entryObjectType)
-		{
-			$entryObjectType = EntryObjectType::ENTRY;
-		}
-
-		switch ($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				/** @var $entryObject entry */
-				//Check if the entry is temporary, if so, dont create the task
-				if($entryObject->getIsTemporary())
-				{
-					KalturaLog::debug("Entry [{$entryObject->getId()}] is temporary, entry vendor task object wont be created for it");
-					return false;
-				}
-
-				//Check if static content and the catalog item is excluding static content, if so, dont create the task
-				if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entryObject->getAdminTagsArr()))
-				{
-					KalturaLog::debug("Entry [{$entryObject->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
-					return false;
-				}
-				return true;
-
-			case EntryObjectType::ASSET:
-				return true;
-
-			default:
-				return false;
-		}
-	}
-
 	protected static function getEntryVendorTaskStatus($reachProfile, $vendorCatalogItem, $entry, $entryObjectType, $validateModeration)
 	{
 		$status = EntryVendorTaskStatus::PENDING;
@@ -938,64 +905,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 		return $status;
-	}
-	
-	protected static function getTaskKuserId($entryObject, $entryObjectType)
-	{
-		$kuserId = kCurrentContext::getCurrentKsKuserId();
-		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
-		{
-			if(!$entryObjectType)
-			{
-				$entryObjectType = EntryObjectType::ENTRY;
-			}
-
-			switch ($entryObjectType)
-			{
-				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-				case EntryObjectType::ENTRY:
-					return $entryObject->getKuserId();
-
-				case EntryObjectType::ASSET:
-					$entryId = $entryObject->getEntryId();
-					$entry = entryPeer::retrieveByPK($entryId);
-					return $entry->getKuserId();
-
-				default:
-					return null;
-			}
-		}
-		return $kuserId;
-	}
-	
-	protected static function getTaskPuserId($entryObject, $entryObjectType)
-	{
-		$puserId = kCurrentContext::$ks_uid;
-		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
-		{
-			if(!$entryObjectType)
-			{
-				$entryObjectType = EntryObjectType::ENTRY;
-			}
-
-			switch ($entryObjectType)
-			{
-				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-				case EntryObjectType::ENTRY:
-					return $entryObject->getPuserId();
-
-				case EntryObjectType::ASSET:
-
-					$entryId = $entryObject->getEntryId();
-					$entry = entryPeer::retrieveByPK($entryId);
-					return $entry->getPuserId();
-
-				default:
-					return null;
-			}
-		}
-		
-		return $puserId;
 	}
 
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
@@ -1028,7 +937,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	protected function abortObjectTasks($entryObject, $entryObjectType)
 	{
-		$message = $this->getAbortStatusMessage($entryObject->getStatus(), $entryObjectType);
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryObjectType);
+		$message = $vendorTaskObjectHandler->getAbortStatusMessage($entryObject->getStatus());
 		$pendingEntryTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entryObject->getId(), $entryObject->getPartnerId());
 		$this->abortTasks($entryObject->getId(), $pendingEntryTasks, $message);
 	}
@@ -1042,48 +952,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$pendingTask->setStatus(EntryVendorTaskStatus::ABORTED);
 			$pendingTask->setErrDescription("Task was aborted by server, associated object [{$objectId}] $errorMessage");
 			$pendingTask->save();
-		}
-	}
-
-	protected function getAbortStatusMessage($status, $entryObjectType)
-	{
-		switch ($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				return $this->getAbortEntryStatusMessage($status);
-
-			case EntryObjectType::ASSET:
-				return $this->getAbortAssetStatusMessage($status);
-		}
-	}
-
-	private function getAbortEntryStatusMessage($status)
-	{
-		switch ($status)
-		{
-			case entryStatus::DELETED:
-				return "deleted";
-			case entryStatus::ERROR_CONVERTING:
-				return "error occurred while converting";
-			case entryStatus::ERROR_IMPORTING:
-				return "error occurred while importing";
-			default:
-				return "invalid status provided";
-		}
-	}
-
-	private function getAbortAssetStatusMessage($status)
-	{
-		switch ($status)
-		{
-			case asset::ASSET_STATUS_DELETED:
-				return "deleted";
-			case asset::ASSET_STATUS_ERROR:
-				return "error occurred";
-			case asset::ASSET_STATUS_NOT_APPLICABLE:
-				return "asset not applicable";
-			default:
-				return "invalid status provided";
 		}
 	}
 
