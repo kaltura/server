@@ -256,6 +256,7 @@ abstract class BaseIndexObject
 		// Check if this partner has a dedicated index for this object type
 		$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
 		$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
+		KalturaLog::debug("Using dedicated index map: " . print_r($dedicatedPartnerIndexMap, true));
 		
 		if (isset($dedicatedPartnerIndexMap[$originalValue]))
 		{
@@ -264,6 +265,7 @@ abstract class BaseIndexObject
 			{
 				if ($indexName === trim($indexNameInConfig))
 				{
+					KalturaLog::debug("Using dedicated index for partner ID [$originalValue] and index object name [$IndexObjectName]");
 					// Use Partner ID as the split index name
 					return $originalValue;
 				}
