@@ -834,7 +834,7 @@ class LiveStreamService extends KalturaLiveEntryService
 	 */
 	public function getActiveLiveEventTimeAction($entryId)
 	{
-		LiveStreamEntry : $liveStreamEntry = $this->fetchLiveEntry($entryId);
+		$liveStreamEntry = $this->fetchLiveEntry($entryId);
 		$event = kSimuliveUtils::getSimuliveEvent($liveStreamEntry);
 		if(!$event || !$event->getStartScreenTime() || !$event->getCalculatedEndTime())
 		{
