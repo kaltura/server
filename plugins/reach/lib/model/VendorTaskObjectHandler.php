@@ -19,4 +19,5 @@ interface VendorTaskObjectHandler
 	public static function hasRestrainingAdminTag($object, $profileId): bool;
 
 	public static function isFeatureTypeSupportedForObject($object, VendorCatalogItem $vendorCatalogItem): bool;
+  
 }

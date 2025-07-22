@@ -93,7 +93,7 @@ class EntryHandler implements VendorTaskObjectHandler
 	{
 		return $object->getEntryId();
 	}
-
+  
 	public static function retrieveObject($objectId): BaseObject
 	{
 		return entryPeer::retrieveByPK($objectId);
@@ -115,4 +115,5 @@ class EntryHandler implements VendorTaskObjectHandler
 		$supportedType = $vendorCatalogItem->isEntryTypeSupported($object->getType(), $object->getMediaType());
 		return !$vendorCatalogItem->isEntryDurationExceeding($object) && $supportedType;
 	}
+  
 }

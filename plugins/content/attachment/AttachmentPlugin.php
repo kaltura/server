@@ -3,10 +3,9 @@
  * Enable attachment assets management for entry objects
  * @package plugins.attachment
  */
-class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaSchemaContributor, IKalturaMrssContributor, IKalturaEventConsumers
+class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKalturaPermissions, IKalturaEnumerator, IKalturaObjectLoader, IKalturaApplicationPartialView, IKalturaSchemaContributor, IKalturaMrssContributor
 {
 	const PLUGIN_NAME = 'attachment';
-	const ATTACHMENT_FLOW_MANAGER_CLASS = 'kAttachmentFlowManager';
 	
 	/* (non-PHPdoc)
 	 * @see IKalturaPlugin::getPluginName()
@@ -240,10 +239,4 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 		return self::getObjectFeatureTypeCoreValue(AttachmentObjectFeatureType::ATTACHMENT);
 	}
 
-	public static function getEventConsumers()
-	{
-		return array(
-			self::ATTACHMENT_FLOW_MANAGER_CLASS,
-		);
-	}
 }

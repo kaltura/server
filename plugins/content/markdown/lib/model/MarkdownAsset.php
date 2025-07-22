@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.transcript
+ * @package plugins.markdown
  * @subpackage model
  */ 
-class TranscriptAsset extends TextualAsset
+class MarkdownAsset extends TextualAsset
 {
 	const CUSTOM_DATA_FIELD_ACCURACY = "accuracy";
 	const CUSTOM_DATA_FIELD_PROVIDER_TYPE = "providerType";
@@ -14,7 +14,7 @@ class TranscriptAsset extends TextualAsset
 	public function applyDefaultValues()
 	{
 		parent::applyDefaultValues();
-		$this->setType(TranscriptPlugin::getAssetTypeCoreValue(TranscriptAssetType::TRANSCRIPT));
+		$this->setType(MarkdownPlugin::getAssetTypeCoreValue(MarkdownAssetType::MARKDOWN));
 	}
 
 	public function getAccuracy()       {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_ACCURACY);}
@@ -26,6 +26,6 @@ class TranscriptAsset extends TextualAsset
 
 	public function getTypeFolderName()
 	{
-		return 'transcripts';
+		return 'markdown';
 	}
 }
