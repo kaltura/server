@@ -1,7 +1,7 @@
 <?php
 /**
  * @package deployment
- * @subpackage falcon.roles_and_permissions
+ * @subpackage venus.roles_and_permissions
  *
  * Add permissions to live stream service
  */
