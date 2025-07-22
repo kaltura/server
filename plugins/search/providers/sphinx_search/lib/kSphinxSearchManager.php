@@ -512,8 +512,32 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$indexSplitFactor = array_count_values($tableNames);
 			if($indexSplitFactor[$indexName] > 1)
 			{
-				$indexId = abs(intval($object->getPartnerId()/10))%$indexSplitFactor[$indexName];
-				$splitIndexName = $indexName . '_' . $indexId;
+				// Check if this partner has a dedicated index for this $indexName
+				$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
+				$partnerId = $object->getPartnerId();
+				$hasDedicatedIndex = false;
+				
+				if(isset($dedicatedPartnerIndexMap[$partnerId]))
+				{
+					$indices = explode(',', $dedicatedPartnerIndexMap[$partnerId]);
+					foreach ($indices as $indexNameInConfig)
+					{
+						if ($indexName === trim($indexNameInConfig))
+						{
+							$splitIndexName = $indexName . '_' . $partnerId;
+							$hasDedicatedIndex = true;
+							KalturaLog::debug("Using dedicated partner index: [$splitIndexName] for partner [$partnerId]");
+							break;
+						}
+					}
+				}
+				
+				// If no dedicated index, use standard sharding logic
+				if (!$hasDedicatedIndex)
+				{
+					$indexId = abs(intval($object->getPartnerId() / 10)) % $indexSplitFactor[$indexName];
+					$splitIndexName = $indexName . '_' . $indexId;
+				}
 			}
 		}
 		
