@@ -229,7 +229,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			return true;
 		}
 
-		if ($object instanceof asset)
+		if ($object instanceof asset && $object->getStatus() == asset::ASSET_STATUS_READY)
 		{
 			return true;
 		}
@@ -354,7 +354,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->checkAutomaticRules($object, true);
 		}
 
-		if ($object instanceof asset)
+		if ($object instanceof asset && $object->getStatus() == asset::ASSET_STATUS_READY)
 		{
 			$this->checkAutomaticRules($object, true);
 		}
