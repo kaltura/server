@@ -70,6 +70,8 @@ if(isset($dbConf['sphinx_split_index']) && $dbConf['sphinx_split_index']['enable
 	$splitIndexSettings = $dbConf['sphinx_split_index'];
 }
 
+$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
+
 $limit = 1000; 	// The number of sphinxLog records we want to query
 $gap = 500;	// The gap from 'getLastLogId' we want to query
 $maxIndexHistory = 2000; //The maximum array size to save unique object ids update and their sphinx log id
@@ -123,13 +125,34 @@ while(true)
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		$sphinxLogId = $sphinxLog->getId();
 		$sphinxLogIndexName = $sphinxLog->getIndexName();
+		
+		// Check if this partner has a dedicated index for this object type
+		$partnerId = $sphinxLog->getPartnerId();
+		$hasDedicatedIndex = false;
+		
+		if(isset($dedicatedPartnerIndexMap[$partnerId]))
+		{
+			$indices = explode(',', $dedicatedPartnerIndexMap[$partnerId]);
+			foreach ($indices as $indexNameInConfig)
+			{
+				// Strip $sphinxLogIndexName of any trailing underscore and digit(s) and check if it matches the index name in the config
+				if (preg_replace('/_[0-9]+$/', '', $sphinxLogIndexName) === trim($indexNameInConfig))
+				{
+					$sphinxLogIndexName = trim($indexNameInConfig) . '_' . $partnerId;
+					$hasDedicatedIndex = true;
+					KalturaLog::debug("Using dedicated partner index [$sphinxLogIndexName] for partner [$partnerId]");
+					break;
+				}
+			}
+		}
+		
 		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 && $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
 		{
 			$splitFactor = $splitIndexSettings[$sphinxLog->getObjectType()];
-			$sphinxLogIndexName = $sphinxLogIndexName . "_" . ($sphinxLog->getPartnerId()/$splitFactor)%$splitFactor;
+			$sphinxLogIndexName = $sphinxLogIndexName . "_" . abs(intval($sphinxLog->getPartnerId() / $splitFactor)) % $splitFactor;
 		}
 		
-		if($isSharded && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
+		if(($isSharded || $hasDedicatedIndex) && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
 		{
 			KalturaLog::log("Sphinx log id [$sphinxLogId] index name [$sphinxLogIndexName] not in rt table list, continue to next one");
 			continue;
