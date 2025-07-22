@@ -149,6 +149,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_MEETING_CAMERA_ON_VIEW_TIME = 'meeting_camera_on_view_time';
 	const METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC = 'transcoding_added_entries_duration_sec';
 	const METRIC_TRANSCODING_ADDED_ENTRIES_DURATION = 'transcoding_added_entries_duration';
+	const METRIC_LATEST = 'latest_event_time';
 
 
 	// druid intermediate metrics
@@ -1507,6 +1508,10 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_PHYSICAL_ADD),
 				self::getNotFilter(self::getInFilter(self::DIMENSION_SOURCE_TYPE, array('Recorded Live Stream'))))),
 			self::getLongSumAggregator(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC, self::METRIC_DURATION_SEC));
+
+		self::$aggregations_def[self::METRIC_LATEST] = self::getLongMaxAggregator(
+			self::METRIC_LATEST,self::DIMENSION_TIME
+		);
 
 		self::$metrics_def[self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION] = array(
 			self::DRUID_AGGR => array(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC),
@@ -3433,7 +3438,9 @@ class kKavaReportsMgr extends kKavaBase
 		$report_def[self::DRUID_AGGR][] = array(
 			self::DRUID_TYPE => self::DRUID_CARDINALITY,
 			self::DRUID_NAME => self::METRIC_CARDINALITY,
-			self::DRUID_FIELDS => is_array($dimension) ? $dimension : array($dimension));
+			self::DRUID_FIELDS => is_array($dimension) ? $dimension : array($dimension),
+			self::DRUID_BY_ROW => is_array($dimension) ? 'true' : 'false');
+
 		return $report_def;
 	}
 

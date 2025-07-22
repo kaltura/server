@@ -397,14 +397,6 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 		ReportType::EP_LATEST_DOWNLOADED_ATTACHMENTS => array(
 			self::REPORT_DATA_SOURCE =>  self::DATASOURCE_HISTORICAL,
 			self::REPORT_DIMENSION_MAP => array(
-				'extract_time' => array(
-					self::DRUID_TYPE => self::DRUID_EXTRACTION,
-					self::DRUID_DIMENSION => self::DIMENSION_TIME,
-					self::DRUID_OUTPUT_NAME => self::DIMENSION_EXTRACT_TIME,
-					self::DRUID_EXTRACTION_FUNC => array(
-						self::DRUID_TYPE => self::DRUID_TIME_FORMAT
-					),
-				),
 				'entry_id' => self::DIMENSION_ENTRY_ID,
 				'entry_name' => self::DIMENSION_ENTRY_ID,
 				'attachment_id' => self::DIMENSION_FLAVOR_ID,
@@ -412,11 +404,6 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'attachment_ext' => self::DIMENSION_FLAVOR_ID,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				array(
-					self::REPORT_ENRICH_OUTPUT => 'extract_time',
-					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
-					self::REPORT_ENRICH_CONTEXT => 'kKavaReportsMgr::timestampToUnixtime',
-				),
 				array(
 					self::REPORT_ENRICH_OUTPUT => 'entry_name',
 					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
@@ -431,9 +418,13 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				),
 			),
 			self::REPORT_FORCE_TOTAL_COUNT => true,
-			self::REPORT_METRICS => array(self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_EVENT_TYPE,
+				self::DRUID_VALUES => array(self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED)
+			),
+			self::REPORT_METRICS => array(self::METRIC_LATEST),
 			self::REPORT_ORDER_BY => array(
-				self::DRUID_DIMENSION => 'extract_time',
+				self::DRUID_DIMENSION => self::METRIC_LATEST,
 				self::DRUID_DIRECTION => '-'
 			),
 		),
