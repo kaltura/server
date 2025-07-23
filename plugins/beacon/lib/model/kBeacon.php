@@ -50,6 +50,8 @@ class kBeacon
 	const FIELD_PARTNER_ID = 'partner_id';
 	const FIELD_IS_LOG = 'is_log';
 	
+	protected $version;
+	
 	protected $id;
 	protected $relatedObjectType;
 	protected $eventType;
@@ -65,6 +67,8 @@ class kBeacon
 			$this->setPartnerId($partnerId);
 		else
 			$this->setPartnerId(kCurrentContext::getCurrentPartnerId());
+		
+		$this->version = kConf::getArrayValue('elasticVersion', 'beacon', 'elastic', elasticClient::ELASTIC_MAJOR_VERSION_5);
 	}
 	
 	public function setId($id)
@@ -157,7 +161,12 @@ class kBeacon
 			$deleteFromOldIndexObject[self::ELASTIC_DOCUMENT_ID_KEY] = $docId;
 			$deleteFromOldIndexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_DELETE_ACTION_VALUE;
 			$deleteFromOldIndexObject[self::ELASTIC_INDEX_KEY] = $oldIndexName;
-			$deleteFromOldIndexObject[self::ELASTIC_INDEX_TYPE_KEY] = self::$indexTypeByBeaconObjectType[$this->relatedObjectType];
+			
+			if ($this->version < elasticClient::ELASTIC_MAJOR_VERSION_7)
+			{
+				$deleteFromOldIndexObject[self::ELASTIC_INDEX_TYPE_KEY] = self::$indexTypeByBeaconObjectType[$this->relatedObjectType];
+			}
+			
 			$deleteFromOldIndexObjects[] = json_encode($deleteFromOldIndexObject);
 		}
 
@@ -296,7 +305,11 @@ class kBeacon
 		//Set Action Name and Index Name and calculated document id
 		$indexObject[self::ELASTIC_ACTION_KEY] = self::ELASTIC_INDEX_ACTION_VALUE;
 		$indexObject[self::ELASTIC_INDEX_KEY] = self::$indexNameByBeaconObjectType[$this->relatedObjectType];
-		$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = self::$indexTypeByBeaconObjectType[$this->relatedObjectType];
+		
+		if ($this->version < elasticClient::ELASTIC_MAJOR_VERSION_7)
+		{
+			$indexObject[self::ELASTIC_INDEX_TYPE_KEY] = self::$indexTypeByBeaconObjectType[$this->relatedObjectType];
+		}
 		
 		//Set values provided in input
 		$indexObject[self::FIELD_RELATED_OBJECT_TYPE] = $this->relatedObjectType;
