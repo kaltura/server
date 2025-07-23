@@ -408,9 +408,9 @@ class flavorAsset extends exportableAsset
 		// Convert hex string to binary
 		$hex = preg_replace('/\s+/', '', $hexString
 							
-		// If the length is odd, prepend a zero
+		// Trim the last char (safer, common in trailing errors)
 		if (strlen($hex) % 2 !== 0) {
-			$hex = '0' . $hex;
+			$hex = substr($hex, 0, -1);
 		}
 		
 		// Convert hex to binary
