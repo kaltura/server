@@ -410,7 +410,8 @@ class flavorAsset extends exportableAsset
 		
 		// If the length is odd, prepend a zero
 		if (strlen($hex) % 2 !== 0) {
-			$hex = '0' . $hex;
+			// Trim the last char (safer, common in trailing errors)
+			$hex = substr($hex, 0, -1);
 		}
 		
 		// Convert hex to binary
