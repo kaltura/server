@@ -11,7 +11,7 @@
 - Issue ID: KAM-61
 
 ### Deployment Scripts ###
-	php deployment/updates/scripts/add_permissions/2025_07_23_add_agent_manager_permissions.php
+	php deployment/updates/scripts/add_permissions/2025_07_23_add_agents_manager_permissions.php
 
 # Ursa-21.20.0
 ## Add ability to search Kaltura user by Zoom external ID
