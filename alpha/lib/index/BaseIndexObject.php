@@ -253,23 +253,10 @@ abstract class BaseIndexObject
 			return null;
 		}
 		
-		// Check if this partner has a dedicated index for this object type
-		$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
-		$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
-		KalturaLog::debug("Using dedicated index map: " . print_r($dedicatedPartnerIndexMap, true));
-		
-		if (isset($dedicatedPartnerIndexMap[$originalValue]))
+		$hasDedicatedIndex = self::getSphinxIndexNamePerPartner($originalValue, $IndexObjectName);
+		if ($hasDedicatedIndex)
 		{
-			$indices = explode(',', $dedicatedPartnerIndexMap[$originalValue]);
-			foreach ($indices as $indexNameInConfig)
-			{
-				if ($indexName === trim($indexNameInConfig))
-				{
-					KalturaLog::debug("Using dedicated index for partner ID [$originalValue] and index object name [$IndexObjectName]");
-					// Use Partner ID as the split index name
-					return $originalValue;
-				}
-			}
+			return $originalValue;
 		}
 		
 		$splitIndexFactor = self::getSplitIndexFactor($IndexObjectName);
@@ -279,5 +266,32 @@ abstract class BaseIndexObject
 		}
 
 		return abs((intval($originalValue/10)))%$splitIndexFactor;
+	}
+	
+	public static function getSphinxIndexNamePerPartner($partnerId, $IndexObjectName): bool
+	{
+		$hasDedicatedIndex = false;
+		
+		// Check if this partner has a dedicated index for this object type
+		$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
+		$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
+		KalturaLog::debug("Using dedicated index map: " . print_r($dedicatedPartnerIndexMap, true));
+		
+		if (isset($dedicatedPartnerIndexMap[$partnerId]))
+		{
+			$indices = explode(',', $dedicatedPartnerIndexMap[$partnerId]);
+			foreach ($indices as $indexNameInConfig)
+			{
+				if ($indexName === trim($indexNameInConfig))
+				{
+					KalturaLog::debug("Using dedicated index for partner ID [$partnerId] and index object name [$IndexObjectName]");
+					// Use Partner ID as the split index name
+					$hasDedicatedIndex = true;
+					break;
+				}
+			}
+		}
+		
+		return $hasDedicatedIndex;
 	}
 }
