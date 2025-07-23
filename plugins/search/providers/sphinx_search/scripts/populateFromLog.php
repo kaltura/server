@@ -125,31 +125,19 @@ while(true)
 		$executedServerId = $sphinxLog->getExecutedServerId();
 		$sphinxLogId = $sphinxLog->getId();
 		$sphinxLogIndexName = $sphinxLog->getIndexName();
+		$partnerId = $sphinxLog->getPartnerId();
 		
 		// Check if this partner has a dedicated index for this object type
-		$partnerId = $sphinxLog->getPartnerId();
-		$hasDedicatedIndex = false;
-		
-		if(isset($dedicatedPartnerIndexMap[$partnerId]))
+		$hasDedicatedIndex = getSphinxIndexNamePerPartner($partnerId, $sphinxLog->getObjectType());
+		if ($hasDedicatedIndex)
 		{
-			$indices = explode(',', $dedicatedPartnerIndexMap[$partnerId]);
-			foreach ($indices as $indexNameInConfig)
-			{
-				// Strip $sphinxLogIndexName of any trailing underscore and digit(s) and check if it matches the index name in the config
-				if (preg_replace('/_[0-9]+$/', '', $sphinxLogIndexName) === trim($indexNameInConfig))
-				{
-					$sphinxLogIndexName = trim($indexNameInConfig) . '_' . $partnerId;
-					$hasDedicatedIndex = true;
-					KalturaLog::debug("Using dedicated partner index [$sphinxLogIndexName] for partner [$partnerId]");
-					break;
-				}
-			}
+			$sphinxLogIndexName = preg_replace('/_[0-9]+$/', '', $sphinxLogIndexName) . '_' . $partnerId;
 		}
 		
 		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 && $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
 		{
 			$splitFactor = $splitIndexSettings[$sphinxLog->getObjectType()];
-			$sphinxLogIndexName = $sphinxLogIndexName . "_" . abs(intval($sphinxLog->getPartnerId() / $splitFactor)) % $splitFactor;
+			$sphinxLogIndexName = $sphinxLogIndexName . "_" . abs(intval($partnerId / $splitFactor)) % $splitFactor;
 		}
 		
 		if(($isSharded || $hasDedicatedIndex) && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
@@ -264,4 +252,30 @@ function getSphinxRtTables($sphinxCon)
 	}
 	
 	return $sphinxRtTables;
+}
+
+function getSphinxIndexNamePerPartner($partnerId, $IndexObjectName): bool
+{
+	$hasDedicatedIndex = false;
+	
+	// Check if this partner has a dedicated index for this object type
+	$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
+	$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
+	
+	if (isset($dedicatedPartnerIndexMap[$partnerId]))
+	{
+		$indices = explode(',', $dedicatedPartnerIndexMap[$partnerId]);
+		foreach ($indices as $indexNameInConfig)
+		{
+			if ($indexName === trim($indexNameInConfig))
+			{
+				KalturaLog::debug("Using dedicated index for partner ID [$partnerId] and index object name [$IndexObjectName]");
+				// Use Partner ID as the split index name
+				$hasDedicatedIndex = true;
+				break;
+			}
+		}
+	}
+	
+	return $hasDedicatedIndex;
 }
