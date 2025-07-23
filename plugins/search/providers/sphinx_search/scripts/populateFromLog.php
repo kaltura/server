@@ -128,7 +128,7 @@ while(true)
 		$partnerId = $sphinxLog->getPartnerId();
 		
 		// Check if this partner has a dedicated index for this object type
-		$hasDedicatedIndex = getSphinxIndexNamePerPartner($partnerId, $sphinxLog->getObjectType());
+		$hasDedicatedIndex = getSphinxIndexNamePerPartner($dedicatedPartnerIndexMap, $partnerId, $sphinxLog->getObjectType());
 		if ($hasDedicatedIndex)
 		{
 			$sphinxLogIndexName = preg_replace('/_[0-9]+$/', '', $sphinxLogIndexName) . '_' . $partnerId;
@@ -254,13 +254,12 @@ function getSphinxRtTables($sphinxCon)
 	return $sphinxRtTables;
 }
 
-function getSphinxIndexNamePerPartner($partnerId, $IndexObjectName): bool
+function getSphinxIndexNamePerPartner($dedicatedPartnerIndexMap, $partnerId, $IndexObjectName): bool
 {
 	$hasDedicatedIndex = false;
 	
 	// Check if this partner has a dedicated index for this object type
 	$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
-	$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinx_dynamic_config', array());
 	
 	if (isset($dedicatedPartnerIndexMap[$partnerId]))
 	{
