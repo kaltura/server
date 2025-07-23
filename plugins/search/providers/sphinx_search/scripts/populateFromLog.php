@@ -70,7 +70,7 @@ if(isset($dbConf['sphinx_split_index']) && $dbConf['sphinx_split_index']['enable
 	$splitIndexSettings = $dbConf['sphinx_split_index'];
 }
 
-$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
+$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinx_dynamic_config', array());
 
 $limit = 1000; 	// The number of sphinxLog records we want to query
 $gap = 500;	// The gap from 'getLastLogId' we want to query
@@ -260,7 +260,7 @@ function getSphinxIndexNamePerPartner($partnerId, $IndexObjectName): bool
 	
 	// Check if this partner has a dedicated index for this object type
 	$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
-	$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinxDynamicMap', array());
+	$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinx_dynamic_config', array());
 	
 	if (isset($dedicatedPartnerIndexMap[$partnerId]))
 	{
