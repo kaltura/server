@@ -137,7 +137,7 @@ while(true)
 		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 && $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
 		{
 			$splitFactor = $splitIndexSettings[$sphinxLog->getObjectType()];
-			$sphinxLogIndexName = $sphinxLogIndexName . "_" . abs(intval($partnerId / $splitFactor)) % $splitFactor;
+			$sphinxLogIndexName = $sphinxLogIndexName . "_" . abs(intval($partnerId / 10)) % $splitFactor;
 		}
 		
 		if(($isSharded || $hasDedicatedIndex) && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
