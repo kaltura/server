@@ -408,6 +408,11 @@ class flavorAsset extends exportableAsset
 		// Convert hex string to binary
 		$hex = preg_replace('/\s+/', '', $hexString);
 		
+		// If the length is odd, prepend a zero
+		if (strlen($hex) % 2 !== 0) {
+			$hex = '0' . $hex;
+		}
+		
 		// Convert hex to binary
 		return hex2bin($hex);
 	}
