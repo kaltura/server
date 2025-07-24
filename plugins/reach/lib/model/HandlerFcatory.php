@@ -16,6 +16,14 @@ class HandlerFactory {
 				throw new KalturaAPIException(KalturaReachErrors::ENTRY_OBJECT_TYPE_NOT_SUPPORTED, $objectType);
 
 		}
+	}
 
+	/**
+	 * @throws KalturaAPIException
+	 */
+	public static function getHandlerByObject($object): VendorTaskObjectHandler
+	{
+		$objectType = $object instanceof asset ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
+		return HandlerFactory::getHandler($objectType);
 	}
 }

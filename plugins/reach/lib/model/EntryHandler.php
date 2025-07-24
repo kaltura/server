@@ -101,8 +101,8 @@ class EntryHandler implements VendorTaskObjectHandler
 
 	public static function hasRestrainingAdminTag($object, $profileId): bool
 	{
-		$reachRestrainAdminTag = kConf::get("reach_restrain_admin_tag", kConfMapNames::RUNTIME_CONFIG, null);
-		if(in_array($reachRestrainAdminTag, $object->getAdminTagsArr()))
+		$reachRestrainAdminTag = kConf::get('reach_restrain_admin_tag', kConfMapNames::RUNTIME_CONFIG, null);
+		if(!is_null($reachRestrainAdminTag) && in_array($reachRestrainAdminTag, $object->getAdminTagsArr()))
 		{
 			KalturaLog::log("Entry has reach restraining admin tag [$reachRestrainAdminTag]");
 			return true;

@@ -50,8 +50,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		//If both the entry and reach profile don't exist, there's no need to hit the loop
 
-		$entryObjectType = $object instanceof asset ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
-		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryObjectType);
+		$vendorTaskObjectHandler = HandlerFactory::getHandlerByObject($object);
 		$taskObject = $vendorTaskObjectHandler->retrieveObject($entryId);
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
 		if(!$taskObject || !$reachProfile)
@@ -62,7 +61,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		if($vendorTaskObjectHandler->hasRestrainingAdminTag($taskObject, $profileId))
 		{
-			KalturaLog::log("tasks will not be added");
+			KalturaLog::log('tasks will not be added');
 			return true;
 		}
 
@@ -880,8 +879,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
 	{
 		$scope = new kScope();
-		$entryObjectType = $object instanceof asset ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
-		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryObjectType);
+		$vendorTaskObjectHandler = HandlerFactory::getHandlerByObject($object);
 		$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
 		$scope->setEntryId($taskObjectId);
 		$this->initReachProfileForPartner($object->getPartnerId());

@@ -12,7 +12,7 @@ class AssetHandler implements VendorTaskObjectHandler
 	{
 		if (!$vendorCatalogItem->isAssetSupported($object))
 		{
-			KalturaLog::log("assets are not supported");
+			KalturaLog::log("service {$vendorCatalogItem->getServiceFeature()} do not support asset {$object->getId()}");
 			return false;
 		}
 		return true;
