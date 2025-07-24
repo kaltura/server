@@ -128,8 +128,8 @@ while(true)
 		$partnerId = $sphinxLog->getPartnerId();
 		
 		// Check if this partner has a dedicated index for this object type
-		$hasDedicatedIndex = getSphinxIndexNamePerPartner($dedicatedPartnerIndexMap, $partnerId, $sphinxLog->getObjectType());
-		if ($hasDedicatedIndex)
+		$hasDedicatedIndex = hasSphinxDedicatedPartnerIndex($dedicatedPartnerIndexMap, $partnerId, $sphinxLog->getObjectType());
+		if ($isSharded && $hasDedicatedIndex)
 		{
 			$sphinxLogIndexName = preg_replace('/_[0-9]+$/', '', $sphinxLogIndexName) . '_' . $partnerId;
 		}
@@ -254,7 +254,7 @@ function getSphinxRtTables($sphinxCon)
 	return $sphinxRtTables;
 }
 
-function getSphinxIndexNamePerPartner($dedicatedPartnerIndexMap, $partnerId, $IndexObjectName): bool
+function hasSphinxDedicatedPartnerIndex($dedicatedPartnerIndexMap, $partnerId, $IndexObjectName): bool
 {
 	$hasDedicatedIndex = false;
 	
