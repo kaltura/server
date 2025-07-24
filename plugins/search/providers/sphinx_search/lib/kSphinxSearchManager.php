@@ -512,7 +512,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			$indexSplitFactor = array_count_values($tableNames);
 			if($indexSplitFactor[$indexName] > 1)
 			{
-				$hasDedicatedIndex = $objectIndexClass::getSphinxIndexNamePerPartner($object->getPartnerId(), $objectIndexClass::getObjectIndexName());
+				$hasDedicatedIndex = $objectIndexClass::hasSphinxDedicatedPartnerIndex($object->getPartnerId(), $objectIndexClass::getObjectIndexName());
 				if ($hasDedicatedIndex)
 				{
 					$splitIndexName = $indexName . '_' . $object->getPartnerId();
