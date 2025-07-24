@@ -253,7 +253,7 @@ abstract class BaseIndexObject
 			return null;
 		}
 		
-		$hasDedicatedIndex = self::getSphinxIndexNamePerPartner($originalValue, $IndexObjectName);
+		$hasDedicatedIndex = self::hasSphinxDedicatedPartnerIndex($originalValue, $IndexObjectName);
 		if ($hasDedicatedIndex)
 		{
 			return $originalValue;
@@ -268,7 +268,7 @@ abstract class BaseIndexObject
 		return abs((intval($originalValue/10)))%$splitIndexFactor;
 	}
 	
-	public static function getSphinxIndexNamePerPartner($partnerId, $IndexObjectName): bool
+	public static function hasSphinxDedicatedPartnerIndex($partnerId, $IndexObjectName): bool
 	{
 		$hasDedicatedIndex = false;
 		
