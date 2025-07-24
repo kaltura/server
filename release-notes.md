@@ -7,7 +7,7 @@
 None.
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2025_07_22_update_live_stream_service.php
+None
 
 ### Known Issues & Limitations ###
     The api is called without a widget KS to exploit CDN cache
