@@ -390,8 +390,8 @@ class thumbnailAction extends sfAction
 			$enableCacheValidation = $accessControl->hasRules(ContextType::THUMBNAIL, array(RuleActionType::BLOCK,RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
 			if ($enableCacheValidation)
 			{
-				$blockingRulesArray = $this->getRules($accessControl, ContextType::THUMBNAIL, array (RuleActionType::BLOCK, RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
-				KalturaLog::debug('This entry has ACP to block thumbnail: [' . print_r($blockingRulesArray, true) . ']');
+				$blockingRule = $this->getRules($accessControl, ContextType::THUMBNAIL, array (RuleActionType::BLOCK, RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
+				KalturaLog::debug('This entry has ACP to block thumbnail: [' . print_r($blockingRule, true) . ']');
 			}
 		}
 
@@ -642,9 +642,8 @@ class thumbnailAction extends sfAction
 	protected function getRules($accessControl, $contextType, $ruleActionTypeArray)
 	{
 		$rules = $accessControl->getRulesArray();
-		$result = array();
 		if (is_null($contextType))
-			return $result;
+			return null;
 
 		foreach($rules as $rule)
 		{
@@ -654,18 +653,16 @@ class thumbnailAction extends sfAction
 			{
 				if ($rule->hasActionType($ruleActionTypeArray))
 				{
-					$result[] = $rule;
-					break;
+					return $rule;
 				}
 			}
 
 			if (in_array($contextType, $contexts) && $rule->hasActionType($ruleActionTypeArray))
 			{
-				$result[] = $rule;
-				break;
+				return $rule;
 			}
 		}
-		return $result;
+		return null;
 	}
 
 	private function getDimensions()
