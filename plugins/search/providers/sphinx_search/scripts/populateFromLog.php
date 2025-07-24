@@ -140,7 +140,7 @@ while(true)
 			$sphinxLogIndexName = $sphinxLogIndexName . "_" . abs(intval($partnerId / 10)) % $splitFactor;
 		}
 		
-		if(($isSharded || $hasDedicatedIndex) && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
+		if($isSharded && $sphinxLogIndexName && !in_array($sphinxLogIndexName, $sphinxRtTables))
 		{
 			KalturaLog::log("Sphinx log id [$sphinxLogId] index name [$sphinxLogIndexName] not in rt table list, continue to next one");
 			continue;
