@@ -1,5 +1,5 @@
 # Venus-22.0.0
-## Add getActiveLiveEventTime API action to get live stream scheduled time
+## Add activeLiveEventTime info to get playback context
 - Issue Type: Feature
 - Issue ID: PLAT-25383
 
