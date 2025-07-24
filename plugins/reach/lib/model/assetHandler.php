@@ -1,0 +1,56 @@
+<?php
+
+class AssetHandler implements VendorTaskObjectHandler
+{
+
+	public static function shouldAddEntryVendorTask($object, $vendorCatalogItem): bool
+	{
+			return true;
+	}
+
+	public static function getTaskKuserId($object): int
+	{
+		$kuserId = kCurrentContext::getCurrentKsKuserId();
+		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
+		{
+			$entryId = $object->getEntryId();
+			$entry = entryPeer::retrieveByPK($entryId);
+			return $entry->getKuserId();
+		}
+		return $kuserId;
+	}
+
+	public static function getTaskPuserId($entryObject): string
+	{
+		$puserId = kCurrentContext::$ks_uid;
+		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
+		{
+			$entryId = $entryObject->getEntryId();
+			$entry = entryPeer::retrieveByPK($entryId);
+			return $entry->getPuserId();
+		}
+
+		return $puserId;
+	}
+
+	public function getAbortStatusMessage($status): string
+	{
+		switch ($status)
+		{
+			case asset::ASSET_STATUS_DELETED:
+				return "deleted";
+			case asset::ASSET_STATUS_ERROR:
+				return "error occurred";
+			case asset::ASSET_STATUS_NOT_APPLICABLE:
+				return "asset not applicable";
+			default:
+				return "invalid status provided";
+		}
+	}
+
+	public static function retrieveObject($objectId): BaseObject
+	{
+		return assetPeer::retrieveById($objectId);
+	}
+}
+

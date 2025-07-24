@@ -40,29 +40,10 @@ class kReachUtils
 		return $tokens * $pricePerUnit;
 	}
 
-	public static function retrieveEntryObject($entryObjectType, $objectId)
-	{
-		if(!$entryObjectType)
-		{
-			$entryObjectType = EntryObjectType::ENTRY;
-		}
-
-		switch($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				return entryPeer::retrieveByPK($objectId);
-
-			case EntryObjectType::ASSET:
-				return assetPeer::retrieveById($objectId);
-
-			default:
-				return null;
-		}
-	}
-
 	public static function validateEntryObjectExists(EntryVendorTask $dbEntryVendorTask)
 	{
-		$dbEntry = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($dbEntryVendorTask->getEntryObjectType());
+		$dbEntry = $vendorTaskObjectHandler->retrieveObject($dbEntryVendorTask->getEntryId());
 		if (!$dbEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
@@ -555,6 +536,7 @@ class kReachUtils
 
 	public static function getPayPerUsePrice($entryVendorTask, $dbEntryVendorTask, $dbVendorCatalogItem)
 	{
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($dbEntryVendorTask->getEntryObjectType());
 		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && $dbVendorCatalogItem->getPayPerUse())
 		{
 			$unitsUsed = is_numeric($entryVendorTask->unitsUsed) ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
@@ -562,7 +544,7 @@ class kReachUtils
 			{
 				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
 			}
-			$entryObject = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
+			$entryObject = $vendorTaskObjectHandler->retrieveObject($dbEntryVendorTask->getEntryId());
 			return $dbVendorCatalogItem->calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), null, $unitsUsed);
 		}
 	}
