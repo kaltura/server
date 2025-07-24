@@ -37,6 +37,11 @@ class KalturaPlaybackContext extends KalturaObject{
 	*/
 	public $bumperData;
 
+	/**
+	 * @var KalturaLiveStreamBumperData
+	 */
+	public $activeLiveStreamTime;
+
 	private static $mapBetweenObjects = array
 	(
 		'playbackCaptions',

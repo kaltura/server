@@ -824,25 +824,4 @@ class LiveStreamService extends KalturaLiveEntryService
 		}
 	}
 
-	/**
-	 * Deliver information about the active live stream time
-	 *
-	 * @action getActiveLiveEventTime
-	 * @param string $entryId Id of the live stream entry
-	 * @return KalturaActiveLiveStreamTime
-	 * @ksIgnored
-	 */
-	public function getActiveLiveEventTimeAction($entryId)
-	{
-		$liveStreamEntry = $this->fetchLiveEntry($entryId);
-		$event = kSimuliveUtils::getSimuliveEvent($liveStreamEntry);
-		if(!$event || !$event->getStartScreenTime() || !$event->getCalculatedEndTime())
-		{
-			throw new KalturaAPIException(APIErrors::ACTIVE_SCHEDULED_LIVE_NOT_FOUND, $entryId);
-		}
-
-		$activeLiveStreamTime = new KalturaActiveLiveStreamTime($event->getStartScreenTime(), $event->getCalculatedEndTime());
-		return $activeLiveStreamTime;
-	}
-
 }
