@@ -1,4 +1,17 @@
 # Venus-22.0.0
+## Add activeLiveEventTime info to get playback context
+- Issue Type: Feature
+- Issue ID: PLAT-25383
+
+### Configuration ###
+None.
+
+### Deployment Scripts ###
+None
+
+### Known Issues & Limitations ###
+    The api is called without a widget KS to exploit CDN cache
+
 ## Add ANALYTICS_BASE permission to WEBCAST_PRODUCER_DEVICE_ROLE
 - Issue Type: Task
 - Issue ID: KME-2830
