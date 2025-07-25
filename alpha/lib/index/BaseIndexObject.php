@@ -275,7 +275,6 @@ abstract class BaseIndexObject
 		// Check if this partner has a dedicated index for this object type
 		$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
 		$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinx_dynamic_config', array());
-		KalturaLog::debug("Using dedicated index map: " . print_r($dedicatedPartnerIndexMap, true));
 		
 		if (isset($dedicatedPartnerIndexMap[$partnerId]))
 		{
