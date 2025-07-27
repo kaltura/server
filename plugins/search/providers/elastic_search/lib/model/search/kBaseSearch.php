@@ -149,7 +149,7 @@ abstract class kBaseSearch
 			$objectIdsArr[] = elasticSearchUtils::formatSearchTerm($singleObjectId);
 		}
 
-		return new kESearchTermQuery('_id', $objectIdsArr);
+		return new kESearchTermsQuery('_id', $objectIdsArr);
 	}
 
 	protected function applyElasticSearchConditions()
