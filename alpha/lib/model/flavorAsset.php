@@ -406,7 +406,7 @@ class flavorAsset extends exportableAsset
 		}
 		
 		// Convert hex string to binary
-		$hex = preg_replace('/\s+/', '', $hexString)
+		$hex = preg_replace('/\s+/', '', $hexString);
 							
 		// Trim the last char (safer, common in trailing errors)
 		if (strlen($hex) % 2 !== 0) {
