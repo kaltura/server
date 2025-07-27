@@ -8,6 +8,16 @@ class AssetHandler implements VendorTaskObjectHandler
 			return true;
 	}
 
+	public static function shouldAddEntryVendorTaskByObject($object, $vendorCatalogItem, $reachProfile) : bool
+	{
+		if (!$vendorCatalogItem->isAssetSupported($object))
+		{
+			KalturaLog::log("service {$vendorCatalogItem->getServiceFeature()} do not support asset {$object->getId()}");
+			return false;
+		}
+		return true;
+	}
+
 	public static function getTaskKuserId($object): int
 	{
 		$kuserId = kCurrentContext::getCurrentKsKuserId();
@@ -48,9 +58,24 @@ class AssetHandler implements VendorTaskObjectHandler
 		}
 	}
 
+	public static function getTaskObjectId(BaseObject $object)
+	{
+		return $object->getId();
+	}
+
 	public static function retrieveObject($objectId): BaseObject
 	{
 		return assetPeer::retrieveById($objectId);
+	}
+
+	public static function hasRestrainingAdminTag($object, $profileId): bool
+	{
+		return false;
+	}
+
+	public static function isFeatureTypeSupportedForObject($object, VendorCatalogItem $vendorCatalogItem): bool
+	{
+		return $vendorCatalogItem->isAssetSupported($object);
 	}
 }
 
