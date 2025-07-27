@@ -19,6 +19,13 @@ None
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2025_07_22_update_webcast_producer_role.php
 
+## Add permissions for Agents Manager ##
+- Issue Type: Task
+- Issue ID: KAM-61
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_07_23_add_agents_manager_permissions.php
+
 # Ursa-21.20.0
 ## Add ability to search Kaltura user by Zoom external ID
 - Issue Type: Task
