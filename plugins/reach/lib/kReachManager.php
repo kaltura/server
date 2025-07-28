@@ -44,7 +44,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object, $autoRule=false)
+	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
 	{
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 
@@ -76,8 +76,18 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
-			if ($autoRule && $object instanceof entry && ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION) && $object->getBlockAutoTranscript()) {
-				continue;
+			if ($autoRule && ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION)) {
+				if ($object instanceof entry && $object->getBlockAutoTranscript()) {
+					KalturaLog::log("Skip the entry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+					continue;
+				}
+				if ($object instanceof categoryEntry) {
+					$entry = entryPeer::retrieveByPK($entryId);
+					if ($entry && $entry->getBlockAutoTranscript()) {
+						KalturaLog::log("Skip the CategoryEntry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+						continue;
+					}
+				}
 			}
 			if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
 			{
