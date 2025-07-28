@@ -77,7 +77,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
 
-			if ($this->shouldSkipAutoRule($autoRule, $object, $entryId, $featureType))
+			if ($autoRule && $this->shouldSkipAutoRule($object, $entryId, $featureType))
 			{
 				continue;
 			}
@@ -94,9 +94,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 	}
 
-	private function shouldSkipAutoRule($autoRule, $object, $entryId, $featureType)
+	private function shouldSkipAutoRule($object, $entryId, $featureType)
 	{
-		if ($autoRule && ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION))
+		if ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION)
 		{
 			if ($object instanceof entry && $object->getBlockAutoTranscript())
 			{
