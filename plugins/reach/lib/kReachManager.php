@@ -76,19 +76,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
-			if ($autoRule && ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION)) {
-				if ($object instanceof entry && $object->getBlockAutoTranscript()) {
-					KalturaLog::log("Skip the entry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
-					continue;
-				}
-				if ($object instanceof categoryEntry) {
-					$entry = entryPeer::retrieveByPK($entryId);
-					if ($entry && $entry->getBlockAutoTranscript()) {
-						KalturaLog::log("Skip the CategoryEntry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
-						continue;
-					}
-				}
+
+			if ($this->shouldSkipAutoRule($autoRule, $object, $entryId, $featureType))
+			{
+				continue;
 			}
+
 			if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
 			{
 				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $entryId");
@@ -99,6 +92,27 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
 			self::addEntryVendorTaskByObjectIds($taskObject, $entryObjectType, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
 		}
+	}
+
+	private function shouldSkipAutoRule($autoRule, $object, $entryId, $featureType)
+	{
+		if ($autoRule && ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION))
+		{
+			if ($object instanceof entry && $object->getBlockAutoTranscript())
+			{
+				KalturaLog::log("Skip the entry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+				return true;
+			}
+			if ($object instanceof categoryEntry) {
+				$entry = entryPeer::retrieveByPK($entryId);
+				if ($entry && $entry->getBlockAutoTranscript())
+				{
+					KalturaLog::log("Skip the CategoryEntry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/* (non-PHPdoc)
