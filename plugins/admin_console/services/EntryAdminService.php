@@ -116,6 +116,19 @@ class EntryAdminService extends KalturaBaseService
 			array_push($fileSyncKeys, $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG));
 		}
 
+		$c = new Criteria();
+		$c->add(MetadataPeer::OBJECT_TYPE, MetadataObjectType::ENTRY);
+		$c->add(MetadataPeer::OBJECT_ID, $entryId);
+		$c->add(MetadataPeer::STATUS, Metadata::STATUS_DELETED, Criteria::EQUAL);
+		MetadataPeer::setUseCriteriaFilter(false);
+		$deletedMetadataObjects = MetadataPeer::doSelect($c);
+		MetadataPeer::setUseCriteriaFilter(true);
+
+		foreach ($deletedMetadataObjects as $metadata)
+		{
+			$fileSyncKeys[] = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		}
+
 		$fileSyncs = array();
 		FileSyncPeer::setUseCriteriaFilter(false);
 		foreach ($fileSyncKeys as $fileSyncKey)
