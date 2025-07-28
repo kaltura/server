@@ -44,7 +44,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object)
+	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object, $autoRule=false)
 	{
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 
@@ -76,6 +76,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
+			if ($autoRule && $object instanceof entry && ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION) && $object->getBlockAutoTranscript()) {
+				continue;
+			}
 			if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
 			{
 				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $entryId");
@@ -108,9 +111,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . implode(',', $fullFieldCatalogItemIds) . ']');
 				continue;
 			}
-			if ($object instanceof entry && !$object->getBlockAutoTranscript()){
-				$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object);
-			}
+			$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object);
 		}
 		return true;
 	}
@@ -901,9 +902,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
 					continue;
 				}
-				if ($object instanceof entry && !$object->getBlockAutoTranscript()) {
-					$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object);
-				}
+				$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object, true);
 			}
 		}
 		return true;
