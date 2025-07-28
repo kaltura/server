@@ -519,7 +519,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 				}
 				else
 				{
-					$indexId = abs(intval($object->getPartnerId() / 10)) % $indexSplitFactor[$indexName];
+					$splitFactor = BaseIndexObject::getSplitIndexFactor($objectIndexClass::getObjectIndexName()) ?? 1;
+					$indexId = abs(intval($object->getPartnerId() / 10)) % $splitFactor;
 					$splitIndexName = $indexName . '_' . $indexId;
 				}
 			}
