@@ -4,7 +4,7 @@
  * @package plugins.attachment
  * @subpackage lib
  */
-class kMarkdownFlowManager implements kObjectDeletedEventConsumer, kObjectAddedEventConsumer
+class kMarkdownFlowManager implements kObjectDeletedEventConsumer, kObjectAddedEventConsumer, kObjectChangedEventConsumer
 {
 
 	private function indexEntry(BaseObject $object)
@@ -19,6 +19,7 @@ class kMarkdownFlowManager implements kObjectDeletedEventConsumer, kObjectAddedE
 
 		return true;
 	}
+
 
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
@@ -52,4 +53,29 @@ class kMarkdownFlowManager implements kObjectDeletedEventConsumer, kObjectAddedE
 
 		return false;
 	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::objectChanged()
+	 */
+	public function objectChanged(BaseObject $object, array $modifiedColumns)
+	{
+		return $this->indexEntry($object);
+	}
+
+	/* (non-PHPdoc)
+	 * @see kObjectChangedEventConsumer::shouldConsumeChangedEvent()
+	*/
+	public function shouldConsumeChangedEvent(BaseObject $object, array $modifiedColumns)
+	{
+		if (class_exists('MarkdownAsset') && $object instanceof MarkdownAsset
+			&& MarkdownPlugin::isAllowedPartner($object->getPartnerId())
+			&& in_array(assetPeer::STATUS, $modifiedColumns)
+			&& $object->getStatus() == MarkdownAsset::ASSET_STATUS_READY)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 }
