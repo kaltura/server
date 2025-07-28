@@ -291,6 +291,7 @@ abstract class BaseIndexObject
 			}
 		}
 		
+		KalturaLog::debug("hasSphinxDedicatedPartnerIndex for partner ID [$partnerId] and index object name [$IndexObjectName] - result: " . ($hasDedicatedIndex ? 'true' : 'false'));
 		return $hasDedicatedIndex;
 	}
 }
