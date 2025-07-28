@@ -502,15 +502,9 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$calcSphinxSplitIndex = kConf::get('dynamic_split_index_calculation', 'runtime_config', null);
 		if($calcSphinxSplitIndex)
 		{
-			$tableNames = $this->getSphinxRtTables($sphinxConnection);
-			foreach ($tableNames as $key => &$tableName)
-			{
-				$tableName = preg_replace('/_[0-9]+/', '', $tableName);
-			}
-			
+			$indexSplitFactor = BaseIndexObject::getSplitIndexFactor($objectIndexClass::getObjectIndexName());
 			$indexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
-			$indexSplitFactor = array_count_values($tableNames);
-			if($indexSplitFactor[$indexName] > 1)
+			if($indexSplitFactor)
 			{
 				$hasDedicatedIndex = $objectIndexClass::hasSphinxDedicatedPartnerIndex($object->getPartnerId(), $objectIndexClass::getObjectIndexName());
 				if ($hasDedicatedIndex)
@@ -519,8 +513,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 				}
 				else
 				{
-					$splitFactor = BaseIndexObject::getSplitIndexFactor($objectIndexClass::getObjectIndexName()) ?? 1;
-					$indexId = abs(intval($object->getPartnerId() / 10)) % $splitFactor;
+					$indexId = abs(intval($object->getPartnerId() / 10)) % $indexSplitFactor;
 					$splitIndexName = $indexName . '_' . $indexId;
 				}
 			}
