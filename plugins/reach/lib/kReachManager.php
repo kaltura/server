@@ -90,7 +90,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 			//Pass the object Id as the context of the task
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
-			KalturaLog::log("ZZZZ {$vendorTaskObjectHandler->getTaskObjectType()}");
 			self::addEntryVendorTaskByObjectIds($taskObject, $vendorTaskObjectHandler->getTaskObjectType(), $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
 		}
 	}
