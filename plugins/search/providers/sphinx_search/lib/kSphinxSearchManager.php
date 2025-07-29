@@ -502,6 +502,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$calcSphinxSplitIndex = kConf::get('dynamic_split_index_calculation', 'runtime_config', null);
 		if($calcSphinxSplitIndex)
 		{
+			// TODO - we can replace all of the 'if' code below with this single line (which basically is what the function is getting already)
+			//$splitIndexName = $object->getSphinxIndexName();
 			$indexSplitFactor = BaseIndexObject::getSplitIndexFactor($objectIndexClass::getObjectIndexName());
 			$indexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
 			if($indexSplitFactor >= 1)
