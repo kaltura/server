@@ -115,5 +115,10 @@ class EntryHandler implements VendorTaskObjectHandler
 		$supportedType = $vendorCatalogItem->isEntryTypeSupported($object->getType(), $object->getMediaType());
 		return !$vendorCatalogItem->isEntryDurationExceeding($object) && $supportedType;
 	}
+
+	public static function getTaskObjectType()
+	{
+		return EntryObjectType::ENTRY;
+	}
   
 }
