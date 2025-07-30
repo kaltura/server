@@ -106,7 +106,7 @@ class MarkdownPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 	 */
 	public static function isAllowedPartner($partnerId)
 	{
-		$partner = PartnerPeer::retrieveByPK($partnerId);
-		return $partner->getPluginEnabled(self::PLUGIN_NAME);
+		# This plugin depends on attachment plugin
+		return AttachmentPlugin::isAllowedPartner($partnerId);
 	}
 }
