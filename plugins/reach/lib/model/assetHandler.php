@@ -77,5 +77,10 @@ class AssetHandler implements VendorTaskObjectHandler
 	{
 		return $vendorCatalogItem->isAssetSupported($object);
 	}
+
+	public static function getTaskObjectType()
+	{
+		return EntryObjectType::ASSET;
+	}
 }
 

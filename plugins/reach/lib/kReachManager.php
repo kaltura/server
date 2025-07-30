@@ -90,7 +90,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 			//Pass the object Id as the context of the task
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
-			self::addEntryVendorTaskByObjectIds($taskObject, $entryObjectType, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
+			self::addEntryVendorTaskByObjectIds($taskObject, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
 		}
 	}
 
@@ -750,11 +750,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds($entryObject, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, VendorTaskObjectHandler $vendorTaskObjectHandler, $context = null, $taskJobData = null)
+	public static function addEntryVendorTaskByObjectIds($entryObject, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, VendorTaskObjectHandler $vendorTaskObjectHandler, $context = null, $taskJobData = null)
 	{
 		$entryId = $entryObject->getId();
 		$partnerId = $entryObject->getPartnerId();
 		$vendorCatalogItemId = $vendorCatalogItem->getId();
+		$entryObjectType = $vendorTaskObjectHandler->getTaskObjectType();
 
 		$targetVersion = $vendorCatalogItem->getTaskVersion($entryId, $entryObjectType);
 		if ($vendorCatalogItem->isDuplicateTask($entryId, $entryObjectType, $partnerId))
