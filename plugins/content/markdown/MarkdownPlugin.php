@@ -4,7 +4,7 @@
  * @package plugins.markdown
  */
 
-class MarkdownPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaObjectLoader, IKalturaPending, IKalturaTypeExtender, IKalturaEventConsumers
+class MarkdownPlugin extends KalturaPlugin implements IKalturaEnumerator, IKalturaPermissions, IKalturaObjectLoader, IKalturaPending, IKalturaTypeExtender, IKalturaEventConsumers
 {
 	const PLUGIN_NAME = 'markdown';
 	const MARKDOWN_FLOW_MANAGER_CLASS = 'kMarkdownFlowManager';
@@ -99,5 +99,14 @@ class MarkdownPlugin extends KalturaPlugin implements IKalturaEnumerator, IKaltu
 		return array(
 			self::MARKDOWN_FLOW_MANAGER_CLASS,
 		);
+	}
+
+	/* (non-PHPdoc)
+	 * @see IKalturaPermissions::isAllowedPartner()
+	 */
+	public static function isAllowedPartner($partnerId)
+	{
+		# This plugin depends on attachment plugin
+		return AttachmentPlugin::isAllowedPartner($partnerId);
 	}
 }
