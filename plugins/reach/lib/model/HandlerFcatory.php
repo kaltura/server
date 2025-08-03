@@ -23,7 +23,7 @@ class HandlerFactory {
 	 */
 	public static function getHandlerByObject($object): VendorTaskObjectHandler
 	{
-		$objectType = $object instanceof asset ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
+		$objectType = $object instanceof AttachmentAsset ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
 		return HandlerFactory::getHandler($objectType);
 	}
 }
