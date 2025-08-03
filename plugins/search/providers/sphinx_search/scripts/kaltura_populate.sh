@@ -27,9 +27,10 @@ echo `date`
 SCRIPTDIR=$APP_DIR/plugins/search/providers/sphinx_search/scripts
 
 SCRIPTEXE=populateFromLog.php
+SCRIPT_ENABLE_DISABLE=setSphinxLogServerPopulateActive.php
 
 if [ $# -ne 1 ]; then
-	echo "Usage: $0 [start|stop|restart|status|forcestart]"
+	echo "Usage: $0 [start|stop|restart|status|forcestart|enable|disable]"
 	exit 1 	
 fi
 
@@ -135,6 +136,34 @@ stop() {
 	return $RC
 }
 
+enable() {
+	echo "Enabling sphinx_log processing"
+	echo "$PHP_BIN ${SCRIPTDIR}/${SCRIPT_ENABLE_DISABLE} 1 >> $LOG_DIR/kaltura_populate_enabled_disabled.log 2>&1 &"
+	cd $SCRIPTDIR
+	su $OS_KALTURA_USER -c "$PHP_BIN $SCRIPT_ENABLE_DISABLE 1 >> $LOG_DIR/kaltura_populate_enabled_disabled.log 2>&1 &"
+	if [ "$?" -eq 0 ]; then
+		echo_success
+		echo
+	else
+		echo_failure
+		echo
+	fi
+}
+
+disable() {
+	echo "Disabling sphinx_log processing"
+	echo "$PHP_BIN ${SCRIPTDIR}/${SCRIPT_ENABLE_DISABLE} 0 >> $LOG_DIR/kaltura_populate_enabled_disabled.log 2>&1 &"
+	cd $SCRIPTDIR
+	su $OS_KALTURA_USER -c "$PHP_BIN $SCRIPT_ENABLE_DISABLE 0 >> $LOG_DIR/kaltura_populate_enabled_disabled.log 2>&1 &"
+	if [ "$?" -eq 0 ]; then
+		echo_success
+		echo
+	else
+		echo_failure
+		echo
+	fi
+}
+
 case "$1" in
 	start)
 		start
@@ -154,8 +183,14 @@ case "$1" in
 		echo "Running in force start mode!!!"
 		start
 		;;
+	enable)
+		enable
+		;;
+	disable)
+		disable
+		;;
 	*)
-		echo "Usage: [start|stop|restart|status|forcestart]"
+		echo "Usage: [start|stop|restart|status|forcestart|enable|disable]"
 		exit 0
 		;;
 esac

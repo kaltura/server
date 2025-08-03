@@ -43,6 +43,7 @@ class SphinxLogServerTableMap extends TableMap {
 		$this->addForeignKey('LAST_LOG_ID', 'LastLogId', 'INTEGER', 'sphinx_log', 'ID', false, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+		$this->addColumn('POPULATE_ACTIVE', 'PopulateActive', 'TINYINT', false, null, 1);
 		// validators
 	} // initialize()
 

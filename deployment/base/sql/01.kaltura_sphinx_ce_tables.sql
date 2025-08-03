@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS `sphinx_log_server` (
   `last_log_id` bigint(20) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `populate_active` tinyint DEFAULT 1,
   PRIMARY KEY (`id`),
   KEY `sphinx_log_server_FI_1` (`last_log_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;

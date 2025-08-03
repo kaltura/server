@@ -21,18 +21,13 @@
 		</index>
 	</table>
 	<table skipSql="false" abstract="false" name="sphinx_log_server" raiseEvents="false">
-		<column lazyLoad="false" name="id" type="integer" autoIncrement="true"
-			required="true" primaryKey="true" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="server" type="varchar" size="63" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="dc" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="last_log_id" type="integer" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="created_at" type="timestamp" />
-		<column primaryKey="false" required="false" autoIncrement="false"
-			lazyLoad="false" name="updated_at" type="timestamp" />
+		<column lazyLoad="false" name="id" type="integer" autoIncrement="true" required="true" primaryKey="true" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="server" type="varchar" size="63" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="dc" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="last_log_id" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="created_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="updated_at" type="timestamp" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="populate_active" type="tinyint" default="1" />
 		<foreign-key onDelete="none" onUpdate="none" foreignTable="sphinx_log">
 			<reference local="last_log_id" foreign="id" />
 		</foreign-key>
