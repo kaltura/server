@@ -12,6 +12,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	const HAS_NO_VALUE = 'HASNOVALUE';
 	
 	const CACHE_PREFIX = 'executed_sphinx_server_';
+	
+	const SPHINX_DEDICATED_INDEX = "dedicated";
 
 	const MAX_SIZE_FOR_PLUGIN_SEARCH_DATA = 800000; // 1MB * 0.8. In bytes
 	
@@ -502,22 +504,24 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 		$calcSphinxSplitIndex = kConf::get('dynamic_split_index_calculation', 'runtime_config', null);
 		if($calcSphinxSplitIndex)
 		{
-			// TODO - we can replace all of the 'if' code below with this single line (which basically is what the function is getting already)
-			//$splitIndexName = $object->getSphinxIndexName();
-			$indexSplitFactor = BaseIndexObject::getSplitIndexFactor($objectIndexClass::getObjectIndexName());
-			$indexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
-			if($indexSplitFactor >= 1)
+			$tableNames = $this->getSphinxRtTables($sphinxConnection);
+			foreach ($tableNames as $key => &$tableName)
 			{
-				$hasDedicatedIndex = $objectIndexClass::hasSphinxDedicatedPartnerIndex($object->getPartnerId(), $objectIndexClass::getObjectIndexName());
-				if ($hasDedicatedIndex)
-				{
-					$splitIndexName = $indexName . '_' . $object->getPartnerId();
-				}
-				else
-				{
-					$indexId = abs(intval($object->getPartnerId() / 10)) % $indexSplitFactor;
-					$splitIndexName = $indexName . '_' . $indexId;
-				}
+				$tableName = preg_replace('/_[0-9]+/', '', $tableName);
+			}
+			
+			$indexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
+			$dedicatedIndexName = $indexName . '_' . kSphinxSearchManager::SPHINX_DEDICATED_INDEX;
+			$indexSplitFactor = array_count_values($tableNames);
+			
+			if (isset($indexSplitFactor[$dedicatedIndexName]) && $objectIndexClass::hasSphinxDedicatedPartnerIndex($object->getPartnerId(), $objectIndexClass::getObjectIndexName()))
+			{
+				$splitIndexName = $dedicatedIndexName . '_' . $object->getPartnerId();
+			}
+			elseif ($indexSplitFactor[$indexName] >= 1)
+			{
+				$indexId = abs(intval($object->getPartnerId() / 10)) % $indexSplitFactor[$indexName];
+				$splitIndexName = $indexName . '_' . $indexId;
 			}
 		}
 		
