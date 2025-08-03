@@ -71,6 +71,7 @@ if(isset($dbConf['sphinx_split_index']) && $dbConf['sphinx_split_index']['enable
 }
 
 $dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinx_dynamic_config', array());
+$dedicated = kSphinxSearchManager::SPHINX_DEDICATED_INDEX;
 
 $limit = 1000; 	// The number of sphinxLog records we want to query
 $gap = 500;	// The gap from 'getLastLogId' we want to query
@@ -128,10 +129,9 @@ while(true)
 		$partnerId = $sphinxLog->getPartnerId();
 		
 		// Check if this partner has a dedicated index for this object type
-		$hasDedicatedIndex = hasSphinxDedicatedPartnerIndex($dedicatedPartnerIndexMap, $partnerId, $sphinxLog->getObjectType());
-		if ($isSharded && $hasDedicatedIndex)
+		if ($isSharded && strpos($sphinxLogIndexName, $dedicated) === false && hasSphinxDedicatedPartnerIndex($dedicatedPartnerIndexMap, $partnerId, $sphinxLog->getObjectType()))
 		{
-			$sphinxLogIndexName = preg_replace('/_[0-9]+$/', '', $sphinxLogIndexName) . '_' . $partnerId;
+			$sphinxLogIndexName = preg_replace('/_[0-9]+$/', '', $sphinxLogIndexName) . "_{$dedicated}_{$partnerId}";
 		}
 		
 		if($isSharded && preg_match('~[0-9]~', $sphinxLogIndexName) == 0 && $splitIndexSettings && isset($splitIndexSettings[$sphinxLog->getObjectType()]))
@@ -256,14 +256,13 @@ function getSphinxRtTables($sphinxCon)
 
 function hasSphinxDedicatedPartnerIndex($dedicatedPartnerIndexMap, $partnerId, $IndexObjectName): bool
 {
-	// Check if this partner has a dedicated index for this object type
-	$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
-	
 	if(!isset($dedicatedPartnerIndexMap[$partnerId]))
 	{
 		return false;
 	}
-
+	
+	// Check if this partner has a dedicated index for this object type
+	$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
 	$indices = array_map('trim', explode(',', $dedicatedPartnerIndexMap[$partnerId]));
 	$hasDedicatedIndex = in_array($indexName, $indices);
 	KalturaLog::debug("Dedicated index for partner ID [$partnerId] and index object name [$IndexObjectName] - res = " . ($hasDedicatedIndex ? 'true' : 'false'));
