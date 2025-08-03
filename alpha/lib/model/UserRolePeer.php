@@ -120,6 +120,18 @@ class UserRolePeer extends BaseUserRolePeer
 		UserRolePeer::setUseCriteriaFilter(true);
 		return $userRole;
 	}
+
+	public static function getByNamesAndPartnerId($roleNames, $partnerId)
+	{
+		$c = new Criteria();
+		$c->addAnd(UserRolePeer::PARTNER_ID, array_map('strval',  array($partnerId, PartnerPeer::GLOBAL_PARTNER)), Criteria::IN);
+		$c->addAnd(UserRolePeer::NAME, $roleNames, Criteria::IN);
+		$c->addAnd(UserRolePeer::STATUS, UserRoleStatus::DELETED, Criteria::NOT_EQUAL);
+		UserRolePeer::setUseCriteriaFilter(false);
+		$userRoles = UserRolePeer::doSelect($c);
+		UserRolePeer::setUseCriteriaFilter(true);
+		return $userRoles;
+	}
 	
 	public static function getCacheInvalidationKeys()
 	{
