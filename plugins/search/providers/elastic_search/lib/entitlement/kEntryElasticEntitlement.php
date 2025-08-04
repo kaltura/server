@@ -135,7 +135,7 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
         }
 
         $filteredCategoriesByEntryIds = self::getCategoryIdsForEntryIds($filteredEntryIds);
-        $filteredCategoryIds = array_unique(array_merge($filteredCategoryIds, $filteredCategoriesByEntryIds));
+        $filteredCategoryIds = array_values(array_unique(array_merge($filteredCategoryIds, $filteredCategoriesByEntryIds)));
         self::$filteredCategoryIds = $filteredCategoryIds;
     }
 

@@ -11,6 +11,7 @@ class ESearchQueryFromAdvancedSearch
 	const ADVANCED_SEARCH_FILTER_CONDITION = 'AdvancedSearchFilterCondition';
 	const ENTRY_CAPTION_ADVANCED_FILTER = 'kEntryCaptionAdvancedFilter';
 	const QUIZ_ADVANCED_FILTER = 'kQuizAdvancedFilter';
+	const ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION = 'AdvancedSearchFilterComparableAttributeCondition';
 	const MRP_DATA_FIELD = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 	const ENCLOSED_WITH_DOUBLE_QUOTATION_MARK_REGEX =  '/(\"){1}[^\"]+(\"){1}/';
 
@@ -43,6 +44,8 @@ class ESearchQueryFromAdvancedSearch
 			case self::ADVANCED_SEARCH_FILTER_CONDITION:
 			case self::ADVANCED_SEARCH_FILTER_MATCH_CONDITION:
 				return $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem);
+			case self::ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION:
+				return $this->createESearchQueryFromSearchFilterCompareCondition($advancedSearchFilterItem);
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
 				return null;
@@ -63,6 +66,19 @@ class ESearchQueryFromAdvancedSearch
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . $type);
 				throw new kCoreException(kESearchException::MISSING_OPERATOR_TYPE);
 		}
+	}
+
+	/**
+	 * @param AdvancedSearchFilterComparableAttributeCondition $advancedSearchFilterItem
+	 * @return ESearchAdvancedSearchItem
+	 */
+	protected function createESearchQueryFromSearchFilterCompareCondition($advancedSearchFilterItem){
+		$eSearchAdvancedSearchItem = new ESearchAdvancedSearchItem();
+		$eSearchAdvancedSearchItem->setValue($advancedSearchFilterItem->getValue());
+		$eSearchAdvancedSearchItem->setFieldName($advancedSearchFilterItem->getField());
+		$eSearchAdvancedSearchItem->setItemType(ESearchItemType::RANGE);
+		$eSearchAdvancedSearchItem->handleComparisonType($advancedSearchFilterItem);
+		return $eSearchAdvancedSearchItem;
 	}
 
 	protected function createESearchQueryFromSearchFilterOperator(AdvancedSearchFilterOperator $operator)
@@ -247,6 +263,7 @@ class ESearchQueryFromAdvancedSearch
 			case self::ADVANCED_SEARCH_FILTER_CONDITION:
 			case self::ENTRY_CAPTION_ADVANCED_FILTER:
 			case self::QUIZ_ADVANCED_FILTER:
+			case self::ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION:
 				return true;
 			default:
 				return false;

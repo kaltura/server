@@ -386,27 +386,6 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array_map("trim", explode(',', $adminTagsToExclude));
 	}
 
-	public function isFeatureTypeSupportedForEntry($entryObject, $entryObjectType)
-	{
-		if(!$entryObjectType)
-		{
-			$entryObjectType = EntryObjectType::ENTRY;
-		}
-
-		switch ($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				$supportedType = $this->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType());
-				return !$this->isEntryDurationExceeding($entryObject) && $supportedType;
-
-			case EntryObjectType::ASSET:
-				return $this->isAssetSupported($entryObject);
-
-			default:
-				return false;
-		}
-	}
-
 	public function isEntryDurationExceeding(entry $entry)
 	{
 		return false;

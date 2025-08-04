@@ -39,9 +39,9 @@ class EntryVendorTaskService extends KalturaBaseService
 	public function addAction(KalturaEntryVendorTask $entryVendorTask)
 	{
 		$entryVendorTask->validateForInsert();
-
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryVendorTask->entryObjectType);
 		$entryId = $entryVendorTask->entryId;
-		$entryObject = kReachUtils::retrieveEntryObject($entryVendorTask->entryObjectType, $entryId);
+		$entryObject = $vendorTaskObjectHandler->retrieveObject($entryId);
 		if (!$entryObject)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
@@ -58,7 +58,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$entryVendorTask->reachProfileId = $dbReachProfile->getId();
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
 
-		if (!$dbVendorCatalogItem->isFeatureTypeSupportedForEntry($entryObject, $entryVendorTask->entryObjectType))
+		if (!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($entryObject, $dbVendorCatalogItem))
 		{
 			$featureType = $dbVendorCatalogItem->getServiceFeature();
 			throw new KalturaAPIException(KalturaReachErrors::FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY, $featureType, $entryId);

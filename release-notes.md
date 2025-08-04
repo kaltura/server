@@ -1,3 +1,31 @@
+# Venus-22.0.0
+## Add activeLiveEventTime info to get playback context
+- Issue Type: Feature
+- Issue ID: PLAT-25383
+
+### Configuration ###
+None.
+
+### Deployment Scripts ###
+None
+
+### Known Issues & Limitations ###
+    The api is called without a widget KS to exploit CDN cache
+
+## Add ANALYTICS_BASE permission to WEBCAST_PRODUCER_DEVICE_ROLE
+- Issue Type: Task
+- Issue ID: KME-2830
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_07_22_update_webcast_producer_role.php
+
+## Add permissions for Agents Manager ##
+- Issue Type: Task
+- Issue ID: KAM-61
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_07_23_add_agents_manager_permissions.php
+
 # Ursa-21.20.0
 ## Add ability to search Kaltura user by Zoom external ID
 - Issue Type: Task
