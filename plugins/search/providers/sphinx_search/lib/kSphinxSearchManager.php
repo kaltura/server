@@ -518,7 +518,7 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			{
 				$splitIndexName = $dedicatedIndexName . '_' . $object->getPartnerId();
 			}
-			elseif ($indexSplitFactor[$indexName] >= 1)
+			elseif ($indexSplitFactor[$indexName] > 1)
 			{
 				$indexId = abs(intval($object->getPartnerId() / 10)) % $indexSplitFactor[$indexName];
 				$splitIndexName = $indexName . '_' . $indexId;
