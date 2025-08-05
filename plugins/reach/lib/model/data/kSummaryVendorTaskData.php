@@ -9,7 +9,7 @@ class kSummaryVendorTaskData extends kLocalizedVendorTaskData
 	protected $typeOfSummary;
 	protected $writingStyle;
 	protected $summaryOutputJson = null;
-	protected $instruction = null; // Added property
+	protected $instruction = null;
 
 	public function __construct()
 	{
