@@ -28,10 +28,18 @@ class KalturaSummaryVendorTaskData extends KalturaLocalizedVendorTaskData
 	 */
 	public $summaryOutputJson;
 
+	/**
+	 * Additional instruction for the summary.
+	 * @insertonly
+	 * @var string
+	 */
+	public $instruction;
+
 	private static $map_between_objects = array(
 		'typeOfSummary',
 		'writingStyle',
 		'summaryOutputJson',
+		'instruction',
 	);
 
 	public function getMapBetweenObjects()
