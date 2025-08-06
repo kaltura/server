@@ -515,7 +515,7 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 	{
 		foreach($streams as $stream)
 		{
-			if ($stream->getCodec() == flavorParams::VIDEO_CODEC_H265 || str_contains($stream->getCodec(), 'hvc1'))
+			if ($stream->getCodec() == flavorParams::VIDEO_CODEC_H265 || str_contains($stream->getCodec(), flavorParams::VIDEO_CODEC_HVC1))
 			{
 				return true;
 			}
