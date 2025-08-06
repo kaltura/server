@@ -519,9 +519,6 @@ abstract class DeliveryProfileLive extends DeliveryProfile {
 			{
 				return true;
 			}
-			{
-				return true;
-			}
 		}
 		return false;
 	}
