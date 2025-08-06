@@ -46,14 +46,14 @@ class kPlaybackContextDataHelper
 	 * @param entry $dbEntry
 	 * @throws kCoreException
 	 */
-	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry)
+	public function constructPlaybackContextResult(kContextDataHelper $contextDataHelper, entry $dbEntry, $isWidgetSession = false)
 	{
 		$this->playbackContext = new kPlaybackContext();
 		$this->storageIds = kDataCenterMgr::getSharedStorageProfileIds($dbEntry->getPartnerId());
 
 		$this->generateRestrictedMessages($contextDataHelper);
 
-		if ($this->hasBlockAction($contextDataHelper))
+		if ($this->hasBlockAction($contextDataHelper, $isWidgetSession))
 			return;
 
 		$this->getRelevantFlavorAssets($contextDataHelper);
@@ -93,7 +93,7 @@ class kPlaybackContextDataHelper
 	 * @param kContextDataHelper $contextDataHelper
 	 * @return boolean
 	 */
-	private function hasBlockAction(kContextDataHelper $contextDataHelper)
+	private function hasBlockAction(kContextDataHelper $contextDataHelper, $isWidgetSession = false)
 	{
 		$actions = $contextDataHelper->getContextDataResult()->getActions();
 
@@ -104,6 +104,11 @@ class kPlaybackContextDataHelper
 			{
 				return true;
 			}
+		}
+
+		if ($isWidgetSession && !$this->isScheduledNow)
+		{
+			return true; // Widget sessions are not allowed to play scheduled entries out side of the scheduled time
 		}
 		return false;
 	}

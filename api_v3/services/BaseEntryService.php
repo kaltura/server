@@ -1040,8 +1040,7 @@ class BaseEntryService extends KalturaEntryService
 			KalturaResponseCacher::disableCache();
 
 		$isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		if (!($isScheduledNow) && $this->getKs() ){
-			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
+		if (!($isScheduledNow) && $this->getKs() && !$this->getKs()->isWidgetSession()){
 			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
 				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
 				$isScheduledNow = true;
@@ -1053,7 +1052,7 @@ class BaseEntryService extends KalturaEntryService
 
 		$playbackContextDataHelper = new kPlaybackContextDataHelper();
 		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
-		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry);
+		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry, $this->getKs()->isWidgetSession());
 
 		$result = new KalturaPlaybackContext();
 		$result->fromObject($playbackContextDataHelper->getPlaybackContext());
