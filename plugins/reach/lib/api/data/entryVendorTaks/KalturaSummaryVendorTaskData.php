@@ -25,6 +25,7 @@ class KalturaSummaryVendorTaskData extends KalturaLocalizedVendorTaskData
 	 * JSON string containing the summary output.
 	 *
 	 * @var string
+	 * @deprecated Please use outputJson instead.
 	 */
 	public $summaryOutputJson;
 
