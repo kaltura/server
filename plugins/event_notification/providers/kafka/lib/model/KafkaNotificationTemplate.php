@@ -120,7 +120,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			$found = false;
 			foreach($requiredPermissions as $requiredPermission)
 			{
-				$found = PermissionPeer::isValidForPartner($requiredPermission, kCurrentContext::getCurrentPartnerId());
+				$found = PermissionPeer::isValidForPartner($requiredPermission, $scope->getPartnerId());
 				if($found)
 				{
 					break;
