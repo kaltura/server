@@ -18,6 +18,20 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 				$object->secureHashingAlgo = $properties['secureHashingAlgo'];
 			}
 
+			if (isset($properties['customHeaders']) && $properties['customHeaders'])
+			{
+				$object->customHeaders = [];
+				$headersStr = explode(',', $properties['customHeaders']);
+				foreach ($headersStr as $headerStr)
+				{
+					list ($key, $value) = explode(':', $headerStr);
+					$keyValuePair = new Kaltura_Client_Type_KeyValue();
+					$keyValuePair->key = $key;
+					$keyValuePair->value = $value;
+					$object->customHeaders[] = $keyValuePair;
+				}
+			}
+
 			if(!isset($properties['dataType']) || !$properties['dataType'])
 				return $object;
 			
@@ -58,7 +72,17 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			return;
 
 		$this->getElement('secureHashingAlgo')->setValue($object->secureHashingAlgo);
-		
+
+		if (count($object->customHeaders))
+		{
+			$headerStrArr = [];
+			foreach ($object->customHeaders as $header)
+			{
+				$headerStrArr[] = $header->key . ':' . $header->value;
+			}
+			$this->getElement('customHeaders')->setValue(implode(',', $headerStrArr));
+		}
+
 		if(!$object->data)
 			return;
 			
@@ -116,7 +140,25 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
-		
+
+		$this->addElement('select', 'method', array(
+			'label'			=> 'Method:',
+			'filters'		=> array('StringTrim'),
+			'multiOptions' 	=> array(
+				Kaltura_Client_HttpNotification_Enum_HttpNotificationMethod::POST => 'POST',
+				Kaltura_Client_HttpNotification_Enum_HttpNotificationMethod::GET => 'GET',
+				Kaltura_Client_HttpNotification_Enum_HttpNotificationMethod::PUT => 'PUT',
+				Kaltura_Client_HttpNotification_Enum_HttpNotificationMethod::DELETE => 'DELETE',
+			),
+		));
+
+		$this->addElement('textarea', "customHeaders", array(
+			'label' 		=> "Custom Headers (Array: enter item comma separated. for key-value insert: key:value)",
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
+		));
+
 		$this->addElement('select', 'dataType', array(
 			'label'			=> 'Data Type:',
 			'filters'		=> array('StringTrim'),
@@ -169,4 +211,6 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmFreeText'))),
 		));
 	}
+
+
 }
