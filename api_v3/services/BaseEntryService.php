@@ -1058,13 +1058,33 @@ class BaseEntryService extends KalturaEntryService
 		$result->fromObject($playbackContextDataHelper->getPlaybackContext());
 		$result->actions = KalturaRuleActionArray::fromDbArray($contextDataHelper->getContextDataResult()->getActions());
 
+		$activeLiveStreamTime = $this->getActiveLiveStreamTime($dbEntry, $simuliveEvent);
+		if($activeLiveStreamTime)
+		{
+			$result->activeLiveStreamTime = $activeLiveStreamTime;
+		}
+		return $result;
+	}
+
+	private function getActiveLiveStreamTime($dbEntry, $simuliveEvent)
+	{
+		$activeLiveStreamTime = null;
 		if($simuliveEvent)
 		{
 			$activeLiveStreamTime = new KalturaActiveLiveStreamTime($simuliveEvent->getStartScreenTime(), $simuliveEvent->getCalculatedEndTime());
-			$result->activeLiveStreamTime = $activeLiveStreamTime;
 		}
-
-		return $result;
+		else if ($dbEntry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $dbEntry->getType() == entryType::LIVE_STREAM)
+		{
+			$startTime = time();
+			$endTime = $startTime + kSimuliveUtils::SIMULIVE_SCHEDULE_MARGIN;
+			$events = $dbEntry->getScheduleEvents($startTime, $endTime);
+			if (count($events) > 0)
+			{
+				$event = $events[0];
+				$activeLiveStreamTime = new KalturaActiveLiveStreamTime($event->getStartScreenTime(), $event->getCalculatedEndTime());
+			}
+		}
+		return $activeLiveStreamTime;
 	}
 	
 	/**
