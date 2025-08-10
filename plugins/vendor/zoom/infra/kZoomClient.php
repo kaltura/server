@@ -241,19 +241,40 @@ class kZoomClient extends kVendorClient
 			"authorization: Bearer {$token}",
 			"content-type: application/json"
 		));
-		$response = $curlWrapper->exec($url);
-		$httpCode = $curlWrapper->getHttpCode();
-		$this->handleCurlResponse($response, $httpCode, $curlWrapper);
+
+		$maxRetries = 3; // Maximum number of retries
+		$retryDelay = 1; // Delay in seconds between retries
+		$attempt = 0;
+		$response = null;
+
+		do
+		{
+			$attempt++;
+			$response = $curlWrapper->exec($url);
+			$httpCode = $curlWrapper->getHttpCode();
+			$this->handleCurlResponse($response, $httpCode, $curlWrapper);
+
+			if ($response)
+			{
+				break; // Exit loop if response is successful
+			}
+
+			KalturaLog::debug("Zoom API call failed on attempt {$attempt}. Retrying...");
+			sleep($retryDelay); // Wait before retrying
+		}
+		while (!$response && $attempt < $maxRetries);
+
 		if (!$response)
 		{
 			$data = $curlWrapper->getErrorMsg();
-			KalturaLog::debug('Zoom API call failed: ' . $data);
+			KalturaLog::debug('Zoom API call failed after maximum retries: ' . $data);
 		}
 		else
 		{
 			$data = json_decode($response, true);
 			KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
 		}
+
 		return $data;
 	}
 

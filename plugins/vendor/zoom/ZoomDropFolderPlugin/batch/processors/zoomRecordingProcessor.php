@@ -52,6 +52,10 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 		{
 			$hostEmail = $zoomUser[self::EMAIL];
 		}
+		else
+		{
+			KalturaLog::warning("Zoom user with hostId [{$hostId}] was not found. Owner id will be determined by the policy set in the Integration Settings");
+		}
 
 		$ownerId = ZoomBatchUtils::getEntryOwnerId($hostEmail, $this->dropFolder->partnerId, $this->dropFolder->zoomVendorIntegration, $this->zoomClient); //returned zoom user after string processing
 		$validatedHosts = $this->getValidatedHosts($recording->meetingMetadata->meetingId, $ownerId);

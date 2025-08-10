@@ -53,6 +53,11 @@ class ZoomBatchUtils
 		{
 			$hostEmail = $zoomUser[self::EMAIL];
 		}
+		else
+		{
+			KalturaLog::warning("Zoom user with hostId [{$hostId}] was not found. Owner id will be determined by the policy set in the Integration Settings");
+		}
+
 		return self::getEntryOwnerId($hostEmail, $partnerId, $zoomVendorIntegration, $zoomClient);
 	}
 
@@ -194,6 +199,10 @@ class ZoomBatchUtils
 				if(isset($zoomUser[self::CMS_USER_FIELD]) && !empty($zoomUser[self::CMS_USER_FIELD]))
 				{
 					$result = $zoomUser[self::CMS_USER_FIELD];
+				}
+				else
+				{
+					KalturaLog::warning("Zoom user [{$userName}] was not matched with CMS. Owner id will be determined by the policy set in the Integration Settings");
 				}
 				break;
 			case kZoomUsersMatching::DO_NOT_MODIFY:
