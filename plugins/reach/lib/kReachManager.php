@@ -50,7 +50,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		//If both the entry and reach profile don't exist, there's no need to hit the loop
 
-		$vendorTaskObjectHandler = HandlerFactory::getHandlerByObject($object);
+		$vendorTaskObjectHandler = HandlerFactory::getHandlerById($entryId, $object);
 		$taskObject = $vendorTaskObjectHandler->retrieveObject($entryId);
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
 		if(!$taskObject || !$reachProfile)
