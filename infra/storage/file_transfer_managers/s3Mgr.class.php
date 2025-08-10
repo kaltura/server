@@ -273,8 +273,9 @@ class s3Mgr extends kFileTransferMgr
 				$options
 			);
 			
-			if($fp)
+			if(is_resource($fp) && get_resource_type($fp) === 'stream')
 			{
+				KalturaLog::debug("Closing file pointer for file: " . $local_file);
 				fclose($fp);
 			}
 
