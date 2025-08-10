@@ -20,6 +20,8 @@ class kZoomClient extends kVendorClient
 	const API_LIST_RECORDING = '/v2/accounts/@accountId@/recordings';
 	const API_GET_MEETING_RECORDING = '/v2/meetings/@meetingId@/recordings';
 	const API_GET_MEETING = '/v2/meetings/@meetingId@';
+	const MAX_RETRIES = 3;
+	const RETRY_DELAY = 1;
 
 	protected $accountId;
 	protected $zoomAuthType;
@@ -242,8 +244,8 @@ class kZoomClient extends kVendorClient
 			"content-type: application/json"
 		));
 
-		$maxRetries = 3; // Maximum number of retries
-		$retryDelay = 1; // Delay in seconds between retries
+		$maxRetries = self::MAX_RETRIES;; // Maximum number of retries
+		$retryDelay = self::RETRY_DELAY; // Delay in seconds between retries
 		$attempt = 0;
 		$response = null;
 
