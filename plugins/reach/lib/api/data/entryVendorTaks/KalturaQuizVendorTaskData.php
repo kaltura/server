@@ -46,6 +46,7 @@ class KalturaQuizVendorTaskData extends KalturaLocalizedVendorTaskData
 	 * Quiz entry Id
 	 *
 	 * @var string
+	 * @deprecated please use outputJson instead.
 	 */
 	public $quizOutput;
 
