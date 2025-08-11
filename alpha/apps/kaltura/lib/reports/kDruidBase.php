@@ -85,7 +85,9 @@ class kDruidBase
 	const DRUID_TIME_FORMAT = 'timeFormat';
 	const DRUID_UNION = 'union';
 	const DRUID_PATTERN = 'pattern';
-	
+	const DRUID_LONG_MAX_AGGR = 'longMax';
+	const DRUID_BY_ROW = 'byRow';
+
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
 	const DRUID_EVENT = 'event';
@@ -310,6 +312,15 @@ class kDruidBase
 			self::DRUID_TYPE => self::DRUID_DOUBLE_LEAST,
 			self::DRUID_NAME => $name,
 			self::DRUID_FIELDS => $fields
+		);
+	}
+
+	protected static function getLongMaxAggregator($name, $fieldName)
+	{
+		return array(
+			self::DRUID_TYPE => self::DRUID_LONG_MAX_AGGR,
+			self::DRUID_NAME => $name,
+			self::DRUID_FIELD_NAME => $fieldName
 		);
 	}
 
