@@ -10,8 +10,21 @@ if($argc > 1 && is_numeric($argv[1]))
 	$c->add(categoryKuserPeer::UPDATED_AT, $argv[1], Criteria::GREATER_EQUAL);
 if($argc > 2 && is_numeric($argv[2]))
 	$c->add(categoryKuserPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
-if($argc > 3 && is_numeric($argv[3]))
-	$c->add(categoryKuserPeer::ID, $argv[3], Criteria::GREATER_EQUAL);
+if($argc > 3)
+{
+	if(is_numeric($argv[3]))
+	{
+		$c->add(categoryKuserPeer::ID, $argv[3], Criteria::GREATER_EQUAL);
+	}
+	elseif(strpos($argv[3], '-') !== false) 
+	{
+		list($minId, $maxId) = explode('-', $argv[3], 2);
+		if(is_numeric($minId) && is_numeric($maxId)) {
+			$c->add(categoryKuserPeer::ID, $minId, Criteria::GREATER_EQUAL);
+			$c->addAnd(categoryKuserPeer::ID, $maxId, Criteria::LESS_THAN);
+		}
+	}
+}
 if($argc > 4)
 	categoryKuserPeer::setUseCriteriaFilter((bool)$argv[4]);
 

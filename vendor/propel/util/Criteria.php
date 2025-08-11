@@ -818,7 +818,7 @@ class Criteria implements IteratorAggregate {
 	/**
 	 * Get offset.
 	 *
-	 * @return     An int with the value for offset.
+	 * @return     int An int with the value for offset.
 	 */
 	public function getOffset()
 	{
