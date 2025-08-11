@@ -1267,7 +1267,7 @@ HTML;
 			return false;
 		}
 		
-		if($playlistEntry->getMediaType() == PlaylistType::STATIC_LIST || $playlistEntry->getMediaType() == PlaylistType::PATH )
+		if($playlistEntry->getMediaType() == PlaylistType::STATIC_LIST || $playlistEntry->getMediaType() == PlaylistType::PATH)
 		{
 			// assume static playlist
 			$static_playlist_str = $playlistEntry->getDataContent();
@@ -1282,6 +1282,22 @@ HTML;
 			foreach ($playlistEntries as $entry)
 			{
 				if($entry->getRedirectEntryId() == $entryId)
+				{
+					return true;
+				}
+			}
+		}
+		elseif ($playlistEntry->getMediaType() == PlaylistType::DYNAMIC)
+		{
+			$playListService = new PlaylistService();
+			$playListEntries = $playListService->executeAction($playlistEntry->getId())->toArray();
+			foreach ($playListEntries as $entry)
+			{
+				if($entry->id === $entryId)
+				{
+					return true;
+				}
+				if($entry->redirectEntryId == $entryId)
 				{
 					return true;
 				}
