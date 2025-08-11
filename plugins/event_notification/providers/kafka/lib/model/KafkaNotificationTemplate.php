@@ -113,6 +113,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			return;
 		}
 
+		$partnerId = $scope->getPartnerId();
 		$requiredPermissions = explode(",", $this->getRequiresPermissions());
 		if(count(array_filter($requiredPermissions, 'strlen')))
 		{
@@ -120,7 +121,7 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			$found = false;
 			foreach($requiredPermissions as $requiredPermission)
 			{
-				$found = PermissionPeer::isValidForPartner($requiredPermission, $scope->getPartnerId());
+				$found = PermissionPeer::isValidForPartner($requiredPermission, $partnerId);
 				if($found)
 				{
 					break;
@@ -192,7 +193,8 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			"eventType" => get_class($scope->getEvent()),
 			"objectType" => $apiObjectType,
 			"virtualEventId" => kCurrentContext::$virtual_event_id,
-			"partnerId" => kCurrentContext::getCurrentPartnerId(),
+			"currentPartnerId" => kCurrentContext::getCurrentPartnerId(),
+			"partnerId" => $partnerId,
 			"object" => $apiObject,
 			"modifiedColumns" => $modifiedColumns
 		);
