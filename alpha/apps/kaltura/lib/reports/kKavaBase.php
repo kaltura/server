@@ -90,6 +90,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_PLAYBACK_MODE = 'playbackMode';
 	const DIMENSION_COMPANY = 'company';
 	const DIMENSION_FLAVOR_ID = 'flavorId';
+	const DIMENSION_VIDEO_CODEC = 'videoCodec';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -675,6 +676,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_KUSER_ID => 1,
 			self::DIMENSION_MEDIA_TYPE => 1,
 			self::DIMENSION_SOURCE_TYPE => 1,
+			self::DIMENSION_VIDEO_CODEC => 1,
 		),
 		self::DATASOURCE_BANDWIDTH_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
@@ -696,6 +698,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_PLAYBACK_TYPE => 1,
 			self::DIMENSION_STATUS => 1,
 			self::DIMENSION_TYPE => 1,
+			self::DIMENSION_VIDEO_CODEC => 1,
 		),
 		self::DATASOURCE_TRANSCODING_USAGE => array(
 			self::DIMENSION_PARTNER_ID => 1,
@@ -707,6 +710,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_SOURCE_TYPE => 1,
 			self::DIMENSION_STATUS => 1,
 			self::DIMENSION_FLAVOR_PARAMS_ID => 1,
+			self::DIMENSION_VIDEO_CODEC => 1,
 		),
 		self::DATASOURCE_USER_LIFECYCLE => array(
 			self::DIMENSION_EVENT_TYPE => 1,
