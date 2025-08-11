@@ -193,8 +193,8 @@ class KafkaNotificationTemplate extends EventNotificationTemplate
 			"eventType" => get_class($scope->getEvent()),
 			"objectType" => $apiObjectType,
 			"virtualEventId" => kCurrentContext::$virtual_event_id,
-			"currentPartnerId" => kCurrentContext::getCurrentPartnerId(),
-			"partnerId" => $partnerId,
+			"scopePartnerId" => $partnerId,
+			"partnerId" => kCurrentContext::getCurrentPartnerId(),
 			"object" => $apiObject,
 			"modifiedColumns" => $modifiedColumns
 		);
