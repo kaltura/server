@@ -38,7 +38,7 @@ class CategoryService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORIES_LOCKED);
 
 		$this->validatePrivacyContexts($category);
-		$lockKey = "category_add_" . $this->getPartnerId();
+		$lockKey = "category_add_" . $this->getPartnerId(). "_" . md5($category->name); 
 		return kLock::runLocked($lockKey, array($this, 'addCategoryImpl'), array($category));
 
 	}
