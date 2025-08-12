@@ -76,7 +76,7 @@ class TvinciDistributionFeedEngine extends DistributionEngine implements
 		if (!$success) {
 			KalturaLog::err("Tvinci distribution action {$actionType} has failed with description: {$result->description} ".
 							"and status: {$result->status}");
-			throw new Exception("{$actionType} failed - reason {$result->description}");
+			throw new KalturaDistributionException("{$actionType} failed - reason {$result->description}");
 		}
 		return true;
 	}
