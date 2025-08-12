@@ -51,9 +51,11 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 				case 'text':
 					$stringField = new Kaltura_Client_Type_StringValue();
 					$stringField->value = $properties['freeText'];
+					$object->data->contentType = $properties['contentType'];
 					
 					$object->data = new Kaltura_Client_HttpNotification_Type_HttpNotificationDataText();
 					$object->data->content = $stringField;
+
 					break;
 			}
 		}
@@ -94,6 +96,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		{
 			$this->getElement('dataType')->setValue('text');
 			$this->getElement('freeText')->setValue($object->data->content->value);
+			$this->getElement('contentType')->setValue($object->data->contentType);
 		}
 		elseif($object->data instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationObjectData)
 		{
@@ -204,8 +207,14 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'label'			=> 'Text:',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('text', 'contentType', array(
+			'label'			=> 'Content Type:',
+			'filters'		=> array('StringTrim'),
+			'value'			=> 'application/json'
+		));
 			
-		$this->addDisplayGroup(array('freeText'), 
+		$this->addDisplayGroup(array('freeText', 'contentType'),
 			'frmFreeText', 
 			array(
 				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmFreeText'))),

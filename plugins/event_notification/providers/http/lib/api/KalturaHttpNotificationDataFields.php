@@ -7,12 +7,30 @@
 class KalturaHttpNotificationDataFields extends KalturaHttpNotificationData
 {
 	/**
+	 * @var string
+	 */
+	public $contentType;
+
+	/**
 	 * It's protected on purpose, used by getData
 	 * @see KalturaHttpNotificationDataFields::getData()
 	 * @var string
 	 */
 	protected $data;
-	
+
+	private static $map_between_objects = array
+	(
+		'contentType',
+	);
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::getMapBetweenObjects()
+	 */
+	public function getMapBetweenObjects ( )
+	{
+		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
@@ -42,5 +60,10 @@ class KalturaHttpNotificationDataFields extends KalturaHttpNotificationData
 	public function getData(kHttpNotificationDispatchJobData $jobData = null)
 	{
 		return $this->data;
+	}
+
+	public function getContentType() : string
+	{
+		return $this->contentType;
 	}
 }
