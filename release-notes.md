@@ -1,3 +1,10 @@
+# Venus-22.1.0
+## Add custom headers and content-type settings to HTTP notification template config
+- Issue Type: Task
+- Issue ID: PSVAMB-47872
+#### Deployment ####
+- Generate Clients
+
 # Venus-22.0.0
 ## Add activeLiveEventTime info to get playback context
 - Issue Type: Feature
