@@ -44,14 +44,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
+	private function addingEntryVendorTaskByObjectIds($taskObjectId, $vendorTaskObjectHandler,  $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
 	{
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
-
-		//If both the entry and reach profile don't exist, there's no need to hit the loop
-		$vendorTaskObjectHandler = HandlerFactory::getHandlerById($entryId, $object);
-		$taskObject = $vendorTaskObjectHandler->retrieveObject($entryId);
+		$taskObject = $vendorTaskObjectHandler->retrieveObject($taskObjectId);
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
+		//If both the entry and reach profile don't exist, there's no need to hit the loop
 		if(!$taskObject || !$reachProfile)
 		{
 			KalturaLog::log('Not all mandatory objects were found, tasks will not be added');
@@ -76,14 +74,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
 
-			if ($autoRule && $this->shouldSkipAutoRule($object, $entryId, $featureType))
+			if ($autoRule && $this->shouldSkipAutoRule($object, $taskObject->getEntryId(), $featureType))
 			{
 				continue;
 			}
 
 			if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
 			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $entryId");
+				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $taskObjectId");
 				continue;
 			}
 
@@ -123,11 +121,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$scope = $event->getScope();
 		$partnerId = $scope->getPartnerId();
 		$object = $scope->getObject();
-		$entryId = $object->getEntryId();
 		foreach (self::$booleanNotificationTemplatesFulfilled as $booleanNotificationTemplate)
 		{
 			$profileId = $booleanNotificationTemplate[self::PROFILE_ID];
 			$fullFieldCatalogItemIds = $booleanNotificationTemplate[self::ACTION][0]->getCatalogItemIds();
+			$taskObjectType = $booleanNotificationTemplate[self::ACTION][0]->getEntryObjectType();
 			$fullFieldCatalogItemIdsArr = array_map('trim', explode(',', $fullFieldCatalogItemIds));
 			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIdsArr, $partnerId);
 			if(!count($allowedCatalogItemIds))
@@ -135,7 +133,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . implode(',', $fullFieldCatalogItemIds) . ']');
 				continue;
 			}
-			$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object);
+			$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType, $object);
+			if(!$vendorTaskObjectHandler)
+			{
+				continue;
+			}
+			$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
+			$this->addingEntryVendorTaskByObjectIds($taskObjectId, $vendorTaskObjectHandler, $allowedCatalogItemIds, $profileId, $object);
 		}
 		return true;
 	}
@@ -907,9 +911,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
 	{
 		$scope = new kScope();
-		$vendorTaskObjectHandler = HandlerFactory::getHandlerByObject($object);
-		$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
-		$scope->setEntryId($taskObjectId);
+		$scope->setEntryId($object->getEntryId());
 		$this->initReachProfileForPartner($object->getPartnerId());
 		if (self::$reachProfilesFilteredThatIncludesRegularRules)
 		{
@@ -917,17 +919,26 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				/* @var $profile ReachProfile */
 				$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
-				if (!count($fullFieldCatalogItemIds))
+				foreach($fullFieldCatalogItemIds as $taskObjectType => $catalogItemIds)
 				{
-					continue;
+					if (!count($catalogItemIds))
+					{
+						continue;
+					}
+					$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($catalogItemIds, $object->getPartnerId());
+					if(!count($allowedCatalogItemIds))
+					{
+						KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $catalogItemIds) . "]");
+						continue;
+					}
+					$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType, $object);
+					if(!$vendorTaskObjectHandler)
+					{
+						continue;
+					}
+					$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
+					$this->addingEntryVendorTaskByObjectIds($taskObjectId, $vendorTaskObjectHandler, $allowedCatalogItemIds, $profile->getId(), $object, true);
 				}
-				$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $object->getPartnerId());
-				if(!count($allowedCatalogItemIds))
-				{
-					KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
-					continue;
-				}
-				$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object, true);
 			}
 		}
 		return true;

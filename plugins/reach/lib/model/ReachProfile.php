@@ -475,10 +475,11 @@ class ReachProfile extends BaseReachProfile
 	 */
 	public function fulfillsRules(kScope $scope, $checkEmptyRulesOnly = false)
 	{
-		$fullFilledCatalogItemIds = array();
+		$fullFilledEntryCatalogItemIds = array();
+		$fullFilledAssetCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
-			return $fullFilledCatalogItemIds;
-		
+			return [EntryObjectType::ENTRY => $fullFilledEntryCatalogItemIds, EntryObjectType::ASSET => $fullFilledAssetCatalogItemIds];
+
 		$context = new kContextDataResult();
 		foreach ($this->getRulesArray() as $rule)
 		{
@@ -531,8 +532,17 @@ class ReachProfile extends BaseReachProfile
 					/* @var $action kRuleAction */
 					if($action->getType() == ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 					{
-						/* $var $action kAddEntryVendorTaskAction */
-						$fullFilledCatalogItemIds = array_merge($fullFilledCatalogItemIds, explode(",", $action->getCatalogItemIds()));
+						switch ($action->getEntryObjectType())
+						{
+							case EntryObjectType::ENTRY:
+								/* $var $action kAddEntryVendorTaskAction */
+								$fullFilledEntryCatalogItemIds = array_merge($fullFilledEntryCatalogItemIds, explode(",", $action->getCatalogItemIds()));
+								break;
+							case EntryObjectType::ASSET:
+								/* $var $action kAddEntryVendorTaskAction */
+								$fullFilledAssetCatalogItemIds = array_merge($fullFilledAssetCatalogItemIds, explode(",", $action->getCatalogItemIds()));
+								break;
+						}
 					}
 				}
 			}
@@ -541,7 +551,7 @@ class ReachProfile extends BaseReachProfile
 				break;
 		}
 		
-		return $fullFilledCatalogItemIds;
+		return [EntryObjectType::ENTRY => $fullFilledEntryCatalogItemIds, EntryObjectType::ASSET => $fullFilledAssetCatalogItemIds];
 	}
 
 	/**
