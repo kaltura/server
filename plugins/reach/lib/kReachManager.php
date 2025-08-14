@@ -102,7 +102,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				KalturaLog::log("Skip the entry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
 				return true;
 			}
-			if ($object instanceof categoryEntry)
+			else
 			{
 				$entry = entryPeer::retrieveByPK($entryId);
 				if ($entry && $entry->getBlockAutoTranscript())
