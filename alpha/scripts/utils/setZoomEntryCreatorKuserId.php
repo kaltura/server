@@ -34,7 +34,7 @@ while (($row = fgetcsv($file)) !== false)
 	list($meetingId, $topic, $host, $email, $username, $startTime) = $row;
 
 	// Search for the entry by name (Topic column)
-	$entries = searchForEntryByName($topic);
+	$entries = searchForEntryByName($topic, $meetingId);
 	if (empty($entries) || !$entries[0]->getObject())
 	{
 		echo "---- Entry with name [$topic] not found" . PHP_EOL;
@@ -43,17 +43,17 @@ while (($row = fgetcsv($file)) !== false)
 	$entry = $entries[0]->getObject();
 
 	// Search for the user by Username (Puser ID)
-	$user = searchForUserByPuserId($username);
+	$user = searchForUserByPuserId($username, $email);
 	if (!$user)
 	{
 		echo "---- User with Puser ID [$username] not found" . PHP_EOL;
 		continue;
 	}
+	echo "---- User with Puser email [$email] and puser_id [$username]found" . PHP_EOL;
 
 	/* @var $entry entry */
 	$entry->setKuserId($user->getId());
-	$entry->setCreatorKuserId($user->getId());
-	$entry->setCreatorPuserId($username);
+	$entry->setPuserId($user->getPuserId());
 	$entry->save();
 	
 	kEventsManager::flushEvents();
@@ -65,13 +65,17 @@ fclose($file);
 echo "Done" . PHP_EOL;
 KalturaLog::debug('Done');
 
-function searchForEntryByName($entryName)
+function searchForEntryByName($entryName, $meetingId)
 {
-	$entryItem = new ESearchEntryItem();
-	$entryItem->setItemType(ESearchItemType::EXACT_MATCH);
-	$entryItem->setFieldName(ESearchEntryFieldName::NAME);
-	$entryItem->setSearchTerm($entryName);
-	$searchItems = array($entryItem);
+	$entryItemName = new ESearchEntryItem();
+	$entryItemName->setItemType(ESearchItemType::EXACT_MATCH);
+	$entryItemName->setFieldName(ESearchEntryFieldName::NAME);
+	$entryItemName->setSearchTerm($entryName);
+	$entryItemDescription = new ESearchEntryItem();
+	$entryItemDescription->setItemType(ESearchItemType::PARTIAL);
+	$entryItemDescription->setFieldName(ESearchEntryFieldName::DESCRIPTION);
+	$entryItemDescription->setSearchTerm(str_replace(' ', '', $meetingId));
+	$searchItems = array($entryItemName, $entryItemDescription);
 	$operator = new ESearchOperator();
 	$operator->setOperator(ESearchOperatorType::AND_OP);
 	$operator->setSearchItems($searchItems);
@@ -82,16 +86,24 @@ function searchForEntryByName($entryName)
 	$entrySearch = new kEntrySearch();
 	$eSearchResults = $entrySearch->doSearch($operator, $pager, array(), null);
 	list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($eSearchResults, $entrySearch);
-
 	return $coreResults;
 }
 
-function searchForUserByPuserId($userId)
+function searchForUserByPuserId($userId, $email)
 {
 	$c = new Criteria();
 	$c->add(kuserPeer::PARTNER_ID, kCurrentContext::$partner_id);
 	$c->add(kuserPeer::PUSER_ID, $userId);
-
 	$user = kuserPeer::doSelectOne($c);
+
+	if (!$user)
+	{
+		echo "---- User with Puser ID [$userId] NOT found" . PHP_EOL;
+		$c->remove(kuserPeer::PUSER_ID);
+		$c->add(kuserPeer::EMAIL, $email);
+		$user = kuserPeer::doSelectOne($c);
+
+	}
+
 	return $user;
 }
