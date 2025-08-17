@@ -44,8 +44,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($taskObjectId, $vendorTaskObjectHandler,  $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
+	private function addingEntryVendorTaskByObjectIds($vendorTaskObjectHandler,  $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
 	{
+		$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 		$taskObject = $vendorTaskObjectHandler->retrieveObject($taskObjectId);
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
@@ -138,8 +139,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				continue;
 			}
-			$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
-			$this->addingEntryVendorTaskByObjectIds($taskObjectId, $vendorTaskObjectHandler, $allowedCatalogItemIds, $profileId, $object);
+			$this->addingEntryVendorTaskByObjectIds($vendorTaskObjectHandler, $allowedCatalogItemIds, $profileId, $object);
 		}
 		return true;
 	}
@@ -936,8 +936,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					{
 						continue;
 					}
-					$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
-					$this->addingEntryVendorTaskByObjectIds($taskObjectId, $vendorTaskObjectHandler, $allowedCatalogItemIds, $profile->getId(), $object, true);
+					$this->addingEntryVendorTaskByObjectIds($vendorTaskObjectHandler, $allowedCatalogItemIds, $profile->getId(), $object, true);
 				}
 			}
 		}
