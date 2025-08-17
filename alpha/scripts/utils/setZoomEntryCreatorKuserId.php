@@ -1,19 +1,22 @@
 <?php
 
-if($argc < 3)
+if($argc < 4)
 {
 	echo "Arguments missing.\n\n";
-	echo "Usage: php " . __FILE__ . " {csvFilePath} {partnerId} <realrun / dryrun>" . PHP_EOL;
+	echo "Usage: php " . __FILE__ . " {csvFilePath} {partnerId} {csvOutputFilePath} <realrun / dryrun>" . PHP_EOL;
 	exit;
 }
-$csvFilePath = $argv[1];
-$dryRun = ($argv[3] === "dryrun");
 
 require_once(__DIR__ . '/../bootstrap.php');
+$csvFilePath = $argv[1];
+kCurrentContext::$partner_id = $argv[2];
+$csvOutputFilePath = $argv[3];
+$dryRun = ($argv[4] === "dryrun");
+
+
 
 KalturaStatement::setDryRun($dryRun);
 
-kCurrentContext::$partner_id = $argv[2];
 if (!file_exists($csvFilePath) || !is_readable($csvFilePath))
 {
 	echo "---- Error: CSV file not found or not readable." . PHP_EOL;
@@ -29,6 +32,8 @@ if ($headers !== ['Meeting ID', 'Topic', 'Host', 'Email', 'Username', 'Start Tim
 	exit;
 }
 
+writeHeaderToCsv($csvOutputFilePath);
+
 while (($row = fgetcsv($file)) !== false)
 {
 	list($meetingId, $topic, $host, $email, $username, $startTime) = $row;
@@ -38,6 +43,7 @@ while (($row = fgetcsv($file)) !== false)
 	if (empty($entries) || !$entries[0]->getObject())
 	{
 		echo "---- Entry with name [$topic] not found" . PHP_EOL;
+		writeResultsToCsv($csvOutputFilePath, array($meetingId, $topic, $host, $email, $username, 'entry not found'));
 		continue;
 	}
 	$entry = $entries[0]->getObject();
@@ -47,9 +53,10 @@ while (($row = fgetcsv($file)) !== false)
 	if (!$user)
 	{
 		echo "---- User with Puser ID [$username] not found" . PHP_EOL;
+		writeResultsToCsv($csvOutputFilePath, array($meetingId, $topic, $host, $email, $username, 'user not found'));
 		continue;
 	}
-	echo "---- User with Puser email [$email] and puser_id [$username]found" . PHP_EOL;
+	echo "---- User with Puser email [$email] and puser_id [$username] found" . PHP_EOL;
 
 	/* @var $entry entry */
 	$entry->setKuserId($user->getId());
@@ -106,4 +113,32 @@ function searchForUserByPuserId($userId, $email)
 	}
 
 	return $user;
+}
+
+function writeHeaderToCsv($outputPath)
+{
+	$file = fopen($outputPath, 'w');
+	if (!$file)
+	{
+		KalturaLog::err("Error: Failed to create file $outputPath");
+		return;
+	}
+
+	$headerRow = array('Meeting ID', 'Topic', 'Host', 'Email', 'Username', 'Reason');
+	fputcsv($file, $headerRow);
+	fclose($file);
+}
+
+function writeResultsToCsv($outputPath, $row)
+{
+	$file = fopen($outputPath, 'a');
+	if (!$file)
+	{
+		KalturaLog::err("Error: Failed to create file $outputPath");
+		return;
+	}
+
+	fputcsv($file, $row);
+
+	fclose($file);
 }
