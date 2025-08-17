@@ -39,7 +39,7 @@ class kAddEntryVendorTaskAction extends kRuleAction
 
 	public function getEntryObjectType()
 	{
-		return $this->entryObjectType;
+		return $this->entryObjectType ?: EntryObjectType::ENTRY;
 	}
 
 	/**

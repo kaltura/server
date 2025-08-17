@@ -23,9 +23,13 @@ class HandlerFactory {
 	 */
 	public static function getHandlerAutomaticFlow($taskObjectType, $object): VendorTaskObjectHandler | null
 	{
-		if ($taskObjectType == EntryObjectType::ENTRY || $object instanceof asset)
+		if ($taskObjectType == EntryObjectType::ENTRY)
 		{
-			return HandlerFactory::getHandler($taskObjectType);
+			return HandlerFactory::getHandler(EntryObjectType::ENTRY);
+		}
+		if ($taskObjectType == EntryObjectType::ASSET && $object instanceof asset)
+		{
+			return HandlerFactory::getHandler( EntryObjectType::ASSET);
 		}
 		return null;
 	}
