@@ -38,7 +38,13 @@
                     <item objectType="KalturaEventFieldCondition">
                         <description>Check Co-publisher added</description>
                         <field objectType="KalturaEvalBooleanField">
-                            <code>!is_null($scope->getEvent()->getCustomDataOldValue('entitledUserPuserPublish')) ? array_diff(explode(' ,', $scope->getObject()->getEntitledPusersPublish()), unserialize($scope->getEvent()->getCustomDataOldValue('entitledUserPuserPublish'))) : true</code>
+                            <code>!is_null($scope->getEvent()->getCustomDataOldValue('entitledUserPuserPublish'))
+                                ? array_diff(
+                                explode(' ,', $scope->getObject()->getEntitledPusersPublish()),
+                                unserialize($scope->getEvent()->getCustomDataOldValue('entitledUserPuserPublish'))
+                                )
+                                : explode(',', $scope->getObject()->getEntitledPusersPublish())
+                            </code>
                         </field>
                     </item>
                 </eventConditions>
