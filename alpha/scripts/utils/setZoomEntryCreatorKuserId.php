@@ -103,15 +103,6 @@ function searchForUserByPuserId($userId, $email)
 	$c->add(kuserPeer::PUSER_ID, $userId);
 	$user = kuserPeer::doSelectOne($c);
 
-	if (!$user)
-	{
-		echo "---- User with Puser ID [$userId] NOT found" . PHP_EOL;
-		$c->remove(kuserPeer::PUSER_ID);
-		$c->add(kuserPeer::EMAIL, $email);
-		$user = kuserPeer::doSelectOne($c);
-
-	}
-
 	return $user;
 }
 
