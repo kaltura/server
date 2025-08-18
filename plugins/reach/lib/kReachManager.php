@@ -95,14 +95,14 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function shouldSkipAutoRule($object, $entryId, $featureType)
 	{
-		if ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION)
+		if ($featureType == VendorServiceFeature::CAPTIONS)
 		{
 			if ($object instanceof entry && $object->getBlockAutoTranscript())
 			{
 				KalturaLog::log("Skip the entry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
 				return true;
 			}
-			if ($object instanceof categoryEntry)
+			else
 			{
 				$entry = entryPeer::retrieveByPK($entryId);
 				if ($entry && $entry->getBlockAutoTranscript())
