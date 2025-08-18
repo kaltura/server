@@ -1,13 +1,12 @@
 <?php
-//require_once (dirname(__FILE__) . '/../bootstrap.php');
-require_once ('/opt/kaltura/app/alpha/scripts/bootstrap.php');
+require_once (dirname(__FILE__) . '/../bootstrap.php');
 
-const UNIX_LINE_END = "\n";
+const UNIX_LINE_END = PHP_EOL;
 
 if ($argc < 2)
 {
 	echo UNIX_LINE_END . ' ---- Delete Kuser From Elastic ---- ' . UNIX_LINE_END;
-	echo ' Execute: php ' . $argv[0] . ' [ /path/to/kuser_id.log || kuserId_1,kuserId_2,kuserId_3,.. ] [realrun / dryrun]' . UNIX_LINE_END;
+	echo ' Execute: php ' . $argv[0] . ' [ /path/to/kuser_id_file (one ID per line) || kuserId_1, kuserId_2, kuserId_3,.. ] [realrun | dryrun]' . UNIX_LINE_END;
 	die(' Error: missing kuser_id file or csv list ' . UNIX_LINE_END . UNIX_LINE_END);
 }
 
