@@ -1040,8 +1040,7 @@ class BaseEntryService extends KalturaEntryService
 			KalturaResponseCacher::disableCache();
 
 		$isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		if (!($isScheduledNow) && $this->getKs() ){
-			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
+		if (!($isScheduledNow) && $this->getKs() && !$this->getKs()->isWidgetSession()){
 			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
 				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
 				$isScheduledNow = true;
@@ -1053,19 +1052,39 @@ class BaseEntryService extends KalturaEntryService
 
 		$playbackContextDataHelper = new kPlaybackContextDataHelper();
 		$playbackContextDataHelper->setIsScheduledNow($isScheduledNow);
-		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry);
+		$playbackContextDataHelper->constructPlaybackContextResult($contextDataHelper, $dbEntry, $this->getKs()->isWidgetSession());
 
 		$result = new KalturaPlaybackContext();
 		$result->fromObject($playbackContextDataHelper->getPlaybackContext());
 		$result->actions = KalturaRuleActionArray::fromDbArray($contextDataHelper->getContextDataResult()->getActions());
 
+		$activeLiveStreamTime = $this->getActiveLiveStreamTime($dbEntry, $simuliveEvent);
+		if($activeLiveStreamTime)
+		{
+			$result->activeLiveStreamTime = $activeLiveStreamTime;
+		}
+		return $result;
+	}
+
+	private function getActiveLiveStreamTime($dbEntry, $simuliveEvent)
+	{
+		$activeLiveStreamTime = null;
 		if($simuliveEvent)
 		{
 			$activeLiveStreamTime = new KalturaActiveLiveStreamTime($simuliveEvent->getStartScreenTime(), $simuliveEvent->getCalculatedEndTime());
-			$result->activeLiveStreamTime = $activeLiveStreamTime;
 		}
-
-		return $result;
+		else if ($dbEntry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $dbEntry->getType() == entryType::LIVE_STREAM)
+		{
+			$startTime = time();
+			$endTime = $startTime + kSimuliveUtils::SIMULIVE_SCHEDULE_MARGIN;
+			$events = $dbEntry->getScheduleEvents($startTime, $endTime);
+			if (count($events) > 0)
+			{
+				$event = $events[0];
+				$activeLiveStreamTime = new KalturaActiveLiveStreamTime($event->getStartScreenTime(), $event->getCalculatedEndTime());
+			}
+		}
+		return $activeLiveStreamTime;
 	}
 	
 	/**

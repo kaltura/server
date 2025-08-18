@@ -9,6 +9,7 @@ class kSummaryVendorTaskData extends kLocalizedVendorTaskData
 	protected $typeOfSummary;
 	protected $writingStyle;
 	protected $summaryOutputJson = null;
+	protected $instruction = null;
 
 	public function __construct()
 	{
@@ -44,5 +45,15 @@ class kSummaryVendorTaskData extends kLocalizedVendorTaskData
 	public function setSummaryOutputJson(?string $summaryOutputJson): void
 	{
 		$this->summaryOutputJson = $summaryOutputJson;
+	}
+
+	public function getInstruction(): ?string
+	{
+		return $this->instruction;
+	}
+
+	public function setInstruction(?string $instruction): void
+	{
+		$this->instruction = $instruction;
 	}
 }

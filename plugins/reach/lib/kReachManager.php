@@ -44,13 +44,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object)
+	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
 	{
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 
 		//If both the entry and reach profile don't exist, there's no need to hit the loop
-
-		$vendorTaskObjectHandler = HandlerFactory::getHandlerByObject($object);
+		$vendorTaskObjectHandler = HandlerFactory::getHandlerById($entryId, $object);
 		$taskObject = $vendorTaskObjectHandler->retrieveObject($entryId);
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
 		if(!$taskObject || !$reachProfile)
@@ -76,6 +75,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
+
+			if ($autoRule && $this->shouldSkipAutoRule($object, $entryId, $featureType))
+			{
+				continue;
+			}
+
 			if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
 			{
 				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $entryId");
@@ -86,6 +91,28 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
 			self::addEntryVendorTaskByObjectIds($taskObject, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
 		}
+	}
+
+	private function shouldSkipAutoRule($object, $entryId, $featureType)
+	{
+		if ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION)
+		{
+			if ($object instanceof entry && $object->getBlockAutoTranscript())
+			{
+				KalturaLog::log("Skip the entry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+				return true;
+			}
+			if ($object instanceof categoryEntry)
+			{
+				$entry = entryPeer::retrieveByPK($entryId);
+				if ($entry && $entry->getBlockAutoTranscript())
+				{
+					KalturaLog::log("Skip the CategoryEntry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -900,7 +927,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
 					continue;
 				}
-				$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object);
+				$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object, true);
 			}
 		}
 		return true;

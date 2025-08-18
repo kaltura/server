@@ -143,8 +143,10 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavor['bitrate'] = $flavor['bitrate'] / 1024;
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
-			$flavor['codec'] = $kLiveStreamParams->getCodec();
-			
+			if ($kLiveStreamParams->getCodec() != flavorParams::VIDEO_CODEC_H264 && $kLiveStreamParams->getCodec() != flavorParams::VIDEO_CODEC_H265)
+			{
+				$flavor['codecs'] = $kLiveStreamParams->getCodec();
+			}
 			$this->addLanguageInfo($flavor, $kLiveStreamParams);
 				
 			$flavors[] = $flavor;

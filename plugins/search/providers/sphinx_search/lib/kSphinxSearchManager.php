@@ -12,6 +12,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 	const HAS_NO_VALUE = 'HASNOVALUE';
 	
 	const CACHE_PREFIX = 'executed_sphinx_server_';
+	
+	const SPHINX_DEDICATED_INDEX = "dedicated";
 
 	const MAX_SIZE_FOR_PLUGIN_SEARCH_DATA = 800000; // 1MB * 0.8. In bytes
 	
@@ -509,10 +511,16 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 			}
 			
 			$indexName = kSphinxSearchManager::getSphinxIndexName($objectIndexClass::getObjectIndexName());
+			$dedicatedIndexName = $indexName . '_' . kSphinxSearchManager::SPHINX_DEDICATED_INDEX;
 			$indexSplitFactor = array_count_values($tableNames);
-			if($indexSplitFactor[$indexName] > 1)
+			
+			if (isset($indexSplitFactor[$dedicatedIndexName]) && $objectIndexClass::hasSphinxDedicatedPartnerIndex($object->getPartnerId(), $objectIndexClass::getObjectIndexName()))
 			{
-				$indexId = abs(intval($object->getPartnerId()/10))%$indexSplitFactor[$indexName];
+				$splitIndexName = $dedicatedIndexName . '_' . $object->getPartnerId();
+			}
+			elseif ($indexSplitFactor[$indexName] > 1)
+			{
+				$indexId = abs(intval($object->getPartnerId() / 10)) % $indexSplitFactor[$indexName];
 				$splitIndexName = $indexName . '_' . $indexId;
 			}
 		}
