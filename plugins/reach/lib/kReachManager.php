@@ -44,7 +44,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
+	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object)
 	{
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 
@@ -76,7 +76,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 			$featureType = $catalogItemToAdd->getServiceFeature();
 
-			if ($autoRule && $this->shouldSkipAutoRule($object, $entryId, $featureType))
+			if ($this->shouldSkipAutoRule($object, $entryId, $featureType))
 			{
 				continue;
 			}
@@ -927,7 +927,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 					KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
 					continue;
 				}
-				$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object, true);
+				$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object);
 			}
 		}
 		return true;
