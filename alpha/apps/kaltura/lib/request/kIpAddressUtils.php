@@ -20,28 +20,31 @@ class kIpAddressUtils
 	
 	public static function getAddressType($ip)
 	{
-		$mask     = strpos($ip, self::IP_ADDRESS_MASK_CHAR);
-		$range    = strpos($ip, self::IP_ADDRESS_RANGE_CHAR);
-		
-        if ($mask && !$range) 
-        { 
-        	$subNet = trim(substr($ip,$mask+1));
-        	$isNetAddr = strpos($subNet, self::IP_ADDRESS_PARTS_DELIMETER);
-        	$type = $isNetAddr ? self::IP_ADDRESS_TYPE_MASK_ADDRESS : self::IP_ADDRESS_TYPE_MASK_CIDR;
-        	return $type;
-        } 
+		$mask  = strpos($ip, self::IP_ADDRESS_MASK_CHAR);
+		$range = strpos($ip, self::IP_ADDRESS_RANGE_CHAR);
 
-        if ($range && !$mask) 
-        { 
-            return self::IP_ADDRESS_TYPE_RANGE; 
-        } 
+		if ($mask !== false && $range === false) 
+		{ 
+			$subNet = trim(substr($ip, $mask + 1));
+			if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+				return self::IP_ADDRESS_TYPE_MASK_CIDR; // IPv6 always uses CIDR
+			}
+			$isNetAddr = strpos($subNet, self::IP_ADDRESS_PARTS_DELIMETER);
+			$type = $isNetAddr !== false ? self::IP_ADDRESS_TYPE_MASK_ADDRESS : self::IP_ADDRESS_TYPE_MASK_CIDR;
+			return $type;
+		} 
 
-        if (ip2long($ip) && !$range && !$mask) 
-        { 
-            return self::IP_ADDRESS_TYPE_SINGLE; 
-        } 
-        
-        return null;
+		if ($range !== false && $mask === false) 
+		{ 
+			return self::IP_ADDRESS_TYPE_RANGE; 
+		} 
+
+		if (filter_var($ip, FILTER_VALIDATE_IP)) 
+		{ 
+			return self::IP_ADDRESS_TYPE_SINGLE; 
+		} 
+
+		return null;
 	}
 	
 	
@@ -49,52 +52,55 @@ class kIpAddressUtils
 	{
 		$ip = !is_null($ip) ? trim($ip) : '';
 		$range = trim($range);
-		
+
 		$rangeType = self::getAddressType($range);
 		if (!$rangeType) {
 			if (class_exists('KalturaLog'))
 				KalturaLog::err("Cannot identify ip address type for [$range]");
 			return false;
 		}
-		
+
 		switch ($rangeType)
 		{
 			case self::IP_ADDRESS_TYPE_SINGLE:
-				return ip2long($ip) === ip2long($range);
+				return self::compareIp($ip, $range) === 0;
 
 			case self::IP_ADDRESS_TYPE_RANGE:
 				$d = strpos($range, self::IP_ADDRESS_RANGE_CHAR);
-				$fromIp = trim(ip2long(substr($range,0,$d)));
-       			$toIp = trim(ip2long(substr($range,$d+1)));
-       			$ip = ip2long($ip);
-				return ($ip>=$fromIp && $ip<=$toIp);
+				$fromIp = trim(substr($range, 0, $d));
+				$toIp = trim(substr($range, $d + 1));
+				return (self::compareIp($ip, $fromIp) >= 0 && self::compareIp($ip, $toIp) <= 0);
 
 			case self::IP_ADDRESS_TYPE_MASK_ADDRESS:
-				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
-				// convert mask address to CIDR
-				$long = ip2long($rangeMask);
-  				$base = ip2long('255.255.255.255');
-  				$rangeMask = 32-log(($long ^ $base)+1,2);
-  				if ($rangeMask <= 0){
-    				return false;
-    			} 
-       			$ipBinaryStr = sprintf("%032b",ip2long($ip)); 
-       			$netBinaryStr = sprintf("%032b",ip2long($rangeIp)); 
-        		return (substr_compare($ipBinaryStr,$netBinaryStr,0,$rangeMask) === 0);
-				
+				// Only valid for IPv4
+				if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) return false;
+				list($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
+				$ipLong = self::ipToLong($ip);
+				$rangeIpLong = self::ipToLong($rangeIp);
+				$maskLong = self::ipToLong($rangeMask);
+				if ($ipLong === false || $rangeIpLong === false || $maskLong === false) return false;
+				return (($ipLong & $maskLong) === ($rangeIpLong & $maskLong));
+
 			case self::IP_ADDRESS_TYPE_MASK_CIDR:
-				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
-    			if ($rangeMask <= 0){
-    				return false;
-    			} 
-       			$ipBinaryStr = sprintf("%032b",ip2long($ip)); 
-       			$netBinaryStr = sprintf("%032b",ip2long($rangeIp)); 
-        		return (substr_compare($ipBinaryStr,$netBinaryStr,0,$rangeMask) === 0);
+				list($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
+				$ipBin = self::inetToBits($ip);
+				$rangeIpBin = self::inetToBits($rangeIp);
+				if ($ipBin === null || $rangeIpBin === null) return false;
+
+				$isIPv6 = (strlen($ipBin) === 128);
+				$bits = $isIPv6 ? 128 : 32;
+				$rangeMask = (int)$rangeMask;
+				if ($rangeMask <= 0 || $rangeMask > $bits) return false;
+
+				$ipMasked = substr($ipBin, 0, $rangeMask);
+				$rangeMasked = substr($rangeIpBin, 0, $rangeMask);
+
+				return $ipMasked === $rangeMasked;
 		}
-		
+
 		if (class_exists('KalturaLog'))
 			KalturaLog::err("IP address type [$rangeType] for [$range] is missing implementation");
-		return false;		
+		return false;
 	}
 	
 	public static function isIpInRanges($ip, $ranges)
@@ -188,28 +194,43 @@ class kIpAddressUtils
 		switch ($rangeType)
 		{
 			case self::IP_ADDRESS_TYPE_SINGLE:
-				$fromIp = $toIp = ip2long($range);
+				$fromIp = $toIp = self::ipToLong($range);
 				break;
 
 			case self::IP_ADDRESS_TYPE_RANGE:
 				$d = strpos($range, self::IP_ADDRESS_RANGE_CHAR);
-				$fromIp = ip2long(substr($range, 0, $d));
-				$toIp = ip2long(substr($range, $d + 1));
+				$fromIp = self::ipToLong(substr($range, 0, $d));
+				$toIp = self::ipToLong(substr($range, $d + 1));
 				break;
 
 			case self::IP_ADDRESS_TYPE_MASK_ADDRESS:
 				list (, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
-				// convert mask address to CIDR
-				$fromIp = ip2long($rangeMask);
-				$base = 0xffffffff;
-				$rangeMask = 32 - log(($fromIp ^ $base) + 1, 2);
-				$toIp = $fromIp + (1 << $rangeMask);
+				$fromIp = self::ipToLong($rangeMask);
+				$base = ~((1 << (32 - (32 - log(($fromIp ^ 0xFFFFFFFF) + 1, 2)))) - 1);
+				$toIp = $fromIp + (1 << (32 - log(($fromIp ^ $base) + 1, 2))) - 1;
 				break;
 
 			case self::IP_ADDRESS_TYPE_MASK_CIDR:
-				list ($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
-				$fromIp = ip2long($rangeIp);
-				$toIp = $fromIp + (1 << (32 - $rangeMask)) - 1; 
+				list($rangeIp, $rangeMask) = array_map('trim', explode(self::IP_ADDRESS_MASK_CHAR, $range));
+				$fromIp = self::ipToLong($rangeIp);
+				$isIPv6 = filter_var($rangeIp, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
+				$bits = $isIPv6 ? 128 : 32;
+				if ($isIPv6) {
+					// Use GMP for 128-bit math
+					if (function_exists('gmp_init')) {
+						$fromGmp = gmp_init($fromIp);
+						$add = gmp_sub(gmp_pow(2, $bits - $rangeMask), 1);
+						$toIp = gmp_strval(gmp_add($fromGmp, $add));
+					} elseif (extension_loaded('bcmath')) {
+						$add = bcsub(bcpow('2', (string)($bits - $rangeMask)), '1');
+						$toIp = bcadd($fromIp, $add);
+					} else {
+						// Fallback: not supported
+						$toIp = $fromIp;
+					}
+				} else {
+					$toIp = $fromIp + (1 << ($bits - $rangeMask)) - 1;
+				}
 				break;
 		}
 		
@@ -290,7 +311,7 @@ class kIpAddressUtils
 			return $values;
 		}
 		
-		$ipLong = ip2long($ip);
+		$ipLong = self::ipToLong($ip);
 		$root = $ipTree;
 		$bitIndex = 32;
 		while(1)
@@ -315,5 +336,64 @@ class kIpAddressUtils
 
 		return $values;
 	}
-	
+
+	// Add helper methods for IPv6 support
+	private static function inetToBits($ip)
+	{
+		$packed = inet_pton($ip);
+		$bits = '';
+		foreach (str_split($packed) as $char) {
+			$bits .= str_pad(decbin(ord($char)), 8, '0', STR_PAD_LEFT);
+		}
+		return $bits;
+	}
+
+    public static function ipToLong($ip)
+    {
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return (string)ip2long($ip);
+        } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $bin = inet_pton($ip);
+            if (function_exists('gmp_import')) {
+                $gmp = gmp_import($bin);
+                return gmp_strval($gmp);
+            } elseif (extension_loaded('gmp')) {
+                $hex = bin2hex($bin);
+                $gmp = gmp_init($hex, 16);
+                return gmp_strval($gmp);
+            } elseif (extension_loaded('bcmath')) {
+                $hex = bin2hex($bin);
+                $dec = '0';
+                for ($i = 0; $i < strlen($hex); $i += 4) {
+                    $chunk = substr($hex, $i, 4);
+                    $dec = bcmul($dec, bcpow('16', strlen($chunk)));
+                    $dec = bcadd($dec, hexdec($chunk));
+                }
+                return $dec;
+            } else {
+                // Fallback: return as hex string
+                return bin2hex($bin);
+            }
+        }
+        return false; // Invalid IP
+    }
+
+    private static function compareIp($ip1, $ip2)
+	{
+		$bin1 = self::inetToBits($ip1);
+		$bin2 = self::inetToBits($ip2);
+		// Use GMP for IPv6, string compare for IPv4
+		if (filter_var($ip1, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) || filter_var($ip2, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+			$long1 = self::ipToLong($ip1);
+			$long2 = self::ipToLong($ip2);
+			if (function_exists('gmp_cmp')) {
+				return gmp_cmp(gmp_init($long1), gmp_init($long2));
+			} elseif (extension_loaded('bcmath')) {
+				return bccomp($long1, $long2);
+			} else {
+				return strcmp($long1, $long2);
+			}
+		}
+		return strcmp($bin1, $bin2);
+	}
 }

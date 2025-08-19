@@ -40,7 +40,7 @@ class WidgetLog extends BaseWidgetLog implements IBaseObject
 		
 		$widget_log = WidgetLogPeer::doSelectOne( $c );
 		
-		$longIP = ip2long( $ip );// to convert back, use long2ip
+		$longIP = kIpAddressUtils::ipToLong($ip);// to convert back, use long2ip
 		if ( $widget_log )
 		{
 			if ( $longIP != -1 )

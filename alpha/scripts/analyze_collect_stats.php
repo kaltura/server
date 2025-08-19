@@ -53,7 +53,7 @@ while(!feof($f))
 	if ( $mode == 0 ) continue;
 
 	$arr = explode(" ", $s);
-	$ip = ip2long($arr[0]);
+	$ip = kIpAddressUtils::ipToLong($arr[0]);
 	$date = $arr[3]." ".$arr[4];
 	$url = $arr[6];
 	

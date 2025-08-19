@@ -44,8 +44,7 @@ foreach($files as $file)
 			
 		if ($uv_type == "ip")
 		{
-			$value = ip2long($line);
-			if ($value >= 0x80000000) $value -= 0x100000000;
+			$value = kIpAddressUtils::ipToLong($line);
 		}
 		else
 			$value = $line;
