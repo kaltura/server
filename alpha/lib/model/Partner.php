@@ -795,6 +795,7 @@ class Partner extends BasePartner
 		$newDisabled = array_diff($disabled, $v, $primaryAdminSecretArray);
 		$this->setDisabledAdditionalAdminSecrets($newDisabled);
 		$this->putInCustomData( "enabledAdditionalAdminSecrets", $v);
+		kSessionUtils::deleteSecretCacheKey($this->getId());
 	}
 
 	/**
