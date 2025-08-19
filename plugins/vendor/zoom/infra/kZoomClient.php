@@ -244,6 +244,7 @@ class kZoomClient extends kVendorClient
 		$response = $curlWrapper->exec($url);
 		$httpCode = $curlWrapper->getHttpCode();
 		$this->handleCurlResponse($response, $httpCode, $curlWrapper);
+
 		if (!$response)
 		{
 			$data = $curlWrapper->getErrorMsg();
@@ -254,6 +255,7 @@ class kZoomClient extends kVendorClient
 			$data = json_decode($response, true);
 			KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
 		}
+
 		return $data;
 	}
 

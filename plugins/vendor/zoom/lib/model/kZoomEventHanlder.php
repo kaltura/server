@@ -235,6 +235,10 @@ class kZoomEventHanlder
 				{
 					$result = $zoomUser[self::CMS_USER_FIELD];
 				}
+				else
+				{
+					KalturaLog::warning("Zoom user [{$userName}] was not matched with CMS. Owner id will be determined by the policy set in the Integration Settings");
+				}
 				break;
 			case kZoomUsersMatching::DO_NOT_MODIFY:
 			default:
