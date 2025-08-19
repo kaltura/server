@@ -1073,7 +1073,7 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$activeLiveStreamTime = new KalturaActiveLiveStreamTime($simuliveEvent->getStartScreenTime(), $simuliveEvent->getCalculatedEndTime());
 		}
-		else if ($dbEntry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $dbEntry->getType() == entryType::LIVE_STREAM)
+		elseif ($dbEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $dbEntry->getType() == entryType::LIVE_STREAM)
 		{
 			$startTime = time();
 			$endTime = $startTime + kSimuliveUtils::SIMULIVE_SCHEDULE_MARGIN;
