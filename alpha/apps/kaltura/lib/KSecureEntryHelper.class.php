@@ -232,7 +232,8 @@ class KSecureEntryHelper
 	{
 		if (!isset($this->actionLists[$actionType]))
 			return null;
-		
+
+		KalturaLog::debug('These are actions that restrict the entry: [' . print_r($this->actionLists[$actionType], true) . ']');
 		return $this->actionLists[$actionType]; 
 	}
 	

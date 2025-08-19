@@ -388,6 +388,11 @@ class thumbnailAction extends sfAction
 		{
 			/* @var accessControl $accessControl */
 			$enableCacheValidation = $accessControl->hasRules(ContextType::THUMBNAIL, array(RuleActionType::BLOCK,RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
+			if ($enableCacheValidation)
+			{
+				$blockingRule = $this->getRules($accessControl, ContextType::THUMBNAIL, array (RuleActionType::BLOCK, RuleActionType::LIMIT_THUMBNAIL_CAPTURE));
+				KalturaLog::debug('This entry has ACP to block thumbnail: [' . print_r($blockingRule, true) . ']');
+			}
 		}
 
 
@@ -632,6 +637,32 @@ class thumbnailAction extends sfAction
 		$lastModified = $lastModifiedFlavor ? $lastModifiedFlavor->getUpdatedAt(null) : null;
 
 		return $lastModified;
+	}
+
+	protected function getRules($accessControl, $contextType, $ruleActionTypeArray)
+	{
+		$rules = $accessControl->getRulesArray();
+		if (is_null($contextType))
+			return null;
+
+		foreach($rules as $rule)
+		{
+			/* @var $rule kRule */
+			$contexts = $rule->getContexts();
+			if(!is_array($contexts) || !count($contexts))
+			{
+				if ($rule->hasActionType($ruleActionTypeArray))
+				{
+					return $rule;
+				}
+			}
+
+			if (in_array($contextType, $contexts) && $rule->hasActionType($ruleActionTypeArray))
+			{
+				return $rule;
+			}
+		}
+		return null;
 	}
 
 	private function getDimensions()
