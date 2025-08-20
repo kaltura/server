@@ -227,24 +227,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		}
 		KalturaLog::info("Sender [{$this::$mailer->FromName}<{$this::$mailer->From}>]");
 		
-		$subject = $emailNotificationTemplate->subject;
-		$body = $emailNotificationTemplate->body;
-
-		$footer = $this->getEmailFooter();
-		if(!is_null($footer))
-		{
-			$body .= "\n" . $footer;
-		}
-		
-		if(is_array($contentParameters) && count($contentParameters))
-		{		
-			$subject = str_replace(array_keys($contentParameters), $contentParameters, $subject);
-			$body = str_replace(array_keys($contentParameters), $contentParameters, $body);
-		}
-				
-		KalturaLog::info("Subject [$subject]");
-		KalturaLog::info("Body [$body]");
-		
+		list($subject, $body) = $this->getSubjectAndBody($emailNotificationTemplate, $contentParameters);
 		$this::$mailer->Subject = $subject;
 		$this::$mailer->Body = $body;
 	
@@ -310,6 +293,29 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		while($recipientsBccHandledCounter < count($recipientsBcc));
 		
 		return true;
+	}
+
+	protected function getSubjectAndBody($emailNotificationTemplate, $contentParameters)
+	{
+		$subject = $emailNotificationTemplate->subject;
+		$body = $emailNotificationTemplate->body;
+
+		$footer = $this->getEmailFooter();
+		if(!is_null($footer))
+		{
+			$body .= "\n" . $footer;
+		}
+
+		if(is_array($contentParameters) && count($contentParameters))
+		{
+			$subject = str_replace(array_keys($contentParameters), $contentParameters, $subject);
+			$body = str_replace(array_keys($contentParameters), $contentParameters, $body);
+		}
+
+		KalturaLog::info("Subject [$subject]");
+		KalturaLog::info("Body [$body]");
+
+		return array($subject, $body);
 	}
 	
 	private function getEmailFooter()
@@ -422,16 +428,15 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		$recipientsCc = $data->cc ? implode(',', $this->prepareRecipients($data->cc, $contentParameters)) : null;
 		$recipientsBcc = $data->bcc ? implode(',', $this->prepareRecipients($data->bcc, $contentParameters)) : null;
 
-		$subject = $messagingClient->formatMessageParamsInString($emailNotificationTemplate->subject);
-		$body = $messagingClient->formatMessageParamsInString($emailNotificationTemplate->body);
+		list($subject, $body) = $this->getSubjectAndBody($emailNotificationTemplate, $contentParameters);
 
-		$msgParamsMap = $this->prepareMessageParamsMap($subject, $body);
+		$msgParamsMap = array('user' => array('type' => 'User'));
 
 		$emailTemplateToAdd = new MessagingClientEmailTemplate($partnerId, $appGuid, $emailNotificationTemplate->systemName, $emailNotificationTemplate->systemName,
 			$emailNotificationTemplate->description, $messagingClient->getDefaultSender($partnerId, $appGuid), $recipientsCc, $recipientsBcc, $subject, $body, $msgParamsMap);
 		$emailTemplate = $messagingClient->addEmailTemplate($emailTemplateToAdd);
 
-		$msgParams = $this->prepareMessageParams($msgParamsMap, $data);
+		$msgParams = array('user' => array('type' => 'User', 'value' => 'Message.userId'));
 
 		$data = new MessagingClientEmailData($partnerId, $emailTemplate['appGuid'], $emailTemplate['id'], $recipientsTo, $msgParams);
 		return $messagingClient->sendEmail($data);
