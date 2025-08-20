@@ -93,8 +93,8 @@ class EntryHandler implements VendorTaskObjectHandler
 	{
 		return $object->getEntryId();
 	}
-  
-	public static function retrieveObject($objectId): BaseObject
+
+	public static function retrieveObject($objectId)
 	{
 		return entryPeer::retrieveByPK($objectId);
 	}

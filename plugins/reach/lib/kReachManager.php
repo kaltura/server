@@ -44,8 +44,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($vendorTaskObjectHandler,  $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
+	private function addingEntryVendorTaskByObjectIds($taskObjectType,  $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
 	{
+		$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType, $object);
+		if(!$vendorTaskObjectHandler)
+		{
+			return true;
+		}
 		$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
 		$taskObject = $vendorTaskObjectHandler->retrieveObject($taskObjectId);
@@ -134,12 +139,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . implode(',', $fullFieldCatalogItemIds) . ']');
 				continue;
 			}
-			$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType, $object);
-			if(!$vendorTaskObjectHandler)
-			{
-				continue;
-			}
-			$this->addingEntryVendorTaskByObjectIds($vendorTaskObjectHandler, $allowedCatalogItemIds, $profileId, $object);
+			$this->addingEntryVendorTaskByObjectIds($taskObjectType, $allowedCatalogItemIds, $profileId, $object);
 		}
 		return true;
 	}
@@ -931,12 +931,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 						KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $catalogItemIds) . "]");
 						continue;
 					}
-					$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType, $object);
-					if(!$vendorTaskObjectHandler)
-					{
-						continue;
-					}
-					$this->addingEntryVendorTaskByObjectIds($vendorTaskObjectHandler, $allowedCatalogItemIds, $profile->getId(), $object, true);
+					$this->addingEntryVendorTaskByObjectIds($taskObjectType, $allowedCatalogItemIds, $profile->getId(), $object, true);
 				}
 			}
 		}

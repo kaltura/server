@@ -475,11 +475,9 @@ class ReachProfile extends BaseReachProfile
 	 */
 	public function fulfillsRules(kScope $scope, $checkEmptyRulesOnly = false)
 	{
-		$fullFilledEntryCatalogItemIds = array();
-		$fullFilledAssetCatalogItemIds = array();
+		$fullFilledCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
-			return [EntryObjectType::ENTRY => $fullFilledEntryCatalogItemIds, EntryObjectType::ASSET => $fullFilledAssetCatalogItemIds];
-
+			return $fullFilledCatalogItemIds;
 		$context = new kContextDataResult();
 		foreach ($this->getRulesArray() as $rule)
 		{
@@ -532,17 +530,13 @@ class ReachProfile extends BaseReachProfile
 					/* @var $action kRuleAction */
 					if($action->getType() == ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 					{
-						switch ($action->getEntryObjectType())
+						/* @var $action kAddEntryVendorTaskAction */
+						$objectType = $action->getEntryObjectType();
+						if(!isset($fullFilledCatalogItemIds[$objectType]))
 						{
-							case EntryObjectType::ENTRY:
-								/* $var $action kAddEntryVendorTaskAction */
-								$fullFilledEntryCatalogItemIds = array_merge($fullFilledEntryCatalogItemIds, explode(",", $action->getCatalogItemIds()));
-								break;
-							case EntryObjectType::ASSET:
-								/* $var $action kAddEntryVendorTaskAction */
-								$fullFilledAssetCatalogItemIds = array_merge($fullFilledAssetCatalogItemIds, explode(",", $action->getCatalogItemIds()));
-								break;
+							$fullFilledCatalogItemIds[$objectType] = array();
 						}
+						$fullFilledCatalogItemIds[$objectType] = array_merge($fullFilledCatalogItemIds[$objectType], explode(",", $action->getCatalogItemIds()));
 					}
 				}
 			}
@@ -550,8 +544,8 @@ class ReachProfile extends BaseReachProfile
 			if($fulfilled && $rule->getStopProcessing())
 				break;
 		}
-		
-		return [EntryObjectType::ENTRY => $fullFilledEntryCatalogItemIds, EntryObjectType::ASSET => $fullFilledAssetCatalogItemIds];
+
+		return $fullFilledCatalogItemIds;
 	}
 
 	/**
