@@ -82,7 +82,7 @@ class KalturaFrontController
 			'requestIndex' => $requestIndex,
 		));
 		
-		KalturaMonitorClient::monitorApiEnd($errorCode);
+		KalturaMonitorClient::monitorApiEnd($errorCode, $duration);
 	}
 	
 	public function run()
