@@ -1737,7 +1737,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->addCapability(QuizPlugin::getCapabilityCoreValue());
 		}
 
- 		kEventsManager::setForceDeferredEvents(true);
+		kEventsManager::setForceDeferredEvents(true);
 	    	// save the entry
  		$newEntry->save();
  		 		
