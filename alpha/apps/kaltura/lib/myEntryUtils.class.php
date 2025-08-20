@@ -1555,6 +1555,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions, $entry->getId()))
 			{
+				if($sourceAsset instanceof captionAsset)
+				{
+					$targetEntry->setBlockAutoTranscript(true);
+					$targetEntry->save();
+				}
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
 		}
@@ -1575,21 +1580,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		return true;
-	}
-
-	private static function shouldBlockAutoTranscript($entry, $newEntry, $copyFlavors, $copyCaptions)
-	{
-		$sourceAssets = assetPeer::retrieveByEntryId($entry->getId());
-		foreach($sourceAssets as $sourceAsset)
-		{
-			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions, $entry->getId()))
-			{
-				if($sourceAsset instanceof captionAsset)
-				{
-					$newEntry->setBlockAutoTranscript(true);
-				}
-			}
-		}
 	}
 
 	/**
@@ -1747,7 +1737,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->addCapability(QuizPlugin::getCapabilityCoreValue());
 		}
 
-		self::shouldBlockAutoTranscript($entry, $newEntry, $copyFlavors, $copyCaptions);
+ 		kEventsManager::setForceDeferredEvents(true);
 	    	// save the entry
  		$newEntry->save();
  		 		
@@ -1761,6 +1751,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
 		}
+
+		kEventsManager::flushEvents();
 
 	    if ( $entry->getStatus() != entryStatus::READY )
 		{
