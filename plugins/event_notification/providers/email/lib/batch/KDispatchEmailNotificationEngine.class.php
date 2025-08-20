@@ -126,7 +126,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		/* @var KalturaEmailNotificationTemplate $eventNotificationTemplate */
 		/* @var KalturaEmailNotificationDispatchJobData $data */
 
-		$configuration = kConf::get('messaging_client', kConfMapNames::LOCAL_SETTINGS, array());
+		$configuration = kConf::get('messaging_client', 'local', array());
 		if (isset($configuration['enable_messaging_client']) && $configuration['enable_messaging_client'])
 		{
 			$this->sendEmailWithMessagingClient($eventNotificationTemplate, $data);
