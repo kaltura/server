@@ -1,6 +1,6 @@
 <?php
 require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
-echo "Starting script to update entriesCount for category\n";
+echo "Starting update status of category kuser\n";
 
 const UNIX_LINE_END = PHP_EOL;
 
