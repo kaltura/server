@@ -49,6 +49,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType, $object);
 		if(!$vendorTaskObjectHandler)
 		{
+			KalturaLog::log("Could not get vendor task handler for type {$taskObjectType}");
 			return true;
 		}
 		$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
