@@ -5,19 +5,46 @@
     #wrapper { padding: 0 0 0 0; width: 100%; }
 </style>
 <div>
-    <h1> Application generic links </h1>
-    <ul id="applicationLinks"></ul>
+    <h1 style="padding: 24px 0 0 24px;"> Application generic links </h1>
+    <div id="applicationLinks"></div>
 </div>
+<iframe style="width: 100vw;height: 100vh" id="displayFrame"></iframe>
 <script type="text/javascript">
+    function loadSource(url) {
+        document.getElementById("displayFrame").src = url;
+        document.getElementById("displayFrame").style.display = "block";
+    }
+
     (function(window) {
-        var ulElement = document.getElementById('applicationLinks');
+        document.getElementById('displayFrame').style.display = "none";
+        var divElement = document.getElementById('applicationLinks');
         <?php foreach ($this->urls as $url): ?>
-        var liElement = document.createElement('li');
-        var aElement = document.createElement('a');
-        aElement.href = '<?php echo htmlspecialchars($url[0]); ?>';
-        aElement.textContent = '<?php echo htmlspecialchars($url[1]); ?>';
-        liElement.appendChild(aElement);
-        ulElement.appendChild(liElement);
+        var button = document.createElement('button');
+        button.textContent = '<?php echo htmlspecialchars($url[1]); ?>'.split("/").filter(Boolean).pop();
+        button.addEventListener("click", function () {
+            loadSource('<?php echo htmlspecialchars($url[0]); ?>');
+        });
+        button.style.width = "140px";
+        button.style.margin = "16px";
+        button.style.background = 'linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)';
+        button.style.color = '#fff';
+        button.style.border = 'none';
+        button.style.borderRadius = '10px';
+        button.style.padding = '16px 28px';
+        button.style.fontSize = '12px';
+        button.style.fontWeight = '600';
+        button.style.fontFamily = 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+        button.style.boxShadow = '0 6px 14px rgba(37,99,235,.35), inset 0 1px 0 rgba(255,255,255,.25)';
+        button.style.cursor = 'pointer';
+        button.style.transition = 'transform .06s ease, filter .15s ease, box-shadow .2s ease';
+        button.style.display = 'inline-flex';
+        button.style.alignItems = 'center';   // vertical center
+        button.style.textAlign = 'center';
+        button.style.display = 'inline-flex';
+        button.style.justifyContent = 'center';
+        button.style.verticalAlign = 'middle';   // or 'top'
+
+        divElement.appendChild(button);
         <?php endforeach; ?>
     })(window);
 </script>
