@@ -20,7 +20,7 @@
         var divElement = document.getElementById('applicationLinks');
         <?php foreach ($this->urls as $url): ?>
         var button = document.createElement('button');
-        button.textContent = '<?php echo htmlspecialchars($url[1]); ?>'.split("/").filter(Boolean).pop();
+        button.textContent = '<?php echo htmlspecialchars($url[1]); ?>'.split("/").at(-2);
         button.addEventListener("click", function () {
             loadSource('<?php echo htmlspecialchars($url[0]); ?>');
         });
