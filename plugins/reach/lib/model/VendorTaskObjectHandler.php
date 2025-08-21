@@ -14,7 +14,7 @@ interface VendorTaskObjectHandler
 
 	public static function getTaskObjectId(BaseObject $object);
 
-	public static function retrieveObject($objectId): BaseObject;
+	public static function retrieveObject($objectId);
 
 	public static function hasRestrainingAdminTag($object, $profileId): bool;
 

@@ -9,6 +9,11 @@ class kAddEntryVendorTaskAction extends kRuleAction
 	 * @var string
 	 */
 	protected $catalogItemIds;
+
+	/**
+	 * @var int
+	 */
+	protected $entryObjectType;
 	
 	public function __construct() 
 	{
@@ -29,5 +34,19 @@ class kAddEntryVendorTaskAction extends kRuleAction
 	public function setCatalogItemIds($catalogItemIds)
 	{
 		$this->catalogItemIds = $catalogItemIds;
+	}
+
+
+	public function getEntryObjectType()
+	{
+		return $this->entryObjectType ?: EntryObjectType::ENTRY;
+	}
+
+	/**
+	 * @param int $entryObjectType
+	 */
+	public function setEntryObjectType($entryObjectType)
+	{
+		$this->entryObjectType = $entryObjectType;
 	}
 }

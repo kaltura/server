@@ -63,7 +63,7 @@ class AssetHandler implements VendorTaskObjectHandler
 		return $object->getId();
 	}
 
-	public static function retrieveObject($objectId): BaseObject
+	public static function retrieveObject($objectId)
 	{
 		return assetPeer::retrieveById($objectId);
 	}
