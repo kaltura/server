@@ -52,12 +52,12 @@ class MessagingClientEmailTemplate
 	public $from;
 
 	/**
-	 * @var array
+	 * @var string
 	 */
 	public $cc;
 
 	/**
-	 * @var array
+	 * @var string
 	 */
 	public $bcc;
 
@@ -83,8 +83,8 @@ class MessagingClientEmailTemplate
 	 * @param string $name
 	 * @param string $description
 	 * @param string $from
-	 * @param array $cc
-	 * @param array $bcc
+	 * @param string $cc
+	 * @param string $bcc
 	 * @param string $subject
 	 * @param string $body
 	 * @param array $msgParamsMap
