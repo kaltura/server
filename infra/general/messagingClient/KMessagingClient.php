@@ -79,7 +79,7 @@ class KMessagingClient
 
 	protected function initClient()
 	{
-		$configuration = kConf::get('messaging_client', 'local', array());
+		$configuration = kConf::get('messaging_client', kConfMapNames::LOCAL_SETTINGS, array());
 		KalturaLog::info("Loading messaging client configurations: " . print_r($configuration, true));
 
 		$requiredClientConfig = array(
