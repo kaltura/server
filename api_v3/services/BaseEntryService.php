@@ -1041,9 +1041,22 @@ class BaseEntryService extends KalturaEntryService
 
 		$isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
 		if (!($isScheduledNow) && $this->getKs() && !$this->getKs()->isWidgetSession()){
-			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
-				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
-				$isScheduledNow = true;
+			if ($parentEntryId)
+			{
+				// In parent-child case, KS view will contain the parent ID, but we still want the child to skip the schedule by checking the sview of the parent id:
+				if ($this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+					$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $parentEntryId))
+				{
+					$isScheduledNow = true;
+				}
+			}
+			else
+			{
+				if ($this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+					$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId))
+				{
+					$isScheduledNow = true;
+				}
 			}
 		}
 
