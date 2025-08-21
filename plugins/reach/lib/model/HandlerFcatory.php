@@ -17,20 +17,4 @@ class HandlerFactory {
 
 		}
 	}
-
-	/**
-	 * @throws KalturaAPIException
-	 */
-	public static function getHandlerAutomaticFlow($taskObjectType, $object): VendorTaskObjectHandler | null
-	{
-		if ($taskObjectType == EntryObjectType::ENTRY)
-		{
-			return HandlerFactory::getHandler(EntryObjectType::ENTRY);
-		}
-		if ($taskObjectType == EntryObjectType::ASSET && $object instanceof asset)
-		{
-			return HandlerFactory::getHandler( EntryObjectType::ASSET);
-		}
-		return null;
-	}
 }

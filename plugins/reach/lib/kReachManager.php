@@ -46,55 +46,63 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 	private function addingEntryVendorTaskByObjectIds($taskObjectType,  $allowedCatalogItemIds, $profileId, $object)
 	{
-		$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType, $object);
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($taskObjectType);
 		if(!$vendorTaskObjectHandler)
 		{
 			KalturaLog::log("Could not get vendor task handler for type {$taskObjectType}");
 			return true;
 		}
-		$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
+		$taskObjects = $vendorTaskObjectHandler->getTaskObjectsByEventObject($object);
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
-		$taskObject = $vendorTaskObjectHandler->retrieveObject($taskObjectId);
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
-		//If both the entry and reach profile don't exist, there's no need to hit the loop
-		if(!$taskObject || !$reachProfile)
+		//If both the task objects and reach profile don't exist, there's no need to hit the loop
+		if(!$taskObjects || !$reachProfile)
 		{
 			KalturaLog::log('Not all mandatory objects were found, tasks will not be added');
 			return true;
 		}
 
-		if($vendorTaskObjectHandler->hasRestrainingAdminTag($taskObject, $profileId))
+		foreach ($taskObjects as $taskObject)
 		{
-			KalturaLog::log('tasks will not be added');
-			return true;
-		}
-
-		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
-		{
-			//Validate the existence of the catalog item
-			$catalogItemToAdd = VendorCatalogItemPeer::retrieveByPK($catalogItemIdToAdd);
-			if(!$catalogItemToAdd)
+			if(!$taskObject)
 			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd could not be retrieved, skipping");
+				KalturaLog::log('object were not found, tasks will not be added');
 				continue;
 			}
 
-			$featureType = $catalogItemToAdd->getServiceFeature();
-
-			if ($this->shouldSkipAutoRule($object, $taskObject->getEntryId(), $featureType))
+			if($vendorTaskObjectHandler->hasRestrainingAdminTag($taskObject, $profileId))
 			{
-				continue;
+				KalturaLog::log('tasks will not be added');
+				return true;
 			}
 
-			if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
+			foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
 			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $taskObjectId");
-				continue;
-			}
+				//Validate the existence of the catalog item
+				$catalogItemToAdd = VendorCatalogItemPeer::retrieveByPK($catalogItemIdToAdd);
+				if(!$catalogItemToAdd)
+				{
+					KalturaLog::log("Catalog item with ID $catalogItemIdToAdd could not be retrieved, skipping");
+					continue;
+				}
 
-			//Pass the object Id as the context of the task
-			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
-			self::addEntryVendorTaskByObjectIds($taskObject, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
+				$featureType = $catalogItemToAdd->getServiceFeature();
+
+				if($this->shouldSkipAutoRule($object, $taskObject->getEntryId(), $featureType))
+				{
+					continue;
+				}
+
+				if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
+				{
+					KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id {$taskObject->getId()}");
+					continue;
+				}
+
+				//Pass the object Id as the context of the task
+				$taskJobData = $catalogItemToAdd->getTaskJobData($object);
+				self::addEntryVendorTaskByObjectIds($taskObject, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
+			}
 		}
 	}
 
@@ -790,7 +798,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 
-		if(!$vendorTaskObjectHandler->shouldAddEntryVendorTaskByObject($entryObject, $vendorCatalogItem, $reachProfile))
+		if(!$vendorTaskObjectHandler->shouldAddEntryVendorTaskByTaskObject($entryObject, $vendorCatalogItem, $reachProfile))
 		{
 			return true;
 		}
