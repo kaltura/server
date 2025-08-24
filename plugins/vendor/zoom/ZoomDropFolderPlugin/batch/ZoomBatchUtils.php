@@ -6,6 +6,7 @@ class ZoomBatchUtils
 	const EMAIL = 'email';
 	const CMS_USER_FIELD = 'cms_user_id';
 	const KALTURA_ZOOM_DEFAULT_USER = 'KalturaZoomDefault';
+	const USER_STATUSES_TO_SEARCH = '0,1'; // KuserStatus::ACTIVE == 1, KuserStatus::BLOCKED == 0
 
 	public static function shouldExcludeUserRecordingIngest ($userId, $groupParticipationType, $optInGroupNames, $optOutGroupNames, $partnerId)
 	{
@@ -104,6 +105,7 @@ class ZoomBatchUtils
 		$searchParams->searchOperator->searchItems[0]->fieldName = $fieldName;
 		$searchParams->searchOperator->searchItems[0]->searchTerm = $searchTerm;
 		$searchParams->searchOperator->searchItems[0]->itemType = $searchType;
+		$searchParams->objectStatuses = self::USER_STATUSES_TO_SEARCH; // Find active users as well as blocked users
 
 		return $searchParams;
 	}
