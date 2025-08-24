@@ -74,14 +74,21 @@ class ZoomBatchUtils
 		$user = self::getKalturaUser($partnerId, $zoomUser, $zoomVendorIntegration->userSearchMethod);
 		KBatchBase::unimpersonate();
 		$userId = '';
-		if ($user)
+		if ($user && $user->status !== KalturaUserStatus::BLOCKED)
 		{
 			KalturaLog::debug('Found [' . $user->id . ']');
 			$userId = $user->id;
 		}
 		else
 		{
-			KalturaLog::debug('User Not Found [' . $hostEmail . ']');
+			if ($user && $user->status == KalturaUserStatus::BLOCKED)
+			{
+				KalturaLog::debug('User is Blocked [' . $hostEmail . ']');
+			}
+			else
+			{
+				KalturaLog::debug('User Not Found [' . $hostEmail . ']');
+			}
 			if ($zoomVendorIntegration->createUserIfNotExist)
 			{
 				KalturaLog::debug('creating new user: ' . $zoomUser->getProcessedName());
