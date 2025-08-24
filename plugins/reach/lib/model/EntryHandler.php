@@ -91,7 +91,8 @@ class EntryHandler implements VendorTaskObjectHandler
 
 	public static function getTaskObjectsByEventObject(BaseObject $object)
 	{
-		return [self::getTaskObjectById($object->getEntryId())];
+		$entry = self::getTaskObjectById($object->getEntryId());
+		return $entry ? [$entry] : null;
 	}
 
 	public static function getTaskObjectById($taskObjectId)
@@ -110,7 +111,7 @@ class EntryHandler implements VendorTaskObjectHandler
 		return false;
 	}
 
-	public static function isFeatureTypeSupportedForObject($taskObject, VendorCatalogItem $vendorCatalogItem): bool
+	public static function isFeatureTypeSupportedForTaskObject($taskObject, VendorCatalogItem $vendorCatalogItem): bool
 	{
 		$supportedType = $vendorCatalogItem->isEntryTypeSupported($taskObject->getType(), $taskObject->getMediaType());
 		return !$vendorCatalogItem->isEntryDurationExceeding($taskObject) && $supportedType;

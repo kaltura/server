@@ -62,7 +62,8 @@ class AssetHandler implements VendorTaskObjectHandler
 	{
 		if ($object instanceof asset)
 		{
-			return [self::getTaskObjectById($object->getId())];
+			$asset = self::getTaskObjectById($object->getId());
+			return $asset ? [$asset] : null;
 		}
 		else if ($object instanceof categoryEntry)
 		{
@@ -82,7 +83,7 @@ class AssetHandler implements VendorTaskObjectHandler
 		return false;
 	}
 
-	public static function isFeatureTypeSupportedForObject($taskObject, VendorCatalogItem $vendorCatalogItem): bool
+	public static function isFeatureTypeSupportedForTaskObject($taskObject, VendorCatalogItem $vendorCatalogItem): bool
 	{
 		return $vendorCatalogItem->isAssetSupported($taskObject);
 	}
