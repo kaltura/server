@@ -2,73 +2,73 @@
 
 class EntryHandler implements VendorTaskObjectHandler
 {
-	public static function shouldAddEntryVendorTask($object, $vendorCatalogItem): bool
+	public static function shouldAddEntryVendorTask($taskObject, $vendorCatalogItem): bool
 	{
 
-		/** @var $object entry */
+		/** @var $taskObject entry */
 		//Check if the entry is temporary, if so, dont create the task
-		if ($object->getIsTemporary())
+		if ($taskObject->getIsTemporary())
 		{
-			KalturaLog::debug("Entry [{$object->getId()}] is temporary, entry vendor task object wont be created for it");
+			KalturaLog::debug("Entry [{$taskObject->getId()}] is temporary, entry vendor task object wont be created for it");
 			return false;
 		}
 
 		//Check if static content and the catalog item is excluding static content, if so, dont create the task
-		if (count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $object->getAdminTagsArr()))
+		if (count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $taskObject->getAdminTagsArr()))
 		{
-			KalturaLog::debug("Entry [{$object->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
+			KalturaLog::debug("Entry [{$taskObject->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
 			return false;
 		}
 		return true;
 	}
 
-	public static function shouldAddEntryVendorTaskByObject($object, $vendorCatalogItem, $reachProfile): bool
+	public static function shouldAddEntryVendorTaskByTaskObject($taskObject, $vendorCatalogItem, $reachProfile): bool
 	{
-		if (!$vendorCatalogItem->isEntryTypeSupported($object->getType(), $object->getMediaType()))
+		if (!$vendorCatalogItem->isEntryTypeSupported($taskObject->getType(), $taskObject->getMediaType()))
 		{
-			KalturaLog::log("Entry of type [{$object->getType()}] is not supported by Reach");
+			KalturaLog::log("Entry of type [{$taskObject->getType()}] is not supported by Reach");
 			return false;
 		}
 
-		if (!kReachUtils::areFlavorsReady($object, $reachProfile))
+		if (!kReachUtils::areFlavorsReady($taskObject, $reachProfile))
 		{
 			KalturaLog::log("Not all flavor params IDs [{$reachProfile->getFlavorParamsIds()}] are ready yet");
 			return false;
 		}
 
-		if($object->getParentEntryId())
+		if($taskObject->getParentEntryId())
 		{
-			KalturaLog::log("Entry [{$object->getId()}] is a child entry, entry vendor task object wont be created for it");
+			KalturaLog::log("Entry [{$taskObject->getId()}] is a child entry, entry vendor task object wont be created for it");
 			return false;
 		}
 
-		if ($vendorCatalogItem->isEntryDurationExceeding($object))
+		if ($vendorCatalogItem->isEntryDurationExceeding($taskObject))
 		{
-			KalturaLog::log("Entry [{$object->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
+			KalturaLog::log("Entry [{$taskObject->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
 			return false;
 		}
 		return true;
 
 	}
 
-	public static function getTaskKuserId($object): int
+	public static function getTaskKuserId($taskObject): int
 	{
 		$kuserId = kCurrentContext::getCurrentKsKuserId();
 		if (kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
 			//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-			return $object->getKuserId();
+			return $taskObject->getKuserId();
 		}
 		return $kuserId;
 	}
 
-	public static function getTaskPuserId($entryObject): string
+	public static function getTaskPuserId($taskObject): string
 	{
 		$puserId = kCurrentContext::$ks_uid;
 		if (kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
 			//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-			return $entryObject->getPuserId();
+			return $taskObject->getPuserId();
 		}
 		return $puserId;
 	}
@@ -89,20 +89,21 @@ class EntryHandler implements VendorTaskObjectHandler
 
 	}
 
-	public static function getTaskObjectId(BaseObject $object)
+	public static function getTaskObjectsByEventObject(BaseObject $object)
 	{
-		return $object->getEntryId();
+		$entry = self::getTaskObjectById($object->getEntryId());
+		return $entry ? [$entry] : null;
 	}
 
-	public static function retrieveObject($objectId)
+	public static function getTaskObjectById($taskObjectId)
 	{
-		return entryPeer::retrieveByPK($objectId);
+		return entryPeer::retrieveByPK($taskObjectId);
 	}
 
-	public static function hasRestrainingAdminTag($object, $profileId): bool
+	public static function hasRestrainingAdminTag($taskObject, $profileId): bool
 	{
 		$reachRestrainAdminTag = kConf::get('reach_restrain_admin_tag', kConfMapNames::RUNTIME_CONFIG, null);
-		if(!is_null($reachRestrainAdminTag) && in_array($reachRestrainAdminTag, $object->getAdminTagsArr()))
+		if(!is_null($reachRestrainAdminTag) && in_array($reachRestrainAdminTag, $taskObject->getAdminTagsArr()))
 		{
 			KalturaLog::log("Entry has reach restraining admin tag [$reachRestrainAdminTag]");
 			return true;
@@ -110,10 +111,10 @@ class EntryHandler implements VendorTaskObjectHandler
 		return false;
 	}
 
-	public static function isFeatureTypeSupportedForObject($object, VendorCatalogItem $vendorCatalogItem): bool
+	public static function isFeatureTypeSupportedForTaskObject($taskObject, VendorCatalogItem $vendorCatalogItem): bool
 	{
-		$supportedType = $vendorCatalogItem->isEntryTypeSupported($object->getType(), $object->getMediaType());
-		return !$vendorCatalogItem->isEntryDurationExceeding($object) && $supportedType;
+		$supportedType = $vendorCatalogItem->isEntryTypeSupported($taskObject->getType(), $taskObject->getMediaType());
+		return !$vendorCatalogItem->isEntryDurationExceeding($taskObject) && $supportedType;
 	}
 
 	public static function getTaskObjectType()

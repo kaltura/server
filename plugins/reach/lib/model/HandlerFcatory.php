@@ -18,19 +18,17 @@ class HandlerFactory {
 		}
 	}
 
-	/**
-	 * @throws KalturaAPIException
-	 */
-	public static function getHandlerAutomaticFlow($taskObjectType, $object): VendorTaskObjectHandler | null
+	public static function getHandlerAutomaticFlow($objectType): VendorTaskObjectHandler | null
 	{
-		if ($taskObjectType == EntryObjectType::ENTRY)
+		switch($objectType)
 		{
-			return HandlerFactory::getHandler(EntryObjectType::ENTRY);
+			case EntryObjectType::ASSET:
+				return new AssetHandler();
+			case EntryObjectType::ENTRY:
+				return new EntryHandler();
+			default:
+				return null;
+
 		}
-		if ($taskObjectType == EntryObjectType::ASSET && $object instanceof asset)
-		{
-			return HandlerFactory::getHandler( EntryObjectType::ASSET);
-		}
-		return null;
 	}
 }

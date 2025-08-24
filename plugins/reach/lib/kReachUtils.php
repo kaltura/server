@@ -43,7 +43,7 @@ class kReachUtils
 	public static function validateEntryObjectExists(EntryVendorTask $dbEntryVendorTask)
 	{
 		$vendorTaskObjectHandler = HandlerFactory::getHandler($dbEntryVendorTask->getEntryObjectType());
-		$dbEntry = $vendorTaskObjectHandler->retrieveObject($dbEntryVendorTask->getEntryId());
+		$dbEntry = $vendorTaskObjectHandler->getTaskObjectById($dbEntryVendorTask->getEntryId());
 		if (!$dbEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
@@ -544,7 +544,7 @@ class kReachUtils
 			{
 				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
 			}
-			$entryObject = $vendorTaskObjectHandler->retrieveObject($dbEntryVendorTask->getEntryId());
+			$entryObject = $vendorTaskObjectHandler->getTaskObjectById($dbEntryVendorTask->getEntryId());
 			return $dbVendorCatalogItem->calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), null, $unitsUsed);
 		}
 	}

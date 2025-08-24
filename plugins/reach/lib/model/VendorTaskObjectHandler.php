@@ -2,23 +2,23 @@
 
 interface VendorTaskObjectHandler
 {
-	public static function shouldAddEntryVendorTask($object, $vendorCatalogItem): bool;
+	public static function shouldAddEntryVendorTask($taskObject, $vendorCatalogItem): bool;
 
-	public static function shouldAddEntryVendorTaskByObject($object, $vendorCatalogItem, $reachProfile) : bool;
+	public static function shouldAddEntryVendorTaskByTaskObject($taskObject, $vendorCatalogItem, $reachProfile) : bool;
 
-	public static function getTaskKuserId($object): int;
+	public static function getTaskKuserId($taskObject): int;
 
-	public static function getTaskPuserId($entryObject): string;
+	public static function getTaskPuserId($taskObject): string;
 
 	public function getAbortStatusMessage($status): string;
 
-	public static function getTaskObjectId(BaseObject $object);
+	public static function getTaskObjectsByEventObject(BaseObject $object);
 
-	public static function retrieveObject($objectId);
+	public static function getTaskObjectById($taskObjectId);
 
-	public static function hasRestrainingAdminTag($object, $profileId): bool;
+	public static function hasRestrainingAdminTag($taskObject, $profileId): bool;
 
-	public static function isFeatureTypeSupportedForObject($object, VendorCatalogItem $vendorCatalogItem): bool;
+	public static function isFeatureTypeSupportedForTaskObject($taskObject, VendorCatalogItem $vendorCatalogItem): bool;
 
 	public static function getTaskObjectType();
   
