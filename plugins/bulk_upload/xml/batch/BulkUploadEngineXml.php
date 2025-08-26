@@ -459,7 +459,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry = $this->createEntryFromItem($item, $existingEntry->type, $existingEntry); //Creates the entry from the item element
 		
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
-		
+		// Handle pre-process plugins first
+		$this->handlePreProcessPlugins($item, $existingEntry);
+
 		$thumbAssets = array();
 		$thumbAssetsResources = array();
 		$flavorAssets = array();
@@ -634,6 +636,20 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
 
 		$this->handlePluginAddedData($item, $existingEntry);
+	}
+
+	/**
+	 * Handle pre-process plugins before content processing
+	 */
+	protected function handlePreProcessPlugins(SimpleXMLElement $item, $entry)
+	{
+		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandler');
+		foreach ($pluginsInstances as $pluginsInstance) {
+			if ($pluginsInstance instanceof IKalturaBulkUploadXmlHandlerPreProcess) {
+				$pluginsInstance->configureBulkUploadXmlHandler($this);
+				$pluginsInstance->handleItemUpdated($entry, $item);
+			}
+		}
 	}
 	
 	/**
@@ -2631,6 +2647,12 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($pluginsInstances as $pluginsInstance)
 		{
 			/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
+
+			// Skip plugins that implement pre-process interface (already handled)
+			if ($pluginsInstance instanceof IKalturaBulkUploadXmlHandlerPreProcess) {
+				continue; // Skip to next plugin
+			}
+
 			try
 			{
 				$pluginsInstance->configureBulkUploadXmlHandler($this);
