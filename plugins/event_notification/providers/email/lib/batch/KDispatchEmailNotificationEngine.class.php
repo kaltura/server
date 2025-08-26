@@ -412,11 +412,11 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 
 	protected function sendEmailWithMessagingClient(KalturaEmailNotificationTemplate $emailNotificationTemplate, KalturaEmailNotificationDispatchJobData $data)
 	{
-		$partnerId = $emailNotificationTemplate->partnerId;
 		$ks = KBatchBase::$kClient->getKs();
 
 		$messagingClient = new KMessagingClient($ks);
 
+		$partnerId = $emailNotificationTemplate->partnerId;
 		$appGuid = $messagingClient->getAppGuid($partnerId);
 		if (!$appGuid)
 		{
