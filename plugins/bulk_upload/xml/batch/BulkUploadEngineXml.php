@@ -2646,11 +2646,6 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
 
-			// Skip plugins that implement pre-process interface (already handled)
-			if ($pluginsInstance instanceof IKalturaBulkUploadXmlHandlerPreProcess) {
-				continue; // Skip to next plugin
-			}
-
 			try
 			{
 				$pluginsInstance->configureBulkUploadXmlHandler($this);
