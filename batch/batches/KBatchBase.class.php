@@ -855,17 +855,4 @@ abstract class KBatchBase implements IKalturaLogger
 		}
 		return $defaultValue;
 	}
-
-	/**
-	 * @param int $partnerId
-	 * @return string
-	 */
-	public static function createKSForPartner($partnerId)
-	{
-		$partnerInfo = KBatchBase::$kClient->partner->get($partnerId);
-		$client = new KalturaClient(KBatchBase::$kClientConfig);
-		$ks = $client->generateSessionV2($partnerInfo->adminSecret, 'batchUser', KalturaSessionType::ADMIN, $partnerId, 86400, '');
-
-		return $ks;
-	}
 }
