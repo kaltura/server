@@ -292,7 +292,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			{
 		        if ($kUser->status == KalturaUserStatus::BLOCKED)
                 {
-	                KalturaLog::debug('User [' . $kUser->id . '] is BLOCKED');
+	                KalturaLog::debug('User blocked [' . $zoomUser->getProcessedName() . ']');
                     continue;
                 }
 				if (strtolower($kUser->id) !== $userToExclude)
@@ -302,23 +302,14 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			elseif($createIfNotFound)
 			{
-				try
+				$dbUser = KBatchBase::$kClient->user->get($zoomUser->getProcessedName());
+				if ($dbUser && $dbUser->status == KalturaUserStatus::BLOCKED)
 				{
-					$this->createNewUser($partnerId,$zoomUser->getProcessedName());
-					$validatedUsers[] = $zoomUser->getProcessedName();
+					KalturaLog::debug('User blocked [' . $zoomUser->getProcessedName() . ']');
 				}
-				catch (Exception $e)
+				elseif (!$dbUser)
 				{
-					if ($e->getCode() === 'DUPLICATE_USER_BY_ID')
-					{
-						//User could already be created by another session, so consider it validated
-						$validatedUsers[] = $zoomUser->getProcessedName();
-					}
-					else
-					{
-						//Re-throw the exception if it's not related to duplicate user ID
-						throw $e;
-					}
+					$validatedUsers[] = $zoomUser->getProcessedName();
 				}
 			}
 		}
