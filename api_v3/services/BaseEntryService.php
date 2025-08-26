@@ -1043,7 +1043,7 @@ class BaseEntryService extends KalturaEntryService
 		
 		if (!($isScheduledNow) && $this->getKs() && !$this->getKs()->isWidgetSession())
 		{
-		  $privilegeEntryId = $parentEntryId ? $parentEntryId : $entryId;
+		  $privilegeEntryId = $parentEntryId ?? $entryId;
 		    if (
 		        $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
 		        $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $privilegeEntryId)
