@@ -166,10 +166,12 @@ class KSecureEntryHelper
 		
 	    if ($this->contexts != array(ContextType::THUMBNAIL))
         {
-            if ( ! ($this->ks &&
+			$parentId = $this->entry->getParentEntryId();
+			$privilegeEntryId = $parentId ?? $this->entry->getId();
+			if ( ! ($this->ks &&
                    ($this->isKsAdmin() ||
                     $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
-                    $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, $this->entry->getId()) ))){
+                    $this->ks->verifyPrivileges(ks::PRIVILEGE_VIEW, $privilegeEntryId) ))){
                 $this->validateModeration();
                 $this->validateScheduling();
             }
