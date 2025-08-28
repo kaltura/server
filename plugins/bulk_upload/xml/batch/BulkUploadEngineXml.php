@@ -644,9 +644,17 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	protected function handlePreProcessPlugins(SimpleXMLElement $item, $entry)
 	{
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandlerPreProcess');
-		foreach ($pluginsInstances as $pluginsInstance) {
+		foreach ($pluginsInstances as $pluginsInstance)
+		{
+			try
+			{
+				/* @var $pluginsInstance IKalturaBulkUploadXmlHandlerPreProcess */
 				$pluginsInstance->configureBulkUploadXmlHandler($this);
 				$pluginsInstance->handleItemUpdated($entry, $item);
+			} catch (Exception $e)
+			{
+			    KalturaLog::err('Plugin processing failed: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
+			}
 		}
 	}
 	
