@@ -97,4 +97,7 @@ class KalturaCatalogItemLanguage extends KalturaStringEnum
 	const ZH_CN = KalturaLanguage::ZH_CN;
 	const ZH_HK = KalturaLanguage::ZH_HK;
 	const AUTO_DETECT = "Auto Detect";
+
+	const EN_ASL = "English (ASL)";
+	const EN_BSL = "English (BSL)";
 }
