@@ -196,6 +196,7 @@ class KMessagingClient
 	{
 		KalturaLog::info("Creating new appGuid for partner id [$partnerId]");
 		$appRegistrationData = array(
+			'partnerId' => $partnerId,
 			'appCustomId' => $this->appCustomId,
 			'appCustomName' => $this->appCustomName,
 			'appType' => $this->appType,
