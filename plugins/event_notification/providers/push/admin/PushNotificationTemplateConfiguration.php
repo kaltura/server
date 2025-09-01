@@ -83,7 +83,7 @@ class Form_PushNotificationTemplateConfiguration extends Form_EventNotificationT
                 'KalturaFlavorParams' => 'Flavor Params',
                 'KalturaConversionProfileAssetParams' => 'Asset Params - Conversion Profile',
                 'KalturaFlavorParamsOutput' => 'Flavor Params Output',
-                'KalturaGenericsynDicationFeed' => 'Genericsyn Dication Feed',
+                'KalturaGenericSyndicationFeed' => 'Generic Syndication Feed',
                 'KalturaPartner' => 'Partner',
                 'KalturaPermission' => 'Permission',
                 'KalturaPermissionItem' => 'Permission Item',

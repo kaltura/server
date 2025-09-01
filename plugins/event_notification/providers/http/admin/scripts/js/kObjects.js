@@ -34,7 +34,7 @@ var kObjects = {
 			flavorParams:					{label:	'Flavor Params', apiType: 'KalturaFlavorParams'},
 			flavorParamsConversionProfile:	{label:	'Asset Params - Conversion Profile', apiType: 'KalturaConversionProfileAssetParams'},
 			flavorParamsOutput:				{label:	'Flavor Params Output', apiType: 'KalturaFlavorParamsOutput'},
-			genericsynDicationFeed:			{label:	'Genericsyn Dication Feed', apiType: 'KalturaGenericsynDicationFeed'},
+			genericSyndicationFeed:			{label:	'Generic Syndication Feed', apiType: 'KalturaGenericSyndicationFeed'},
 			Partner:						{label:	'Partner', apiType: 'KalturaPartner'},
 			Permission:						{label:	'Permission', apiType: 'KalturaPermission'},
 			PermissionItem:					{label:	'Permission Item', apiType: 'KalturaPermissionItem'},
