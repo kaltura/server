@@ -129,7 +129,7 @@ class kDropFolderAllocator
 		{
 			$index = ($cache->increment($indexKey)) % $numOfDropFolders;
 			$dropFolderToAllocate = $dropFolders[$index];
-			if (self::lockDropFolder($dropFolderToAllocate->getId(), $maxTimeForWatch))
+//			if (self::lockDropFolder($dropFolderToAllocate->getId(), $maxTimeForWatch))
 				return $dropFolderToAllocate;
 		}
 		KalturaLog::debug("Could not allocate any drop folder after [$numOfDropFolders] attempts");
