@@ -292,7 +292,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			{
 		        if ($kUser->status == KalturaUserStatus::BLOCKED)
                 {
-	                KalturaLog::debug('User blocked [' . $zoomUser->getProcessedName() . ']');
+	                KalturaLog::debug('User [' . $kUser->id . '] is BLOCKED');
                     continue;
                 }
 				if (strtolower($kUser->id) !== $userToExclude)
@@ -302,15 +302,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			elseif($createIfNotFound)
 			{
-				$dbUser = KBatchBase::$kClient->user->get($zoomUser->getProcessedName());
-				if ($dbUser && $dbUser->status == KalturaUserStatus::BLOCKED)
-				{
-					KalturaLog::debug('User blocked [' . $zoomUser->getProcessedName() . ']');
-				}
-				elseif (!$dbUser)
-				{
-					$validatedUsers[] = $zoomUser->getProcessedName();
-				}
+				$validatedUsers[] = $zoomUser->getProcessedName();
 			}
 		}
 		KalturaLog::debug('Additional users : [' . print_r($validatedUsers, true) . ']');
