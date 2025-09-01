@@ -247,6 +247,17 @@ class BulkUploadEntryEngineCsv extends BulkUploadEngineCsv
 			{
 			    $bulkUploadResult->objectId = $values[$index];
 			}
+			else if ($column == 'url')
+			{
+				$value = $values[$index];
+				if (!mb_check_encoding($value, 'UTF-8')) {
+					$value = mb_convert_encoding($value, 'UTF-8', 'auto');
+				}
+
+				$value = preg_replace_callback('/[^\x20-\x7E]/u', fn($matches) => rawurlencode($matches[0]), $value);
+				$bulkUploadResult->$column = $value;
+				KalturaLog::info("Set value $column [{$bulkUploadResult->$column}]");
+			}
 			else
 			{
 				if(isset($values[$index]) && iconv_strlen($values[$index], 'UTF-8'))
