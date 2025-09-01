@@ -243,7 +243,7 @@ class DbManager
 	}
 	
 	/**
-	 * Translate sphinx host to matching cname if exists
+	 * Translate Sphinx host to matching cname if it exists
 	 * @param $hostName
 	 * @return bool|mixed
 	 */
@@ -259,14 +259,14 @@ class DbManager
 		$cacheResult = $cache->get(kQueryCache::SPHINX_CNAME_MAP);
 		if (!$cacheResult)
 		{
-			KalturaLog::debug("failed to get sphinx_cname_map from memcache, using sphinx hostname as is");
+			KalturaLog::debug("sphinx_cname_map not found in cache, using sphinx hostname as is");
 			return $hostName;
 		}
 		
 		$cnameMap = json_decode($cacheResult, true);
 		if (empty($cnameMap))
 		{
-			KalturaLog::debug("failed decoding sphinx_cname_map, using sphinx hostname as is");
+			KalturaLog::debug("sphinx_cname_map decoding failed or the map is empty, using sphinx hostname as is");
 			return $hostName;
 		}
 		
