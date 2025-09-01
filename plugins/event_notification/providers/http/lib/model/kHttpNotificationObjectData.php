@@ -134,7 +134,7 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	 */
 	public function getDataStringReplacements()
 	{
-	        return $this->dataStringReplacements;
+		return $this->dataStringReplacements;
 	}
 
 	/**
@@ -142,6 +142,6 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	 */
 	public function setDataStringReplacements($dataStringReplacements)
 	{
-	        $this->dataStringReplacements = $dataStringReplacements;
+		$this->dataStringReplacements = $dataStringReplacements;
 	}
 }
