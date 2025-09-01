@@ -89,8 +89,16 @@ class kEncryptFileUtils
             {
                 $iv = call_user_func_array("kEncryptFileUtils::$functionName", array($fd1, $key, $iv, $fd2));
             }
-            fclose($fd1);
-            fclose($fd2);
+			
+			if(is_resource($fd1) && get_resource_type($fd1) === 'stream')
+			{
+				fclose($fd1);
+			}
+			
+			if(is_resource($fd2) && get_resource_type($fd2) === 'stream')
+			{
+				fclose($fd2);
+			}
 
             if (!$dstFilePath)
                 $dstFilePath = $srcFilePath;
@@ -99,10 +107,15 @@ class kEncryptFileUtils
         }
         catch(Exception $e)
         {
-            if ($fd1)
-                fclose($fd1);
-            if ($fd2)
-                fclose($fd2);
+			if(is_resource($fd1) && get_resource_type($fd1) === 'stream')
+			{
+				fclose($fd1);
+			}
+			
+			if(is_resource($fd2) && get_resource_type($fd2) === 'stream')
+			{
+				fclose($fd2);
+			}
             throw new Exception("Failed to [$functionName] for src path [$srcFilePath] and dest [$dstFilePath] because " . $e->getMessage());
         }
     }

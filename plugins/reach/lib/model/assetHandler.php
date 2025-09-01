@@ -3,39 +3,39 @@
 class AssetHandler implements VendorTaskObjectHandler
 {
 
-	public static function shouldAddEntryVendorTask($object, $vendorCatalogItem): bool
+	public static function shouldAddEntryVendorTask($taskObject, $vendorCatalogItem): bool
 	{
 			return true;
 	}
 
-	public static function shouldAddEntryVendorTaskByObject($object, $vendorCatalogItem, $reachProfile) : bool
+	public static function shouldAddEntryVendorTaskByTaskObject($taskObject, $vendorCatalogItem, $reachProfile) : bool
 	{
-		if (!$vendorCatalogItem->isAssetSupported($object))
+		if (!$vendorCatalogItem->isAssetSupported($taskObject))
 		{
-			KalturaLog::log("service {$vendorCatalogItem->getServiceFeature()} do not support asset {$object->getId()}");
+			KalturaLog::log("service {$vendorCatalogItem->getServiceFeature()} do not support asset {$taskObject->getId()}");
 			return false;
 		}
 		return true;
 	}
 
-	public static function getTaskKuserId($object): int
+	public static function getTaskKuserId($taskObject): int
 	{
 		$kuserId = kCurrentContext::getCurrentKsKuserId();
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
-			$entryId = $object->getEntryId();
+			$entryId = $taskObject->getEntryId();
 			$entry = entryPeer::retrieveByPK($entryId);
 			return $entry->getKuserId();
 		}
 		return $kuserId;
 	}
 
-	public static function getTaskPuserId($entryObject): string
+	public static function getTaskPuserId($taskObject): string
 	{
 		$puserId = kCurrentContext::$ks_uid;
 		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
 		{
-			$entryId = $entryObject->getEntryId();
+			$entryId = $taskObject->getEntryId();
 			$entry = entryPeer::retrieveByPK($entryId);
 			return $entry->getPuserId();
 		}
@@ -58,24 +58,34 @@ class AssetHandler implements VendorTaskObjectHandler
 		}
 	}
 
-	public static function getTaskObjectId(BaseObject $object)
+	public static function getTaskObjectsByEventObject(BaseObject $object)
 	{
-		return $object->getId();
+		if ($object instanceof asset)
+		{
+			$asset = self::getTaskObjectById($object->getId());
+			return $asset ? [$asset] : null;
+		}
+		else if ($object instanceof categoryEntry)
+		{
+			return assetPeer::retrieveByEntryId($object->getEntryId());
+
+		}
+		return null;
 	}
 
-	public static function retrieveObject($objectId): BaseObject
+	public static function getTaskObjectById($taskObjectId)
 	{
-		return assetPeer::retrieveById($objectId);
+		return assetPeer::retrieveById($taskObjectId);
 	}
 
-	public static function hasRestrainingAdminTag($object, $profileId): bool
+	public static function hasRestrainingAdminTag($taskObject, $profileId): bool
 	{
 		return false;
 	}
 
-	public static function isFeatureTypeSupportedForObject($object, VendorCatalogItem $vendorCatalogItem): bool
+	public static function isFeatureTypeSupportedForTaskObject($taskObject, VendorCatalogItem $vendorCatalogItem): bool
 	{
-		return $vendorCatalogItem->isAssetSupported($object);
+		return $vendorCatalogItem->isAssetSupported($taskObject);
 	}
 
 	public static function getTaskObjectType()

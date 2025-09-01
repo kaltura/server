@@ -5,10 +5,11 @@ require_once(__DIR__ . '/bootstrap.php');
 // parse the command line
 if($argc<3)
 {
-	die("Usage: php " . $argv[0] . " <partner id> <realRun | dryRun>\n");
+	die("Usage: php " . $argv[0] . " <partner id> <realRun | dryRun> <userList - optional csv file>\n");
 }
 $partnerId = $argv[1];
 $dryRun = $argv[2];
+$userListCsv = $argv[3];
 var_dump($partnerId, $dryRun);
 
 if (!PartnerPeer::retrieveByPK($partnerId))
@@ -16,8 +17,22 @@ if (!PartnerPeer::retrieveByPK($partnerId))
 	die("Please enter a valid partner Id!\n");
 }
 
-$noEmailUsers = getUsers($partnerId, false);
-$withEmailUsers = getUsers($partnerId, true);
+if (empty($userListCsv))
+{
+	$noEmailUsers = getUsers($partnerId, false);
+	$withEmailUsers = getUsers($partnerId, true);
+}else
+{
+	$userList = file($userListCsv, FILE_IGNORE_NEW_LINES);
+	$userListChunk = array_chunk($userList, 100);
+	$noEmailUsers = [];
+	$withEmailUsers = [];
+	foreach ($userListChunk as $puserIds)
+	{
+		$noEmailUsers = array_push($noEmailUsers, getUsers($partnerId, false, $puserIds));
+		$withEmailUsers = array_push($withEmailUsers, getUsers($partnerId, true, $puserIds));
+	}
+}
 $totalUsers = count($noEmailUsers) + count($withEmailUsers);
 $noUserPercentage = noEmailPercentage(count($noEmailUsers), $totalUsers);
 KalturaLog::log("[$noUserPercentage%] of the users of partner [$partnerId] do not have an email address. exact numbers: [" . count($noEmailUsers) ." /$totalUsers]");
@@ -41,10 +56,14 @@ function noEmailPercentage($noEmailUsersCount, $totalUsers)
 	return (int)(($noEmailUsersCount * 100)/$totalUsers);
 }
 
-function getUsers($partnerId, $hasEmail)
+function getUsers($partnerId, $hasEmail, $puserIds=null)
 {
 	$emailCriteria = new Criteria();
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+	if (!empty($puserIds))
+	{
+		$emailCriteria->add(kuserPeer::PUSER_ID, $puserIds, Criteria::IN);
+	}
 	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
 	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
 	if($hasEmail)

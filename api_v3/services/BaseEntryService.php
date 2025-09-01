@@ -1040,11 +1040,16 @@ class BaseEntryService extends KalturaEntryService
 			KalturaResponseCacher::disableCache();
 
 		$isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		if (!($isScheduledNow) && $this->getKs() && !$this->getKs()->isWidgetSession()){
-			if ( $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
-				$this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $entryId)) {
-				$isScheduledNow = true;
-			}
+		
+		if (!($isScheduledNow) && $this->getKs() && !$this->getKs()->isWidgetSession())
+		{
+		  $privilegeEntryId = $parentEntryId ?? $entryId;
+		    if (
+		        $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, ks::PRIVILEGE_WILDCARD) ||
+		        $this->getKs()->verifyPrivileges(ks::PRIVILEGE_VIEW, $privilegeEntryId)
+		    ) {
+		        $isScheduledNow = true;
+		    }
 		}
 
 		$contextDataHelper->setMediaProtocol($contextDataParams->mediaProtocol);
@@ -1073,7 +1078,7 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$activeLiveStreamTime = new KalturaActiveLiveStreamTime($simuliveEvent->getStartScreenTime(), $simuliveEvent->getCalculatedEndTime());
 		}
-		else if ($dbEntry->hasCapability(LiveEntry::SIMULIVE_CAPABILITY) && $dbEntry->getType() == entryType::LIVE_STREAM)
+		elseif ($dbEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $dbEntry->getType() == entryType::LIVE_STREAM)
 		{
 			$startTime = time();
 			$endTime = $startTime + kSimuliveUtils::SIMULIVE_SCHEDULE_MARGIN;

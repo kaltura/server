@@ -59,10 +59,21 @@ class KMessagingClient
 	protected $defaultSender;
 
 	/**
+	 * @var string
+	 */
+	protected $ks;
+
+	/**
+	 * @param string $ks
 	 * @throws Exception
 	 */
-	public function __construct()
+	public function __construct($ks)
 	{
+		if (!$ks)
+		{
+			throw new Exception("KMessagingClient requires a valid KS");
+		}
+		$this->ks = $ks;
 		$this->initClient();
 	}
 
@@ -95,16 +106,15 @@ class KMessagingClient
 
     protected function curlServiceAction($service, $action, $data, $format = 1)
     {
-        $ks = kCurrentContext::$ks;
         $endPoint = $this->getRequestEndpoint($service);
 
         $url = "$endPoint/$service/$action?format=$format";
         $headers = array(
             'Content-Type: application/json',
-            'Authorization: KS ' . $ks,
+            'Authorization: KS ' . $this->ks,
         );
 
-        KalturaLog::info("Sending request [$url], using KS [$ks], with body: " . print_r($data, true));
+        KalturaLog::info("Sending request [$url], using KS [$this->ks], with body: " . print_r($data, true));
 
         $curlWrapper = new KCurlWrapper();
 		$curlWrapper->setOpt(CURLOPT_POST, 1);
@@ -347,7 +357,7 @@ class KMessagingClient
 
 	/**
 	 * @param string $string
-	 * @return array
+	 * @return string
 	 */
 	public static function formatMessageParamsInString($string)
 	{

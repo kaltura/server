@@ -1289,15 +1289,14 @@ HTML;
 		}
 		elseif ($playlistEntry->getMediaType() == PlaylistType::DYNAMIC)
 		{
-			$playListService = new PlaylistService();
-			$playListEntries = $playListService->executeAction($playlistEntry->getId())->toArray();
+			$playListEntries = myPlaylistUtils::executePlaylist($partnerId, $playlistEntry, null, true);
 			foreach ($playListEntries as $entry)
 			{
-				if($entry->id === $entryId)
+				if($entry->getId() === $entryId)
 				{
 					return true;
 				}
-				if($entry->redirectEntryId == $entryId)
+				if($entry->getRedirectEntryId()== $entryId)
 				{
 					return true;
 				}

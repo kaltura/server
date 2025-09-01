@@ -18,27 +18,17 @@ class HandlerFactory {
 		}
 	}
 
-	/**
-	 * @throws KalturaAPIException
-	 */
-	public static function getHandlerByObject($object): VendorTaskObjectHandler
+	public static function getHandlerAutomaticFlow($objectType): VendorTaskObjectHandler | null
 	{
-		$objectType = $object instanceof AttachmentAsset ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
-		return HandlerFactory::getHandler($objectType);
-	}
+		switch($objectType)
+		{
+			case EntryObjectType::ASSET:
+				return new AssetHandler();
+			case EntryObjectType::ENTRY:
+				return new EntryHandler();
+			default:
+				return null;
 
-	/**
-	 * @throws KalturaAPIException
-	 * TEMP solution for fix HF
-	 */
-	public static function getHandlerById($objectId, $eventObject): VendorTaskObjectHandler
-	{
-		// Getting the $eventObject to avoid calling to the DB is not needed.
-		// As currently the only case when we need to check if the object ID is asset is if the event object is AttachmentAsset
-		$object = null;
-		if ($eventObject instanceof AttachmentAsset)
-			$object = assetPeer::retrieveById($objectId);
-		$objectType = $object ? EntryObjectType::ASSET : EntryObjectType::ENTRY;
-		return HandlerFactory::getHandler($objectType);
+		}
 	}
 }

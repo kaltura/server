@@ -3,7 +3,7 @@
  * @package plugins.metadataBulkUploadXml
  * @subpackage lib
  */
-class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandler
+class MetadataBulkUploadXmlEngineHandler implements IKalturaBulkUploadXmlHandlerPreProcess
 {
 	/**
 	 * @var KalturaMetadataObjectType

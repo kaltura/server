@@ -44,70 +44,87 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object, $autoRule = false)
+	private function retrieveCatalogItems($allowedCatalogItemIds)
 	{
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
+		$catalogItemsToAdd = [];
+		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
+		{
+			//Validate the existence of the catalog item
+			$catalogItemToAdd = VendorCatalogItemPeer::retrieveByPK($catalogItemIdToAdd);
+			if (!$catalogItemToAdd) {
+				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd could not be retrieved, skipping");
+				continue;
+			}
+			$catalogItemsToAdd[] = $catalogItemToAdd;
+		}
+		return $catalogItemsToAdd;
+	}
 
-		//If both the entry and reach profile don't exist, there's no need to hit the loop
-		$vendorTaskObjectHandler = HandlerFactory::getHandlerById($entryId, $object);
-		$taskObject = $vendorTaskObjectHandler->retrieveObject($entryId);
+	private function addingEntryVendorTaskByObjectIds($taskObjectType,  $allowedCatalogItemIds, $profileId, $object)
+	{
+		$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType);
+		if(!$vendorTaskObjectHandler)
+		{
+			KalturaLog::log("Could not get vendor task handler for type {$taskObjectType}");
+			return true;
+		}
+		$taskObjects = $vendorTaskObjectHandler->getTaskObjectsByEventObject($object);
+		$catalogItemsToAdd = $this->retrieveCatalogItems($allowedCatalogItemIds);
+
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
-		if(!$taskObject || !$reachProfile)
+		if(!$taskObjects || !$reachProfile)
 		{
 			KalturaLog::log('Not all mandatory objects were found, tasks will not be added');
 			return true;
 		}
 
-		if($vendorTaskObjectHandler->hasRestrainingAdminTag($taskObject, $profileId))
+		foreach ($taskObjects as $taskObject)
 		{
-			KalturaLog::log('tasks will not be added');
-			return true;
-		}
 
-		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
-		{
-			//Validate the existence of the catalog item
-			$catalogItemToAdd = VendorCatalogItemPeer::retrieveByPK($catalogItemIdToAdd);
-			if(!$catalogItemToAdd)
+			if($vendorTaskObjectHandler->hasRestrainingAdminTag($taskObject, $profileId))
 			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd could not be retrieved, skipping");
-				continue;
+				KalturaLog::log('tasks will not be added');
+				return true;
 			}
 
-			$featureType = $catalogItemToAdd->getServiceFeature();
-
-			if ($autoRule && $this->shouldSkipAutoRule($object, $entryId, $featureType))
+			foreach ($catalogItemsToAdd as $catalogItemToAdd)
 			{
-				continue;
-			}
+				$featureType = $catalogItemToAdd->getServiceFeature();
 
-			if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForObject($taskObject, $catalogItemToAdd))
-			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for object Id $entryId");
-				continue;
-			}
+				if($this->shouldSkipAutoRule($object, $taskObject->getEntryId(), $featureType))
+				{
+					continue;
+				}
 
-			//Pass the object Id as the context of the task
-			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
-			self::addEntryVendorTaskByObjectIds($taskObject, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
+				if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForTaskObject($taskObject, $catalogItemToAdd))
+				{
+					KalturaLog::log("Catalog item with ID {$catalogItemToAdd->getId()} with feature type $featureType is not supported for object Id {$taskObject->getId()}");
+					continue;
+				}
+
+				//Pass the object Id as the context of the task
+				$taskJobData = $catalogItemToAdd->getTaskJobData($object);
+				self::addEntryVendorTaskByObjectIds($taskObject, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
+			}
 		}
 	}
 
 	private function shouldSkipAutoRule($object, $entryId, $featureType)
 	{
-		if ($featureType == VendorServiceFeature::CAPTIONS || $featureType == VendorServiceFeature::TRANSLATION)
+		if ($featureType == VendorServiceFeature::CAPTIONS)
 		{
 			if ($object instanceof entry && $object->getBlockAutoTranscript())
 			{
 				KalturaLog::log("Skip the entry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
 				return true;
 			}
-			if ($object instanceof categoryEntry)
+			else
 			{
 				$entry = entryPeer::retrieveByPK($entryId);
 				if ($entry && $entry->getBlockAutoTranscript())
 				{
-					KalturaLog::log("Skip the CategoryEntry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+					KalturaLog::log("Skip the automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
 					return true;
 				}
 			}
@@ -123,11 +140,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$scope = $event->getScope();
 		$partnerId = $scope->getPartnerId();
 		$object = $scope->getObject();
-		$entryId = $object->getEntryId();
 		foreach (self::$booleanNotificationTemplatesFulfilled as $booleanNotificationTemplate)
 		{
 			$profileId = $booleanNotificationTemplate[self::PROFILE_ID];
 			$fullFieldCatalogItemIds = $booleanNotificationTemplate[self::ACTION][0]->getCatalogItemIds();
+			$taskObjectType = $booleanNotificationTemplate[self::ACTION][0]->getEntryObjectType();
 			$fullFieldCatalogItemIdsArr = array_map('trim', explode(',', $fullFieldCatalogItemIds));
 			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIdsArr, $partnerId);
 			if(!count($allowedCatalogItemIds))
@@ -135,7 +152,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . implode(',', $fullFieldCatalogItemIds) . ']');
 				continue;
 			}
-			$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object);
+			$this->addingEntryVendorTaskByObjectIds($taskObjectType, $allowedCatalogItemIds, $profileId, $object);
 		}
 		return true;
 	}
@@ -785,7 +802,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 
-		if(!$vendorTaskObjectHandler->shouldAddEntryVendorTaskByObject($entryObject, $vendorCatalogItem, $reachProfile))
+		if(!$vendorTaskObjectHandler->shouldAddEntryVendorTaskByTaskObject($entryObject, $vendorCatalogItem, $reachProfile))
 		{
 			return true;
 		}
@@ -907,9 +924,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
 	{
 		$scope = new kScope();
-		$vendorTaskObjectHandler = HandlerFactory::getHandlerByObject($object);
-		$taskObjectId = $vendorTaskObjectHandler->getTaskObjectId($object);
-		$scope->setEntryId($taskObjectId);
+		$scope->setEntryId($object->getEntryId());
 		$this->initReachProfileForPartner($object->getPartnerId());
 		if (self::$reachProfilesFilteredThatIncludesRegularRules)
 		{
@@ -917,17 +932,20 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				/* @var $profile ReachProfile */
 				$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
-				if (!count($fullFieldCatalogItemIds))
+				foreach($fullFieldCatalogItemIds as $taskObjectType => $catalogItemIds)
 				{
-					continue;
+					if (!count($catalogItemIds))
+					{
+						continue;
+					}
+					$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($catalogItemIds, $object->getPartnerId());
+					if(!count($allowedCatalogItemIds))
+					{
+						KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $catalogItemIds) . "]");
+						continue;
+					}
+					$this->addingEntryVendorTaskByObjectIds($taskObjectType, $allowedCatalogItemIds, $profile->getId(), $object);
 				}
-				$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $object->getPartnerId());
-				if(!count($allowedCatalogItemIds))
-				{
-					KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
-					continue;
-				}
-				$this->addingEntryVendorTaskByObjectIds($taskObjectId, $allowedCatalogItemIds, $profile->getId(), $object, true);
 			}
 		}
 		return true;
