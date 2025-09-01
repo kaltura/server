@@ -553,7 +553,8 @@ class kSphinxSearchManager implements kObjectUpdatedEventConsumer, kObjectAddedE
 					return $sphinxConnectionId;
 			}
 			
-			$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($sphinxConnection->getHostName());
+			$hostName = DbManager::getRealHostName($sphinxConnection->getHostName());
+			$sphinxServer = SphinxLogServerPeer::retrieveByLocalServer($hostName);
 			if($sphinxServer)
 			{
 	        	$sphinxConnectionId = $sphinxServer->getId();
