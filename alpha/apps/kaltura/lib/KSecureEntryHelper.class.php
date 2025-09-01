@@ -159,7 +159,7 @@ class KSecureEntryHelper
 	public function validateForPlay($performApiAccessCheck = true)
 	{
 		if ($this->entry->getDisplayInSearch() === EntryDisplayInSearchType::RECYCLED &&
-			!($this->entry->isOwnerActionsAllowed($this->ks->getKuserId()) || $this->isKsAdmin()))
+			!($this->ks && ($this->entry->isOwnerActionsAllowed($this->ks->getKuserId()) || $this->isKsAdmin())))
 		{
 			KExternalErrors::dieError(KExternalErrors::RECYCLED_ENTRY_UNAVAILABLE);
 		}
