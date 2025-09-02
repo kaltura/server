@@ -1,16 +1,17 @@
 <?php
 
-if($argc < 3)
+if($argc < 4)
 {
 	echo "Arguments missing.\n\n";
-	echo "Usage: php " . __FILE__ . " {xmlFilePath} {partnerId} <realrun / dryrun>" . PHP_EOL;
+	echo "Usage: php " . __FILE__ . " {xmlFilePath} {outputFileForMultipleUsers}{partnerId} <realrun / dryrun>" . PHP_EOL;
 	exit;
 }
 
 require_once(__DIR__ . '/../bootstrap.php');
 $xmlFilePath = $argv[1];
-kCurrentContext::$partner_id = $argv[2];
-$dryRun = ($argv[3] === "dryrun");
+$csvOutputFile = $argv[2];
+kCurrentContext::$partner_id = $argv[3];
+$dryRun = ($argv[4] === "dryrun");
 
 
 
@@ -21,6 +22,8 @@ if (!file_exists($xmlFilePath) || !is_readable($xmlFilePath))
 	echo "---- Error: xml file not found or not readable." . PHP_EOL;
 	exit;
 }
+
+writeHeaderToCsv($csvOutputFile);
 
 $xmlString = file_get_contents($xmlFilePath);
 $xmlContent = simplexml_load_string($xmlString);
@@ -38,6 +41,12 @@ foreach ($xmlContent->DATA_RECORD as $record)
 	$customData = (string)$record->custom_data;
 
 	$users = searchForUserByEmail($puserId);
+	if (count($users) > 1)
+	{
+		echo "---- Found multiple user with email [$puserId]. Did not handle ownership of entries" . PHP_EOL;
+		writeResultsToCsv($csvOutputFile, array($puserId));
+		continue;
+	}
 	if (!$users || !$users[0])
 	{
 		continue;
@@ -45,10 +54,10 @@ foreach ($xmlContent->DATA_RECORD as $record)
 	$user = $users[0]->getObject();
 	if (!$user)
 	{
-		echo "---- User with Puser ID [$puserId] not found" . PHP_EOL;
+		echo "---- User with email [$puserId] not found" . PHP_EOL;
 		continue;
 	}
-	echo "---- User with Puser [$puserId] and id [$id] found" . PHP_EOL;
+	echo "---- User with email [$puserId] found" . PHP_EOL;
 
 	// Search for the entry by name (Topic column)
 	$entries = searchForEntriesByPuser($id);
@@ -118,4 +127,33 @@ function searchForUserByEmail($email)
 	list($coreResults, $objectCount) = kESearchCoreAdapter::transformElasticToCoreObject($eSearchResults, $userSearch);
 
 	return $coreResults;
+}
+
+
+function writeHeaderToCsv($outputPath)
+{
+	$file = fopen($outputPath, 'w');
+	if (!$file)
+	{
+		KalturaLog::err("Error: Failed to create file $outputPath");
+		return;
+	}
+
+	$headerRow = array('user email');
+	fputcsv($file, $headerRow);
+	fclose($file);
+}
+
+function writeResultsToCsv($outputPath, $row)
+{
+	$file = fopen($outputPath, 'a');
+	if (!$file)
+	{
+		KalturaLog::err("Error: Failed to create file $outputPath");
+		return;
+	}
+
+	fputcsv($file, $row);
+
+	fclose($file);
 }
