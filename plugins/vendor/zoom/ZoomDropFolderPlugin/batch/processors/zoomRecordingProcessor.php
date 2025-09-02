@@ -302,7 +302,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			}
 			elseif($createIfNotFound)
 			{
-				$validatedUsers[] = $zoomUser->getProcessedName(); 
+				$validatedUsers[] = $zoomUser->getProcessedName();
 			}
 		}
 		KalturaLog::debug('Additional users : [' . print_r($validatedUsers, true) . ']');
