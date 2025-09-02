@@ -56,12 +56,12 @@ class kApcWrapper
 		return false;
 	}
 	
-	public static function apcInc($key, $delta = 1)
+	public static function apcInc($key, $delta = 1, $success = null, $ttl = 0)
 	{
 		if (function_exists('apc_inc'))
-			return apc_inc($key, $delta);
+			return apc_inc($key, $delta, $success);
 		if (function_exists('apcu_inc'))
-			return apcu_inc($key, $delta);
+			return apcu_inc($key, $delta, $success, $ttl);
 		
 		return false;
 	}
