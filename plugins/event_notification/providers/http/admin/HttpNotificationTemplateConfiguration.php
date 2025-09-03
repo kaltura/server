@@ -51,10 +51,10 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 				case 'text':
 					$stringField = new Kaltura_Client_Type_StringValue();
 					$stringField->value = $properties['freeText'];
-					$object->data->contentType = $properties['contentType'];
 					
 					$object->data = new Kaltura_Client_HttpNotification_Type_HttpNotificationDataText();
 					$object->data->content = $stringField;
+					$object->data->contentType = $properties['contentType'];
 
 					break;
 			}
