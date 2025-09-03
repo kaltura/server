@@ -886,6 +886,8 @@ class KalturaMonitorClient
 	protected static function safeLog($msg)
 	{
 		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
 			KalturaLog::debug($msg);
+		}
 	}
 }
