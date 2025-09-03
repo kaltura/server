@@ -49,18 +49,14 @@ foreach ($xmlContent->DATA_RECORD as $record)
 	}
 	if (!$users || !$users[0])
 	{
-		continue;
-	}
-	$user = $users[0]->getObject();
-	if (!$user)
-	{
 		echo "---- User with email [$puserId] not found" . PHP_EOL;
 		continue;
 	}
+	$user = $users[0]->getObject();
 	echo "---- User with email [$puserId] found" . PHP_EOL;
 
 	// Search for the entry by name (Topic column)
-	$entries = searchForEntriesByPuser($id);
+	$entries = searchForEntriesByKuser($id);
 	if (!$entries)
 	{
 		continue;
@@ -86,7 +82,7 @@ foreach ($xmlContent->DATA_RECORD as $record)
 echo "Done" . PHP_EOL;
 KalturaLog::debug('Done');
 
-function searchForEntriesByPuser($kuserId)
+function searchForEntriesByKuser($kuserId)
 {
 	$entryItemName = new ESearchEntryItem();
 	$entryItemName->setItemType(ESearchItemType::EXACT_MATCH);
