@@ -240,11 +240,7 @@
 								<code>($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getkuser()->getEmail() : ''</code>
 							</email>
 							<name objectType="KalturaEvalStringField">
-								<code>
-									($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId()))
-									? (($kuser = $entry->getkuser()) ? $kuser->getFirstName().' '.$kuser->getLastName() : '')
-									: ''
-								</code>
+								<code>($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getkuser()->getFirstName().' '.$entry->getkuser()->getLastName() : ''</code>
 							</name>
 						</item>
 					</emailRecipients>
@@ -338,11 +334,7 @@
 								<code>($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getkuser()->getEmail() : ''</code>
 							</email>
 							<name objectType="KalturaEvalStringField">
-								<code>
-									($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId()))
-									? (($kuser = $entry->getkuser()) ? $kuser->getFirstName().' '.$kuser->getLastName() : 'Unknown User')
-									: ''
-								</code>
+								<code>($entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? $entry->getkuser()->getFirstName().' '.$entry->getkuser()->getLastName() : ''</code>
 							</name>
 						</item>
 					</emailRecipients>
