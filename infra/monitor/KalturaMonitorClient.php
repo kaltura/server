@@ -868,15 +868,24 @@ class KalturaMonitorClient
 		if($reqTime && $reqCount)
 		{
 			$reqAvgTime = ($reqTime/1000000)/$reqCount;
-			header('X-Kaltura-Service-Status: ' . self::SERVICE_OK);
+			$serviceStatus = self::SERVICE_OK;
 			if($reqAvgTime > $thresholdInSeconds)
 			{
-				header('X-Kaltura-Service-Status: ' . self::SERVICE_NEARING_LIMITS);
+				$serviceStatus = self::SERVICE_NEARING_LIMITS;
 				if(isset($serviceStatusConfig['send_analytics_beacons']) && $serviceStatusConfig['send_analytics_beacons'])
 				{
 					self::sendErrorEvent('NEARING_LIMITS');
 				}
 			}
+			
+			header('X-Kaltura-Service-Status: ' . $serviceStatus);
+			self::safeLog("Service status: serviceStatus [$serviceStatus] count [$reqCount] time [$reqTime] avg [$reqAvgTime]");
 		}
+	}
+	
+	protected static function safeLog($msg)
+	{
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+			KalturaLog::debug($msg);
 	}
 }
