@@ -854,6 +854,13 @@ class KalturaMonitorClient
 		if(!isset($serviceStatusConfig['enabled']) || !$serviceStatusConfig['enabled'])
 			return;
 		
+		$skipActions = isset($serviceStatusConfig['skip_actions']) ?  $serviceStatusConfig['skip_actions'] : array();
+		if(isset(self::$basicEventInfo[self::FIELD_ACTION]) && in_array(self::$basicEventInfo[self::FIELD_ACTION], $skipActions))
+		{
+			self::safeLog("Skipping service status for action: " . self::$basicEventInfo[self::FIELD_ACTION]);
+			return;
+		}
+		
 		$thresholdInSeconds = isset($serviceStatusConfig['threshold_in_seconds']) ?
 			$serviceStatusConfig['threshold_in_seconds'] :
 			self::DEFAULT_SERVICE_THRESHOLD;
