@@ -123,8 +123,8 @@ class Form_CatalogItemConfigure extends ConfigureForm
 				'filters'		=> array('StringTrim'),
 				'required'		=> true,
 				'multiOptions' 	=> array(
-					Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_ASL,
-					Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_BSL,
+					Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_ASL => Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_ASL,
+					Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_BSL => Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_BSL,
 				),
 				'value' => Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_ASL,
 
