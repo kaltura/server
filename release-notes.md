@@ -11887,3 +11887,23 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
+
+
+
+# Ursa-21.13.0
+
+## Update Entry Approved or Rejected  in category template ##
+* Issue Type: Task
+* Issue ID: SUP-49053
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the owner of the entry is a deleted user (with status = 2), therefore it won't be returned from the DB.
+In order to avoid null pointer exception, add a safety check for kuser.
+
+Update script:
+
+     - deployment/updates/scripts/xml/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.template.xml
+     - php deployment/updates/scripts/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.php
