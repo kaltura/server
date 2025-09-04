@@ -854,6 +854,13 @@ class KalturaMonitorClient
 		if(!isset($serviceStatusConfig['enabled']) || !$serviceStatusConfig['enabled'])
 			return;
 		
+		$skipActions = isset($serviceStatusConfig['skip_actions']) ?  $serviceStatusConfig['skip_actions'] : array();
+		if(isset(self::$basicEventInfo[self::FIELD_ACTION]) && in_array(self::$basicEventInfo[self::FIELD_ACTION], $skipActions))
+		{
+			self::safeLog("Skipping service status for action: " . self::$basicEventInfo[self::FIELD_ACTION]);
+			return;
+		}
+		
 		$thresholdInSeconds = isset($serviceStatusConfig['threshold_in_seconds']) ?
 			$serviceStatusConfig['threshold_in_seconds'] :
 			self::DEFAULT_SERVICE_THRESHOLD;
@@ -868,15 +875,26 @@ class KalturaMonitorClient
 		if($reqTime && $reqCount)
 		{
 			$reqAvgTime = ($reqTime/1000000)/$reqCount;
-			header('X-Kaltura-Service-Status: ' . self::SERVICE_OK);
+			$serviceStatus = self::SERVICE_OK;
 			if($reqAvgTime > $thresholdInSeconds)
 			{
-				header('X-Kaltura-Service-Status: ' . self::SERVICE_NEARING_LIMITS);
+				$serviceStatus = self::SERVICE_NEARING_LIMITS;
 				if(isset($serviceStatusConfig['send_analytics_beacons']) && $serviceStatusConfig['send_analytics_beacons'])
 				{
 					self::sendErrorEvent('NEARING_LIMITS');
 				}
 			}
+			
+			header('X-Kaltura-Service-Status: ' . $serviceStatus);
+			self::safeLog("Service status: serviceStatus [$serviceStatus] count [$reqCount] time [$reqTime] avg [$reqAvgTime]");
+		}
+	}
+	
+	protected static function safeLog($msg)
+	{
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
+			KalturaLog::debug($msg);
 		}
 	}
 }
