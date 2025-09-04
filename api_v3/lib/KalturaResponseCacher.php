@@ -118,7 +118,7 @@ class KalturaResponseCacher extends kApiCache
 			if (is_numeric($key) && is_array($value) && array_key_exists('ks', $value))
 			{
 				$curKs = $value['ks'];
-				if (is_string($curKs) && strpos($curKs, ':result') !== false)
+				if (!is_string($curKs) || (strpos($curKs, ':result') !== false))
 					continue;				// the ks is the result of some sub request
 				
 				if ($ks && $ks != $curKs)
