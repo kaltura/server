@@ -1,3 +1,15 @@
+# Venus-22.3.0
+## Update status of kafka event notification to active for category entry create/update ##
+- Issue Type: Task
+- Issue ID: KAM-136
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_09_07_update_category_entry_kafka_notifications.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_09_07_update_category_entry_kafka_notifications.php
+
 # Venus-22.1.0
 ## Add custom headers and content-type settings to HTTP notification template config
 - Issue Type: Task
@@ -67,7 +79,7 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 	php deployment/updates/scripts/add_permissions/2025_06_30_agents_manager_add_partner.php
 
 
-## Add kafka event notification for category entry create/update/delete and support pushign entry events when agents are enabled ##
+## Add kafka event notification for category entry create/update and support pushing entry events when agents are enabled ##
 - Issue Type: Task
 - Issue ID: KAM-6
 
