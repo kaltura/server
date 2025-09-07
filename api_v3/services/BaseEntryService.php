@@ -39,7 +39,7 @@ class BaseEntryService extends KalturaEntryService
 
 		return parent::kalturaNetworkAllowed($actionName);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaBaseService::partnerRequired()
 	 */
@@ -50,7 +50,7 @@ class BaseEntryService extends KalturaEntryService
 		}
 		return parent::partnerRequired($actionName);
 	}
-	
+
     /**
      * Generic add entry, should be used when the uploaded entry type is not known.
      *
@@ -73,19 +73,19 @@ class BaseEntryService extends KalturaEntryService
 	   		$dbEntry->setStatus(entryStatus::NO_CONTENT);
 	    	$dbEntry->save();
     	}
-    	
+
 		$trackEntry = new TrackEntry();
 		$trackEntry->setEntryId($dbEntry->getId());
 		$trackEntry->setTrackEventTypeId(TrackEntry::TRACK_ENTRY_EVENT_TYPE_ADD_ENTRY);
 		$trackEntry->setDescription(__METHOD__ . ":" . __LINE__ . "::ENTRY_BASE");
 		TrackEntry::addTrackEntry($trackEntry);
-		
+
     	myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry, $dbEntry->getPartnerId(), null, null, null, $dbEntry->getId());
-    	
+
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
 		return $entry;
     }
-	
+
     /**
      * Attach content resource to entry in status NO_MEDIA
      *
@@ -102,20 +102,20 @@ class BaseEntryService extends KalturaEntryService
 
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-	
+
 		if ($dbEntry->getStatus() != entryStatus::NO_CONTENT)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ALREADY_WITH_CONTENT);
-		
+
 		$kResource = $resource->toObject();
     	if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
     		$this->setEntryTypeByResource($dbEntry, $kResource);
 		$dbEntry->save();
-		
+
 		$resource->validateEntry($dbEntry);
 		$this->attachResource($kResource, $dbEntry);
 		$this->validateContent($dbEntry);
 		$resource->entryHandled($dbEntry);
-    	
+
 		return $this->getEntry($entryId);
     }
 
@@ -133,27 +133,27 @@ class BaseEntryService extends KalturaEntryService
 				$service = new MediaService();
     			$service->initService('media', 'media', $this->actionName);
     			break;
-				
+
 			case entryType::MIX:
 				$service = new MixingService();
     			$service->initService('mixing', 'mixing', $this->actionName);
     			break;
-				
+
 			case entryType::PLAYLIST:
 				$service = new PlaylistService();
     			$service->initService('playlist', 'playlist', $this->actionName);
     			break;
-				
+
 			case entryType::DATA:
 				$service = new DataService();
     			$service->initService('data', 'data', $this->actionName);
     			break;
-				
+
 			case entryType::LIVE_STREAM:
 				$service = new LiveStreamService();
     			$service->initService('liveStream', 'liveStream', $this->actionName);
     			break;
-				
+
 			case entryType::DOCUMENT:
 				if(KalturaPluginManager::getPluginInstance(DocumentPlugin::getPluginName()))
 				{
@@ -161,15 +161,15 @@ class BaseEntryService extends KalturaEntryService
 					$service->initService('document_documents', 'document_documents', $this->actionName);
 					break;
 				}
-			   
-    			
+
+
     		default:
     			throw new KalturaAPIException(KalturaErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
     	}
-    		
+
     	$service->attachResource($resource, $dbEntry, $asset);
     }
-    
+
     /**
      * @param kResource $resource
      */
@@ -180,10 +180,10 @@ class BaseEntryService extends KalturaEntryService
     	{
     		case 'kAssetParamsResourceContainer':
     			return $this->setEntryTypeByResource($dbEntry, $resource->getResource());
-    			
+
 			case 'kAssetsParamsResourceContainers':
     			return $this->setEntryTypeByResource($dbEntry, reset($resource->getResources()));
-				
+
 			case 'kFileSyncResource':
 				$sourceEntry = null;
 		    	if($resource->getFileSyncObjectType() == FileSyncObjectType::ENTRY)
@@ -194,30 +194,30 @@ class BaseEntryService extends KalturaEntryService
 		    		if($sourceAsset)
 		    			$sourceEntry = $sourceAsset->getentry();
 		    	}
-		    	
+
 				if($sourceEntry)
 				{
 					$dbEntry->setType($sourceEntry->getType());
 					$dbEntry->setMediaType($sourceEntry->getMediaType());
 				}
 				return;
-				
+
 			case 'kLocalFileResource':
 				$fullPath = $resource->getLocalFilePath();
 				break;
-				
+
 			case 'kUrlResource':
 			case 'kRemoteStorageResource':
 				$fullPath = $resource->getUrl();
 				break;
-				
+
 			default:
 				return;
     	}
     	if($fullPath)
     		$this->setEntryTypeByExtension($dbEntry, $fullPath);
     }
-    
+
     protected function setEntryTypeByExtension(entry $dbEntry, $fullPath)
     {
     	$ext = pathinfo($fullPath, PATHINFO_EXTENSION);
@@ -228,7 +228,7 @@ class BaseEntryService extends KalturaEntryService
 			if(!$ext)
 				return;
 		}
-    	
+
     	$mediaType = myFileUploadService::getMediaTypeFromFileExt($ext);
     	if($mediaType != entry::ENTRY_MEDIA_TYPE_AUTOMATIC)
     	{
@@ -236,7 +236,7 @@ class BaseEntryService extends KalturaEntryService
 			$dbEntry->setMediaType($mediaType);
     	}
     }
-    
+
     /**
      * Generic add entry using an uploaded file, should be used when the uploaded entry type is not known.
      *
@@ -278,7 +278,7 @@ class BaseEntryService extends KalturaEntryService
 			}
 			*/
 		}
-	    
+
 	    // validate the input object
 	    //$entry->validatePropertyMinLength("name", 1);
 	    if (!$entry->name)
@@ -287,28 +287,28 @@ class BaseEntryService extends KalturaEntryService
 	    // first copy all the properties to the db entry, then we'll check for security stuff
 	    $dbEntry = $this->duplicateTemplateEntry($entry->conversionProfileId, $entry->templateEntryId, self::getCoreEntry($entry->type));
 	    $dbEntry = $entry->toInsertableObject($dbEntry);
-	    
+
 	    $dbEntry->setType($type);
 	    $dbEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_AUTOMATIC);
-	        
+
 	    $this->checkAndSetValidUserInsert($entry, $dbEntry);
 	    $this->checkAdminOnlyInsertProperties($entry);
 	    $this->validateAccessControlId($entry);
 	    $this->validateEntryScheduleDates($entry, $dbEntry);
-	    
+
 	    $dbEntry->setPartnerId($this->getPartnerId());
 	    $dbEntry->setSubpId($this->getPartnerId() * 100);
 	    $dbEntry->setSourceId( $uploadTokenId );
 	    $dbEntry->setSourceLink( $entryFullPath );
 	    myEntryUtils::setEntryTypeAndMediaTypeFromFile($dbEntry, $entryFullPath);
 	    $dbEntry->setDefaultModerationStatus();
-		
+
 		// hack due to KCW of version from KMC
 		if (! is_null ( parent::getConversionQualityFromRequest () ))
 			$dbEntry->setConversionQuality ( parent::getConversionQualityFromRequest () );
-		
+
 	    $dbEntry->save();
-	    
+
 	    // setup the needed params for my insert entry helper
 	    $paramsArray = array (
 		    "entry_media_source" => KalturaSourceType::FILE,
@@ -319,21 +319,21 @@ class BaseEntryService extends KalturaEntryService
 		    "entry_source_link" => $dbEntry->getSourceLink(),
 		    "entry_tags" => $dbEntry->getTags(),
 	    );
-			
+
 	    $token = $this->getKsUniqueString();
 	    $insert_entry_helper = new myInsertEntryHelper(null , $dbEntry->getKuserId(), $paramsArray);
 	    $insert_entry_helper->setPartnerId($this->getPartnerId(), $this->getPartnerId() * 100);
 	    $insert_entry_helper->insertEntry($token, $dbEntry->getType(), $dbEntry->getId(), $dbEntry->getName(), $dbEntry->getTags(), $dbEntry);
 	    $dbEntry = $insert_entry_helper->getEntry();
-	    
+
 	    kUploadTokenMgr::closeUploadTokenById($uploadTokenId);
-	    
+
 	    myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_ADD, $dbEntry);
 
 	    $entry->fromObject($dbEntry, $this->getResponseProfile());
 	    return $entry;
     }
-    
+
 	/**
 	 * Get base entry by ID.
 	 *
@@ -346,7 +346,7 @@ class BaseEntryService extends KalturaEntryService
     {
 		return $this->getEntry($entryId, $version);
     }
-	
+
     /**
      * Get remote storage existing paths for the asset.
      *
@@ -360,7 +360,7 @@ class BaseEntryService extends KalturaEntryService
     {
 		return $this->getRemotePaths($entryId);
 	}
-	
+
 	/**
 	 * Update base entry. Only the properties that were set will be updated.
 	 *
@@ -384,7 +384,7 @@ class BaseEntryService extends KalturaEntryService
 		$baseEntry = $this->updateEntry($entryId, $baseEntry);
 		return $baseEntry;
 	}
-	
+
 	/**
 	 * Update the content resource associated with the entry.
 	 *
@@ -403,17 +403,17 @@ class BaseEntryService extends KalturaEntryService
     	$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-	
+
 	 	if($dbEntry->getType() == KalturaEntryType::AUTOMATIC || is_null($dbEntry->getType()))
         {
         	$kResource = $resource->toObject();
         	$this->setEntryTypeByResource($dbEntry, $kResource);
         	$dbEntry->save();
         }
-		
+
 		$baseEntry = new KalturaBaseEntry();
 		$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
-		
+
 		switch($dbEntry->getType())
 		{
 			case entryType::MEDIA_CLIP:
@@ -448,7 +448,7 @@ class BaseEntryService extends KalturaEntryService
 		$baseEntry->fromObject($dbEntry, $this->getResponseProfile());
 		return $baseEntry;
 	}
-	
+
 	/**
 	 * Get an array of KalturaBaseEntry objects by a comma-separated list of ids.
 	 *
@@ -459,26 +459,26 @@ class BaseEntryService extends KalturaEntryService
 	function getByIdsAction($entryIds)
 	{
 		$entryIdsArray = explode(",", $entryIds);
-		
+
 		// remove white spaces
 		foreach($entryIdsArray as &$entryId)
 			$entryId = trim($entryId);
-			
+
 	 	$list = entryPeer::retrieveByPKs($entryIdsArray);
 		$newList = array();
-		
+
 		$ks = $this->getKs();
 		$isAdmin = false;
 		if($ks)
 			$isAdmin = $ks->isAdmin();
-			
+
 	 	foreach($list as $dbEntry)
 	 	{
 	 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType(), $isAdmin);
 		    $entry->fromObject($dbEntry, $this->getResponseProfile());
 		    $newList[] = $entry;
 	 	}
-	 	
+
 	 	return $newList;
 	}
 
@@ -558,26 +558,26 @@ class BaseEntryService extends KalturaEntryService
 			$result = $filter->getListResponse($pager, $this->getResponseProfile());
 		}
 
-		
-		if ($result->totalCount == 1 && 
-			count($result->objects) == 1 && 
+
+		if ($result->totalCount == 1 &&
+			count($result->objects) == 1 &&
 			$result->objects[0]->status != KalturaEntryStatus::READY)
 		{
-			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry, 
+			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry,
 			// and the request becomes cached for a long time, preventing playback even after the entry
 			// becomes ready
 			kApiCache::setExpiry(60);
 		}
-		
+
 		// NOTE: The following is a hack in order to make sure all responses are of type KalturaBaseEntryListResponse.
 		//       The reason is that baseentry::list() is not being extended by derived classes.
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $result->objects;
 		$response->totalCount = $result->totalCount;
-		
+
 		return $response;
 	}
-	
+
 	/**
 	 * List base entries by filter according to reference id
 	 *
@@ -594,7 +594,7 @@ class BaseEntryService extends KalturaEntryService
 			//if refId wasn't provided return an error of missing parameter
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, $refId);
 		}
-				
+
 		if (!$pager){
 			$pager = new KalturaFilterPager();
 		}
@@ -607,7 +607,7 @@ class BaseEntryService extends KalturaEntryService
 		$entryFilter->attachToCriteria($c);
 		$displayInSearchStatusNotIn = array(mySearchUtils::DISPLAY_IN_SEARCH_RECYCLED, mySearchUtils::DISPLAY_IN_SEARCH_SYSTEM);
 		$c->addAnd(entryPeer::DISPLAY_IN_SEARCH, $displayInSearchStatusNotIn, Criteria::NOT_IN);
-				
+
 		KalturaCriterion::disableTag(KalturaCriterion::TAG_WIDGET_SESSION);
 
 		if (kEntitlementUtils::getEntitlementEnforcement() && !kCurrentContext::$is_admin_session && entryPeer::getUserContentOnly())
@@ -615,16 +615,16 @@ class BaseEntryService extends KalturaEntryService
 
 		$list = entryPeer::doSelect($c);
 		KalturaCriterion::restoreTag(KalturaCriterion::TAG_WIDGET_SESSION);
-		
+
 		$totalCount = $c->getRecordsCount();
-				
+
 	    $newList = KalturaBaseEntryArray::fromDbArray($list, $this->getResponseProfile());
 		$response = new KalturaBaseEntryListResponse();
 		$response->objects = $newList;
 		$response->totalCount = $totalCount;
 		return $response;
 	}
-	
+
 	/**
 	 * Count base entries by filter.
 	 *
@@ -636,7 +636,7 @@ class BaseEntryService extends KalturaEntryService
 	{
 	    return parent::countEntriesByFilter($filter);
 	}
-	
+
 	/**
 	 * Upload a file to Kaltura, that can be used to create an entry.
 	 *
@@ -649,17 +649,17 @@ class BaseEntryService extends KalturaEntryService
 	function uploadAction($fileData)
 	{
 		$ksUnique = $this->getKsUniqueString();
-		
+
 		$uniqueId = substr(base_convert(md5(uniqid(rand(), true)), 16, 36), 1, 20);
-		
+
 		$ext = pathinfo($fileData["name"], PATHINFO_EXTENSION);
 		$token = $ksUnique."_".$uniqueId.".".$ext;
 		// filesync ok
 		$res = myUploadUtils::uploadFileByToken($fileData, $token, "", null, true);
-	
+
 		return $res["token"];
 	}
-	
+
 	/**
 	 * Update entry thumbnail using a raw jpeg file.
 	 *
@@ -675,7 +675,7 @@ class BaseEntryService extends KalturaEntryService
 	{
 		return parent::updateThumbnailJpegForEntry($entryId, $fileData);
 	}
-	
+
 	/**
 	 * Update entry thumbnail using URL.
 	 *
@@ -691,7 +691,7 @@ class BaseEntryService extends KalturaEntryService
 	{
 		return parent::updateThumbnailForEntryFromUrl($entryId, $url);
 	}
-	
+
 	/**
 	 * Update entry thumbnail from a different entry by a specified time offset (in seconds).
 	 *
@@ -708,7 +708,7 @@ class BaseEntryService extends KalturaEntryService
 	{
 		return parent::updateThumbnailForEntryFromSourceEntry($entryId, $sourceEntryId, $timeOffset);
 	}
-	
+
 	/**
 	 * Flag inappropriate entry for moderation.
 	 *
@@ -724,7 +724,7 @@ class BaseEntryService extends KalturaEntryService
 		KalturaResponseCacher::disableCache();
 		return parent::flagEntry($moderationFlag);
 	}
-	
+
 	/**
 	 * Reject the entry and mark the pending flags (if any) as moderated (this will make the entry non-playable).
 	 *
@@ -737,7 +737,7 @@ class BaseEntryService extends KalturaEntryService
 	{
 		parent::rejectEntry($entryId);
 	}
-	
+
 	/**
 	 * Approve the entry and mark the pending flags (if any) as moderated (this will make the entry playable).
 	 *
@@ -750,7 +750,7 @@ class BaseEntryService extends KalturaEntryService
 	{
 		parent::approveEntry($entryId);
 	}
-	
+
 	/**
 	 * List all pending flags for the entry.
 	 *
@@ -764,7 +764,7 @@ class BaseEntryService extends KalturaEntryService
 	{
 		return parent::listFlagsForEntry($entryId, $pager);
 	}
-	
+
 	/**
 	 * Anonymously rank an entry, no validation is done on duplicate rankings.
 	 *
@@ -777,7 +777,7 @@ class BaseEntryService extends KalturaEntryService
 		KalturaResponseCacher::disableCache();
 		return parent::anonymousRankEntry($entryId, null, $rank);
 	}
-	
+
 	/**
 	 * This action delivers entry-related data, based on the user's context: access control, restriction, playback format and storage information.
 	 * @action getContextData
@@ -790,7 +790,7 @@ class BaseEntryService extends KalturaEntryService
 		$dbEntry = entryPeer::retrieveByPK($entryId);
 		if (!$dbEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
-		
+
 		if ($dbEntry->getStatus() != entryStatus::READY)
 		{
 			// the purpose of this is to solve a case in which a player attempts to play a non-ready entry,
@@ -798,7 +798,7 @@ class BaseEntryService extends KalturaEntryService
 			// becomes ready
 			kApiCache::setExpiry(60);
 		}
-		
+
 		$asset = null;
 		if($contextDataParams->flavorAssetId)
 		{
@@ -806,19 +806,19 @@ class BaseEntryService extends KalturaEntryService
 			if(!$asset)
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_ID_NOT_FOUND, $contextDataParams->flavorAssetId);
 		}
-			
+
 		$contextDataHelper = new kContextDataHelper($dbEntry, $this->getPartner(), $asset);
-		
+
 		if ($dbEntry->getAccessControl() && $dbEntry->getAccessControl()->hasRules())
 			$accessControlScope = $dbEntry->getAccessControl()->getScope();
 		else
 			$accessControlScope = new accessControlScope();
 		$contextDataParams->toObject($accessControlScope);
-		
+
 		$contextDataHelper->buildContextDataResult($accessControlScope, $contextDataParams->flavorTags, $contextDataParams->streamerType, $contextDataParams->mediaProtocol);
 		if($contextDataHelper->getDisableCache())
 			KalturaResponseCacher::disableCache();
-			
+
 		$result = new KalturaEntryContextDataResult();
 		$result->fromObject($contextDataHelper->getContextDataResult());
 		$result->flavorAssets = KalturaFlavorAssetArray::fromDbArray($contextDataHelper->getAllowedFlavorAssets());
@@ -827,7 +827,7 @@ class BaseEntryService extends KalturaEntryService
 		$result->mediaProtocol = $contextDataHelper->getMediaProtocol();
 		$result->storageProfilesXML = $contextDataHelper->getStorageProfilesXML();
 		$result->isAdmin = $contextDataHelper->getIsAdmin();
-		
+
 		$parentEntryId = $dbEntry->getSecurityParentId();
 		if ($parentEntryId)
 		{
@@ -835,7 +835,7 @@ class BaseEntryService extends KalturaEntryService
 			if(!$dbEntry)
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $parentEntryId);
 		}
-		
+
 		$result->isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
 		if (!($result->isScheduledNow) && $this->getKs() ){
 			// in case the sview is defined in the ks simulate schedule now true to allow player to pass verification
@@ -860,7 +860,7 @@ class BaseEntryService extends KalturaEntryService
 
 		return $result;
 	}
-	
+
 	/**
 	 * @action export
 	 * Action for manually exporting an entry
@@ -877,13 +877,13 @@ class BaseEntryService extends KalturaEntryService
 	    {
 	        throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 	    }
-	    
+
 	    $dbStorageProfile = StorageProfilePeer::retrieveByIdAndPartnerId($storageProfileId, $dbEntry->getPartnerId());
 	    if (!$dbStorageProfile)
 	    {
 	        throw new KalturaAPIException(KalturaErrors::STORAGE_PROFILE_ID_NOT_FOUND, $storageProfileId);
 	    }
-	    
+
 	    $scope = $dbStorageProfile->getScope();
 	    $scope->setEntryId($entryId);
 	    if(!$dbStorageProfile->fulfillsRules($scope))
@@ -902,16 +902,16 @@ class BaseEntryService extends KalturaEntryService
  	    		throw new KalturaAPIException(APIErrors::PROFILE_STATUS_DISABLED,$entryId);
 	    	}
 	    }
-	     
-	    
+
+
 	    //TODO: implement export errors
-	    
+
 		$entry = KalturaEntryFactory::getInstanceByType($dbEntry->getType());
 		$entry->fromObject($dbEntry, $this->getResponseProfile());
 	    return $entry;
-	    
+
 	}
-	
+
 	/**
 	 * Index an entry by id.
 	 *
@@ -924,7 +924,7 @@ class BaseEntryService extends KalturaEntryService
 	{
 		if(kEntitlementUtils::getEntitlementEnforcement())
 			throw new KalturaAPIException(KalturaErrors::CANNOT_INDEX_OBJECT_WHEN_ENTITLEMENT_IS_ENABLE);
-			
+
 		$entryDb = entryPeer::retrieveByPK($id);
 		if (!$entryDb)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $id);
@@ -932,16 +932,16 @@ class BaseEntryService extends KalturaEntryService
 		if (!$shouldUpdate)
 		{
 			$entryDb->indexToSearchIndex();
-			
+
 			return $entryDb->getIntId();
 		}
-		
+
 		return myEntryUtils::index($entryDb);
 	}
 
 	/**
 	 * Clone an entry with optional attributes to apply to the clone
-	 * 
+	 *
 	 * @action clone
 	 * @param string $entryId Id of entry to clone
 	 * @param KalturaBaseEntryCloneOptionsArray $cloneOptions
@@ -1014,7 +1014,7 @@ class BaseEntryService extends KalturaEntryService
 		{
 			$dbEntry = kSimuliveUtils::getSourceEntry($simuliveEvent);
 			if (!$dbEntry)
-			{	
+			{
 				throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 			}
 		}
@@ -1040,7 +1040,7 @@ class BaseEntryService extends KalturaEntryService
 			KalturaResponseCacher::disableCache();
 
 		$isScheduledNow = $dbEntry->isScheduledNow($contextDataParams->time);
-		
+
 		if (!($isScheduledNow) && $this->getKs() && !$this->getKs()->isWidgetSession())
 		{
 		  $privilegeEntryId = $parentEntryId ?? $entryId;
@@ -1081,7 +1081,7 @@ class BaseEntryService extends KalturaEntryService
 		elseif ($dbEntry->hasCapability(LiveEntry::LIVE_SCHEDULE_CAPABILITY) && $dbEntry->getType() == entryType::LIVE_STREAM)
 		{
 			$startTime = time();
-			$endTime = $startTime + kSimuliveUtils::SIMULIVE_SCHEDULE_MARGIN;
+			$endTime = $startTime + dateUtils::HOUR;
 			$events = $dbEntry->getScheduleEvents($startTime, $endTime);
 			if (count($events) > 0)
 			{
@@ -1091,7 +1091,7 @@ class BaseEntryService extends KalturaEntryService
 		}
 		return $activeLiveStreamTime;
 	}
-	
+
 	/**
 	 * This action serves HLS encrypted key if access control is validated
 	 * @action servePlaybackKey
@@ -1106,17 +1106,17 @@ class BaseEntryService extends KalturaEntryService
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
-		
+
 		$securityEntryHelper = new KSecureEntryHelper($entry, null, kApiCache::getHttpReferrer(), ContextType::PLAY);
 		http_response_code(KCurlHeaderResponse::HTTP_STATUS_FORBIDDEN);
 		$securityEntryHelper->validateForPlay();
 		http_response_code(KCurlHeaderResponse::HTTP_STATUS_OK);
-		
+
 		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
 		$key = md5(md5(kConf::get(self::PLAYBACK_SECRET) . $partner->getId()) . $entryId, true);
 		return new kRendererString($key, kMimeTypes::TYPE_TEXT);
 	}
-	
+
 	/**
 	 * Move the entry to the recycle bin
 	 *
@@ -1131,23 +1131,23 @@ class BaseEntryService extends KalturaEntryService
 		{
 			throw new KalturaAPIException(KalturaErrors::FEATURE_RECYCLE_BIN_DISABLED);
 		}
-		
+
 		$entry = entryPeer::retrieveByPKNoFilter($entryId);
 		if (!$entry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
-		
+
 		if ($entry->getDisplayInSearch() === KalturaEntryDisplayInSearchType::RECYCLED)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS_FOR_RECYCLE);
 		}
-		
+
 		$entry->setRecycledAt(time());
 		$entry->setPreviousDisplayInSearchStatus($entry->getDisplayInSearch());
 		$entry->setDisplayInSearch(KalturaEntryDisplayInSearchType::RECYCLED);
 		$entry->save();
-		
+
 		return $this->getEntry($entryId);
 	}
 
@@ -1171,12 +1171,12 @@ class BaseEntryService extends KalturaEntryService
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_ENTRY_STATUS_FOR_RESTORE);
 		}
-		
+
 		$entry->setDisplayInSearch($entry->getPreviousDisplayInSearchStatus());
 		$entry->setPreviousDisplayInSearchStatus(null);
 		$entry->setRecycledAt(null);
 		$entry->save();
-		
+
 		return $this->getEntry($entryId);
 	}
 }
