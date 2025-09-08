@@ -32,7 +32,7 @@ class VendorDocumentEnrichmentCatalogItem extends VendorCatalogItem
 
 	public function isAssetSupported($asset): bool
 	{
-		$supportedFileExts = ["pdf", "pptx", "docx", "ppt", "doc"];
+		$supportedFileExts = ["pdf", "pptx", "docx", "ppt", "doc", "txt"];
 		return $asset instanceof AttachmentAsset && in_array($asset->getFileExt(), $supportedFileExts);
 	}
 }
