@@ -43,6 +43,27 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
  	 */
 	public function getListResponse(KalturaFilterPager $pager, KalturaDetachedResponseProfile $responseProfile = null)
 	{
+		$this->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
+		
+		//Check status filter validity
+		if($this->statusEqual || $this->statusIn)
+		{
+			// only PENDING and SCHEDULED statuses are valid for filtering
+			$validStatuses = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED);
+			$filteredStatus = $this->statusEqual ? array($this->statusEqual) : explode(",", $this->statusIn);
+			if (!empty(array_diff($filteredStatus, $validStatuses)))
+			{
+				KalturaLog::debug("Invalid status filter, defaulting to PENDING");
+				$this->statusEqual = EntryVendorTaskStatus::PENDING;
+			}
+		}
+		else
+		{
+			// default status filter
+			KalturaLog::debug("No status filter, defaulting to PENDING");
+			$filter->statusEqual = EntryVendorTaskStatus::PENDING;
+		}
+		
 		$c = KalturaCriteria::create(EntryVendorTaskPeer::OM_CLASS);
 		$filter = $this->toObject();
 		$filter->attachToCriteria($c);

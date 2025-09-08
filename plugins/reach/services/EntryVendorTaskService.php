@@ -336,12 +336,14 @@ class EntryVendorTaskService extends KalturaBaseService
 	public function getJobsAction(KalturaEntryVendorTaskFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaEntryVendorTaskFilter();
+		}
 		
-		$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
-		$filter->statusEqual = EntryVendorTaskStatus::PENDING;
 		if (!$pager)
+		{
 			$pager = new KalturaFilterPager();
+		}
 		
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
