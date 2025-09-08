@@ -116,8 +116,10 @@ class ReachProfileService extends KalturaBaseService
 			if ($dbCurrentCredit instanceof kReoccurringVendorCredit && $dbCurrentCredit->wasCreditUpdated($updatedCredit))
 			{
 				$currentCredit = $dbReachProfile->getCredit();
-				/* @var $updatedCredit kReoccurringVendorCredit */
-				$currentCredit->setPeriodDates();
+				if($currentCredit instanceof kReoccurringVendorCredit)
+				{
+					$currentCredit->setPeriodDates();
+				}
 				$dbReachProfile->setCredit($currentCredit);
 			}
 			$dbReachProfile->calculateCreditPercentUsage();
