@@ -1,4 +1,16 @@
 # Venus-22.3.0
+
+## Activate scheule events related kafka notification by default ##
+- Issue Type: Task
+- Issue ID: N/A
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	deployment/updates/scripts/xml/notifications/2025_09_09_update_kafka_schedule_event_events.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_09_07_update_category_entry_kafka_notifications.php
+
 ## Update status of kafka event notification to active for category entry create/update ##
 - Issue Type: Task
 - Issue ID: KAM-136
