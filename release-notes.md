@@ -9,7 +9,7 @@
 	deployment/updates/scripts/xml/notifications/2025_09_09_update_kafka_schedule_event_events.template.xml
 
 ### Deployment scripts ###
-	php /opt/kaltura/app/deployment/updates/scripts/2025_09_09_update_schedule_event_kafka_notifications.php
+	php deployment/updates/scripts/2025_09_09_update_schedule_event_kafka_notifications.php
 
 ## Update status of kafka event notification to active for category entry create/update ##
 - Issue Type: Task
