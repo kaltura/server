@@ -19,23 +19,23 @@ abstract class KalturaHttpNotificationData extends KalturaObject
 			case 'kHttpNotificationDataFields':
 				$data = new KalturaHttpNotificationDataFields();
 				break;
-				
+
 			case 'kHttpNotificationDataText':
 				$data = new KalturaHttpNotificationDataText();
 				break;
-				
+
 			case 'kHttpNotificationObjectData':
 				$data = new KalturaHttpNotificationObjectData();
 				break;
-				
+
 			default:
 				$data = KalturaPluginManager::loadObject('KalturaHttpNotificationData', $dataType);
 				break;
 		}
-		
+
 		if($data)
 			$data->fromObject($coreObject);
-			
+
 		return $data;
 	}
 
@@ -45,7 +45,7 @@ abstract class KalturaHttpNotificationData extends KalturaObject
 	 */
 	abstract public function getData(kHttpNotificationDispatchJobData $jobData = null);
 
-	public function getContentType() : string
+	public function getContentType()
 	{
 		return '';
 	}
