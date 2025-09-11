@@ -21,7 +21,7 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 	 * @var string
 	 */
 	protected $data;
-	
+
 	private static $map_between_objects = array
 	(
 		'content',
@@ -35,7 +35,7 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 	{
 		return array_merge ( parent::getMapBetweenObjects() , self::$map_between_objects );
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
@@ -43,10 +43,10 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 	{
 		if(is_null($dbObject))
 			$dbObject = new kHttpNotificationDataText();
-			
+
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
-	 
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject()
 	 */
@@ -54,7 +54,7 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 	{
 		/* @var $dbObject kHttpNotificationDataText */
 		parent::doFromObject($dbObject, $responseProfile);
-		
+
 		if($this->shouldGet('content', $responseProfile))
 		{
 			$contentType = get_class($dbObject->getContent());
@@ -63,24 +63,24 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 				case 'kStringValue':
 					$this->content = new KalturaStringValue();
 					break;
-					
+
 				case 'kEvalStringField':
 					$this->content = new KalturaEvalStringField();
 					break;
-					
+
 				default:
 					$this->content = KalturaPluginManager::loadObject('KalturaStringValue', $contentType);
 					break;
 			}
-			
+
 			if($this->content)
 				$this->content->fromObject($dbObject->getContent());
 		}
-			
+
 		if($this->shouldGet('data', $responseProfile))
 			$this->data = $dbObject->getData();
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaHttpNotificationData::getData()
 	 */
@@ -89,7 +89,7 @@ class KalturaHttpNotificationDataText extends KalturaHttpNotificationData
 		return $this->data;
 	}
 
-	public function getContentType() : string
+	public function getContentType()
 	{
 		return $this->contentType;
 	}
