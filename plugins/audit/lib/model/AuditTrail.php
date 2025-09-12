@@ -190,7 +190,7 @@ class AuditTrail extends BaseAuditTrail implements IBaseObject
 		$this->setEntryPoint(kCurrentContext::getEntryPoint());
 		$this->setUserAgent(requestUtils::getRemoteUserAgent());
 		
-		return parent::save($con);
+		//return parent::save($con);
 	} // save()
 	
 } // AuditTrail
