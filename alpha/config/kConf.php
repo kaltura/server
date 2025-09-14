@@ -61,6 +61,26 @@ class kConf extends kEnvironment
 		return $result;
 	}
 
+	public static function hasSecret($paramName) {
+		return kConf::hasParam($paramName) || kConf::hasParam($paramName, 'secrets');
+	}
+
+	public static function getCurrentSecret($paramName)
+	{
+		$fallback = self::get($paramName, 'local', null);
+		return self::get($paramName, 'secrets', $fallback);
+	}
+
+	public static function getAllSecrets($paramName): array
+	{
+		$current = self::getCurrentSecret($paramName);
+		$previous = kConf::get($paramName, 'secrets.previous', []);
+		if (!is_array($previous)) {
+			$previous = [$previous];
+		}
+		return array_merge([$current], $previous);
+	}
+
 	/**
 	 * Adds the ability to get an element from array(Section) of configuration directly instead of the Entire array
 	 * @param string $sectionName
@@ -87,7 +107,7 @@ class kConf extends kEnvironment
 	{
 		return self::getMap('local');
 	}
-	
+
 	public static function getDB()
 	{
 		return self::getMap('db');
