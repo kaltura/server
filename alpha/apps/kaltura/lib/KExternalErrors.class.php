@@ -198,8 +198,13 @@ class KExternalErrors
 
 	public static function terminateDispatch($errorCode = null)
 	{
-		$requestTook = (microtime(true) - $GLOBALS["start"]);
-		if (class_exists('KalturaLog') && isset($GLOBALS["start"]))
+		$requestTook = null;
+		if(isset($GLOBALS["start"]))
+		{
+			$requestTook = (microtime(true) - $GLOBALS["start"]);
+		}
+		
+		if (class_exists('KalturaLog') && !is_null($requestTook))
 		{
 			KalturaLog::debug("Dispatch took - " . $requestTook . " seconds, memory: " . memory_get_peak_usage(true));
 		}
