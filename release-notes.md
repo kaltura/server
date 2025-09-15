@@ -1,5 +1,12 @@
-# Venus-22.3.0
+# Venus-22.4.0
+## Add permissions for Agents Manager ##
+- Issue Type: Task
+- Issue ID: KAM-134
 
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_09_15_add_agents_manager_permissions.php
+
+# Venus-22.3.0
 ## Activate scheule events related kafka notification by default ##
 - Issue Type: Task
 - Issue ID: N/A
