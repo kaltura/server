@@ -234,4 +234,6 @@ interface ReportType extends BaseEnum
    const EP_LATEST_DOWNLOADED_ATTACHMENTS = 60019;
 
    const CNC_PARTICIPATION = 70001;
+
+   const GENIE_USAGE_REPORT = 80001;
 }

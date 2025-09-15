@@ -21,6 +21,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
 	const DATASOURCE_CNC_EVENTS = 'cnc-events';
 	const DATASOURCE_APPLICATION_EVENTS = 'application-events';
+	const DATASOURCE_KAI = 'kai-events';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -91,6 +92,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_COMPANY = 'company';
 	const DIMENSION_FLAVOR_ID = 'flavorId';
 	const DIMENSION_VIDEO_CODEC = 'videoCodec';
+	const DIMENSION_KALTURA_APPLICATION = 'kalturaApplication';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -220,6 +222,10 @@ class kKavaBase extends kDruidBase
 
 	// Entry vendor task statuses
 	const TASK_READY = "Ready";
+
+	// KAI
+	const SEARCH_ACTION_TYPE = 'search';
+	const GENIE_APP = 'Genie';
 
 	// event properties
 	const PROPERTY_HAS_BITRATE = 'hasBitrate';
@@ -880,7 +886,16 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_EVENT_VAR4 => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
-		)
+		),
+		self::DATASOURCE_KAI => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_KALTURA_APPLICATION => 1,
+			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_EVENT_VAR2 => 1,
+		),
 	);
 
 	protected static $datasources_hash_dimensions = array(

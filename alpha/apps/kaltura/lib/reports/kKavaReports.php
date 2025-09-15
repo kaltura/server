@@ -2014,6 +2014,24 @@ class kKavaReports extends kKavaReportsMgr
 					self::REPORT_METRICS => array(self::METRIC_MEETING_VIEW_TIME),
 					self::REPORT_GRAPH_METRICS => array(self::METRIC_MEETING_VIEW_TIME),
 				),
+				// genie
+				array(
+					self::REPORT_DATA_SOURCE => self::DATASOURCE_KAI,
+					self::REPORT_FILTER_DIMENSION => self::DIMENSION_PARTNER_ID,
+					self::REPORT_FILTER => array(
+						array(
+							self::DRUID_DIMENSION => self::DIMENSION_EVENT_VAR2,
+							self::DRUID_VALUES => array(self::SEARCH_ACTION_TYPE)
+						),
+						array(
+							self::DRUID_DIMENSION => self::DIMENSION_KALTURA_APPLICATION,
+							self::DRUID_VALUES => array(self::GENIE_APP)
+						),
+					),
+					self::REPORT_GRANULARITY => self::GRANULARITY_DAY,
+					self::REPORT_GRAPH_METRICS => array(self::METRIC_REQUEST_COUNT, self::METRIC_UNIQUE_USERS),
+				)
+
 			),
 			self::REPORT_GRAPH_AGGR_FUNC => 'kKavaReportsMgr::aggregateUsageData',
 			self::REPORT_GRAPH_FINALIZE_FUNC => 'kKavaReportsMgr::addCombinedLiveViewTimeGraph',
@@ -2034,6 +2052,8 @@ class kKavaReports extends kKavaReportsMgr
 				'video_streams' => self::EVENT_TYPE_PLAYMANIFEST,
 				'transcoding_duration' => self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION,
 				'live_view_time' => self::METRIC_COMBINED_LIVE_VIEW_TIME,
+				'genie_unique_users' => self::METRIC_UNIQUE_USERS,
+				'genie_requests' => self::METRIC_REQUEST_COUNT,
 			),
 		)
 	);

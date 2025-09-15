@@ -170,6 +170,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_MEETING_VIEW_TIME_SEC = 'meeting_view_time_sec';
 	const METRIC_UNION_LIVE_MEETING_VIEW_TIME = 'union_live_meeting_view_time';
 	const METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME = 'union_live_meeting_vod_view_time';
+	const METRIC_REQUEST_COUNT = 'request_count';
 
 	// non druid metrics
 	const METRIC_BANDWIDTH_STORAGE_MB = 'combined_bandwidth_storage';
@@ -1512,6 +1513,9 @@ class kKavaReportsMgr extends kKavaBase
 			self::DRUID_AGGR => array(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC),
 			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
 				self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION, self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC, '60'));
+
+		self::$aggregations_def[self::METRIC_REQUEST_COUNT] = self::getLongSumAggregator(
+			self::METRIC_REQUEST_COUNT, self::METRIC_REQUEST_COUNT);
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
