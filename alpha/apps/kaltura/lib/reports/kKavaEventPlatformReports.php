@@ -361,6 +361,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::DRUID_VALUES => array(self::VALUE_UNKNOWN, "0", "")
 				)
 			),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_METRICS => array(
 				self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS,
 				self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO,
