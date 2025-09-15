@@ -54,6 +54,11 @@ class KalturaMonitorClient
 
 	const SESSION_COUNTERS_SECRET_HEADER = 'HTTP_X_KALTURA_SESSION_COUNTERS';
 	
+	const SERVICE_OK = 'OK';
+	const SERVICE_NEARING_LIMITS = 'NearingLimits';
+	const DEFAULT_SERVICE_THRESHOLD = 1; // 1 second
+	const DEFAULT_SERVICE_CACHE_INTERVAL = 60; // 1 second
+	
 	protected static $queryTypes = array(
 			'SELECT ' 		=> 'SELECT',
 			'UPDATE ' 		=> 'UPDATE',
@@ -335,8 +340,10 @@ class KalturaMonitorClient
 		self::checkApiRateLimit($partnerId, $service, $action, $params);
 	}
 
-	public static function monitorApiEnd($errorCode)
+	public static function monitorApiEnd($errorCode, $took = null)
 	{
+		self::sendServiceStatusHeader($took);
+		
 		if (!self::$stream)
 			return;
 
@@ -829,6 +836,65 @@ class KalturaMonitorClient
 		if(!KalturaResponseCacher::rateLimit($service, $action, $params, $partnerId))
 		{
 			KExternalErrors::dieError(KExternalErrors::ACTION_RATE_LIMIT);
+		}
+	}
+	
+	private static function sendServiceStatusHeader($requestTook = null)
+	{
+		if(!isset($requestTook))
+			return;
+		
+		if(!kApcWrapper::functionExists('inc'))
+			return;
+		
+		$serviceStatusConfig = kConf::get('service_status_config', kConfMapNames::RUNTIME_CONFIG, array());
+		if(!is_array($serviceStatusConfig) || !count($serviceStatusConfig))
+			return;
+		
+		if(!isset($serviceStatusConfig['enabled']) || !$serviceStatusConfig['enabled'])
+			return;
+		
+		$skipActions = isset($serviceStatusConfig['skip_actions']) ?  $serviceStatusConfig['skip_actions'] : array();
+		if(isset(self::$basicEventInfo[self::FIELD_ACTION]) && in_array(self::$basicEventInfo[self::FIELD_ACTION], $skipActions))
+		{
+			self::safeLog("Skipping service status for action: " . self::$basicEventInfo[self::FIELD_ACTION]);
+			return;
+		}
+		
+		$thresholdInSeconds = isset($serviceStatusConfig['threshold_in_seconds']) ?
+			$serviceStatusConfig['threshold_in_seconds'] :
+			self::DEFAULT_SERVICE_THRESHOLD;
+		
+		$cacheInterval = isset($serviceStatusConfig['cache_interval']) ?
+			$serviceStatusConfig['cache_interval'] :
+			self::DEFAULT_SERVICE_CACHE_INTERVAL;
+		
+		$elapsedMicro = (int)round($requestTook * 1000000);
+		$reqCount = kApcWrapper::apcInc('req_count', 1, null, $cacheInterval);
+		$reqTime = kApcWrapper::apcInc('req_time', $elapsedMicro, null, $cacheInterval);
+		if($reqTime && $reqCount)
+		{
+			$reqAvgTime = ($reqTime/1000000)/$reqCount;
+			$serviceStatus = self::SERVICE_OK;
+			if($reqAvgTime > $thresholdInSeconds)
+			{
+				$serviceStatus = self::SERVICE_NEARING_LIMITS;
+				if(isset($serviceStatusConfig['send_analytics_beacons']) && $serviceStatusConfig['send_analytics_beacons'])
+				{
+					self::sendErrorEvent('NEARING_LIMITS');
+				}
+			}
+			
+			header('X-Kaltura-Service-Status: ' . $serviceStatus);
+			self::safeLog("Service status: serviceStatus [$serviceStatus] count [$reqCount] time [$reqTime] avg [$reqAvgTime]");
+		}
+	}
+	
+	protected static function safeLog($msg)
+	{
+		if (class_exists('KalturaLog') && KalturaLog::isInitialized())
+		{
+			KalturaLog::debug($msg);
 		}
 	}
 }

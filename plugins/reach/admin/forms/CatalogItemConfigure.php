@@ -118,11 +118,17 @@ class Form_CatalogItemConfigure extends ConfigureForm
 
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::SIGN_LANGUAGE)
 		{
-			$targetLanguage = new Kaltura_Form_Element_EnumSelect('targetLanguage', array('enum' => 'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage'));
-			$targetLanguage->setLabel('Target Language:');
-			$targetLanguage->setRequired(true);
-			$targetLanguage->setValue(Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_ASL);
-			$this->addElement($targetLanguage);
+			$this->addElement('select', 'targetLanguage', array(
+				'label'			=> 'Target Language:',
+				'filters'		=> array('StringTrim'),
+				'required'		=> true,
+				'multiOptions' 	=> array(
+					Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_ASL => Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_ASL,
+					Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_BSL => Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_BSL,
+				),
+				'value' => Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_ASL,
+
+			));
 		}
 		
 		if ($this->catalogItemType == Kaltura_Client_Reach_Enum_VendorServiceFeature::TRANSLATION)

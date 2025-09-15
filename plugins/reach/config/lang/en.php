@@ -170,8 +170,8 @@ $englishArray = array(
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::ZH_HK' => "Traditional Chinese",
 	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AUTO_DETECT' => "Auto Detect",
 
-	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_ASL' => "English (ASL)",
-	'Kaltura_Client_Reach_Enum_CatalogItemSignLanguage::ENGLISH_BSL' => "English (BSL)",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_ASL' => "English (ASL)",
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::EN_BSL' => "English (BSL)",
 
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::PENDING' => 'Pending',
 	'Kaltura_Client_Reach_Enum_EntryVendorTaskStatus::READY' => 'Ready',

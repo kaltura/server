@@ -241,6 +241,43 @@ class DbManager
 		
 		return self::getPreferredSphinxIndexByWeight($hostToLag, $hostToIndex);
 	}
+	
+	/**
+	 * Translate Sphinx host to matching cname if it exists
+	 * @param $hostName
+	 * @return bool|mixed
+	 */
+	public static function getRealHostName($hostName)
+	{
+		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_QUERY_CACHE_KEYS);
+		if (!$cache)
+		{
+			KalturaLog::debug("Query cache keys form cache not found, using sphinx hostname as is");
+			return $hostName;
+		}
+		
+		$cacheResult = $cache->get(kQueryCache::SPHINX_CNAME_MAP);
+		if (!$cacheResult)
+		{
+			KalturaLog::debug("sphinx_cname_map not found in cache, using sphinx hostname as is");
+			return $hostName;
+		}
+		
+		$cnameMap = json_decode($cacheResult, true);
+		if (empty($cnameMap))
+		{
+			KalturaLog::debug("sphinx_cname_map decoding failed or the map is empty, using sphinx hostname as is");
+			return $hostName;
+		}
+		
+		if (array_key_exists($hostName, $cnameMap))
+		{
+			KalturaLog::debug("Translating sphinx host [$hostName] to cname [" . $cnameMap[$hostName] . "]");
+			$hostName = $cnameMap[$hostName];
+		}
+		
+		return $hostName;
+	}
 
 	protected static function getStickySessionKey()
 	{

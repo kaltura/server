@@ -292,6 +292,7 @@ abstract class zoomRecordingProcessor extends zoomProcessor
 			{
 		        if ($kUser->status == KalturaUserStatus::BLOCKED)
                 {
+	                KalturaLog::debug('User [' . $kUser->id . '] is BLOCKED');
                     continue;
                 }
 				if (strtolower($kUser->id) !== $userToExclude)

@@ -2214,8 +2214,11 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$this->putInCustomData ( "entitledUserPuserView" , serialize($entitledUserPuserView) );
 	}
 	
-	public function isOwnerActionsAllowed($kuserId)
+	public function isOwnerActionsAllowed($kuserId = null)
 	{
+		if(!$kuserId)
+			return false;
+		
 		$ownerKuserId = $this->getKuserId();
 		if($kuserId == $ownerKuserId)
 			return true;

@@ -6,7 +6,7 @@
 class KalturaVendorSignLanguageCatalogItem extends KalturaVendorCatalogItem
 {
 	/**
-	 * @var KalturaCatalogItemSignLanguage
+	 * @var KalturaCatalogItemLanguage
 	 * @filter eq,in
 	 */
 	public $targetLanguage;

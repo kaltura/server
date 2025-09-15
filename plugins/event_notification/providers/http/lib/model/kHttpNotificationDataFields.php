@@ -10,7 +10,22 @@ class kHttpNotificationDataFields extends kHttpNotificationData
 	 * @var string
 	 */
 	protected $data;
-	
+
+	/**
+	 * @var string
+	 */
+	protected $contentType;
+
+	public function getContentType()
+	{
+		return $this->contentType;
+	}
+
+	public function setContentType(string $contentType): void
+	{
+		$this->contentType = $contentType;
+	}
+
 	/* (non-PHPdoc)
 	 * @see kHttpNotificationData::setScope()
 	 */
