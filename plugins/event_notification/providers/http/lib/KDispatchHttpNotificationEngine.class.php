@@ -77,6 +77,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			$headers[] = "X-KALTURA-HASH-ALGO: $shaType";
 		}
 
+		$isContentTypeSet = false;
 		if(is_array($data->customHeaders) && count($data->customHeaders))
 		{
 			foreach($data->customHeaders as $customHeader)
@@ -95,11 +96,17 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 					$value = $this->handleOauth2($data->url, $value);
 				}
 
+				if (strtolower($key) == 'content-type')
+				{
+					$isContentTypeSet = true;
+				}
+
+
 				$headers[] = "$key: $value";
 			}
 		}
 
-		if($data->contentType)
+		if($data->contentType && !$isContentTypeSet)
 		{
 			$headers[] = "Content-Type: " . $data->contentType;
 		}
