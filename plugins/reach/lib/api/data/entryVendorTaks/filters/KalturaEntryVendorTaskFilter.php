@@ -21,7 +21,7 @@ class KalturaEntryVendorTaskFilter extends KalturaEntryVendorTaskBaseFilter
 		"+expectedFinishTime" => "+expected_finish_time",
 		"-expectedFinishTime" => "-expected_finish_time",
 	);
-	
+
 	public function getOrderByMap()
 	{
 		return array_merge(parent::getOrderByMap(), self::$order_by_map);
