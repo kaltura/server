@@ -345,6 +345,27 @@ class EntryVendorTaskService extends KalturaBaseService
 			$pager = new KalturaFilterPager();
 		}
 		
+		$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
+		
+		//Check status filter validity
+		if($filter->statusEqual || $filter->statusIn)
+		{
+			// only PENDING and SCHEDULED statuses are valid for filtering
+			$validStatuses = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED);
+			$filteredStatus = $filter->statusEqual ? array($filter->statusEqual) : explode(",", $filter->statusIn);
+			if (!empty(array_diff($filteredStatus, $validStatuses)))
+			{
+				KalturaLog::debug("Invalid status filter, defaulting to PENDING");
+				$filter->statusEqual = EntryVendorTaskStatus::PENDING;
+			}
+		}
+		else
+		{
+			// default status filter
+			KalturaLog::debug("No status filter, defaulting to PENDING");
+			$filter->statusEqual = EntryVendorTaskStatus::PENDING;
+		}
+		
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
 	
