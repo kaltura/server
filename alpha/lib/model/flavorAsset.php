@@ -16,7 +16,7 @@ class flavorAsset extends exportableAsset
 	const CUSTOM_DATA_FIELD_LANGUAGE = "language";
 	const CUSTOM_DATA_FIELD_LABEL = "label";
 	const CUSTOM_DATA_FIELD_DEFAULT = "default";
-	
+
 	/**
 	 * Applies default values to this object.
 	 * This method should be called from the object's constructor (or
@@ -93,7 +93,7 @@ class flavorAsset extends exportableAsset
 	{
 		return assetParamsPeer::retrieveByPk($this->flavor_params_id);
 	}
-	
+
 	public function getIsWeb()
 	{
 		return $this->hasTag(flavorParams::TAG_WEB);
@@ -102,7 +102,7 @@ class flavorAsset extends exportableAsset
 	public function setFromAssetParams($dbAssetParams)
 	{
 		parent::setFromAssetParams($dbAssetParams);
-		
+
 		$this->setBitrate($dbAssetParams->getVideoBitrate()+$dbAssetParams->getAudioBitrate());
 		$this->setFrameRate($dbAssetParams->getFrameRate());
 		$this->setVideoCodecId($dbAssetParams->getVideoCodec());
@@ -110,13 +110,13 @@ class flavorAsset extends exportableAsset
 
 	/**
 	 * Code to be run after inserting to database
-	 * @param PropelPDO $con 
+	 * @param PropelPDO $con
 	 */
 	public function postInsert(PropelPDO $con = null)
 	{
 		parent::postInsert($con);
-		
-		$this->syncEntryFlavorParamsIds();		
+
+		$this->syncEntryFlavorParamsIds();
 	}
 
 	/**
@@ -129,18 +129,18 @@ class flavorAsset extends exportableAsset
 			return parent::postUpdate($con);
 
 		$syncFlavorParamsIds = false;
-		if($this->isColumnModified(assetPeer::STATUS)){ 
+		if($this->isColumnModified(assetPeer::STATUS)){
 			$syncFlavorParamsIds = true;
 		}
-		
+
 		$ret = parent::postUpdate($con);
-		
+
 		if($syncFlavorParamsIds)
-        	$this->syncEntryFlavorParamsIds();	
-        	
+        	$this->syncEntryFlavorParamsIds();
+
         return $ret;
 	}
-	
+
 	protected function syncEntryFlavorParamsIds()
 	{
 		if ($this->getStatus() == self::ASSET_STATUS_DELETED || $this->getStatus() == self::ASSET_STATUS_READY)
@@ -157,7 +157,7 @@ class flavorAsset extends exportableAsset
 	    	}
 		}
 	}
-	
+
 	public function linkFromAsset(asset $fromAsset)
 	{
 		parent::linkFromAsset($fromAsset);
@@ -168,7 +168,7 @@ class flavorAsset extends exportableAsset
 		$this->setLanguage($fromAsset->getLanguage());
 		$this->setIsOriginal($fromAsset->getIsOriginal());
 	}
-	
+
 	public function getInterFlowCount() { return $this->getFromCustomData("interFlowCount"); }
 	public function incrementInterFlowCount() { $this->putInCustomData("interFlowCount", $this->getInterFlowCount() ? $this->getInterFlowCount()+1 : 1); }
 	public function removeInterFlowCount() { $this->removeFromCustomData("interFlowCount"); }
@@ -192,7 +192,7 @@ class flavorAsset extends exportableAsset
 
 	public function getLabel()  {return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LABEL); }
 	public function setLabel($v){$this->putInCustomData(self::CUSTOM_DATA_FIELD_LABEL, $v);}
-	
+
 	public function getDefault()		{return $this->getFromCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, null, false);}
 	public function setDefault($v)		{$this->putInCustomData(self::CUSTOM_DATA_FIELD_DEFAULT, (bool)$v);}
 
@@ -212,7 +212,7 @@ class flavorAsset extends exportableAsset
 		}
 		return $obj;
 	}
-	
+
 	public function getVideoBitrate()
 	{
 		return $this->getBitrate();
@@ -222,19 +222,19 @@ class flavorAsset extends exportableAsset
 	{
 		$videoStream = null;
 		$audioStream = null;
-		
+
 		$mediaInfo = $this->getMediaInfo();
 		if(!$mediaInfo)
 		{
 			return '';
 		}
-		
+
 		$contentStreams = json_decode($mediaInfo->getContentStreams(), true);
 		if(!$contentStreams)
 		{
 			return '';
 		}
-		
+
 		foreach ($contentStreams as $key => $value)
 		{
 			if($key == "video")
@@ -246,35 +246,35 @@ class flavorAsset extends exportableAsset
 				$audioStream = $value[0];
 			}
 		}
-		
+
 		if(!isset($videoStream['extradata']))
 		{
 			return '';
 		}
-		
+
 		// Handle video codec
 		$videoCodecString = '';
 		if ($videoStream)
 		{
 			$vCodec = strtolower($videoStream['videoFormat']);
-			
+
 			switch ($vCodec)
 			{
 				case 'h264':
 					$videoCodecString = $this->getAvc1Codec($videoStream['extradata'] ?? '');
 					break;
-				
+
 				case 'hevc':
 				case 'h265':
 					$videoCodecString = $this->getHvc1Codec($videoStream['extradata'] ?? '');
 					break;
-				
+
 				case 'av1':
 					$videoCodecString = $this->getAv1Codec($videoStream);
 					break;
 			}
 		}
-		
+
 		// Handle audio codec
 		$audioCodecString = '';
 		if ($audioStream)
@@ -284,10 +284,10 @@ class flavorAsset extends exportableAsset
 			$extraData = isset($audioStream['extradata']) ? $audioStream['extradata'] : null;
 			$audioCodecString = $this->getAudioCodec($aCodec, $aProfile, $extraData);
 		}
-		
+
 		return implode(',', array_filter(array($videoCodecString, $audioCodecString)));
 	}
-	
+
 	/**
 	 * Get AVC1 codec string
 	 * @param string $extraDataRaw
@@ -296,24 +296,24 @@ class flavorAsset extends exportableAsset
 	private function getAvc1Codec(string $extraDataRaw)
 	{
 		$bytes = $this->hexStringToBytes($extraDataRaw);
-		
+
 		$pos = strpos($bytes, "\x67");
 		if ($pos === false)
 			return null;  // no SPS found
-		
+
 		// Check length to avoid reading past buffer
 		$profile_idc = isset($bytes[$pos + 1]) ? ord($bytes[$pos + 1]) : 0x42;
 		$constraint_flags = isset($bytes[$pos + 2]) ? ord($bytes[$pos + 2]) : 0x00;
 		$level_idc = isset($bytes[$pos + 3]) ? ord($bytes[$pos + 3]) : 0x1e;
-		
+
 		// Format as two-digit hex lowercase
 		$profileHex = sprintf('%02x', $profile_idc);
 		$constraintsHex = sprintf('%02x', $constraint_flags);
 		$levelHex = sprintf('%02x', $level_idc);
-		
+
 		return "avc1." . $profileHex . $constraintsHex . $levelHex;
 	}
-	
+
 	/**
 	 * Get HVC1 codec string
 	 * @param string $extraDataRaw
@@ -322,32 +322,32 @@ class flavorAsset extends exportableAsset
 	private function getHvc1Codec(string $extraDataRaw)
 	{
 		$bytes = $this->hexStringToBytes($extraDataRaw);
-		
+
 		// Check if conversion was successful
 		if ($bytes === false || strlen($bytes) < 19)
 		{
 			return null; // Invalid hex string or too short
 		}
-		
+
 		//Extract the first 19 bytes
 		$profile_tier_level = ord($bytes[1]);
-		
+
 		//Extract the profile IDC (first 5 bits of byte[1])
 		$profile_idc = $profile_tier_level & 0x1F;
-		
+
 		//Extract the correct nibble (first nibble of byte[2])
 		$profile_compat_byte = (ord($bytes[2]) >> 4); // e.g. 0x60 >> 4 = 6
-		
+
 		//Extract the tier flag (bit 5 of byte[1])
 		$tier_flag = ($profile_tier_level & 0x20) ? 'H' : 'L';
-		
+
 		//Extract the level IDC (byte[12])
 		$level_idc = ord($bytes[12]);
-		
+
 		// Constraint Indicator Flags: bytes 6–11
 		$constraint_bytes = unpack('C6', substr($bytes, 6, 6));
 		$constraint_flags = '';
-		
+
 		// Iterate through the constraint bytes and convert to hex
 		foreach ($constraint_bytes as $byte)
 		{
@@ -356,13 +356,13 @@ class flavorAsset extends exportableAsset
 				$constraint_flags .= sprintf('%02X', $byte);
 			}
 		}
-		
+
 		// Limit to 4 characters
 		$constraint_flags = strtolower(substr($constraint_flags, 0, 2));
-		
+
 		return sprintf("hvc1.%d.%d.%s%d.%s", $profile_idc, $profile_compat_byte, $tier_flag, $level_idc, $constraint_flags);
 	}
-	
+
 	/**
 	 * Get AV1 codec string
 	 * @param array $stream
@@ -375,19 +375,19 @@ class flavorAsset extends exportableAsset
 			'High' => 1,
 			'Professional' => 2
 		];
-		
+
 		$profile = $profileMap[$stream['profile']] ?? 0;
 		$level = $stream['videoLevel'] ?? 8; // Level 4.0
 		$tier = 'M'; // assume Main tier; you could add ffprobe tier_flag later
 		$bitDepth = $stream['bit_depth'] ?? 8;
-		
+
 		// Ensure two-digit level and bit depth
 		$levelStr = str_pad($level, 2, '0', STR_PAD_LEFT);
 		$bitDepthStr = str_pad($bitDepth, 2, '0', STR_PAD_LEFT);
-		
+
 		return "av01.{$profile}.{$levelStr}{$tier}.{$bitDepthStr}";
 	}
-	
+
 	/**
 	 * Convert a hex string to binary data
 	 * @param string $extraDataRaw
@@ -404,19 +404,19 @@ class flavorAsset extends exportableAsset
 				$hexString .= str_replace(' ', '', $matches[1]);  // Remove spaces and concatenate
 			}
 		}
-		
+
 		// Convert hex string to binary
 		$hex = preg_replace('/\s+/', '', $hexString);
-		
+
 		// Trim the last char (safer, common in trailing errors)
 		if (strlen($hex) % 2 !== 0) {
 			$hex = substr($hex, 0, -1);
 		}
-		
+
 		// Convert hex to binary
 		return hex2bin($hex);
 	}
-	
+
 	/**
 	 * Get audio codec string based on codec name and profile
 	 * @param string $codecName
@@ -436,12 +436,12 @@ class flavorAsset extends exportableAsset
 				'he-aacv2' => 'mp4a.40.29',
 				'main' => 'mp4a.40.1',
 			);
-			
+
 			if (isset($profileMap[$profile]))
 			{
 				return $profileMap[$profile];
 			}
-			
+
 			if ($extraData)
 			{
 				$parsed = $this->parseAacFromExtraData($extraData);
@@ -450,11 +450,11 @@ class flavorAsset extends exportableAsset
 					return $parsed;
 				}
 			}
-			
+
 			// Default fallback
 			return 'mp4a.40.2';
 		}
-		
+
 		$codecMap = array(
 			'mp3'    => 'mp4a.69',
 			'ac3'    => 'ac-3',
@@ -464,7 +464,7 @@ class flavorAsset extends exportableAsset
 			'flac'   => 'flac',
 			'alac'   => 'alac',
 		);
-		
+
 		return isset($codecMap[$codecName]) ? $codecMap[$codecName] : '';
 	}
 
@@ -478,14 +478,14 @@ class flavorAsset extends exportableAsset
 		$bytes = $this->hexStringToBytes($hexData);
 		if (!$bytes || strlen($bytes) < 2)
 			return null;
-		
+
 		// AudioSpecificConfig (ISO/IEC 14496-3)
 		// First 5 bits = audioObjectType
 		$byte1 = ord($bytes[0]);
 		$byte2 = ord($bytes[1]);
-		
+
 		$audioObjectType = ($byte1 >> 3) & 0x1F;
-		
+
 		// Optional: handle extended AOTs, not shown here
 		switch ($audioObjectType)
 		{
@@ -496,7 +496,7 @@ class flavorAsset extends exportableAsset
 			default: return 'mp4a.40.2'; // fallback to LC
 		}
 	}
-	
+
 	public function getServeFlavorUrl($previewLength = null, $fileName = null, $urlManager = null, $isDir = false)
 	{
 		$entry = $this->getentry();
@@ -512,7 +512,7 @@ class flavorAsset extends exportableAsset
 			list($fileName , $extension) = kAssetUtils::getFileName($entry , $this);
 			$fileName = str_replace("\n", ' ', $fileName);
 			$fileName = kString::keepOnlyValidUrlChars($fileName);
-	
+
 			if ($extension && $extension !== kUploadTokenMgr::NO_EXTENSION_IDENTIFIER)
 			{
 				$fileName .= ".$extension";
@@ -526,7 +526,7 @@ class flavorAsset extends exportableAsset
 				}
 			}
 		}
-		
+
 		//adding a serveFlavor download parameter
 		$urlParameters = "/fileName/$fileName";
 		$explicitFileExt = null;
@@ -540,18 +540,18 @@ class flavorAsset extends exportableAsset
 			$urlParameters .= "/clipTo/$previewLength";
 
 		$url = kAssetUtils::getAssetUrl($this, false, null, null , $urlParameters, null, $urlManager, $explicitFileExt);
-		
+
 		return $url;
 	}
-	
-	
+
+
 	public function getPlayManifestUrl($clientTag, $storageProfileId = null, $mediaProtocol = PlaybackProtocol::HTTP, $addKtToken = false) {
 		$entryId = $this->getEntryId();
 		$partnerId = $this->getPartnerId();
 		$subpId = $this->getentry()->getSubpId();
 		$partnerPath = myPartnerUtils::getUrlForPartner($partnerId, $subpId);
 		$flavorAssetId = $this->getId();
-		
+
 		$url = "$partnerPath/playManifest/entryId/$entryId/flavorId/$flavorAssetId/protocol/$mediaProtocol/format/url";
 		if($storageProfileId)
 			$url .= "/storageId/" . $storageProfileId;
@@ -569,17 +569,17 @@ class flavorAsset extends exportableAsset
 
 		return $url;
 	}
-	
+
 	public function estimateFileSize(entry $entry, $seconds) {
 		$orginalSizeKB = $this->getSize();
 		$size = $orginalSizeKB * ($seconds / ($entry->getLengthInMsecs() / 1000)) * 1.2;
 		$size = min($orginalSizeKB, floor($size)) * 1024;
 		return $size;
 	}
-	
+
 	static protected function calculateKalturaToken($url)
 	{
-		$token = sha1(kConf::get('url_token_secret') . $url);
+		$token = sha1(kConf::getCurrentSecret('url_token_secret') . $url);
 		return str_replace(self::KALTURA_TOKEN_MARKER, $token, $url);
 	}
 
@@ -590,17 +590,17 @@ class flavorAsset extends exportableAsset
 			$this->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM),
 			$this->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC));
 	}
-	
+
 	public function getKeepOldAssetOnEntryReplacement()
 	{
-		if($this->getentry()->getReplacementOptions()->getKeepOldAssets()) 
+		if($this->getentry()->getReplacementOptions()->getKeepOldAssets())
 		{
 			return true;
 		}
-	
+
 		return false;
 	}
-	
+
 	public function getName()
 	{
 		$flavorParams = $this->getFlavorParams();
@@ -608,7 +608,7 @@ class flavorAsset extends exportableAsset
 			return $flavorParams->getName();
 		return "";
 	}
-	
+
 	/* (non-PHPdoc)
  	 * @see Baseasset::copyInto()
  	 */
