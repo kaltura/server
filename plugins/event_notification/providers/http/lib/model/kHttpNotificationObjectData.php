@@ -38,10 +38,16 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	protected $coreObject;
 
 	/**
+	 * @var int
+	 */
+	protected $responseProfileId;
+
+	/**
 	 * An array of pattern-replacement pairs used for data string regex replacements
 	 * @var array
 	 */
 	protected $dataStringReplacements;
+
 
 	/* (non-PHPdoc)
 	 * @see kHttpNotificationData::setScope()
@@ -143,5 +149,15 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 	public function setDataStringReplacements($dataStringReplacements)
 	{
 		$this->dataStringReplacements = $dataStringReplacements;
+	}
+
+	public function getResponseProfileId(): int
+	{
+		return $this->responseProfileId;
+	}
+
+	public function setResponseProfileId(int $responseProfileId): void
+	{
+		$this->responseProfileId = $responseProfileId;
 	}
 }

@@ -44,6 +44,11 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	 */
 	protected $coreObject;
 
+	/**
+	 * @var int
+	 */
+	protected $responseProfileId;
+
 	static private $map_between_objects = array
 	(
 		'apiObjectType' => 'objectType',
@@ -51,6 +56,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		'ignoreNull',
 		'code',
 		'dataStringReplacements',
+		'responseProfileId',
 	);
 
 	/* (non-PHPdoc)
@@ -94,7 +100,16 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 
 		$apiObject = new $this->apiObjectType;
 		/* @var $apiObject KalturaObject */
-		$apiObject->fromObject($coreObject);
+
+		$responseProfile = null;
+		if ($this->responseProfileId)
+		{
+			$responseProfile = new KalturaDetachedResponseProfile();
+			$coreProfile = ResponseProfilePeer::retrieveByPK($this->responseProfileId);
+			$responseProfile->fromObject($coreProfile);
+		}
+
+		$apiObject->fromObject($coreObject, $responseProfile ?? null);
 
 		$httpNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($jobData->getTemplateId());
 
