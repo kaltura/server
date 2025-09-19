@@ -42,6 +42,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 					$object->data->apiObjectType = $properties['objectType'];
 					$object->data->format = $properties['objectFormat'];
 					$object->data->code = $properties['object'];
+					$object->data->responseProfileId = $properties['responseProfileId'];
 					break;
 					
 				case 'map':
@@ -104,6 +105,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			$this->getElement('objectType')->setValue($object->data->apiObjectType);
 			$this->getElement('objectFormat')->setValue($object->data->format);
 			$this->getElement('object')->setValue($object->data->code);
+			$this->getElement('responseProfileId')->setValue($object->data->responseProfileId);
 		}
 	}
 	
@@ -179,6 +181,11 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
 		));
+
+		$this->addElement('text', 'responseProfileId', array(
+			'label'			=> 'Content Type:',
+			'filters'		=> array('StringTrim'),
+		));
 		
 		$this->addElement('text', 'objectType', array(
 			'label'			=> 'Object Type (KalturaObject):',
@@ -197,7 +204,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			),
 		));
 			
-		$this->addDisplayGroup(array('object', 'objectType', 'objectFormat'), 
+		$this->addDisplayGroup(array('object', 'objectType', 'objectFormat', 'responseProfileId'),
 			'frmObject', 
 			array(
 				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmObject'))),
