@@ -47,7 +47,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	/**
 	 * @var int
 	 */
-	protected $responseProfileId;
+	public $responseProfileId;
 
 	static private $map_between_objects = array
 	(
