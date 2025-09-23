@@ -183,7 +183,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		));
 
 		$this->addElement('text', 'responseProfileId', array(
-			'label'			=> 'Content Type:',
+			'label'			=> 'Response profile ID:',
 			'filters'		=> array('StringTrim'),
 		));
 		
