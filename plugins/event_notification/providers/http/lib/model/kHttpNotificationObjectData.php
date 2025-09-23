@@ -151,7 +151,7 @@ class kHttpNotificationObjectData extends kHttpNotificationData
 		$this->dataStringReplacements = $dataStringReplacements;
 	}
 
-	public function getResponseProfileId(): int
+	public function getResponseProfileId(): ?int
 	{
 		return $this->responseProfileId;
 	}
