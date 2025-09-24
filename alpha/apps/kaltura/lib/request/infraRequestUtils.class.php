@@ -18,7 +18,7 @@ class infraRequestUtils
 	const CLIENT_TAG = 'clientTag';
 	const ORIGIN_HEADER = 'HTTP_ORIGIN';
 	const KCONF_KEY_API_MASK_PARAMS = 'api_mask_params';
-	
+
 	protected static $isInGetRemoteAddress = false;
 	protected static $remoteAddress = array();
 	protected static $requestParams = null;
@@ -55,7 +55,7 @@ class infraRequestUtils
 		if (isset($_SERVER['HTTP_RANGE']))
 		{
 			header("Accept-Ranges: 0-$length");
-	  	
+
 			$c_start = $start;
 			$c_end   = $end;
 			// Extract the range string
@@ -107,10 +107,10 @@ class infraRequestUtils
 		// Notify the client the byte range we'll be outputting
 		if ($set_content_length_header)
 			header("Content-Length: $length");
-		
+
 		return array($start, $end, $length);
 	}
-		
+
 	public static function formatHttpTime($time)
 	{
 		if (!$time)
@@ -137,12 +137,12 @@ class infraRequestUtils
 			header("Pragma: no-cache" );
 		}
 	}
-	
+
 	public static function sendCdnHeaders($ext, $content_length, $max_age = 8640000 , $mime = null, $private = false, $last_modified = null)
 	{
 		if ( $max_age === null ) $max_age = 8640000;
 		while(FALSE !== ob_get_clean());
-		
+
 		if ( $mime == null )
 		{
 			switch ($ext)
@@ -232,7 +232,7 @@ class infraRequestUtils
 		}
 
 		self::sendCachingHeaders($max_age, $private, $last_modified);
-		
+
 		header("Content-Length: $content_length ");
 		header("Pragma:");
 		header("Content-Type: $content_type");
@@ -240,19 +240,19 @@ class infraRequestUtils
 
 	public static function getSignedIpAddressHeader($ip = null)
 	{
-		if (!kConf::hasParam('remote_addr_header_salt'))
+		if (!kConf::hasSecret('remote_addr_header_salt'))
 			return null;
-			
+
 		if (!$ip)
 			$ip = self::getRemoteAddress();
 
-		$salt = kConf::get('remote_addr_header_salt');
+		$salt = kConf::getCurrentSecret('remote_addr_header_salt');
 		$baseHeader = array(trim($ip), time(), microtime(true));
 		$baseHeader = implode(',', $baseHeader);
 		$ipHeader = $baseHeader . ',' . md5($baseHeader . ',' . $salt);
 		return array('X-KALTURA-REMOTE-ADDR', $ipHeader);
 	}
-	
+
 	public static function isIpPrivate($ip)
 	{
 		$privateRanges = array(
@@ -262,7 +262,7 @@ class infraRequestUtils
 			'169.254.0.0|169.254.255.255',
 			'127.0.0.0|127.255.255.255',
 		);
-		
+
 		$longIp = ip2long($ip);
 		if ($longIp && $longIp != -1)
 		{
@@ -274,7 +274,7 @@ class infraRequestUtils
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -304,17 +304,17 @@ class infraRequestUtils
 		if(array_key_exists($key, self::$remoteAddress)) {
 			return self::$remoteAddress[$key];
 		}
-			
+
 		if ($phpizeHeader)
 			$httpHeader = "HTTP_".strtoupper(str_replace("-", "_", $httpHeader));
-		
+
 		if (!isset($_SERVER[$httpHeader])) {
 			self::$remoteAddress[$key] = null;
 			return null;
 		}
-		
+
 		$remote_addr = null;
-				
+
 		// pick the first non private ip
 		$headerIPs = explode(',', trim($_SERVER[$httpHeader], ','));
 		foreach ($headerIPs as $ip)
@@ -326,33 +326,33 @@ class infraRequestUtils
 				$remote_addr = $ipv6;
 				break;
 			}
-			
+
 			preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $ip, $matches); // ignore any string after the ip address
 			if (!isset($matches[0]))
 				continue;
-	
+
 			$tempAddr = trim($matches[0]);
 			if (!$acceptInternalIps && self::isIpPrivate($tempAddr))	// verify that ip is not from a private range
 				continue;
-	
+
 			$remote_addr = $tempAddr;
 			break;
 		}
-		 
+
 		self::$remoteAddress[$key] = $remote_addr;
 		return $remote_addr;
 	}
-	
+
 	public static function getRemoteAddress()
 	{
 		if(array_key_exists("ip", self::$remoteAddress)) {
 			return self::$remoteAddress["ip"];
 		}
-			
+
 		// Prevent call cycles in case KalturaLog will be used in internalGetRemoteAddress
 		if (self::$isInGetRemoteAddress)
 			return null;
-		
+
 		self::$isInGetRemoteAddress = true;
 		self::$remoteAddress["ip"] = self::internalGetRemoteAddress();
 		self::$isInGetRemoteAddress = false;
@@ -367,44 +367,49 @@ class infraRequestUtils
 		if(array_key_exists("ip", self::$remoteAddress)) {
 			return self::$remoteAddress["ip"];
 		}
-			
+
 		// enable access control debug
 		if(isset($_POST['debug_ip']) && kConf::hasParam('debug_ip_enabled') && kConf::get('debug_ip_enabled'))
 		{
 			header('Debug IP: ' . $_POST['debug_ip']);
 			return $_POST['debug_ip'];
 		}
-			
-		$remote_addr = null;
 
+		$remote_addr = null;
 		if (!$remote_addr && isset ( $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR'] ) )
 		{
 			list($remote_addr, $time, $uniqueId, $hash) = @explode(",", $_SERVER['HTTP_X_KALTURA_REMOTE_ADDR']);
-			
-			if (kConf::hasParam('remote_addr_header_salt') && kConf::hasParam("remote_addr_header_timeout"))
+
+			if (kConf::hasSecret('remote_addr_header_salt') && kConf::hasParam("remote_addr_header_timeout"))
 			{
-				$salt = kConf::get('remote_addr_header_salt');
+				$salts = kConf::getAllSecrets('remote_addr_header_salt');
 				$timeout = kConf::get("remote_addr_header_timeout");
-				
+
 				if ($timeout) {
 					// Compare the absolute value of the difference between the current time
 					// and the "token" time.
 					if (abs(time() - $time) > $timeout )
 						die("REMOTE_ADDR header invalid time");
 				}
-				
-				if ($hash !== md5("$remote_addr,$time,$uniqueId,$salt"))
-				{
+
+				$validSignature = false;
+				foreach ($salts as $salt) {
+					if ($hash === md5("$remote_addr,$time,$uniqueId,$salt")) {
+						$validSignature = true;
+						break;
+					}
+				}
+				if (!$validSignature) {
 					die("REMOTE_ADDR header invalid signature");
 				}
 			}
 		}
-		
+
 		// support getting the original ip address of the client when using the cdn for API calls (cdnapi)
 		// validate either HTTP_HOST or HTTP_X_FORWARDED_HOST in case of a proxy
 		if (!$remote_addr &&
 			isset($_SERVER['HTTP_X_FORWARDED_FOR']) &&
-			(isset($_SERVER['HTTP_HOST']) && 
+			(isset($_SERVER['HTTP_HOST']) &&
 			in_array($_SERVER['HTTP_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ||
 			isset($_SERVER['HTTP_X_FORWARDED_HOST']) &&
 			in_array($_SERVER['HTTP_X_FORWARDED_HOST'], kConf::get('remote_addr_whitelisted_hosts') ) ) )
@@ -423,28 +428,28 @@ class infraRequestUtils
 			$headerIPs = explode(",", $_SERVER['HTTP_X_FORWARDED_FOR']);
 			$remote_addr = trim($headerIPs[count($headerIPs) - 1]);
 		}
-		
+
 		// if still empty ....
 		if (!$remote_addr)
 			$remote_addr = (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null);
-		
+
 		return $remote_addr;
 	}
-	
+
 	public static function getProtocol()
 	{
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
 			return self::PROTOCOL_HTTPS;
-		
+
 		$params = self::getRequestParams();
 		if (isset($params['apiProtocol']) &&
 			kConf::hasParam('https_param_salt') &&
 			$params['apiProtocol'] == 'https_' . kConf::get('https_param_salt'))
 			return self::PROTOCOL_HTTPS;
-		
+
 		return self::PROTOCOL_HTTP;
 	}
-	
+
 	public static function parseUrlHost($url)
 	{
 		$urlDetails = parse_url($url);
@@ -457,7 +462,7 @@ class infraRequestUtils
 			// parse_url could not extract domain, but returned path
 			// we validate that this path could be considered a domain
 			$result = rtrim($urlDetails['path'], '/'); // trim trailing slashes. example: www.kaltura.com/test.php
-			
+
 			// stop string at first slash. example: httpssss/google.com - malformed url...
 			if (strpos($result, "/") !== false)
 			{
@@ -468,7 +473,7 @@ class infraRequestUtils
 		{
 			return null;
 		}
-		
+
 		// some urls might return host or path which is not yet clean for comparison with user's input
 		if (strpos($result, "?") !== false)
 		{
