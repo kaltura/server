@@ -13,7 +13,16 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	protected $fieldValuesByEntryDistributionId = null;
 	
 	protected $requiredFields = null;
-		
+
+	public function setFieldConfigArrayCompressed($v)
+	{
+		$this->putInCustomData('field_config_array_compressed', $v);
+	}
+
+	public function getFieldConfigArrayCompressed()
+	{
+		return $this->getFromCustomData('field_config_array_compressed', null, false);
+	}
 	/********************************/
 	/* Field config array functions */
     /********************************/
@@ -57,9 +66,29 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	{
 	    if (is_null($this->fieldConfigArray))
 	    {
-	        $this->fieldConfigArray = array();
-	        $tempArray = unserialize($this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_ARRAY));
-	        if (!is_array($tempArray)) {
+			$this->fieldConfigArray = array();
+			$dataString = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_ARRAY);
+			if($dataString)
+			{
+				try
+				{
+					if($this->getFieldConfigArrayCompressed())
+						$dataString = gzuncompress($dataString);
+
+					$tempArray = unserialize($dataString);
+				}
+				catch(Exception $e)
+				{
+					KalturaLog::err("Unable to unserialize field config array: " . $e->getMessage());
+					$tempArray = array();
+				}
+			}
+			else
+			{
+				$tempArray = array();
+			}
+
+			if (!is_array($tempArray)) {
 	            $tempArray = array();
 	        }
 	        foreach ($tempArray as $tempConfig)
@@ -113,7 +142,22 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	            }
 	        }	        
 	    }
-	    $this->putInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_ARRAY, serialize($tempArray));
+		// Add compression logic
+		$serializedData = serialize($tempArray);
+
+		if(strlen($serializedData) > myCustomData::MAX_TEXT_FIELD_SIZE)
+		{
+			$this->setFieldConfigArrayCompressed(true);
+			$serializedData = gzcompress($serializedData);
+			if(strlen(utf8_encode($serializedData)) > myCustomData::MAX_MEDIUM_TEXT_FIELD_SIZE)
+				throw new kCoreException('Exceeded max size allowed', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
+		}
+		else
+		{
+			$this->setFieldConfigArrayCompressed(false);
+		}
+
+		$this->putInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_ARRAY, $serializedData);
 	}
 	
 	public function getItemXpathsToExtend()
