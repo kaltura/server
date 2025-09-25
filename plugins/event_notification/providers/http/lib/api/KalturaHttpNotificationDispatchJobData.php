@@ -164,6 +164,7 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 		'method',
 		'data',
 		'timeout',
+		'contentType',
 		'connectTimeout',
 		'username',
 		'password',
