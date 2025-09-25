@@ -38,10 +38,10 @@ class KalturaHttpNotificationDataFields extends KalturaHttpNotificationData
 	{
 		if(is_null($dbObject))
 			$dbObject = new kHttpNotificationDataFields();
-			
+
 		return parent::toObject($dbObject, $propertiesToSkip);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj)
 	 */
@@ -49,11 +49,11 @@ class KalturaHttpNotificationDataFields extends KalturaHttpNotificationData
 	{
 		/* @var $srcObj kHttpNotificationDataFields */
 		parent::doFromObject($srcObj, $responseProfile);
-		
+
 		if($this->shouldGet('data', $responseProfile))
 			$this->data = $srcObj->getData();
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaHttpNotificationData::getData()
 	 */
@@ -62,7 +62,7 @@ class KalturaHttpNotificationDataFields extends KalturaHttpNotificationData
 		return $this->data;
 	}
 
-	public function getContentType() : string
+	public function getContentType()
 	{
 		return $this->contentType;
 	}
