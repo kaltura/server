@@ -66,6 +66,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 	{
 	    if (is_null($this->fieldConfigArray))
 	    {
+			$tempArray = array();
 			$this->fieldConfigArray = array();
 			$dataString = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_CONFIG_ARRAY);
 			if($dataString)
@@ -80,12 +81,7 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 				catch(Exception $e)
 				{
 					KalturaLog::err("Unable to unserialize field config array: " . $e->getMessage());
-					$tempArray = array();
 				}
-			}
-			else
-			{
-				$tempArray = array();
 			}
 
 			if (!is_array($tempArray)) {
@@ -145,16 +141,13 @@ abstract class ConfigurableDistributionProfile extends DistributionProfile
 		// Add compression logic
 		$serializedData = serialize($tempArray);
 
-		if(strlen($serializedData) > myCustomData::MAX_TEXT_FIELD_SIZE)
+		if(strlen($serializedData) >= myCustomData::MAX_TEXT_FIELD_SIZE)
 		{
-			$this->setFieldConfigArrayCompressed(true);
 			$serializedData = gzcompress($serializedData);
-			if(strlen(utf8_encode($serializedData)) > myCustomData::MAX_MEDIUM_TEXT_FIELD_SIZE)
+			if(strlen(utf8_encode($serializedData)) >= myCustomData::MAX_MEDIUM_TEXT_FIELD_SIZE)
 				throw new kCoreException('Exceeded max size allowed', kCoreException::EXCEEDED_MAX_CUSTOM_DATA_SIZE);
-		}
-		else
-		{
-			$this->setFieldConfigArrayCompressed(false);
+
+			$this->setFieldConfigArrayCompressed(true);
 		}
 
 		$this->putInCustomData(self::CUSTOM_DATA_FIELD_CONFIG_ARRAY, $serializedData);
