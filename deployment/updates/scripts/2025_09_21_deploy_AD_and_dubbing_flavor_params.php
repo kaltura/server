@@ -2,7 +2,7 @@
 /**
  * @package deployment
  *
- * Deploy live hd & language packages defualt live params
+ * Deploy dubbing & standard audio description language packages
  *
  * No need to re-run after server code deploy
  */
