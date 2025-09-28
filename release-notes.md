@@ -9,7 +9,7 @@ Replace the tokens: @IN_APP_MESSAGING_PARTNER_ADMIN_SECRET@ , @IN_APP_MESSAGING_
     /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment Scripts ###
-    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2024_10_31_add_ai_partner.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_09_28_add_in_app_messaging_partner.php
 
 # Venus-22.3.0
 ## Activate scheule events related kafka notification by default ##
