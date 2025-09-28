@@ -1,3 +1,10 @@
+# Venus-22.4.0
+## Add Audio Description and Dubbing flavors to the list of available flavors ##
+- Issue Type: Task
+- Issue ID: PLAT-25292, PLAT-25448, PLAT-25447, PLAT-25446
+### Deployment scripts ###
+	php deployment/updates/scripts/2025_09_21_deploy_AD_and_dubbing_flavor_params.php
+
 # Venus-22.3.0
 
 ## Activate scheule events related kafka notification by default ##
