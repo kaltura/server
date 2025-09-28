@@ -86,7 +86,7 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 		return $validationErrors;
 	}
 
-	public function putInCustomData ( $name , $value , $namespace = null )
+	protected function putCompressedInCustomData ( $name , $value , $namespace = null )
 	{
 		$content = serialize($value);
 		if(strlen($content) > self::MAX_CUSTOM_DATA_CLEAR_FIELD_SIZE)
@@ -95,8 +95,8 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 		}
 		parent::putInCustomData ( $name , $value , $namespace );
 	}
-	
-	public function getFromCustomData ( $name , $namespace = null, $defaultValue = null )
+
+	protected function getCompressedFromCustomData ( $name , $namespace = null, $defaultValue = null )
 	{
 		$ret = parent::getFromCustomData ( $name , $namespace, $defaultValue );
 		//if the return data starts with ##COMPRESS## - then it is compressed data so uncompress it
@@ -111,11 +111,11 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	public function getXsltFile()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_XSLT);
+		return $this->getCompressedFromCustomData(self::CUSTOM_DATA_XSLT);
 	}
 	public function setXsltFile($v)
 	{
-		$this->putInCustomData(self::CUSTOM_DATA_XSLT, $v);
+		$this->putCompressedInCustomData(self::CUSTOM_DATA_XSLT, $v);
 	}
 
 
