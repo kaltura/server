@@ -25,10 +25,17 @@ class KalturaRoomEntry extends KalturaBaseEntry
 	 */
 	public $templateRoomEntryId;
 
+	/**
+     * The entryId of the recording
+     * @var string
+     */
+    public $recordingEntryId;
+
 	private static $map_between_objects = array(
 		'roomType',
 		'broadcastEntryId',
-		'templateRoomEntryId'
+		'templateRoomEntryId',
+		'recordingEntryId'
 	);
 
 	public function __construct()
@@ -55,12 +62,14 @@ class KalturaRoomEntry extends KalturaBaseEntry
 	{
 		$this->validatePropertyNotNull('roomType');
 		$this->validateTemplateRoomEntry();
+		$this->validateRecordingEntryId();
 		return parent::validateForInsert($propertiesToSkip);
 	}
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validateTemplateRoomEntry();
+		$this->validateRecordingEntryId();
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
@@ -88,6 +97,19 @@ class KalturaRoomEntry extends KalturaBaseEntry
 		$allowedPids = array($partnerId, Partner::KME_PARTNER_ID);
 		return entryPeer::retrieveByIdAndPartnerIds($entryId, $allowedPids);
 	}
+
+    protected function validateRecordingEntryId()
+    {
+        if(!isset($this->recordingEntryId) || $this->recordingEntryId === '')
+        {
+			return;
+        }
+		$recordingEntry = entryPeer::retrieveByPK($this->recordingEntryId);
+		if (!$recordingEntry)
+		{
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->templateRoomEntryId);
+		}
+    }
 
 
 }
