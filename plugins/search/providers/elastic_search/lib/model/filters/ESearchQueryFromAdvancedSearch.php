@@ -12,6 +12,7 @@ class ESearchQueryFromAdvancedSearch
 	const ENTRY_CAPTION_ADVANCED_FILTER = 'kEntryCaptionAdvancedFilter';
 	const QUIZ_ADVANCED_FILTER = 'kQuizAdvancedFilter';
 	const ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION = 'AdvancedSearchFilterComparableAttributeCondition';
+	const ADVANCED_SEARCH_FILTER_MATCH_ATTRIBUTE_CONDITION = 'AdvancedSearchFilterMatchAttributeCondition';
 	const MRP_DATA_FIELD = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 	const ENCLOSED_WITH_DOUBLE_QUOTATION_MARK_REGEX =  '/(\"){1}[^\"]+(\"){1}/';
 
@@ -46,6 +47,8 @@ class ESearchQueryFromAdvancedSearch
 				return $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem);
 			case self::ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION:
 				return $this->createESearchQueryFromSearchFilterCompareCondition($advancedSearchFilterItem);
+			case self::ADVANCED_SEARCH_FILTER_MATCH_ATTRIBUTE_CONDITION:
+				return $this->createESearchQueryFromSearchFilterMatchCondition($advancedSearchFilterItem);
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
 				return null;
@@ -78,6 +81,24 @@ class ESearchQueryFromAdvancedSearch
 		$eSearchAdvancedSearchItem->setFieldName($advancedSearchFilterItem->getField());
 		$eSearchAdvancedSearchItem->setItemType(ESearchItemType::RANGE);
 		$eSearchAdvancedSearchItem->handleComparisonType($advancedSearchFilterItem);
+		return $eSearchAdvancedSearchItem;
+	}
+
+
+	/**
+	 * @param AdvancedSearchFilterComparableAttributeCondition $advancedSearchFilterItem
+	 * @return ESearchAdvancedSearchItem
+	 */
+	protected function createESearchQueryFromSearchFilterMatchCondition($advancedSearchFilterItem){
+		$eSearchAdvancedSearchItem = new ESearchAdvancedSearchItem();
+		$eSearchAdvancedSearchItem->setSearchTerm($advancedSearchFilterItem->getValue());
+		$eSearchAdvancedSearchItem->setFieldName($advancedSearchFilterItem->getField());
+		$eSearchAdvancedSearchItem->setNot($advancedSearchFilterItem->getNot());
+		$eSearchAdvancedSearchItem->setItemType(ESearchItemType::EXACT_MATCH); // not sure this is how it should be
+		// need to verify how to send the tags here. as search term and exact match? the query doens't fail
+		// but we don't get proper results. need to find a good example to compare to.
+		// need to look at elastic service for entry items and compare
+
 		return $eSearchAdvancedSearchItem;
 	}
 
@@ -264,6 +285,7 @@ class ESearchQueryFromAdvancedSearch
 			case self::ENTRY_CAPTION_ADVANCED_FILTER:
 			case self::QUIZ_ADVANCED_FILTER:
 			case self::ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION:
+			case self::ADVANCED_SEARCH_FILTER_MATCH_ATTRIBUTE_CONDITION:
 				return true;
 			default:
 				return false;
