@@ -107,7 +107,7 @@ class KalturaRoomEntry extends KalturaBaseEntry
 		$recordingEntry = entryPeer::retrieveByPK($this->recordingEntryId);
 		if (!$recordingEntry)
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->templateRoomEntryId);
+			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'recordingEntryId - ' . $this->recordingEntryId);
 		}
     }
 
