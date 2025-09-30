@@ -596,10 +596,11 @@ class KGenericScheduler
 		foreach($runningBatches as $workerName => $indexes)
 		{
 			if(!is_array($indexes))
+			{
 				continue;
+			}
 			
 			foreach ($indexes as $taskIndex => $procId) {
-
 				$proc = new KProcessWrapper($taskConfigs[$workerName], $taskIndex);
 				$proc->initMockedProcess($procId);
 				if($proc->isRunning()) {
