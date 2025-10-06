@@ -480,7 +480,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 		}
 		
-		if($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::PROCESSING)
+		if(!in_array($dbEntryVendorTask->getStatus(), array(EntryVendorTaskStatus::SCHEDULED, EntryVendorTaskStatus::PROCESSING)))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_EXTEND_ACCESS_KEY);
 		}

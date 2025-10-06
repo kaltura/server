@@ -9,7 +9,7 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	 * @var string
 	 */
 	public $ingestUrl;
-	
+
 	/**
 	 * @var string
 	 */
@@ -44,7 +44,7 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the object (on the right)
 	 */
-	private static $map_between_objects = array 
+	private static $map_between_objects = array
 	(
 		'ingestUrl',
 		'username',
@@ -54,7 +54,7 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 		'innerType',
 		'assetsType',
 	 );
-		 
+
 	public function getMapBetweenObjects()
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
@@ -68,5 +68,6 @@ class KalturaTvinciDistributionProfile extends KalturaConfigurableDistributionPr
 	{
 		parent::doFromObject($srcObj, $responseProfile);
 		$this->tags = KalturaTvinciDistributionTagArray::fromDbArray($srcObj->getTags());
+		$this->xsltFile = $srcObj->getXsltFile();
 	}
 }
