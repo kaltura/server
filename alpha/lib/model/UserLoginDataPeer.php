@@ -59,7 +59,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$charset = "abcdefghijklmnopqrstuvwxyz";
 		if ($useupper) $charset .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		if ($usenumbers) $charset .= "0123456789";
-		if ($usespecial) $charset .= "~@#$%^*()_+-={}]["; // Note: using all special characters this reads: "~!@#$%^&*()_+`-={}|\\]?[\":;'><,./";
+		if ($usespecial) $charset .= "~@#$%^*()_+-={}]["; // Note: using all special characters this reads: "~!@#$%^&*()_+`-={}\\]?[\":;'><,./";
 		if ($minlength > $maxlength) $length = mt_rand ($maxlength, $minlength);
 		else $length = mt_rand ($minlength, $maxlength);
 		$key = "";
