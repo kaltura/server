@@ -25,8 +25,6 @@ class widget extends Basewidget implements IBaseObject
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		$widget_id = $partner->getDefaultWidgetId();
 
-		if ( $kdp_ui_conf_id != null && $kdp_ui_conf_id != 200 ) $widget_id .= "_{$kdp_ui_conf_id}";
-
 		try
 		{
 			// create widget associated with the kdp_ui_conf
