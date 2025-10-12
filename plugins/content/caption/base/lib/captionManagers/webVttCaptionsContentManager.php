@@ -138,6 +138,24 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 		return new webVttCaptionsContentManager();
 	}
 
+	/**
+	 * Reconstruct VTT timing line from parsed data
+	 * @param array $itemData Array containing startTime, endTime, and styleInfo
+	 * @return string Reconstructed timing line
+	 */
+	public function reconstructTimingLine($itemData)
+	{
+		$startTimeString = kWebVTTGenerator::formatWebVTTTimeStamp($itemData['startTime']);
+		$endTimeString = kWebVTTGenerator::formatWebVTTTimeStamp($itemData['endTime']);
+		$timingLine = $startTimeString . ' --> ' . $endTimeString;
+
+		if (!empty($itemData['styleInfo'])) {
+			$timingLine .= ' ' . $itemData['styleInfo'];
+		}
+
+		return $timingLine;
+	}
+
 
 	/**
 	 * @param $content
@@ -168,13 +186,19 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 				$foundFirstTimeCode = true;
 				$start = $this->parseCaptionTime($matches[1]);
 				$stop = $this->parseCaptionTime($matches[2]);
+				$styleInfo = isset($matches[3]) ? trim($matches[3]) : '';
 				$text = '';
 				while (trim($line = self::getNextValueFromArray($fileContentArray)) !== '')
 				{
 					$line = $this->handleTextLines($line);
 					$text .= $line . self::UNIX_LINE_ENDING;
 				}
-				$itemsData[] = array('startTime' => $start, 'endTime' => $stop, 'content' => array(array('text' => $text)));
+				$itemsData[] = array(
+					'startTime' => $start,
+					'endTime' => $stop,
+					'styleInfo' => $styleInfo,
+					'content' => array(array('text' => $text))
+				);
 			}elseif ($foundFirstTimeCode == false)
 				$this->headerInfo[] = $line . self::UNIX_LINE_ENDING;
 		};
