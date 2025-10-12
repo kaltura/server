@@ -137,26 +137,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	{
 		return new webVttCaptionsContentManager();
 	}
-
-	/**
-	 * Reconstruct VTT timing line from parsed data
-	 * @param array $itemData Array containing startTime, endTime, and styleInfo
-	 * @return string Reconstructed timing line
-	 */
-	public function reconstructTimingLine($itemData)
-	{
-		$startTimeString = kWebVTTGenerator::formatWebVTTTimeStamp($itemData['startTime']);
-		$endTimeString = kWebVTTGenerator::formatWebVTTTimeStamp($itemData['endTime']);
-		$timingLine = $startTimeString . ' --> ' . $endTimeString;
-
-		if (!empty($itemData['styleInfo'])) {
-			$timingLine .= ' ' . $itemData['styleInfo'];
-		}
-
-		return $timingLine;
-	}
-
-
+	
 	/**
 	 * @param $content
 	 * @return array
