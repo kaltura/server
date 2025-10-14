@@ -143,6 +143,23 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	 * @var string
 	 */
 	protected $signSecret;
+
+	/**
+	 * The type of the data to send.
+	 *
+	 * @var string
+	 */
+	protected $contentType;
+
+	public function getContentType(): string
+	{
+		return $this->contentType;
+	}
+
+	public function setContentType(string $contentType): void
+	{
+		$this->contentType = $contentType;
+	}
 	
 	/**
 	 * @return string $url
