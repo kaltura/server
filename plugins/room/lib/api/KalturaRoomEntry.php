@@ -29,13 +29,13 @@ class KalturaRoomEntry extends KalturaBaseEntry
      * The entryId of the recording
      * @var string
      */
-    public $recordingEntryId;
+    public $recordedEntryId;
 
 	private static $map_between_objects = array(
 		'roomType',
 		'broadcastEntryId',
 		'templateRoomEntryId',
-		'recordingEntryId'
+		'recordedEntryId'
 	);
 
 	public function __construct()
@@ -62,14 +62,14 @@ class KalturaRoomEntry extends KalturaBaseEntry
 	{
 		$this->validatePropertyNotNull('roomType');
 		$this->validateTemplateRoomEntry();
-		$this->validateRecordingEntryId();
+		$this->validateRecordedEntryId();
 		return parent::validateForInsert($propertiesToSkip);
 	}
 
 	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
 	{
 		$this->validateTemplateRoomEntry();
-		$this->validateRecordingEntryId();
+		$this->validateRecordedEntryId();
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
@@ -98,16 +98,16 @@ class KalturaRoomEntry extends KalturaBaseEntry
 		return entryPeer::retrieveByIdAndPartnerIds($entryId, $allowedPids);
 	}
 
-    protected function validateRecordingEntryId()
+    protected function validateRecordedEntryId()
     {
-        if(!isset($this->recordingEntryId) || $this->recordingEntryId === '')
+        if(!isset($this->recordedEntryId) || $this->recordedEntryId === '')
         {
 			return;
         }
-		$recordingEntry = entryPeer::retrieveByPK($this->recordingEntryId);
-		if (!$recordingEntry)
+		$recordedEntry = entryPeer::retrieveByPK($this->recordedEntryId);
+		if (!$recordedEntry)
 		{
-			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'recordingEntryId - ' . $this->recordingEntryId);
+			throw new KalturaAPIException(APIErrors::INVALID_FIELD_VALUE, 'recordedEntryId - ' . $this->recordedEntryId);
 		}
     }
 
