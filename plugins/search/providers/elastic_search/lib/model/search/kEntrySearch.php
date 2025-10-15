@@ -13,6 +13,7 @@ class kEntrySearch extends kBaseESearch
     public function __construct()
     {
         $this->isInitialized = false;
+		$this->boostItemsBy = ESearchBoostField::CREATED_AT;
         parent::__construct();
 		$this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
     }
@@ -39,6 +40,27 @@ class kEntrySearch extends kBaseESearch
         $result = $this->execSearch($eSearchOperator);
         return $result;
     }
+
+	protected function boostItems()
+	{
+		$query = $this->query['body']['query'];
+		unset($this->query['body']['query']);
+		$this->query['body']['query']['function_score']['query'] = $query;
+		
+		switch ($this->boostItemsBy)
+		{
+			case ESearchBoostField::CREATED_AT:
+			default:
+			{
+				$this->query['body']['query']['function_score']['functions'][] = array(ESearchBoostFunction::EXP => array(ESearchBoostField::CREATED_AT => array (
+					'origin' => ESearchCreatedAtBoostItems::ORIGIN_NOW,
+					'scale' => ESearchCreatedAtBoostItems::SCALE_30D,
+					'decay' => ESearchCreatedAtBoostItems::DECAY_HALF)));
+				$this->query['body']['query']['function_score']['boost_mode'] = ESearchBoostMode::MULTIPLY;
+			}
+		}
+
+	}
 
     protected function initQuery(array $statuses, $objectIdsCsvStr, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
     {
