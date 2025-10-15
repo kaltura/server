@@ -223,7 +223,22 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 
 	public static function getCaptionElasticSearchData($entry)
 	{
-		$captionAssets = assetPeer::retrieveByEntryId($entry->getId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+
+		$entryId = $entry->getId();
+
+		// For live entries with redirectEntryId, index captions from the redirect target
+		if ($entry instanceof LiveEntry) {
+			$redirectEntryId = $entry->getRedirectEntryId();
+			if ($redirectEntryId) {
+				KalturaLog::info("Live entry {$entryId} has redirectEntryId {$redirectEntryId}, fetching captions from redirect target");
+				$redirectEntry = entryPeer::retrieveByPK($redirectEntryId);
+				if ($redirectEntry) {
+					$entryId = $redirectEntryId;
+				}
+			}
+		}
+
+		$captionAssets = assetPeer::retrieveByEntryId($entryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 		if(!$captionAssets || !count($captionAssets))
 			return null;
 
