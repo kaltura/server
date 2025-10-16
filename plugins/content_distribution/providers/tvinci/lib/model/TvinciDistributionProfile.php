@@ -15,7 +15,9 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 
 	const INNER_TYPE_CATALOG = 'catalog';
 	const INNER_TYPE_INGEST = 'ingest';
-	
+	const COMPRESSION_PREFIX = '##COMPRESS##';
+	const MAX_CUSTOM_DATA_CLEAR_FIELD_SIZE = 32*1024;
+
 	/* (non-PHPdoc)
 	 * @see DistributionProfile::getProvider()
 	 */
@@ -84,8 +86,39 @@ class TvinciDistributionProfile extends ConfigurableDistributionProfile
 		return $validationErrors;
 	}
 
-	public function getXsltFile()				{return $this->getFromCustomData(self::CUSTOM_DATA_XSLT);}
-	public function setXsltFile($v)				{$this->putInCustomData(self::CUSTOM_DATA_XSLT, $v);}
+	protected function putCompressedInCustomData ( $name , $value , $namespace = null )
+	{
+		$content = serialize($value);
+		if(strlen($content) > self::MAX_CUSTOM_DATA_CLEAR_FIELD_SIZE)
+		{
+			$value = self::COMPRESSION_PREFIX.gzcompress($content, 9);
+		}
+		parent::putInCustomData ( $name , $value , $namespace );
+	}
+
+	protected function getCompressedFromCustomData ( $name , $namespace = null, $defaultValue = null )
+	{
+		$ret = parent::getFromCustomData ( $name , $namespace, $defaultValue );
+		//if the return data starts with ##COMPRESS## - then it is compressed data so uncompress it
+		if(is_string($ret) && strlen($ret) > strlen(self::COMPRESSION_PREFIX) && strpos($ret, self::COMPRESSION_PREFIX) === 0)
+		{
+			$ret = substr($ret, strlen(self::COMPRESSION_PREFIX));
+			$ret = gzuncompress($ret);
+			$ret = unserialize($ret);
+		}
+		return $ret;
+	}
+
+	public function getXsltFile()
+	{
+		return $this->getCompressedFromCustomData(self::CUSTOM_DATA_XSLT);
+	}
+	public function setXsltFile($v)
+	{
+		$this->putCompressedInCustomData(self::CUSTOM_DATA_XSLT, $v);
+	}
+
+
 
 	public function getIngestUrl()				{return $this->getFromCustomData(self::CUSTOM_DATA_INGEST_URL);}
 	public function setIngestUrl($v)			{$this->putInCustomData(self::CUSTOM_DATA_INGEST_URL, $v);}
