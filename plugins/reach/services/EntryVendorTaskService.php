@@ -336,12 +336,35 @@ class EntryVendorTaskService extends KalturaBaseService
 	public function getJobsAction(KalturaEntryVendorTaskFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaEntryVendorTaskFilter();
+		}
+		
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
 		
 		$filter->vendorPartnerIdEqual = kCurrentContext::getCurrentPartnerId();
-		$filter->statusEqual = EntryVendorTaskStatus::PENDING;
-		if (!$pager)
-			$pager = new KalturaFilterPager();
+		
+		//Check status filter validity
+		if($filter->statusEqual || $filter->statusIn)
+		{
+			// only PENDING and SCHEDULED statuses are valid for filtering
+			$validStatuses = array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED);
+			$filteredStatus = $filter->statusEqual ? array($filter->statusEqual) : explode(",", $filter->statusIn);
+			if (!empty(array_diff($filteredStatus, $validStatuses)))
+			{
+				KalturaLog::debug("Invalid status filter, defaulting to PENDING");
+				$filter->statusEqual = EntryVendorTaskStatus::PENDING;
+			}
+		}
+		else
+		{
+			// default status filter
+			KalturaLog::debug("No status filter, defaulting to PENDING");
+			$filter->statusEqual = EntryVendorTaskStatus::PENDING;
+		}
 		
 		return $filter->getListResponse($pager, $this->getResponseProfile());
 	}
@@ -480,7 +503,7 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
 		}
 		
-		if($dbEntryVendorTask->getStatus() != EntryVendorTaskStatus::PROCESSING)
+		if(!in_array($dbEntryVendorTask->getStatus(), array(EntryVendorTaskStatus::SCHEDULED, EntryVendorTaskStatus::PROCESSING)))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::CANNOT_EXTEND_ACCESS_KEY);
 		}

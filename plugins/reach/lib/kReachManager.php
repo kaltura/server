@@ -21,6 +21,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		$mapObjectType = array("entry" => objectType::ENTRY,
 			"LiveStreamEntry" => objectType::ENTRY,
+			"ExternalMediaEntry" => objectType::ENTRY,
 			"category" => objectType::CATEGORY,
 			"asset" => objectType::ASSET,
 			"flavorAsset" => objectType::FLAVORASSET,
