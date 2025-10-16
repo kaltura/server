@@ -1,4 +1,12 @@
-# Venus-22.4.0
+# Venus-22.5.0
+## Add new permission to EP_USER_ANALYTICS Role ##
+- Issue Type: Task
+- Issue ID: PLAT-25375
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_09_16_add_ep_beacon_permission.php
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_09_16_add_permission_to_ep_analytics_role.php
+
+# Venus-22.3.0
 ## Add partner and permissions for In-App Messaging ##
 - Issue Type: Task
 - Issue ID: PLAT-25503
