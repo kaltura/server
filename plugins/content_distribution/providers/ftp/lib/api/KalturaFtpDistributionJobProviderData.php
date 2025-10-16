@@ -77,7 +77,14 @@ class KalturaFtpDistributionJobProviderData extends KalturaConfigurableDistribut
 			if (!$sendMetadataAfterAssets)
 				$files[] = $metadataFile;
 		}
-		
+		$entry = $distributionProfileDb->getEntryFromPeer($entryDistributionDb);
+		if($entry->getType() == entryType::DATA && !is_null($entry->getDataContent()))
+		{
+			$metadataFile = new KalturaFtpDistributionFile();
+			$metadataFile->filename = $entry->getName();
+			$metadataFile->contents = $entry->getDataContent();
+			$files[] = $metadataFile;
+		}
 		$flavorAssetsIds = explode(',', $entryDistributionDb->getFlavorAssetIds());
 		$thumbnailAssetIds = explode(',', $entryDistributionDb->getThumbAssetIds());
 		$assetIds = explode(',', $entryDistributionDb->getAssetIds());
