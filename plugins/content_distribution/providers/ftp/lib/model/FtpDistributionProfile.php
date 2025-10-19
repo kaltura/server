@@ -109,19 +109,9 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 		
 		return $xslt->transformToXml($mrssDoc);
 	}
-
-	public function getEntryFromPeer(EntryDistribution $entryDistribution) {
-		static $entry;
-		if(is_null($entry))
-		{
-			$entry =  entryPeer::retrieveByPK($entryDistribution->getEntryId());
-		}
-		return $entry;
-	}
-	
 	public function getEntryMrssDoc(EntryDistribution $entryDistribution)
 	{
-		$entry = $this->getEntryFromPeer($entryDistribution);
+		$entry = entryPeer::retrieveByPK($entryDistribution->getEntryId());
 				
 		// set the default criteria to use the current entry distribution partner id (it is restored later)
 		// this is needed for related entries under kMetadataMrssManager which is using retrieveByPK without the correct partner id filter
