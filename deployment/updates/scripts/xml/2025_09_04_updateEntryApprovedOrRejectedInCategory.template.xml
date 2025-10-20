@@ -44,11 +44,18 @@
                 <emailRecipients objectType="array">
                     <item objectType = "KalturaEmailNotificationRecipient">
                         <email objectType="KalturaEvalStringField">
-                          <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? (!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getEmail() : '') : ''</code>
+                          <code>
+$entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId());
+$kuser = !is_null($entry) ? $entry->getkuser() : null;
+!is_null($entry) ? (!is_null($kuser) ? $kuser->getEmail() : '') : ''
+</code>
                         </email>
                         <name objectType="KalturaEvalStringField">
-                            <code>!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())) ? (!is_null(entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()) ? entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getFirstName().' '.entryPeer::retrieveByPk($scope->getObject()->getEntryId())->getkuser()->getLastName() : '') : ''
-                            </code>
+                            <code>
+$entry = entryPeer::retrieveByPk($scope->getObject()->getEntryId());
+$kuser = !is_null($entry) ? $entry->getkuser() : null;
+!is_null($entry) ? (!is_null($kuser) ? $kuser->getFirstName().' '.$kuser->getLastName() : '') : ''
+</code>
                         </name>
                     </item>
                 </emailRecipients>
