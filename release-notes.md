@@ -11943,8 +11943,7 @@ Internal indication for api time properties and support for times that are relat
 None.
 
 ### Deployment scripts ###
-If the owner of the entry is a deleted user (with status = 2), therefore it won't be returned from the DB.
-In order to avoid null pointer exception, add a safety check for kuser.
+Replace all tokens in the XML file below.  Remove ".template" from the file name.  Run the php deployment script.
 
 Update script:
 
