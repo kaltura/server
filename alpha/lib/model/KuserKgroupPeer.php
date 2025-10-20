@@ -138,10 +138,12 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 	 */
 	public function getRootObjects(IRelatedObject $object)
 	{
-		return array(
+		$objects = array(
 			kuserPeer::retrieveByPK($object->getKuserId()),
 			kuserPeer::retrieveByPK($object->getKgroupId()),
 		);
+		//PHP's built-in array_filter() function to remove any null or false values
+		return array_filter($objects);
 	}
 
 	/* (non-PHPdoc)
