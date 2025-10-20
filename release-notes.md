@@ -11947,5 +11947,5 @@ Replace all tokens in the XML file below.  Remove ".template" from the file name
 
 Update script:
 
-     - deployment/updates/scripts/xml/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.template.xml
-     - php deployment/updates/scripts/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.php
+     - deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.template.xml
+     - php deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.php
