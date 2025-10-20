@@ -156,6 +156,16 @@ class EntryAdminService extends KalturaBaseService
 		$deletedEntry->setStatusReady();
 		$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);
 		$deletedEntry->setData($deletedEntry->getFromCustomData("deleted_original_data"),true); //data should be resotred even if it's NULL
+
+		// Read previousDisplayInSearchStatus FIRST (while it still has a value)
+		if ($deletedEntry->getDisplayInSearch() === KalturaEntryDisplayInSearchType::RECYCLED) {
+			$deletedEntry->setDisplayInSearch($deletedEntry->getPreviousDisplayInSearchStatus());
+		}
+
+		// THEN clear the recycle bin fields
+		$deletedEntry->setRecycledAt(null);
+		$deletedEntry->setPreviousDisplayInSearchStatus(null);
+
 		$deletedEntry->save();
 
 		kEventsManager::flushEvents();

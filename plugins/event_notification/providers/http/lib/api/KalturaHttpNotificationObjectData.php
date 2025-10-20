@@ -1,7 +1,7 @@
 <?php
 /**
  * Evaluates PHP statement, depends on the execution context
- * 
+ *
  * @package plugins.httpNotification
  * @subpackage api.objects
  */
@@ -12,19 +12,19 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	 * @var string
 	 */
 	public $apiObjectType;
-	
+
 	/**
 	 * Data format
 	 * @var KalturaResponseType
 	 */
 	public $format;
-	
+
 	/**
 	 * Ignore null attributes during serialization
 	 * @var bool
 	 */
 	public $ignoreNull;
-	
+
 	/**
 	 * PHP code
 	 * @var string
@@ -44,6 +44,11 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	 */
 	protected $coreObject;
 
+	/**
+	 * @var int
+	 */
+	public $responseProfileId;
+
 	static private $map_between_objects = array
 	(
 		'apiObjectType' => 'objectType',
@@ -51,6 +56,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		'ignoreNull',
 		'code',
 		'dataStringReplacements',
+		'responseProfileId',
 	);
 
 	/* (non-PHPdoc)
@@ -60,7 +66,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
@@ -68,13 +74,13 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	{
 		if(!$this->apiObjectType || !is_subclass_of($this->apiObjectType, 'KalturaObject'))
 			throw new KalturaAPIException(KalturaHttpNotificationErrors::HTTP_NOTIFICATION_INVALID_OBJECT_TYPE);
-			
+
 		if(!$dbObject)
 			$dbObject = new kHttpNotificationObjectData();
-			
+
 		return parent::toObject($dbObject, $skip);
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::fromObject($srcObj)
 	 */
@@ -84,7 +90,7 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		parent::doFromObject($srcObj, $responseProfile);
 		$this->coreObject = $srcObj->getCoreObject();
 	}
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaHttpNotificationData::getData()
 	 */
@@ -94,10 +100,19 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 
 		$apiObject = new $this->apiObjectType;
 		/* @var $apiObject KalturaObject */
-		$apiObject->fromObject($coreObject);
-		
+
+		$responseProfile = null;
+		if ($this->responseProfileId)
+		{
+			$responseProfile = new KalturaDetachedResponseProfile();
+			$coreProfile = ResponseProfilePeer::retrieveByPK($this->responseProfileId);
+			$responseProfile->fromObject($coreProfile);
+		}
+
+		$apiObject->fromObject($coreObject, $responseProfile ?? null);
+
 		$httpNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($jobData->getTemplateId());
-		
+
 		$notification = new KalturaHttpNotification();
 		$notification->object = $apiObject;
 		$notification->eventObjectType = kPluginableEnumsManager::coreToApi('EventNotificationEventObjectType', $httpNotificationTemplate->getObjectType());
@@ -111,17 +126,17 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		switch ($this->format)
 		{
 			case KalturaResponseType::RESPONSE_TYPE_XML:
-				$serializer = new KalturaXmlSerializer($this->ignoreNull);				
+				$serializer = new KalturaXmlSerializer($this->ignoreNull);
 				$data = '<notification>' . $serializer->serialize($notification) . '</notification>';
 				break;
-				
+
 			case KalturaResponseType::RESPONSE_TYPE_PHP:
-				$serializer = new KalturaPhpSerializer($this->ignoreNull);				
+				$serializer = new KalturaPhpSerializer($this->ignoreNull);
 				$data = $serializer->serialize($notification);
 				break;
-				
+
 			case KalturaResponseType::RESPONSE_TYPE_JSON:
-				$serializer = new KalturaJsonSerializer($this->ignoreNull);				
+				$serializer = new KalturaJsonSerializer($this->ignoreNull);
 				$data = $serializer->serialize($notification);
 
 				if($this->dataStringReplacements)
@@ -145,11 +160,11 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 				$data = urlencode($data);
 				break;
 		}
-		
+
 		return "data=$data";
 	}
 
-	public function getContentType() : string
+	public function getContentType()
 	{
 		switch ($this->format)
 		{

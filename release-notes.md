@@ -1,3 +1,46 @@
+# Venus-22.5.0
+## Add Audio Description and Dubbing flavors to the list of available flavors ##
+- Issue Type: Task
+- Issue ID: PLAT-25292, PLAT-25448, PLAT-25447, PLAT-25446
+### Deployment scripts ###
+	php deployment/updates/scripts/2025_09_21_deploy_AD_and_dubbing_flavor_params.php
+
+# Venus-22.4.0
+## Add partner and permissions for In-App Messaging ##
+- Issue Type: Task
+- Issue ID: PLAT-25503
+
+### Configuration ###
+Replace the tokens: @IN_APP_MESSAGING_PARTNER_ADMIN_SECRET@ , @IN_APP_MESSAGING_PARTNER_SECRET@  in the ini file and remove ".template" from the file name:
+
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_09_28_add_in_app_messaging_partner.php
+
+# Venus-22.3.0
+## Activate scheule events related kafka notification by default ##
+- Issue Type: Task
+- Issue ID: N/A
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	deployment/updates/scripts/xml/notifications/2025_09_09_update_kafka_schedule_event_events.template.xml
+
+### Deployment scripts ###
+	php deployment/updates/scripts/2025_09_09_update_schedule_event_kafka_notifications.php
+
+## Update status of kafka event notification to active for category entry create/update ##
+- Issue Type: Task
+- Issue ID: KAM-136
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_09_07_update_category_entry_kafka_notifications.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_09_07_update_category_entry_kafka_notifications.php
+
 # Venus-22.1.0
 ## Add custom headers and content-type settings to HTTP notification template config
 - Issue Type: Task
@@ -67,7 +110,7 @@ deployment/base/scripts/init_data/01.Partner.template.ini
 	php deployment/updates/scripts/add_permissions/2025_06_30_agents_manager_add_partner.php
 
 
-## Add kafka event notification for category entry create/update/delete and support pushign entry events when agents are enabled ##
+## Add kafka event notification for category entry create/update and support pushing entry events when agents are enabled ##
 - Issue Type: Task
 - Issue ID: KAM-6
 
