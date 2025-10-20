@@ -142,7 +142,7 @@ class KuserKgroupPeer extends BaseKuserKgroupPeer implements IRelatedObjectPeer
 			kuserPeer::retrieveByPK($object->getKuserId()),
 			kuserPeer::retrieveByPK($object->getKgroupId()),
 		);
-		//PHP's built-in array_filter() function to remove any null or false values
+		//PHP's built-in array_filter() function to removes all values that evaluate to false in boolean context (e.g., null, false, 0, empty string, empty array, etc.)
 		return array_filter($objects);
 	}
 
