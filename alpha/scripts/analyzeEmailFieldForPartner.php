@@ -72,7 +72,6 @@ KalturaLog::log("Done Running for partner [$partnerId]. Report file: $userUpdate
 
 
 function noEmailPercentage($noEmailUsersCount, $totalUsers): int {
-    
 	if ($totalUsers <= 0) {
         return 0;
     }
