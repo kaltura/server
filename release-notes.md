@@ -11930,3 +11930,22 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
+
+
+
+# Venus-22.5.0
+
+## Update Entry Approved or Rejected  in category template ##
+* Issue Type: Task
+* Issue ID: SUP-49053
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+Replace all tokens in the XML file below.  Remove ".template" from the file name.  Run the php deployment script.
+
+Update script:
+
+     - deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.template.xml
+     - php deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.php
