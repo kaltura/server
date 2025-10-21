@@ -841,10 +841,7 @@ class KalturaMonitorClient
 	
 	private static function sendServiceStatusHeader($requestTook = null)
 	{
-		if(!isset($requestTook))
-			return;
-		
-		if(!kApcWrapper::functionExists('inc'))
+		if(!isset($requestTook) || !kApcWrapper::functionExists('inc'))
 			return;
 		
 		$serviceStatusConfig = kConf::get('service_status_config', kConfMapNames::RUNTIME_CONFIG, array());
@@ -861,20 +858,12 @@ class KalturaMonitorClient
 			return;
 		}
 		
-		$thresholdInSeconds = isset($serviceStatusConfig['threshold_in_seconds']) ?
-			$serviceStatusConfig['threshold_in_seconds'] :
-			self::DEFAULT_SERVICE_THRESHOLD;
+		$thresholdInSeconds = $serviceStatusConfig['threshold_in_seconds'] ?? self::DEFAULT_SERVICE_THRESHOLD;
+		$cacheInterval = $serviceStatusConfig['cache_interval'] ?? self::DEFAULT_SERVICE_CACHE_INTERVAL;
+		list($reqTime, $reqCount, $reqAvgTime) = self::getServiceStatusStats($requestTook, $cacheInterval);
 		
-		$cacheInterval = isset($serviceStatusConfig['cache_interval']) ?
-			$serviceStatusConfig['cache_interval'] :
-			self::DEFAULT_SERVICE_CACHE_INTERVAL;
-		
-		$elapsedMicro = (int)round($requestTook * 1000000);
-		$reqCount = kApcWrapper::apcInc('req_count', 1, null, $cacheInterval);
-		$reqTime = kApcWrapper::apcInc('req_time', $elapsedMicro, null, $cacheInterval);
-		if($reqTime && $reqCount)
+		if($reqAvgTime)
 		{
-			$reqAvgTime = ($reqTime/1000000)/$reqCount;
 			$serviceStatus = self::SERVICE_OK;
 			if($reqAvgTime > $thresholdInSeconds)
 			{
@@ -888,6 +877,50 @@ class KalturaMonitorClient
 			header('X-Kaltura-Service-Status: ' . $serviceStatus);
 			self::safeLog("Service status: serviceStatus [$serviceStatus] count [$reqCount] time [$reqTime] avg [$reqAvgTime]");
 		}
+	}
+	
+	private static function getServiceStatusStats($requestTook, $cacheInterval)
+	{
+		// convert to micro seconds
+		$requestTook = (int)round($requestTook * 1000000);
+		
+		$currentCacheKeyPostfix = intval(time()/10);
+		$reqCount = kApcWrapper::apcInc('req_count_'.$currentCacheKeyPostfix, 1, null, $cacheInterval);
+		$reqTime = kApcWrapper::apcInc('req_time_'.$currentCacheKeyPostfix, $requestTook, null, $cacheInterval);
+		if($reqCount === false || $reqTime === false)
+		{
+			return null;
+		}
+		
+		// get last 5 10 seconds buckets as well each key is a 10 second interval
+		// so we get last 50 seconds data
+		$keysToFetch = array();
+		for($i=1; $i<=5; $i++)
+		{
+			$keysToFetch[] = 'req_count_'.($currentCacheKeyPostfix - $i);
+			$keysToFetch[] = 'req_time_'.($currentCacheKeyPostfix - $i);
+		}
+		
+		$res = kApcWrapper::apcMultiGet($keysToFetch);
+		if(!is_array($res) || count($res) < 2)
+		{
+			//If we dont have enough historical data yet - we return null to avoid false positives
+			return null;
+		}
+		
+		foreach($res as $key => $value)
+		{
+			if(strpos($key, 'req_count_') === 0 && is_numeric($value))
+			{
+				$reqCount += $value;
+			}
+			else if(strpos($key, 'req_time_') === 0 && is_numeric($value))
+			{
+				$reqTime += $value;
+			}
+		}
+		
+		return array($reqTime, $reqCount, ($reqTime/1000000)/$reqCount);
 	}
 	
 	protected static function safeLog($msg)
