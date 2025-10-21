@@ -105,7 +105,7 @@ function countUsersWithDuplicatedEmail($partnerId, $kuserEmails = null, $metadat
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId);
 	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 	$emailCriteria->add(kuserPeer::TYPE, KuserType::USER);
-	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0, 1), Criteria::IN); // Do we need Admins?
+	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0, 1), Criteria::IN);
 	$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNOTNULL);
 
 	if (!empty($kuserEmails)) {
