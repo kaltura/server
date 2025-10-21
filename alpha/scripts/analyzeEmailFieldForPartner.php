@@ -511,7 +511,8 @@ function fetchMetadataRolesForUsers(int $partnerId, array $kuserIds, array $meta
 			$xml = kFileSyncUtils::file_get_contents($key, true, false);
 
 			$simpleXml = new SimpleXMLElement($xml);
-			$roleValue = strval($simpleXml->xpath('.//role')[0]);
+			$roleNodes = $simpleXml->xpath('.//role');
+			$roleValue = isset($roleNodes[0]) ? strval($roleNodes[0]) : '';
 			$objectId = (int)$metadataObject->getObjectId();
 			$profileId = (int)$metadataObject->getMetadataProfileId();
 
