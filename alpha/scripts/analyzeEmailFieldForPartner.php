@@ -284,7 +284,7 @@ function writeArrayToCsv($header, $rows): string {
  * @param array $duplicates An array of duplicate records, where each record contains the email and its duplicate count.
  * @param int $partnerId Partner ID used when fetching metadata roles.
  * @param array $metadataProfileIds List of metadata profile IDs to include role columns for.
- * @return string Returns true if the report was successfully written, otherwise false.
+ * @return string The filename of the generated report.
  * @throws Exception
  */
 function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, array $duplicates, int $partnerId, array $metadataProfileIds = [], bool $includeDuplicateColumns = true) {
