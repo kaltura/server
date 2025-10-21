@@ -5,7 +5,7 @@ require_once(__DIR__ . '/bootstrap.php');
 // parse the command line
 if ($argc < 4) {
 	echo "Example: php " . $argv[0] . " 12345 dryRun false false users.csv\n";
-	die("Usage: php " . $argv[0] . " <partner id> <realRun | dryRun> <UpdateLoginEmail - true | false > <checkDuplications - if to check duplicate user Emails> <metadataProfileIds - optional comma separated list of metadata profile IDs>  <userList - optional csv file>\n");
+	die("Usage: php " . $argv[0] . " <partner id> <realRun | dryRun> <UpdateLoginEmail - true | false > <checkDuplications - if to check duplicate user Emails> <metadataProfileIds - optional comma separated list of metadata profile IDs>  <userList - optional csv file with puserIds column>\n");
 }
 
 $partnerId = $argv[1];
@@ -72,8 +72,14 @@ KalturaLog::log("Done Running for partner [$partnerId]. Report file: $userUpdate
 
 
 function noEmailPercentage($noEmailUsersCount, $totalUsers): int {
-	return (int)(($noEmailUsersCount * 100) / $totalUsers);
+    
+	if ($totalUsers <= 0) {
+        return 0;
+    }
+
+    return (int) floor(($noEmailUsersCount * 100) / $totalUsers);
 }
+
 
 function getUsers($partnerId, $hasEmail, $puserIds = null): array {
 	$emailCriteria = new Criteria();
@@ -276,19 +282,14 @@ function writeArrayToCsv($header, $rows): string {
 }
 
 /**
- * Prepares and writes a user update report to a CSV file. The report includes information
- * about user login emails, external IDs, whether updates are needed, and the count of duplicate emails.
+ * Builds the CSV headers for the user update report, including optional duplicate columns and metadata profile columns.
  *
- * @param array $withEmailUsers An array of user objects with email information.
- * @param array $report An array containing 'loginEmailUpdates' and 'externalIdUpdates' mappings for users.
- * @param array $duplicates An array of duplicate records, where each record contains the email and its duplicate count.
- * @param int $partnerId Partner ID used when fetching metadata roles.
- * @param array $metadataProfileIds List of metadata profile IDs to include role columns for.
- * @return string The filename of the generated report.
- * @throws Exception
+ * @param bool $includeDuplicateColumns Whether to append duplicate count and entry ownership columns.
+ * @param array $metadataProfileIds Metadata profile IDs that require role columns.
+ * @return array
  */
-function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, array $duplicates, int $partnerId, array $metadataProfileIds = [], bool $includeDuplicateColumns = true) {
-
+function buildReportHeaders(bool $includeDuplicateColumns, array $metadataProfileIds): array
+{
 	$headers = ['kuserId', 'email', 'puserId', 'loginEmail', 'FirstName', 'LastName', 'CreatedAt', 'externalId', 'isAdmin', 'needsLoginEmailUpdate', 'needsExternalIdUpdate'];
 
 	if ($includeDuplicateColumns) {
@@ -296,13 +297,34 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, a
 		$headers[] = 'entryOwnedCount';
 	}
 
+	foreach ($metadataProfileIds as $profileId) {
+		$headers[] = 'metadataRole_' . $profileId;
+	}
+
+	return $headers;
+}
+
+/**
+ * Normalizes duplicate data into lookup structures used for report enrichment.
+ *
+ * @param array $duplicates Raw duplicates information.
+ * @param bool $includeDuplicateColumns Whether duplicate-specific columns will be emitted.
+ * @return array{
+ *     emailCounts: array<string,int>,
+ *     byKuserId: array<int,array>,
+ *     entryCounts: array<int,int>,
+ *     userIds: array<int>
+ * }
+ */
+function normalizeDuplicateData(array $duplicates, bool $includeDuplicateColumns): array
+{
 	$duplicateEmailCounts = [];
 	$duplicatesByKuserId = [];
+	$duplicateEntryCounts = [];
 
 	foreach ($duplicates as $dup) {
-
-		if (is_array($dup) && isset($dup[0]) && isset($dup[1]) && is_string($dup[0]) && is_numeric($dup[1])) {
-			$duplicateEmailCounts[$dup[0]] = $dup[1];
+		if (is_array($dup) && isset($dup[0], $dup[1]) && is_string($dup[0]) && is_numeric($dup[1])) {
+			$duplicateEmailCounts[$dup[0]] = (int)$dup[1];
 			continue;
 		}
 
@@ -313,45 +335,75 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, a
 		$kuserId = $dup['kuserId'];
 		$duplicatesByKuserId[$kuserId] = $dup;
 
+		if ($includeDuplicateColumns) {
+			$duplicateEntryCounts[$kuserId] = $dup['entryOwnedCount'] ?? 0;
+		}
 	}
 
-	$metadataRolesByUser = [];
-	$duplicateEntryCounts = [];
-	$duplicateUserIds = array_keys($duplicatesByKuserId);
-
-	foreach ($duplicatesByKuserId as $dupUserId => $dupData) {
-		$duplicateEntryCounts[$dupUserId] = $dupData['entryOwnedCount'] ?? 0;
+	if (!$includeDuplicateColumns) {
+		$duplicateEntryCounts = [];
 	}
 
+	return [
+		'emailCounts' => $duplicateEmailCounts,
+		'byKuserId' => $duplicatesByKuserId,
+		'entryCounts' => $duplicateEntryCounts,
+		'userIds' => array_keys($duplicatesByKuserId),
+	];
+}
+
+/**
+ * Resolves metadata roles for duplicated users and returns the final profile list.
+ *
+ * @param int $partnerId
+ * @param array $duplicateUserIds
+ * @param array $metadataProfileIds
+ * @return array{roles: array<int,array>, profileIds: array<int>}
+ */
+function resolveMetadataRoles(int $partnerId, array $duplicateUserIds, array $metadataProfileIds): array
+{
 	$requestedProfileIds = !empty($metadataProfileIds) ? array_values(array_unique($metadataProfileIds)) : [];
 
-	if (!empty($duplicateUserIds)) {
-		$metadataFetchResult = fetchMetadataRolesForUsers($partnerId, $duplicateUserIds, $requestedProfileIds);
-		$metadataRolesByUser = $metadataFetchResult['roles'];
-		$discoveredProfileIds = $metadataFetchResult['profileIds'];
-
-		if (!empty($requestedProfileIds)) {
-			$metadataProfileIds = $requestedProfileIds;
-		} else {
-			$metadataProfileIds = $discoveredProfileIds;
-		}
-	} else {
-		$metadataProfileIds = $requestedProfileIds;
+	if (empty($duplicateUserIds)) {
+		return [
+			'roles' => [],
+			'profileIds' => $requestedProfileIds,
+		];
 	}
 
-	if (!empty($metadataProfileIds)) {
-		$metadataProfileIds = array_values(array_unique($metadataProfileIds));
-		foreach ($metadataProfileIds as $profileId) {
-			$headers[] = 'metadataRole_' . $profileId;
-		}
-	}
+	$metadataFetchResult = fetchMetadataRolesForUsers($partnerId, $duplicateUserIds, $requestedProfileIds);
+	$metadataRolesByUser = $metadataFetchResult['roles'];
+	$discoveredProfileIds = $metadataFetchResult['profileIds'];
 
-	$loginEmailUpdateIds = array_flip($report['loginEmailUpdates']);
-	$externalIdUpdateIds = array_flip($report['externalIdUpdates']);
-	$reportRows = [];
+	$finalProfileIds = !empty($requestedProfileIds) ? $requestedProfileIds : $discoveredProfileIds;
+	$finalProfileIds = !empty($finalProfileIds) ? array_values(array_unique($finalProfileIds)) : [];
+
+	return [
+		'roles' => $metadataRolesByUser,
+		'profileIds' => $finalProfileIds,
+	];
+}
+
+/**
+ * Builds report rows for users retrieved with email information.
+ *
+ * @param array $withEmailUsers
+ * @param array $duplicateEmailCounts
+ * @param array $duplicateEntryCounts
+ * @param array $metadataProfileIds
+ * @param array $metadataRolesByUser
+ * @param array $loginEmailUpdateIds
+ * @param array $externalIdUpdateIds
+ * @param bool $includeDuplicateColumns
+ * @param int $partnerId
+ * @return array{rows: array<int,array>, processedUserIds: array<int,bool>}
+ */
+function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmailCounts, array $duplicateEntryCounts, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, bool $includeDuplicateColumns, int $partnerId): array
+{
+	$rows = [];
 	$processedUserIds = [];
 
-	foreach($withEmailUsers as $user) {
+	foreach ($withEmailUsers as $user) {
 		$kuserId = $user->getId();
 		$processedUserIds[$kuserId] = true;
 		$puserId = $user->getPuserId();
@@ -367,11 +419,16 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, a
 		$duplicateCount = $duplicateEmailCounts[$userEmail] ?? 0;
 		$entryOwnedCount = $duplicateEntryCounts[$kuserId] ?? '';
 
-		if ($entryOwnedCount === '' && $duplicateCount > 0) {
+		if ($includeDuplicateColumns && $entryOwnedCount === '' && $duplicateCount > 0) {
 			$entryOwnedCount = getOwnedEntryCount($kuserId, $partnerId);
 		}
 
-		$row = [$kuserId, $userEmail, $puserId, $loginEmail, $firstName, $lastName, $createdAt, $externalId, $isAdmin, $needsLoginEmailUpdate, $needsExternalIdUpdate, $duplicateCount, $entryOwnedCount];
+		$row = [$kuserId, $userEmail, $puserId, $loginEmail, $firstName, $lastName, $createdAt, $externalId, $isAdmin, $needsLoginEmailUpdate, $needsExternalIdUpdate];
+
+		if ($includeDuplicateColumns) {
+			$row[] = $duplicateCount;
+			$row[] = $entryOwnedCount;
+		}
 
 		if (!empty($metadataProfileIds)) {
 			$hasDupMetadata = isset($metadataRolesByUser[$kuserId]);
@@ -385,8 +442,29 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, a
 			}
 		}
 
-		$reportRows[] = $row;
+		$rows[] = $row;
 	}
+
+	return ['rows' => $rows, 'processedUserIds' => $processedUserIds];
+}
+
+/**
+ * Builds report rows for duplicate users that were not part of the main email user list.
+ *
+ * @param array $duplicatesByKuserId
+ * @param array $processedUserIds
+ * @param array $duplicateEmailCounts
+ * @param array $duplicateEntryCounts
+ * @param array $metadataProfileIds
+ * @param array $metadataRolesByUser
+ * @param array $loginEmailUpdateIds
+ * @param array $externalIdUpdateIds
+ * @param bool $includeDuplicateColumns
+ * @return array
+ */
+function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $processedUserIds, array $duplicateEmailCounts, array $duplicateEntryCounts, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, bool $includeDuplicateColumns): array
+{
+	$rows = [];
 
 	foreach ($duplicatesByKuserId as $dupUserId => $dup) {
 		if (isset($processedUserIds[$dupUserId])) {
@@ -408,9 +486,12 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, a
 			$dup['isAdmin'] ?? '',
 			isset($loginEmailUpdateIds[$dupUserId]) ? 'yes' : 'no',
 			isset($externalIdUpdateIds[$dupUserId]) ? 'yes' : 'no',
-			$duplicateCount,
-			$duplicateEntryCounts[$dupUserId] ?? ($dup['entryOwnedCount'] ?? 0),
 		];
+
+		if ($includeDuplicateColumns) {
+			$row[] = $duplicateCount;
+			$row[] = $duplicateEntryCounts[$dupUserId] ?? ($dup['entryOwnedCount'] ?? 0);
+		}
 
 		if (!empty($metadataProfileIds)) {
 			foreach ($metadataProfileIds as $profileId) {
@@ -418,8 +499,45 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, a
 			}
 		}
 
-		$reportRows[] = $row;
+		$rows[] = $row;
 	}
+
+	return $rows;
+}
+
+/**
+ * Prepares and writes a user update report to a CSV file. The report includes information
+ * about user login emails, external IDs, whether updates are needed, and the count of duplicate emails.
+ *
+ * @param array $withEmailUsers An array of user objects with email information.
+ * @param array $report An array containing 'loginEmailUpdates' and 'externalIdUpdates' mappings for users.
+ * @param array $duplicates An array of duplicate records, where each record contains the email and its duplicate count.
+ * @param int $partnerId Partner ID used when fetching metadata roles.
+ * @param array $metadataProfileIds List of metadata profile IDs to include role columns for.
+ * @return string The filename of the generated report.
+ * @throws Exception
+ */
+function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $report, array $duplicates, int $partnerId, array $metadataProfileIds = [], bool $includeDuplicateColumns = true): string
+{
+	$normalizedDuplicates = normalizeDuplicateData($duplicates, $includeDuplicateColumns);
+	$duplicateEmailCounts = $normalizedDuplicates['emailCounts'];
+	$duplicatesByKuserId = $normalizedDuplicates['byKuserId'];
+	$duplicateEntryCounts = $normalizedDuplicates['entryCounts'];
+	$duplicateUserIds = $normalizedDuplicates['userIds'];
+
+	$metadataResolution = resolveMetadataRoles($partnerId, $duplicateUserIds, $metadataProfileIds);
+	$metadataRolesByUser = $metadataResolution['roles'];
+	$metadataProfileIds = $metadataResolution['profileIds'];
+	$headers = buildReportHeaders($includeDuplicateColumns, $metadataProfileIds);
+
+	$loginEmailUpdateIds = array_flip($report['loginEmailUpdates']);
+	$externalIdUpdateIds = array_flip($report['externalIdUpdates']);
+	$usersWithEmailRows = buildRowsForUsersWithEmail($withEmailUsers, $duplicateEmailCounts, $duplicateEntryCounts, $metadataProfileIds, $metadataRolesByUser, $loginEmailUpdateIds, $externalIdUpdateIds, $includeDuplicateColumns, $partnerId);
+	$reportRows = $usersWithEmailRows['rows'];
+	$processedUserIds = $usersWithEmailRows['processedUserIds'];
+
+	$duplicateOnlyRows = buildRowsForDuplicateOnlyUsers($duplicatesByKuserId, $processedUserIds, $duplicateEmailCounts, $duplicateEntryCounts, $metadataProfileIds, $metadataRolesByUser, $loginEmailUpdateIds, $externalIdUpdateIds, $includeDuplicateColumns);
+	array_push($reportRows, ...$duplicateOnlyRows);
 
 	return writeArrayToCsv($headers, $reportRows);
 }
