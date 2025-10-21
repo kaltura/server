@@ -17,7 +17,7 @@ $userListCsv = '';
 
 $metadataArg = $argv[5] ?? null;
 
-if ($metadataArg !== null && strtolower(substr($metadataArg, -4)) === '.csv' && !isset($argv[6])) {
+if ($metadataArg !== null && is_readable($metadataArg) && !isset($argv[6])) {
 	// No metadata IDs provided, only a CSV argument
 	$userListCsv = $metadataArg;
 } else {
