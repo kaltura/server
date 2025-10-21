@@ -889,7 +889,7 @@ class KalturaMonitorClient
 		$reqTime = kApcWrapper::apcInc('req_time_'.$currentCacheKeyPostfix, $requestTook, null, $cacheInterval);
 		if($reqCount === false || $reqTime === false)
 		{
-			return null;
+			return array(null, null, null);
 		}
 		
 		// get last 5 10 seconds buckets as well each key is a 10 second interval
@@ -905,7 +905,7 @@ class KalturaMonitorClient
 		if(!is_array($res) || count($res) < 4)
 		{
 			//If we dont have enough historical data yet - we return null to avoid false positives
-			return null;
+			return array(null, null, null);
 		}
 		
 		foreach($res as $key => $value)
