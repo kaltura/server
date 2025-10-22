@@ -81,7 +81,7 @@ class KalturaFtpDistributionJobProviderData extends KalturaConfigurableDistribut
 		if($entry->getType() == entryType::DATA && !is_null($entry->getDataContent()))
 		{
 			$dataEntryFile = new KalturaFtpDistributionFile();
-			$dataEntryFile->filename = $entry->getName();
+			$dataEntryFile->filename = $distributionProfileDb->getDataContentsFilename($entryDistributionDb, $entry->getName(), $entryDistributionDb->getEntryId());
 			$dataEntryFile->contents = $entry->getDataContent();
 			$files[] = $dataEntryFile;
 		}

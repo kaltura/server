@@ -20,6 +20,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT = 'flavorAssetFilenameXslt';
 	const CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT = 'thumbnailAssetFilenameXslt';
 	const CUSTOM_DATA_ASSET_FILENAME_XSLT = 'assetFilenameXslt';
+	const CUSTOM_DATA_DATA_CONTENTS_FILENAME_XSLT = 'dataContentsXslt';
 	const CUSTOM_DATA_ASPERA_PUBLIC_KEY = 'asperaPublicKey';
 	const CUSTOM_DATA_ASPERA_PRIVATE_KEY = 'asperaPrivateKey';
 	const CUSTOM_DATA_SEND_METADATA_AFTER_ASSETS = 'sendMetadataAfterAssets';
@@ -77,6 +78,14 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 			return trim($this->transformXslForEntry($entryDistribution, $this->getMetadataFilenameXslt()));
 		else
 			return $entryDistribution->getEntryId() . '_metadata.xml';
+	}
+
+	public function getDataContentsFilename(EntryDistribution $entryDistribution, $defaultFilename, $entryId)
+	{
+		if ($this->getDataContentsFilenameXslt())
+			return trim($this->transformXslForEntry($entryDistribution, $this->getDataContentsFilenameXslt(), array('entryId' => $entryId)));
+		else
+			return $defaultFilename;
 	}
 	
 	public function getMetadataXml(EntryDistribution $entryDistribution)
@@ -171,6 +180,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function getFlavorAssetFilenameXslt()		{return $this->getFromCustomData(self::CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT);}
 	public function getThumbnailAssetFilenameXslt()		{return $this->getFromCustomData(self::CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT);}
 	public function getAssetFilenameXslt()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASSET_FILENAME_XSLT);}
+	public function getDataContentsFilenameXslt()		{return $this->getFromCustomData(self::CUSTOM_DATA_DATA_CONTENTS_FILENAME_XSLT);}
 	public function getAsperaPublicKey()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_PUBLIC_KEY);}
 	public function getAsperaPrivateKey()				{return $this->getFromCustomData(self::CUSTOM_DATA_ASPERA_PRIVATE_KEY);}
 	public function getSendMetadataAfterAssets()		{return $this->getFromCustomData(self::CUSTOM_DATA_SEND_METADATA_AFTER_ASSETS);}
@@ -190,6 +200,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	public function setFlavorAssetFilenameXslt($v)		{$this->putInCustomData(self::CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT, $v);}
 	public function setThumbnailAssetFilenameXslt($v)	{$this->putInCustomData(self::CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT, $v);}
 	public function setAssetFilenameXslt($v)			{$this->putInCustomData(self::CUSTOM_DATA_ASSET_FILENAME_XSLT, $v);}
+	public function setDataContentsFilenameXslt($v)		{$this->putInCustomData(self::CUSTOM_DATA_DATA_CONTENTS_FILENAME_XSLT, $v);}
  	public function setAsperaPublicKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_PUBLIC_KEY, $v);}
     public function setAsperaPrivateKey($v)				{$this->putInCustomData(self::CUSTOM_DATA_ASPERA_PRIVATE_KEY, $v);}
 	public function setSendMetadataAfterAssets($v)		{$this->putInCustomData(self::CUSTOM_DATA_SEND_METADATA_AFTER_ASSETS, $v);}
