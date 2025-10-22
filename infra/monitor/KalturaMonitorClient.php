@@ -910,7 +910,7 @@ class KalturaMonitorClient
 		}
 		
 		$res = kApcWrapper::apcMultiGet($keysToFetch);
-		if(!is_array($res) || count($res) < ($historicalBucketsToFetch*2))
+		if(!is_array($res) || count($res) < ($minimumRequiredBuckets*2))
 		{
 			//If we dont have enough historical data yet - we return null to avoid false positives
 			return array(null, null, null);
