@@ -20,7 +20,7 @@ class FtpDistributionProfile extends ConfigurableDistributionProfile
 	const CUSTOM_DATA_FLAVOR_ASSET_FILENAME_XSLT = 'flavorAssetFilenameXslt';
 	const CUSTOM_DATA_THUMBNAIL_ASSET_FILENAME_XSLT = 'thumbnailAssetFilenameXslt';
 	const CUSTOM_DATA_ASSET_FILENAME_XSLT = 'assetFilenameXslt';
-	const CUSTOM_DATA_DATA_CONTENTS_FILENAME_XSLT = 'dataContentsXslt';
+	const CUSTOM_DATA_DATA_CONTENTS_FILENAME_XSLT = 'dataContentFilenameXslt';
 	const CUSTOM_DATA_ASPERA_PUBLIC_KEY = 'asperaPublicKey';
 	const CUSTOM_DATA_ASPERA_PRIVATE_KEY = 'asperaPrivateKey';
 	const CUSTOM_DATA_SEND_METADATA_AFTER_ASSETS = 'sendMetadataAfterAssets';
