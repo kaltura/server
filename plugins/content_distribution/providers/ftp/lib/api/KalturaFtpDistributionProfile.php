@@ -83,7 +83,7 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 	/**
 	 * @var string
 	 */
-	public $dataContentsXslt;
+	public $dataContentFilenameXslt;
 	 
 	 /**
 	 * @var string
