@@ -122,7 +122,7 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 		'flavorAssetFilenameXslt',
 		'thumbnailAssetFilenameXslt',
 		'assetFilenameXslt',
-		'dataContentsXslt',
+		'dataContentFilenameXslt',
 		'asperaPublicKey',
 		'asperaPrivateKey',
 		'sendMetadataAfterAssets',
