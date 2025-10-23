@@ -33,6 +33,7 @@ class embedPlaykitJsAction extends sfAction
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
 	const RAPT = "rapt";
 	const DEFAULT_MAX_OBJECT_CACHE_SIZE = 4 * 1024 * 1024; // 4MB
+	const FAILED_TO_SAVE_BUNDLE_IN_CACHE = "FAILED_TO_SAVE_BUNDLE_IN_CACHE";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -63,9 +64,9 @@ class embedPlaykitJsAction extends sfAction
 		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 
 		$this->initMembers();
-		$bundleContent = $this->getCacheData($this, 'bundleCache', $this->bundle_name);
-		$i18nContent = $this->getCacheData($this, 'bundleCache', $this->bundle_i18n_name);
-		$extraModulesNames = unserialize($this->getCacheData($this,'bundleCache', $this->bundle_extra_modules_names));
+		$bundleContent = self::getCacheData($this, 'bundleCache', $this->bundle_name);
+		$i18nContent = self::getCacheData($this, 'bundleCache', $this->bundle_i18n_name);
+		$extraModulesNames = unserialize(self::getCacheData($this,'bundleCache', $this->bundle_extra_modules_names));
 		KalturaLog::debug("Fetch bundle content from cache for key [{$this->bundle_name}], result: [" . !empty($bundleContent) . "]");
 
 		if (!$bundleContent || $this->regenerate)
@@ -153,12 +154,16 @@ class embedPlaykitJsAction extends sfAction
 		return array($bundleContent, $i18nContent, $extraModulesNames);
 	}
 	
-	private static function setCacheData($context, $cacheType, $key, $data)
+	protected static function setCacheData($context, $cacheType, $key, $data)
 	{
 		//If length of data is over 4MB compress it before caching
 		if(strlen($data) > $context->maxObjectCacheSize)
 		{
 			$data = "COMPRESSED," . gzcompress($data);
+			if(strlen($data) > $context->maxObjectCacheSize)
+			{
+				KalturaMonitorClient::sendErrorEvent(self::FAILED_TO_SAVE_BUNDLE_IN_CACHE);
+			}
 			return $context->$cacheType->set($key, $data);
 		}
 		else
@@ -167,7 +172,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 	}
 	
-	public static function getCacheData($context, $cacheType, $key)
+	protected static function getCacheData($context, $cacheType, $key)
 	{
 		$data = $context->$cacheType->get($key);
 		if($data && strpos($data, "COMPRESSED,") === 0)
