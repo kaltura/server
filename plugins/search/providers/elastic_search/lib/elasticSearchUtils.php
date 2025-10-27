@@ -221,11 +221,6 @@ class elasticSearchUtils
 
 	public static function isValidUTCDateOrDuration($value)
 	{
-		// Check if value is 'now'
-		if ($value === 'now') {
-			return true;
-		}
-
 		// Check for duration format (e.g., 30d, 1h, 20m, 3w)
 		if (preg_match('/^\d+[dhmw]$/', $value)) {
 			$unit = substr($value, -1);
