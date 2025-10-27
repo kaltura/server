@@ -1,3 +1,10 @@
+# Venus-22.5.0
+## Add Audio Description and Dubbing flavors to the list of available flavors ##
+- Issue Type: Task
+- Issue ID: PLAT-25292, PLAT-25448, PLAT-25447, PLAT-25446
+### Deployment scripts ###
+	php deployment/updates/scripts/2025_09_21_deploy_AD_and_dubbing_flavor_params.php
+
 # Venus-22.4.0
 ## Add partner and permissions for In-App Messaging ##
 - Issue Type: Task
@@ -11923,3 +11930,22 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
+
+
+
+# Venus-22.5.0
+
+## Update Entry Approved or Rejected  in category template ##
+* Issue Type: Task
+* Issue ID: SUP-49053
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+Replace all tokens in the XML file below.  Remove ".template" from the file name.  Run the php deployment script.
+
+Update script:
+
+     - deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.template.xml
+     - php deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.php

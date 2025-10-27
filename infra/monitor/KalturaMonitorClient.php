@@ -57,7 +57,10 @@ class KalturaMonitorClient
 	const SERVICE_OK = 'OK';
 	const SERVICE_NEARING_LIMITS = 'NearingLimits';
 	const DEFAULT_SERVICE_THRESHOLD = 1; // 1 second
-	const DEFAULT_SERVICE_CACHE_INTERVAL = 60; // 1 second
+	const DEFAULT_SERVICE_CACHE_EXPIRY = 70; // 70 second
+	const DEFAULT_CACHE_BUCKET_INTERVAL_SECONDS = 10; // 70 second
+	const DEFAULT_HISTORICAL_BUCKET_COUNT = 5; // 5 * DEFAULT_BUCKET_SIZE_SECONDS
+	const DEFAULT_MIN_REQUIRED_BUCKETS = 2; //
 	
 	protected static $queryTypes = array(
 			'SELECT ' 		=> 'SELECT',
@@ -841,10 +844,7 @@ class KalturaMonitorClient
 	
 	private static function sendServiceStatusHeader($requestTook = null)
 	{
-		if(!isset($requestTook))
-			return;
-		
-		if(!kApcWrapper::functionExists('inc'))
+		if(!isset($requestTook) || !kApcWrapper::functionExists('inc'))
 			return;
 		
 		$serviceStatusConfig = kConf::get('service_status_config', kConfMapNames::RUNTIME_CONFIG, array());
@@ -861,20 +861,17 @@ class KalturaMonitorClient
 			return;
 		}
 		
-		$thresholdInSeconds = isset($serviceStatusConfig['threshold_in_seconds']) ?
-			$serviceStatusConfig['threshold_in_seconds'] :
-			self::DEFAULT_SERVICE_THRESHOLD;
+		$thresholdInSeconds = $serviceStatusConfig['threshold_in_seconds'] ?? self::DEFAULT_SERVICE_THRESHOLD;
+		$cacheExpiry = $serviceStatusConfig['cache_expiry'] ?? self::DEFAULT_SERVICE_CACHE_EXPIRY;
 		
-		$cacheInterval = isset($serviceStatusConfig['cache_interval']) ?
-			$serviceStatusConfig['cache_interval'] :
-			self::DEFAULT_SERVICE_CACHE_INTERVAL;
+		$cacheBucketInterval = $serviceStatusConfig['bucket_interval_in_seconds'] ?? self::DEFAULT_CACHE_BUCKET_INTERVAL_SECONDS;
+		$historicalBucketsToFetch = $serviceStatusConfig['historical_bucket_count'] ?? self::DEFAULT_HISTORICAL_BUCKET_COUNT;
+		$minimumRequiredBuckets = $serviceStatusConfig['minimum_require_buckets'] ?? self::DEFAULT_MIN_REQUIRED_BUCKETS;
 		
-		$elapsedMicro = (int)round($requestTook * 1000000);
-		$reqCount = kApcWrapper::apcInc('req_count', 1, null, $cacheInterval);
-		$reqTime = kApcWrapper::apcInc('req_time', $elapsedMicro, null, $cacheInterval);
-		if($reqTime && $reqCount)
+		list($reqTime, $reqCount, $reqAvgTime) = self::getServiceStatusStats($requestTook, $cacheExpiry, $cacheBucketInterval, $historicalBucketsToFetch, $minimumRequiredBuckets);
+		
+		if($reqAvgTime)
 		{
-			$reqAvgTime = ($reqTime/1000000)/$reqCount;
 			$serviceStatus = self::SERVICE_OK;
 			if($reqAvgTime > $thresholdInSeconds)
 			{
@@ -888,6 +885,50 @@ class KalturaMonitorClient
 			header('X-Kaltura-Service-Status: ' . $serviceStatus);
 			self::safeLog("Service status: serviceStatus [$serviceStatus] count [$reqCount] time [$reqTime] avg [$reqAvgTime]");
 		}
+	}
+	
+	private static function getServiceStatusStats($requestTook, $cacheExpiry, $cacheBucketInterval, $historicalBucketsToFetch, $minimumRequiredBuckets)
+	{
+		// convert to micro seconds
+		$requestTook = (int)round($requestTook * 1000000);
+		
+		$currentCacheKeyPostfix = intval(time()/$cacheBucketInterval);
+		$reqCount = kApcWrapper::apcInc('req_count_'.$currentCacheKeyPostfix, 1, null, $cacheExpiry);
+		$reqTime = kApcWrapper::apcInc('req_time_'.$currentCacheKeyPostfix, $requestTook, null, $cacheExpiry);
+		if($reqCount === false || $reqTime === false)
+		{
+			return array(null, null, null);
+		}
+		
+		// get last 5 10 seconds buckets as well each key is a 10 second interval
+		// so we get last 50 seconds data
+		$keysToFetch = array();
+		for($i=1; $i<=$historicalBucketsToFetch; $i++)
+		{
+			$keysToFetch[] = 'req_count_'.($currentCacheKeyPostfix - $i);
+			$keysToFetch[] = 'req_time_'.($currentCacheKeyPostfix - $i);
+		}
+		
+		$res = kApcWrapper::apcMultiGet($keysToFetch);
+		if(!is_array($res) || count($res) < ($minimumRequiredBuckets*2))
+		{
+			//If we dont have enough historical data yet - we return null to avoid false positives
+			return array(null, null, null);
+		}
+		
+		foreach($res as $key => $value)
+		{
+			if(strpos($key, 'req_count_') === 0 && is_numeric($value))
+			{
+				$reqCount += $value;
+			}
+			else if(strpos($key, 'req_time_') === 0 && is_numeric($value))
+			{
+				$reqTime += $value;
+			}
+		}
+		
+		return array($reqTime, $reqCount, ($reqTime/1000000)/$reqCount);
 	}
 	
 	protected static function safeLog($msg)

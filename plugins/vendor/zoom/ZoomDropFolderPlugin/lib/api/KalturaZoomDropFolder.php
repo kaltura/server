@@ -109,6 +109,12 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 					}
 				}
 
+				if(!in_array(kCurrentContext::$ks_partner_id, array(Partner::BATCH_PARTNER_ID, Partner::ADMIN_CONSOLE_PARTNER_ID)))
+				{
+					$this->accessToken = null;
+					$this->refreshToken = null;
+				}
+
 				$zoomIntegrationObject = new KalturaZoomIntegrationSetting();
 				$zoomIntegrationObject->fromObject($vendorIntegration);
 				$this->zoomVendorIntegration = $zoomIntegrationObject;

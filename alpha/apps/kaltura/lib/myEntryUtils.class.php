@@ -42,15 +42,15 @@ class myEntryUtils
 
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $dbEntry);
 	}
-	
+
 	public static function createThumbnailAssetFromFile(entry $entry, $filePath)
-	{	
+	{
 		$fileLocation = tempnam(sys_get_temp_dir(), $entry->getId());
 		$res = KCurlWrapper::getDataFromFile($filePath, $fileLocation, kConf::get('thumb_size_limit'));
 		if (!$res){
 			throw new Exception("thumbnail cannot be created from $filePath " . error_get_last());
-		}	
-		
+		}
+
 		$thumbAsset = new thumbAsset();
 		$thumbAsset->setPartnerId($entry->getPartnerId());
 		$thumbAsset->setEntryId($entry->getId());
@@ -62,7 +62,7 @@ class myEntryUtils
 		list($width, $height, $type, $attr) = getimagesize($fileLocation);
 		$ext = pathinfo($fileLocation, PATHINFO_EXTENSION);
 		$size = filesize($fileLocation);
-		
+
 		$fileSyncKey = $thumbAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 		kFileSyncUtils::moveFromFile($fileLocation, $fileSyncKey);
 
@@ -72,11 +72,11 @@ class myEntryUtils
 		$thumbAsset->setSize($size);
 		$thumbAsset->setStatus(thumbAsset::ASSET_STATUS_READY);
 		$thumbAsset->save();
-		
+
 		kBusinessConvertDL::setAsDefaultThumbAsset($thumbAsset);
 		myNotificationMgr::createNotification(kNotificationJobData::NOTIFICATION_TYPE_ENTRY_UPDATE_THUMBNAIL, $entry);
 	}
-	
+
 	public static function deepClone ( entry $source , $kshow_id , $override_fields, $echo = false)
 	{
 		if ($echo)
@@ -101,14 +101,14 @@ class myEntryUtils
 		$target->setViews ( 0 );
 		$target->setVotes ( 0 );
 		$target->setFavorites ( 0 );
-		$target->save(); 
+		$target->save();
 
 		$content = null;
 		$source_thumbnail_path = null;
 		$target_thumbnail_path = null;
 		$source_data_path = null;
 		$target_data_path = null;
-		
+
 		if ($echo)
 			echo "Copied " . $source->getId() . " (from kshow [" . $source->getKshowId() . "]) -> " . $target->getId() . "\n";
 
@@ -161,27 +161,27 @@ class myEntryUtils
 		if ( ! $source_entry ) return false;
 
 		$exclude_fields = array(
-			"id" , 
-			"comments" , 
-			"total_rank" , 
-			"views" , 
-			"votes" , 
-			"favorites" , 
-			"conversion_profile_id" , 
-			"access_control_id" , 
-			"categories" , 
-			"categories_ids" , 
-			"start_date" , 
-			"end_date" , 
+			"id" ,
+			"comments" ,
+			"total_rank" ,
+			"views" ,
+			"votes" ,
+			"favorites" ,
+			"conversion_profile_id" ,
+			"access_control_id" ,
+			"categories" ,
+			"categories_ids" ,
+			"start_date" ,
+			"end_date" ,
 		);
-		
+
 		baseObjectUtils::fillObjectFromObject ( entryPeer::getFieldNames(BasePeer::TYPE_FIELDNAME) ,
 				$source_entry , $target , baseObjectUtils::CLONE_POLICY_PREFER_EXISTING , $exclude_fields );
 
 		$target->setDimensions ( $source_entry->getWidth() , $source_entry->getHeight() );
 
-		$target->getCustomDataObj ( );	
-		
+		$target->getCustomDataObj ( );
+
 
 //		$target->setLengthInMsecs( $source_entry->getLengthInMsecs() );
 //		$target->setMediaType( $source_entry->getMediaType() );
@@ -204,19 +204,19 @@ class myEntryUtils
 
 		if(kFileSyncUtils::file_exists($sourceDataKey, true))
 			kFileSyncUtils::softCopy($sourceDataKey, $targetDataKey);
-			
+
 		if(kFileSyncUtils::file_exists($sourceThumbKey, true))
 			kFileSyncUtils::softCopy($sourceThumbKey, $targetThumbKey);
-			
+
 		if(kFileSyncUtils::file_exists($sourceDataEditKey, true))
 			kFileSyncUtils::softCopy($sourceDataEditKey, $targetDataEditKey);
-			
-		
+
+
 		// added by Tan-Tan 12/01/2010 to support falvors copy
 		$sourceFlavorAssets = assetPeer::retrieveByEntryId($source_entry_id);
 		foreach($sourceFlavorAssets as $sourceFlavorAsset)
 			$sourceFlavorAsset->copyToEntry($target->getId(), $target->getPartnerId());
-		
+
 
 		return true;
 	}
@@ -256,7 +256,7 @@ class myEntryUtils
 			$entry->setData( ".xml" );
 		}
 		$targetFileSyncKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA);
-		
+
 		// doesn't require kFileSyncUtils change - this is a static template that should not be represented as row in the table
 		$source = $content . myContentStorage::getGeneralEntityPath ( "entry/data" , 0, 0 , "&metadata_text.xml" );
 
@@ -336,7 +336,7 @@ class myEntryUtils
 	{
 		if ( $entry->getStatus() == entryStatus::DELETED || $entry->getStatus() == entryStatus::BLOCKED  )
 			return ; // don't do this twice !
-			
+
 		 if ($onlyIfAllJobsDone) {
 			$dbEntryBatchJobLocks = BatchJobLockPeer::retrieveByEntryId($entry->getId());
 			foreach($dbEntryBatchJobLocks as $jobLock) {
@@ -348,7 +348,7 @@ class myEntryUtils
 				return;
 			}
 		}
-		
+
 		if($entry->getType() === entryType::LIVE_STREAM)
 		{
 			$connectedEntryServerNodes = EntryServerNodePeer::retrieveByEntryIdAndStatuses($entry->getId(), EntryServerNodePeer::$connectedServerNodeStatuses);
@@ -357,13 +357,13 @@ class myEntryUtils
 				KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, while streaming");
 				throw new KalturaAPIException(KalturaErrors::CANNOT_DELETE_LIVE_ENTRY_WHILE_STREAMING, $entry->getId());
 			}
-			
+
 			if($entry->getRecordedEntryId())
 			{
 				$recordedEntry = entryPeer::retrieveByPK($entry->getRecordedEntryId());
 				if($recordedEntry)
 				{
-					//If entry is pending for recording to finish for more than 7 days than it will probably never happen 
+					//If entry is pending for recording to finish for more than 7 days than it will probably never happen
 					if($recordedEntry->isInsideDeleteGracePeriod())
 					{
 						if(in_array($recordedEntry->getStatus(), array(entryStatus::PENDING, entryStatus::NO_CONTENT, entryStatus::PRECONVERT)))
@@ -371,17 +371,17 @@ class myEntryUtils
 							KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, associated VOD entry still not in ready status");
 							throw new KalturaAPIException(KalturaErrors::RECORDED_NOT_READY, $entry->getId());
 						}
-						
+
 						if(myEntryUtils::shouldServeVodFromLive($recordedEntry))
 						{
 							KalturaLog::info("Live Entry [". $entry->getId() ."] cannot be deleted, entry still beeing handled by recordign engien");
 							throw new KalturaAPIException(KalturaErrors::RECORDING_FLOW_NOT_COMPLETE, $entry->getId());
 						}
 					}
-				}	
+				}
 			}
 		}
-		
+
 		if($entry->getSourceType() == EntrySourceType::KALTURA_RECORDED_LIVE)
 		{
 			//Check if recorded entry flavors are still not ready to be played, this means set recorded content was not yet called
@@ -390,7 +390,7 @@ class myEntryUtils
 				KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted until recorded content is set");
 				throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
 			}
-			
+
 			//Check if the recorded entry is the current recorded entry of the live, in that case validate there are not any active server nodes
 			$liveEntryId = $entry->getCustomDataRootEntryId();
 			$liveEntry = $liveEntryId ? entryPeer::retrieveByPK($liveEntryId) : null;
@@ -401,14 +401,14 @@ class myEntryUtils
 				{
 					KalturaLog::info("Recorded Entry [". $entry->getId() ."] cannot be deleted, active server nodes detected");
 					throw new KalturaAPIException(KalturaErrors::RECORDING_CONTENT_NOT_YET_SET, $entry->getId());
-				} 
+				}
 			}
 		}
 
 		KalturaLog::log("delete Entry [" . $entry->getId() . "] Partner [" . $entry->getPartnerId() . "]");
 
 		kJobsManager::abortEntryJobs($entry->getId());
-		
+
 		$media_type = $entry->getMediaType();
 		$need_to_fix_roughcut = false;
 		$thumb_template_file = "&deleted_image.jpg";
@@ -419,18 +419,18 @@ class myEntryUtils
 				$template_file = "&deleted_audio.flv";
 				$need_to_fix_roughcut = true;
 				break;
-				
+
 			case entry::ENTRY_MEDIA_TYPE_IMAGE:
 				$template_file = "&deleted_image.jpg";
 				$need_to_fix_roughcut = false ; // no need to add a batch job for images
 				break;
-				
+
 			case entry::ENTRY_MEDIA_TYPE_VIDEO:
 				$template_file = "&deleted_video.flv";
 				$need_to_fix_roughcut = true;
 				break;
-				
-			case entry::ENTRY_MEDIA_TYPE_SHOW:				
+
+			case entry::ENTRY_MEDIA_TYPE_SHOW:
 			default:
 				$template_file = "&deleted_rc.xml";
 				$need_to_fix_roughcut = false;
@@ -439,7 +439,7 @@ class myEntryUtils
 
 		if ($entry->getType() == entryType::LIVE_STREAM)
 			kJobsManager::addProvisionDeleteJob(null, $entry);
-			
+
 		// in this case we'll need some batch job to fix all related roughcuts for this entry
 		// use the batch_job mechanism to indicate there is a deleted entry to handle
 		if ( $need_to_fix_roughcut )
@@ -449,7 +449,7 @@ class myEntryUtils
 		}
 
 		$entry->putInCustomData( "deleted_original_data" , $entry->getData() ) ;
-		$entry->putInCustomData( "deleted_original_thumb" , $entry->getThumbnail() ) ;		
+		$entry->putInCustomData( "deleted_original_thumb" , $entry->getThumbnail() ) ;
 
 		$content_path = myContentStorage::getFSContentRootPath();
 
@@ -457,27 +457,27 @@ class myEntryUtils
 		$entry->setData( $template_file ); 					// the other to set the template
 		$entry->setThumbnail( $entry->getThumbnail() );		// once to increment the verions
 		$entry->setThumbnail( $thumb_template_file );		// the other to set the template
-		
+
 //		Remarked by Tan-Tan 27/09/2010
 //		Handled by kObjectDeleteHandler
 //		// move file so there will be no access to it
 //		$deleted_content = kFileSyncUtils::deleteSyncFileForKey($currentDataKey);
 //		$deleted_content .= "|" . kFileSyncUtils::deleteSyncFileForKey($currentDataEditKey,false); // for some entries there may not be an edit version
 //		$deleted_content .= "|" . kFileSyncUtils::deleteSyncFileForKey($currentThumbKey,false); // for some entries (empty mix / audio) there may not be a thumb FileSync
-		
+
 //		Remarked by Tan-Tan 27/09/2010
 //		$deleted_content is always null anyway
 //		$entry->putInCustomData( "deleted_file_path" , $deleted_content ? $deleted_content : serialize($currentDataKey) ) ;
-		
-		$entry->setStatus ( entryStatus::DELETED ); 
-		
+
+		$entry->setStatus ( entryStatus::DELETED );
+
 		//$entry->setCategories("");
-		
+
 		// make sure the moderation_status is set to moderation::MODERATION_STATUS_DELETE
-		$entry->setModerationStatus ( moderation::MODERATION_STATUS_DELETE ); 
+		$entry->setModerationStatus ( moderation::MODERATION_STATUS_DELETE );
 		$entry->setModifiedAt( time() ) ;
 		$entry->save();
-		
+
 		myNotificationMgr::createNotification( kNotificationJobData::NOTIFICATION_TYPE_ENTRY_DELETE , $entry, null , null , null , null, $entry->getId());
 	}
 
@@ -495,7 +495,7 @@ class myEntryUtils
 
 		$data = $entry->getData();
 		$original_play = "";
-		
+
 		$parts = explode ( "&" , $data );
 		if ( count ( $parts ) < 2 )
 			$original_play = $data;
@@ -503,7 +503,7 @@ class myEntryUtils
 		{
 			$original_play = $parts[0];
 		}
-		
+
 		$deleted_file_path = $entry->getFromCustomData( "deleted_file_path" );
 
 //		echo $deleted_file_path . "\n";
@@ -518,10 +518,10 @@ class myEntryUtils
 			$dataEditKey = $entry->getSyncKey(kEntryFileSyncSubType::DATA_EDIT, @$deleted_paths[1]);
 			kFileSyncUtils::undeleteSyncFile($dataEditKey);
 			//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[1] );
-			
+
 			//figure out the thumb's path from the deleted path  and the property deleted_original_thumb
 			$entry->setData ( null );
-			$entry->setData ( $entry->getFromCustomData( "deleted_original_data" ) , true ) ; // force the value that was set beforehand 
+			$entry->setData ( $entry->getFromCustomData( "deleted_original_data" ) , true ) ; // force the value that was set beforehand
 			// the data is supposed to point to a delete template 100000.flv&deleted_video.flv
 
 			$orig_thumb = $entry->getFromCustomData( "deleted_original_thumb" );
@@ -535,14 +535,14 @@ class myEntryUtils
 				$entry->setThumbnail( $entry->getFromCustomData( "deleted_original_thumb" ) , true ); // force the value that was set beforehand
 				$thumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB, @$deleted_paths[2]);
 				kFileSyncUtils::undeleteSyncFile($thumbKey);
-				//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[2] ); // 
-			}	
+				//$original = myContentStorage::moveFromDeleted ( @$deleted_paths[2] ); //
+			}
 		}
 		else
 		{
 			// error
 		}
-		
+
 		$entry->setStatusReady();
 	}
 
@@ -552,41 +552,41 @@ class myEntryUtils
 		$kshow = kshowPeer::retrieveByPK( $source_entry->getKshowId() );
 		if ( ! $kshow )
 		{
-			KalturaLog::log( "Error: entry [" . $source_entry->getId() . "] does not have a kshow" );	
+			KalturaLog::log( "Error: entry [" . $source_entry->getId() . "] does not have a kshow" );
 			return false;
 		}
-	
+
 		if ( $kshow )
 		{
 			$roughcut = $kshow->getShowEntry();
 			if ( ! $roughcut )
 			{
 				KalturaLog::log( "Error: entry [" . $source_entry->getId() . "] from kshow " . $kshow->getId() . "] does not have a roughcut " );
-				return false;	
+				return false;
 			}
-			
+
 			return self::createRoughcutThumbnail ( $roughcut , $source_entry , $should_force )	;
 		}
 		else
 		{
 			return false;
 		}
-		
+
 	}
-	
+
 	public static function createRoughcutThumbnail ( $roughcut, $source_entry , $should_force = false )
 	{
 		if ( ! $roughcut )
 		{
 			return false;
-		} 
-		
+		}
+
 		$res = self::createThumbnail( $roughcut, $source_entry , $should_force );
-		if ( $res ) 
+		if ( $res )
 		{
 			$content = $roughcut->getDataContent();
 			if ( $content )
-			{			
+			{
 				$new_metadata = myMetadataUtils::updateThumbUrlFromMetadata ($content , $source_entry->getThumbnailUrl() );
 				$roughcut->setMediaType ( entry::ENTRY_MEDIA_TYPE_SHOW );
 				$roughcut->setDataContent($new_metadata, false ,true ) ;
@@ -596,7 +596,7 @@ class myEntryUtils
 		}
 		return false;
 	}
-	
+
 	public static function createThumbnail ( $entry , $source_entry , $should_force = false )
 	{
 		// empty or template
@@ -609,32 +609,32 @@ class myEntryUtils
 
 		return false;
 	}
-	
+
 	public static function createThumbnailFromEntry ( entry $entry , entry $source_entry, $time_offset, $flavorParamsId = null)
 	{
 		$media_type = $source_entry->getMediaType();
-		
+
 		// should capture thumbnail from video
 		if ($media_type == entry::ENTRY_MEDIA_TYPE_VIDEO && $time_offset != -1)
 		{
 			$flavorAsset = null;
 			if($flavorParamsId)
 				$flavorAsset = assetPeer::retrieveByEntryIdAndParams($source_entry->getId(), $flavorParamsId);
-				
+
 			if(is_null($flavorAsset) || !$flavorAsset->isLocalReadyStatus())
 				$flavorAsset = assetPeer::retrieveOriginalByEntryId($source_entry->getId());
-				
+
 			if (is_null($flavorAsset))
 				$flavorAsset = assetPeer::retrieveHighestBitrateByEntryId($source_entry->getId());
-			
+
 			if (is_null($flavorAsset))
 				throw new Exception("Flavor asset not found");
-			
+
 			$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 			if (!$flavorSyncKey)
 				return false;
 			$dataPath = kFileSyncUtils::getReadyLocalFilePathForKey($flavorSyncKey);
-			
+
 			$tempPath = myContentStorage::getFSUploadsPath();
 
 			$tempThumbPrefix = $tempPath."temp_thumb".microtime(true);
@@ -645,16 +645,16 @@ class myEntryUtils
 
 			// removed creation of "small thumb" - not in use
 			myFileConverter::convertImage($thumbBigFullPath, $thumbFullPath);
-			
+
 			$bigThumbExists = file_exists($thumbBigFullPath) && filesize($thumbBigFullPath);
 			if (!$bigThumbExists)
 			{
 				return false;
-			}			
+			}
 			$entry->setThumbnail ( ".jpg");
 			$entry->setCreateThumb(false);
 			$entry->save();
-			
+
 			// create new thumb file for entry
 			$newThumbKey = $entry->getSyncKey(kEntryFileSyncSubType::THUMB);
 			kFileSyncUtils::moveFromFile($thumbBigFullPath, $newThumbKey);
@@ -826,7 +826,7 @@ class myEntryUtils
 		{
 			$thumbNameAttributes .= "_esec_{$end_sec}";
 		}
-				
+
 		$entryThumbFilename = $entry->getThumbnail();
 		if(!$entryThumbFilename)
 		{
@@ -843,7 +843,7 @@ class myEntryUtils
 		{
 			$thumbNameAttributes .= "_NOCACHE_";
 		}
-		
+
 		// we remove the & from the template thumb otherwise getGeneralEntityPath will drop $tempThumbName from the final path
 		$entryThumbFilename = str_replace("&", "", $entryThumbFilename);
 		$thumbDirs = kConf::get('thumb_path', 'local', array('0' => 'tempthumb'));
@@ -886,18 +886,18 @@ class myEntryUtils
 		{
 			throw new kFileSyncException('no ready filesync on current DC', kFileSyncException::FILE_DOES_NOT_EXIST_ON_CURRENT_DC);
 		}
-		
+
 		// check a request for animated thumbs without a concrete vid_slice
 		// in which case we'll create all the frames as one wide image
 		$multi = $vid_slice == -1 && $vid_slices != -1;
 		$count = $multi ? $vid_slices : 1;
 		$im = null;
-		
+
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
-		
+
 		if ($multi)
 			$vid_slice = 0;
-		
+
 		$cacheLockKey = "thumb-processing-resize" . $finalThumbPath;
 		// creating the thumbnail is a very heavy operation prevent calling it in parallel for the same thumbnail for 5 minutes
 		if ($cache && !$cache->add($cacheLockKey, true, 5 * 60))
@@ -970,18 +970,18 @@ class myEntryUtils
 				{
 					$calc_vid_sec = $servingVODfromLive ? self::DEFAULT_THUMB_SEC_LIVE : $entry->getBestThumbOffset();
 				}
-				
+
 				if(isset($last_calc_vid_sec) && $im && $h && $w && $last_calc_vid_sec == $calc_vid_sec)
 				{
 					imagecopy($im, $im, $w * $vid_slice, 0, $w * ($vid_slice - 1), 0, $w, $h);
 					++$vid_slice;
 					continue;
 				}
-					
+
 				$capturedThumbName = $entry->getId()."_sec_{$calc_vid_sec}";
 				$capturedThumbPath = sys_get_temp_dir()  . myContentStorage::getGeneralEntityPath(self::THUMB_ENTITY_NAME_PREFIX . $thumbDirs[0], $entry->getIntId(), $capturedThumbName, $entry->getThumbnail() , $version );
 				$orig_image_path = $capturedThumbPath . self::TEMP_FILE_POSTFIX;
-				
+
 				// if we already captured the frame at that second, do not recapture, just use the existing file
 				if (!file_exists($orig_image_path))
 				{
@@ -1027,7 +1027,7 @@ class myEntryUtils
 					{
 						$cache->delete($cacheLockKeyProcessing);
 					}
-					
+
 					if (!$success)
 					{
 						// since this is not really being processed on this server, and will probably cause redirect in thumbnailAction
@@ -1089,21 +1089,21 @@ class myEntryUtils
 					unlink($packagerResizeFullPath);
 				}
 			}
-			
+
 			// die if resize operation failed
 			if ($convertedImagePath === null || !@kFile::fileSize($convertedImagePath))
 			{
 				myEntryUtils::deleteLocalTempFile($fileToDelete);
 				KExternalErrors::dieError(KExternalErrors::IMAGE_RESIZE_FAILED);
 			}
-			
+
 			if ($multi)
 			{
-				//please notice the 3rd parameter - image type, is ignored. 
+				//please notice the 3rd parameter - image type, is ignored.
 				list($w, $h, , $attr, $srcIm) = myFileConverter::createImageByFile($processingThumbPath);
 				if (!$im)
 					$im = imagecreatetruecolor($w * $vid_slices, $h);
-					
+
 				imagecopy($im, $srcIm, $w * $vid_slice, 0, 0, 0, $w, $h);
 				imagedestroy($srcIm);
 				++$vid_slice;
@@ -1122,19 +1122,19 @@ class myEntryUtils
 					unlink($orig_image_path);
 				}
 			}
-			
+
 			$last_calc_vid_sec = isset($calc_vid_sec) ? $calc_vid_sec : null;
 		}
-		
+
 		if ($multi)
 		{
 			imagejpeg($im, $processingThumbPath);
 			imagedestroy($im);
 		}
-		
+
 		kFile::fullMkdir($finalThumbPath);
 		kFile::moveFile($processingThumbPath, $finalThumbPath);
-		
+
 		if ($cache)
 			$cache->delete($cacheLockKey);
 
@@ -1148,14 +1148,14 @@ class myEntryUtils
 
 		return $finalThumbPath;
 	}
-	
+
 	private static function deleteLocalTempFile($filepath)
 	{
 		if (!is_file($filepath))
 		{
 			return;
 		}
-		
+
 		kFile::doDeleteFile($filepath);
 	}
 
@@ -1163,7 +1163,7 @@ class myEntryUtils
 	{
 		return kString::endsWith($filePath, self::TEMP_FILE_POSTFIX);
 	}
-	
+
 	private static function encryptThumb($thumbPath, $key, $iv)
 	{
 		$encryptedPath = kFileUtils::addEncryptToFileName($thumbPath);
@@ -1240,7 +1240,7 @@ class myEntryUtils
 		$flavorAssetId = $flavorAsset->getId();
 		$flavorSyncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
 		$entry_data_path = self::getEntryDataPath($flavorSyncKey, $flavorAsset);
-		
+
 		if (!$entry_data_path)
 			return false;
 
@@ -1253,11 +1253,11 @@ class myEntryUtils
 				$cache->delete($cacheLockKey);
 				$cache->delete($cacheLockKeyProcessing);
 			}
-			
+
 			myEntryUtils::deleteLocalTempFile($fileToDelete);
 			KExternalErrors::dieError(KExternalErrors::TOO_MANY_PROCESSES);
 		}
-		
+
 		// close db connections as we won't be requiring the database anymore and capturing a thumbnail may take a long time
 		kFile::closeDbConnections();
 		$decryptionKey = $flavorAsset->getEncryptionKey() ? bin2hex(base64_decode($flavorAsset->getEncryptionKey())) : null;
@@ -1273,7 +1273,7 @@ class myEntryUtils
 		{
 			$preferredStorageId = $currentDcId;
 		}
-		
+
 		$fileSync = kFileSyncUtils::getFileSyncByPreferredStorage($flavorSyncKey, $flavorAsset, $preferredStorageId, null);
 		if (!$fileSync)
 		{
@@ -1322,7 +1322,7 @@ class myEntryUtils
 		list ( $file_sync , $local )= kFileSyncUtils::getReadyFileSyncForKey($entryImageKey, false, false);
 		return ($local ? $file_sync : null);
 	}
-	
+
 	public static function getLocalImageFilePathByEntry( $entry, $version = null )
 	{
 		$sub_type = $entry->getMediaType() == entry::ENTRY_MEDIA_TYPE_IMAGE ? kEntryFileSyncSubType::DATA : kEntryFileSyncSubType::THUMB;
@@ -1333,10 +1333,10 @@ class myEntryUtils
 			$entry_image_key = $entry->getSyncKey($sub_type);
 			$entry_image_path = kFileSyncUtils::getReadyLocalFilePathForKey($entry_image_key);
 		}
-		
+
 		return $entry_image_path;
-	} 
-	
+	}
+
 	//
 	// sets the type and media_type of an entry according to the file extension
 	// in case the media_type is entry::ENTRY_MEDIA_TYPE_AUTOMATIC we find the media_type from the extension
@@ -1344,8 +1344,8 @@ class myEntryUtils
 	//
 	// two use cases:
 	// 1. TYPE set to DOCUMENT and MEDIA_TYPE to AUTOMATIC : the media_type will be set to DOCUMENT no matter what the file ext. is
-	// 2. TYPE set to MEDIA_CLIP and MEDIA_TYPE to AUTOMATIC : the correct media_type will be set or remain on AUTOMATIC 
-	//		to be handled outside this function 
+	// 2. TYPE set to MEDIA_CLIP and MEDIA_TYPE to AUTOMATIC : the correct media_type will be set or remain on AUTOMATIC
+	//		to be handled outside this function
 	// 3. TYPE set to AUTOMATIC and MEDIA_TYPE to AUTOMATIC : the media_type will be detected.
 	//		if its found TYPE will be set to MEDIA_CLIP otherwise to DOCUMENT
 	//
@@ -1357,7 +1357,7 @@ class myEntryUtils
 			$media_type = myFileUploadService::getMediaTypeFromFileExt(pathinfo($entry_full_path, PATHINFO_EXTENSION));
 			$entry->setMediaType($media_type);
 		}
-		
+
 		// we'll set the type according to the media_type - either a media_clip or a document
 		if ($entry->getType() == entryType::AUTOMATIC)
 		{
@@ -1366,18 +1366,18 @@ class myEntryUtils
 				$entry->setType(entryType::MEDIA_CLIP);
 		}
 	}
-	
+
 	/*
-	 * When there is a big list of entries that we know the getPuser will be called - 
+	 * When there is a big list of entries that we know the getPuser will be called -
 	 * Use this to fetch the whole list rather than one-by-on
 	 * TODO - not relevant once merge puser_kuser in kuser table
 	 */
 	public static function updatePuserIdsForEntries ( $entries )
 	{
 		if ( ! $entries ) return;
-		// get the whole list of kuser_ids	
+		// get the whole list of kuser_ids
 		$partner_kuser_list = array();
-kuserPeer::getCriteriaFilter()->disable(); 			
+kuserPeer::getCriteriaFilter()->disable();
 PuserKuserPeer::getCriteriaFilter()->disable();
 		foreach ( $entries as &$entry )
 		{
@@ -1390,7 +1390,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			{
 				$partner_kuser_ids = $partner_kuser_list[$pid];
 			}
-//print_r ( $entry );			
+//print_r ( $entry );
 			$kuser_id = $entry->getKuserId();
 
 			$partner_kuser_ids[$kuser_id] = $kuser_id;
@@ -1398,13 +1398,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 
 		// the kuser_id is unique across partners
-		$kuser_list = array();	
-		$puser_id = null;	
+		$kuser_list = array();
+		$puser_id = null;
 		foreach ( $partner_kuser_list as $pid => $kuser_ids )
 		{
 			$puser_kuser_list = PuserKuserPeer::getPuserIdFromKuserIds( $pid , $kuser_ids );
-			
-			// builf a map where the key is kuser_id for fast fetch 
+
+			// builf a map where the key is kuser_id for fast fetch
 			foreach ( $puser_kuser_list as $puser_kuser )
 			{
 				$kuser_id = $puser_kuser->getKuserId();
@@ -1417,17 +1417,17 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$kuser_id = $entry->getKuserId();
 			if(isset($kuser_list[$kuser_id]))
 				$puser_id = $kuser_list[$kuser_id];
-			
+
 			if ( $puser_id )
 			{
 				$entry->tempSetPuserId ( $puser_id );
 			}
 		}
-		
-		kuserPeer::getCriteriaFilter()->enable(); 			
+
+		kuserPeer::getCriteriaFilter()->enable();
 		PuserKuserPeer::getCriteriaFilter()->enable();
 	}
-	
+
 	//
 	// calculate the total storage size of an entry by adding its file size and archive size
 	// if the entry status is deleted the returned size is zero since we can remove it
@@ -1436,13 +1436,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	{
 		if ($entry->getStatus() == entryStatus::DELETED)
 			return 0;
-		
+
 		$size = 0;
-		
+
 		$entry_id = $entry->getId();
-		
+
 		$entrySyncKeys = $entry::getEntryFileSyncSubTypes();
-		
+
 		$assets = assetPeer::retrieveByEntryId($entry_id);
 		foreach($assets as $asset)
 		{
@@ -1451,21 +1451,21 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISM);
 			$entrySyncKeys[] = $asset->getSyncKey(flavorAsset::FILE_SYNC_ASSET_SUB_TYPE_ISMC);
 		}
-		
+
 		foreach($entrySyncKeys as $syncKey)
 		{
 			$fileSync = kFileSyncUtils::getOriginFileSyncForKey($syncKey, false);
 			if(!$fileSync || $fileSync->getStatus() != FileSync::FILE_SYNC_STATUS_READY)
 				continue;
-			
+
 			$fileSize = $fileSync->getFileSize();
 			if($fileSize > 0)
 				$size += $fileSize;
 		}
-			
+
 		return $size;
 	}
-	
+
 	public static function resetEntryStatistics(entry $entry)
 	{
 		$entry->setPlays(0);
@@ -1555,11 +1555,6 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		{
 			if (self::shouldCopyAsset($sourceAsset, $copyFlavors, $copyCaptions, $entry->getId()))
 			{
-				if($sourceAsset instanceof captionAsset)
-				{
-					$targetEntry->setBlockAutoTranscript(true);
-					$targetEntry->save();
-				}
 				$sourceAsset->copyToEntry($targetEntry->getId(), $targetEntry->getPartnerId());
 			}
 		}
@@ -1672,7 +1667,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		    if ($toPartner->getId() != $entry->getPartnerId() || !$copyAccessControl)
 				$newEntry->setAccessControlId($toPartner->getDefaultAccessControlId());
  		}
- 		
+
 		$kuserForNewEntry = null;
 		if(kCurrentContext::$ks_partner_id == Partner::BATCH_PARTNER_ID)
 		{
@@ -1696,7 +1691,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->setKuserId($kuserForNewEntry->getId());
 			$newEntry->setCreatorKuserId($kuserForNewEntry->getId());
 		}
- 		
+
  		// copy the kshow
  		kshowPeer::setUseCriteriaFilter(false);
  		$kshow = $entry->getKshow();
@@ -1710,14 +1705,14 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  				$newKshow->setProducerId($kuserForNewEntry->getId());
  			}
  			$newKshow->save();
- 			
+
  			$newEntry->setKshowId($newKshow->getId());
  		}
  		kshowPeer::setUseCriteriaFilter(true);
- 		
+
  		// reset the statistics
  		myEntryUtils::resetEntryStatistics($newEntry);
- 		
+
  		// set the new partner id into the default category criteria filter
  		$defaultCategoryFilter = categoryPeer::getCriteriaFilter()->getFilter();
  		$oldPartnerId = $defaultCategoryFilter->get(categoryPeer::PARTNER_ID);
@@ -1737,22 +1732,22 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->addCapability(QuizPlugin::getCapabilityCoreValue());
 		}
 
-		kEventsManager::setForceDeferredEvents(true);
-	    	// save the entry
+
+		$newEntry->setBlockAutoTranscript($copyCaptions);
+
+		// save the entry
  		$newEntry->save();
- 		 		
+
  		// restore the original partner id in the default category criteria filter
 		$defaultCategoryFilter->remove(categoryPeer::PARTNER_ID);
  		$defaultCategoryFilter->addAnd(categoryPeer::PARTNER_ID, $oldPartnerId);
- 		
+
  		KalturaLog::log("copyEntry - New entry [".$newEntry->getId()."] was created");
 
 		if (in_array($entry->getStatus(), [entryStatus::READY, entryStatus::NO_CONTENT]))
 		{
 			self::copyEntryData( $entry, $newEntry, $copyFlavors, $copyCaptions );
 		}
-
-		kEventsManager::flushEvents();
 
 	    if ( $entry->getStatus() != entryStatus::READY )
 		{
@@ -1774,7 +1769,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
                     {
                         $toEntryIds[] = kObjectCopyHandler::getMappedId(entryPeer::OM_CLASS, $fromEntryId);
                     }
-                    
+
                     $newEntry->setDataContent(implode(",", $toEntryIds));
                     break;
 		        case entry::ENTRY_MEDIA_TYPE_XML:
@@ -1785,7 +1780,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		            foreach ($fromFiltersList as $filterXML)
 		            {
 		                $entryFilter = new entryFilter();
-			            $entryFilter->fillObjectFromXml($filterXML, "_"); 
+			            $entryFilter->fillObjectFromXml($filterXML, "_");
 			            if (isset($entryFilter->fields["_matchand_categories_ids"]))
 			            {
 			                $categoriesIds = explode(",", $entryFilter->fields["_matchand_categories_ids"]);
@@ -1819,7 +1814,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			            $toEntryFilterXML = $toFiltersXml->addChild("filter");
 			            $toEntryFilterXML = $entryFilter->toXml($toEntryFilterXML);
 		            }
-		            
+
 		            $newEntry->setDataContent($toPlaylistXml->asXML());
 		            break;
 		    }
@@ -1935,13 +1930,13 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	            return EntrySourceType::CLIP;
 
         	return $originSourceType;
-	}	
+	}
 
 	private static function getCloneConversionProfile($originSourceType,$partner,$sourceEntry)
 	{
 		if (self::isSourceLive($originSourceType))
 			return $partner->getDefaultConversionProfileId();
-		
+
 		$conversionProfileId = $sourceEntry->getConversionProfileId();
 		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
 		if (!$conversionProfile)
@@ -1958,22 +1953,22 @@ PuserKuserPeer::getCriteriaFilter()->disable();
  	public static function index(entry $entry)
  	{
  		$categoriesWithNoPrivacyContext = $entry->getCategoriesWithNoPrivacyContext();
- 		
+
  		$categoriesFullName = array();
  		$categoriesIds = array();
- 		
+
  		foreach($categoriesWithNoPrivacyContext as $category)
  		{
  			$categoriesFullName[] = $category->getFullName();
  			$categoriesIds[] = $category->getId();
  		}
- 		
+
  		$entry->parentSetCategories(implode(',', $categoriesFullName));
 		$entry->parentsetCategoriesIds(implode(',', $categoriesIds));
-		
-		if(!$entry->save())		
+
+		if(!$entry->save())
 			$entry->indexToSearchIndex();
-		
+
 		return $entry->getIntId();
  	}
 
@@ -1987,7 +1982,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		$recordedEntry->setReplacementStatus(entryReplacementStatus::NONE);
 		$recordedEntry->save();
 	}
-	
+
 	/*
 	 * Check if recorded entry should be served from live
 	 */
@@ -2385,21 +2380,21 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		if($syncKey)
 		{
 			list($filePath, $isTempFile) = kAssetUtils::getLocalImagePath($syncKey);
-			
+
 			$purifyParams = array();
 			$partner = PartnerPeer::retrieveByPK($syncKey->getPartnerId());
 			if ($partner && $partner->getPurifyImageContent())
 			{
 				$purifyParams = array('className' => 'thumbasset', 'fieldName' => 'content');
 			}
-			
+
 			$validContent = myXmlUtils::validateXmlFileContent($filePath, $purifyParams);
-			
+
 			if($isTempFile)
 			{
 				unlink($filePath);
 			}
-			
+
 			if(!$validContent)
 			{
 				throw new Exception ("content contains potential security risks");
@@ -2487,7 +2482,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		}
 		return array($flavorAssets, $audioOnlyAssets);
 	}
-	
+
 	/**
 	 * Returning the categories array of the entry
 	 * @param entry $entry
@@ -2496,19 +2491,19 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	public static function getCategoriesIdsArrayFromEntry(entry $entry)
 	{
 		$categoryEntryItems = CategoryEntryPeer::retrieveActiveByEntryId($entry->getId());
-		
+
 		$categoryEntryIdsArray = array_map(function (categoryEntry $categoryEntry) {
 			return $categoryEntry->getCategoryId();
 			}, $categoryEntryItems);
-		
+
 		if (!isset($categoryEntryIdsArray))
 		{
 			KalturaLog::info("Categories for entry {$entry->getId()} could not be retrieved.");
 		}
-		
+
 		return $categoryEntryIdsArray;
 	}
-	
+
 	/**
 	 * Check if $entry has an ancestor that is of $sourceType (EntrySourceType)
 	 * @param $entry
@@ -2525,19 +2520,19 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 				return false;
 			}
 		}
-		
+
 		$rootEntryId = $entry->getRootEntryId(true);
 		if ($entry->getId() == $rootEntryId)
 		{
 			return false;
 		}
-		
+
 		$rootEntry = entryPeer::retrieveByPKNoFilter($rootEntryId);
 		if (!$rootEntry)
 		{
 			return false;
 		}
-		
+
 		return in_array($rootEntry->getSourceType(), $sourceType);
 	}
 
