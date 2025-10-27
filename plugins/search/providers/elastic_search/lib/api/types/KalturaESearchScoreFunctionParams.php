@@ -78,7 +78,7 @@ class KalturaESearchScoreFunctionParams extends KalturaObject
 			throw new KalturaAPIException(KalturaESearchErrors::INVALID_ORIGIN_VALUE_IN_BOOST_SCORE_FUNCTION);
 		}
 
-		if (!$scale || !elasticSearchUtils::isValidUTCDateOrDuration($scale))
+		if (!$scale || !elasticSearchUtils::isValidDuration($scale))
 		{
 			throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCALE_VALUE_IN_BOOST_SCORE_FUNCTION);
 		}

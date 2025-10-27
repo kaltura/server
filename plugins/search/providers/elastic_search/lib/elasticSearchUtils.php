@@ -219,7 +219,7 @@ class elasticSearchUtils
 		$value = strip_tags($value);
 	}
 
-	public static function isValidUTCDateOrDuration($value)
+	public static function isValidDuration($value)
 	{
 		// Check for duration format (e.g., 30d, 1h, 20m, 3w)
 		if (preg_match('/^\d+[dhmw]$/', $value)) {
