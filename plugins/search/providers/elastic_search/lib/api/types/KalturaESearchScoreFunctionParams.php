@@ -83,7 +83,7 @@ class KalturaESearchScoreFunctionParams extends KalturaObject
 			throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCALE_VALUE_IN_BOOST_SCORE_FUNCTION);
 		}
 
-		if (!$weight)
+		if (!$weight || $weight < 0 || is_string($weight))
 		{
 			throw new KalturaAPIException(KalturaESearchErrors::INVALID_WEIGHT_VALUE_IN_BOOST_SCORE_FUNCTION);
 		}
