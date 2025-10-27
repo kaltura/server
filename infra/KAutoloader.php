@@ -79,16 +79,7 @@ class KAutoloader
 			kApcWrapper::apcStore(self::$_classMapCacheKey . $class, $classPath);
 		
 		if ($classPath)
-		{
-			try
-			{
-				require_once($classPath);
-			}
-			catch (Exception $e)
-			{
-				KalturaLog::warning("Error while searching entries: " . $e->getMessage());
-			}
-		}
+			require_once($classPath);
 	}
 
 	static function scanDirectory($directory, $recursive)
