@@ -12,9 +12,9 @@ class kEntrySearch extends kBaseESearch
 
     public function __construct()
     {
-		    $this->isInitialized = false;
-		    parent::__construct();
-		    $this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
+	    $this->isInitialized = false;
+	    parent::__construct();
+	    $this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
     }
 
     protected function handleDisplayInSearch()

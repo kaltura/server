@@ -21,7 +21,7 @@ class ESearchService extends KalturaBaseService
 		$response = new KalturaESearchEntryResponse();
 		$response->objects = KalturaESearchEntryResultArray::fromDbArray($coreResults, $this->getResponseProfile());
 		$response->totalCount = $objectCount;
-		if ($aggregations)
+		if($aggregations)
 		{
 			$aggregationResponse = new KalturaESearchAggregationResponse();
 			$response->aggregations = $aggregationResponse->resultToApi($aggregations);

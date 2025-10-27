@@ -241,13 +241,7 @@ class elasticSearchUtils
 			}
 		}
 
-		// Check for UTC date format
-		try {
-			$dateTime = new DateTime($value);
-			return $dateTime->format('Y-m-d\TH:i:s\Z') === $value;
-		} catch (Exception $e) {
-			return false;
-		}
+		return false;
 	}
 
 }

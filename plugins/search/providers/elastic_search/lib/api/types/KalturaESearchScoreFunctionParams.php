@@ -72,8 +72,8 @@ class KalturaESearchScoreFunctionParams extends KalturaObject
 		{
 			throw new KalturaAPIException(KalturaESearchErrors::INVALID_DECAY_VALUE_IN_BOOST_SCORE_FUNCTION);
 		}
-		//TODO validate values with util function
-		if (!$origin || !elasticSearchUtils::isValidUTCDateOrDuration($origin))
+
+		if (!$origin || $origin != 'now')
 		{
 			throw new KalturaAPIException(KalturaESearchErrors::INVALID_ORIGIN_VALUE_IN_BOOST_SCORE_FUNCTION);
 		}
