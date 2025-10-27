@@ -35,7 +35,7 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
 		return EntryVendorTaskPeer::doSelect($c);
 	}
 
-    public static function retrieveTasksByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
+    public static function retrieveTasksByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses, $versionEqualOrHigher = false)
     {
         $c = new Criteria();
         $c->add(EntryVendorTaskPeer::ENTRY_ID, $entryId);
@@ -44,7 +44,8 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
         $c->add(EntryVendorTaskPeer::STATUS, $statuses, Criteria::IN);
         if ($version)
         {
-            $c->add(EntryVendorTaskPeer::VERSION, $version);
+			$comparison = $versionEqualOrHigher ?  Criteria::GREATER_EQUAL: null;
+            $c->add(EntryVendorTaskPeer::VERSION, $version, $comparison);
         }
 
         $c->addDescendingOrderByColumn(EntryVendorTaskPeer::VERSION);
@@ -53,9 +54,9 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
         return EntryVendorTaskPeer::doSelect($c);
     }
 
-    public static function retrieveOneTaskByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses)
+    public static function retrieveOneTaskByStatus ($entryId, $catalogItemId, $partnerId, $version, array $statuses, $versionEqualOrHigher = false)
     {
-        $tasks = self::retrieveTasksByStatus($entryId, $catalogItemId, $partnerId, $version, $statuses);
+        $tasks = self::retrieveTasksByStatus($entryId, $catalogItemId, $partnerId, $version, $statuses, $versionEqualOrHigher);
         if(!$tasks || !count($tasks))
         {
             return null;
@@ -64,7 +65,7 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
         return $tasks[0];
     }
 
-	public static function retrieveOneActiveOrCompleteTask($entryId, $catalogItemId, $partnerId, $version = null)
+	public static function retrieveOneActiveOrCompleteTask($entryId, $catalogItemId, $partnerId, $version = null, $versionEqualOrHigher = false)
 	{
 	    $statusList = array(EntryVendorTaskStatus::PROCESSING,
             EntryVendorTaskStatus::READY,
@@ -74,7 +75,7 @@ class EntryVendorTaskPeer extends BaseEntryVendorTaskPeer
             EntryVendorTaskStatus::PENDING_ENTRY_READY,
         );
 
-	    return self::retrieveOneTaskByStatus($entryId, $catalogItemId, $partnerId, $version, $statusList);
+	    return self::retrieveOneTaskByStatus($entryId, $catalogItemId, $partnerId, $version, $statusList, $versionEqualOrHigher);
     }
 	
 

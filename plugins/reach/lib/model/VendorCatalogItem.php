@@ -276,10 +276,9 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array("vendorCatalogItem:id=".strtolower($this->getId()));
 	}
 
-	public function isDuplicateTask($entryId, $entryObjectType, $partnerId)
+	public function isDuplicateTask($entryId, $entryObjectType, $partnerId, $version)
 	{
-		$version = $this->getTaskVersion($entryId, $entryObjectType);
-		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryId, $this->getId(), $partnerId, $version);
+		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryId, $this->getId(), $partnerId, $version, true);
 		if($activeTask)
 		{
 			return true;
