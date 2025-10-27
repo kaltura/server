@@ -3744,6 +3744,15 @@ class kFlowHelper
 		//If source flavor is not part of mbr playback and it is not the only asset on the entry do the replacement
 		if ($sourceFlavor && !$sourceFlavor->hasTag(flavorParams::TAG_MBR) && $highestBitrateFlavor && $highestBitrateFlavor->getId() != $sourceFlavor->getId())
 		{
+			if ($highestBitrateFlavor->getVersion() != $sourceFlavor->getVersion())
+			{
+				$evts = EntryVendorTaskPeer::retrieveAllActiveOrCompleteTasks($sourceFlavor->getEntryId(), $sourceFlavor->getPartnerId(), $sourceFlavor->getVersion());
+				foreach ($evts as $evt)
+				{
+					$evt->setVersion($highestBitrateFlavor->getVersion());
+					$evt->save();
+				}
+			}
 			$sourceFlavor->setStatus(asset::ASSET_STATUS_DELETED);
 			$sourceFlavor->save();
 			$highestBitrateFlavor->setIsOriginal(true);
