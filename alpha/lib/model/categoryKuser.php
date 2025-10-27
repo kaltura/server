@@ -148,6 +148,12 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 	
 	private function updateCategory($isDelete = false)
 	{
+		$lockKey = 'category_members_count_' . $this->category_id;
+		return kLock::runLocked($lockKey, array($this, 'updateCategoryImpl'), array($isDelete));
+	}
+
+	private function updateCategoryImpl($isDelete)
+	{
 		categoryPeer::setUseCriteriaFilter(false);
 		$category = categoryPeer::retrieveByPK($this->category_id);
 		categoryPeer::setUseCriteriaFilter(true);
