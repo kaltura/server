@@ -110,31 +110,31 @@ class ESearchQueryFromAdvancedSearch
 
 	protected function createESearchQueryFromEntryCaptionAdvancedFilter(kEntryCaptionAdvancedFilter $searchFilter)
 	{
-		$item = new ESearchCaptionItem();
-		$item->setFieldName(ESearchCaptionFieldName::CONTENT);
-		$item->setItemType(ESearchItemType::EXISTS);
-		if($searchFilter->getHasCaption())
+		if (!$searchFilter->getLanguage())
 		{
+			$item = new ESearchCaptionItem();
+			$item->setFieldName(ESearchCaptionFieldName::CONTENT);
+			$item->setItemType(ESearchItemType::EXISTS);
 			$result = $item;
 		}
 		else
 		{
-			$result = self::createNegativeQuery($item);
-		}
-		if($searchFilter->getLanguage())
-		{
-			$languageItem = new ESearchCaptionItem();
-			$languageItem->setFieldName(ESearchCaptionFieldName::LANGUAGE);
-			$languageItem->setItemType(ESearchItemType::EXACT_MATCH);
-			$languageItem->setSearchTerm($searchFilter->getLanguage());
-			if (!is_array($result))
-			{
-				$result = array($result);
-			}
-			$result[] = $languageItem;
+			$item = new ESearchCaptionItem();
+			$item->setFieldName(ESearchCaptionFieldName::LANGUAGE);
+			$item->setItemType(ESearchItemType::EXACT_MATCH);
+			$item->setSearchTerm($searchFilter->getLanguage());
+			$result = $item;
 		}
 
-		return $result;
+		if ($searchFilter->getHasCaption())
+		{
+			return $result;
+		}
+		else
+		{
+			return self::createNegativeQuery($item);
+		}
+
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)
