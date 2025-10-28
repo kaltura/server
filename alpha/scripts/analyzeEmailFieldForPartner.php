@@ -68,14 +68,11 @@ $usersResult = getUsersByPartnerAndCsv($partnerId, $userListCsv);
 $noEmailUsers = $usersResult['noEmailUsers'];
 $withEmailUsers = $usersResult['withEmailUsers'];
 $kuserEmailsFromListCsv = $usersResult['kuserEmailsFromListCsv'];
+$usersResultsEmailMap = buildEmailUsageMap($withEmailUsers);
+$userCollectionSummary = summarizeUserCollections($withEmailUsers, $noEmailUsers);
+$listByCSV = !empty($userListCsv);
 
-$totalUsers = count($noEmailUsers) + count($withEmailUsers);
-$noUserPercentage = noEmailPercentage(count($noEmailUsers), $totalUsers);
-KalturaLog::log("[$noUserPercentage%] of the users of partner [$partnerId] do not have an email address. exact numbers: [" . count($noEmailUsers) . " /$totalUsers]");
-KalturaLog::log("[" . count($withEmailUsers) . "] users out of a total of [$totalUsers] users have email");
-KalturaLog::log("[" . count($noEmailUsers) . "] users out of a total of [$totalUsers] users dont have email");
-
-$report = updateUserForSharedUsers($withEmailUsers, $dryRun, $partner->getAdminSecret(), $updateLoginEmail, $setPuserAsEmailWhenPuserIsEmail);
+$report = updateUserForSharedUsers($withEmailUsers, $dryRun, $partner->getAdminSecret(), $updateLoginEmail, $setPuserAsEmailWhenPuserIsEmail, $usersResultsEmailMap, $listByCSV);
 
 KalturaLog::log('Users needing externalId update: ' . count($report['externalIdUpdates']));
 KalturaLog::log('Users needing loginEmail update: ' . count($report['loginEmailUpdates']));
@@ -90,6 +87,31 @@ if ($checkDuplications)
 
 
 $userUpdateReportFile = prepareAndWriteUserUpdateReport($withEmailUsers,$noEmailUsers, $report, $duplicates, $partnerId, $metadataProfileIds, $checkDuplications);
+
+$externalIdUpdatesCount = count($report['externalIdUpdates'] ?? []);
+$loginEmailUpdatesCount = count($report['loginEmailUpdates'] ?? []);
+$puserAsEmailUpdatesCount = count($report['puserAsEmailUpdates'] ?? []);
+$duplicateSummary = $checkDuplications ? summarizeDuplicateData($duplicates) : ['duplicateEmailsCount' => 0, 'duplicateUsersCount' => 0];
+$totalUsers = $userCollectionSummary['withEmailCount'] + $userCollectionSummary['noEmailCount'];
+$noUserPercentage = noEmailPercentage($userCollectionSummary['noEmailCount'], $totalUsers);
+
+KalturaLog::log("Summary for partner [$partnerId]:");
+KalturaLog::log(" - Users with email: " . $userCollectionSummary['withEmailCount']);
+KalturaLog::log("   - With valid email value: " . $userCollectionSummary['withEmailValidCount']);
+KalturaLog::log("   - With empty string email: " . $userCollectionSummary['withEmailEmptyCount']);
+KalturaLog::log(" - Users without email: " . $userCollectionSummary['noEmailCount']);
+KalturaLog::log("   - Percentage without email: {$noUserPercentage}%");
+KalturaLog::log(" - Unique users fetched: " . $userCollectionSummary['uniqueUsersCount']);
+KalturaLog::log(" - Users with External ID updates: $externalIdUpdatesCount");
+KalturaLog::log(" - Users with Login email updates: $loginEmailUpdatesCount");
+KalturaLog::log(" - Users with Puser set as email: $puserAsEmailUpdatesCount");
+
+if ($checkDuplications) {
+	KalturaLog::log(" - Users with Duplicate emails detected: " . $duplicateSummary['duplicateEmailsCount']);
+	KalturaLog::log(" - Users involved in duplicates: " . $duplicateSummary['duplicateUsersCount']);
+} else {
+	KalturaLog::log(' - Duplicate analysis skipped.');
+}
 
 KalturaLog::log("Done Running for partner [$partnerId]. Report file: $userUpdateReportFile");
 
@@ -251,33 +273,57 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = []): a
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	$duplicates = [];
+	$duplicateEmails = [];
 
 	foreach ($rows as $row) {
-		KalturaLog::log("email [" . $row['EMAIL'] . "] is duplicated [" . $row['COUNT(kuser.EMAIL)'] . "] times");
+		$emailValue = isset($row['EMAIL']) ? trim((string) $row['EMAIL']) : '';
+
+		if ($emailValue === '') {
+			KalturaLog::log('Skipping duplicate email aggregation for empty string value.');
+			continue;
+		}
+
+		KalturaLog::log("email [" . $emailValue . "] is duplicated [" . $row['COUNT(kuser.EMAIL)'] . "] times");
 		$duplicates[] = [
-			$row['EMAIL'],
+			$emailValue,
 			$row['COUNT(kuser.EMAIL)']
 		];
 
-		$singleEmailCriteria = new Criteria();
-		$singleEmailCriteria->add(kuserPeer::PARTNER_ID, $partnerId);
-		$singleEmailCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
-		$singleEmailCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
-		$singleEmailCriteria->add(kuserPeer::EMAIL, $row['EMAIL'] );
+		$duplicateEmails[] = $emailValue;
+	}
 
-		$duplicateEmailUsers = kuserPeer::doSelect($singleEmailCriteria);
+	if (empty($duplicateEmails)) {
+		return $duplicates;
+	}
+
+	$chunkSize = 500;
+	$baseCriteria = new Criteria();
+	$baseCriteria->add(kuserPeer::PARTNER_ID, $partnerId);
+	$baseCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
+	$baseCriteria->add(kuserPeer::TYPE, KuserType::USER);
+	$baseCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
+
+	foreach (array_chunk($duplicateEmails, $chunkSize) as $emailsChunk) {
+		$duplicateUsersCriteria = clone $baseCriteria;
+		$duplicateUsersCriteria->add(kuserPeer::EMAIL, $emailsChunk, Criteria::IN);
+
+		$duplicateEmailUsers = kuserPeer::doSelect($duplicateUsersCriteria);
 		kMemoryManager::clearMemory();
 
-		foreach ($duplicateEmailUsers as $duplicateEmailUser)
-		{
+		foreach ($duplicateEmailUsers as $duplicateEmailUser) {
 			$loginData = $duplicateEmailUser->getLoginData();
+			$userEmail = trim((string) $duplicateEmailUser->getEmail());
+
+			if ($userEmail === '') {
+				continue;
+			}
+
 			$kuserId = $duplicateEmailUser->getId();
 
 			$data = [
-				'email' => $duplicateEmailUser->getEmail(),
+				'email' => $userEmail,
 				'puserId' => $duplicateEmailUser->getPuserId(),
 				'kuserId' => $kuserId,
-				'entryOwnedCount' => getOwnedEntryCount($kuserId, $partnerId),
 				'loginEmail' => $loginData ? $loginData->getLoginEmail() : null,
 				'firstName' => $duplicateEmailUser->getFirstName(),
 				'lastName' => $duplicateEmailUser->getLastName(),
@@ -298,17 +344,20 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = []): a
  * This function processes an array of users by comparing their login emails to an expected format
  * and updating them if necessary. It also sets the external ID to the user's email if it's not already defined.
  *
- * @param array $usersWithEmail An array of user objects that contain email information to process.
- * @param bool $dryRun If true, the function will simulate updates without performing actual changes.
- * @param string $adminSecret Secret key used for generating unique email addresses for shared users.
- * @param bool $updateLoginEmail Indicates whether login email updates should be performed.
+ * @param array $usersWithEmail
+ * @param bool $dryRun
+ * @param string $adminSecret
+ * @param bool $updateLoginEmail
+ * @param bool $setPuserAsEmailWhenPuserIsEmail
+ * @param array $usersResultsEmailMap
+ * @param bool $listByCSV
  *
  * @return array An associative array containing two lists of updated users:
  *               'externalIdUpdates' for users whose external ID was updated,
  *               'loginEmailUpdates' for users whose login email was updated.
  * @throws PropelException
  */
-function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $adminSecret, bool $updateLoginEmail, $setPuserAsEmailWhenPuserIsEmail): array {
+function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $adminSecret, bool $updateLoginEmail, $setPuserAsEmailWhenPuserIsEmail, array $usersResultsEmailMap, bool $listByCSV): array {
 	KalturaLog::log('Processing users with email for updates.');
 
 	$report = ['externalIdUpdates' => [], 'loginEmailUpdates' => [], 'puserAsEmailUpdates' => []];
@@ -355,7 +404,12 @@ function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $a
 						continue;
 					}
 
-					$existingUserWithPuserAsEmail = getUserByEmail($user->getPartnerId(), $user->getPuserId());
+					if (!$listByCSV) {
+						$emailKey = strtolower(trim((string) $user->getPuserId()));
+						$existingUserWithPuserAsEmail = isset($usersResultsEmailMap[$emailKey]) && !isset($usersResultsEmailMap[$emailKey][$user->getId()]);
+					} else {
+						$existingUserWithPuserAsEmail = getUserByEmail($user->getPartnerId(), $user->getPuserId());
+					}
 
 					if ($setPuserAsEmailWhenPuserIsEmail && !$existingUserWithPuserAsEmail) {
 						$report['puserAsEmailUpdates'][] = $user->getId();
@@ -364,8 +418,14 @@ function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $a
 
 						if (!$dryRun) {
 							$user->setEmail($puserEmail);
+							if (!$listByCSV) {
+								$usersResultsEmailMap[$emailKey][$user->getId()] = true;
+							}
 						} else {
 							KalturaLog::log('Dry RUN - would set email for user [' . $user->getId() . '] to ' . $puserEmail);
+							if (!$listByCSV) {
+								$usersResultsEmailMap[$emailKey][$user->getId()] = true;
+							}
 						}
 					}
 
@@ -456,19 +516,16 @@ function buildReportHeaders(bool $includeDuplicateColumns, array $metadataProfil
  * Normalizes duplicate data into lookup structures used for report enrichment.
  *
  * @param array $duplicates Raw duplicates information.
- * @param bool $includeDuplicateColumns Whether duplicate-specific columns will be emitted.
  * @return array{
  *     emailCounts: array<string,int>,
  *     byKuserId: array<int,array>,
- *     entryCounts: array<int,int>,
  *     userIds: array<int>
  * }
  */
-function normalizeDuplicateData(array $duplicates, bool $includeDuplicateColumns): array
+function normalizeDuplicateData(array $duplicates): array
 {
 	$duplicateEmailCounts = [];
 	$duplicatesByKuserId = [];
-	$duplicateEntryCounts = [];
 
 	foreach ($duplicates as $dup) {
 		if (is_array($dup) && isset($dup[0], $dup[1]) && is_string($dup[0]) && is_numeric($dup[1])) {
@@ -489,20 +546,11 @@ function normalizeDuplicateData(array $duplicates, bool $includeDuplicateColumns
 
 		$kuserId = $dup['kuserId'];
 		$duplicatesByKuserId[$kuserId] = $dup;
-
-		if ($includeDuplicateColumns) {
-			$duplicateEntryCounts[$kuserId] = $dup['entryOwnedCount'] ?? 0;
-		}
-	}
-
-	if (!$includeDuplicateColumns) {
-		$duplicateEntryCounts = [];
 	}
 
 	return [
 		'emailCounts' => $duplicateEmailCounts,
 		'byKuserId' => $duplicatesByKuserId,
-		'entryCounts' => $duplicateEntryCounts,
 		'userIds' => array_keys($duplicatesByKuserId),
 	];
 }
@@ -544,7 +592,7 @@ function resolveMetadataRoles(int $partnerId, array $duplicateUserIds, array $me
  *
  * @param array $withEmailUsers
  * @param array $duplicateEmailCounts
- * @param array $duplicateEntryCounts
+ * @param array $ownedEntryCountsByKuserId
  * @param array $metadataProfileIds
  * @param array $metadataRolesByUser
  * @param array $loginEmailUpdateIds
@@ -554,7 +602,7 @@ function resolveMetadataRoles(int $partnerId, array $duplicateUserIds, array $me
  * @param int $partnerId
  * @return array{rows: array<int,array>, processedUserIds: array<int,bool>}
  */
-function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmailCounts, array $duplicateEntryCounts, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns, int $partnerId): array
+function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmailCounts, array $ownedEntryCountsByKuserId, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns, int $partnerId): array
 {
 	$rows = [];
 	$processedUserIds = [];
@@ -574,10 +622,10 @@ function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmail
 		$needsPuserAsEmailUpdate = isset($puserAsEmailUpdateIds[$kuserId]) ? 'yes' : 'no';
 		$userEmail = $user->getEmail();
 		$duplicateCount = $duplicateEmailCounts[$userEmail] ?? 0;
-		$entryOwnedCount = $duplicateEntryCounts[$kuserId] ?? '';
+		$entryOwnedCount = '';
 
-		if ($includeDuplicateColumns && $entryOwnedCount === '' && $duplicateCount > 0) {
-			$entryOwnedCount = getOwnedEntryCount($kuserId, $partnerId);
+		if ($includeDuplicateColumns) {
+			$entryOwnedCount = $ownedEntryCountsByKuserId[$kuserId] ?? ($duplicateCount > 0 ? 0 : '');
 		}
 
 		$row = [$kuserId, $userEmail, $puserId, $loginEmail, $firstName, $lastName, $createdAt, $externalId, $isAdmin, $needsLoginEmailUpdate, $needsExternalIdUpdate, $needsPuserAsEmailUpdate];
@@ -658,7 +706,7 @@ function buildRowsForUsersWithoutEmail(array $noEmailUsers, array $metadataProfi
  * @param array $duplicatesByKuserId
  * @param array $processedUserIds
  * @param array $duplicateEmailCounts
- * @param array $duplicateEntryCounts
+ * @param array $ownedEntryCountsByKuserId
  * @param array $metadataProfileIds
  * @param array $metadataRolesByUser
  * @param array $loginEmailUpdateIds
@@ -667,7 +715,7 @@ function buildRowsForUsersWithoutEmail(array $noEmailUsers, array $metadataProfi
  * @param bool $includeDuplicateColumns
  * @return array
  */
-function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $processedUserIds, array $duplicateEmailCounts, array $duplicateEntryCounts, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns): array
+function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $processedUserIds, array $duplicateEmailCounts, array $ownedEntryCountsByKuserId, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns): array
 {
 	$rows = [];
 
@@ -696,7 +744,7 @@ function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $proce
 
 		if ($includeDuplicateColumns) {
 			$row[] = $duplicateCount;
-			$row[] = $duplicateEntryCounts[$dupUserId] ?? ($dup['entryOwnedCount'] ?? 0);
+			$row[] = $ownedEntryCountsByKuserId[$dupUserId] ?? 0;
 		}
 
 		if (!empty($metadataProfileIds)) {
@@ -726,10 +774,9 @@ function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $proce
  */
 function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $noEmailUsers, array $report, array $duplicates, int $partnerId, array $metadataProfileIds = [], bool $includeDuplicateColumns = true): string
 {
-	$normalizedDuplicates = normalizeDuplicateData($duplicates, $includeDuplicateColumns);
+	$normalizedDuplicates = normalizeDuplicateData($duplicates);
 	$duplicateEmailCounts = $normalizedDuplicates['emailCounts'];
 	$duplicatesByKuserId = $normalizedDuplicates['byKuserId'];
-	$duplicateEntryCounts = $normalizedDuplicates['entryCounts'];
 	$duplicateUserIds = $normalizedDuplicates['userIds'];
 
 	$noEmailExclusionPatterns = getNoEmailUserExclusionPatterns();
@@ -746,12 +793,20 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $noEmailUs
 	$metadataResolution = resolveMetadataRoles($partnerId, $duplicateUserIds, $metadataProfileIds);
 	$metadataRolesByUser = $metadataResolution['roles'];
 	$metadataProfileIds = $metadataResolution['profileIds'];
+
+	$ownedEntryCountsByKuserId = [];
+
+	if ($includeDuplicateColumns) {
+		$ownedEntryCounts = resolveOwnedEntryCounts($partnerId, $duplicatesByKuserId);
+		$ownedEntryCountsByKuserId = $ownedEntryCounts['byKuserId'];
+	}
+
 	$headers = buildReportHeaders($includeDuplicateColumns, $metadataProfileIds);
 
 	$loginEmailUpdateIds = array_flip($report['loginEmailUpdates'] ?? []);
 	$externalIdUpdateIds = array_flip($report['externalIdUpdates'] ?? []);
 	$puserAsEmailUpdateIds = array_flip($report['puserAsEmailUpdates'] ?? []);
-	$usersWithEmailRows = buildRowsForUsersWithEmail($withEmailUsers, $duplicateEmailCounts, $duplicateEntryCounts, $metadataProfileIds, $metadataRolesByUser, $loginEmailUpdateIds, $externalIdUpdateIds, $puserAsEmailUpdateIds, $includeDuplicateColumns, $partnerId);
+	$usersWithEmailRows = buildRowsForUsersWithEmail($withEmailUsers, $duplicateEmailCounts, $ownedEntryCountsByKuserId, $metadataProfileIds, $metadataRolesByUser, $loginEmailUpdateIds, $externalIdUpdateIds, $puserAsEmailUpdateIds, $includeDuplicateColumns, $partnerId);
 	$reportRows = $usersWithEmailRows['rows'];
 	$processedUserIds = $usersWithEmailRows['processedUserIds'];
 
@@ -759,10 +814,60 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $noEmailUs
 	$reportRows = array_merge($reportRows, $noEmailRows['rows']);
 	$processedUserIds += $noEmailRows['processedUserIds'];
 
-	$duplicateOnlyRows = buildRowsForDuplicateOnlyUsers($duplicatesByKuserId, $processedUserIds, $duplicateEmailCounts, $duplicateEntryCounts, $metadataProfileIds, $metadataRolesByUser, $loginEmailUpdateIds, $externalIdUpdateIds, $puserAsEmailUpdateIds, $includeDuplicateColumns);
-	array_push($reportRows, ...$duplicateOnlyRows);
+$duplicateOnlyRows = buildRowsForDuplicateOnlyUsers($duplicatesByKuserId, $processedUserIds, $duplicateEmailCounts, $ownedEntryCountsByKuserId, $metadataProfileIds, $metadataRolesByUser, $loginEmailUpdateIds, $externalIdUpdateIds, $puserAsEmailUpdateIds, $includeDuplicateColumns);
+array_push($reportRows, ...$duplicateOnlyRows);
 
-	return writeArrayToCsv($headers, $reportRows);
+return writeArrayToCsv($headers, $reportRows);
+}
+
+function summarizeDuplicateData(array $duplicates): array
+{
+	if (empty($duplicates)) {
+		return [
+			'duplicateEmailsCount' => 0,
+			'duplicateUsersCount' => 0,
+		];
+	}
+
+	$normalized = normalizeDuplicateData($duplicates);
+
+	return [
+		'duplicateEmailsCount' => count($normalized['emailCounts']),
+		'duplicateUsersCount' => count($normalized['byKuserId']),
+	];
+}
+
+function summarizeUserCollections(array $withEmailUsers, array $noEmailUsers): array
+{
+	$withEmailCount = count($withEmailUsers);
+	$withEmailEmptyCount = 0;
+	$withEmailValidCount = 0;
+	$uniqueUserIds = [];
+
+	foreach ($withEmailUsers as $user) {
+		$kuserId = (int) $user->getId();
+		$uniqueUserIds[$kuserId] = true;
+
+		$email = trim((string) $user->getEmail());
+		if ($email === '') {
+			$withEmailEmptyCount++;
+		} else {
+			$withEmailValidCount++;
+		}
+	}
+
+	foreach ($noEmailUsers as $user) {
+		$kuserId = (int) $user->getId();
+		$uniqueUserIds[$kuserId] = true;
+	}
+
+	return [
+		'withEmailCount' => $withEmailCount,
+		'withEmailEmptyCount' => $withEmailEmptyCount,
+		'withEmailValidCount' => $withEmailValidCount,
+		'noEmailCount' => count($noEmailUsers),
+		'uniqueUsersCount' => count($uniqueUserIds),
+	];
 }
 
 /**
@@ -888,20 +993,71 @@ function fetchMetadataRolesForUsers(int $partnerId, array $kuserIds, array $meta
 	];
 }
 
-function getOwnedEntryCount($kuserId, $partnerId) {
-	// check for owned entries per user id and count them
-	/* @var $kuserId kuser */
-	$countField = 'COUNT(entry.ID)';
-	$ownedEntryCriteria = new Criteria();
-	$ownedEntryCriteria->add(entryPeer::PARTNER_ID, $partnerId);
-	$ownedEntryCriteria->add(entryPeer::KUSER_ID, $kuserId);
-	$ownedEntryCriteria->add(entryPeer::STATUS, 2);
-	$ownedEntryCriteria->addGroupByColumn(entryPeer::KUSER_ID);
-	$ownedEntryCriteria->addSelectColumn($countField);
-	$ownedEntryCriteria->addSelectColumn(entryPeer::ID);
+function resolveOwnedEntryCounts(int $partnerId, array $duplicatesByKuserId, int $chunkSize = 100): array {
+	$ownedEntryCountsByKuserId = [];
 
-	$stmt = entryPeer::doSelectStmt($ownedEntryCriteria);
+	if (empty($duplicatesByKuserId)) {
+		return ['byKuserId' => $ownedEntryCountsByKuserId];
+	}
+
+	$uniqueUserIds = array_values(array_unique(array_map('intval', array_keys($duplicatesByKuserId))));
+
+	foreach (array_chunk($uniqueUserIds, $chunkSize) as $userIdsChunk) {
+		$chunkResults = getOwnedEntryCounts($partnerId, $userIdsChunk);
+
+		foreach ($userIdsChunk as $rawKuserId) {
+			$kuserId = (int) $rawKuserId;
+			$entryCount = $chunkResults[$kuserId] ?? 0;
+			$ownedEntryCountsByKuserId[$kuserId] = (int) $entryCount;
+		}
+	}
+
+	return ['byKuserId' => $ownedEntryCountsByKuserId];
+}
+
+function getOwnedEntryCounts(int $partnerId, array $kuserIds): array {
+	if (empty($kuserIds)) {
+		return [];
+	}
+
+	$criteria = new Criteria();
+	$criteria->add(entryPeer::PARTNER_ID, $partnerId);
+	$criteria->add(entryPeer::KUSER_ID, $kuserIds, Criteria::IN);
+	$criteria->add(entryPeer::STATUS, 2);
+	$criteria->clearSelectColumns();
+	$criteria->addAsColumn('entry_owner_kuser_id', entryPeer::KUSER_ID);
+	$criteria->addAsColumn('entry_count', 'COUNT(*)');
+	$criteria->addGroupByColumn(entryPeer::KUSER_ID);
+	$stmt = entryPeer::doSelectStmt($criteria);
+
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	$results = [];
 
-	return $rows[0]['COUNT(entry.ID)'] ?? 0;
+	foreach ($rows as $row) {
+		$kuserId = isset($row['entry_owner_kuser_id']) ? (int) $row['entry_owner_kuser_id'] : null;
+
+		if ($kuserId === null) {
+			continue;
+		}
+
+		$results[$kuserId] = (int) ($row['entry_count'] ?? 0);
+	}
+
+	return $results;
+}
+
+function buildEmailUsageMap(array $withEmailUsers): array {
+    $usage = [];
+
+    foreach ($withEmailUsers as $user) {
+        $email = strtolower(trim((string) $user->getEmail()));
+
+        if ($email === '') {
+            continue;
+        }
+
+        $usage[$email][$user->getId()] = true;
+    }
+
+    return $usage;
 }
