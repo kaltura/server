@@ -10,9 +10,14 @@ class KalturaEntryCaptionAdvancedFilter extends KalturaSearchItem
 	 */
 	public $hasCaption;
 
+	/**
+	 * @var KalturaLanguage
+	 */
+	public $language;
+
 	private static $map_between_objects = array
 	(
-		"hasCaption",
+		"hasCaption","language"
 	);
 
 	public function getMapBetweenObjects ( )

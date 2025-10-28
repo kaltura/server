@@ -121,6 +121,18 @@ class ESearchQueryFromAdvancedSearch
 		{
 			$result = self::createNegativeQuery($item);
 		}
+		if($searchFilter->getLanguage())
+		{
+			$languageItem = new ESearchCaptionItem();
+			$languageItem->setFieldName(ESearchCaptionFieldName::LANGUAGE);
+			$languageItem->setItemType(ESearchItemType::EXACT_MATCH);
+			$languageItem->setSearchTerm($searchFilter->getLanguage());
+			if (!is_array($result))
+			{
+				$result = array($result);
+			}
+			$result[] = $languageItem;
+		}
 
 		return $result;
 	}

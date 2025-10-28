@@ -11,6 +11,12 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	protected $hasCaption = true;
 
 	/**
+	 * @var KalturaLanguage
+	 */
+	protected $language;
+
+
+	/**
 	 * @return boolean
 	 */
 	public function getHasCaption()
@@ -24,6 +30,22 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	public function setHasCaption($hasCaption)
 	{
 		$this->hasCaption = $hasCaption;
+	}
+
+	/**
+	 * @return KalturaLanguage
+	 */
+	public function getLanguage()
+	{
+		return $this->language;
+	}
+
+	/**
+	 * @param KalturaLanguage $language
+	 */
+	public function setLanguage($language)
+	{
+		$this->language = $language;
 	}
 
 	/* (non-PHPdoc)
