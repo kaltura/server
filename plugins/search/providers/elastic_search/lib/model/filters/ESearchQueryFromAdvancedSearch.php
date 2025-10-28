@@ -110,21 +110,19 @@ class ESearchQueryFromAdvancedSearch
 
 	protected function createESearchQueryFromEntryCaptionAdvancedFilter(kEntryCaptionAdvancedFilter $searchFilter)
 	{
+		$item = new ESearchCaptionItem();
 		if (!$searchFilter->getLanguage())
 		{
-			$item = new ESearchCaptionItem();
 			$item->setFieldName(ESearchCaptionFieldName::CONTENT);
 			$item->setItemType(ESearchItemType::EXISTS);
-			$result = $item;
 		}
 		else
 		{
-			$item = new ESearchCaptionItem();
 			$item->setFieldName(ESearchCaptionFieldName::LANGUAGE);
 			$item->setItemType(ESearchItemType::EXACT_MATCH);
 			$item->setSearchTerm($searchFilter->getLanguage());
-			$result = $item;
 		}
+		$result = $item;
 
 		if ($searchFilter->getHasCaption())
 		{
