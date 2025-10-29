@@ -162,6 +162,10 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	 */
 	public $v2Redirect;
 
+	/**
+	 * @var string
+	 */
+	public $referenceId;
 
 	private static $map_between_objects = array
 	(
@@ -189,7 +193,8 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 		"config",
 		"version",
 		"partnerTags",
-		"v2Redirect"
+		"v2Redirect",
+		"referenceId"
 	);
 
 	public function getMapBetweenObjects ( )
