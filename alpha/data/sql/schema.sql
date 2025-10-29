@@ -1176,9 +1176,11 @@ CREATE TABLE `ui_conf`
 	`version` VARCHAR(10),
 	`html5_url` VARCHAR(256),
 	`partner_tags` TEXT,
+	`reference_id` VARCHAR(512),
 	PRIMARY KEY (`id`),
 	KEY `partner_id_index`(`partner_id`),
-	KEY `partner_id_creation_mode_index`(`partner_id`, `creation_mode`)
+	KEY `partner_id_creation_mode_index`(`partner_id`, `creation_mode`),
+	KEY `partner_id_reference_id_index`(`partner_id`, `reference_id`)
 )Type=InnoDB;
 
 #-----------------------------------------------------------------------------
