@@ -318,7 +318,8 @@ class kBusinessPostConvertDL
     			// Export the source
     			kStorageExporter::exportSourceFlavorAsset($entry->getEntryId());
 
-    			kFlowHelper::handleStaticContent($entry);
+    			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
+					kFlowHelper::handleStaticContent($entry);
 
     			// mark the context root job as finished only if all conversion jobs are completed
     			kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
