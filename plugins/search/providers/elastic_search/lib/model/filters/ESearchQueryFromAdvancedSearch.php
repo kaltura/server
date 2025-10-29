@@ -94,10 +94,7 @@ class ESearchQueryFromAdvancedSearch
 		$eSearchAdvancedSearchItem->setSearchTerm($advancedSearchFilterItem->getValue());
 		$eSearchAdvancedSearchItem->setFieldName($advancedSearchFilterItem->getField());
 		$eSearchAdvancedSearchItem->setNot($advancedSearchFilterItem->getNot());
-		$eSearchAdvancedSearchItem->setItemType(ESearchItemType::EXACT_MATCH); // not sure this is how it should be
-		// need to verify how to send the tags here. as search term and exact match? the query doens't fail
-		// but we don't get proper results. need to find a good example to compare to.
-		// need to look at elastic service for entry items and compare
+		$eSearchAdvancedSearchItem->setItemType(ESearchItemType::EXACT_MATCH);
 
 		return $eSearchAdvancedSearchItem;
 	}
