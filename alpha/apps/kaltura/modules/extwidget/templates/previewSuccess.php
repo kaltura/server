@@ -280,7 +280,7 @@
 
 				code = embedCode;
 				if (data.embedType === 'iframe') {
-					code = '<iframe id="kaltura_player" src="'+iframeURL+'" width="'+ width +'" height="'+height+'" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" allow="autoplay; fullscreen; encrypted-media" frameborder="0" style="width: '+width+'px; height: '+height+'px;" itemprop="video" itemscope="" itemtype="http://schema.org/VideoObject"></iframe>';
+					code = '<iframe id="kaltura_player" src="'+iframeURL+'" width="'+ width +'" height="'+height+'" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen="" allow="autoplay; fullscreen; encrypted-media" frameborder="0" style="width: 100%; height: 100%;" itemprop="video" itemscope="" itemtype="http://schema.org/VideoObject"></iframe>';
 				}
 				else if (data.embedType === 'thumb') {
 					code = `<div id='kaltura_player_1' style='width: 560px;height: 395px'></div>
