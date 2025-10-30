@@ -411,11 +411,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $this->entryId);
 		}
-		
-		if ($dbEntry->getStatus() != entryStatus::READY)
-		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_NOT_READY, $this->entryId);
-		}
+		$this->validateEntryStatus($dbEntry);
 		if (!ReachPlugin::isEntryTypeSupportedForReach($dbEntry->getType()))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_TYPE_NOT_SUPPORTED, $dbEntry->getType());
@@ -429,6 +425,20 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			{
 				throw new KalturaAPIException(KalturaReachErrors::TASK_EVENT_ENTRY_ID_MISMATCH, $this->entryId, $connectedEvent->getId());
 			}
+		}
+	}
+
+	private function validateEntryStatus($dbEntry)
+	{
+		$allowedStatuses = array(entryStatus::READY);
+		$roomPlugin = KalturaPluginManager::getPluginInstance(RoomPlugin::getPluginName());
+		if ($roomPlugin && $dbEntry->getType() == RoomPlugin::getEntryTypeCoreValue(RoomEntryType::ROOM))
+		{
+			$allowedStatuses[] = entryStatus::NO_CONTENT;
+		}
+		if (!in_array($dbEntry->getStatus(), $allowedStatuses))
+		{
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_NOT_READY_FOR_ORDER, $dbEntry->getStatus());
 		}
 	}
 
