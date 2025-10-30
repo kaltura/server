@@ -12,6 +12,8 @@ class uiConfFilter extends baseObjectFilter
 		$this->fields = kArray::makeAssociativeDefaultValue ( array (
 			"_eq_id" , 
 			"_in_id",
+			"_eq_reference_id" ,
+			"_in_reference_id",
 			"_gte_id" ,
 			"_eq_partner_id",
 			"_in_partner_id",
