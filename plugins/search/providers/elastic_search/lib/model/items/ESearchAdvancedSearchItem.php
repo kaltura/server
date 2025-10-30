@@ -37,6 +37,14 @@ class ESearchAdvancedSearchItem extends ESearchEntryItem
 	}
 
 	/**
+	 * @param string $searchTerm
+	 */
+	public function setSearchTerm($searchTerm)
+	{
+		$this->searchTerm = $searchTerm;
+	}
+
+	/**
 	 * @param string $field
 	 */
 	public function setFieldName($fieldName)
@@ -69,6 +77,13 @@ class ESearchAdvancedSearchItem extends ESearchEntryItem
 		$this->range = $range;
 	}
 
+	/**
+	 * @param boolean $value
+	 */
+	public function setNot($not)
+	{
+		$this->not = $not;
+	}
 
 	public function handleComparisonType($advancedSearchFilterItem)
 	{

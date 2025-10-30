@@ -50,6 +50,21 @@ class AdvancedSearchFilterCondition extends AdvancedSearchFilterItem
 	}
 
 	/**
+	 * @return boolean $value
+	 */
+	public function getNot() {
+		return $this->not;
+	}
+
+	/**
+	 * @param boolean $value
+	 */
+	public function setNot($not)
+	{
+		$this->not = $not;
+	}
+
+	/**
 	 * @param string $field the $field to set
 	 */
 	public function setField($field) {
