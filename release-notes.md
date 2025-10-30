@@ -12,7 +12,6 @@ If the event notification template does not exist in the system use "add scripts
 First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
 
 Add script:
-
 - deployment/updates/scripts/xml/2025_10_29_addCaptionAssetHttpNotification.template.xml
 - php deployment/updates/scripts/2025_10_29_deploy_add_caption_asset_http_notification.php
 
