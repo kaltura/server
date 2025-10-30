@@ -32,6 +32,8 @@ class embedPlaykitJsAction extends sfAction
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
 	const RAPT = "rapt";
+	const DEFAULT_MAX_OBJECT_CACHE_SIZE = 4 * 1024 * 1024; // 4MB
+	const FAILED_TO_SAVE_BUNDLE_IN_CACHE = "FAILED_TO_SAVE_BUNDLE_IN_CACHE";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -54,6 +56,7 @@ class embedPlaykitJsAction extends sfAction
 	private $regenerate = false;
 	private $includeSourceMap = 'false';
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
+	private $maxObjectCacheSize;
 
 	public function execute()
 	{
@@ -61,10 +64,9 @@ class embedPlaykitJsAction extends sfAction
 		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 
 		$this->initMembers();
-
-		$bundleContent = $this->bundleCache->get($this->bundle_name);
-		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
-		$extraModulesNames = unserialize($this->bundleCache->get($this->bundle_extra_modules_names));
+		$bundleContent = self::getCacheData($this, 'bundleCache', $this->bundle_name);
+		$i18nContent = self::getCacheData($this, 'bundleCache', $this->bundle_i18n_name);
+		$extraModulesNames = unserialize(self::getCacheData($this,'bundleCache', $this->bundle_extra_modules_names));
 		KalturaLog::debug("Fetch bundle content from cache for key [{$this->bundle_name}], result: [" . !empty($bundleContent) . "]");
 
 		if (!$bundleContent || $this->regenerate)
@@ -90,11 +92,11 @@ class embedPlaykitJsAction extends sfAction
 		//if bundle not exists or explicitly should be regenerated build it
 		if(!$context->regenerate)
 		{
-			$bundleContent = $context->bundleCache->get($context->bundle_name);
+			$bundleContent = self::getCacheData($context, 'bundleCache', $context->bundle_name);
 			if ($bundleContent)
 			{
-				$i18nContent = $context->bundleCache->get($context->bundle_i18n_name);
-				$extraModulesNames = unserialize($context->bundleCache->get($context->bundle_extra_modules_names));
+				$i18nContent = self::getCacheData($context, 'bundleCache', $context->bundle_i18n_name);
+				$extraModulesNames = unserialize(self::getCacheData($context, 'bundleCache', $context->bundle_extra_modules_names));
 				return array($bundleContent, $i18nContent, $extraModulesNames);
 			}
 		}
@@ -133,23 +135,52 @@ class embedPlaykitJsAction extends sfAction
         }
 		
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
-		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
+		$bundleSaved = self::setCacheData($context, 'bundleCache', $context->bundle_name, $bundleContent);
 		
 		$sourceMapContent = base64_decode($content['sourceMap']);
-		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
+		self::setCacheData($context, 'sourceMapsCache', $context->bundle_name, $sourceMapContent);
 		
 		$i18nContent = isset($content['i18n']) ? base64_decode($content['i18n']) : "";
-		$context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
+		self::setCacheData($context, 'bundleCache', $context->bundle_i18n_name, $i18nContent);
 		
 		$extraModules = isset($content['extraModules']) ? $content['extraModules'] : array();
-		$extraModulesNames = self::getExtraModuleNames($extraModules);
-		$context->bundleCache->set($context->bundle_extra_modules_names, serialize($extraModulesNames));
+		$extraModulesNames = self::getExtraModuleNames($extraModules);;
+		self::setCacheData($context, 'bundleCache', $context->bundle_extra_modules_names, serialize($extraModulesNames));
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
 		}
 
 		return array($bundleContent, $i18nContent, $extraModulesNames);
+	}
+	
+	protected static function setCacheData($context, $cacheType, $key, $data)
+	{
+		//If length of data is over 4MB compress it before caching
+		if(strlen($data) > $context->maxObjectCacheSize)
+		{
+			$data = "COMPRESSED," . gzcompress($data);
+			if(strlen($data) > $context->maxObjectCacheSize)
+			{
+				KalturaMonitorClient::sendErrorEvent(self::FAILED_TO_SAVE_BUNDLE_IN_CACHE);
+			}
+			return $context->$cacheType->set($key, $data);
+		}
+		else
+		{
+			return $context->$cacheType->set($key, $data);
+		}
+	}
+	
+	protected static function getCacheData($context, $cacheType, $key)
+	{
+		$data = $context->$cacheType->get($key);
+		if($data && strpos($data, "COMPRESSED,") === 0)
+		{
+			$data = substr($data, strlen("COMPRESSED,"));
+			$data = gzuncompress($data);
+		}
+		return $data;
 	}
 	
 	private static function getExtraModuleNames($extraModules = array())
@@ -871,6 +902,8 @@ class embedPlaykitJsAction extends sfAction
 
 			if (array_key_exists('play_kit_js_cache_version', $playkitConfig))
 				$this->sourceMapLoader = rtrim($playkitConfig['playkit_js_source_map_loader']);
+			
+			$this->maxObjectCacheSize = $playkitConfig['max_object_cache_size'] ?? self::DEFAULT_MAX_OBJECT_CACHE_SIZE;
 
 
 		}
