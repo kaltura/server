@@ -17,8 +17,13 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 
 
 	/**
+	 * @var int
+	 */
+	protected $accuracy;
+	/**
 	 * @return boolean
 	 */
+
 	public function getHasCaption()
 	{
 		return $this->hasCaption;
@@ -46,6 +51,22 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	public function setLanguage($language)
 	{
 		$this->language = $language;
+	}
+
+	/**
+	 * @return ESearchRange
+	 */
+	public function getAccuracy()
+	{
+		return $this->accuracy;
+	}
+
+	/**
+	 * @param ESearchRange $accuracy
+	 */
+	public function setAccuracy($accuracy)
+	{
+		$this->accuracy = $accuracy;
 	}
 
 	/* (non-PHPdoc)

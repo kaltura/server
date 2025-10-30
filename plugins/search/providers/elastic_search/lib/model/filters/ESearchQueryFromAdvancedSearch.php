@@ -124,6 +124,19 @@ class ESearchQueryFromAdvancedSearch
 		}
 		$result = $item;
 
+		if (!$searchFilter->getAccuracy())
+		{
+			$item->setFieldName(ESearchCaptionFieldName::CONTENT);
+			$item->setItemType(ESearchItemType::EXISTS);
+		}
+		else
+		{
+			$item->setRange($searchFilter->getAccuracy());
+			$item->setFieldName(ESearchCaptionFieldName::ACCURACY);
+			$item->setItemType(ESearchItemType::RANGE);
+		}
+		$result = $item;
+
 		if ($searchFilter->getHasCaption())
 		{
 			return $result;
@@ -133,6 +146,7 @@ class ESearchQueryFromAdvancedSearch
 			return self::createNegativeQuery($item);
 		}
 
+		return $result;
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)

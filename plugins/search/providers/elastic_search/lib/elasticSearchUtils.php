@@ -218,5 +218,4 @@ class elasticSearchUtils
 		$value = str_replace(self::$html_chars_to_replace, " ", $value);
 		$value = strip_tags($value);
 	}
-
 }
