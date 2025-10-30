@@ -12,7 +12,7 @@ abstract class kBaseESearch extends kBaseSearch
 
 	public abstract function fetchCoreObjectsByIds($ids);
 
-	protected function execSearch(ESearchOperator $eSearchOperator)
+	protected function execSearch(ESearchOperator $eSearchOperator, ESearchScoreFunctionParams $scoreFunctionParams = null)
 	{
 		$subQuery = $eSearchOperator::createSearchQuery($eSearchOperator->getSearchItems(), null, $this->queryAttributes, $eSearchOperator->getOperator());
 		$this->handleDisplayInSearch();
@@ -26,6 +26,11 @@ abstract class kBaseESearch extends kBaseSearch
 		}
 		$this->applyElasticSearchConditions();
 		$this->addGlobalHighlights();
+		if ($scoreFunctionParams)
+		{
+			$this->boostItems($scoreFunctionParams);
+		}
+
 		$result = $this->elasticClient->search($this->query, true, true);
 		$this->addSearchTermsToSearchHistory();
 		return $result;

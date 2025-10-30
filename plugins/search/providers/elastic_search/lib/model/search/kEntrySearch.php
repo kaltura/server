@@ -12,9 +12,9 @@ class kEntrySearch extends kBaseESearch
 
     public function __construct()
     {
-        $this->isInitialized = false;
-        parent::__construct();
-		$this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
+	    $this->isInitialized = false;
+	    parent::__construct();
+	    $this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
     }
 
     protected function handleDisplayInSearch()
@@ -29,16 +29,41 @@ class kEntrySearch extends kBaseESearch
         }
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectIdsCsvStr = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectIdsCsvStr = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null, ESearchScoreFunctionParams $scoreFunctionParams = null)
     {
         kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus, $objectIdsCsvStr, $pager, $order, $aggregations, $objectIdsNotIn);
         $this->initEntitlement($eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn);
-        $result = $this->execSearch($eSearchOperator);
+
+		$result = $this->execSearch($eSearchOperator, $scoreFunctionParams);
         return $result;
     }
+
+	protected function boostItems(ESearchScoreFunctionParams $scoreFunctionParams)
+	{
+		$query = $this->query['body']['query'];
+		unset($this->query['body']['query']);
+		$this->query['body']['query']['function_score']['query'] = $query;
+		
+		switch ($scoreFunctionParams->getScoreFunctionBoostField())
+		{
+			case ESearchScoreFunctionField::CREATED_AT:
+			default:
+			{
+				$this->query['body']['query']['function_score']['functions'][] = array(
+					$scoreFunctionParams->getScoreFunctionBoostType() => array( //exp
+						$scoreFunctionParams->getScoreFunctionBoostField() => array ( //CREATED_AT
+						'origin' => $scoreFunctionParams->getOrigin(),//now
+						'scale' => $scoreFunctionParams->getScale(),//30d
+						'decay' => $scoreFunctionParams->getDecay())),//ESearchCreatedAtBoostItems::DECAY_HALF)));
+					'weight' => $scoreFunctionParams->getWeight());//1
+				$this->query['body']['query']['function_score']['boost_mode'] = $scoreFunctionParams->getScoreFunctionBoostMode();//ESearchScoreFunctionMode::MULTIPLY;
+			}
+		}
+
+	}
 
     protected function initQuery(array $statuses, $objectIdsCsvStr, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
     {
