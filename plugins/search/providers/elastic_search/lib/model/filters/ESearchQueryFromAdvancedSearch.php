@@ -111,18 +111,28 @@ class ESearchQueryFromAdvancedSearch
 	protected function createESearchQueryFromEntryCaptionAdvancedFilter(kEntryCaptionAdvancedFilter $searchFilter)
 	{
 		$item = new ESearchCaptionItem();
-		$item->setFieldName(ESearchCaptionFieldName::CONTENT);
-		$item->setItemType(ESearchItemType::EXISTS);
-		if($searchFilter->getHasCaption())
+		if (!$searchFilter->getLanguage())
 		{
-			$result = $item;
+			$item->setFieldName(ESearchCaptionFieldName::CONTENT);
+			$item->setItemType(ESearchItemType::EXISTS);
 		}
 		else
 		{
-			$result = self::createNegativeQuery($item);
+			$item->setFieldName(ESearchCaptionFieldName::LANGUAGE);
+			$item->setItemType(ESearchItemType::EXACT_MATCH);
+			$item->setSearchTerm($searchFilter->getLanguage());
+		}
+		$result = $item;
+
+		if ($searchFilter->getHasCaption())
+		{
+			return $result;
+		}
+		else
+		{
+			return self::createNegativeQuery($item);
 		}
 
-		return $result;
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)
