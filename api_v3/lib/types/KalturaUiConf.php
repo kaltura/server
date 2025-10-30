@@ -163,7 +163,9 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	public $v2Redirect;
 
 	/**
+	 *
 	 * @var string
+	 * @filter eq,in
 	 */
 	public $referenceId;
 
