@@ -296,7 +296,7 @@ function shouldExcludeUserByPatterns(string $email, array $patterns): bool
 	}
 
 	foreach ($patterns as $pattern) {
-		if (@preg_match(pattern: $pattern, $email) === 1) {
+		if (@preg_match($pattern, $email) === 1) {
 			return true;
 		}
 	}
