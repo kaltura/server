@@ -1520,9 +1520,10 @@ if(isset($mediaInfo)) {
 			if(($multiStreamJson=$flavor->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
 			&& KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "label")){
 				$flavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
-				self::setAudioDescriptionLabel($flavorAsset, $flavor);
 				$flavorAsset->save();
 			}
+
+			self::setAudioDescriptionLabel($flavorAsset, $flavor);
 
 			$collectionTag = $flavor->getCollectionTag();
 			/*
@@ -1744,9 +1745,10 @@ if(isset($mediaInfo)) {
 			if(isset($sourceFlavorOutput) && ($multiStreamJson=$sourceFlavorOutput->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
 			&& KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "label")){
 				$originalFlavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
-				self::setAudioDescriptionLabel($originalFlavorAsset, $sourceFlavorOutput);
 				$originalFlavorAsset->save();
 			}
+
+			self::setAudioDescriptionLabel($originalFlavorAsset, $sourceFlavorOutput);
 
 			if(!$sourceFlavorOutput)
 			{
@@ -2342,6 +2344,7 @@ if(isset($mediaInfo)) {
 		}
 
 		$currentLabel = $flavorAsset->getLabel();
+
 		if($currentLabel) {
 			$flavorAsset->setLabel($currentLabel . '_aad');
 		} else {
