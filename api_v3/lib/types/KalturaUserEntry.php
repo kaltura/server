@@ -186,9 +186,11 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 
 	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
-		$object = KalturaEntryFactory::getInstanceByType($sourceObject->getType());
+		$object = self::getInstanceByType($sourceObject->getType());
 		if (!$object)
-			return null;
+		{
+			throw new KalturaAPIException(KalturaErrors::USER_ENTRY_OBJECT_TYPE_ERROR, $sourceObject->getType(), $sourceObject->getId());
+		}
 
 		$object->fromObject($sourceObject, $responseProfile);
 

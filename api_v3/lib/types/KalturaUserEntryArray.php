@@ -11,12 +11,7 @@ class KalturaUserEntryArray extends KalturaTypedArray
 		foreach($arr as $obj)
 		{
 			/* @var $obj UserEntry */
-			$nObj = KalturaUserEntry::getInstanceByType($obj->getType());
-			if (!$nObj)
-			{
-				throw new KalturaAPIException(KalturaErrors::USER_ENTRY_OBJECT_TYPE_ERROR, $obj->getType(), $obj->getId());
-			}
-			$nObj->fromObject($obj, $responseProfile);
+			$nObj = KalturaUserEntry::getInstance($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 
