@@ -122,7 +122,6 @@ class ESearchQueryFromAdvancedSearch
 			$item->setItemType(ESearchItemType::EXACT_MATCH);
 			$item->setSearchTerm($searchFilter->getLanguage());
 		}
-		$result = $item;
 
 		if (!$searchFilter->getAccuracy())
 		{
@@ -145,8 +144,6 @@ class ESearchQueryFromAdvancedSearch
 		{
 			return self::createNegativeQuery($item);
 		}
-
-		return $result;
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)
