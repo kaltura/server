@@ -625,12 +625,6 @@ class KalturaTypeReflector
 		return is_subclass_of($this->_type, 'IRelatedFilterable');
 	}
 
-	public function isImplementing($interfaceName)
-	{
-		$reflectionClass = new ReflectionClass($this->_type);
-		return $reflectionClass->implementsInterface($interfaceName);
-	}
-	
 	/**
 	 * @return string plugin name
 	 */
