@@ -5,7 +5,7 @@
  * @abstract
  * @relatedService UserEntryService
  */
-abstract class KalturaUserEntry extends KalturaObject implements IRelatedFilterable
+abstract class KalturaUserEntry extends KalturaObject implements IRelatedFilterable, IApiObjectFactory
 {
 
 	/**
@@ -96,6 +96,7 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		{
 			KalturaLog::err("The type '$type' is unknown");
 		}
+
 		return $obj;
 	}
 
@@ -181,5 +182,16 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 		$userId = $this->userId ? $this->userId : kCurrentContext::getCurrentKsKuserId();
 		if(!$userId || trim($userId) == '')
 			throw new KalturaAPIException(KalturaErrors::USER_ID_NOT_PROVIDED_OR_EMPTY);
+	}
+
+	public static function getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		$object = KalturaEntryFactory::getInstanceByType($sourceObject->getType());
+		if (!$object)
+			return null;
+
+		$object->fromObject($sourceObject, $responseProfile);
+
+		return $object;
 	}
 }
