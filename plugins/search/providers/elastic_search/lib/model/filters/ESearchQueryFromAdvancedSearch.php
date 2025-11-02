@@ -110,40 +110,56 @@ class ESearchQueryFromAdvancedSearch
 
 	protected function createESearchQueryFromEntryCaptionAdvancedFilter(kEntryCaptionAdvancedFilter $searchFilter)
 	{
-		$item = new ESearchCaptionItem();
-		if (!$searchFilter->getLanguage())
-		{
-			$item->setFieldName(ESearchCaptionFieldName::CONTENT);
-			$item->setItemType(ESearchItemType::EXISTS);
-		}
-		else
-		{
-			$item->setFieldName(ESearchCaptionFieldName::LANGUAGE);
-			$item->setItemType(ESearchItemType::EXACT_MATCH);
-			$item->setSearchTerm($searchFilter->getLanguage());
-		}
-
-		if (!$searchFilter->getAccuracy())
-		{
-			$item->setFieldName(ESearchCaptionFieldName::CONTENT);
-			$item->setItemType(ESearchItemType::EXISTS);
-		}
-		else
-		{
-			$item->setRange($searchFilter->getAccuracy());
-			$item->setFieldName(ESearchCaptionFieldName::ACCURACY);
-			$item->setItemType(ESearchItemType::RANGE);
-		}
-		$result = $item;
+		$items = [];
 
 		if ($searchFilter->getHasCaption())
 		{
-			return $result;
+			$hasCaptionsItem = new ESearchCaptionItem();
+			$hasCaptionsItem->setFieldName(ESearchCaptionFieldName::CONTENT);
+			$hasCaptionsItem->setItemType(ESearchItemType::EXISTS);
+			$items[] = $hasCaptionsItem;
 		}
-		else
+
+		if ($language = $searchFilter->getLanguage())
 		{
-			return self::createNegativeQuery($item);
+			$languageItem = new ESearchCaptionItem();
+			$languageItem->setFieldName(ESearchCaptionFieldName::LANGUAGE);
+			$languageItem->setItemType(ESearchItemType::EXACT_MATCH);
+			$languageItem->setSearchTerm($language);
+			$items[] = $languageItem;
 		}
+
+		if ($accuracy = $searchFilter->getAccuracy())
+		{
+			$accuracyItem = new ESearchCaptionItem();
+			$accuracyItem->setRange($accuracy);
+			$accuracyItem->setFieldName(ESearchCaptionFieldName::ACCURACY);
+			$accuracyItem->setItemType(ESearchItemType::RANGE);
+			$items[] = $accuracyItem;
+		}
+
+		if (empty($items)) {
+			return null;
+		}
+
+		if (!$searchFilter->getHasCaption())
+		{
+			// If hasCaption is false, we are looking for entries that do NOT match the other criteria.
+			// The other criteria are language and/or accuracy.
+			$itemToNegate = count($items) > 1 ? $items : $items[0];
+			return self::createNegativeQuery($itemToNegate);
+		}
+
+		// If hasCaption is true, we are looking for entries that match ALL criteria.
+		if (count($items) === 1)
+		{
+			return $items[0];
+		}
+
+		$result = new ESearchOperator();
+		$result->setOperator(ESearchOperatorType::AND_OP);
+		$result->setSearchItems($items);
+		return $result;
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)

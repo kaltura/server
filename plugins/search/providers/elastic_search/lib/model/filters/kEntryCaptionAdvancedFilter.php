@@ -15,15 +15,14 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	 */
 	protected $language;
 
-
 	/**
 	 * @var int
 	 */
 	protected $accuracy;
+
 	/**
 	 * @return boolean
 	 */
-
 	public function getHasCaption()
 	{
 		return $this->hasCaption;
