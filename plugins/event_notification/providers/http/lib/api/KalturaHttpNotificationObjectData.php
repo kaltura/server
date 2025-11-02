@@ -105,7 +105,6 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 		}
 
 		$coreObject = unserialize($this->coreObject);
-		/* @var $apiObject KalturaObject */
 		if (is_subclass_of($this->apiObjectType, 'IApiObjectFactory'))
 		{
 			$apiObject = $this->apiObjectType::getInstance($coreObject, $responseProfile);
