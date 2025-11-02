@@ -2337,7 +2337,7 @@ if(isset($mediaInfo)) {
 		return;
 	}
 
-	public static function setAudioDescriptionLabel($flavorAsset, $flavorParams)
+	public function setAudioDescriptionLabel($flavorAsset, $flavorParams)
 	{
 		if(!in_array('audio_description', $flavorParams->getTagsArray())) {
 			return;
