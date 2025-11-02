@@ -111,7 +111,21 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 
 		$apiObject->fromObject($coreObject, $responseProfile ?? null);
 
+		if (kCurrentContext::$master_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID || kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			//Reason for this code - if an event notification using object data was dispatched for an entry in the past
+			// and later deleted, the result is a null exception for all the fields below (because a deleted object will
+			// not return from the DB), which in turn causes an error in the entry-investigation page in KAC.
+			// We only want to ignore the deleted status for admin console PID, since if a notification was deleted
+			// we will not want to dispatch the jobs related to it.
+			EventNotificationTemplatePeer::setUseCriteriaFilter(false);
+		}
 		$httpNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($jobData->getTemplateId());
+		if (kCurrentContext::$master_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID || kCurrentContext::$ks_partner_id == Partner::ADMIN_CONSOLE_PARTNER_ID)
+		{
+			EventNotificationTemplatePeer::setUseCriteriaFilter(true);
+		}
+
 
 		$notification = new KalturaHttpNotification();
 		$notification->object = $apiObject;
