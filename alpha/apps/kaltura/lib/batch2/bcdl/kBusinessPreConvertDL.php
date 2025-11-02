@@ -541,6 +541,8 @@ class kBusinessPreConvertDL
 			$flavorAsset->save();
 		}
 
+		self::setAudioDescriptionLabel($flavorAsset, $flavorParams);
+
 		if(!$flavorAsset->getIsOriginal())
 			$flavor->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE); // should not be taken in completion rules check
 
@@ -1518,6 +1520,7 @@ if(isset($mediaInfo)) {
 			if(($multiStreamJson=$flavor->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
 			&& KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "label")){
 				$flavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
+				self::setAudioDescriptionLabel($flavorAsset, $flavor);
 				$flavorAsset->save();
 			}
 
@@ -1741,6 +1744,7 @@ if(isset($mediaInfo)) {
 			if(isset($sourceFlavorOutput) && ($multiStreamJson=$sourceFlavorOutput->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null
 			&& KDLAudioMultiStreaming::IsStreamFieldSet($multiStreamObj, "label")){
 				$originalFlavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
+				self::setAudioDescriptionLabel($originalFlavorAsset, $sourceFlavorOutput);
 				$originalFlavorAsset->save();
 			}
 
@@ -2329,6 +2333,28 @@ if(isset($mediaInfo)) {
 		
 		KalturaLog::log("None of the conditions are met.");
 		return;
+	}
+
+	public static function setAudioDescriptionLabel($flavorAsset, $flavorParams)
+	{
+		if(!in_array('audio_description', $flavorParams->getTagsArray())) {
+			return;
+		}
+
+		$currentLabel = $flavorAsset->getLabel();
+		if($currentLabel) {
+			$flavorAsset->setLabel($currentLabel . '_aad');
+		} else {
+			// Use language from MultiStream if no label exists
+			$lang = 'aad'; // fallback
+			if(($multiStreamJson=$flavorParams->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null) {
+				if(isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages)>0){
+					$lang = $multiStreamObj->audio->languages[0] . '_aad';
+				}
+			}
+			$flavorAsset->setLabel($lang);
+		}
+		$flavorAsset->save();
 	}
 
 	/**
