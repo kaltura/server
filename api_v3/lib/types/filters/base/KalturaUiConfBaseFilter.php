@@ -10,6 +10,8 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
+		"referenceIdEqual" => "_eq_reference_id",
+		"referenceIdin" => "_in_reference_id",
 		"nameLike" => "_like_name",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",

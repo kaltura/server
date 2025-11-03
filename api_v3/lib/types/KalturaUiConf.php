@@ -8,14 +8,14 @@ class KalturaUiConf extends KalturaObject implements IFilterable
 	/**
 	 * @var int
 	 * @readonly
-	 * @filter eq,in
+	 * @filter eq,in,order
 	 */
 	public $id;
-	
+
 	/**
 	 * Name of the uiConf, this is not a primary key
 	 * @var string
-	 * @filter like
+	 * @filter like,order
 	 */
 	public $name;
 	
