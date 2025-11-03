@@ -82,8 +82,6 @@ if ($metadataArg !== null) {
 	$metadataProfileIds = $metadataArg !== '' ? explode(',', $metadataArg) : [];
 }
 
-
-
 if (!$partner = PartnerPeer::retrieveByPK($partnerId)) {
 	die("Please enter a valid partner Id!\n");
 }
@@ -239,7 +237,7 @@ function getAllUserExclusionPatterns(array $additionalPatterns = []): array
 		}
 
 		if (@preg_match($normalizedPattern, '') === false) {
-			KalturaLog::log('Skipping invalid exclusion pattern [' . $normalizedPattern . '].');
+			KalturaLog::warning('Skipping invalid exclusion pattern [' . $normalizedPattern . '].');
 			continue;
 		}
 
@@ -253,31 +251,6 @@ function getAllUserExclusionPatterns(array $additionalPatterns = []): array
 	$mergedPatterns = array_merge($patterns, $normalizedAdditionalPatterns);
 
 	return array_values(array_unique($mergedPatterns));
-}
-
-/**
- * Checks whether a no-email user should be excluded from the report based on configured patterns.
- *
- * @param kuser $user
- * @param array<int,string> $patterns
- *
- * @return bool
- */
-function shouldExcludeNoEmailUser(kuser $user, array $patterns): bool
-{
-	if (empty($patterns)) {
-		return false;
-	}
-
-	$puserId = (string) $user->getPuserId();
-
-	foreach ($patterns as $pattern) {
-		if (@preg_match($pattern, $puserId) === 1) {
-			return true;
-		}
-	}
-
-	return false;
 }
 
 /**
@@ -324,6 +297,7 @@ function countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv = nul
 	if (!empty($kuserEmailsFromListCsv)) {
 		$emailList = is_array($kuserEmailsFromListCsv) ? $kuserEmailsFromListCsv : array_map('trim', explode(',', (string) $kuserEmailsFromListCsv));
 		$emailList = array_values(array_unique(array_filter($emailList, function ($value) use ($ignoreEmailPatterns) {
+
 			if ($value === '') {
 				return false;
 			}
@@ -375,6 +349,7 @@ function countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv = nul
  * @param array<int,string> $emailFilter
  * @param array<int,string> $ignoreEmailPatterns
  * @return array
+ * @throws PropelException
  */
 function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], array $ignoreEmailPatterns = []): array
 {
@@ -495,7 +470,7 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], ar
  *               'loginEmailUpdates' for users whose login email was updated.
  * @throws PropelException
  */
-function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $adminSecret, bool $updateLoginEmail, $setPuserAsEmailWhenPuserIsEmail, array $usersResultsEmailMap, bool $listByCSV): array {
+function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $adminSecret, bool $updateLoginEmail, bool $setPuserAsEmailWhenPuserIsEmail, array $usersResultsEmailMap, bool $listByCSV): array {
 	KalturaLog::log('Processing users with email for updates.');
 
 	$report = ['externalIdUpdates' => [], 'loginEmailUpdates' => [], 'puserAsEmailUpdates' => []];
@@ -543,13 +518,15 @@ function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $a
 					}
 
 					if (!$listByCSV) {
-						$emailKey = strtolower(trim((string) $user->getPuserId()));
+						// When we are not listing by CSV, we can use the existing email map to check for existing users with this email, instead of fetching from DB each time.
+						$emailKey = strtolower(trim((string)$user->getPuserId()));
 						$existingUserWithPuserAsEmail = isset($usersResultsEmailMap[$emailKey]) && !isset($usersResultsEmailMap[$emailKey][$user->getId()]);
 					} else {
+						// When listing by CSV, we don't have the full email map, so we need to fetch from DB each time.
 						$existingUserWithPuserAsEmail = getUserByEmail($user->getPartnerId(), $user->getPuserId());
 					}
 
-					if ($setPuserAsEmailWhenPuserIsEmail && !$existingUserWithPuserAsEmail) {
+					if ($setPuserAsEmailWhenPuserIsEmail && empty($existingUserWithPuserAsEmail)) {
 						$report['puserAsEmailUpdates'][] = $user->getId();
 						$puserEmail = $user->getPuserId();
 						KalturaLog::log('Setting puserId as email for user [' . $user->getId() . '] since puserId is a valid email and no other user has this email.');
