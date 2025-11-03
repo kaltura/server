@@ -288,19 +288,7 @@ class kBatchManager
 		}
 
 		if(isset($flavorParams) && in_array('audio_description', $flavorParams->getTagsArray())) {
-			$currentLabel = $flavorAsset->getLabel();
-			if($currentLabel) {
-				$flavorAsset->setLabel($currentLabel . '_aad');
-			} else {
-				// Use language from MultiStream if no label exists
-				$lang = 'aad'; // fallback
-				if(($multiStreamJson=$flavorParams->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null) {
-					if(isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages)>0){
-						$lang = $multiStreamObj->audio->languages[0] . '_aad';
-					}
-				}
-				$flavorAsset->setLabel($lang);
-			}
+			kBusinessPreConvertDL::setAudioDescriptionLabel($flavorAsset, $flavorParams);
 		}
 
 		$flavorAsset->save();
