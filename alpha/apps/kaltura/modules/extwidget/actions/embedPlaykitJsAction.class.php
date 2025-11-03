@@ -69,7 +69,7 @@ class embedPlaykitJsAction extends sfAction
 		$extraModulesNames = unserialize(self::getCacheData($this,'bundleCache', $this->bundle_extra_modules_names));
 		KalturaLog::debug("Fetch bundle content from cache for key [{$this->bundle_name}], result: [" . !empty($bundleContent) . "]");
 
-		if (!$bundleContent || $this->regenerate)
+		if (!$bundleContent || !$i18nContent || $this->regenerate)
 		{
 			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 30);
 		}
@@ -112,7 +112,7 @@ class embedPlaykitJsAction extends sfAction
 			'&name=' . $context->bundle_name .
 			'&source=' . base64_encode($context->sourcesPath) .
 			'&includeSourceMap=' . $context->includeSourceMap;
-		
+
 		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'), true);
 
 		if (!$content)
@@ -133,16 +133,16 @@ class embedPlaykitJsAction extends sfAction
                 KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
             }
         }
-		
+
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
 		$bundleSaved = self::setCacheData($context, 'bundleCache', $context->bundle_name, $bundleContent);
-		
+
 		$sourceMapContent = base64_decode($content['sourceMap']);
 		self::setCacheData($context, 'sourceMapsCache', $context->bundle_name, $sourceMapContent);
-		
+
 		$i18nContent = isset($content['i18n']) ? base64_decode($content['i18n']) : "";
 		self::setCacheData($context, 'bundleCache', $context->bundle_i18n_name, $i18nContent);
-		
+
 		$extraModules = isset($content['extraModules']) ? $content['extraModules'] : array();
 		$extraModulesNames = self::getExtraModuleNames($extraModules);;
 		self::setCacheData($context, 'bundleCache', $context->bundle_extra_modules_names, serialize($extraModulesNames));
@@ -153,7 +153,7 @@ class embedPlaykitJsAction extends sfAction
 
 		return array($bundleContent, $i18nContent, $extraModulesNames);
 	}
-	
+
 	protected static function setCacheData($context, $cacheType, $key, $data)
 	{
 		//If length of data is over 4MB compress it before caching
@@ -171,7 +171,7 @@ class embedPlaykitJsAction extends sfAction
 			return $context->$cacheType->set($key, $data);
 		}
 	}
-	
+
 	protected static function getCacheData($context, $cacheType, $key)
 	{
 		$data = $context->$cacheType->get($key);
@@ -182,7 +182,7 @@ class embedPlaykitJsAction extends sfAction
 		}
 		return $data;
 	}
-	
+
 	private static function getExtraModuleNames($extraModules = array())
 	{
 		$extraModuleNames = array();
@@ -194,7 +194,7 @@ class embedPlaykitJsAction extends sfAction
 			}
 			$extraModuleNames[] = $extraModule['name'];
 		}
-		
+
 		return $extraModuleNames;
 	}
 
@@ -329,19 +329,19 @@ class embedPlaykitJsAction extends sfAction
 			$uiConf->ui->translations = (object) $this->arrayMergeRecursive($i18nArr, $uiConfI18nArr);
 		}
 	}
-	
+
 	private function mergeExtraModuleNames($uiConf, $extraModulesNames)
 	{
 		if(!$extraModulesNames || !count($extraModulesNames))
 		{
 			return;
 		}
-		
+
 		if(!property_exists($uiConf, 'plugins'))
 		{
 			$uiConf->plugins = new stdClass();
 		}
-		
+
 		foreach($extraModulesNames as $extraModulesName)
 		{
 			$uiConf->plugins->$extraModulesName = new stdClass();
@@ -585,20 +585,20 @@ class embedPlaykitJsAction extends sfAction
 		{
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
-		
+
 		// Player setup
 		$kalturaPlayer = "KalturaPlayer.setup(config);";
 		if($iframe_embed_type === self::RAPT)
 		{
 			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
 		}
-		
+
 		// Player content loading
 		$loadPlayerJs = "
 			var kalturaPlayer = $kalturaPlayer;
 			$loadContentMethod
 		";
-		
+
 		$v2tov7ConfigJs = '';
 		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
@@ -876,7 +876,7 @@ class embedPlaykitJsAction extends sfAction
 
 		//Get should force regenration
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
-		
+
 		//Should we include player source map in the request result
 		$this->includeSourceMap = $this->getRequestParameter(self::INCLUDE_SOURCE_MAP_PARAM_NAME, 'false');
 
@@ -902,7 +902,7 @@ class embedPlaykitJsAction extends sfAction
 
 			if (array_key_exists('play_kit_js_cache_version', $playkitConfig))
 				$this->sourceMapLoader = rtrim($playkitConfig['playkit_js_source_map_loader']);
-			
+
 			$this->maxObjectCacheSize = $playkitConfig['max_object_cache_size'] ?? self::DEFAULT_MAX_OBJECT_CACHE_SIZE;
 
 
