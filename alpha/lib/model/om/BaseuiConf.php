@@ -158,6 +158,12 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	protected $partner_tags;
 
 	/**
+	 * The value for the reference_id field.
+	 * @var        string
+	 */
+	protected $reference_id;
+
+	/**
 	 * @var        array widget[] Collection to store aggregation of widget objects.
 	 */
 	protected $collwidgets;
@@ -500,6 +506,16 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function getPartnerTags()
 	{
 		return $this->partner_tags;
+	}
+
+	/**
+	 * Get the [reference_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getReferenceId()
+	{
+		return $this->reference_id;
 	}
 
 	/**
@@ -1081,6 +1097,29 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	} // setPartnerTags()
 
 	/**
+	 * Set the value of [reference_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     uiConf The current object (for fluent API support)
+	 */
+	public function setReferenceId($v)
+	{
+		if(!isset($this->oldColumnsValues[uiConfPeer::REFERENCE_ID]))
+			$this->oldColumnsValues[uiConfPeer::REFERENCE_ID] = $this->reference_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->reference_id !== $v) {
+			$this->reference_id = $v;
+			$this->modifiedColumns[] = uiConfPeer::REFERENCE_ID;
+		}
+
+		return $this;
+	} // setReferenceId()
+
+	/**
 	 * Indicates whether the columns in this object are only set to default values.
 	 *
 	 * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -1111,7 +1150,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	public function hydrate($row, $startcol = 0, $rehydrate = false)
 	{
 		$this->last_hydrate_time = time();
-
+		
 		// Nullify cached objects
 		$this->m_custom_data = null;
 		
@@ -1140,6 +1179,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			$this->version = ($row[$startcol + 20] !== null) ? (string) $row[$startcol + 20] : null;
 			$this->html5_url = ($row[$startcol + 21] !== null) ? (string) $row[$startcol + 21] : null;
 			$this->partner_tags = ($row[$startcol + 22] !== null) ? (string) $row[$startcol + 22] : null;
+			$this->reference_id = ($row[$startcol + 23] !== null) ? (string) $row[$startcol + 23] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -1149,7 +1189,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 23; // 23 = uiConfPeer::NUM_COLUMNS - uiConfPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 24; // 24 = uiConfPeer::NUM_COLUMNS - uiConfPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating uiConf object", $e);
@@ -1757,6 +1797,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			case 22:
 				return $this->getPartnerTags();
 				break;
+			case 23:
+				return $this->getReferenceId();
+				break;
 			default:
 				return null;
 				break;
@@ -1801,6 +1844,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			$keys[20] => $this->getVersion(),
 			$keys[21] => $this->getHtml5Url(),
 			$keys[22] => $this->getPartnerTags(),
+			$keys[23] => $this->getReferenceId(),
 		);
 		return $result;
 	}
@@ -1901,6 +1945,9 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			case 22:
 				$this->setPartnerTags($value);
 				break;
+			case 23:
+				$this->setReferenceId($value);
+				break;
 		} // switch()
 	}
 
@@ -1948,6 +1995,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[20], $arr)) $this->setVersion($arr[$keys[20]]);
 		if (array_key_exists($keys[21], $arr)) $this->setHtml5Url($arr[$keys[21]]);
 		if (array_key_exists($keys[22], $arr)) $this->setPartnerTags($arr[$keys[22]]);
+		if (array_key_exists($keys[23], $arr)) $this->setReferenceId($arr[$keys[23]]);
 	}
 
 	/**
@@ -1982,6 +2030,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(uiConfPeer::VERSION)) $criteria->add(uiConfPeer::VERSION, $this->version);
 		if ($this->isColumnModified(uiConfPeer::HTML5_URL)) $criteria->add(uiConfPeer::HTML5_URL, $this->html5_url);
 		if ($this->isColumnModified(uiConfPeer::PARTNER_TAGS)) $criteria->add(uiConfPeer::PARTNER_TAGS, $this->partner_tags);
+		if ($this->isColumnModified(uiConfPeer::REFERENCE_ID)) $criteria->add(uiConfPeer::REFERENCE_ID, $this->reference_id);
 
 		return $criteria;
 	}
@@ -2005,8 +2054,16 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 			if ($this->isColumnModified(uiConfPeer::CUSTOM_DATA))
 			{
 				if (!is_null($this->custom_data_md5))
+				{
 					$criteria->add(uiConfPeer::CUSTOM_DATA, "MD5(cast(" . uiConfPeer::CUSTOM_DATA . " as char character set latin1)) = '$this->custom_data_md5'", Criteria::CUSTOM);
 					//casting to latin char set to avoid mysql and php md5 difference
+					if (kDataCenterMgr::isMultiDc()) // if multi DC configuration don't check costume data on other DC
+					{
+						$currentDcId = kDataCenterMgr::getCurrentDcId();
+						//addOr(column, value, comparison)
+						$criteria->addOr(uiConfPeer::CUSTOM_DATA," '$currentDcId' != getDC()" ,Criteria::CUSTOM);
+					}
+				}
 				else 
 					$criteria->add(uiConfPeer::CUSTOM_DATA, NULL, Criteria::ISNULL);
 			}
@@ -2103,6 +2160,8 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		$copyObj->setHtml5Url($this->html5_url);
 
 		$copyObj->setPartnerTags($this->partner_tags);
+
+		$copyObj->setReferenceId($this->reference_id);
 
 
 		if ($deepCopy) {
@@ -2488,6 +2547,10 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 	{
 		$customData = $this->getCustomDataObj( );
 		
+		$customDataOldValue = $customData->get($name, $namespace);
+		if(!is_null($customDataOldValue) && serialize($customDataOldValue) === serialize($value))
+			return;
+				
 		$currentNamespace = '';
 		if($namespace)
 			$currentNamespace = $namespace;
@@ -2495,7 +2558,7 @@ abstract class BaseuiConf extends BaseObject  implements Persistent {
 		if(!isset($this->oldCustomDataValues[$currentNamespace]))
 			$this->oldCustomDataValues[$currentNamespace] = array();
 		if(!isset($this->oldCustomDataValues[$currentNamespace][$name]))
-			$this->oldCustomDataValues[$currentNamespace][$name] = $customData->get($name, $namespace);
+			$this->oldCustomDataValues[$currentNamespace][$name] = $customDataOldValue;
 		
 		$customData->put ( $name , $value , $namespace );
 	}

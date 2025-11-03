@@ -1112,6 +1112,7 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="version" type="varchar" size="10" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="html5_url" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_tags" type="longvarchar" />
+        <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="reference_id" type="varchar" size="512" />
 		<index name="partner_id_index">
 			<index-column name="partner_id" />
 		</index>
@@ -1119,6 +1120,10 @@
 			<index-column name="partner_id" />
 			<index-column name="creation_mode" />
 		</index>
+        <index name="partner_id_reference_id_index">
+            <index-column name="partner_id" />
+            <index-column name="reference_id" />
+        </index>
 	</table>
 	<table skipSql="false" abstract="false" name="partner_stats">
 		<column lazyLoad="false" name="partner_id" type="integer" required="true" primaryKey="true" />
