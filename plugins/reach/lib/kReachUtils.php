@@ -401,8 +401,7 @@ class kReachUtils
 
 		foreach (self::$getCsvHeaders() as $field)
 		{
-			if (isset($values[$field]))
-			{
+			if (isset($values[$field])) {
 				if ($values[$field] === false)
 				{
 					$csvData[$field] = '0';
