@@ -12,6 +12,11 @@ class ESearchAdvancedSearchItem extends ESearchEntryItem
 	protected $itemType;
 
 	/**
+	 * @var boolean
+	 */
+	protected $not;
+
+	/**
 	 * @return kIntegerValue
 	 */
 	public function getValue()

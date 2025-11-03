@@ -15,6 +15,11 @@ class AdvancedSearchFilterCondition extends AdvancedSearchFilterItem
 	 */
 	protected $value;
 
+	/**
+	 * @var boolean
+	 */
+	protected $not;
+
 	public function addToXml(SimpleXMLElement &$xmlElement)
 	{
 		parent::addToXml($xmlElement);
