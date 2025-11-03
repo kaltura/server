@@ -71,6 +71,7 @@ class embedPlaykitJsAction extends sfAction
 
 		if (!$bundleContent || !$i18nContent || $this->regenerate)
 		{
+			KalturaLog::debug("bundleContent: " . $bundleContent. " i18nContent: " . $i18nContent . " regenerate: " . $this->regenerate);
 			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 30);
 		}
 
