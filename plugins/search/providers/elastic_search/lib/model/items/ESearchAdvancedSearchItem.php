@@ -90,6 +90,14 @@ class ESearchAdvancedSearchItem extends ESearchEntryItem
 		$this->not = $not;
 	}
 
+	/**
+	 * @return boolean
+	 */
+	public function getNot()
+	{
+		return $this->not;
+	}
+
 	public function handleComparisonType($advancedSearchFilterItem)
 	{
 		$range = new ESearchRange();
