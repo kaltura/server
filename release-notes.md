@@ -1,3 +1,16 @@
+
+# Venus-22.6.0
+## Add reference id to the ui conf table ##
+- Issue Type: Story
+- Issue ID: PLAT-25545
+
+### Deployment Scripts ###
+* Note: all the commands below should be executed from the 'server' directory (i.e. '/opt/kaltura/app/')
+* Alternatively, modify file path to be absolute instead of relative
+````
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2025_10_29_add_reference_id_to_ui_conf.sql
+````
+
 # Venus-22.5.0
 ## Add Audio Description and Dubbing flavors to the list of available flavors ##
 - Issue Type: Task

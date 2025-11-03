@@ -2508,11 +2508,13 @@ CREATE TABLE IF NOT EXISTS `ui_conf` (
   `version` varchar(10) DEFAULT NULL,
   `html5_url` varchar(256) DEFAULT NULL,
   `partner_tags` text,
+  `reference_id` varchar(512) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `updated_at` (`updated_at`),
   KEY `partner_id_status_tags` (`partner_id`,`status`,`tags`(32)),
-  KEY `parner_id_obj_type` (`partner_id`,`obj_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+  KEY `parner_id_obj_type` (`partner_id`,`obj_type`),
+  KEY `partner_id_reference_id_index`(`partner_id`, `reference_id`)
+	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 
 
