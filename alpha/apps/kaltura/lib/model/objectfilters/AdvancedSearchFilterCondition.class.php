@@ -52,7 +52,8 @@ class AdvancedSearchFilterCondition extends AdvancedSearchFilterItem
 	/**
 	 * @return boolean $value
 	 */
-	public function getNot() {
+	public function getNot() 
+	{
 		return $this->not;
 	}
 
