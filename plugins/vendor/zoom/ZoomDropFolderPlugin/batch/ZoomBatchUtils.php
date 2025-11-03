@@ -157,7 +157,7 @@ class ZoomBatchUtils
 					KalturaLog::debug('Searching by email [' . $kZoomUser->getProcessedName() . ']');
 					$secondarySearchParams = self::getElasticSearchOperator(
 						KalturaESearchUserFieldName::EMAIL,
-						KalturaESearchItemType::STARTS_WITH,
+						KalturaESearchItemType::EXACT_MATCH,
 						$kZoomUser->getOriginalName()
 					);
 					break;
