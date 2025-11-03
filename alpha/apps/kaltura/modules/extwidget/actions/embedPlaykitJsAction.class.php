@@ -69,9 +69,9 @@ class embedPlaykitJsAction extends sfAction
 		$extraModulesNames = unserialize(self::getCacheData($this,'bundleCache', $this->bundle_extra_modules_names));
 		KalturaLog::debug("Fetch bundle content from cache for key [{$this->bundle_name}], result: [" . !empty($bundleContent) . "]");
 
-		if (!$leContent || !$i18nContent || $this->regenerate)
+		if (!$bundleContent || !$i18nContent || $this->regenerate)
 		{
-			KalturaLog::debug("leContent: " . $leContent . " i18nContent: " . $i18nContent . " regenerate: " . $this->regenerate);
+			KalturaLog::debug("bundleContent: " . $bundleContent . " i18nContent: " . $i18nContent . " regenerate: " . $this->regenerate);
 			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 30);
 		}
 
