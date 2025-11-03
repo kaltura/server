@@ -89,7 +89,8 @@ class ESearchQueryFromAdvancedSearch
 	 * @param AdvancedSearchFilterMatchAttributeCondition $advancedSearchFilterItem
 	 * @return ESearchAdvancedSearchItem
 	 */
-	protected function createESearchQueryFromSearchFilterMatchCondition($advancedSearchFilterItem) {
+	protected function createESearchQueryFromSearchFilterMatchCondition($advancedSearchFilterItem) 
+	{
 		$eSearchAdvancedSearchItem = new ESearchAdvancedSearchItem();
 		$eSearchAdvancedSearchItem->setSearchTerm($advancedSearchFilterItem->getValue());
 		$eSearchAdvancedSearchItem->setFieldName($advancedSearchFilterItem->getField());
