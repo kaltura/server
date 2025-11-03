@@ -94,7 +94,8 @@ class embedPlaykitJsAction extends sfAction
 		if(!$context->regenerate)
 		{
 			$bundleContent = self::getCacheData($context, 'bundleCache', $context->bundle_name);
-			if ($bundleContent)
+			$i18nContent = self::getCacheData($context, 'bundleCache', $context->bundle_i18n_name);
+			if ($bundleContent && $i18nContent)
 			{
 				$i18nContent = self::getCacheData($context, 'bundleCache', $context->bundle_i18n_name);
 				$extraModulesNames = unserialize(self::getCacheData($context, 'bundleCache', $context->bundle_extra_modules_names));
