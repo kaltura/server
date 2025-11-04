@@ -29,6 +29,13 @@ abstract class KCopyCuePointEngine
 		{
 			return false;
 		}
+
+		// Special handling for annotation cue points without timing (comments)
+		if ($cuePoint->cuePointType == self::ANNOTATION && $cuePoint->startTime == 0 && !isset($cuePoint->endTime))
+		{
+			return true;
+		}
+
 		$extendedShouldCopyTagsArray = array(self::CUE_POINT_CODE => array("poll-data"));
 		foreach($extendedShouldCopyTagsArray as $type => $tags)
 		{
