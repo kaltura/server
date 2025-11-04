@@ -837,6 +837,9 @@
 						"label" : {
 							"type" : "keyword",
 							"normalizer" : "kaltura_keyword_normalizer"
+						},
+						"accuracy": {
+							"type": "integer"
 						}
 					}
 				},

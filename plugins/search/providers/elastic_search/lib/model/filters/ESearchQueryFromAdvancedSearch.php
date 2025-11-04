@@ -156,10 +156,11 @@ class ESearchQueryFromAdvancedSearch
 			return $items[0];
 		}
 
-		$result = new ESearchOperator();
-		$result->setOperator(ESearchOperatorType::AND_OP);
-		$result->setSearchItems($items);
-		return $result;
+//		$result = new ESearchOperator();
+//		$result->setOperator(ESearchOperatorType::AND_OP);
+//		$result->setSearchItems($items);
+//		return $result;
+		return $items;
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)

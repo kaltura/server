@@ -122,22 +122,47 @@ class kEntryElasticEntitlement extends kBaseElasticEntitlement
 
         foreach ($searchItems as $searchItem)
         {
-            $filteredObjectId = $searchItem->getFilteredObjectId();
-            if ($filteredObjectId)
-            {
-	            $filteredEntryIds[] = $filteredObjectId;
-            }
-            $FilteredCategoryId = $searchItem->getFilteredCategoryId();
-            if ($FilteredCategoryId)
-            {
-                $filteredCategoryIds[] = $FilteredCategoryId;
-            }
+			if (is_array($searchItem))
+			{
+				foreach ($searchItem as $subSearchItem)
+				{
+					self::processFilteredObjectAndCategoryIds($subSearchItem, $filteredEntryIds, $filteredCategoryIds);
+				}
+			}
+			else
+			{
+				self::processFilteredObjectAndCategoryIds($searchItem, $filteredEntryIds, $filteredCategoryIds);
+			}
+//            $filteredObjectId = $searchItem->getFilteredObjectId();
+//            if ($filteredObjectId)
+//            {
+//	            $filteredEntryIds[] = $filteredObjectId;
+//            }
+//            $FilteredCategoryId = $searchItem->getFilteredCategoryId();
+//            if ($FilteredCategoryId)
+//            {
+//                $filteredCategoryIds[] = $FilteredCategoryId;
+//            }
         }
 
         $filteredCategoriesByEntryIds = self::getCategoryIdsForEntryIds($filteredEntryIds);
         $filteredCategoryIds = array_values(array_unique(array_merge($filteredCategoryIds, $filteredCategoriesByEntryIds)));
         self::$filteredCategoryIds = $filteredCategoryIds;
     }
+
+	protected static function processFilteredObjectAndCategoryIds($searchItem, &$filteredEntryIds, &$filteredCategoryIds)
+	{
+		$filteredObjectId = $searchItem->getFilteredObjectId();
+		if ($filteredObjectId)
+		{
+			$filteredEntryIds[] = $filteredObjectId;
+		}
+		$FilteredCategoryId = $searchItem->getFilteredCategoryId();
+		if ($FilteredCategoryId)
+		{
+			$filteredCategoryIds[] = $FilteredCategoryId;
+		}
+	}
 
     protected static function getCategoryIdsForEntryIds($filteredEntryId)
     {

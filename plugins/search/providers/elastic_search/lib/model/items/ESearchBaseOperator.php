@@ -92,19 +92,30 @@ abstract class ESearchBaseOperator extends ESearchItem
 		//categorize each different search item by type except ESearchOperator
 		foreach ($eSearchItemsArr as $searchItem)
 		{
-			/**
-			 * @var ESearchItem $searchItem
-			 */
-			$className = get_class($searchItem);
-			if(in_array($className, self::$operatorTypes)) //ESearchOperator or ESearchNestedOperator
+			if(!is_array($searchItem))
 			{
-				$allCategorizedSearchItems[] = array('className' => $className, 'items' => $searchItem, 'operatorType' => $searchItem->getOperator());
-				continue;
+				self::getSubCategorizedSearchItems($searchItem, $categorizedSearchItems, $allCategorizedSearchItems);
 			}
-
-			if (!isset($categorizedSearchItems[$className]))
-				$categorizedSearchItems[$className] = array();
-			$categorizedSearchItems[$className][] = $searchItem;
+			else
+			{
+				foreach ($searchItem as $subSearchItem)
+				{
+					self::getSubCategorizedSearchItems($subSearchItem, $categorizedSearchItems, $allCategorizedSearchItems);
+				}
+			}
+//			/**
+//			 * @var ESearchItem $searchItem
+//			 */
+//			$className = get_class($searchItem);
+//			if(in_array($className, self::$operatorTypes)) //ESearchOperator or ESearchNestedOperator
+//			{
+//				$allCategorizedSearchItems[] = array('className' => $className, 'items' => $searchItem, 'operatorType' => $searchItem->getOperator());
+//				continue;
+//			}
+//
+//			if (!isset($categorizedSearchItems[$className]))
+//				$categorizedSearchItems[$className] = array();
+//			$categorizedSearchItems[$className][] = $searchItem;
 		}
 
 		foreach ($categorizedSearchItems as $className => $searchItems)
@@ -113,6 +124,20 @@ abstract class ESearchBaseOperator extends ESearchItem
 		}
 
 		return $allCategorizedSearchItems;
+	}
+
+	protected static function getSubCategorizedSearchItems(ESearchItem $searchItem, &$categorizedSearchItems, &$allCategorizedSearchItems)
+	{
+		$className = get_class($searchItem);
+		if(in_array($className, self::$operatorTypes)) //ESearchOperator or ESearchNestedOperator
+		{
+			$allCategorizedSearchItems[] = array('className' => $className, 'items' => $searchItem, 'operatorType' => $searchItem->getOperator());
+			return;
+		}
+
+		if (!isset($categorizedSearchItems[$className]))
+			$categorizedSearchItems[$className] = array();
+		$categorizedSearchItems[$className][] = $searchItem;
 	}
 
 	public function shouldAddLanguageSearch()

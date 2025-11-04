@@ -255,7 +255,8 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				continue;
 
 			$language = $captionAsset->getLanguage();
-			self::getElasticLines($captionData, $captionRawData, $items, $language, $captionAsset->getId(), $captionAsset->getLabel());
+			$accuracy = $captionAsset->getAccuracy();
+			self::getElasticLines($captionData, $captionRawData, $items, $language, $captionAsset->getId(), $accuracy, $captionAsset->getLabel());
 		}
 		$data['caption_assets'] = $captionData;
 		$captionRawData = array_values(array_unique($captionRawData));
@@ -263,7 +264,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		return $data;
 	}
 
-	protected static function getElasticLines(&$captionData ,&$captionRawData, $items, $language, $assetId, $label = null)
+	protected static function getElasticLines(&$captionData ,&$captionRawData, $items, $language, $assetId, $accuracy, $label = null)
 	{
 		foreach ($items as $item)
 		{
@@ -272,6 +273,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				'end_time' => $item['endTime'],
 				'language' => $language,
 				'caption_asset_id' => $assetId,
+				'accuracy' => $accuracy
 			);
 
 			if($label)

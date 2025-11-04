@@ -35,6 +35,11 @@ class ESearchCaptionItemData extends ESearchItemData
 	 */
 	protected $label;
 
+	/**
+	 * @var int
+	 */
+	protected $accuracy;
+
 	public function getType()
 	{
 		return ESearchItemDataType::CAPTION;
@@ -136,6 +141,22 @@ class ESearchCaptionItemData extends ESearchItemData
 		$this->label = $label;
 	}
 
+	/**
+	 * @return int
+	 */
+	public function getAccuracy()
+	{
+		return $this->accuracy;
+	}
+
+	/**
+	 * @param int $accuracy
+	 */
+	public function setAccuracy($accuracy)
+	{
+		$this->accuracy = $accuracy;
+	}
+
 	public function loadFromElasticHits($objectResult)
 	{
 		$this->setLine($objectResult['_source']['content']);
@@ -143,6 +164,7 @@ class ESearchCaptionItemData extends ESearchItemData
 		$this->setEndsAt($objectResult['_source']['end_time']);
 		$this->setLanguage($objectResult['_source']['language']);
 		$this->setCaptionAssetId($objectResult['_source']['caption_asset_id']);
+		$this->setAccuracy($objectResult['_source']['accuracy']);
 		if(isset($objectResult['_source']['label']))
 			$this->setLabel($objectResult['_source']['label']);
 		if(isset($objectResult['highlight']))
