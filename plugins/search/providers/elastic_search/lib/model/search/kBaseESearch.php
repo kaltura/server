@@ -28,7 +28,7 @@ abstract class kBaseESearch extends kBaseSearch
 		$this->addGlobalHighlights();
 		if ($scoreFunctionParams)
 		{
-			$this->boostItems($scoreFunctionParams);
+			$this->addQueryFunctionScore($scoreFunctionParams);
 		}
 
 		$result = $this->elasticClient->search($this->query, true, true);

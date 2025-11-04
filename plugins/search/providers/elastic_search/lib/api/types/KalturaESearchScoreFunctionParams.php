@@ -1,7 +1,4 @@
 <?php
-
-use enum\KalturaESearchScoreFunctionType;
-
 /**
  * @package plugins.elasticSearch
  * @subpackage api.objects
@@ -12,17 +9,17 @@ class KalturaESearchScoreFunctionParams extends KalturaObject
 	/**
 	 * @var KalturaESearchScoreFunctionType
 	 */
-	public $scoreFunctionBoostType;  //exp
+	public $scoreFunctionBoostType = KalturaESearchScoreFunctionType::EXP;
 
 	/**
 	 * @var KalturaESearchScoreFunctionField
 	 */
-	public $scoreFunctionBoostField;
+	public $scoreFunctionBoostField = KalturaESearchScoreFunctionField::CREATED_AT;
 
 	/**
 	 * @var KalturaESearchScoreFunctionMode
 	 */
-	public $scoreFunctionBoostMode; //multiply, sum
+	public $scoreFunctionBoostMode = KalturaESearchScoreFunctionMode::MULTIPLY;
 
 	/**
 	 * @var float
@@ -32,7 +29,7 @@ class KalturaESearchScoreFunctionParams extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $scale;
+	public $scale = '30d';
 
 	/**
 	 * @var float
@@ -42,7 +39,7 @@ class KalturaESearchScoreFunctionParams extends KalturaObject
 	/**
 	 * @var string
 	 */
-	public $origin;
+	public $origin = 'now';
 
 	protected static $mapBetweenObjects = array
 	(
@@ -61,46 +58,6 @@ class KalturaESearchScoreFunctionParams extends KalturaObject
 			$object_to_fill = new ESearchScoreFunctionParams();
 		}
 
-		self::validateParams($this->decay, $this->origin, $this->scale, $this->scoreFunctionBoostField, $this->scoreFunctionBoostType, $this->scoreFunctionBoostMode, $this->weight);
-
 		return parent::toObject($object_to_fill, $props_to_skip);
-	}
-
-	protected static function validateParams($decay, $origin, $scale, $scoreFunctionBoostField, $scoreFunctionBoostType, $scoreFunctionBoostMode, $weight)
-	{
-		if (!$decay || $decay < 0 || $decay > 1)
-		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_DECAY_VALUE_IN_BOOST_SCORE_FUNCTION);
-		}
-
-		if (!$origin || $origin != 'now')
-		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_ORIGIN_VALUE_IN_BOOST_SCORE_FUNCTION);
-		}
-
-		if (!$scale || !elasticSearchUtils::isValidDuration($scale))
-		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCALE_VALUE_IN_BOOST_SCORE_FUNCTION);
-		}
-
-		if (!$weight || $weight < 0 || is_string($weight))
-		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_WEIGHT_VALUE_IN_BOOST_SCORE_FUNCTION);
-		}
-
-		if (!$scoreFunctionBoostField)
-		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_FIELD_VALUE_IN_BOOST_SCORE_FUNCTION);
-		}
-
-		if (!$scoreFunctionBoostType)
-		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_FUNCTION_VALUE_IN_BOOST_SCORE_FUNCTION);
-		}
-
-		if (!$scoreFunctionBoostMode)
-		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_FUNCTION_MODE_VALUE_IN_BOOST_SCORE_FUNCTION);
-		}
 	}
 }

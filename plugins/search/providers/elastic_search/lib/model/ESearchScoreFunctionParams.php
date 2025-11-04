@@ -8,7 +8,7 @@ class ESearchScoreFunctionParams extends BaseObject
 	/**
 	 * @var ESearchScoreFunctionType
 	 */
-	protected $scoreFunctionBoostType;  //exp
+	protected $scoreFunctionBoostType;
 
 	/**
 	 * @var ESearchScoreFunctionField
@@ -18,7 +18,7 @@ class ESearchScoreFunctionParams extends BaseObject
 	/**
 	 * @var ESearchScoreFunctionMode
 	 */
-	protected $scoreFunctionBoostMode; //multiply, sum
+	protected $scoreFunctionBoostMode;
 
 	/**
 	 * @var float
