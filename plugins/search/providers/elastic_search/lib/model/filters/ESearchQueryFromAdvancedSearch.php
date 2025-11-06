@@ -111,7 +111,6 @@ class ESearchQueryFromAdvancedSearch
 	protected function createESearchQueryFromEntryCaptionAdvancedFilter(kEntryCaptionAdvancedFilter $searchFilter)
 	{
 		$items = [];
-
 		if ($searchFilter->getHasCaption())
 		{
 			$hasCaptionsItem = new ESearchCaptionItem();
@@ -146,8 +145,12 @@ class ESearchQueryFromAdvancedSearch
 		{
 			// If hasCaption is false, we are looking for entries that do NOT match the other criteria.
 			// The other criteria are language and/or accuracy.
-			$itemToNegate = count($items) > 1 ? $items : $items[0];
-			return self::createNegativeQuery($itemToNegate);
+			if (count($items) > 1)
+			{
+				return self::createNestedOperator($items, ESearchOperatorType::NOT_OP);
+			}
+
+			return self::createNegativeQuery($items[0]);
 		}
 
 		// If hasCaption is true, we are looking for entries that match ALL criteria.
@@ -156,11 +159,7 @@ class ESearchQueryFromAdvancedSearch
 			return $items[0];
 		}
 
-//		$result = new ESearchOperator();
-//		$result->setOperator(ESearchOperatorType::AND_OP);
-//		$result->setSearchItems($items);
-//		return $result;
-		return $items;
+		return self::createNestedOperator($items);
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)
@@ -180,12 +179,22 @@ class ESearchQueryFromAdvancedSearch
 		return $result;
 	}
 
+	protected static function createNestedOperator($items, $operator = ESearchOperatorType::AND_OP)
+	{
+		return self::createOperatorByType('ESearchNestedOperator', $operator, $items);
+	}
+
+	protected static function createOperatorByType($operator, $operatorType, $items)
+	{
+		$operator = new $operator();
+		$operator->setOperator($operatorType);
+		$operator->setSearchItems($items);
+		return $operator;
+	}
+
 	public static function createNegativeQuery($item)
 	{
-		$result = new ESearchOperator();
-		$result->setOperator(ESearchOperatorType::NOT_OP);
-		$result->setSearchItems(array($item));
-		return $result;
+		return self::createOperatorByType('ESearchOperator', ESearchOperatorType::NOT_OP, array($item));
 	}
 
 	public static function enclosedInQuotationMarks($searchTerm)

@@ -146,8 +146,9 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
         $advanceFilterAdapter = new ESearchQueryFromAdvancedSearch();
         $advanceSearch = $advanceFilterAdapter->processAdvanceFilter($filter->getAdvancedSearch());
-        if ($advanceSearch) {
-            $this->searchItems[] = $advanceSearch; //TODO probably need the advanced search items to be a sub array
+        if ($advanceSearch)
+		{
+            $this->searchItems[] = $advanceSearch;
         }
 
         return $this->createFinalOperator($kEsearchOrderBy);

@@ -55,7 +55,7 @@ abstract class ESearchBaseOperator extends ESearchItem
 
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		if (!$eSearchItemsArr || !count($eSearchItemsArr))
+		if (empty($eSearchItemsArr))
 		{
 			throw new kESearchException('empty search items are not allowed', kESearchException::EMPTY_SEARCH_ITEMS_NOT_ALLOWED);
 		}
@@ -92,30 +92,19 @@ abstract class ESearchBaseOperator extends ESearchItem
 		//categorize each different search item by type except ESearchOperator
 		foreach ($eSearchItemsArr as $searchItem)
 		{
-			if(!is_array($searchItem))
+			/**
+			 * @var ESearchItem $searchItem
+			 */
+			$className = get_class($searchItem);
+			if(in_array($className, self::$operatorTypes)) //ESearchOperator or ESearchNestedOperator
 			{
-				self::getSubCategorizedSearchItems($searchItem, $categorizedSearchItems, $allCategorizedSearchItems);
+				$allCategorizedSearchItems[] = array('className' => $className, 'items' => $searchItem, 'operatorType' => $searchItem->getOperator());
+				continue;
 			}
-			else
-			{
-				foreach ($searchItem as $subSearchItem)
-				{
-					self::getSubCategorizedSearchItems($subSearchItem, $categorizedSearchItems, $allCategorizedSearchItems);
-				}
-			}
-//			/**
-//			 * @var ESearchItem $searchItem
-//			 */
-//			$className = get_class($searchItem);
-//			if(in_array($className, self::$operatorTypes)) //ESearchOperator or ESearchNestedOperator
-//			{
-//				$allCategorizedSearchItems[] = array('className' => $className, 'items' => $searchItem, 'operatorType' => $searchItem->getOperator());
-//				continue;
-//			}
-//
-//			if (!isset($categorizedSearchItems[$className]))
-//				$categorizedSearchItems[$className] = array();
-//			$categorizedSearchItems[$className][] = $searchItem;
+
+			if (!isset($categorizedSearchItems[$className]))
+				$categorizedSearchItems[$className] = array();
+			$categorizedSearchItems[$className][] = $searchItem;
 		}
 
 		foreach ($categorizedSearchItems as $className => $searchItems)
@@ -124,20 +113,6 @@ abstract class ESearchBaseOperator extends ESearchItem
 		}
 
 		return $allCategorizedSearchItems;
-	}
-
-	protected static function getSubCategorizedSearchItems(ESearchItem $searchItem, &$categorizedSearchItems, &$allCategorizedSearchItems)
-	{
-		$className = get_class($searchItem);
-		if(in_array($className, self::$operatorTypes)) //ESearchOperator or ESearchNestedOperator
-		{
-			$allCategorizedSearchItems[] = array('className' => $className, 'items' => $searchItem, 'operatorType' => $searchItem->getOperator());
-			return;
-		}
-
-		if (!isset($categorizedSearchItems[$className]))
-			$categorizedSearchItems[$className] = array();
-		$categorizedSearchItems[$className][] = $searchItem;
 	}
 
 	public function shouldAddLanguageSearch()
