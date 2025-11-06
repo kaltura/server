@@ -230,7 +230,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
 	protected function handleOauth2($url, $value)
 	{
-		if (str_contains($url, 'fcm.googleapis.com') && $value == 'firebase')
+		if (str_contains($url, 'fcm.googleapis.com') && str_contains($value, 'firebase'))
 		{
 			$accessTokens = kFirebaseOauth::requestAuthorizationTokens($value);
 			if (!$accessTokens || !isset($accessTokens[kFirebaseOauth::ACCESS_TOKEN]))
