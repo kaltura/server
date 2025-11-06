@@ -1,4 +1,4 @@
-# Venus-22.6.0
+# Venus-22.7.0
 ## Add caption accuracy to entry list filter ##
 - Issue Type: Task
 - Issue ID: PLAT-25558
