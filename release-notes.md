@@ -1,3 +1,14 @@
+# Venus-22.6.0
+## Add caption accuracy to entry list filter ##
+- Issue Type: Task
+- Issue ID: PLAT-25558
+### Deployment scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port' and execute the curl command
+
+    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"caption_assets":{"properties":{"accuracy": {"type": "integer"}}}}}'
+
 # Venus-22.5.0
 ## Add Audio Description and Dubbing flavors to the list of available flavors ##
 - Issue Type: Task
