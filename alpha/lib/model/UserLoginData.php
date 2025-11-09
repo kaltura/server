@@ -49,12 +49,7 @@ class UserLoginData extends BaseUserLoginData
 	{
 		$time = $time ?? time();
 		$lastLoginTime = $this->getLastLoginTime();
-		if(is_int($lastLoginTime))
-		{
-			$lastLoginTime = array();
-		}
 		$lastLoginTime[$partnerId] = $time;
-		
 		$this->setLastLoginTime($lastLoginTime);
 	}
 	
