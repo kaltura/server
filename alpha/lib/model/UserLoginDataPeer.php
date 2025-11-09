@@ -16,7 +16,7 @@
 class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectPeer
 {
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
-	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 10; // 10 Minutes
+	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 600; // 10 Minutes
 	const OTP_MISSING = 'otp is missing';
 	const OTP_INVALID = 'otp is invalid';
 	
