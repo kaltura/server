@@ -25,10 +25,10 @@ class kFirebaseOauth
 			return $accessTokens;
 		}
 
-		KalturaLog::info('Requesting authorization tokens from Firebase');
+		KalturaLog::info('Requesting authorization tokens from Firebase, code:'.$authCode);
 
 		$header = self::getHeaderData();
-		$explodedParts = explode('_', $authCode);
+		$explodedParts = explode('-', $authCode);
 		$entryId = $explodedParts[1] ?? null;
 		$jwt = self::createFirebaseJwt(self::URL, $entryId);
 		if (!$jwt)
