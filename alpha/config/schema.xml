@@ -1113,13 +1113,18 @@
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="html5_url" type="varchar" size="256" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="partner_tags" type="longvarchar" />
         <column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="reference_id" type="varchar" size="512" />
-		<index name="partner_id_index">
-			<index-column name="partner_id" />
-		</index>
-		<index name="partner_id_creation_mode_index">
-			<index-column name="partner_id" />
-			<index-column name="creation_mode" />
-		</index>
+        <index name="updated_at">
+            <index-column name="updated_at" />
+        </index>
+        <index name="partner_id_status_tags">
+            <index-column name="partner_id" />
+            <index-column name="status" />
+            <index-column name="tags" />
+        </index>
+        <index name="parner_id_obj_type">
+            <index-column name="partner_id" />
+            <index-column name="obj_type" />
+        </index>
         <index name="partner_id_reference_id_index">
             <index-column name="partner_id" />
             <index-column name="reference_id" />
