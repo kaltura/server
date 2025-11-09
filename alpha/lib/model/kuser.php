@@ -670,7 +670,8 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 */
 	public function getLastLoginTime()
 	{
-		return $this->getFromCustomData('last_login_time');
+		$loginData = $this->getLoginData();
+		return $loginData ? $loginData->getLastLoginTimeForPartner($this->getPartnerId()) : null;
 	}
 
 	public function setKsPrivileges($ksPrivileges)

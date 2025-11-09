@@ -16,7 +16,7 @@
 class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectPeer
 {
 	const KALTURAS_CMS_PASSWORD_RESET = 51;
-	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 600; // 10 Minutes
+	const LAST_LOGIN_TIME_UPDATE_INTERVAL = 10; // 10 Minutes
 	const OTP_MISSING = 'otp is missing';
 	const OTP_INVALID = 'otp is invalid';
 	
@@ -783,23 +783,30 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 	public static function setLastLoginFields($loginData, $kuser)
 	{
-		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
-		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
+		/* @var $kuser kuser */
+		/* @var $loginData UserLoginData */
+		
 		$isAdmin = $kuser->getIsAdmin();
+		$partnerId = $kuser->getPartnerId();
+		
+		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
 		$updateTimeLimit = $loginData->getUpdatedAt(null) + 5 < time();
+		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
 		$ignorePartner = in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'));
+		
 		if ($isAdmin && !$ignoreUser && $updateTimeLimit && !$ignorePartner)
 		{
 			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
 		}
-		$loginData->save();
 		
 		$currentTime = time();
-		$dbLastLoginTime = $kuser->getLastLoginTime();
+		$dbLastLoginTime = $loginData->getLastLoginTimeForPartner($kuser->getPartnerId());
 		if(!$ignoreUser && (!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL))
-			$kuser->setLastLoginTime($currentTime);
+		{
+			$loginData->setLastLoginTimeForPartner($kuser->getPartnerId(), $currentTime);
+		}
 		
-		$kuser->save();
+		$loginData->save();
 		return $kuser;
 	}
 	
