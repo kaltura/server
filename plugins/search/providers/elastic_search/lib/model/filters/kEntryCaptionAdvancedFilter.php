@@ -21,7 +21,7 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	protected $accuracy;
 
 	/**
-	 * @var CaptionUsage //TODO might need to use the kaltura object
+	 * @var CaptionUsage
 	 */
 	protected $usage;
 

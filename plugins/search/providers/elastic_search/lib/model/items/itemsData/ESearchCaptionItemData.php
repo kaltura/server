@@ -171,7 +171,7 @@ class ESearchCaptionItemData extends ESearchItemData
 	}
 
 	/**
-	 * @param int $accuracy
+	 * @param int $usage
 	 */
 	public function setUsage($usage)
 	{
@@ -187,7 +187,8 @@ class ESearchCaptionItemData extends ESearchItemData
 		$this->setCaptionAssetId($objectResult['_source']['caption_asset_id']);
 		if(isset($objectResult['_source']['accuracy']))
 			$this->setAccuracy($objectResult['_source']['accuracy']);
-		$this->setUsage($objectResult['_source']['usage']);
+		if(isset($objectResult['_source']['usage']))
+			$this->setUsage($objectResult['_source']['usage']);
 		if(isset($objectResult['_source']['label']))
 			$this->setLabel($objectResult['_source']['label']);
 		if(isset($objectResult['highlight']))

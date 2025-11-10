@@ -15,7 +15,7 @@ class kESearchException extends kCoreException
     const MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED = 'mixed search items in nested operator not allowed';
     const MISSING_OPERATOR_TYPE = 'missing operator type';
 	const INVALID_CAPTION_ACCURACY_VALUES = 'All range values are null';
-	const INVALID_CAPTION_ACCURACY_VALUES_NOT_IN_RANG = "INVALID_CAPTION_ACCURACY_VALUES_NOT_IN_RANG;FIELD;Range value for \"@FIELD@\" is illegal: Values must be between 0-100";
+	const INVALID_CAPTION_ACCURACY_VALUES_NOT_IN_RANGE = "INVALID_CAPTION_ACCURACY_VALUES_NOT_IN_RANG;FIELD;Range value for \"@FIELD@\" is illegal: Values must be between 0-100";
 
     //Query parsing errors
     const MISSING_QUERY_OPERAND = 'Missing operand [AND / OR / NOT]';
