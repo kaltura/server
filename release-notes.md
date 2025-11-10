@@ -9,6 +9,31 @@ Replace 'esearch_host', 'esearch_port' and execute the curl command
 
     curl -X PUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"caption_assets":{"properties":{"accuracy":{"type":"integer"},"usage":{"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}}}'
 
+# Venus-22.6.0
+
+## Update caption asset http notification template ##
+* Issue Type: Task
+* Issue ID: SUP-49863
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+- deployment/updates/scripts/xml/2025_10_29_addCaptionAssetHttpNotification.template.xml
+- php deployment/updates/scripts/2025_10_29_deploy_add_caption_asset_http_notification.php
+
+Update script:
+- deployment/updates/scripts/xml/2025_10_29_updateCaptionAssetHttpNotification.template.xml
+- php deployment/updates/scripts/2025_10_29_deploy_update_caption_asset_http_notification.php
+
+Permission script:
+- php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
+
+
 # Venus-22.5.0
 ## Add Audio Description and Dubbing flavors to the list of available flavors ##
 - Issue Type: Task

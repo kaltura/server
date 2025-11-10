@@ -96,11 +96,6 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 	 */
 	public function getData(kHttpNotificationDispatchJobData $jobData = null)
 	{
-		$coreObject = unserialize($this->coreObject);
-
-		$apiObject = new $this->apiObjectType;
-		/* @var $apiObject KalturaObject */
-
 		$responseProfile = null;
 		if ($this->responseProfileId)
 		{
@@ -109,7 +104,16 @@ class KalturaHttpNotificationObjectData extends KalturaHttpNotificationData
 			$responseProfile->fromObject($coreProfile);
 		}
 
-		$apiObject->fromObject($coreObject, $responseProfile ?? null);
+		$coreObject = unserialize($this->coreObject);
+		if (is_subclass_of($this->apiObjectType, 'IApiObjectFactory'))
+		{
+			$apiObject = $this->apiObjectType::getInstance($coreObject, $responseProfile);
+		}
+		else
+		{
+			$apiObject = new $this->apiObjectType;
+			$apiObject->fromObject($coreObject, $responseProfile ?? null);
+		}
 
 		$httpNotificationTemplate = EventNotificationTemplatePeer::retrieveByPK($jobData->getTemplateId());
 

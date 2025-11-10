@@ -455,11 +455,17 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		if(isset(self::$incrementedEntryIds[$this->getId()]) && isset(self::$incrementedEntryIds[$this->getId()][$entryId]))
 			unset(self::$incrementedEntryIds[$this->getId()][$entryId]);
 	}
-	
+
+	public function incrementDirectEntriesCount($entryId)
+	{
+		$lockKey = "category_increment_direct_entries_" . $this->getId();
+		return kLock::runLocked($lockKey, array($this, 'incrementDirectEntriesCountImpl'), array($entryId));
+	}
+
 	/**
 	 * Increment direct entries count
 	 */
-	public function incrementDirectEntriesCount($entryId)
+	public function incrementDirectEntriesCountImpl($entryId)
 	{
 		KalturaLog::debug("incrementing $entryId to direct entries count " . $this->getFullName());
 		$this->preIncrement($entryId);
@@ -483,10 +489,16 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$this->save();
 	}
 	
+	public function decrementDirectEntriesCount($entryId)
+	{
+		$lockKey = "category_decrement_direct_entries_" . $this->getId();
+		return kLock::runLocked($lockKey, array($this, 'decrementDirectEntriesCountImpl'), array($entryId));
+	}
+
 	/**
 	 * Decrement direct entries count (will decrement recursively the parent categories too)
 	 */
-	public function decrementDirectEntriesCount($entryId)
+	public function decrementDirectEntriesCountImpl($entryId)
 	{
 		KalturaLog::debug("decrementing $entryId from direct entries count " . $this->getFullName());
 		$this->preDecrement($entryId);
@@ -1535,10 +1547,16 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$this->setPendingEntriesCount($count);
 	}
 	
+	public function decrementEntriesCount($entryId)
+	{
+		$lockKey = "category_decrement_entries_" . $this->getId();
+		return kLock::runLocked($lockKey, array($this, 'decrementEntriesCountImpl'), array($entryId));
+	}
+
 	/**
 	 * Decrement category's entriesCount by calculate it.
 	 */
-	public function decrementEntriesCount($entryId)
+	public function decrementEntriesCountImpl($entryId)
 	{
 		KalturaLog::debug("decrementing $entryId from " . $this->getFullName());
 		$this->preDecrement($entryId);
@@ -1557,11 +1575,17 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 			}
 		}
 	}
-	
+
+	public function incrementEntriesCount($entryId)
+	{
+		$lockKey = "category_increment_entries_" . $this->getId();
+		return kLock::runLocked($lockKey, array($this, 'incrementEntriesCountImpl'), array($entryId));
+	}
+
 	/**
 	 * Decrement category's entriesCount by calculate it.
 	 */
-	public function incrementEntriesCount($entryId)
+	public function incrementEntriesCountImpl($entryId)
 	{
 		KalturaLog::debug("incrementing $entryId to " . $this->getFullName());
 		$this->preIncrement($entryId);
