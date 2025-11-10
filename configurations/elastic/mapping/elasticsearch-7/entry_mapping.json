@@ -835,6 +835,10 @@
 					},
 					"accuracy": {
 						"type": "integer"
+					},
+					"usage": {
+						"type": "keyword",
+						"normalizer": "kaltura_keyword_normalizer"
 					}
 				}
 			},

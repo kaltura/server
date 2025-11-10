@@ -119,8 +119,9 @@ class ESearchQueryFromAdvancedSearch
 			$items[] = $hasCaptionsItem;
 		}
 
-		if ($language = $searchFilter->getLanguage())
+		if ($searchFilter->getLanguage())
 		{
+			$language = $searchFilter->getLanguage();
 			$languageItem = new ESearchCaptionItem();
 			$languageItem->setFieldName(ESearchCaptionFieldName::LANGUAGE);
 			$languageItem->setItemType(ESearchItemType::EXACT_MATCH);
@@ -128,13 +129,24 @@ class ESearchQueryFromAdvancedSearch
 			$items[] = $languageItem;
 		}
 
-		if ($accuracy = $searchFilter->getAccuracy())
+		if ($searchFilter->getAccuracy())
 		{
+			$accuracy = $searchFilter->getAccuracy();
 			$accuracyItem = new ESearchCaptionItem();
 			$accuracyItem->setRange($accuracy);
 			$accuracyItem->setFieldName(ESearchCaptionFieldName::ACCURACY);
 			$accuracyItem->setItemType(ESearchItemType::RANGE);
 			$items[] = $accuracyItem;
+		}
+
+		if ($searchFilter->getUsage() !== null)
+		{
+			$usage = $searchFilter->getUsage();
+			$usageItem = new ESearchCaptionItem();
+			$usageItem->setFieldName(ESearchCaptionFieldName::USAGE);
+			$usageItem->setItemType(ESearchItemType::EXACT_MATCH);
+			$usageItem->setSearchTerm($usage);
+			$items[] = $usageItem;
 		}
 
 		if (empty($items)) {

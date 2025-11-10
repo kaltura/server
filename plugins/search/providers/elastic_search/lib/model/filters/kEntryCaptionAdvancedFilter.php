@@ -21,6 +21,11 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	protected $accuracy;
 
 	/**
+	 * @var CaptionUsage //TODO might need to use the kaltura object
+	 */
+	protected $usage;
+
+	/**
 	 * @return boolean
 	 */
 	public function getHasCaption()
@@ -66,6 +71,22 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	public function setAccuracy($accuracy)
 	{
 		$this->accuracy = $accuracy;
+	}
+
+	/**
+	 * @return CaptionUsage
+	 */
+	public function getUsage()
+	{
+		return $this->usage;
+	}
+
+	/**
+	 * @param CaptionUsage $usage
+	 */
+	public function setUsage($usage)
+	{
+		$this->usage = $usage;
 	}
 
 	/* (non-PHPdoc)

@@ -40,6 +40,11 @@ class KalturaESearchCaptionItemData extends KalturaESearchItemData {
 	 */
 	public $accuracy;
 
+	/**
+	 * @var int //TODO might be string
+	 */
+	public $usage;
+
 	private static $map_between_objects = array(
 		'line',
 		'startsAt',
@@ -47,7 +52,8 @@ class KalturaESearchCaptionItemData extends KalturaESearchItemData {
 		'language',
 		'captionAssetId',
 		'label',
-		'accuracy'
+		'accuracy',
+		'usage',
 	);
 
 	protected function getMapBetweenObjects()
