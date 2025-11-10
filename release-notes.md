@@ -7,7 +7,7 @@
 ##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
 Replace 'esearch_host', 'esearch_port' and execute the curl command
 
-    curl -XPUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"caption_assets":{"properties":{"accuracy": {"type": "integer"}}}}}'
+    curl -X PUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"caption_assets":{"properties":{"accuracy":{"type":"integer"},"usage":{"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}}}'
 
 # Venus-22.5.0
 ## Add Audio Description and Dubbing flavors to the list of available flavors ##
