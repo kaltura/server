@@ -10,8 +10,6 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 	(
 		"idEqual" => "_eq_id",
 		"idIn" => "_in_id",
-		"referenceIdEqual" => "_eq_reference_id",
-		"referenceIdin" => "_in_reference_id",
 		"nameLike" => "_like_name",
 		"partnerIdEqual" => "_eq_partner_id",
 		"partnerIdIn" => "_in_partner_id",
@@ -30,18 +28,20 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 		"versionMultiLikeAnd" => "_mlikeand_version",
 		"partnerTagsMultiLikeOr" => "_mlikeor_partner_tags",
 		"partnerTagsMultiLikeAnd" => "_mlikeand_partner_tags",
+		"referenceIdEqual" => "_eq_reference_id",
+		"referenceIdIn" => "_in_reference_id",
 	);
 
 	static private $order_by_map = array
 	(
-		"+createdAt" => "+created_at",
-		"-createdAt" => "-created_at",
-		"+updatedAt" => "+updated_at",
-		"-updatedAt" => "-updated_at",
 		"+id" => "+id",
 		"-id" => "-id",
 		"+name" => "+name",
 		"-name" => "-name",
+		"+createdAt" => "+created_at",
+		"-createdAt" => "-created_at",
+		"+updatedAt" => "+updated_at",
+		"-updatedAt" => "-updated_at",
 	);
 
 	public function getMapBetweenObjects()
@@ -153,4 +153,14 @@ abstract class KalturaUiConfBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $partnerTagsMultiLikeAnd;
+
+	/**
+	 * @var string
+	 */
+	public $referenceIdEqual;
+
+	/**
+	 * @var string
+	 */
+	public $referenceIdIn;
 }
