@@ -42,7 +42,49 @@ class KalturaEntryCaptionAdvancedFilter extends KalturaSearchItem
 			$object_to_fill = new kEntryCaptionAdvancedFilter();
 		}
 
+		$this->validateAccuracy();
 		return parent::toObject($object_to_fill, $props_to_skip);
+	}
+
+	protected function validateAccuracy()
+	{
+		if (!isset($this->accuracy)) {
+			return;
+		}
+
+		if ($this->accuracy->greaterThanOrEqual === null &&
+			$this->accuracy->lessThanOrEqual === null &&
+			$this->accuracy->greaterThan === null &&
+			$this->accuracy->lessThan === null)
+		{
+			throw new KalturaAPIException(kESearchException::INVALID_CAPTION_ACCURACY_VALUES);
+		}
+
+		$rangeValues = array();
+		if ($this->accuracy->greaterThanOrEqual !== null)
+		{
+			$rangeValues['greaterThanOrEqual'] = $this->accuracy->greaterThanOrEqual;
+		}
+		if ($this->accuracy->lessThanOrEqual !== null)
+		{
+			$rangeValues['lessThanOrEqual'] = $this->accuracy->lessThanOrEqual;
+		}
+		if ($this->accuracy->greaterThan !== null)
+		{
+			$rangeValues['greaterThan'] = $this->accuracy->greaterThan;
+		}
+		if ($this->accuracy->lessThan !== null)
+		{
+			$rangeValues['lessThan'] = $this->accuracy->lessThan;
+		}
+
+		foreach ($rangeValues as $field => $value)
+		{
+			if ($value < 0 || $value > 100)
+			{
+				throw new KalturaAPIException(kESearchException::INVALID_CAPTION_ACCURACY_VALUES_NOT_IN_RANG, $field);
+			}
+		}
 	}
 
 }

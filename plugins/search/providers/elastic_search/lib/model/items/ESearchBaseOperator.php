@@ -55,7 +55,7 @@ abstract class ESearchBaseOperator extends ESearchItem
 
 	public static function createSearchQuery($eSearchItemsArr, $boolOperator, &$queryAttributes, $eSearchOperatorType = null)
 	{
-		if ( !$eSearchItemsArr || !count($eSearchItemsArr))//(empty($eSearchItemsArr))
+		if ( !$eSearchItemsArr || !count($eSearchItemsArr))
 		{
 			throw new kESearchException('empty search items are not allowed', kESearchException::EMPTY_SEARCH_ITEMS_NOT_ALLOWED);
 		}

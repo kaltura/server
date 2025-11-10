@@ -41,7 +41,7 @@ class KalturaESearchCaptionItemData extends KalturaESearchItemData {
 	public $accuracy;
 
 	/**
-	 * @var int //TODO might be string
+	 * @var int
 	 */
 	public $usage;
 
