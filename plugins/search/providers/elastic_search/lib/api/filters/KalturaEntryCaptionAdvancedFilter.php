@@ -82,7 +82,7 @@ class KalturaEntryCaptionAdvancedFilter extends KalturaSearchItem
 		{
 			if ($value < 0 || $value > 100)
 			{
-				throw new KalturaAPIException(kESearchException::INVALID_CAPTION_ACCURACY_VALUES_NOT_IN_RANG, $field);
+				throw new KalturaAPIException(kESearchException::INVALID_CAPTION_ACCURACY_VALUES_NOT_IN_RANGE, $field);
 			}
 		}
 	}
