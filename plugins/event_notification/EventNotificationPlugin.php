@@ -239,6 +239,9 @@ class EventNotificationPlugin extends KalturaPlugin implements IKalturaVersion, 
 				case EventNotificationEventObjectType::GROUPUSER:
 					return 'KuserKgroup';
 
+				case EventNotificationEventObjectType::USER_ENTRY:
+					return 'UserEntry';
+
 			}
 		}
 		

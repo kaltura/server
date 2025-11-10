@@ -15,6 +15,11 @@ class AdvancedSearchFilterCondition extends AdvancedSearchFilterItem
 	 */
 	protected $value;
 
+	/**
+	 * @var boolean
+	 */
+	protected $not;
+
 	public function addToXml(SimpleXMLElement &$xmlElement)
 	{
 		parent::addToXml($xmlElement);
@@ -47,6 +52,22 @@ class AdvancedSearchFilterCondition extends AdvancedSearchFilterItem
 	 */
 	public function getValue() {
 		return $this->value;
+	}
+
+	/**
+	 * @return boolean $value
+	 */
+	public function getNot() 
+	{
+		return $this->not;
+	}
+
+	/**
+	 * @param boolean $value
+	 */
+	public function setNot($not)
+	{
+		$this->not = $not;
 	}
 
 	/**

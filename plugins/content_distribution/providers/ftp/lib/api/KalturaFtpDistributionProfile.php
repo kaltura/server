@@ -80,6 +80,10 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 	  * @var string
 	  */
 	 public $assetFilenameXslt;
+	/**
+	 * @var string
+	 */
+	public $dataContentFilenameXslt;
 	 
 	 /**
 	 * @var string
@@ -118,6 +122,7 @@ class KalturaFtpDistributionProfile extends KalturaConfigurableDistributionProfi
 		'flavorAssetFilenameXslt',
 		'thumbnailAssetFilenameXslt',
 		'assetFilenameXslt',
+		'dataContentFilenameXslt',
 		'asperaPublicKey',
 		'asperaPrivateKey',
 		'sendMetadataAfterAssets',

@@ -48,6 +48,7 @@ var kObjects = {
 			UploadToken:					{label:	'Upload Token', apiType: 'KalturaUploadToken'},
 			UserLoginData:					{label:	'User Login Data', apiType: 'KalturaUserLoginData'},
 			UserRole:						{label:	'User Role', apiType: 'KalturaUserRole'},
+			UserEntry:						{label: 'User Entry', apiType: 'KalturaUserEntry'},
 			widget:							{label:	'Widget', apiType: 'KalturaWidget'},
 			categoryEntry:					{label:	'Category - Entry', apiType: 'KalturaCategoryEntry'},
 			entryVendorTask:				{label: 'Entry Vendor Task', apiType: 'KalturaEntryVendorTask'},

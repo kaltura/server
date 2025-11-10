@@ -12,6 +12,7 @@ class ESearchQueryFromAdvancedSearch
 	const ENTRY_CAPTION_ADVANCED_FILTER = 'kEntryCaptionAdvancedFilter';
 	const QUIZ_ADVANCED_FILTER = 'kQuizAdvancedFilter';
 	const ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION = 'AdvancedSearchFilterComparableAttributeCondition';
+	const ADVANCED_SEARCH_FILTER_MATCH_ATTRIBUTE_CONDITION = 'AdvancedSearchFilterMatchAttributeCondition';
 	const MRP_DATA_FIELD = '/*[local-name()=\'metadata\']/*[local-name()=\'MRPData\']';
 	const ENCLOSED_WITH_DOUBLE_QUOTATION_MARK_REGEX =  '/(\"){1}[^\"]+(\"){1}/';
 
@@ -46,6 +47,8 @@ class ESearchQueryFromAdvancedSearch
 				return $this->createESearchMetadataItemFromFilterMatchCondition($advancedSearchFilterItem);
 			case self::ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION:
 				return $this->createESearchQueryFromSearchFilterCompareCondition($advancedSearchFilterItem);
+			case self::ADVANCED_SEARCH_FILTER_MATCH_ATTRIBUTE_CONDITION:
+				return $this->createESearchQueryFromSearchFilterMatchCondition($advancedSearchFilterItem);
 			default:
 				KalturaLog::crit('Tried to convert not supported advance filter of type:' . get_class($advancedSearchFilterItem));
 				return null;
@@ -81,6 +84,22 @@ class ESearchQueryFromAdvancedSearch
 		return $eSearchAdvancedSearchItem;
 	}
 
+
+	/**
+	 * @param AdvancedSearchFilterMatchAttributeCondition $advancedSearchFilterItem
+	 * @return ESearchAdvancedSearchItem
+	 */
+	protected function createESearchQueryFromSearchFilterMatchCondition($advancedSearchFilterItem) 
+	{
+		$eSearchAdvancedSearchItem = new ESearchAdvancedSearchItem();
+		$eSearchAdvancedSearchItem->setSearchTerm($advancedSearchFilterItem->getValue());
+		$eSearchAdvancedSearchItem->setFieldName($advancedSearchFilterItem->getField());
+		$eSearchAdvancedSearchItem->setNot($advancedSearchFilterItem->getNot());
+		$eSearchAdvancedSearchItem->setItemType(ESearchItemType::EXACT_MATCH);
+
+		return $eSearchAdvancedSearchItem;
+	}
+
 	protected function createESearchQueryFromSearchFilterOperator(AdvancedSearchFilterOperator $operator)
 	{
 		$advanceFilterOperator = new ESearchOperator();
@@ -111,18 +130,28 @@ class ESearchQueryFromAdvancedSearch
 	protected function createESearchQueryFromEntryCaptionAdvancedFilter(kEntryCaptionAdvancedFilter $searchFilter)
 	{
 		$item = new ESearchCaptionItem();
-		$item->setFieldName(ESearchCaptionFieldName::CONTENT);
-		$item->setItemType(ESearchItemType::EXISTS);
-		if($searchFilter->getHasCaption())
+		if (!$searchFilter->getLanguage())
 		{
-			$result = $item;
+			$item->setFieldName(ESearchCaptionFieldName::CONTENT);
+			$item->setItemType(ESearchItemType::EXISTS);
 		}
 		else
 		{
-			$result = self::createNegativeQuery($item);
+			$item->setFieldName(ESearchCaptionFieldName::LANGUAGE);
+			$item->setItemType(ESearchItemType::EXACT_MATCH);
+			$item->setSearchTerm($searchFilter->getLanguage());
+		}
+		$result = $item;
+
+		if ($searchFilter->getHasCaption())
+		{
+			return $result;
+		}
+		else
+		{
+			return self::createNegativeQuery($item);
 		}
 
-		return $result;
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)
@@ -264,6 +293,7 @@ class ESearchQueryFromAdvancedSearch
 			case self::ENTRY_CAPTION_ADVANCED_FILTER:
 			case self::QUIZ_ADVANCED_FILTER:
 			case self::ADVANCED_SEARCH_FILTER_COMPARE_ATTRIBUTE_CONDITION:
+			case self::ADVANCED_SEARCH_FILTER_MATCH_ATTRIBUTE_CONDITION:
 				return true;
 			default:
 				return false;

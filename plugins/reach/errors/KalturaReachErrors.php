@@ -76,7 +76,7 @@ class KalturaReachErrors implements kReachErrors
 
 	const FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY = "FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY;FEATURE,ID;Requesting tasks of feature [@FEATURE@] for entry id [@ID@] is not supported";
 
-	const ENTRY_NOT_READY = "ENTRY_NOT_READY;;Ordering task is not allowed for entries which are not ins status ready";
+	const ENTRY_NOT_READY_FOR_ORDER = "ENTRY_NOT_READY;STATUS;Ordering task is not allowed for entries which is in status [@STATUS@]";
 	
 	const CANNOT_EXTEND_ACCESS_KEY = "CANNOT_EXTEND_ACCESS_KEY;;Extending accessKey for non processing task is not allowed";
 	

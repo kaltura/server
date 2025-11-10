@@ -12,6 +12,11 @@ class ESearchAdvancedSearchItem extends ESearchEntryItem
 	protected $itemType;
 
 	/**
+	 * @var boolean
+	 */
+	protected $not;
+
+	/**
 	 * @return kIntegerValue
 	 */
 	public function getValue()
@@ -34,6 +39,14 @@ class ESearchAdvancedSearchItem extends ESearchEntryItem
 	public function setValue(string $value)
 	{
 		$this->value = $value;
+	}
+
+	/**
+	 * @param string $searchTerm
+	 */
+	public function setSearchTerm($searchTerm)
+	{
+		$this->searchTerm = $searchTerm;
 	}
 
 	/**
@@ -69,6 +82,21 @@ class ESearchAdvancedSearchItem extends ESearchEntryItem
 		$this->range = $range;
 	}
 
+	/**
+	 * @param boolean $value
+	 */
+	public function setNot($not)
+	{
+		$this->not = $not;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function getNot()
+	{
+		return $this->not;
+	}
 
 	public function handleComparisonType($advancedSearchFilterItem)
 	{

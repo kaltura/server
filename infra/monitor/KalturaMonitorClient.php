@@ -867,6 +867,8 @@ class KalturaMonitorClient
 		$cacheBucketInterval = $serviceStatusConfig['bucket_interval_in_seconds'] ?? self::DEFAULT_CACHE_BUCKET_INTERVAL_SECONDS;
 		$historicalBucketsToFetch = $serviceStatusConfig['historical_bucket_count'] ?? self::DEFAULT_HISTORICAL_BUCKET_COUNT;
 		$minimumRequiredBuckets = $serviceStatusConfig['minimum_require_buckets'] ?? self::DEFAULT_MIN_REQUIRED_BUCKETS;
+		$sendAnalyticsBeacons = $serviceStatusConfig['send_analytics_beacons'] ?? false;
+		$sendHeader = $serviceStatusConfig['send_header'] ?? false;
 		
 		list($reqTime, $reqCount, $reqAvgTime) = self::getServiceStatusStats($requestTook, $cacheExpiry, $cacheBucketInterval, $historicalBucketsToFetch, $minimumRequiredBuckets);
 		
@@ -876,13 +878,17 @@ class KalturaMonitorClient
 			if($reqAvgTime > $thresholdInSeconds)
 			{
 				$serviceStatus = self::SERVICE_NEARING_LIMITS;
-				if(isset($serviceStatusConfig['send_analytics_beacons']) && $serviceStatusConfig['send_analytics_beacons'])
+				if($sendAnalyticsBeacons)
 				{
 					self::sendErrorEvent('NEARING_LIMITS');
 				}
 			}
 			
-			header('X-Kaltura-Service-Status: ' . $serviceStatus);
+			if($sendHeader)
+			{
+				header('X-Kaltura-Service-Status: ' . $serviceStatus);
+			}
+			
 			self::safeLog("Service status: serviceStatus [$serviceStatus] count [$reqCount] time [$reqTime] avg [$reqAvgTime]");
 		}
 	}

@@ -3716,7 +3716,7 @@ class kFlowHelper
 	 * @param entry $entry
 	 * @throws PropelException
 	 */
-	protected static function handleStaticContent(entry $entry)
+	public static function handleStaticContent(entry $entry)
 	{
 		$disableStaticContentSourceDeletionPartners = kConf::get('disableStaticContentSourceDeletionPartners', 'runtime_config', array());
 		if (in_array($entry->getPartnerId(), $disableStaticContentSourceDeletionPartners) || in_array(myPartnerUtils::ALL_PARTNERS_WILD_CHAR, $disableStaticContentSourceDeletionPartners) || !kBusinessPreConvertDL::shouldCheckStaticContentFlow($entry))
