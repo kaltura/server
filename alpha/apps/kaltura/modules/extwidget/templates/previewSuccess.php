@@ -4,6 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="google-site-verification" content="9kyYz8bwNkl5Om29R8XfZeGsoCj8OFlTLX6VIKt2JbE" />
 	<title><?php echo htmlspecialchars($entry_name); ?></title>
 	<?php if( $entry_id ) { ?>
 		<meta property="og:url" content="<?php echo $pageURL; ?>" />
