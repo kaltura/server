@@ -95,6 +95,17 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO),
+			self::REPORT_FRIENDLY_DEF => array(
+				self::REPORT_DIMENSION_MAP => array(
+					'email' => self::DIMENSION_KUSER_ID,
+				),
+				self::REPORT_ENRICH_DEF => array(
+					self::REPORT_ENRICH_OUTPUT => 'email',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('PUSER_ID', 'EMAIL'),
+					)
+				),
+			)
 		),
 
 		ReportType::SPECIFIC_USER_ENGAGEMENT => array(
@@ -2038,12 +2049,17 @@ class kKavaReports extends kKavaReportsMgr
 		)
 	);
 
-	public static function getReportDef($report_type, $input_filter)
+	public static function getReportDef($report_type, $input_filter, $response_options = null)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))
 		{
 			return null;
+		}
+
+		if (isset($response_options) && $response_options->getUseFriendlyHeadersNames() && isset($report_def[self::REPORT_FRIENDLY_DEF]))
+		{
+			$report_def = array_merge_recursive($report_def, $report_def[self::REPORT_FRIENDLY_DEF]);
 		}
 
 		self::initTransformTimeDimensions();
