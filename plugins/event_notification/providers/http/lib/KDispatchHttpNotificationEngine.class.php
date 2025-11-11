@@ -93,7 +93,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
 				if ($key == 'Authorization')
 				{
-					$value = $this->handleOauth2($data->url, $value);
+					$value = $this->handleOauth2($data->url, $value, $httpNotificationTemplate->partnerId);
 				}
 
 				if (strtolower($key) == 'content-type')
@@ -228,11 +228,14 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		return true;
 	}
 
-	protected function handleOauth2($url, $value)
+	protected function handleOauth2($url, $value, $partnerId)
 	{
+
 		if (str_contains($url, 'fcm.googleapis.com') && str_contains($value, 'firebase'))
 		{
-			$accessTokens = kFirebaseOauth::requestAuthorizationTokens($value);
+			$explodedParts = explode('-', $value);
+			$firebaseSpecificJson = $explodedParts[1] ? $this->getServiceAccountJsonFromEntry($explodedParts[1], $partnerId) : null;
+			$accessTokens = kFirebaseOauth::requestAuthorizationTokens($firebaseSpecificJson);
 			if (!$accessTokens || !isset($accessTokens[kFirebaseOauth::ACCESS_TOKEN]))
 			{
 				KalturaLog::err('Error: Failed requesting access token');
@@ -243,5 +246,29 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		}
 
 		return $value;
+	}
+
+	protected function getServiceAccountJsonFromEntry($entryId, $partnerId)
+	{
+		try{
+			KBatchBase::impersonate($partnerId);
+			$entry = KBatchBase::$kClient->baseEntry->get($entryId);
+			if(empty($entry->partnerData))
+			{
+				throw new Exception('partnerData is empty');
+			}
+			if(!is_array(json_decode($entry->partnerData, true)))
+			{
+				throw new Exception('Cant decode partnerData');
+			}
+		}
+		catch(Exception $e)
+		{
+			KBatchBase::unimpersonate();
+			KalturaLog::err('Error: Failed retrieving service account JSON from entry '. $entryId. " ,Msg:".$e->getMessage());
+			return null;
+		}
+		KBatchBase::unimpersonate();
+		return trim($entry->partnerData);
 	}
 }

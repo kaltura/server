@@ -16,7 +16,7 @@ class kFirebaseOauth
 	 * @param $authCode
 	 * @return array|void
 	 */
-	public static function requestAuthorizationTokens($authCode)
+	public static function requestAuthorizationTokens($firebaseSpecificJson)
 	{
 		$accessTokens = self::getTokensFromCache();
 		if ($accessTokens)
@@ -25,12 +25,8 @@ class kFirebaseOauth
 			return $accessTokens;
 		}
 
-		KalturaLog::info('Requesting authorization tokens from Firebase, code:'.$authCode);
-
 		$header = self::getHeaderData();
-		$explodedParts = explode('-', $authCode);
-		$entryId = $explodedParts[1] ?? null;
-		$jwt = self::createFirebaseJwt(self::URL, $entryId);
+		$jwt = self::createFirebaseJwt(self::URL, $firebaseSpecificJson);
 		if (!$jwt)
 		{
 			return null;
@@ -113,16 +109,9 @@ class kFirebaseOauth
 		return array('Content-Type: application/x-www-form-urlencoded');
 	}
 
-	protected static function createFirebaseJwt($url, $entryId)
+	protected static function createFirebaseJwt($url, $firebaseSpecificJson)
 	{
-		if($entryId)
-		{
-			$serviceAccountJson = self::getServiceAccountJsonFromEntry($entryId);
-		}
-		else
-		{
-			$serviceAccountJson = self::getServiceAccountJson();
-		}
+		$serviceAccountJson = $firebaseSpecificJson ?? self::getServiceAccountJson();
 		if (!$serviceAccountJson)
 		{
 			KalturaLog::err('Error: Failed retrieving service account JSON');
@@ -166,29 +155,6 @@ class kFirebaseOauth
 	public static function extractTokensFromData($data)
 	{
 		return array(self::ACCESS_TOKEN => $data[self::ACCESS_TOKEN], self::EXPIRES_IN => $data[self::EXPIRES_IN]);
-	}
-
-	protected static function getServiceAccountJsonFromEntry($entryId)
-	{
-		try{
-			$client = Infra_ClientHelper::getClient();
-			$entry = $client->baseEntry->get($entryId);
-			if(empty($entry->partnerData))
-			{
-				throw new Exception('partnerData is empty');
-			}
-			if(!is_array(json_decode($entry->partnerData, true)))
-			{
-				throw new Exception('Cant decode partnerData');
-			}
-		}
-		catch(Exception $e)
-		{
-			KalturaLog::err('Error: Failed retrieving service account JSON from entry '. $entryId. " ,Msg:".$e->getMessage());
-			return false;
-		}
-
-		return $entry->partnerData;
 	}
 
 	protected static function getServiceAccountJson()
