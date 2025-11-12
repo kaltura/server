@@ -151,7 +151,7 @@ class kHttpNotificationDispatchJobData extends kEventNotificationDispatchJobData
 	 */
 	protected $contentType;
 
-	public function getContentType(): string
+	public function getContentType(): ?string
 	{
 		return $this->contentType;
 	}
