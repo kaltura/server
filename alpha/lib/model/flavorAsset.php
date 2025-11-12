@@ -181,9 +181,18 @@ class flavorAsset extends exportableAsset
 	public function getLanguage()
 	{
 		$languageCode = $this->getFromCustomData(self::CUSTOM_DATA_FIELD_LANGUAGE);
-		$obj = languageCodeManager::getObjectFromTwoCode($languageCode);
+		if (!$languageCode)
+			return null;
+
+		$obj = languageCodeManager::getObjectFromKalturaName($languageCode);
+		if (is_null($obj))
+			$obj = languageCodeManager::getObjectFromTwoCode($languageCode);
+		if (is_null($obj))
+			$obj = languageCodeManager::getObjectFromThreeCode($languageCode);
+
 		return !is_null($obj) ? $obj[languageCodeManager::KALTURA_NAME] : $languageCode;
 	}
+
 	public function setLanguage($v)
 	{
 		$key = languageCodeManager::getLanguageKey($v,$v);

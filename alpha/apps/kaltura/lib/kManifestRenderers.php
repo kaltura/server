@@ -1002,6 +1002,13 @@ class kM3U8ManifestRenderer extends kMultiFlavorManifestRenderer
 
 				$language = (isset($flavor['audioLanguage'])) ? $flavor['audioLanguage'] : 'und';
 				$languageName = (isset($flavor['audioLabel'])) ? $flavor['audioLabel'] : $flavor['audioLanguageName'];
+
+
+				$language = (isset($flavor['audioLanguage'])) ? $flavor['audioLanguage'] : 'und';
+				$languageName = (isset($flavor['audioLabel'])) ? $flavor['audioLabel'] : $flavor['audioLanguageName'];
+// Use $language for lang attribute, $languageName for label attribute
+
+
 				$content = "#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID=\"audio\",LANGUAGE=\"{$language}\",NAME=\"{$languageName}\"" . 
 						",AUTOSELECT=$isFirstAudioStream,DEFAULT=$isFirstAudioStream,URI=\"{$flavor['url']}\"";
 				$audioFlavorsArr[] = $content;
