@@ -65,8 +65,14 @@ class kSessionTypeCondition extends kCondition
 	}
 	protected function isInternalRequest($requestIp)
 	{
-		$internalIpList = kConf::get('internal_partner_access_allowed_ips', kConfMapNames::SECURITY, array());
-		foreach ($internalIpList as $curRange)
+		$internalIpsList = kConf::get('internal_partner_access_allowed_ips', kConfMapNames::SECURITY, null);
+		if(!$internalIpsList)
+		{
+			return false;
+		}
+		
+		$internalIpsArray = explode(',', $internalIpsList);
+		foreach ($internalIpsArray as $curRange)
 		{
 			if (kIpAddressUtils::isIpInRange($requestIp, $curRange))
 			{
