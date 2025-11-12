@@ -783,23 +783,30 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 	public static function setLastLoginFields($loginData, $kuser)
 	{
-		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
-		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
+		/* @var $kuser kuser */
+		/* @var $loginData UserLoginData */
+		
 		$isAdmin = $kuser->getIsAdmin();
+		$partnerId = $kuser->getPartnerId();
+		
+		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
 		$updateTimeLimit = $loginData->getUpdatedAt(null) + 5 < time();
-		$ignorePartner = in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'));
+		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
+		$ignorePartner = in_array($partnerId, kConf::get('no_save_of_last_login_partner_for_partner_ids'));
+		
 		if ($isAdmin && !$ignoreUser && $updateTimeLimit && !$ignorePartner)
 		{
-			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
+			$loginData->setLastLoginPartnerId($partnerId);
 		}
-		$loginData->save();
 		
 		$currentTime = time();
-		$dbLastLoginTime = $kuser->getLastLoginTime();
+		$dbLastLoginTime = $loginData->getLastLoginTimeForPartner($partnerId);
 		if(!$ignoreUser && (!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL))
-			$kuser->setLastLoginTime($currentTime);
+		{
+			$loginData->setLastLoginTimeForPartner($partnerId, $currentTime);
+		}
 		
-		$kuser->save();
+		$loginData->save();
 		return $kuser;
 	}
 	
