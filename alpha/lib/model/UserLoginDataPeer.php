@@ -792,18 +792,18 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
 		$updateTimeLimit = $loginData->getUpdatedAt(null) + 5 < time();
 		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
-		$ignorePartner = in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'));
+		$ignorePartner = in_array($partnerId, kConf::get('no_save_of_last_login_partner_for_partner_ids'));
 		
 		if ($isAdmin && !$ignoreUser && $updateTimeLimit && !$ignorePartner)
 		{
-			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
+			$loginData->setLastLoginPartnerId($partnerId);
 		}
 		
 		$currentTime = time();
-		$dbLastLoginTime = $loginData->getLastLoginTimeForPartner($kuser->getPartnerId());
+		$dbLastLoginTime = $loginData->getLastLoginTimeForPartner($partnerId);
 		if(!$ignoreUser && (!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL))
 		{
-			$loginData->setLastLoginTimeForPartner($kuser->getPartnerId(), $currentTime);
+			$loginData->setLastLoginTimeForPartner($partnerId, $currentTime);
 		}
 		
 		$loginData->save();
