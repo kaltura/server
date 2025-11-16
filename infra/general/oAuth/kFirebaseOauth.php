@@ -12,7 +12,7 @@ class kFirebaseOauth
 
 	const URL = 'https://oauth2.googleapis.com/token';
 
-	static protected string $cacheKey = 'firebase_oauth_tokens';
+	protected static string $cacheKey = 'firebase_oauth_tokens';
 
 	/**
 	 * @param string     $firebaseSpecificJson
