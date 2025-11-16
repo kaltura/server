@@ -234,8 +234,9 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		if (str_contains($url, 'fcm.googleapis.com') && str_contains($value, 'firebase'))
 		{
 			$explodedParts = explode('-', $value);
-			$firebaseSpecificJson = $explodedParts[1] ? $this->getServiceAccountJsonFromEntry($explodedParts[1], $partnerId) : null;
-			$accessTokens = kFirebaseOauth::requestAuthorizationTokens($firebaseSpecificJson);
+			$entryId = $explodedParts[1] ?? null;
+			$firebaseSpecificJson = $entryId ? $this->getServiceAccountJsonFromEntry($entryId, $partnerId) : null;
+			$accessTokens = kFirebaseOauth::requestAuthorizationTokens($firebaseSpecificJson, $entryId);
 			if (!$accessTokens || !isset($accessTokens[kFirebaseOauth::ACCESS_TOKEN]))
 			{
 				KalturaLog::err('Error: Failed requesting access token');

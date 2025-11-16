@@ -12,12 +12,19 @@ class kFirebaseOauth
 
 	const URL = 'https://oauth2.googleapis.com/token';
 
+	static protected string $cacheKey = 'firebase_oauth_tokens';
+
 	/**
-	 * @param $authCode
+	 * @param string     $firebaseSpecificJson
+	 * @param string $cacheIdentifier
 	 * @return array|void
 	 */
-	public static function requestAuthorizationTokens($firebaseSpecificJson)
+	public static function requestAuthorizationTokens($firebaseSpecificJson, $cacheIdentifier = null)
 	{
+		if ($cacheIdentifier)
+		{
+			self::$cacheKey = self::$cacheKey . '_' . $cacheIdentifier;
+		}
 		$accessTokens = self::getTokensFromCache();
 		if ($accessTokens)
 		{
@@ -98,7 +105,7 @@ class kFirebaseOauth
 
 	protected static function getCacheKey()
 	{
-		return 'firebase_oauth_tokens';
+		return self::$cacheKey;
 	}
 
 	/**
