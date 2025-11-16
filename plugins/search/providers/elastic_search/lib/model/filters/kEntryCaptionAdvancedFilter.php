@@ -11,14 +11,29 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	protected $hasCaption = true;
 
 	/**
-	 * @var KalturaLanguage
+	 * @var string
 	 */
 	protected $language;
 
 	/**
 	 * @var int
 	 */
-	protected $accuracy;
+	protected $accuracyGreaterThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	protected $accuracyLessThanOrEqual;
+
+	/**
+	 * @var int
+	 */
+	protected $accuracyGreaterThan;
+
+	/**
+	 * @var int
+	 */
+	protected $accuracyLessThan;
 
 	/**
 	 * @var CaptionUsage
@@ -42,7 +57,7 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	}
 
 	/**
-	 * @return KalturaLanguage
+	 * @return string
 	 */
 	public function getLanguage()
 	{
@@ -50,7 +65,7 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	}
 
 	/**
-	 * @param KalturaLanguage $language
+	 * @param string $language
 	 */
 	public function setLanguage($language)
 	{
@@ -58,19 +73,67 @@ class kEntryCaptionAdvancedFilter extends AdvancedSearchFilterItem
 	}
 
 	/**
-	 * @return ESearchRange
+	 * @return int
 	 */
-	public function getAccuracy()
+	public function getAccuracyGreaterThanOrEqual()
 	{
-		return $this->accuracy;
+		return $this->accuracyGreaterThanOrEqual;
 	}
 
 	/**
-	 * @param ESearchRange $accuracy
+	 * @param int $accuracyGreaterThanOrEqual
 	 */
-	public function setAccuracy($accuracy)
+	public function setAccuracyGreaterThanOrEqual($accuracyGreaterThanOrEqual)
 	{
-		$this->accuracy = $accuracy;
+		$this->accuracyGreaterThanOrEqual = $accuracyGreaterThanOrEqual;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getAccuracyLessThanOrEqual()
+	{
+		return $this->accuracyLessThanOrEqual;
+	}
+
+	/**
+	 * @param int $accuracyLessThanOrEqual
+	 */
+	public function setAccuracyLessThanOrEqual($accuracyLessThanOrEqual)
+	{
+		$this->accuracyLessThanOrEqual = $accuracyLessThanOrEqual;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getAccuracyGreaterThan()
+	{
+		return $this->accuracyGreaterThan;
+	}
+
+	/**
+	 * @param int $accuracyGreaterThan
+	 */
+	public function setAccuracyGreaterThan($accuracyGreaterThan)
+	{
+		$this->accuracyGreaterThan = $accuracyGreaterThan;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getAccuracyLessThan()
+	{
+		return $this->accuracyLessThan;
+	}
+
+	/**
+	 * @param int $accuracyLessThan
+	 */
+	public function setAccuracyLessThan($accuracyLessThan)
+	{
+		$this->accuracyLessThan = $accuracyLessThan;
 	}
 
 	/**

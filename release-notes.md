@@ -1,5 +1,5 @@
 # Venus-22.7.0
-## Add caption accuracy to entry list filter ##
+## Add caption accuracy and usuage fields to entry list filter ##
 - Issue Type: Task
 - Issue ID: PLAT-25558
 ### Deployment scripts ###
