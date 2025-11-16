@@ -417,6 +417,8 @@ class EntryVendorTaskService extends KalturaBaseService
 	 * @return KalturaEntryVendorTask
 	 * @throws KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
+	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
+	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 */
 	public function resetJobCatalogItemAction($id, $catalogItemId)
 	{
