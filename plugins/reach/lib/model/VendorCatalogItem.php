@@ -276,15 +276,30 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array("vendorCatalogItem:id=".strtolower($this->getId()));
 	}
 
+	public function getLinkedCatalogItems(): array
+	{
+		$notes  = json_decode($this->getNotes(), true) ?? [];
+		$linked_catalog_items = $notes['linked_catalog_items'] ?? '';
+		if ($linked_catalog_items === '' || $linked_catalog_items === null) {
+			return [];
+		}
+		return array_map('trim', explode(',', $linked_catalog_items));
+	}
+
+
 	public function isDuplicateTask($entryId, $entryObjectType, $partnerId)
 	{
 		$version = $this->getTaskVersion($entryId, $entryObjectType);
-		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryId, $this->getId(), $partnerId, $version);
-		if($activeTask)
+		$catalog_item_ids = [$this->getId()];
+		$catalog_item_ids = array_merge($catalog_item_ids, $this->getLinkedCatalogItems());
+		foreach ($catalog_item_ids as $id)
 		{
-			return true;
+			$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryId, $id, $partnerId, $version);
+			if($activeTask)
+			{
+				return true;
+			}
 		}
-
 		return false;
 	}
 

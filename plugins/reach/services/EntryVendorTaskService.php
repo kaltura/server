@@ -419,6 +419,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	 * @throws KalturaReachErrors::CATALOG_ITEM_NOT_FOUND
 	 * @throws KalturaErrors::ENTRY_ID_NOT_FOUND
 	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
+	 * @throws KalturaReachErrors::CATALOG_ITEMS_ARE_NOT_LINKED
 	 */
 	public function resetJobCatalogItemAction($id, $catalogItemId)
 	{
@@ -429,6 +430,11 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
 		if (!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $catalogItemId);
+
+		if (!in_array((string)$catalogItemId, $dbEntryVendorTask->getCatalogItem()->getLinkedCatalogItems(), true))
+		{
+			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEMS_ARE_NOT_LINKED, $catalogItemId, $dbEntryVendorTask->getCatalogItemId());
+		}
 
 		$vendorTaskObjectHandler = HandlerFactory::getHandler($dbEntryVendorTask->getEntryObjectType());
 		$entryId = $dbEntryVendorTask->getEntryId();
@@ -441,8 +447,7 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbReachProfile = ReachProfilePeer::retrieveByPK($dbEntryVendorTask->getReachProfileId());
 		if (!$dbReachProfile)
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $dbEntryVendorTask->getReachProfileId());
-
-
+		
 		$this->validateEntryVendorTask($entryObject, $dbVendorCatalogItem, $dbReachProfile, $vendorTaskObjectHandler, $dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getUnitsUsed(), $dbEntryVendorTask->getTaskJobData());
 
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::PENDING);
