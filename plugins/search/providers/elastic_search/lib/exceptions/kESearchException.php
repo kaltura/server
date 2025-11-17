@@ -14,8 +14,7 @@ class kESearchException extends kCoreException
     const MISSING_MANDATORY_PARAMETERS_IN_ORDER_ITEM = 'missing mandatory parameters in order item';
     const MIXED_SEARCH_ITEMS_IN_NESTED_OPERATOR_NOT_ALLOWED = 'mixed search items in nested operator not allowed';
     const MISSING_OPERATOR_TYPE = 'missing operator type';
-	const INVALID_CAPTION_ACCURACY_VALUES = 'All range values are null';
-	const RANGE_VALUE_FOR_ACCURACY_IS_ILLEGAL = 'Range value for Accuracy is illegal';
+    const RANGE_VALUE_FOR_ACCURACY_IS_ILLEGAL = 'Range value for Accuracy is illegal';
 
     //Query parsing errors
     const MISSING_QUERY_OPERAND = 'Missing operand [AND / OR / NOT]';

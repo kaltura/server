@@ -207,8 +207,9 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			$captionLabel = $captionAsset->getLabel() ? $captionAsset->getLabel() : '';
 			$captionLanguage = $captionAsset->getLanguage() ? $captionAsset->getLanguage() : '';
 			$captionAccuracy = $captionAsset->getAccuracy() ? $captionAsset->getAccuracy() : 0;
+			$captionUsage = $captionAsset->getUsage() ? $captionAsset->getUsage() : CaptionUsage::CAPTION;
 
-			$key = "{$captionLanguage}_{$captionLabel}";
+			$key = "{$captionLanguage}_{$captionLabel}_{$captionUsage}";
 
 			if(isset($accuracies[$key]) && ($captionAccuracy <= $accuracies[$key]))
 			{
