@@ -4,6 +4,11 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<?php
+	$googleVerificationToken = kConf::get("google-site-verification", "local","");
+	if( $googleVerificationToken ) { ?>
+	<meta name="google-site-verification" content="<?php echo $googleVerificationToken; ?>"/>
+	<?php } ?>
 	<title><?php echo htmlspecialchars($entry_name); ?></title>
 	<?php if( $entry_id ) { ?>
 		<meta property="og:url" content="<?php echo $pageURL; ?>" />
