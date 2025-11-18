@@ -425,11 +425,15 @@ class EntryVendorTaskService extends KalturaBaseService
 	{
 		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
 		if (!$dbEntryVendorTask)
+		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_VENDOR_TASK_NOT_FOUND, $id);
+		}
 
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($catalogItemId);
 		if (!$dbVendorCatalogItem)
+		{
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $catalogItemId);
+		}
 
 		if (!in_array((string)$catalogItemId, $dbEntryVendorTask->getCatalogItem()->getLinkedCatalogItems(), true))
 		{
@@ -446,8 +450,10 @@ class EntryVendorTaskService extends KalturaBaseService
 
 		$dbReachProfile = ReachProfilePeer::retrieveByPK($dbEntryVendorTask->getReachProfileId());
 		if (!$dbReachProfile)
+		{
 			throw new KalturaAPIException(KalturaReachErrors::REACH_PROFILE_NOT_FOUND, $dbEntryVendorTask->getReachProfileId());
-		
+		}
+
 		$this->validateEntryVendorTask($entryObject, $dbVendorCatalogItem, $dbReachProfile, $vendorTaskObjectHandler, $dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getUnitsUsed(), $dbEntryVendorTask->getTaskJobData());
 
 		$dbEntryVendorTask->setStatus(KalturaEntryVendorTaskStatus::PENDING);

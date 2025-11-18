@@ -97,7 +97,7 @@ class KalturaReachErrors implements kReachErrors
 	const REQUIRE_CAPTION = "REQUIRE_CAPTION;CATALOG_ITEM_ID;Caption Asset must be provided for catalog item [@CATALOG_ITEM_ID@]";
 	const ENTRY_OBJECT_TYPE_NOT_SUPPORTED = "ENTRY_OBJECT_TYPE_NOT_SUPPORTED;ENTRY_OBJECT_TYPE;Entry object type [@ENTRY_OBJECT_TYPE@] is not supported";
 
-	const CATALOG_ITEMS_ARE_NOT_LINKED = "CATALOG_ITEMS_ARE_NOT_LINKED;FIRST_CATALOG_ITEM_ID,SEC_CATALOG_ITEM_ID; catalog item [@FIRST_CATALOG_ITEM_ID@] is not linked to catalog item [@SEC_CATALOG_ITEM_ID@]";
+	const CATALOG_ITEMS_ARE_NOT_LINKED = "CATALOG_ITEMS_ARE_NOT_LINKED;FIRST_CATALOG_ITEM_ID,SECOND_CATALOG_ITEM_ID; catalog item [@FIRST_CATALOG_ITEM_ID@] is not linked to catalog item [@SECOND_CATALOG_ITEM_ID@]";
 
 	/* Credit */
 	
