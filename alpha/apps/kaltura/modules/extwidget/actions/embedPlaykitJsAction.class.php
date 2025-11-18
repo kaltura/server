@@ -5,6 +5,8 @@
  */
 class embedPlaykitJsAction extends sfAction
 {
+	const COMPRESSED_PREFIX = "COMPRESSED,";
+	
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
 	const VERSIONS_PARAM_NAME = "versions";
@@ -160,7 +162,7 @@ class embedPlaykitJsAction extends sfAction
 		//If length of data is over 4MB compress it before caching
 		if(strlen($data) > $context->maxObjectCacheSize)
 		{
-			$data = "COMPRESSED," . gzcompress($data);
+			$data = self::COMPRESSED_PREFIX . gzcompress($data);
 			if(strlen($data) > $context->maxObjectCacheSize)
 			{
 				KalturaMonitorClient::sendErrorEvent(self::FAILED_TO_SAVE_BUNDLE_IN_CACHE);
@@ -176,9 +178,9 @@ class embedPlaykitJsAction extends sfAction
 	protected static function getCacheData($context, $cacheType, $key)
 	{
 		$data = $context->$cacheType->get($key);
-		if($data && strpos($data, "COMPRESSED,") === 0)
+		if($data && strpos($data, self::COMPRESSED_PREFIX) === 0)
 		{
-			$data = substr($data, strlen("COMPRESSED,"));
+			$data = substr($data, strlen(self::COMPRESSED_PREFIX));
 			$data = gzuncompress($data);
 		}
 		return $data;

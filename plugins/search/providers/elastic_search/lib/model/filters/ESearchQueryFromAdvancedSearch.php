@@ -127,31 +127,146 @@ class ESearchQueryFromAdvancedSearch
 		return $advanceFilterOperator;
 	}
 
+	/**
+	 * Check if any field conditions are specified in the caption advanced filter
+	 *
+	 * @param kEntryCaptionAdvancedFilter $searchFilter
+	 * @return bool
+	 */
+	private function hasFieldConditions(kEntryCaptionAdvancedFilter $searchFilter)
+	{
+		return $searchFilter->getLanguage() ||
+		       $searchFilter->getAccuracyGreaterThanOrEqual() !== null ||
+		       $searchFilter->getAccuracyLessThanOrEqual() !== null ||
+		       $searchFilter->getAccuracyGreaterThan() !== null ||
+		       $searchFilter->getAccuracyLessThan() !== null ||
+		       $searchFilter->getUsage() !== null;
+	}
+
+	/**
+	 * Create a general caption search item
+	 *
+	 * @param mixed $fieldName The caption field name
+	 * @param mixed $itemType The search item type
+	 * @param mixed $searchTerm Optional search term to set
+	 * @return ESearchCaptionItem
+	 */
+	private function createESearchCaptionItem($fieldName, $itemType, $searchTerm = null)
+	{
+		$captionItem = new ESearchCaptionItem();
+		$captionItem->setFieldName($fieldName);
+		$captionItem->setItemType($itemType);
+
+		if ($searchTerm !== null) {
+			$captionItem->setSearchTerm($searchTerm);
+		}
+
+		return $captionItem;
+	}
+
+	/**
+	 * Create an accuracy range search item
+	 *
+	 * @param kEntryCaptionAdvancedFilter $searchFilter
+	 * @return ESearchCaptionItem|null
+	 */
+	private function createAccuracyItem(kEntryCaptionAdvancedFilter $searchFilter)
+	{
+		if ($searchFilter->getAccuracyGreaterThanOrEqual() === null &&
+			$searchFilter->getAccuracyLessThanOrEqual() === null &&
+			$searchFilter->getAccuracyGreaterThan() === null &&
+			$searchFilter->getAccuracyLessThan() === null) {
+			return null;
+		}
+
+		$accuracyRange = new ESearchRange();
+		if ($searchFilter->getAccuracyGreaterThanOrEqual() !== null) {
+			$accuracyRange->setGreaterThanOrEqual($searchFilter->getAccuracyGreaterThanOrEqual());
+		}
+		if ($searchFilter->getAccuracyLessThanOrEqual() !== null) {
+			$accuracyRange->setLessThanOrEqual($searchFilter->getAccuracyLessThanOrEqual());
+		}
+		if ($searchFilter->getAccuracyGreaterThan() !== null) {
+			$accuracyRange->setGreaterThan($searchFilter->getAccuracyGreaterThan());
+		}
+		if ($searchFilter->getAccuracyLessThan() !== null) {
+			$accuracyRange->setLessThan($searchFilter->getAccuracyLessThan());
+		}
+
+		$accuracyItem = $this->createESearchCaptionItem(ESearchCaptionFieldName::ACCURACY, ESearchItemType::RANGE);
+		$accuracyItem->setRange($accuracyRange);
+		return $accuracyItem;
+	}
+
 	protected function createESearchQueryFromEntryCaptionAdvancedFilter(kEntryCaptionAdvancedFilter $searchFilter)
 	{
-		$item = new ESearchCaptionItem();
-		if (!$searchFilter->getLanguage())
+		$hasFieldConditions = $this->hasFieldConditions($searchFilter);
+
+		// If no field conditions are specified, maintain old behavior (always return result based on hasCaption)
+		if (!$hasFieldConditions)
 		{
-			$item->setFieldName(ESearchCaptionFieldName::CONTENT);
-			$item->setItemType(ESearchItemType::EXISTS);
+			$hasCaptionsItem = $this->createESearchCaptionItem(ESearchCaptionFieldName::CONTENT, ESearchItemType::EXISTS);;
+			if ($searchFilter->getHasCaption())
+			{
+				$result = $hasCaptionsItem;
+			}
+			else
+			{
+				$result = self::createNegativeQuery($hasCaptionsItem);
+			}
+			return $result;
 		}
-		else
-		{
-			$item->setFieldName(ESearchCaptionFieldName::LANGUAGE);
-			$item->setItemType(ESearchItemType::EXACT_MATCH);
-			$item->setSearchTerm($searchFilter->getLanguage());
-		}
-		$result = $item;
+
+		// If field conditions exist, build nested query with those conditions
+		$captionFieldConditions = [];
 
 		if ($searchFilter->getHasCaption())
 		{
-			return $result;
+			$hasCaptionsItem = $this->createESearchCaptionItem(ESearchCaptionFieldName::CONTENT, ESearchItemType::EXISTS);;
+			$captionFieldConditions[] = $hasCaptionsItem;
+		}
+
+		if ($searchFilter->getLanguage())
+		{
+			$languageItem = $this->createESearchCaptionItem(ESearchCaptionFieldName::LANGUAGE, ESearchItemType::EXACT_MATCH, $searchFilter->getLanguage());;
+			$captionFieldConditions[] = $languageItem;
+		}
+
+		$accuracyItem = $this->createAccuracyItem($searchFilter);
+		if ($accuracyItem !== null)
+		{
+			$captionFieldConditions[] = $accuracyItem;
+		}
+
+		if ($searchFilter->getUsage() !== null)
+		{
+			$usageItem = $this->createESearchCaptionItem(ESearchCaptionFieldName::USAGE, ESearchItemType::EXACT_MATCH, $searchFilter->getUsage());
+			$captionFieldConditions[] = $usageItem;
+		}
+
+		if (empty($captionFieldConditions))
+		{
+			return null;
+		}
+
+		// Create the nested query ensuring all conditions apply to the same caption asset
+		if (count($captionFieldConditions) === 1)
+		{
+			$nestedQuery = $captionFieldConditions[0];
 		}
 		else
 		{
-			return self::createNegativeQuery($item);
+			$nestedQuery = self::createNestedOperator($captionFieldConditions);
 		}
 
+		if ($searchFilter->getHasCaption())
+		{
+			return $nestedQuery;
+		}
+		else
+		{
+			return self::createNegativeQuery($nestedQuery);
+		}
 	}
 
 	protected function createESearchQueryFromEntryQuizAdvancedFilter(kQuizAdvancedFilter $filter)
@@ -171,12 +286,22 @@ class ESearchQueryFromAdvancedSearch
 		return $result;
 	}
 
+	protected static function createNestedOperator($items, $operator = ESearchOperatorType::AND_OP)
+	{
+		return self::createOperatorByType('ESearchNestedOperator', $operator, $items);
+	}
+
+	protected static function createOperatorByType($operator, $operatorType, $items)
+	{
+		$operator = new $operator();
+		$operator->setOperator($operatorType);
+		$operator->setSearchItems($items);
+		return $operator;
+	}
+
 	public static function createNegativeQuery($item)
 	{
-		$result = new ESearchOperator();
-		$result->setOperator(ESearchOperatorType::NOT_OP);
-		$result->setSearchItems(array($item));
-		return $result;
+		return self::createOperatorByType('ESearchOperator', ESearchOperatorType::NOT_OP, array($item));
 	}
 
 	public static function enclosedInQuotationMarks($searchTerm)

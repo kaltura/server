@@ -288,8 +288,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_JOIN_REPORTS => array(
 				array(
 					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
-					self::REPORT_TOTAL_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+					self::REPORT_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
 				),
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
@@ -302,7 +302,6 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'live_view_time' => self::METRIC_UNION_LIVE_MEETING_VIEW_TIME,
 				'total_view_time' => self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME,
 				'avg_completion_rate' => self::METRIC_UNIQUE_PERCENTILES_RATIO,
-				'engagement_rate' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO,
 				'count_reaction_clicked' => self::EVENT_TYPE_REACTION_CLICKED,
 				'count_raise_hand_clicked' => self::EVENT_TYPE_MEETING_RAISE_HAND,
 				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
@@ -440,7 +439,7 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 		),
 	);
 
-	public static function getReportDef($report_type, $input_filter)
+	public static function getReportDef($report_type, $input_filter, $response_options = null)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))
