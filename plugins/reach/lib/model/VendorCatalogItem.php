@@ -280,7 +280,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	{
 		$notes  = json_decode($this->getNotes(), true) ?? [];
 		$linked_catalog_items = $notes['linked_catalog_items'] ?? '';
-		if ($linked_catalog_items === '' || $linked_catalog_items === null)
+		if (!$linked_catalog_items)
 		{
 			return [];
 		}

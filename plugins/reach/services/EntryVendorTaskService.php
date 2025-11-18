@@ -34,15 +34,14 @@ class EntryVendorTaskService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaReachErrors::FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY, $featureType, $entryId);
 		}
 
-		$dbTaskData = $taskJobData ? $taskJobData->toObject() : null;
-		if (!kReachUtils::verifyRequiredSource($dbVendorCatalogItem, $dbTaskData))
+		if (!kReachUtils::verifyRequiredSource($dbVendorCatalogItem, $taskJobData))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::REQUIRE_CAPTION, $dbVendorCatalogItem->getId());
 		}
 
 		if($dbVendorCatalogItem->requiresPayment())
 		{
-			$unitsUsed = kReachUtils::getPricingUnits($dbVendorCatalogItem, $entryObject, $entryObjectType, $dbTaskData, $unitsUsed);
+			$unitsUsed = kReachUtils::getPricingUnits($dbVendorCatalogItem, $entryObject, $entryObjectType, $taskJobData, $unitsUsed);
 			$this->validateEntryVendorTaskPayment($entryId, $entryObjectType, $dbVendorCatalogItem, $entryObject, $dbReachProfile, $unitsUsed);
 		}
 

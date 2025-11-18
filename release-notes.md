@@ -1,3 +1,14 @@
+# Venus-22.7.0
+
+## Update caption asset http notification template ##
+* Issue Type: Task
+* Issue ID: Plat 25581
+
+### Deployment scripts ###
+
+php deployment/updates/scripts/add_permissions/2025_11_13_add_entryvendortask_reset_catalogItem.php
+
+
 # Venus-22.6.0
 
 ## Update caption asset http notification template ##
