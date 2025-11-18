@@ -1,4 +1,13 @@
 # Venus-22.7.0
+
+## Add action reset_catalogItem to EntryVendorTask service  ##
+* Issue Type: Task
+* Issue ID: Plat 25581
+
+### Deployment scripts ###
+
+php deployment/updates/scripts/add_permissions/2025_11_13_add_entryvendortask_reset.php
+
 ## Add caption accuracy and usage fields to entry list filter ##
 - Issue Type: Task
 - Issue ID: PLAT-25558
