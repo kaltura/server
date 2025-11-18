@@ -21,6 +21,7 @@ class kBatchManager
 	{
 		return self::$currentUpdatingJob;
 	}
+
 	
 	/**
 	 * batch createFlavorAsset orgenize a convert job data 
@@ -288,7 +289,7 @@ class kBatchManager
 		}
 
 		if(isset($flavorParams) && in_array('audio_description', $flavorParams->getTagsArray())) {
-			kBusinessPreConvertDL::setAudioDescriptionLabel($flavorAsset, $flavorParams);
+			self::setAudioDescriptionLabel($flavorAsset, $flavorParams);
 		}
 
 		$flavorAsset->save();
@@ -420,4 +421,33 @@ public static function updateEntry($entryId, $status)
 		return $entry;
 	}
 
+	public function setAudioDescriptionLabel($flavorAsset, $flavorParams)
+	{
+		if(!in_array('audio_description', $flavorParams->getTagsArray()))
+		{
+			return;
+		}
+
+		$currentLabel = $flavorAsset->getLabel();
+
+		if (!$currentLabel)
+		{
+			$lang = 'AAD';
+			if (($multiStreamJson = $flavorParams->getMultiStream()) !== null && ($multiStreamObj = json_decode($multiStreamJson)) !== null)
+			{
+				if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
+				{
+					$lang = $multiStreamObj->audio->languages[0] . '_AAD';
+				}
+			}
+			$flavorAsset->setLabel($lang);
+		}
+
+		else if (strpos($currentLabel, "AAD") === false)
+		{
+			$flavorAsset->setLabel($currentLabel . '_AAD');
+		}
+
+		$flavorAsset->save();
+	}
 }

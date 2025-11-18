@@ -541,8 +541,6 @@ class kBusinessPreConvertDL
 			$flavorAsset->save();
 		}
 
-		self::setAudioDescriptionLabel($flavorAsset, $flavorParams);
-
 		if(!$flavorAsset->getIsOriginal())
 			$flavor->setReadyBehavior(flavorParamsConversionProfile::READY_BEHAVIOR_IGNORE); // should not be taken in completion rules check
 
@@ -1523,8 +1521,6 @@ if(isset($mediaInfo)) {
 				$flavorAsset->save();
 			}
 
-			self::setAudioDescriptionLabel($flavorAsset, $flavor);
-
 			$collectionTag = $flavor->getCollectionTag();
 			/*
 			 * CHANGE: collection porcessing only for ExpressionEncoder jobs
@@ -1747,8 +1743,6 @@ if(isset($mediaInfo)) {
 				$originalFlavorAsset->setLabel($multiStreamObj->audio->streams[0]->label);
 				$originalFlavorAsset->save();
 			}
-
-			self::setAudioDescriptionLabel($originalFlavorAsset, $sourceFlavorOutput);
 
 			if(!$sourceFlavorOutput)
 			{
@@ -2335,29 +2329,6 @@ if(isset($mediaInfo)) {
 		
 		KalturaLog::log("None of the conditions are met.");
 		return;
-	}
-
-	public static function setAudioDescriptionLabel($flavorAsset, $flavorParams)
-	{
-		if(!in_array('audio_description', $flavorParams->getTagsArray())) {
-			return;
-		}
-
-		$currentLabel = $flavorAsset->getLabel();
-
-		if($currentLabel) {
-			$flavorAsset->setLabel($currentLabel . '_aad');
-		} else {
-			// Use language from MultiStream if no label exists
-			$lang = 'aad'; // fallback
-			if(($multiStreamJson=$flavorParams->getMultiStream())!=null && ($multiStreamObj=json_decode($multiStreamJson))!=null) {
-				if(isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages)>0){
-					$lang = $multiStreamObj->audio->languages[0] . '_aad';
-				}
-			}
-			$flavorAsset->setLabel($lang);
-		}
-		$flavorAsset->save();
 	}
 
 	/**
