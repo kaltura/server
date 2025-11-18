@@ -21,6 +21,9 @@ class kZoomClient extends kVendorClient
 	const API_GET_MEETING_RECORDING = '/v2/meetings/@meetingId@/recordings';
 	const API_GET_MEETING = '/v2/meetings/@meetingId@';
 
+	const MAX_RETRIES = 3;
+	const RETRY_DELAY_MS = 1000; // 1 second fixed delay
+
 	protected $accountId;
 	protected $zoomAuthType;
 	protected $zoomTokensHelper;
@@ -231,30 +234,64 @@ class kZoomClient extends kVendorClient
 	public function callZoom(string $apiPath, array $options = array())
 	{
 		KalturaLog::info('Calling zoom api: ' . $apiPath);
-		$curlWrapper = new KCurlWrapper();
-		$curlWrapper->setOpts($options);
-		
-		$url = $this->generateContextualUrl($apiPath);
-		$token = $this->accessToken;
 
-		$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
-			"authorization: Bearer {$token}",
-			"content-type: application/json"
-		));
-		$response = $curlWrapper->exec($url);
-		$httpCode = $curlWrapper->getHttpCode();
-		$this->handleCurlResponse($response, $httpCode, $curlWrapper);
-		if (!$response)
+		$maxRetries = self::MAX_RETRIES;
+		$attempt = 0;
+		$lastError = null;
+		while ($attempt <= $maxRetries)
 		{
-			$data = $curlWrapper->getErrorMsg();
-			KalturaLog::debug('Zoom API call failed: ' . $data);
+			$curlWrapper = new KCurlWrapper();
+			$curlWrapper->setOpts($options);
+
+			$url = $this->generateContextualUrl($apiPath);
+			$token = $this->accessToken;
+
+			$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array("authorization: Bearer {$token}","content-type: application/json"));
+			$response = $curlWrapper->exec($url);
+			$httpCode = $curlWrapper->getHttpCode();
+			$this->handleCurlResponse($response, $httpCode, $curlWrapper);
+
+			if ($response)
+			{
+				$data = json_decode($response, true);
+				KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
+				return $data;
+			}
+			// Check if error is retryable
+			$lastError = $curlWrapper->getErrorMsg();
+			if (!$this->isRetryableError($lastError, $httpCode)) 
+			{
+				KalturaLog::info('Zoom API call failed with non-retryable error: ' . $lastError);
+				return null;
+			}
+
+			$attempt++;
+			if ($attempt <= $maxRetries) 
+			{
+				KalturaLog::info("Zoom API call failed (attempt $attempt/$maxRetries), retrying after " . self::RETRY_DELAY_MS . "ms. Error: $lastError");
+				usleep(self::RETRY_DELAY_MS * 1000); // Convert to microseconds
+			}
 		}
-		else
+
+		KalturaLog::info("Zoom API call failed after $maxRetries retries: $lastError");
+		return null;
+	}
+
+	protected function isRetryableError($errorMsg, $httpCode)
+	{
+		// Retry on SSL/connection errors
+		if (strpos($errorMsg, 'SSL') !== false || strpos($errorMsg, 'Connection') !== false || strpos($errorMsg, 'timeout') !== false) 
 		{
-			$data = json_decode($response, true);
-			KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
+			return true;
 		}
-		return $data;
+
+		// Retry on 5xx server errors and 429 rate limiting
+		if ($httpCode >= 500 || $httpCode == 429) 
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	protected function generateContextualUrl($apiPath)
