@@ -319,6 +319,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_ROW_FILTER_BY_COLUMN = 'report_row_filter_by_column';
 	const REPORT_MAX_RESULT_SIZE = 'report_max_result_size';
 	const REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER = 'report_enrich_edit_context_from_filter';
+	const REPORT_FRIENDLY_DEF = 'report_friendly_definition';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -2551,15 +2552,15 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	protected static function getReportDefFromReportClass($report_type, $input_filter = null)
+	protected static function getReportDefFromReportClass($report_type, $input_filter = null, $response_options = null)
 	{
 		$report_class = self::getReportClassName($report_type);
-		return $report_class ? $report_class::getReportDef($report_type, $input_filter) : null;
+		return $report_class ? $report_class::getReportDef($report_type, $input_filter, $response_options) : null;
 	}
 
-	protected static function getReportDefinition($report_type, $input_filter = null)
+	protected static function getReportDefinition($report_type, $input_filter = null, $response_options = null)
 	{
-		$report_def = self::getReportDefFromReportClass($report_type, $input_filter);
+		$report_def = self::getReportDefFromReportClass($report_type, $input_filter, $response_options);
 		return $report_def ? self::buildReportDef($report_def) : null;
 	}
 
@@ -4120,7 +4121,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::init();
 		
-		$report_def = self::getReportDefinition($report_type, $input_filter);
+		$report_def = self::getReportDefinition($report_type, $input_filter, $response_options);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
@@ -6551,7 +6552,7 @@ class kKavaReportsMgr extends kKavaBase
 			$page_index = 1;
 		
 		// run the query
-		$report_def = self::getReportDefinition($report_type, $input_filter);
+		$report_def = self::getReportDefinition($report_type, $input_filter, $response_options);
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
 			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
@@ -7221,7 +7222,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::init();
 
-		$report_def = self::getReportDefinition($report_type, $input_filter);
+		$report_def = self::getReportDefinition($report_type, $input_filter, $response_options);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
@@ -7667,7 +7668,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		list($headers_for_total, $headers_for_table) = explode(';', $headers);
 
-		$report_def = self::getReportDefinition($report_type, $input_filter);
+		$report_def = self::getReportDefinition($report_type, $input_filter, $response_options);
 
 		if (isset($report_def[self::REPORT_JOIN_REPORTS]) || isset($report_def[self::REPORT_JOIN_GRAPHS]) || isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{

@@ -207,8 +207,9 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 			$captionLabel = $captionAsset->getLabel() ? $captionAsset->getLabel() : '';
 			$captionLanguage = $captionAsset->getLanguage() ? $captionAsset->getLanguage() : '';
 			$captionAccuracy = $captionAsset->getAccuracy() ? $captionAsset->getAccuracy() : 0;
+			$captionUsage = $captionAsset->getUsage() ? $captionAsset->getUsage() : CaptionUsage::CAPTION;
 
-			$key = "{$captionLanguage}_{$captionLabel}";
+			$key = "{$captionLanguage}_{$captionLabel}_{$captionUsage}";
 
 			if(isset($accuracies[$key]) && ($captionAccuracy <= $accuracies[$key]))
 			{
@@ -255,7 +256,8 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				continue;
 
 			$language = $captionAsset->getLanguage();
-			self::getElasticLines($captionData, $captionRawData, $items, $language, $captionAsset->getId(), $captionAsset->getLabel());
+
+			self::getElasticLines($captionData, $captionRawData, $items, $language, $captionAsset->getId(), $captionAsset->getUsage(), $captionAsset->getLabel(), $captionAsset->getAccuracy());
 		}
 		$data['caption_assets'] = $captionData;
 		$captionRawData = array_values(array_unique($captionRawData));
@@ -263,7 +265,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 		return $data;
 	}
 
-	protected static function getElasticLines(&$captionData ,&$captionRawData, $items, $language, $assetId, $label = null)
+	protected static function getElasticLines(&$captionData ,&$captionRawData, $items, $language, $assetId, $usage, $label = null, $accuracy = null)
 	{
 		foreach ($items as $item)
 		{
@@ -272,10 +274,14 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				'end_time' => $item['endTime'],
 				'language' => $language,
 				'caption_asset_id' => $assetId,
+				'usage' => $usage,
 			);
 
 			if($label)
 				$line['label'] = $label;
+
+			if($accuracy)
+				$line['accuracy'] = $accuracy;
 
 			$content = '';
 			foreach ($item['content'] as $curChunk)

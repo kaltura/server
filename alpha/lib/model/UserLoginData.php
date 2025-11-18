@@ -19,20 +19,48 @@ class UserLoginData extends BaseUserLoginData
 	const PASSWORD_ARGON2ID = 'argon2id';
 	const PASSWORD_ARGON2I = 'argon2i';
 	const K_CONF_PAS_HASH_ALGO_PARAM = 'password_hash_algo';
+	
+	// Custom data keys
+	const CUSTOM_DATA_KEY_LAST_LOGIN_PARTNER_ID = 'last_login_partner_id';
+	const CUSTOM_DATA_KEY_LAST_LOGIN_TIME = 'last_login_time';
 
 	public function getFullName()
 	{
 		return trim($this->getFirstName() . ' ' . $this->getLastName());
 	}
 	
+	public function getLastLoginTime()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_KEY_LAST_LOGIN_TIME, null, array());
+	}
+	
+	public function setLastLoginTime($value)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_KEY_LAST_LOGIN_TIME, $value);
+	}
+	
+	public function getLastLoginTimeForPartner($partnerId)
+	{
+		$lastLoginTime = $this->getLastLoginTime();
+		return $lastLoginTime[$partnerId] ?? null;
+	}
+	
+	public function setLastLoginTimeForPartner($partnerId, $time = null)
+	{
+		$time = $time ?? time();
+		$lastLoginTime = $this->getLastLoginTime();
+		$lastLoginTime[$partnerId] = $time;
+		$this->setLastLoginTime($lastLoginTime);
+	}
+	
 	public function setLastLoginPartnerId($partnerId)
 	{
-		$this->putInCustomData('last_login_partner_id', $partnerId);
+		$this->putInCustomData(self::CUSTOM_DATA_KEY_LAST_LOGIN_PARTNER_ID, $partnerId);
 	}
 	
 	public function getLastLoginPartnerId()
 	{
-		$lastPartner =  $this->getFromCustomData('last_login_partner_id');
+		$lastPartner =  $this->getFromCustomData(self::CUSTOM_DATA_KEY_LAST_LOGIN_PARTNER_ID);
 		if (!$lastPartner) {
 			$lastPartner = $this->config_partner_id;
 		}
