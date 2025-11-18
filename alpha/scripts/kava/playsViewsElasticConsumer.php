@@ -12,7 +12,7 @@ class playsViewsElasticConsumer extends BaseConsumer
 {
 	protected function processMessage($message)
 	{
-		global $elasticClient, $indexConfig, $explicitPartnerIds;
+		global $elasticClient, $indexConfig, $explicitPartnerIds, $memcInstances, $maxLastPlayedAt;
 		$data = json_decode($message, true);
 		$entryId = $data['entry_id'];
 		unset($data['entry_id']);
@@ -29,6 +29,19 @@ class playsViewsElasticConsumer extends BaseConsumer
 		}
 		
 		$doc = array_map('intval', $data);
+		if (isset($data['last_played_at']))
+		{
+			$lastPlayedAt = $data['last_played_at'];
+			if ($lastPlayedAt > $maxLastPlayedAt)
+			{
+				foreach ($memcInstances as $memc)
+				{
+					$memc->set(MEMC_KEY_LAST_PLAYED_AT . "_$this->consumerId", $lastPlayedAt);
+				}
+				$maxLastPlayedAt = $lastPlayedAt;
+			}
+		}
+
 		$indexName = isset($indexConfig[$partnerId]) ? $indexConfig[$partnerId] : ElasticIndexMap::ELASTIC_ENTRY_INDEX;
 		$index = kBaseESearch::getSplitIndexNamePerPartner($indexName, $partnerId);
 		$params = array(
@@ -63,6 +76,8 @@ if ($argc < 2)
 
 // get the bulk size from the command line argument or use the default value
 $bulkSize = is_numeric($argv[1]) ? intval($argv[1]) : 250;
+// get memcache to update last played at
+$memcache = getenv(MEMCACHE_VAR);
 
 // load cluster configurations
 $config = kConf::get('elasticPopulateSettings', 'elastic_populate', array());
@@ -160,6 +175,23 @@ if ($explicitPartnerIdsString)
         $explicitPartnerIds = array_map('trim', $explicitPartnerIdsArray);
 }
 
+$memcInstances = array();
+$memcacheArr = explode(',', $memcache);
+foreach ($memcacheArr as $memcacheConfig)
+{
+	list($currMemcacheHost, $currMemcachePort) = explode(':', $memcacheConfig);
+	$currMemc = new kInfraMemcacheCacheWrapper();
+	$ret = $currMemc->init(array('host'=>$currMemcacheHost, 'port'=>$currMemcachePort));
+	if (!$ret)
+	{
+		$message = "Failed to connect to cache host {$currMemcacheHost} port {$currMemcachePort}";
+		KalturaLog::err($message);
+		writeFailure($message);
+		exit(1);
+	}
+	$memcInstances[] = $currMemc;
+}
+
 //When loading the server bootstrap it disables the stream wrappers, we need to enable it back for the s3Wrapper to be able to fetch files form s3
 if (!array_intersect(array('https', 'http'), stream_get_wrappers()))
 {
@@ -169,6 +201,7 @@ if (!array_intersect(array('https', 'http'), stream_get_wrappers()))
 
 $consumer = new playsViewsElasticConsumer($topicsPath, PLAYSVIEWS_TOPIC, $consumerId);
 
+$maxLastPlayedAt = 0;
 //uncomment if rate limit is needed
 //$consumer->setMessagesPerSecond(100);
 $consumer->consumeQueue();
