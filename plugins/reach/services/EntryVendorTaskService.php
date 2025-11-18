@@ -410,7 +410,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	/**
 	 * Reset entry vendor task. change status back to pending with a new catalog item
 	 *
-	 * @action resetJobCatalogItem
+	 * @action resetItem
 	 * @param int $id vendor task id to reset
 	 * @param int $catalogItemId new catalog item
 	 * @return KalturaEntryVendorTask
@@ -420,7 +420,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	 * @throws KalturaReachErrors::REACH_PROFILE_NOT_FOUND
 	 * @throws KalturaReachErrors::CATALOG_ITEMS_ARE_NOT_LINKED
 	 */
-	public function resetJobCatalogItemAction($id, $catalogItemId)
+	public function resetAction($id, $catalogItemId)
 	{
 		$dbEntryVendorTask = EntryVendorTaskPeer::retrieveByPK($id);
 		if (!$dbEntryVendorTask)

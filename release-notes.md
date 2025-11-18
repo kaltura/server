@@ -6,7 +6,7 @@
 
 ### Deployment scripts ###
 
-php deployment/updates/scripts/add_permissions/2025_11_13_add_entryvendortask_reset_catalogItem.php
+php deployment/updates/scripts/add_permissions/2025_11_13_add_entryvendortask_reset.php
 
 ## Add caption accuracy and usage fields to entry list filter ##
 - Issue Type: Task
