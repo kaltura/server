@@ -410,7 +410,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	/**
 	 * Reset entry vendor task. change status back to pending with a new catalog item
 	 *
-	 * @action resetItem
+	 * @action reset
 	 * @param int $id vendor task id to reset
 	 * @param int $catalogItemId new catalog item
 	 * @return KalturaEntryVendorTask
