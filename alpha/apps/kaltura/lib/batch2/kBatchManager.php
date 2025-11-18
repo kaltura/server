@@ -287,7 +287,8 @@ class kBatchManager
 			}
 		}
 
-		if(isset($flavorParams) && in_array('audio_description', $flavorParams->getTagsArray())) {
+		if(isset($flavorParams) && in_array('audio_description', $flavorParams->getTagsArray()))
+		{
 			self::setAudioDescriptionLabel($flavorAsset, $flavorParams);
 		}
 
