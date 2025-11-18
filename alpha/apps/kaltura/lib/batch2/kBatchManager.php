@@ -21,7 +21,6 @@ class kBatchManager
 	{
 		return self::$currentUpdatingJob;
 	}
-
 	
 	/**
 	 * batch createFlavorAsset orgenize a convert job data 
