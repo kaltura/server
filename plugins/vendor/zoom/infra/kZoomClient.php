@@ -262,7 +262,8 @@ class kZoomClient extends kVendorClient
 			}
 			// Check if error is retryable
 			$lastError = $curlWrapper->getErrorMsg();
-			if (!$this->isRetryableError($lastError, $httpCode)) {
+			if (!$this->isRetryableError($lastError, $httpCode)) 
+			{
 				KalturaLog::debug('Zoom API call failed with non-retryable error: ' . $lastError);
 				return null;
 			}
@@ -290,11 +291,6 @@ class kZoomClient extends kVendorClient
 		// Retry on 5xx server errors and 429 rate limiting
 		if ($httpCode >= 500 || $httpCode == 429) {
 			return true;
-		}
-
-		// Don't retry on 4xx client errors (except 429)
-		if ($httpCode >= 400 && $httpCode < 500) {
-			return false;
 		}
 
 		return false;
