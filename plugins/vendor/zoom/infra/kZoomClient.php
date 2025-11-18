@@ -261,7 +261,7 @@ class kZoomClient extends kVendorClient
 			$lastError = $curlWrapper->getErrorMsg();
 			if (!$this->isRetryableError($lastError, $httpCode)) 
 			{
-				KalturaLog::debug('Zoom API call failed with non-retryable error: ' . $lastError);
+				KalturaLog::info('Zoom API call failed with non-retryable error: ' . $lastError);
 				return null;
 			}
 
@@ -273,7 +273,7 @@ class kZoomClient extends kVendorClient
 			}
 		}
 
-		KalturaLog::debug("Zoom API call failed after $maxRetries retries: $lastError");
+		KalturaLog::info("Zoom API call failed after $maxRetries retries: $lastError");
 		return null;
 	}
 
