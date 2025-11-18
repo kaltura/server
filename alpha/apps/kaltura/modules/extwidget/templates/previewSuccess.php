@@ -5,7 +5,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<?php
-	$googleVerificationToken = kConf::get("google-site-verification", "local","");
+	$playkitConfig = kConf::get('playkit-js','local',[]);
+	$googleVerificationToken = "";
+	if (array_key_exists('googleVerificationToken', $playkitConfig)) {
+		$googleVerificationToken = $playkitConfig['googleVerificationToken'];
+	}
 	if( $googleVerificationToken ) { ?>
 	<meta name="google-site-verification" content="<?php echo $googleVerificationToken; ?>"/>
 	<?php } ?>
