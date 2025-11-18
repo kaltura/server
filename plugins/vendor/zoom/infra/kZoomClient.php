@@ -246,10 +246,7 @@ class kZoomClient extends kVendorClient
 			$url = $this->generateContextualUrl($apiPath);
 			$token = $this->accessToken;
 
-			$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
-				"authorization: Bearer {$token}",
-				"content-type: application/json"
-			));
+			$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array("authorization: Bearer {$token}","content-type: application/json"));
 			$response = $curlWrapper->exec($url);
 			$httpCode = $curlWrapper->getHttpCode();
 			$this->handleCurlResponse($response, $httpCode, $curlWrapper);
@@ -269,7 +266,8 @@ class kZoomClient extends kVendorClient
 			}
 
 			$attempt++;
-			if ($attempt <= $maxRetries) {
+			if ($attempt <= $maxRetries) 
+			{
 				KalturaLog::info("Zoom API call failed (attempt $attempt/$maxRetries), retrying after " . self::RETRY_DELAY_MS . "ms. Error: $lastError");
 				usleep(self::RETRY_DELAY_MS * 1000); // Convert to microseconds
 			}
@@ -282,14 +280,14 @@ class kZoomClient extends kVendorClient
 	protected function isRetryableError($errorMsg, $httpCode)
 	{
 		// Retry on SSL/connection errors
-		if (strpos($errorMsg, 'SSL') !== false ||
-			strpos($errorMsg, 'Connection') !== false ||
-			strpos($errorMsg, 'timeout') !== false) {
+		if (strpos($errorMsg, 'SSL') !== false || strpos($errorMsg, 'Connection') !== false || strpos($errorMsg, 'timeout') !== false) 
+		{
 			return true;
 		}
 
 		// Retry on 5xx server errors and 429 rate limiting
-		if ($httpCode >= 500 || $httpCode == 429) {
+		if ($httpCode >= 500 || $httpCode == 429) 
+		{
 			return true;
 		}
 
