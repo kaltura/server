@@ -421,7 +421,7 @@ public static function updateEntry($entryId, $status)
 		return $entry;
 	}
 
-	public function setAudioDescriptionLabel($flavorAsset, $flavorParams)
+	public static function setAudioDescriptionLabel($flavorAsset, $flavorParams)
 	{
 		if(!in_array('audio_description', $flavorParams->getTagsArray()))
 		{
@@ -432,20 +432,20 @@ public static function updateEntry($entryId, $status)
 
 		if (!$currentLabel)
 		{
-			$lang = 'AAD';
+			$lang = ' - Audio Description';
 			if (($multiStreamJson = $flavorParams->getMultiStream()) !== null && ($multiStreamObj = json_decode($multiStreamJson)) !== null)
 			{
 				if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
 				{
-					$lang = $multiStreamObj->audio->languages[0] . '_AAD';
+					$lang = $flavorAsset->getLanguage() . ' - Audio Description';
 				}
 			}
 			$flavorAsset->setLabel($lang);
 		}
 
-		else if (strpos($currentLabel, "AAD") === false)
+		else if (strpos($currentLabel, " - Audio Description") === false)
 		{
-			$flavorAsset->setLabel($currentLabel . '_AAD');
+			$flavorAsset->setLabel($currentLabel . ' - Audio Description');
 		}
 
 		$flavorAsset->save();
