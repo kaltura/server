@@ -137,4 +137,5 @@ $monitor = new monitorPlaysViewsElastic($fromTime, $toTime, $baseFolder);
 $nonMatchingCount = $monitor->runMonitor();
 
 $data = "playsviews_elastic_sync_diff_total $nonMatchingCount" . PHP_EOL;
+createDirPath(DEFAULT_PROM_FILE);
 file_put_contents(DEFAULT_PROM_FILE, $data, LOCK_EX);
