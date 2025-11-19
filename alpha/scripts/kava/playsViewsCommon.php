@@ -38,3 +38,12 @@ function normalizeEntryId($entryId)
 	return null;
 }
 
+function createDirPath($filePath): void
+{
+	$dirPath = dirname($filePath);
+	if (!is_dir($dirPath))
+	{
+		mkdir($dirPath, 0775, true);
+	}
+}
+

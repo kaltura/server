@@ -250,12 +250,3 @@ function writeFailure($e, $filePath = null): void
 	
 	file_put_contents($filePath, $data, LOCK_EX);
 }
-
-function createDirPath($filePath): void
-{
-	$dirPath = dirname($filePath);
-	if (!is_dir($dirPath))
-	{
-		mkdir($dirPath, 0775, true);
-	}
-}
