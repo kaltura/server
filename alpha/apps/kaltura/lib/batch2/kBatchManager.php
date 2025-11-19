@@ -21,6 +21,8 @@ class kBatchManager
 	{
 		return self::$currentUpdatingJob;
 	}
+
+	public const AUDIO_DESCRIPTION_SUFFIX = ' - Audio Description';
 	
 	/**
 	 * batch createFlavorAsset orgenize a convert job data 
@@ -432,20 +434,20 @@ public static function updateEntry($entryId, $status)
 
 		if (!$currentLabel)
 		{
-			$lang = ' - Audio Description';
+			$lang = self::AUDIO_DESCRIPTION_SUFFIX;
 			if (($multiStreamJson = $flavorParams->getMultiStream()) !== null && ($multiStreamObj = json_decode($multiStreamJson)) !== null)
 			{
 				if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
 				{
-					$lang = $flavorAsset->getLanguage() . ' - Audio Description';
+					$lang = $flavorAsset->getLanguage() . self::AUDIO_DESCRIPTION_SUFFIX;
 				}
 			}
 			$flavorAsset->setLabel($lang);
 		}
 
-		else if (strpos($currentLabel, " - Audio Description") === false)
+		else if (!str_contains($currentLabel, self::AUDIO_DESCRIPTION_SUFFIX))
 		{
-			$flavorAsset->setLabel($currentLabel . ' - Audio Description');
+			$flavorAsset->setLabel($currentLabel . self::AUDIO_DESCRIPTION_SUFFIX);
 		}
 
 		$flavorAsset->save();
