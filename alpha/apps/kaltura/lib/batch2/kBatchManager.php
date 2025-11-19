@@ -436,12 +436,14 @@ public static function updateEntry($entryId, $status)
 		{
 			$lang = self::AUDIO_DESCRIPTION_SUFFIX;
 			$multiStreamJson = $flavorParams->getMultiStream();
-			if ($multiStreamJson !== null) {
+			if ($multiStreamJson !== null)
+			{
 				$multiStreamObj = json_decode($multiStreamJson);
 				if ($multiStreamObj !== null &&
 					isset($multiStreamObj->audio->languages) &&
 					is_array($multiStreamObj->audio->languages) &&
-					count($multiStreamObj->audio->languages) > 0) {
+					count($multiStreamObj->audio->languages) > 0)
+				{
 					$lang = $flavorAsset->getLanguage() . self::AUDIO_DESCRIPTION_SUFFIX;
 				}
 			}
