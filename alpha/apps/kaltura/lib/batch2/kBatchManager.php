@@ -435,10 +435,13 @@ public static function updateEntry($entryId, $status)
 		if (!$currentLabel)
 		{
 			$lang = self::AUDIO_DESCRIPTION_SUFFIX;
-			if (($multiStreamJson = $flavorParams->getMultiStream()) !== null && ($multiStreamObj = json_decode($multiStreamJson)) !== null)
-			{
-				if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
-				{
+			$multiStreamJson = $flavorParams->getMultiStream();
+			if ($multiStreamJson !== null) {
+				$multiStreamObj = json_decode($multiStreamJson);
+				if ($multiStreamObj !== null &&
+					isset($multiStreamObj->audio->languages) &&
+					is_array($multiStreamObj->audio->languages) &&
+					count($multiStreamObj->audio->languages) > 0) {
 					$lang = $flavorAsset->getLanguage() . self::AUDIO_DESCRIPTION_SUFFIX;
 				}
 			}
