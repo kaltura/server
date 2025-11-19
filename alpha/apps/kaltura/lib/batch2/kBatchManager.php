@@ -21,6 +21,8 @@ class kBatchManager
 	{
 		return self::$currentUpdatingJob;
 	}
+
+	public const AUDIO_DESCRIPTION_SUFFIX = ' - Audio Description';
 	
 	/**
 	 * batch createFlavorAsset orgenize a convert job data 
@@ -421,7 +423,7 @@ public static function updateEntry($entryId, $status)
 		return $entry;
 	}
 
-	public function setAudioDescriptionLabel($flavorAsset, $flavorParams)
+	public static function setAudioDescriptionLabel($flavorAsset, $flavorParams)
 	{
 		if(!in_array('audio_description', $flavorParams->getTagsArray()))
 		{
@@ -429,25 +431,11 @@ public static function updateEntry($entryId, $status)
 		}
 
 		$currentLabel = $flavorAsset->getLabel();
-
 		if (!$currentLabel)
 		{
-			$lang = 'AAD';
-			if (($multiStreamJson = $flavorParams->getMultiStream()) !== null && ($multiStreamObj = json_decode($multiStreamJson)) !== null)
-			{
-				if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
-				{
-					$lang = $multiStreamObj->audio->languages[0] . '_AAD';
-				}
-			}
+			$lang = $flavorAsset->getLanguage() . self::AUDIO_DESCRIPTION_SUFFIX;
 			$flavorAsset->setLabel($lang);
+			$flavorAsset->save();
 		}
-
-		else if (strpos($currentLabel, "AAD") === false)
-		{
-			$flavorAsset->setLabel($currentLabel . '_AAD');
-		}
-
-		$flavorAsset->save();
 	}
 }
