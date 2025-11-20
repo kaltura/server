@@ -1,5 +1,4 @@
 # Venus-22.6.0
-
 ## Update caption asset http notification template ##
 * Issue Type: Task
 * Issue ID: SUP-49863
@@ -22,6 +21,12 @@ Update script:
 Permission script:
 - php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
 
+## Add roles and permissions for In-App Messaging ##
+- Issue Type: Task
+- Issue ID: PLAT-25567
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_11_04_create_in_app_messaging_roles.php
 
 # Venus-22.5.0
 ## Add Audio Description and Dubbing flavors to the list of available flavors ##
