@@ -150,7 +150,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIdsArr, $partnerId);
 			if(!count($allowedCatalogItemIds))
 			{
-				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . implode(',', $fullFieldCatalogItemIds ? $fullFieldCatalogItemIds : []) . ']');
+				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . $fullFieldCatalogItemIds . ']');
 				continue;
 			}
 			$this->addingEntryVendorTaskByObjectIds($taskObjectType, $allowedCatalogItemIds, $profileId, $object);
