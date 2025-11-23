@@ -61,6 +61,7 @@ class KalturaMonitorClient
 	const DEFAULT_CACHE_BUCKET_INTERVAL_SECONDS = 10; // 70 second
 	const DEFAULT_HISTORICAL_BUCKET_COUNT = 5; // 5 * DEFAULT_BUCKET_SIZE_SECONDS
 	const DEFAULT_MIN_REQUIRED_BUCKETS = 2; //
+	const DEFAULT_MACHINE_TYPE_REGEX = "/upload|thumb|play|fapi|bapi|adminconsole/m"; //
 	
 	protected static $queryTypes = array(
 			'SELECT ' 		=> 'SELECT',
@@ -869,6 +870,7 @@ class KalturaMonitorClient
 		$minimumRequiredBuckets = $serviceStatusConfig['minimum_require_buckets'] ?? self::DEFAULT_MIN_REQUIRED_BUCKETS;
 		$sendAnalyticsBeacons = $serviceStatusConfig['send_analytics_beacons'] ?? false;
 		$sendHeader = $serviceStatusConfig['send_header'] ?? false;
+		$machineTypeRegex = $serviceStatusConfig['machine_type_regex'] ?? self::DEFAULT_MACHINE_TYPE_REGEX;
 		
 		list($reqTime, $reqCount, $reqAvgTime) = self::getServiceStatusStats($requestTook, $cacheExpiry, $cacheBucketInterval, $historicalBucketsToFetch, $minimumRequiredBuckets);
 		
@@ -880,11 +882,18 @@ class KalturaMonitorClient
 				$serviceStatus = self::SERVICE_NEARING_LIMITS;
 				if($sendAnalyticsBeacons)
 				{
-					self::sendErrorEvent('NEARING_LIMITS');
+					$errorCode = "NEARING_LIMITS";
+					$hostName = (class_exists('kCurrentContext') && isset(kCurrentContext::$host)) ? kCurrentContext::$host : gethostname();
+					if($hostName && preg_match($machineTypeRegex, $hostName, $matches) && isset($matches[0]))
+					{
+						$errorCode .= '_'. strtoupper($matches[0]);
+					}
+					self::safeLog("FFF: errorCode [$errorCode]");
+					self::sendErrorEvent($errorCode);
 				}
 			}
 			
-			if($sendHeader)
+			if($sendHeader && !headers_sent())
 			{
 				header('X-Kaltura-Service-Status: ' . $serviceStatus);
 			}
