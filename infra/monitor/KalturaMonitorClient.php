@@ -888,7 +888,6 @@ class KalturaMonitorClient
 					{
 						$errorCode .= '_'. strtoupper($matches[0]);
 					}
-					self::safeLog("FFF: errorCode [$errorCode]");
 					self::sendErrorEvent($errorCode);
 				}
 			}
