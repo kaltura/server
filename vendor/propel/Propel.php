@@ -583,7 +583,6 @@ class Propel
 	 */
 	public static function initConnection($conparams, $name, $defaultClass = Propel::CLASS_PROPEL_PDO)
 	{
-
 		$dsn = $conparams['dsn'];
 		if ($dsn === null) {
 			throw new PropelException('No dsn specified in your connection parameters for datasource ['.$name.']');
@@ -623,17 +622,20 @@ class Propel
 
 		if (!array_key_exists(PDO::ATTR_TIMEOUT, $driver_options))
 		{
-			$driver_options[PDO::ATTR_TIMEOUT] = 1;
-			$count = 3;
+			$driver_options[PDO::ATTR_TIMEOUT] = $conparams['max_time_out'] ?? 1;
+			$count = $conparams['max_retries'] ?? 5;
 		}
 		else
+		{
 			$count = 1;
+		}
 
 		for($i = 1; $i <= $count; $i++)
 		{
 			try {
-				if ($i > 1 && $i == $count) // remove the timeout on the last attempt of the a attempt loop
-					unset($driver_options[PDO::ATTR_TIMEOUT]);
+				//TBD: Remove this code as it causes stuck apache workers in case stuck apache workers when there are any issues with DB connection
+				//if ($i > 1 && $i == $count) // remove the timeout on the last attempt of the a attempt loop
+				//	unset($driver_options[PDO::ATTR_TIMEOUT]);
 
 				$startTime = microtime(true);
 				$con = new $classname($dsn, $user, $password, $driver_options);
