@@ -16,7 +16,9 @@ class ESearchCaptionItem extends ESearchNestedObjectItem
 		ESearchCaptionFieldName::END_TIME => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		ESearchCaptionFieldName::LANGUAGE => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
 		ESearchCaptionFieldName::LABEL => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
-		ESearchCaptionFieldName::CAPTION_ASSET_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH)
+		ESearchCaptionFieldName::CAPTION_ASSET_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH),
+		ESearchCaptionFieldName::ACCURACY => array ('ESearchItemType::RANGE' => ESearchItemType::RANGE),
+		ESearchCaptionFieldName::USAGE => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH)
 	);
 
 	private static $multiLanguageFields = array(

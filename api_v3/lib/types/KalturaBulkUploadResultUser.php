@@ -83,7 +83,12 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	 * @var string
 	 */
 	public $capabilities;
-    
+
+	/**
+	 * @var int
+	 */
+	public $groupUserCreationMode;
+
     private static $mapBetweenObjects = array
 	(
 		"userId" => "puserId",
@@ -101,6 +106,7 @@ class KalturaBulkUploadResultUser extends KalturaBulkUploadResult
 	    "group",
 	    "externalId",
 	    "capabilities",
+	    "groupUserCreationMode",
 	);
 	
     /* (non-PHPdoc)
