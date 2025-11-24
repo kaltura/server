@@ -318,8 +318,9 @@ class KalturaFlavorParams extends KalturaAssetParams
 	protected function extractAudioLanguagesFromMultiStream($assetParamsDb)
 	{
 		$audioLanguages = new KalturaStringArray();
-		
-		if (($multiStreamJson = $assetParamsDb->getMultiStream()) != null && ($multiStreamObj = json_decode($multiStreamJson)) != null) {
+		$multiStreamJson = $assetParamsDb->getMultiStream();
+		$multiStreamObj = $multiStreamJson ? json_decode($multiStreamJson) : null;
+		if ($multiStreamObj) {
 			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0) {
 				foreach ($multiStreamObj->audio->languages as $languageCode) {
 					$language = languageCodeManager::getObjectFromThreeCode($languageCode);
