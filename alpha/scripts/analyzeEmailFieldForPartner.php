@@ -379,7 +379,7 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], ar
 	};
 
 	foreach ($rows as $row) {
-		$emailValue = isset($row['EMAIL']) ? trim((string) $row['EMAIL']) : '';
+		$emailValue = isset($row['EMAIL']) ? strtolower(trim((string) $row['EMAIL'])) : '';
 
 		if ($emailValue === '') {
 			KalturaLog::log('Skipping duplicate email aggregation for empty string value.');
