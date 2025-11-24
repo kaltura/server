@@ -634,8 +634,8 @@ class Propel
 		{
 			try {
 				//TBD: Remove this code as it causes stuck apache workers in case stuck apache workers when there are any issues with DB connection
-				//if ($i > 1 && $i == $count) // remove the timeout on the last attempt of the a attempt loop
-				//	unset($driver_options[PDO::ATTR_TIMEOUT]);
+				if ($i > 1 && $i == $count && isset($conparams['unset_attr_on_last_retry']) && $conparams['unset_attr_on_last_retry']) // remove the timeout on the last attempt of the a attempt loop
+					unset($driver_options[PDO::ATTR_TIMEOUT]);
 
 				$startTime = microtime(true);
 				$con = new $classname($dsn, $user, $password, $driver_options);
