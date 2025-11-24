@@ -247,12 +247,12 @@ class KalturaFlavorParams extends KalturaAssetParams
 	public $clipDuration;
 
 	/**
-	 * Language extracted from multiStream field
+	 * Audio languages extracted from multiStream field
 	 *
-	 * @var string
+	 * @var KalturaStringArray
 	 * @readonly
 	 */
-	public $language;
+	public $audioLanguages;
 	
 	private static $map_between_objects = array
 	(
@@ -297,7 +297,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"chunkedEncodeMode",
 		"clipOffset",
 		"clipDuration",
-		"language",
+		"audioLanguages",
 	);
 	
 	public function getMapBetweenObjects()
@@ -315,17 +315,23 @@ class KalturaFlavorParams extends KalturaAssetParams
 		return array();
 	}
 
-	protected function extractLanguageFromMultiStream($assetParamsDb)
+	protected function extractAudioLanguagesFromMultiStream($assetParamsDb)
 	{
+		$audioLanguages = new KalturaStringArray();
+		
 		if (($multiStreamJson = $assetParamsDb->getMultiStream()) != null && ($multiStreamObj = json_decode($multiStreamJson)) != null) {
 			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0) {
-
-				$languageCode = $multiStreamObj->audio->languages[0];
-				$language = languageCodeManager::getObjectFromThreeCode($languageCode);
-				return !is_null($language) ? $language[languageCodeManager::KALTURA_NAME] : $languageCode;
+				foreach ($multiStreamObj->audio->languages as $languageCode) {
+					$language = languageCodeManager::getObjectFromThreeCode($languageCode);
+					$languageName = !is_null($language) ? $language[languageCodeManager::KALTURA_NAME] : $languageCode;
+					
+					$stringObject = new KalturaString();
+					$stringObject->value = $languageName;
+					$audioLanguages[] = $stringObject;
+				}
 			}
 		}
-		return null;
+		return $audioLanguages;
 	}
 
 	/* (non-PHPdoc)
@@ -342,9 +348,6 @@ class KalturaFlavorParams extends KalturaAssetParams
 	public function doFromObject($assetParamsDb, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($assetParamsDb, $responseProfile);
-		$language = $this->extractLanguageFromMultiStream($assetParamsDb);
-		if ($language !== null) {
-			$this->language = $language;
-		}
+		$this->audioLanguages = $this->extractAudioLanguagesFromMultiStream($assetParamsDb);
 	}
 }
