@@ -141,7 +141,7 @@ class embedPlaykitJsAction extends sfAction
 		$bundleSaved = self::setCacheData($context, 'bundleCache', $context->bundle_name, $bundleContent);
 
 		$sourceMapContent = base64_decode($content['sourceMap']);
-		self::setCacheData($context, 'sourceMapsCache', $context->bundle_name, $sourceMapContent);
+		self::setCacheData($context, 'sourceMapsCache', $context->bundle_name, $sourceMapContent, false);
 
 		$i18nContent = isset($content['i18n']) ? base64_decode($content['i18n']) : "";
 		self::setCacheData($context, 'bundleCache', $context->bundle_i18n_name, $i18nContent);
@@ -157,10 +157,10 @@ class embedPlaykitJsAction extends sfAction
 		return array($bundleContent, $i18nContent, $extraModulesNames);
 	}
 
-	protected static function setCacheData($context, $cacheType, $key, $data)
+	protected static function setCacheData($context, $cacheType, $key, $data, $shouldCompress = true)
 	{
 		//If length of data is over 4MB compress it before caching
-		if(strlen($data) > $context->maxObjectCacheSize)
+		if($shouldCompress && strlen($data) > $context->maxObjectCacheSize)
 		{
 			$data = self::COMPRESSED_PREFIX . gzcompress($data);
 			if(strlen($data) > $context->maxObjectCacheSize)
