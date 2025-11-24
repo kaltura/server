@@ -320,11 +320,14 @@ class KalturaFlavorParams extends KalturaAssetParams
 		$audioLanguages = new KalturaStringArray();
 		$multiStreamJson = $assetParamsDb->getMultiStream();
 		$multiStreamObj = $multiStreamJson ? json_decode($multiStreamJson) : null;
-		if ($multiStreamObj) {
-			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0) {
-				foreach ($multiStreamObj->audio->languages as $languageCode) {
+		if ($multiStreamObj)
+		{
+			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
+			{
+				foreach ($multiStreamObj->audio->languages as $languageCode)
+				{
 					$language = languageCodeManager::getObjectFromThreeCode($languageCode);
-					$languageName = !is_null($language) ? $language[languageCodeManager::KALTURA_NAME] : $languageCode;
+					$languageName = isset($language[languageCodeManager::KALTURA_NAME]) ? $language[languageCodeManager::KALTURA_NAME] : $languageCode;
 					
 					$stringObject = new KalturaString();
 					$stringObject->value = $languageName;
