@@ -25,11 +25,11 @@ class embedPlaykitJsSourceMapsAction extends sfAction
         
         $sourceMap = $sourceMapsCache->get($cacheKey);
 	    //Source map can be compressed see alpha/apps/kaltura/modules/extwidget/actions/embedPlaykitJsAction.class.php:142
-	    if($sourceMap && strpos($sourceMap, "COMPRESSED,") === 0)
-	    {
-		    $sourceMap = substr($data, strlen("COMPRESSED,"));
-		    $sourceMap = gzuncompress($data);
-	    }
+        if($sourceMap && strpos($sourceMap, "COMPRESSED,") === 0)
+        {
+            $sourceMap = substr($sourceMap, strlen("COMPRESSED,"));
+            $sourceMap = gzuncompress($sourceMap);
+        }
         header("Content-Type:application/octet-stream");
 
         echo($sourceMap);
