@@ -69,8 +69,12 @@ class KalturaAnnotation extends KalturaCuePoint
 	 * @var KalturaNullableBoolean
 	 */
 	public $searchableOnEntry;
-	
-	
+
+	/**
+	 * In case of cloned annotation it will hold source cuepoint createdAt.
+	 * @var time
+	 */
+	public $originalCuePointCreateAt;
 
 	public function __construct()
 	{
@@ -86,8 +90,9 @@ class KalturaAnnotation extends KalturaCuePoint
 		"depth",
 		"childrenCount",
 		"directChildrenCount",
-	    "isPublic",
-	    "searchableOnEntry",
+		"isPublic",
+		"searchableOnEntry",
+		"originalCuePointCreateAt"
 	);
 	
 	/* (non-PHPdoc)

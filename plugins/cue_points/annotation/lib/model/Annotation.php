@@ -5,7 +5,8 @@
  */
 class Annotation extends CuePoint implements IMetadataObject
 {
-    const CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY = 'searchableOnEntry';
+	const CUSTOM_DATA_FIELD_SEARCHABLE_ON_ENTRY = 'searchableOnEntry';
+	const ORIGINAL_CUE_POINT_CREATE_AT = 'originalCuePointCreateAt';
     
 	public function __construct() 
 	{
@@ -174,5 +175,14 @@ class Annotation extends CuePoint implements IMetadataObject
 		return $ret;
 	}
 
+	public function setOriginalCuePointCreateAt($createAt)
+	{
+		$this->putInCustomData(self::ORIGINAL_CUE_POINT_CREATE_AT, $createAt);
+	}
+
+	public function getOriginalCuePointCreateAt()
+	{
+		return $this->getFromCustomData(self::ORIGINAL_CUE_POINT_CREATE_AT);
+	}
 
 }
