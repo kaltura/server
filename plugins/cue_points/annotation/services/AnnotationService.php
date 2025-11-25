@@ -59,7 +59,7 @@ class AnnotationService extends CuePointService
 			$dbAnnotation->setParentId($parentId);
 		}
 
-		//save  the original annotation cue point createAt time on field originalCuePointCreateAt
+		//save the original annotation cue point createdAt time on field originalCuePointCreateAt
 		$originalCuePoint = cuePointPeer::retrieveByPK($id);
 		$originalCuePointCreatedAt = $originalCuePoint->getOriginalCuePointCreateAt();
 		if(!$originalCuePointCreatedAt)
