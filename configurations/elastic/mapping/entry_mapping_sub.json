@@ -487,6 +487,10 @@
 					"type" : "keyword",
 					"normalizer" : "kaltura_keyword_normalizer"
 				},
+				"flavor_params_ids" : {
+					"type" : "keyword",
+					"normalizer" : "kaltura_keyword_normalizer"
+				},
 				"tags" : {
 					"type" : "text",
 					"analyzer" : "kaltura_text",
