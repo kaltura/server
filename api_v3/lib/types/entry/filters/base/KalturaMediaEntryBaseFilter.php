@@ -94,4 +94,5 @@ abstract class KalturaMediaEntryBaseFilter extends KalturaPlayableEntryFilter
 	 * @var string
 	 */
 	public $flavorParamsIdsNotContains;
+	
 }
