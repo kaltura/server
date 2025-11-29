@@ -97,7 +97,16 @@ class ESearchQueryFromAdvancedSearch
 		$eSearchAdvancedSearchItem->setNot($advancedSearchFilterItem->getNot());
 		$eSearchAdvancedSearchItem->setItemType(ESearchItemType::EXACT_MATCH);
 
-		return $eSearchAdvancedSearchItem;
+		if($advancedSearchFilterItem->getNot())
+		{
+			$result = self::createNegativeQuery($eSearchAdvancedSearchItem);
+		}
+		else
+		{
+			$result = $eSearchAdvancedSearchItem;
+		}
+
+		return $result;
 	}
 
 	protected function createESearchQueryFromSearchFilterOperator(AdvancedSearchFilterOperator $operator)
