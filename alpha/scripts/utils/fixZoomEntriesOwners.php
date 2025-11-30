@@ -161,34 +161,30 @@ foreach ($entryIds as $entryId)
         continue;
     }
 
-    if ($ownerId)
+    echo "Entry $entryId: Resolved owner = $ownerId\n";
+
+    $entry = entryPeer::retrieveByPK($entryId);
+    if (!$entry)
     {
-        echo "Entry $entryId: Resolved owner = $ownerId\n";
-
-        $entry = entryPeer::retrieveByPK($entryId);
-        if (!$entry)
-        {
-            echo "Entry $entryId: Could not retrieve entry from database\n";
-            continue;
-        }
-
-        $kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $ownerId);
-        if (!$kuser)
-        {
-            echo "Entry $entryId: Could not find kuser for owner $ownerId\n";
-            continue;
-        }
-
-        // Update the entry owner
-        $entry->setKuserId($kuser->getId());
-        $entry->setPuserId($ownerId);
-        $entry->save();
-
-        kEventsManager::flushEvents();
-        kMemoryManager::clearMemory();
-
-        echo "Entry $entryId: Successfully updated owner to $ownerId\n";
-
+        echo "Entry $entryId: Could not retrieve entry from database\n";
+        continue;
     }
+
+    $kuser = kuserPeer::getActiveKuserByPartnerAndUid($partnerId, $ownerId);
+    if (!$kuser)
+    {
+        echo "Entry $entryId: Could not find kuser for owner $ownerId\n";
+        continue;
+    }
+
+    // Update the entry owner
+    $entry->setKuserId($kuser->getId());
+    $entry->setPuserId($ownerId);
+    $entry->save();
+
+    kEventsManager::flushEvents();
+    kMemoryManager::clearMemory();
+
+    echo "Entry $entryId: Successfully updated owner to $ownerId\n";
 }
 
