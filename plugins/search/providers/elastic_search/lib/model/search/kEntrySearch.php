@@ -12,9 +12,9 @@ class kEntrySearch extends kBaseESearch
 
     public function __construct()
     {
-        $this->isInitialized = false;
-        parent::__construct();
-		$this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
+	    $this->isInitialized = false;
+	    parent::__construct();
+	    $this->queryAttributes->setQueryFilterAttributes(new ESearchEntryQueryFilterAttributes());
     }
 
     protected function handleDisplayInSearch()
@@ -29,14 +29,15 @@ class kEntrySearch extends kBaseESearch
         }
     }
 
-    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectIdsCsvStr = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
+    public function doSearch(ESearchOperator $eSearchOperator, kPager $pager = null, $entriesStatus = array(), $objectIdsCsvStr = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null, ESearchScoreFunctionParams $scoreFunctionParams = null)
     {
         kEntryElasticEntitlement::init();
         if (!count($entriesStatus))
             $entriesStatus = array(entryStatus::READY);
         $this->initQuery($entriesStatus, $objectIdsCsvStr, $pager, $order, $aggregations, $objectIdsNotIn);
         $this->initEntitlement($eSearchOperator, $objectIdsCsvStr, $objectIdsNotIn);
-        $result = $this->execSearch($eSearchOperator);
+
+		$result = $this->execSearch($eSearchOperator, $scoreFunctionParams);
         return $result;
     }
 

@@ -219,4 +219,24 @@ class elasticSearchUtils
 		$value = strip_tags($value);
 	}
 
+	public static function isValidDuration($value)
+	{
+		// Check for duration format (e.g., 30d)
+		if (preg_match('/^\d+[d]$/', $value))
+		{
+			$unit = substr($value, -1);
+			$number = intval(substr($value, 0, -1));
+
+			switch ($unit)
+			{
+				case 'd':
+					return $number > 0 && $number <= 365;
+				default:
+					return false;
+			}
+		}
+
+		return false;
+	}
+
 }
