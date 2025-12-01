@@ -1,3 +1,14 @@
+# Venus-22.8.0
+## Index flavor_params field to elastic and allow in advanced search##
+- Issue Type: Task
+- Issue ID: KAM-270
+### Deployment scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port' and execute the curl command
+
+    curl -X PUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"flavor_params": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}'
+
 # Venus-22.7.0
 
 ## Add action reset_catalogItem to EntryVendorTask service  ##
