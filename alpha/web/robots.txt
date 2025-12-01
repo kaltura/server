@@ -6,6 +6,7 @@ Disallow: /p/*/serveFlavor/
 Disallow: /index.php/kmc/preview/
 Disallow: /api_v3/
 Disallow: /tiny/
+Disallow: /index.php/extwidget/preview/
 
 User-agent: Googlebot
 Allow: /api_v3/testmeDoc/
@@ -16,4 +17,3 @@ Disallow: /p/*/serveFlavor/
 Disallow: /index.php/kmc/preview/
 Disallow: /api_v3/
 Disallow: /tiny/
-Disallow: /index.php/extwidget/preview/
