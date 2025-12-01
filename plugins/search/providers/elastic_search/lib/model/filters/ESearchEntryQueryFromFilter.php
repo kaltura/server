@@ -84,7 +84,6 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
         ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE,
         ESearchEntryFilterFields::ROOM_TYPE,
 		ESearchEntryFilterFields::BROADCAST_ENTRY_ID,
-		ESearchEntryFilterFields::FLAVOR_PARAMS_IDS,
     );
 
     protected static $specialFields = array(
