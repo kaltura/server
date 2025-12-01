@@ -9,7 +9,6 @@ class KalturaBaseEntryMatchAttribute extends KalturaStringEnum
 	const NAME = "name";
 	const TAGS = "tags";
 	const CATEGORIES_IDS = "categoriesIds";
-	const FLAVOR_PARAMS_IDS = "flavorParamsIds";
 	const GROUP_ID = "groupId";
 	const DESCRIPTION = "description";
 	const ADMIN_TAGS = "adminTags";

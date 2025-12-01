@@ -96,7 +96,6 @@ class entryFilter extends baseObjectFilter
 			"_empty_categories_ids",
 			"_matchand_flavor_params_ids",
 			"_matchor_flavor_params_ids",
-			"_notcontains_flavor_params_ids",
 			"_matchor_duration_type", // see alias
 			"_eq_document_type", // for document listing in api_v3
 			"_in_document_type", // for document listing in api_v3
