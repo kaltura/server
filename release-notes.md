@@ -1,5 +1,5 @@
 # Venus-22.8.0
-## Index flavor_params field to elastic and allow in advanced search##
+## Index flavor_params field to elastic and allow in advanced search ##
 - Issue Type: Task
 - Issue ID: KAM-270
 ### Deployment scripts ###
