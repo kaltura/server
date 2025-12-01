@@ -339,6 +339,9 @@ class kReachUtils
 			'minimalRefundTime',
 			'minimalOrderTime',
 			'durationLimit',
+			'startTimeBuffer',
+			'endTimeBuffer',
+			'payPerUse'
 		);
 	}
 
