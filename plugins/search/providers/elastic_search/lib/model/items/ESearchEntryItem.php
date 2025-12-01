@@ -67,6 +67,7 @@ class ESearchEntryItem extends ESearchItem
 		'recycled_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 		'room_type' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
 		'broadcast_entry_id' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
+		'flavor_params_ids' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
 	);
 
 	protected static $field_boost_values = array(
