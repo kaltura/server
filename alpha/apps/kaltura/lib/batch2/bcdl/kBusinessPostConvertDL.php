@@ -522,7 +522,7 @@ class kBusinessPostConvertDL
 
 			if($allJobsCompleted)
 			{
-                kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			}
 			else
 			{
