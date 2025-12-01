@@ -15,15 +15,10 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 	 */
 	public $aggregations;
 
-	/**
-	 * @var KalturaESearchScoreFunctionParams
-	 */
-	public $scoreFunctionParams;
-
 
 	private static $mapBetweenObjects = array
 	(
-		"searchOperator","aggregations","scoreFunctionParams"
+		"searchOperator","aggregations"
 	);
 
 	protected function initStatuses()
@@ -61,8 +56,4 @@ class KalturaESearchEntryParams extends KalturaESearchParams
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
-	public function getScoreFunctionParams()
-	{
-		return $this->scoreFunctionParams;
-	}
 }

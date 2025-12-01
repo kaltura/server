@@ -41,49 +41,6 @@ class kEntrySearch extends kBaseESearch
         return $result;
     }
 
-	protected function addQueryFunctionScore(ESearchScoreFunctionParams $scoreFunctionParams)
-	{
-		$query = $this->query['body']['query'];
-		unset($this->query['body']['query']);
-		$this->query['body']['query']['function_score']['query'] = $query;
-
-		switch ($scoreFunctionParams->getScoreFunctionBoostField())
-		{
-			case ESearchScoreFunctionField::CREATED_AT:
-			default:
-			{
-				$this->query['body']['query']['function_score']['functions'][] = $this->processScoreFunctionBoostFields($scoreFunctionParams);;
-				$this->query['body']['query']['function_score']['boost_mode'] = $scoreFunctionParams->getScoreFunctionBoostMode();
-			}
-		}
-
-	}
-
-	protected function processScoreFunctionBoostFields($scoreFunctionParams)
-	{
-		$function = [];
-		$fieldParams = [
-			'origin' => $scoreFunctionParams->getOrigin(),
-			'scale' => $scoreFunctionParams->getScale(),
-		];
-
-		$decay = $scoreFunctionParams->getDecay();
-		if ($decay !== null) {
-			$fieldParams['decay'] = $decay;
-		}
-
-		$function[$scoreFunctionParams->getScoreFunctionBoostType()] = [
-			$scoreFunctionParams->getScoreFunctionBoostField() => $fieldParams
-		];
-
-		$weight = $scoreFunctionParams->getWeight();
-		if ($weight !== null) {
-			$function['weight'] = $weight;
-		}
-
-		return $function;
-	}
-
     protected function initQuery(array $statuses, $objectIdsCsvStr, kPager $pager = null, ESearchOrderBy $order = null, ESearchAggregations $aggregations = null, $objectIdsNotIn = null)
     {
         $indexName = kBaseESearch::getElasticIndexNamePerPartner(ElasticIndexMap::ELASTIC_ENTRY_INDEX, kCurrentContext::getCurrentPartnerId());

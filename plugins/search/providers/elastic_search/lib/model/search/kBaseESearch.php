@@ -140,4 +140,52 @@ abstract class kBaseESearch extends kBaseSearch
 		}
 		return $indexName;
 	}
+
+	protected function addQueryFunctionScore(ESearchScoreFunctionParams $scoreFunctionParams)
+	{
+		$query = $this->query['body']['query'];
+		unset($this->query['body']['query']);
+		$this->query['body']['query']['function_score']['query'] = $query;
+
+		switch ($scoreFunctionParams->getFunctionField())
+		{
+			case ESearchScoreFunctionField::CREATED_AT:
+			default:
+			{
+				$this->query['body']['query']['function_score']['functions'][] = $this->processScoreFunctionBoostFields($scoreFunctionParams);;
+				$this->query['body']['query']['function_score']['boost_mode'] = $scoreFunctionParams->getBoostMode();
+			}
+		}
+
+	}
+
+	protected function processScoreFunctionBoostFields($scoreFunctionParams)
+	{
+		$function = [];
+		$fieldParams = [];
+
+		$origin = $scoreFunctionParams->getOrigin();
+		if ($origin !== null) {
+			$fieldParams['origin'] = $origin;
+		}
+		$scale = $scoreFunctionParams->getScale();
+		if ($scale !== null) {
+			$fieldParams['scale'] = $scale;
+		}
+		$decay = $scoreFunctionParams->getDecay();
+		if ($decay !== null) {
+			$fieldParams['decay'] = $decay;
+		}
+
+		$function[$scoreFunctionParams->getDecayAlgorithm()] = [
+			$scoreFunctionParams->getFunctionField() => $fieldParams
+		];
+
+		$weight = $scoreFunctionParams->getWeight();
+		if ($weight !== null) {
+			$function['weight'] = $weight;
+		}
+
+		return $function;
+	}
 }

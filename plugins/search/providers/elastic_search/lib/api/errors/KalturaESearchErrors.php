@@ -26,12 +26,6 @@ class KalturaESearchErrors extends KalturaErrors
     const INVALID_METADATA_FIELD = 'INVALID METADATA FIELD;FIELD_NAME;Illegal metadata field name [@FIELD_NAME@]. allowed only [xpath, metadata_profile_id, term]';
     const INVALID_MIXED_SEARCH_TYPES = 'INVALID_MIXED_SEARCH_TYPES ;FIELD_NAME;FIELD_VALUE;Illegal mixed search item types. [@FIELD_NAME@] [@FIELD_VALUE@] can\'t be set to starts-with-search / partial-search and range-search simultaneously';
     const UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER = 'UNABLE_TO_EXECUTE_ENTRY_CAPTION_ADVANCED_FILTER;;Unable to execute entry caption advanced filter';
-	const INVALID_DECAY_VALUE_IN_BOOST_SCORE_FUNCTION = 'INVALID_DECAY_VALUE_IN_BOOST_SCORE_FUNCTION;;Invalid DECAY value in boost score function';
-    const INVALID_ORIGIN_VALUE_IN_BOOST_SCORE_FUNCTION = 'INVALID_ORIGIN_VALUE_IN_BOOST_SCORE_FUNCTION;;Invalid ORIGIN value in boost score function';
-    const INVALID_SCALE_VALUE_IN_BOOST_SCORE_FUNCTION = 'INVALID_SCALE_VALUE_IN_BOOST_SCORE_FUNCTION;;Invalid SCALE value in boost score function';
-    const INVALID_FUNCTION_MODE_VALUE_IN_BOOST_SCORE_FUNCTION = 'INVALID_FUNCTION_MODE_VALUE_IN_BOOST_SCORE_FUNCTION;;Invalid FUNCTION MODE value in boost score function';
-    const INVALID_FIELD_VALUE_IN_BOOST_SCORE_FUNCTION = 'INVALID_FIELD_VALUE_IN_BOOST_SCORE_FUNCTION;;Invalid FIELD value in boost score function';
-	const INVALID_FUNCTION_VALUE_IN_BOOST_SCORE_FUNCTION = 'INVALID_FUNCTION_VALUE_IN_BOOST_SCORE_FUNCTION;;Invalid FUNCTION TYPEvalue in boost score function';
-	const INVALID_WEIGHT_VALUE_IN_BOOST_SCORE_FUNCTION = 'INVALID_WEIGHT_VALUE_IN_BOOST_SCORE_FUNCTION;;Invalid WEIGHT value in boost score function';
-
+	const MISSING_MANDATORY_SCORE_FUNCTION_PARAM = 'MISSING_MANDATORY_SCORE_FUNCTION_PARAM;;Missing mandatory score function parameter';
+	const INVALID_SCORE_FUNCTION_FIELD_VALUE = 'INVALID_SCORE_FUNCTION_FIELD_VALUE;FIELD_NAME;Invalid [@FIELD_NAME@] value in score function';
 }

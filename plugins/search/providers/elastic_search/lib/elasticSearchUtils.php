@@ -222,14 +222,17 @@ class elasticSearchUtils
 	public static function isValidDuration($value)
 	{
 		// Check for duration format (e.g., 30d)
-		if (preg_match('/^\d+[d]$/', $value)) {
+		if (preg_match('/^\d+[d]$/', $value))
+		{
 			$unit = substr($value, -1);
 			$number = intval(substr($value, 0, -1));
 
-			// Validate based on reasonable limits for each unit
-			switch ($unit) {
-				case 'd': return $number > 0 && $number <= 365;
-				default: return false;
+			switch ($unit)
+			{
+				case 'd':
+					return $number > 0 && $number <= 365;
+				default:
+					return false;
 			}
 		}
 

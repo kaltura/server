@@ -6,19 +6,24 @@
 class ESearchScoreFunctionParams extends BaseObject
 {
 	/**
-	 * @var ESearchScoreFunctionType
+	 * @var ESearchScoreFunctionDecayAlgorithm
 	 */
-	protected $scoreFunctionBoostType;
+	protected $decayAlgorithm;
 
 	/**
 	 * @var ESearchScoreFunctionField
 	 */
-	protected $scoreFunctionBoostField;
+	protected $functionField;
 
 	/**
-	 * @var ESearchScoreFunctionMode
+	 * @var ESearchScoreFunctionBoostMode
 	 */
-	protected $scoreFunctionBoostMode;
+	protected $boostMode;
+
+	/**
+	 * @var ESearchScoreFunctionOrigin
+	 */
+	protected $origin;
 
 	/**
 	 * @var float
@@ -35,58 +40,53 @@ class ESearchScoreFunctionParams extends BaseObject
 	 */
 	protected $decay;
 
-	/**
-	 * @var string
-	 */
-	protected $origin;
-
 
 	/**
-	 * @return ESearchScoreFunctionType
+	 * @return ESearchScoreFunctionDecayAlgorithm
 	 */
-	public function getScoreFunctionBoostType()
+	public function getDecayAlgorithm()
 	{
-		return $this->scoreFunctionBoostType;
+		return $this->decayAlgorithm;
 	}
 
 	/**
-	 * @param ESearchScoreFunctionType $scoreFunctionBoostFunction
+	 * @param ESearchScoreFunctionDecayAlgorithm $scoreFunctionBoostFunction
 	 */
-	public function setScoreFunctionBoostType($scoreFunctionBoostType)
+	public function setDecayAlgorithm($decayAlgorithm)
 	{
-		$this->scoreFunctionBoostType = $scoreFunctionBoostType;
+		$this->decayAlgorithm = $decayAlgorithm;
 	}
 
 	/**
 	 * @return ESearchScoreFunctionField
 	 */
-	public function getScoreFunctionBoostField()
+	public function getFunctionField()
 	{
-		return $this->scoreFunctionBoostField;
+		return $this->functionField;
 	}
 
 	/**
-	 * @param ESearchScoreFunctionField $scoreFunctionBoostField
+	 * @param ESearchScoreFunctionField $functionField
 	 */
-	public function setScoreFunctionBoostField($scoreFunctionBoostField)
+	public function setFunctionField($functionField)
 	{
-		$this->scoreFunctionBoostField = $scoreFunctionBoostField;
+		$this->functionField = $functionField;
 	}
 
 	/**
-	 * @return ESearchScoreFunctionMode
+	 * @return ESearchScoreFunctionBoostMode
 	 */
-	public function getScoreFunctionBoostMode()
+	public function getBoostMode()
 	{
-		return $this->scoreFunctionBoostMode;
+		return $this->boostMode;
 	}
 
 	/**
-	 * @param ESearchScoreFunctionMode $scoreFunctionBoostMode
+	 * @param ESearchScoreFunctionBoostMode $boostMode
 	 */
-	public function setScoreFunctionBoostMode($scoreFunctionBoostMode)
+	public function setBoostMode($boostMode)
 	{
-		$this->scoreFunctionBoostMode = $scoreFunctionBoostMode;
+		$this->boostMode = $boostMode;
 	}
 
 	/**
