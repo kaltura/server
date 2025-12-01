@@ -483,6 +483,10 @@
 					"type" : "keyword",
 					"normalizer" : "kaltura_keyword_normalizer"
 				},
+				"flavor_params" : {
+					"type" : "keyword",
+					"normalizer" : "kaltura_keyword_normalizer"
+				},
 				"categories_names" : {
 					"type" : "keyword",
 					"normalizer" : "kaltura_keyword_normalizer"
