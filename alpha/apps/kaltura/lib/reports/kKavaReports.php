@@ -105,7 +105,7 @@ class kKavaReports extends kKavaReportsMgr
 						'columns' => array('PUSER_ID', 'EMAIL'),
 					)
 				),
-			)
+			),
 		),
 
 		ReportType::SPECIFIC_USER_ENGAGEMENT => array(
@@ -137,6 +137,17 @@ class kKavaReports extends kKavaReportsMgr
 			self::REPORT_METRICS => array(self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_SHARE_CLICKED, self::METRIC_TOTAL_UNIQUE_PERCENTILES, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
 			self::REPORT_GRAPH_METRICS => array(self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_UNIQUE_USERS, self::METRIC_AVG_DROP_OFF, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_SHARE_CLICKED, self::METRIC_UNIQUE_VIEWERS, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
 			self::REPORT_TOTAL_METRICS => array(self::METRIC_UNIQUE_USERS, self::METRIC_UNIQUE_ENTRIES, self::EVENT_TYPE_PLAY, self::METRIC_QUARTILE_PLAY_TIME, self::METRIC_AVG_PLAY_TIME, self::METRIC_AVG_DROP_OFF, self::EVENT_TYPE_PLAYER_IMPRESSION, self::METRIC_PLAYER_IMPRESSION_RATIO, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_SHARE_CLICKED, self::METRIC_UNIQUE_VIEWERS, self::METRIC_VIEW_PERIOD_PLAY_TIME, self::METRIC_AVG_VIEW_PERIOD_PLAY_TIME),
+			self::REPORT_FRIENDLY_DEF => array(
+				self::REPORT_DIMENSION_MAP => array(
+					'email' => self::DIMENSION_KUSER_ID,
+				),
+				self::REPORT_ENRICH_DEF => array(
+					self::REPORT_ENRICH_OUTPUT => 'email',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('EMAIL'),
+					)
+				),
+			),
 		),
 
 		ReportType::USER_CONTENT_DROPOFF => array(
@@ -1392,7 +1403,18 @@ class kKavaReports extends kKavaReportsMgr
 				'added_entries' => self::METRIC_ENTRIES_ADDED,
 				'added_msecs' => self::METRIC_DURATION_ADDED_MSEC,
 				'contributor_ranking' => self::METRIC_CONTRIBUTOR_RANKING,
-			)
+			),
+			self::REPORT_FRIENDLY_DEF => array(
+				self::REPORT_DIMENSION_MAP => array(
+					'email' => self::DIMENSION_KUSER_ID,
+				),
+				self::REPORT_ENRICH_DEF => array(
+					self::REPORT_ENRICH_OUTPUT => 'email',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'columns' => array('EMAIL'),
+					)
+				),
+			),
 		),
 
 		ReportType::TOP_SOURCES => array(
