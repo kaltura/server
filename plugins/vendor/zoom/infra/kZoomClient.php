@@ -300,13 +300,9 @@ class kZoomClient extends kVendorClient
 	 * @param bool $tokenRefreshed Flag indicating if a token refresh has already been attempted
 	 * @return bool True if the token was successfully refreshed, false otherwise
 	 */
-	protected function refreshAccessTokenIfInvalid($tokenRefreshed)
+	protected function refreshAccessTokenIfInvalid()
 	{
-		if ($tokenRefreshed) {
-			// Only attempt refresh once per API call to prevent infinite loops
-			return false;
-		}
-
+		
 		KalturaLog::info('Attempting to refresh Zoom access token');
 		/* @var ZoomVendorIntegration $vendorIntegration */
 		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($this->accountId, VendorTypeEnum::ZOOM_ACCOUNT);
