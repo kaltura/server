@@ -509,16 +509,16 @@ class kBusinessPostConvertDL
 
 			foreach($childJobs as $childJob)
 			{
-				if($childJob->getId() != $rootBatchJob->getId() && !in_array($childJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_FINISHED, BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL)))
+				if($childJob->getId() != $rootBatchJob->getId() && !in_array($childJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_FINISHED, BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL, BatchJob::BATCHJOB_STATUS_ABORTED)))
 				{
 					$allJobsCompleted = false;
 					break;
 				}
 			}
 
-			$errorMsg = "Convert job " . $dbBatchJob->getId() . " failed, bulk download job will process other entries.";
+			$errorMsg = 'Convert job ' . $dbBatchJob->getId() . ' failed, bulk download job will process other entries.';
 			$rootBatchJob->setMessage($errorMsg);
-			$rootBatchJob->setDescription($rootBatchJob->getDescription() . "\n" . $errorMsg);
+			$rootBatchJob->setDescription($rootBatchJob->getDescription() . PHP_EOL . $errorMsg);
 
 			if($allJobsCompleted)
 			{
