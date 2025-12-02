@@ -294,6 +294,18 @@ class kZoomClient extends kVendorClient
 		return null;
 	}
 
+	/**
+	 * Checks if a response indicates an invalid access token error
+	 *
+	 * @param array $data The response data from Zoom API
+	 * @return bool True if the response indicates an invalid token error
+	 */
+	protected function isInvalidTokenError($data)
+	{
+		return isset($data['code']) && $data['code'] == 200 &&
+		       (strpos($data['message'], 'Invalid access token') !== false);
+	}
+
 	protected function isRetryableError($errorMsg, $httpCode)
 	{
 		// Retry on SSL/connection errors
