@@ -103,9 +103,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 					$freshTokens = kZoomOauth::refreshTokens($vendorIntegration);
 					if ($freshTokens)
 					{
-						$this->accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
-						$this->refreshToken = isset($freshTokens[kZoomTokens::REFRESH_TOKEN]) ? $freshTokens[kZoomTokens::REFRESH_TOKEN] : null;
-						$this->accessExpiresIn = kZoomOauth::getTokenExpiryRelativeTime($freshTokens[kZoomTokens::EXPIRES_IN]);
+						kZoomOauth::updateObjectWithFreshTokens($this, $freshTokens);
 					}
 				}
 

@@ -48,6 +48,24 @@ class kZoomOauth extends kOAuth
 
 		return null;
 	}
+
+	/**
+	 * Update object properties with fresh tokens
+	 * @param object $object The object to update (must have accessToken, refreshToken, accessExpiresIn properties)
+	 * @param array $freshTokens The fresh tokens array from refreshTokens()
+	 */
+	public static function updateObjectWithFreshTokens($object, $freshTokens)
+	{
+		if (!$freshTokens || !$object) {
+			return;
+		}
+
+		$object->accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
+		$object->refreshToken = isset($freshTokens[kZoomTokens::REFRESH_TOKEN]) ?
+			$freshTokens[kZoomTokens::REFRESH_TOKEN] : null;
+		$object->accessExpiresIn = self::getTokenExpiryRelativeTime(
+			$freshTokens[kZoomTokens::EXPIRES_IN]);
+	}
 	
 
 	public static function requestAuthorizationTokens($authCode)

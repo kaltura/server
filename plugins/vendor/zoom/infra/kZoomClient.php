@@ -227,8 +227,11 @@ class kZoomClient extends kVendorClient
 	}
 	
 	/**
-	 * @param string $apiPath
-	 * @return mixed
+	 * Makes a call to the Zoom API with automatic token refresh and retry capabilities
+	 *
+	 * @param string $apiPath The API endpoint path
+	 * @param array $options Optional cURL options
+	 * @return mixed The decoded JSON response or null on failure
 	 * @throws Exception
 	 */
 	public function callZoom(string $apiPath, array $options = array())
@@ -238,6 +241,8 @@ class kZoomClient extends kVendorClient
 		$maxRetries = self::MAX_RETRIES;
 		$attempt = 0;
 		$lastError = null;
+		$tokenRefreshed = false;
+
 		while ($attempt <= $maxRetries)
 		{
 			$curlWrapper = new KCurlWrapper();
@@ -255,6 +260,17 @@ class kZoomClient extends kVendorClient
 			{
 				$data = json_decode($response, true);
 				KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
+
+				// Check for invalid token errors and refresh once
+				if (!$tokenRefreshed && $this->isInvalidTokenError($data))
+				{
+					KalturaLog::info('Detected invalid token, attempting refresh');
+					if ($this->refreshAccessTokenIfInvalid($tokenRefreshed)) {
+						$tokenRefreshed = true;
+						KalturaLog::info('Token refreshed, retrying API call');
+						continue; // Retry with new token
+					}
+				}
 				return $data;
 			}
 			// Check if error is retryable
