@@ -265,7 +265,7 @@ class kZoomClient extends kVendorClient
 				if (!$tokenRefreshed && $this->isInvalidTokenError($data))
 				{
 					KalturaLog::info('Detected invalid token, attempting refresh');
-					if ($this->refreshAccessTokenIfInvalid($tokenRefreshed)) {
+					if ($this->refreshAccessTokenIfInvalid()) {
 						$tokenRefreshed = true;
 						KalturaLog::info('Token refreshed, retrying API call');
 						continue; // Retry with new token
