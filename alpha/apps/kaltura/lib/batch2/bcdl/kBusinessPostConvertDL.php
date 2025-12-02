@@ -501,10 +501,33 @@ class kBusinessPostConvertDL
 		if($rootBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FAILED || $rootBatchJob->getStatus() == BatchJob::BATCHJOB_STATUS_FATAL)
 			return false;
 
-		// bulk download root job no need to handle 
+		// bulk download root job: allow partial success
 		if($rootBatchJob->getJobType() == BatchJobType::BULKDOWNLOAD)
 		{
-			kJobsManager::failBatchJob($rootBatchJob, "Convert job " . $dbBatchJob->getId() . " failed");
+			$childJobs = $rootBatchJob->getChildJobs();
+			$allJobsCompleted = true;
+
+			foreach($childJobs as $childJob)
+			{
+				if($childJob->getId() != $rootBatchJob->getId() && !in_array($childJob->getStatus(), array(BatchJob::BATCHJOB_STATUS_FINISHED, BatchJob::BATCHJOB_STATUS_FAILED, BatchJob::BATCHJOB_STATUS_FATAL, BatchJob::BATCHJOB_STATUS_ABORTED)))
+				{
+					$allJobsCompleted = false;
+					break;
+				}
+			}
+
+			$errorMsg = 'Convert job ' . $dbBatchJob->getId() . ' failed, bulk download job will process other entries.';
+			$rootBatchJob->setMessage($errorMsg);
+			$rootBatchJob->setDescription($rootBatchJob->getDescription() . PHP_EOL . $errorMsg);
+
+			if($allJobsCompleted)
+			{
+				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
+			}
+			else
+			{
+				kJobsManager::updateBatchJob($rootBatchJob, $rootBatchJob->getStatus());
+			}
 			return false;
 		}
 			
