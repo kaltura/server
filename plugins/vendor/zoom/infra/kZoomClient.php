@@ -260,6 +260,18 @@ class kZoomClient extends kVendorClient
 			{
 				$data = json_decode($response, true);
 				KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
+
+				// Check for invalid token errors and refresh once
+				if (!$tokenRefreshed && $this->isInvalidTokenError($data))
+				{
+					KalturaLog::info('Detected invalid token, attempting refresh');
+					if ($this->refreshAccessTokenIfInvalid($tokenRefreshed)) {
+						$tokenRefreshed = true;
+						KalturaLog::info('Token refreshed, retrying API call');
+						continue; // Retry with new token
+					}
+				}
+				
 				return $data;
 			}
 			// Check if error is retryable
