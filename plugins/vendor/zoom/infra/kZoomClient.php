@@ -295,6 +295,37 @@ class kZoomClient extends kVendorClient
 	}
 
 	/**
+	 * Attempts to refresh the access token if it's invalid
+	 *
+	 * @param bool $tokenRefreshed Flag indicating if a token refresh has already been attempted
+	 * @return bool True if the token was successfully refreshed, false otherwise
+	 */
+	protected function refreshAccessTokenIfInvalid($tokenRefreshed)
+	{
+		if ($tokenRefreshed) {
+			// Only attempt refresh once per API call to prevent infinite loops
+			return false;
+		}
+
+		KalturaLog::info('Attempting to refresh Zoom access token');
+		/* @var ZoomVendorIntegration $vendorIntegration */
+		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($this->accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if (!$vendorIntegration) {
+			KalturaLog::error('Failed to retrieve vendor integration for account ID: ' . $this->accountId);
+			return false;
+		}
+
+		$freshTokens = kZoomOauth::refreshTokens($vendorIntegration, $this);
+		if (!$freshTokens) {
+			KalturaLog::error('Failed to refresh tokens');
+			return false;
+		}
+
+		KalturaLog::info('Zoom access token successfully refreshed');
+		return true;
+	}
+
+	/**
 	 * Checks if a response indicates an invalid access token error
 	 *
 	 * @param array $data The response data from Zoom API
