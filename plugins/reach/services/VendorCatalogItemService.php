@@ -176,12 +176,11 @@ class VendorCatalogItemService extends KalturaBaseService
 	public function serveAction($vendorPartnerId = null, KalturaVendorCatalogItemFilter $filters = null)
 	{
 		$filter = $filters ? clone $filters : new KalturaVendorCatalogItemFilter();
-
 		if($vendorPartnerId)
 		{
 			$filter->vendorPartnerIdEqual = $vendorPartnerId;
 		}
-		
+
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
