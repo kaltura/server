@@ -379,7 +379,7 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], ar
 	};
 
 	foreach ($rows as $row) {
-		$emailValue = isset($row['EMAIL']) ? trim((string) $row['EMAIL']) : '';
+		$emailValue = isset($row['EMAIL']) ? strtolower(trim((string) $row['EMAIL'])) : '';
 
 		if ($emailValue === '') {
 			KalturaLog::log('Skipping duplicate email aggregation for empty string value.');
@@ -644,7 +644,7 @@ function normalizeDuplicateData(array $duplicates): array
 
 	foreach ($duplicates as $dup) {
 		if (is_array($dup) && isset($dup[0], $dup[1]) && is_string($dup[0]) && is_numeric($dup[1])) {
-			$email = $dup[0];
+			$email = strtolower(trim((string) $dup[0]));
 			$count = (int) $dup[1];
 
 			if (!isset($duplicateEmailCounts[$email])) {
@@ -736,7 +736,8 @@ function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmail
 		$needsExternalIdUpdate = isset($externalIdUpdateIds[$kuserId]) ? 'yes' : 'no';
 		$needsPuserAsEmailUpdate = isset($puserAsEmailUpdateIds[$kuserId]) ? 'yes' : 'no';
 		$userEmail = $user->getEmail();
-		$duplicateCount = $duplicateEmailCounts[$userEmail] ?? 0;
+		$normalizedEmail = strtolower(trim((string) $userEmail));
+		$duplicateCount = $duplicateEmailCounts[$normalizedEmail] ?? 0;
 		$entryOwnedCount = '';
 
 		if ($includeDuplicateColumns) {
@@ -840,7 +841,8 @@ function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $proce
 		}
 
 		$email = $dup['email'] ?? '';
-		$duplicateCount = $email !== '' ? ($duplicateEmailCounts[$email] ?? 0) : 0;
+		$normalizedEmail = strtolower(trim((string) $email));
+		$duplicateCount = $normalizedEmail !== '' ? ($duplicateEmailCounts[$normalizedEmail] ?? 0) : 0;
 
 		$row = [
 			$dupUserId,
