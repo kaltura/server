@@ -181,7 +181,7 @@ class VendorCatalogItemService extends KalturaBaseService
 		{
 			$filter->vendorPartnerIdEqual = $vendorPartnerId;
 		}
-
+		
 		$pager = new KalturaFilterPager();
 		$pager->pageSize = 500;
 		$pager->pageIndex = 1;
