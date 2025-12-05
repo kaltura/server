@@ -76,8 +76,6 @@ if ($argc < 2)
 
 // get the bulk size from the command line argument or use the default value
 $bulkSize = is_numeric($argv[1]) ? intval($argv[1]) : 250;
-// get memcache to update last played at
-$memcache = getenv(MEMCACHE_VAR);
 
 // load cluster configurations
 $config = kConf::get('elasticPopulateSettings', 'elastic_populate', array());
@@ -131,6 +129,30 @@ try
 	{
 		throw new Exception("Missing configuration values: consumerId [$consumerId] host [$host], port [$port], version [$version]");
 	}
+	
+	// load cache sections for playsViews to update last_played_at key for monitoring
+	$memcInstances = array();
+	
+	$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+	if(!$cacheSections)
+	{
+		throw new Exception("No cache sections found for [ " . kCacheManager::CACHE_TYPE_PLAYS_VIEWS . " ] cache type");
+	}
+	
+	foreach ($cacheSections as $cacheSection)
+	{
+		$cacheStore = kCacheManager::getCache($cacheSection);
+		if (!$cacheStore)
+			continue;
+		
+		$memcInstances[] = $cacheStore;
+	}
+	
+	// validate we have at least one memcache instance
+	if (empty($memcInstances))
+	{
+		throw new Exception("Could not connect to any [ " . kCacheManager::CACHE_TYPE_PLAYS_VIEWS . " ] cache");
+	}
 }
 catch (Exception $e)
 {
@@ -142,6 +164,7 @@ catch (Exception $e)
 KalturaLog::log('Started, pid=' . getmypid());
 KalturaLog::log("Starting playsViewsElasticConsumer for consumerId [$consumerId] and bulkSize [$bulkSize]");
 KalturaLog::log("Elastic Client host [$host] port [$port] version [$version]");
+KalturaLog::log("Memcache connected " . print_r($memcInstances, true));
 
 // connect to elastic
 $elasticClient = new elasticClient($host, $port, $version);
@@ -173,23 +196,6 @@ if ($explicitPartnerIdsString)
 {
         $explicitPartnerIdsArray = explode(',', $explicitPartnerIdsString);
         $explicitPartnerIds = array_map('trim', $explicitPartnerIdsArray);
-}
-
-$memcInstances = array();
-$memcacheArr = explode(',', $memcache);
-foreach ($memcacheArr as $memcacheConfig)
-{
-	list($currMemcacheHost, $currMemcachePort) = explode(':', $memcacheConfig);
-	$currMemc = new kInfraMemcacheCacheWrapper();
-	$ret = $currMemc->init(array('host'=>$currMemcacheHost, 'port'=>$currMemcachePort));
-	if (!$ret)
-	{
-		$message = "Failed to connect to cache host {$currMemcacheHost} port {$currMemcachePort}";
-		KalturaLog::err($message);
-		writeFailure($message);
-		exit(1);
-	}
-	$memcInstances[] = $currMemc;
 }
 
 //When loading the server bootstrap it disables the stream wrappers, we need to enable it back for the s3Wrapper to be able to fetch files form s3
@@ -230,7 +236,7 @@ function writeSuccess($filePath = null): void
 	$timestamp = time();
 	$date = date("Y-m-d H:i:s", $timestamp);
 	$hostname = gethostname();
-	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", success=\"true\"} $timestamp" . PHP_EOL;
+	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host_name=\"$hostname\", description=\"$description\", success=\"true\"} $timestamp" . PHP_EOL;
 	
 	file_put_contents($filePath, $data, LOCK_EX);
 }
@@ -246,7 +252,7 @@ function writeFailure($e, $filePath = null): void
 	$hostname = gethostname();
 	$message = $e instanceof Exception ? $e->getMessage() : $e;
 	$code = $e instanceof Exception ? $e->getCode() : 0;
-	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host=\"$hostname\", description=\"$description\", success=\"false\", message=\"$message\", code=\"$code\"} $timestamp" . PHP_EOL;
+	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host_name=\"$hostname\", description=\"$description\", success=\"false\", message=\"$message\", code=\"$code\"} $timestamp" . PHP_EOL;
 	
 	file_put_contents($filePath, $data, LOCK_EX);
 }
