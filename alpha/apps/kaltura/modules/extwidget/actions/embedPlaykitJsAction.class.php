@@ -6,7 +6,7 @@
 class embedPlaykitJsAction extends sfAction
 {
 	const COMPRESSED_PREFIX = "COMPRESSED,";
-	
+
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
 	const VERSIONS_PARAM_NAME = "versions";
@@ -70,10 +70,10 @@ class embedPlaykitJsAction extends sfAction
 		$i18nContent = self::getCacheData($this, 'bundleCache', $this->bundle_i18n_name);
 		$extraModulesNames = unserialize(self::getCacheData($this,'bundleCache', $this->bundle_extra_modules_names));
 		KalturaLog::debug("Fetch bundle content from cache for key [{$this->bundle_name}], result: [" . !empty($bundleContent) . "]");
-
-		if (!$bundleContent || !$i18nContent || $this->regenerate)
+		$i18nContentNeeded = is_array($this->uiConfLangs) && count($this->uiConfLangs) > 1;
+		if (!$bundleContent || (!$i18nContent && $i18nContentNeeded)|| $this->regenerate)
 		{
-			KalturaLog::debug("bundleContent: " . $bundleContent . " i18nContent: " . $i18nContent . " regenerate: " . $this->regenerate);
+			KalturaLog::debug("bundleContent: " . $bundleContent . " i18nContent: " . $i18nContent . " i18nContentNeeded ".$i18nContentNeeded . " regenerate: " . $this->regenerate);
 			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 30);
 		}
 
