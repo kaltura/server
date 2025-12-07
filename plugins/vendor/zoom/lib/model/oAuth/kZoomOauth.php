@@ -13,11 +13,14 @@ class kZoomOauth extends kOAuth
 	const X_ZM_REQUEST_TIMESTAMP = 'x-zm-request-timestamp';
 
 	/**
-	 * @param ZoomVendorIntegration $vendorIntegration
-	 * @return array|null
+	 * Refreshes the authentication tokens for a Zoom integration and optionally updates a target object
+	 *
+	 * @param ZoomVendorIntegration $vendorIntegration The vendor integration to refresh tokens for
+	 * @param object|null $targetObject Optional object to update with fresh tokens
+	 * @return array|null The fresh tokens or null if refresh failed
 	 * @throws Exception
 	 */
-	public static function refreshTokens($vendorIntegration)
+	public static function refreshTokens($vendorIntegration, $targetObject = null)
 	{
 		switch ($vendorIntegration->getZoomAuthType())
 		{
@@ -29,6 +32,12 @@ class kZoomOauth extends kOAuth
 				$response = self::curlRetrieveTokensData($zoomBaseURL, null, $header, $postFields);
 				$tokensData = self::retrieveAccessTokenDataFromResponse($response);
 				$vendorIntegration->saveAccessTokenData($tokensData);
+
+				// Update target object if provided
+				if ($tokensData && $targetObject) {
+					self::updateObjectWithFreshTokens($targetObject, $tokensData);
+				}
+
 				return $tokensData;
 
 			case kZoomAuthTypes::OAUTH:
@@ -39,6 +48,12 @@ class kZoomOauth extends kOAuth
 				$response = self::curlRetrieveTokensData($zoomBaseURL, $userPwd, $header, $postFields);
 				$tokensData = self::retrieveTokensDataFromResponse($response);
 				$vendorIntegration->saveTokensData($tokensData);
+
+				// Update target object if provided
+				if ($tokensData && $targetObject) {
+					self::updateObjectWithFreshTokens($targetObject, $tokensData);
+				}
+
 				return $tokensData;
 
 			default:
@@ -124,6 +139,25 @@ class kZoomOauth extends kOAuth
 	}
 
 	/**
+	 * Update object properties with fresh tokens
+	 * @param object $object The object to update (must have accessToken, refreshToken, accessExpiresIn properties)
+	 * @param array $freshTokens The fresh tokens array from refreshTokens()
+	 */
+	public static function updateObjectWithFreshTokens($object, $freshTokens)
+	{
+		if (!$freshTokens || !$object) {
+			return;
+		}
+
+		$object->accessToken = $freshTokens[kZoomTokens::ACCESS_TOKEN];
+		$object->refreshToken = isset($freshTokens[kZoomTokens::REFRESH_TOKEN]) ?
+			$freshTokens[kZoomTokens::REFRESH_TOKEN] : null;
+		$object->accessExpiresIn = time() + self::getTokenExpiryAbsoluteTime(
+			$freshTokens[kZoomTokens::EXPIRES_IN]);
+	}
+
+
+	/**
 	 * @param ZoomVendorIntegration $zoomIntegration
 	 * @return string
 	 * @throws kZoomErrorMessages
@@ -132,7 +166,7 @@ class kZoomOauth extends kOAuth
 	{
 		if (time() >= $zoomIntegration->getExpiresIn()) // token have expired -> refresh
 		{
-			self::refreshTokens($zoomIntegration);
+			self::refreshTokens($zoomIntegration, null); // Explicitly pass null to avoid object updates
 		}
 		return $zoomIntegration->getAccessToken();
 	}
