@@ -4195,6 +4195,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			'views_1day' => $this->getViewsLastDay(),
 			'plays_1day' => $this->getPlaysLastDay(),
 			'recycled_at' => $this->getRecycledAt(),
+			'flavor_params' => explode(",",!is_null($this->getFlavorParamsIds()) ? $this->getFlavorParamsIds() : ""),
 		);
 
 		$this->addCategoriesToObjectParams($body);
