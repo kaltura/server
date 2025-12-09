@@ -72,7 +72,12 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaVendorCatalogItemFilter();
-		
+
+		if ($filter->orderBy === null)
+		{
+			$filter->orderBy = KalturaVendorCatalogItemOrderBy::ID_DESC;
+		}
+
 		if(!$pager)
 			$pager = new KalturaFilterPager();
 		
