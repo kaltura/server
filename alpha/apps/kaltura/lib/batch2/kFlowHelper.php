@@ -341,7 +341,15 @@ class kFlowHelper
 				kJobsManager::addCapturaThumbJob($entryThumbnail->getPartnerId(), $entryThumbnail->getEntryId(), $entryThumbnail->getId(), $srcSyncKey, $flavorAsset->getId(), $srcAssetType, $thumbParamsOutput);
 			}
 		}
-		
+
+		$replacingEntry = $dbBatchJob->getEntry();
+		if ($replacingEntry &&
+			$replacingEntry->getIsTemporary() &&
+			kReplacementHelper::shouldSyncFlavorInfo($flavorAsset, $flavorAsset->getEntryId()))
+		{
+			kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($flavorAsset);
+		}
+
 		return $dbBatchJob;
 	}
 
