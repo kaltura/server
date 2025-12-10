@@ -478,11 +478,7 @@ class kMrssManager
 		$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
 		$thumbnailUrl = $mrss->addChild('thumbnailUrl');
 		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
-		$protocol = null;
-		if ($partner && $partner->getEnforceHttpsApi())
-		{
-			$protocol = "https";
-		}
+		$protocol = ($partner && $partner->getEnforceHttpsApi()) ? 'https' : null;
 		$thumbnailUrl->addAttribute('url', $entry->getThumbnailUrl($entry->getThumbnailVersion(), $protocol));
 		if(trim($entry->getTags(), " \r\n\t"))
 		{
