@@ -58,6 +58,17 @@ class AnnotationService extends CuePointService
 		{
 			$dbAnnotation->setParentId($parentId);
 		}
+
+		//save the original annotation cue point createdAt time on field originalCuePointCreateAt
+		$originalCuePoint = cuePointPeer::retrieveByPK($id);
+		$originalCuePointCreatedAt = $originalCuePoint->getOriginalCuePointCreateAt();
+		if(!$originalCuePointCreatedAt)
+		{
+			$createAt = $originalCuePoint->getCreatedAt();
+			$dt = new DateTime($createAt);
+			$originalCuePointCreatedAt = $dt->getTimestamp();
+		}
+		$dbAnnotation->setOriginalCuePointCreateAt($originalCuePointCreatedAt);
 		$dbAnnotation->save();
 		return KalturaAnnotation::getInstance($dbAnnotation, $this->getResponseProfile());
 	}

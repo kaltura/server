@@ -281,7 +281,7 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				$line['label'] = $label;
 
 			if($accuracy)
-				$line['accuracy'] = $accuracy;
+				$line['accuracy'] = preg_replace('/[^0-9]/', '', $accuracy);
 
 			$content = '';
 			foreach ($item['content'] as $curChunk)
