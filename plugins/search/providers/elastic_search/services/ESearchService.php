@@ -137,13 +137,7 @@ class ESearchService extends KalturaBaseService
 			$ignoreSynonym = true;
 		}
 
-		$scoreFunctionParams = null;
-
-		if ($coreParams->getScoreFunctionParams())
-		{
-			$scoreFunctionParams = $coreParams->getScoreFunctionParams();
-		}
-		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $coreParams->getObjectIdsNotIn(), $kPager, $coreParams->getOrderBy(), $coreParams->getAggregations(), $ignoreSynonym, $scoreFunctionParams);
+		return array($coreParams->getSearchOperator(), $objectStatusesArr, $coreParams->getObjectId(), $coreParams->getObjectIdsNotIn(), $kPager, $coreParams->getOrderBy(), $coreParams->getAggregations(), $ignoreSynonym, $coreParams->getScoreFunctionParams());
 	}
 
 }

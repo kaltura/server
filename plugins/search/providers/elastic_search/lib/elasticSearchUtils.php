@@ -221,8 +221,8 @@ class elasticSearchUtils
 
 	public static function isValidDuration($value)
 	{
-		// Check for duration format (e.g., 30d)
-		if (preg_match('/^\d+[d]$/', $value))
+		// Check for duration format (e.g., 30d, 30w, 30m, 30h)
+		if (preg_match('/^\d+[dwmh]$/', $value))
 		{
 			$unit = substr($value, -1);
 			$number = intval(substr($value, 0, -1));
@@ -231,6 +231,12 @@ class elasticSearchUtils
 			{
 				case 'd':
 					return $number > 0 && $number <= 365;
+				case 'w':
+					return $number > 0 && $number <= 52;
+				case 'm':
+					return $number > 0 && $number <= 12;
+				case 'h':
+					return $number > 0 && $number <= 8760; // 365 * 24 hours
 				default:
 					return false;
 			}

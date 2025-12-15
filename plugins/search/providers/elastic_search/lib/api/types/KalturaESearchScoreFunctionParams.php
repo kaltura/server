@@ -65,24 +65,31 @@ class KalturaESearchScoreFunctionParams extends KalturaObject
 
 	public function validateScoreFunctionParams()
 	{
-		if (!isset($this->decayAlgorithm) || !isset($this->scale) || !isset($this->functionField))
+		if (!isset($this->decayAlgorithm) || !isset($this->scale) || !isset($this->functionField) | !isset($this->origin))
 		{
 			throw new KalturaAPIException(KalturaESearchErrors::MISSING_MANDATORY_SCORE_FUNCTION_PARAM);
 		}
 
 		if (!elasticSearchUtils::isValidDuration($this->scale))
 		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCORE_FUNCTION_FIELD_VALUE, 'scale');
+			throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCORE_FUNCTION_FIELD_VALUE, 'scale', 'Invalid duration format');
 		}
 
-		if (isset($this->decay) && (!is_float($this->decay) || $this->decay <= 0 || $this->decay >= 1))
+		if (isset($this->decay))
 		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCORE_FUNCTION_FIELD_VALUE, 'decay');
+			if(!is_float($this->decay))
+			{
+				throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCORE_FUNCTION_FIELD_VALUE, 'decay', 'Must be float');
+			}
+			if($this->decay <= 0 || $this->decay >= 1)
+			{
+				throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCORE_FUNCTION_FIELD_VALUE, 'decay', 'Must be between 0 and 1');
+			}
 		}
 
-		if (isset($this->weight) && (!is_float($this->weight) && !is_numeric($this->weight)))
+		if (isset($this->weight) && !is_numeric($this->weight))
 		{
-			throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCORE_FUNCTION_FIELD_VALUE, 'weight');
+			throw new KalturaAPIException(KalturaESearchErrors::INVALID_SCORE_FUNCTION_FIELD_VALUE, 'weight', 'Must be numeric');
 		}
 	}
 }

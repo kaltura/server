@@ -152,7 +152,7 @@ abstract class kBaseESearch extends kBaseSearch
 			case ESearchScoreFunctionField::CREATED_AT:
 			default:
 			{
-				$this->query['body']['query']['function_score']['functions'][] = $this->processScoreFunctionBoostFields($scoreFunctionParams);;
+				$this->query['body']['query']['function_score']['functions'][] = $this->processScoreFunctionBoostFields($scoreFunctionParams);
 				$this->query['body']['query']['function_score']['boost_mode'] = $scoreFunctionParams->getBoostMode();
 			}
 		}
