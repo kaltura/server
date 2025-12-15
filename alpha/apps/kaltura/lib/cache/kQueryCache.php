@@ -40,7 +40,7 @@ class kQueryCache
 													// the query timestamp should be greater by this value to use the cache
 													// in order to compensate for clock differences
 	const SLAVE_LAG_TIME_MARGIN_SEC = 70;			// This value is added to the measured slave lag as a safety margin.
-													// it is composed of the lag measuring period (60) and the clock sync margin (10)
+													// it is composed of the lag measuring period (60 or lower) and the clock sync margin (10)
 	const MAX_QUERY_MASTER_TIME_MARGIN_SEC = 3600;	// The maximum time frame after a DB change during which we should query the master
 	
 	const MAX_CACHED_OBJECT_COUNT = 500;			// Select queries that return more objects than this const will not be cached
@@ -264,8 +264,12 @@ class kQueryCache
 			strlen($cacheResult[self::MAX_SLAVE_LAG_KEY]) && 
 			is_numeric($cacheResult[self::MAX_SLAVE_LAG_KEY]))
 		{
+			// Load cache runtime config
+			$cacheConfig = kConf::get("cache", kConfMapNames::RUNTIME_CONFIG, array());
+			$slaveLagTimeMarginSec = $cacheConfig['slave_lag_time_margin_sec'] ?? self::SLAVE_LAG_TIME_MARGIN_SEC;
+			
 			$maxSlaveLag = $cacheResult[self::MAX_SLAVE_LAG_KEY];
-			$maxSlaveLag += self::SLAVE_LAG_TIME_MARGIN_SEC;
+			$maxSlaveLag += $slaveLagTimeMarginSec;
 			$queryMasterThreshold = min($maxSlaveLag, $queryMasterThreshold);
 		}
 		unset($cacheResult[self::MAX_SLAVE_LAG_KEY]);
