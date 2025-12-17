@@ -66,6 +66,7 @@ class PlaylistService extends KalturaEntryService
 		$dbPlaylist->setStatus ( entryStatus::READY );
 		$dbPlaylist->setKshowId ( null ); // this is brave !!
 		$dbPlaylist->setType ( entryType::PLAYLIST );
+		$dbPlaylist->setApplication(0);
 
 		myPlaylistUtils::validatePlaylist($dbPlaylist);
 
