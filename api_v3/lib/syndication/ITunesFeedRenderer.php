@@ -124,7 +124,8 @@ class ITunesFeedRenderer extends SyndicationFeedRenderer {
 		$res .= $this->writeFullXmlNode('title', $this->stringToSafeXml($e->name), 3);
 		$res .= $this->writeFullXmlNode('link', $this->syndicationFeed->landingPage.$e->id, 3);
 		$res .= $this->writeFullXmlNode('guid', $flavorAssetUrl, 3);
-		$res .= $this->writeFullXmlNode('pubDate', date('r',$e->createdAt), 3);
+		$pubDate = $e->startDate && $e->startDate > 0 ? $e->startDate : $e->createdAt;
+		$res .= $this->writeFullXmlNode('pubDate', date('r', $pubDate), 3);
 		$res .= $this->writeFullXmlNode('description', $this->stringToSafeXml($e->description), 3);
 
 		$enclosure_attr = array(
