@@ -1248,27 +1248,27 @@ function getUserStatusEnumLabel($status): string {
 
 function isUserValidEP(Kuser $user): string {
 	$puserId = $user->getPuserId();
-	$email = $user->getEmail();
-	$isValidForEP = null;
-	$existingFirstName = strtolower(trim($user->getFirstName()));
-	$existingLastName = strtolower(trim($user->getLastName()));
+	$isValidForEP = true;
+	$email = trim((string) $user->getEmail());
+	$firstName = trim((string) $user->getFirstName());
+	$lastName = trim((string) $user->getLastName());
 
-	if (empty($email)) {
+	if ($email === '') {
 		KalturaLog::log('User [' . $puserId . '] is missing Email.');
 		return 'false';
 	}
 
-	if (empty($existingFirstName)) {
+	if ($firstName === '') {
 		KalturaLog::log('User [' . $puserId . '] is missing first name.');
 		$isValidForEP = false;
-	} 
+	}
 
-	if (empty($existingLastName)) {
+	if ($lastName === '') {
 		KalturaLog::log('User [' . $puserId . '] is missing last name.');
 		$isValidForEP = false;
 	}
 
-	return $isValidForEP === false ? 'false' : 'true';
+	return $isValidForEP ? 'true' : 'false';
 }
 
 /**
