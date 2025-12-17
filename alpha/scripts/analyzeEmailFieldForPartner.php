@@ -1249,21 +1249,24 @@ function getUserStatusEnumLabel($status): string {
 function isUserValidEP(Kuser $user): string {
 	$puserId = $user->getPuserId();
 	$isValidForEP = true;
-	$email = trim((string) $user->getEmail());
-	$firstName = trim((string) $user->getFirstName());
-	$lastName = trim((string) $user->getLastName());
+	$emailRaw = $user->getEmail();
+	$firstNameRaw = $user->getFirstName();
+	$lastNameRaw = $user->getLastName();
+	$email = trim((string) $emailRaw);
+	$firstName = trim((string) $firstNameRaw);
+	$lastName = trim((string) $lastNameRaw);
 
-	if ($email === '') {
+	if ($emailRaw === null || $email === '') {
 		KalturaLog::log('User [' . $puserId . '] is missing Email.');
-		return 'false';
+		$isValidForEP = false;
 	}
 
-	if ($firstName === '') {
+	if ($firstNameRaw === null || $firstName === '') {
 		KalturaLog::log('User [' . $puserId . '] is missing first name.');
 		$isValidForEP = false;
 	}
 
-	if ($lastName === '') {
+	if ($lastNameRaw === null || $lastName === '') {
 		KalturaLog::log('User [' . $puserId . '] is missing last name.');
 		$isValidForEP = false;
 	}
