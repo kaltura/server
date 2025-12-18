@@ -244,7 +244,23 @@ class kMrssManager
 		$mrss = self::getEntryMrssXml($entry, $mrss, $mrssParams);
 		return $mrss->asXML();
 	}
-	
+
+	protected static function enforceHttpsIfRequired($partnerId, $url)
+	{
+		try
+		{
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if ($partner && $partner->getEnforceHttpsApi())
+			{
+				$url = str_replace('http://', 'https://', $url);
+			}
+		} catch (Exception $e)
+		{
+			KalturaLog::err('Failed to enforce HTTPS for URL: ' . $e->getMessage());
+		}
+		return $url;
+	}
+
 	/**
 	 * @param thumbAsset $thumbAsset
 	 * @param SimpleXMLElement $mrss
@@ -262,11 +278,13 @@ class kMrssManager
 		{
 			$cdnUrl = $cdnUrlPartners[$thumbAsset->getPartnerId()];
 			$assetUrl = kAssetUtils::getAssetUrl($thumbAsset, false, null, null, '', $cdnUrl);
+			$assetUrl = self::enforceHttpsIfRequired($thumbAsset->getPartnerId(),$assetUrl);
 			$thumbnail->addAttribute('url', $assetUrl);
 		}
 		else
 		{
 			$assetUrl = kAssetUtils::getAssetUrl($thumbAsset);
+			$assetUrl = self::enforceHttpsIfRequired($thumbAsset->getPartnerId(),$assetUrl);
 			$thumbnail->addAttribute('url', !is_null($assetUrl) ? $assetUrl : '');
 		}
 		$thumbnail->addAttribute('thumbAssetId', $thumbAsset->getId());
@@ -477,9 +495,9 @@ class kMrssManager
 		$mrss->addChild('status', self::stringToSafeXml($entry->getStatus()));
 		$mrss->addChild('description', self::stringToSafeXml($entry->getDescription()));
 		$thumbnailUrl = $mrss->addChild('thumbnailUrl');
-		$partner = PartnerPeer::retrieveByPK($entry->getPartnerId());
-		$protocol = ($partner && $partner->getEnforceHttpsApi()) ? 'https' : null;
-		$thumbnailUrl->addAttribute('url', $entry->getThumbnailUrl($entry->getThumbnailVersion(), $protocol));
+		$url = $entry->getThumbnailUrl($entry->getThumbnailVersion());
+		$url = self::enforceHttpsIfRequired($entry->getPartnerId(), $url);
+		$thumbnailUrl->addAttribute('url', $url);
 		if(trim($entry->getTags(), " \r\n\t"))
 		{
 			$tags = $mrss->addChild('tags');
