@@ -20,6 +20,11 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 	 */
 	public $captionsInfo;
 
+	/**
+	 * @var KalturaMediaType
+	 */
+	public $mediaType;
+
 	public function __construct(KalturaDistributionJobData $distributionJobData = null)
 	{
 		parent::__construct($distributionJobData);
@@ -44,7 +49,7 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 			$flavorAsset = assetPeer::retrieveOriginalReadyByEntryId($distributionJobData->entryDistribution->entryId);
 		}
 
-		
+
 		if($flavorAsset) 
 		{
 			$syncKey = $flavorAsset->getSyncKey(flavorAsset::FILE_SYNC_FLAVOR_ASSET_SUB_TYPE_ASSET);
@@ -63,6 +68,13 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 				$this->thumbAssetFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey, false);
 			}
 		}
+
+		$entry = entryPeer::retrieveByPK($distributionJobData->entryDistribution->entryId);
+		if(!$entry)
+		{
+			KalturaLog::err("Entry [$distributionJobData->entryDistribution->entryId] not found");
+		}
+		$this->mediaType = $entry->getMediaType() ?? KalturaMediaType::VIDEO;
 		
 		$this->addCaptionsData($distributionJobData);
 	}
@@ -72,6 +84,7 @@ class KalturaCortexApiDistributionJobProviderData extends KalturaConfigurableDis
 		"videoAssetFilePath",
 		"thumbAssetFilePath",
 		"captionsInfo",
+		"mediaType",
 	);
 
 	public function getMapBetweenObjects ( )
