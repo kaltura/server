@@ -72,7 +72,12 @@ class VendorCatalogItemService extends KalturaBaseService
 	{
 		if (!$filter)
 			$filter = new KalturaVendorCatalogItemFilter();
-		
+
+		if ($filter->orderBy === null)
+		{
+			$filter->orderBy = KalturaVendorCatalogItemOrderBy::ID_DESC;
+		}
+
 		if(!$pager)
 			$pager = new KalturaFilterPager();
 		
@@ -157,7 +162,7 @@ class VendorCatalogItemService extends KalturaBaseService
 		if (!$dbVendorCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $id);
 		
-		// Check if partnerCatalogItem exists, in this case you should not be able to delete the vendorCatalogItem prior to deleting the partner assignment first 
+		// Check if partnerCatalogItem exists, in this case you should not be able to delete the vendorCatalogItem prior to deleting the partner assignment first
 		$partnerCatalogItem = PartnerCatalogItemPeer::retrieveByCatalogItemId($id);
 		if($partnerCatalogItem)
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_CANNOT_BE_DELETED, $id);
@@ -170,11 +175,14 @@ class VendorCatalogItemService extends KalturaBaseService
 	/**
 	 * @action serve
 	 * @param int $vendorPartnerId
+	 * @param KalturaVendorCatalogItemFilter $filter
 	 * @return file
 	 */
-	public function serveAction($vendorPartnerId = null)
+	public function serveAction($vendorPartnerId = null, KalturaVendorCatalogItemFilter $filter = null)
 	{
-		$filter = new KalturaVendorCatalogItemFilter();
+		if (!$filter)
+			$filter = new KalturaVendorCatalogItemFilter();
+
 		if($vendorPartnerId)
 		{
 			$filter->vendorPartnerIdEqual = $vendorPartnerId;
