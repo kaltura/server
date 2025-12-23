@@ -214,7 +214,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		$params = array(
 			'CoreField.unique-identifier' => $this->getCortexSystemId()
 		);
-		return $this->requestCortex($params, $this->getBaseApiByMediaType($apiDistributionJobProviderData, true));
+		return $this->requestCortex($params, $this->getApiEndpointByMediaType($apiDistributionJobProviderData, true));
 	}
 	/**
 	 * @return void
@@ -410,7 +410,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$metadata["CoreField.Creation-Date:"] = $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE] ? date('Y-m-d', $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE]) : '';
 			$metadata["MAY.Legacy-Keywords:"] = $fieldValues[CortexApiDistributionField::MEDIA_KEYWORDS] ? str_replace(',', ', ', $fieldValues[CortexApiDistributionField::MEDIA_KEYWORDS]) : '';
 			$metadata["MAY.Job-Number:"] = $metadataFields[self::CORTEX_KALTURA_METADATA_FIELD_JOB_NUMBER];
-			$result = $this->requestCortex($metadata, $this->getBaseApiByMediaType($apiDistributionJobProviderData, false));
+			$result = $this->requestCortex($metadata, $this->getApiEndpointByMediaType($apiDistributionJobProviderData, false));
 			$this->setRecordId($result->RecordID ?? '');
 		}
 		catch(Exception $e)
@@ -421,7 +421,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @param bool                                        $readApi
 	 * @return string
 	 */
-	protected function getBaseApiByMediaType(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData, bool $readApi)
+	protected function getApiEndpointByMediaType(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData, bool $readApi)
 	{
 		if($apiDistributionJobProviderData->mediaType == KalturaMediaType::AUDIO)
 		{
@@ -516,7 +516,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$metadata = array();
 			$metadata["CoreField.Identifier"] = $this->getCortexSystemId();
 			$metadata["CoreField.Representative_DO:"] = "[DataTable/v2.2/Documents.Image.Default:Read?CoreField.Identifier=$imageSystemId]";
-			$this->requestCortex($metadata, $this->getBaseApiByMediaType($apiDistributionJobProviderData->mediaType, false));
+			$this->requestCortex($metadata, $this->getApiEndpointByMediaType($apiDistributionJobProviderData->mediaType, false));
 			KalturaLog::info("Cortex: setting thumbnail succeeded, ImageIdentifier: $imageSystemId, VideoIdentifier:".$this->getCortexSystemId());
 		}
 		catch(Exception $e)
