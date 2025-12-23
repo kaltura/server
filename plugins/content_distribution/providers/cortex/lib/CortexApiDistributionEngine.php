@@ -89,7 +89,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		sleep(30);
 		if (kFile::checkFileExists($data->providerData->thumbAssetFilePath))
 		{
-			$this->uploadThumbnail($data->providerData->thumbAssetFilePath);
+			$this->uploadThumbnail($data->providerData->thumbAssetFilePath, $data->providerData);
 		}
 		$this->submitMetadata($data->providerData);
 		if(isset($data->providerData->captionsInfo))
@@ -507,7 +507,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @param string $thumbAssetFilePath
 	 * @throws Exception
 	 */
-	protected function uploadThumbnail($thumbAssetFilePath)
+	protected function uploadThumbnail($thumbAssetFilePath, KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
 		try
 		{
@@ -516,7 +516,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$metadata = array();
 			$metadata["CoreField.Identifier"] = $this->getCortexSystemId();
 			$metadata["CoreField.Representative_DO:"] = "[DataTable/v2.2/Documents.Image.Default:Read?CoreField.Identifier=$imageSystemId]";
-			$this->requestCortex($metadata, self::CORTEX_API_VIDEO_SEND_METADATA);
+			$this->requestCortex($metadata, $this->getBaseApiByMediaType($apiDistributionJobProviderData->mediaType, false));
 			KalturaLog::info("Cortex: setting thumbnail succeeded, ImageIdentifier: $imageSystemId, VideoIdentifier:".$this->getCortexSystemId());
 		}
 		catch(Exception $e)
