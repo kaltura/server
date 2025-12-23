@@ -69,7 +69,7 @@ KalturaLog::log('Starting to analyze users for partner [' . $partnerId . '] Run 
 
 try {
 	$usersList = getUsersByCsv($partnerId, $userListCsv);
-	$report = removeExternalIDFromuser($usersList, $dryRun);
+	$report = removeExternalIdFromUser($usersList, $dryRun);
 	$userUpdateReportFile = prepareAndWriteUserUpdateReport($report, $partnerId, $dryRun);
 	KalturaLog::log('Done Running for partner [' . $partnerId . ']. Report file: ' . $userUpdateReportFile);
 } catch (Exception $e) {
@@ -77,22 +77,22 @@ try {
 }
 
 /**
- * Removes external IDs for the provided users and tracks the outcome per user.
+ * Removes the external ID from a list of user objects. If the dryRun flag is set to true, no actual changes are made, and it simulates the removal process.
  *
- * @param array $usersWithEmail
- * @param bool $dryRun
- * @return array List of user update results.
- * @throws PropelException
+ * @param array $users An array of user objects containing the external IDs to be removed.
+ * @param bool $dryRun If true, simulates the removal of external IDs without persisting any changes.
+ *
+ * @return array A report detailing the processing of each user, including information about whether the external ID was removed and the current external ID.
  */
-function removeExternalIDFromuser(array $usersWithEmail, bool $dryRun): array {
+function removeExternalIdFromUser(array $users, bool $dryRun): array {
 	KalturaLog::log('Processing users to remove external ID.');
 
 	$report = [];
 
-	if (sizeof($usersWithEmail) > 0) {
+	if (sizeof($users) > 0) {
 
 		/* @var $user kuser */
-		foreach($usersWithEmail as $user) {
+		foreach($users as $user) {
 			$userId = $user->getPuserId();
 			KalturaLog::log('Processing user [' . $userId . ']');
 			$currentExternalId = $user->getExternalId();
@@ -123,9 +123,21 @@ function removeExternalIDFromuser(array $usersWithEmail, bool $dryRun): array {
 }
 
 
-function writeReportoCsv($header, $rows, $partnerId, $dryRun): string {
+/**
+ * Writes a report to a CSV file. The file includes the specified header and rows, and its name is generated dynamically based on the partner ID and whether the run is a dry run or a real run.
+ *
+ * @param array $header An array of header columns to include as the first row of the CSV file.
+ * @param array $rows An array of rows to be written to the CSV file, with each row being an array of values.
+ * @param int $partnerId The ID of the partner, used to generate the filename.
+ * @param bool $dryRun If true, indicates a dry run, and the filename will reflect this as part of its name.
+ *
+ * @return string The name of the generated CSV file.
+ *
+ * @throws Exception If the file cannot be opened for writing.
+ */
+function writeReportToCsv(array $header, array $rows, int $partnerId, bool $dryRun): string {
 
-	$filename = ($dryRun ? 'DryRun' : 'RealRun') . "-$partnerId-external_user_update_report-" . date('Y-m-d_H-i-s') . '.csv';
+	$filename = ($dryRun ? 'DryRun' : 'RealRun') . "-$partnerId-external_user_remove_report-" . date('Y-m-d_H-i-s') . '.csv';
 
 	$fp = fopen($filename, 'a+');
 
@@ -186,7 +198,7 @@ function prepareAndWriteUserUpdateReport(array $updatedUsers, int $partnerId, $d
 	$users = buildRowsForUsers($updatedUsers);
 	$reportRows = $users['rows'];
 
-	return writeReportoCsv($headers, $reportRows, $partnerId, $dryRun);
+	return writeReportToCsv($headers, $reportRows, $partnerId, $dryRun);
 }
 
 /**
@@ -215,6 +227,16 @@ function getUsersByCsv(int $partnerId, string $userListCsv = ''): array {
 	return $usersList;
 }
 
+/**
+ * Parses a CSV file to extract unique puserId values. The method assumes the CSV may include a header row
+ * with a column named "puserId". If no header is present, the first column of each row is used as the source of puserId values.
+ *
+ * @param string $userListCsv Path to the CSV file containing the user list.
+ *
+ * @return array An array of unique puserId values extracted from the CSV file.
+ *
+ * @throws Exception If the CSV file cannot be opened, is empty, or contains no valid puserId values.
+ */
 function parsePuserIdsFromCsv(string $userListCsv): array {
 	$handle = fopen($userListCsv, 'r');
 
@@ -272,11 +294,11 @@ function getPUsersIn($partnerId, array $puserIds = []): array {
 		return [];
 	}
 
-	$emailCriteria = new Criteria();
-	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
-	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
-	$emailCriteria->add(kuserPeer::TYPE, KuserType::USER);
-	$emailCriteria->add(kuserPeer::PUSER_ID, $puserIds, Criteria::IN);
+	$puserCriteria = new Criteria();
+	$puserCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
+	$puserCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
+	$puserCriteria->add(kuserPeer::TYPE, KuserType::USER);
+	$puserCriteria->add(kuserPeer::PUSER_ID, $puserIds, Criteria::IN);
 
-	return kuserPeer::doSelect($emailCriteria);
+	return kuserPeer::doSelect($puserCriteria);
 }
