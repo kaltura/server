@@ -7613,6 +7613,18 @@ class kKavaReportsMgr extends kKavaBase
 			$header = self::mapMetricsToHeaders($header);
 		}
 
+		if (kConf::hasParam('internal_analytics_host'))
+		{
+			$stats_host = explode(':', kConf::get('internal_analytics_host'));
+			self::sendAnalyticsBeacon(
+				$stats_host[0],
+				isset($stats_host[1]) ? $stats_host[1] : 80,
+				$partner_id,
+				$id,
+				$params
+			);
+		}
+
 		return array($header, $data);
 	}
 
@@ -7814,5 +7826,66 @@ class kKavaReportsMgr extends kKavaBase
 			$timestamp = self::timestampToDateId($timestamp, $tz);
 			$row[$timePosition] = $timestamp;
 		}
+	}
+
+	protected static function sendAnalyticsBeacon($host, $port, $partner_id, $id, $params)
+	{
+		// prepare params
+		$api_info = '';
+		foreach ($params as $key => $value)
+		{
+			if ($key != 'partner_id')
+			{
+				$api_info .= "$key=$value;";
+			}
+		}
+
+		// build the uri
+		$output = array(
+			'eventType' => '10005',
+			'service' => 'analytics',
+			'action' => 'trackEvent',
+			'partnerId' => $partner_id,
+			'apiAction' => 'getCsvFromStringParams',
+			'apiName' => 'reports',
+			'apiValue' => $id,
+			'apiInfo' => $api_info
+		);
+
+		$params = infraRequestUtils::getRequestParams();
+		if (isset($params['ks']))
+		{
+			$output['ks'] = $params['ks'];
+		}
+		$uri = '/api_v3/index.php?' . http_build_query($output, '', '&');
+
+		// build the request
+		$headers = array(
+			'Host' => $host,
+			'X-Forwarded-For' => infraRequestUtils::getRemoteAddress(),
+		);
+		if (isset($_SERVER['HTTP_USER_AGENT']))
+		{
+			$headers['User-Agent'] = $_SERVER['HTTP_USER_AGENT'];
+		}
+
+		$out = "GET {$uri} HTTP/1.1\r\n";
+
+		foreach($headers as $header => $value)
+		{
+			$out .= "$header: $value\r\n";
+		}
+
+		$out .= "\r\n";
+
+		// send the request
+		$fp = fsockopen($host, $port, $errno, $errstr, 0.1);
+		if ($fp === false)
+		{
+			return;
+		}
+
+		fwrite($fp, $out);
+		fclose($fp);
 	}
 }
