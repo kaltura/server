@@ -154,7 +154,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		try {
 			$metadataListResponse = $metadataPlugin->metadata->listAction($metadataFilter, $metadataPager);
 		} catch(Exception $e) {
-			$this->throwError("Cant do metadata.list for entry $entryId, Msg:" . $e->getMessage());
+			$this->throwError("Metadata for entry $entryId could not be retrieved, msg:" . $e->getMessage());
 		}
 		if($metadataListResponse->totalCount == 0) {
 			return $result;
