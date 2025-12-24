@@ -505,7 +505,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$metadata = array();
 			$metadata["CoreField.Identifier"] = $this->getCortexSystemId();
 			$metadata["CoreField.Representative_DO:"] = "[DataTable/v2.2/Documents.Image.Default:Read?CoreField.Identifier=$imageSystemId]";
-			$this->requestCortex($metadata, $this->getApiEndpointByMediaType($apiDistributionJobProviderData->mediaType, FALSE));			KalturaLog::info("Cortex: setting thumbnail succeeded, ImageIdentifier: $imageSystemId, VideoIdentifier:".$this->getCortexSystemId());
+			$this->requestCortex($metadata, $this->getApiEndpointByMediaType($apiDistributionJobProviderData, FALSE));			KalturaLog::info("Cortex: setting thumbnail succeeded, ImageIdentifier: $imageSystemId, VideoIdentifier:".$this->getCortexSystemId());
 		}
 		catch(Exception $e)
 		{
