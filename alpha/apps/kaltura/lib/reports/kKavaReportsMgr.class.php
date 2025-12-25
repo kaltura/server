@@ -407,6 +407,23 @@ class kKavaReportsMgr extends kKavaBase
 	const SCHEDULE_EVENT_PAST_DATE = 1577836800; // 1.1.2020
 	const SCHEDULE_EVENT_DURATION = 94608000; // 3 years
 
+	// analytics beacon consts
+	const SERVICE = 'service';
+	const ACTION = 'action';
+	const SERVICE_ANALYTICS = 'analytics';
+	const ACTION_TRACKEVENT = 'trackEvent';
+	const EVENT_TYPE = 'eventType';
+	const API_CALL_EVENT_TYPE = 10005;
+	const PARTNER_ID = 'partnerId';
+	const API_ACTION = 'apiAction';
+	const API_NAME = 'apiName';
+	const API_VALUE = 'apiValue';
+	const API_INFO = 'apiInfo';
+	const KS = 'ks';
+	const CUSTOM_REPORT_ACTION_NAME = 'getCsvFromStringParams';
+	const REPORTS_SERVICE = 'reports';
+	const INTERNAL_ANALYTICS_HOST = 'internal_analytics_host';
+
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
 		self::EVENT_TYPE_PLAYER_IMPRESSION,
@@ -7613,15 +7630,14 @@ class kKavaReportsMgr extends kKavaBase
 			$header = self::mapMetricsToHeaders($header);
 		}
 
-		if (kConf::hasParam('internal_analytics_host'))
+		if (kConf::hasParam(self::INTERNAL_ANALYTICS_HOST))
 		{
-			$stats_host = explode(':', kConf::get('internal_analytics_host'));
-			self::sendAnalyticsBeacon(
+			$stats_host = explode(':', kConf::get(self::INTERNAL_ANALYTICS_HOST));
+			$customReportEventContent = self::getCustomReportAnalyticsEventContent($id, $params, $partner_id);
+			requestUtils::sendAnalyticsBeacon(
+				$customReportEventContent,
 				$stats_host[0],
-				isset($stats_host[1]) ? $stats_host[1] : 80,
-				$partner_id,
-				$id,
-				$params
+				isset($stats_host[1]) ? $stats_host[1] : 80
 			);
 		}
 
@@ -7828,9 +7844,8 @@ class kKavaReportsMgr extends kKavaBase
 		}
 	}
 
-	protected static function sendAnalyticsBeacon($host, $port, $partner_id, $id, $params)
+	protected static function getCustomReportAnalyticsEventContent($id, $params, $partner_id)
 	{
-		// prepare params
 		$api_info = '';
 		foreach ($params as $key => $value)
 		{
@@ -7840,52 +7855,23 @@ class kKavaReportsMgr extends kKavaBase
 			}
 		}
 
-		// build the uri
-		$output = array(
-			'eventType' => '10005',
-			'service' => 'analytics',
-			'action' => 'trackEvent',
-			'partnerId' => $partner_id,
-			'apiAction' => 'getCsvFromStringParams',
-			'apiName' => 'reports',
-			'apiValue' => $id,
-			'apiInfo' => $api_info
+		$content = array(
+			self::SERVICE => self::SERVICE_ANALYTICS,
+			self::ACTION => self::ACTION_TRACKEVENT,
+			self::EVENT_TYPE => self::API_CALL_EVENT_TYPE,
+			self::PARTNER_ID => $partner_id,
+			self::API_ACTION => self::CUSTOM_REPORT_ACTION_NAME,
+			self::API_NAME => self::REPORTS_SERVICE,
+			self::API_VALUE => $id,
+			self::API_INFO => $api_info
 		);
 
-		$params = infraRequestUtils::getRequestParams();
-		if (isset($params['ks']))
+		$req_params = infraRequestUtils::getRequestParams();
+		if (isset($req_params[self::KS]))
 		{
-			$output['ks'] = $params['ks'];
-		}
-		$uri = '/api_v3/index.php?' . http_build_query($output, '', '&');
-
-		// build the request
-		$headers = array(
-			'Host' => $host,
-			'X-Forwarded-For' => infraRequestUtils::getRemoteAddress(),
-		);
-		if (isset($_SERVER['HTTP_USER_AGENT']))
-		{
-			$headers['User-Agent'] = $_SERVER['HTTP_USER_AGENT'];
+			$content[self::KS] = $req_params[self::KS];
 		}
 
-		$out = "GET {$uri} HTTP/1.1\r\n";
-
-		foreach($headers as $header => $value)
-		{
-			$out .= "$header: $value\r\n";
-		}
-
-		$out .= "\r\n";
-
-		// send the request
-		$fp = fsockopen($host, $port, $errno, $errstr, 0.1);
-		if ($fp === false)
-		{
-			return;
-		}
-
-		fwrite($fp, $out);
-		fclose($fp);
+		return $content;
 	}
 }
