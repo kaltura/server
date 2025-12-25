@@ -562,7 +562,10 @@ class KalturaPartner extends KalturaObject implements IFilterable
 			$this->usageLimitWarning = null;
 			$this->lastFreeTrialNotificationDay = null;
 			$this->monitorUsage = null;
-			if($partner->getHideSecrets() && kCurrentContext::$ks_partner_id > 0)
+			$ksPartnerId = kCurrentContext::$master_partner_id ?
+				kCurrentContext::$master_partner_id :
+				(kCurrentContext::$ks_partner_id ? kCurrentContext::$ks_partner_id : kCurrentContext::getCurrentPartnerId());
+			if($partner->getHideSecrets() && $ksPartnerId > 0)
 			{
 				$this->adminSecret = null;
 				$this->secret = null;
