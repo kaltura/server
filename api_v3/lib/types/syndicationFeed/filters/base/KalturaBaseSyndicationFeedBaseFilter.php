@@ -6,8 +6,23 @@
  */
 abstract class KalturaBaseSyndicationFeedBaseFilter extends KalturaFilter
 {
+	/**
+	 * This filter should be in use for retrieving only a specific syndication (identified by its syndication id).
+	 * @var string
+	 */
+	public $idEqual;
+
+	/**
+	 * This filter should be in use for retrieving specific syndication (string should include comma separated list of
+	 * syndication strings).
+	 * @var string
+	 */
+	public $idIn;
+
 	static private $map_between_objects = array
 	(
+		"idEqual" => "_eq_id",
+		"idIn" => "_in_id"
 	);
 
 	static private $order_by_map = array
