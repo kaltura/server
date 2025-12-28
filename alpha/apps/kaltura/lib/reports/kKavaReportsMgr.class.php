@@ -423,6 +423,8 @@ class kKavaReportsMgr extends kKavaBase
 	const CUSTOM_REPORT_ACTION_NAME = 'getCsvFromStringParams';
 	const REPORTS_SERVICE = 'reports';
 	const INTERNAL_ANALYTICS_HOST = 'internal_analytics_host';
+	const PARTNER_ID_PARAM = 'partner_id';
+	const DEFAULT_HTTP_PORT = '80';
 
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
@@ -7436,7 +7438,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else
 		{
-			$partner_id = $params['partner_id'];
+			$partner_id = $params[self::PARTNER_ID_PARAM];
 		}
 
 		// apply param processing
@@ -7637,7 +7639,7 @@ class kKavaReportsMgr extends kKavaBase
 			requestUtils::sendAnalyticsBeacon(
 				$customReportEventContent,
 				$stats_host[0],
-				isset($stats_host[1]) ? $stats_host[1] : 80
+				isset($stats_host[1]) ? $stats_host[1] : self::DEFAULT_HTTP_PORT
 			);
 		}
 
@@ -7849,7 +7851,7 @@ class kKavaReportsMgr extends kKavaBase
 		$api_info = '';
 		foreach ($params as $key => $value)
 		{
-			if ($key != 'partner_id')
+			if ($key != self::PARTNER_ID_PARAM)
 			{
 				$api_info .= "$key=$value;";
 			}
