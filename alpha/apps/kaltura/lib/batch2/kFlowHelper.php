@@ -349,7 +349,8 @@ class kFlowHelper
 		{
 			try {
 				kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($flavorAsset);
-			} catch (PropelException $e) {
+			} catch (PropelException $e)
+			{
 				$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
 				$dbBatchJob->setMessage("Failed to copy asset  " . $flavorAsset->getId() . " " . $e->getMessage());;
 				$dbBatchJob->save();
