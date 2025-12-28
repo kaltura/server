@@ -145,7 +145,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	const TAGS = 'tags';
 	
 	const MAX_NAME_LEN = 256;
-	
+	const MAX_PUSER_ID_LEN = 64;
+
 	protected static $multiLingualSupportedFields = array(
 		self::NAME => self::NAME,
 		self::DESCRIPTION => self::DESCRIPTION,
@@ -430,6 +431,12 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			return parent::setTags(trim($newTags));
 		}
 		return null;
+	}
+
+	public function setPuserId($v)
+	{
+		PeerUtils::setExtension($this, $v, self::MAX_PUSER_ID_LEN, __FUNCTION__);
+		return parent::setPuserId(kString::alignUtf8String($v, self::MAX_PUSER_ID_LEN));
 	}
 	
 	protected function updateMultiLingualTags($multiLingualTags)
@@ -2639,8 +2646,8 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 	public function getPuserId()
 	{
 		if (kCurrentContext::isApiV3Context())
-			return parent::getPuserId();
-			
+			return parent::getPuserId() . PeerUtils::getExtension($this, __FUNCTION__);
+
 		$puser_id = $this->getFromCustomData( "puserId" );
 		if ( $this->m_puser_id ) // ! $puser_id )
 		{
