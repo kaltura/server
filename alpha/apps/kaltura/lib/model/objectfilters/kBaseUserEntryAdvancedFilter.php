@@ -93,7 +93,7 @@ class kBaseUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 				$ids[] = $entry->getId();
 			}
 
-			$entryIds = UserEntryPeer::getEntryIdsByFilter($limit, 0, $this->filter, $ids);
+			$entryIds = UserEntryPeer::getEntryIdsByFilter(count($ids), 0, $this->filter, $ids);
 		}
 
 		else
@@ -108,11 +108,6 @@ class kBaseUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 
 			while (true)
 			{
-				if (count($entryIds) >= $limit)
-				{
-					KalturaLog::info("Enough entry IDs retrieved");
-					break;
-				}
 				if ($userEntryOffset > self::USER_ENTRIES_LIMIT)
 				{
 					KalturaLog::info("Not all objects will return from the search - consider narrowing the search criteria");
@@ -131,10 +126,6 @@ class kBaseUserEntryAdvancedFilter extends AdvancedSearchFilterItem
 				$entries = entryPeer::doSelect($query);
 				foreach($entries as $entry)
 				{
-					if(count($entryIds) >= $limit)
-					{
-						break;
-					}
 					$entryIds[] = $entry->getId();
 				}
 
