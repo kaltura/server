@@ -36,6 +36,18 @@ define('SOURCE_MEETING', -21);
 define('SOURCE_ONEDRIVE', -22);
 define('SOURCE_WEBEX_API', -23);
 define('SOURCE_TEAMS_ENTRY', -24);
+define('SOURCE_IDOMOO', -25);
+define('SOURCE_POWTOON', -26);
+define('SOURCE_SIGNAPSE', -27);
+define('SOURCE_SYNTHESIA', -28);
+define('SOURCE_HEYGEN', -29);
+define('SOURCE_D_ID', -30);
+define('SOURCE_EPIPHAN', -31);
+define('SOURCE_EXTRON', -32);
+define('SOURCE_VIZRT', -33);
+define('SOURCE_LUMENS', -34);
+define('SOURCE_MATROX', -35);
+define('SOURCE_AREC', -36);
 
 define('CREATED_DAY_TS', 'UNIX_TIMESTAMP(DATE(CREATED_AT))');
 
@@ -53,7 +65,19 @@ $sourceFromAdminTag = array(
 	'kalturameeting' => SOURCE_MEETING,
 	'onedrive' => SOURCE_ONEDRIVE,
 	'webexapi' => SOURCE_WEBEX_API,
-	'teamsentry' => SOURCE_TEAMS_ENTRY
+	'teamsentry' => SOURCE_TEAMS_ENTRY,
+	'idomoo' => SOURCE_IDOMOO,
+	'powtoon' => SOURCE_POWTOON,
+	'signapse' => SOURCE_SIGNAPSE,
+	'synthesia' => SOURCE_SYNTHESIA,
+	'heygen' => SOURCE_HEYGEN,
+	'd-id' => SOURCE_D_ID,
+	'epiphan' => SOURCE_EPIPHAN,
+	'extron' => SOURCE_EXTRON,
+	'vizrt' => SOURCE_VIZRT,
+	'lumens' => SOURCE_LUMENS,
+	'matrox' => SOURCE_MATROX,
+	'arec' => SOURCE_AREC
 );
 
 $externalSources = array(
