@@ -250,9 +250,9 @@ class kMrssManager
 		try
 		{
 			$partner = PartnerPeer::retrieveByPK($partnerId);
-			if ($partner && $partner->getEnforceHttpsApi())
+			if ($partner && $partner->getEnforceHttpsApi() && str_starts_with($url, 'http://'))
 			{
-				$url = str_replace('http://', 'https://', $url);
+				$url = 'https://' . substr($url, 7);
 			}
 		} catch (Exception $e)
 		{
@@ -278,7 +278,7 @@ class kMrssManager
 		{
 			$cdnUrl = $cdnUrlPartners[$thumbAsset->getPartnerId()];
 			$assetUrl = kAssetUtils::getAssetUrl($thumbAsset, false, null, null, '', $cdnUrl);
-			$assetUrl = self::enforceHttpsIfRequired($thumbAsset->getPartnerId(),$assetUrl);
+			$assetUrl = self::enforceHttpsIfRequired($thumbAsset->getPartnerId(), $assetUrl);
 			$thumbnail->addAttribute('url', $assetUrl);
 		}
 		else
