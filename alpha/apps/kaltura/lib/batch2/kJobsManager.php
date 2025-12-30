@@ -2106,4 +2106,18 @@ class kJobsManager
 		}
 		return false;
 	}
+
+	public static function addBulkUpdateUserEntryJob($partnerId, $entryId, $oldUserEntryStatus, $newUserEntryStatus)
+	{
+		$bulkUpdateUserEntryData = new kBulkUpdateUserEntryData();
+		$bulkUpdateUserEntryData->setPartnerId($partnerId);
+		$bulkUpdateUserEntryData->setEntryId($entryId);
+		$bulkUpdateUserEntryData->setOldStatus($oldUserEntryStatus);
+		$bulkUpdateUserEntryData->setNewStatus($newUserEntryStatus);
+
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+		$batchJob->setEntryId($entryId);
+		return self::addJob($batchJob, $bulkUpdateUserEntryData, BatchJobType::BULK_UPDATE_USER_ENTRY);
+	}
 }

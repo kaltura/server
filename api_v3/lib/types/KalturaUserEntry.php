@@ -38,7 +38,6 @@ abstract class KalturaUserEntry extends KalturaObject implements IRelatedFiltera
 
 	/**
 	 * @var KalturaUserEntryStatus
-	 * @readonly
 	 * @filter eq
 	 */
 	public $status;

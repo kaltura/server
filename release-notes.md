@@ -1,3 +1,13 @@
+# Venus-22.10.0
+## Recycle bin updates big bulks of userEntries inside batch ##
+- Issue Type: Task
+- Issue ID: PLAT-25619
+
+### Deployment Scripts ###
+
+    php deployment/updates/scripts/add_permissions/2025_30_12_update_user_entry_permission.php
+
+
 # Venus-22.8.0
 ## Index flavor_params field to elastic and allow in advanced search ##
 - Issue Type: Task

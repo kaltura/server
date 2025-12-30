@@ -73,6 +73,7 @@ enabledWorkers.KAsyncExportCsv                      = 0
 enabledWorkers.KAsyncLiveEntryArchive               = 0
 enabledWorkers.KAsyncStorageUpdate                  = 1
 enabledWorkers.KAsyncRecycleBin                     = 1
+enabledWorkers.KAsyncBulkUpdateUserEntry            = 1
 
 
 [mainTemplate : template]
@@ -83,7 +84,7 @@ enabledWorkers.KAsyncJobSuspender                   = 1
 enabledWorkers.KAsyncConvertCloser					= 1
 enabledWorkers.KAsyncConvertProfileCloser			= 1
 enabledWorkers.KAsyncBulkDownloadCloser				= 1
-enabledWorkers.KAsyncBulkUploadCloser				= 1
+enabledWorkers.KAsyncBulkUploadCloser				/opt/kaltura/app/deployment/base/scripts/elastic/populateElasticCategories.php= 1
 enabledWorkers.KAsyncDistributeSubmitCloser			= 1
 enabledWorkers.KAsyncDistributeUpdateCloser			= 1
 enabledWorkers.KAsyncDistributeDeleteCloser			= 1
@@ -879,3 +880,9 @@ type                                                = KAsyncStorageUpdate
 scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
 sleepBetweenStopStart                               = 86400
 params.debugMode                                    = 1
+
+[KAsyncBulkUpdateUserEntry : JobHandlerWorker]
+id													= 810
+friendlyName										= Bulk Update User Entry
+type												= KAsyncBulkUpdateUserEntry
+scriptPath											= batches/RecycleBin/KAsyncBulkUpdateUserEntryExe.php
