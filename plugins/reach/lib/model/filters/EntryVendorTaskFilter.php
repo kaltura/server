@@ -46,7 +46,7 @@ class EntryVendorTaskFilter extends baseObjectFilter
 			"id",
 			"created_at",
 			"updated_at",
-			"queue_at",
+			"queue_time",
 			"finished_at",
 			"price",
 			"status",
