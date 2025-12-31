@@ -1,19 +1,19 @@
 <?php
 /**
- * Update bulk of UserEntry
+ * Update UserEntries
  *
  * @package Scheduler
- * @subpackage BulkUpdateUserEntry
+ * @subpackage UpdateUserEntries
  */
 
-class KAsyncBulkUpdateUserEntry extends KJobHandlerWorker
+class KAsyncUpdateUserEntries extends KJobHandlerWorker
 {
 	/** (non-PHPdoc)
 	 * @see KBatchBase::getType()
 	 */
 	public static function getType()
 	{
-		return KalturaBatchJobType::BULK_UPDATE_USER_ENTRY;
+		return KalturaBatchJobType::UPDATE_USER_ENTRIES;
 	}
 
 	/**
@@ -22,21 +22,22 @@ class KAsyncBulkUpdateUserEntry extends KJobHandlerWorker
 	 */
 	protected function getJobType()
 	{
-		return KalturaBatchJobType::BULK_UPDATE_USER_ENTRY;
+		return KalturaBatchJobType::UPDATE_USER_ENTRIES;
 	}
 
-	/* (non-PHPdoc)
+	/**
+	 * (non-PHPdoc)
 	 * @see KJobHandlerWorker::exec()
 	 */
 	protected function exec(KalturaBatchJob $job)
 	{
 		$jobData = $job->data;
-		/** @var KalturaBulkUpdateUserEntryData $jobData */
+		/** @var KalturaUpdateUserEntriesData $jobData */
 
 		try
 		{
-			KBatchBase::impersonate($jobData->partnerId);
-			$this->updateUserEntryStatus($jobData->partnerId, $jobData->entryId, $jobData->oldStatus, $jobData->newStatus);
+			KBatchBase::impersonate($job->partnerId);
+			$this->updateUserEntryStatus($job->partnerId, $job->entryId, $jobData->oldStatus, $jobData->newStatus);
 			KBatchBase::unimpersonate();
 		}
 		catch (Exception $e)
@@ -61,7 +62,15 @@ class KAsyncBulkUpdateUserEntry extends KJobHandlerWorker
 
 		do
 		{
-			$userEntryList = KBatchBase::$kClient->userEntry->listAction($filter, $pager);
+			try
+			{
+				$userEntryList = KBatchBase::$kClient->userEntry->listAction($filter, $pager);
+			}
+			catch (KalturaAPIException $e)
+			{
+				KalturaLog::err("Failed to list user entries for entryId [$entryId]: " . $e->getMessage());
+				throw $e;
+			}
 			foreach ($userEntryList->objects as $userEntry)
 			{
 				/** @var KalturaUserEntry $userEntry */
@@ -69,7 +78,15 @@ class KAsyncBulkUpdateUserEntry extends KJobHandlerWorker
 				$updatedUserEntry = new $class();
 				$updatedUserEntry->status = $newStatus;
 
-				KBatchBase::$kClient->userEntry->update($userEntry->id, $updatedUserEntry);
+				try
+				{
+					KBatchBase::$kClient->userEntry->update($userEntry->id, $updatedUserEntry);
+				}
+				catch (KalturaAPIException $e)
+				{
+					KalturaLog::err("Failed to update user entry [{$userEntry->id}] status from [$oldStatus] to [$newStatus]: " . $e->getMessage());
+					throw $e;
+				}
 			}
 		} while (count($userEntryList->objects) === $pager->pageSize);
 	}

@@ -4,18 +4,8 @@
  * @subpackage model.data
  */
 
-class kBulkUpdateUserEntryData extends kJobData
+class kUpdateUserEntriesData extends kJobData
 {
-	/**
-	 * @var int
-	 */
-	protected $partnerId;
-
-	/**
-	 * @var string
-	 */
-	protected $entryId;
-
 	/**
 	 * @var int
 	 */
@@ -25,26 +15,6 @@ class kBulkUpdateUserEntryData extends kJobData
 	 * @var int
 	 */
 	protected $newStatus;
-
-	public function setPartnerId($partnerId)
-	{
-		$this->partnerId = $partnerId;
-	}
-
-	public function getPartnerId()
-	{
-		return $this->partnerId;
-	}
-
-	public function setEntryId($entryId)
-	{
-		$this->entryId = $entryId;
-	}
-
-	public function getEntryId()
-	{
-		return $this->entryId;
-	}
 
 	public function setOldStatus($oldStatus)
 	{

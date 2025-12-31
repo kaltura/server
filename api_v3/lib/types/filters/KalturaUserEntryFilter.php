@@ -124,7 +124,7 @@ class KalturaUserEntryFilter extends KalturaUserEntryBaseFilter
 			$userEntryFilter->unsetByName('_eq_entry_id');
 			$userEntryFilter->unsetByName('_in_entry_id');
 		}
-		elseif (in_array($this->statusEqual, array(KalturaUserEntryStatus::RECYCLED, KalturaUserEntryStatus::DELETED)))
+		elseif (kCurrentContext::$ks_partner_id == -1 && in_array($this->statusEqual, array(KalturaUserEntryStatus::RECYCLED, KalturaUserEntryStatus::DELETED)))
 		{
 			$disableDefaultCriteria = true;
 			UserEntryPeer::setUseCriteriaFilter(false);

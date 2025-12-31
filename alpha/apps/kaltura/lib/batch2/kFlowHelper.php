@@ -26,7 +26,7 @@ class kFlowHelper
 	const DAYS = 'days';
 	const HOURS = 'hours';
 
-	const RECYCLE_BIN_USERENTRY_THRESHOLD_DEFAULT = 50;
+	const MAX_USER_ENTRIES_TO_RECYCLE = 50;
 	
 	
 	/**
@@ -3038,10 +3038,10 @@ class kFlowHelper
 
 		$userEntriesCount = UserEntryPeer::doCount($userEntryCriteria);
 		KalturaLog::info("Found $userEntriesCount user entries for entry id [{$entry->getId()}] with status [$oldUserEntryStatus] to update to status [$newUserEntryStatus]");
-		$groupLimit = kConf::get('recycle_bin_userentry_threshold', kConfMapNames::LOCAL_SETTINGS, self::RECYCLE_BIN_USERENTRY_THRESHOLD_DEFAULT);
+		$groupLimit = kConf::get('recycle_bin_userentry_threshold', kConfMapNames::LOCAL_SETTINGS, self::MAX_USER_ENTRIES_TO_RECYCLE);
 		if ($groupLimit < $userEntriesCount)
 		{
-			kJobsManager::addBulkUpdateUserEntryJob($entry->getPartnerId(), $entry->getId(), $oldUserEntryStatus, $newUserEntryStatus);
+			kJobsManager::addUpdateUserEntriesJob($entry->getPartnerId(), $entry->getId(), $oldUserEntryStatus, $newUserEntryStatus);
 			return;
 		}
 

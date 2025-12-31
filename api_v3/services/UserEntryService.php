@@ -51,13 +51,15 @@ class UserEntryService extends KalturaBaseService {
 	 */
 	public function updateAction($id, KalturaUserEntry $userEntry)
 	{
-		if (isset($userEntry->status))
+		if (kCurrentContext::$ks_partner_id == -1 && isset($userEntry->status))
 		{
-			UserEntryPeer::setUseCriteriaFilter(false);
+			$dbUserEntry = UserEntryPeer::retrieveByPKNoFilter($id);
+		}
+		else
+		{
+			$dbUserEntry = UserEntryPeer::retrieveByPK($id);
 		}
 
-		$dbUserEntry = UserEntryPeer::retrieveByPK($id);
-		UserEntryPeer::setUseCriteriaFilter(true);
 		if (!$dbUserEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);

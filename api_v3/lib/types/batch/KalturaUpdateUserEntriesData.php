@@ -4,18 +4,8 @@
  * @subpackage objects
  */
 
-class KalturaBulkUpdateUserEntryData extends KalturaJobData
+class KalturaUpdateUserEntriesData extends KalturaJobData
 {
-	/**
-	 * @var int
-	 */
-	public $partnerId;
-
-	/**
-	 * @var string
-	 */
-	public $entryId;
-
 	/**
 	 * @var KalturaUserEntryStatus
 	 */
@@ -28,8 +18,6 @@ class KalturaBulkUpdateUserEntryData extends KalturaJobData
 
 	private static $map_between_objects = array
 	(
-		'partnerId',
-		'entryId',
 		'oldStatus',
 		'newStatus',
 	);
@@ -43,7 +31,7 @@ class KalturaBulkUpdateUserEntryData extends KalturaJobData
 	{
 		if (!$object_to_fill)
 		{
-			$object_to_fill = new kBulkUpdateUserEntryData();
+			$object_to_fill = new kUpdateUserEntriesData();
 		}
 
 		return parent::toObject($object_to_fill, $props_to_skip);
