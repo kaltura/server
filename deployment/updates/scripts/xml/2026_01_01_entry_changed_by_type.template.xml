@@ -30,7 +30,7 @@
                         <modifiedColumns>{modified_columns}</modifiedColumns>
                     </item>
                     <item objectType="KalturaFieldMatchCondition">
-                        <description>Entry type is the chosen</description>
+                        <description>Dispatch for specific entry type</description>
                         <field objectType="KalturaEvalStringField">
                             <code>$scope->getObject()->getType()</code>
                         </field>
