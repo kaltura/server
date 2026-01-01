@@ -5,13 +5,13 @@
  */
 class KalturaGroupUserArray extends KalturaTypedArray
 {
-	public static function fromDbArray($arr)
+	public static function fromDbArray($arr, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		$newArr = new KalturaGroupUserArray();
 		foreach($arr as $obj)
 		{
 			$nObj = new KalturaGroupUser();
-			$nObj->fromObject($obj);
+			$nObj->fromObject($obj, $responseProfile);
 			$newArr[] = $nObj;
 		}
 		
