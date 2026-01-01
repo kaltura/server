@@ -40,6 +40,12 @@
                             </item>
                         </values>
                     </item>
+                    <item objectType="KalturaEventFieldCondition">
+                        <description>Is not temporary entry</description>
+                        <field objectType="KalturaEvalBooleanField">
+                            <code>empty($scope->getObject()->getReplacedEntryId())</code>
+                        </field>
+                    </item>
                 </eventConditions>
                 <contentParameters objectType="array">
                     <item objectType="KalturaEventNotificationParameter">
