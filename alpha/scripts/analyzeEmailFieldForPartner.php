@@ -114,22 +114,25 @@ KalturaLog::log('Applying email exclusion patterns: ' . implode(', ', $emailExcl
 
 $withEmailUsers = array_values(array_filter($withEmailUsers, function ($user) use ($emailExclusionPatterns) {
 	$email = trim((string) $user->getEmail());
+	$puserId = trim((string) $user->getPuserId());
 
-	return !shouldExcludeUserByPatterns($email, $emailExclusionPatterns);
+	return !shouldExcludeUserByPatterns($email, $puserId, $emailExclusionPatterns);
 }));
 
-if (is_array($kuserEmailsFromListCsv)) {
-	$kuserEmailsFromListCsv = array_values(array_filter($kuserEmailsFromListCsv, function ($email) use ($emailExclusionPatterns) {
-		return !shouldExcludeUserByPatterns(trim((string) $email), $emailExclusionPatterns);
-	}));
-}
+$noEmailUsers = array_values(array_filter($noEmailUsers, function ($user) use ($emailExclusionPatterns) {
+	$email = trim((string) $user->getEmail());
+	$puserId = trim((string) $user->getPuserId());
 
-if (is_array($noEmailUsers)) {
-	$noEmailUsers = array_values(array_filter($noEmailUsers, function ($user) use ($emailExclusionPatterns) {
-		$emailFromPuserId = trim((string) $user->getPuserId());
+	return !shouldExcludeUserByPatterns($email, $puserId, $emailExclusionPatterns);
+}));
 
-		return !shouldExcludeUserByPatterns(trim((string) $emailFromPuserId), $emailExclusionPatterns);
-	}));
+if ($kuserEmailsFromListCsv !== null) {
+	$kuserEmailsFromListCsv = array_filter($kuserEmailsFromListCsv, function ($userData) use ($emailExclusionPatterns) {
+		$email = trim((string) ($userData['email'] ?? ''));
+		$puserId = trim((string) ($userData['puserId'] ?? ''));
+
+		return !shouldExcludeUserByPatterns($email, $puserId, $emailExclusionPatterns);
+	});
 }
 
 $usersResultsEmailMap = buildEmailUsageMap($withEmailUsers);
@@ -236,7 +239,7 @@ function getAllUserExclusionPatterns(array $additionalPatterns = []): array {
 		'/kmsSaaSAdmin/',
 		'/WebcastingAdmin/',
 		'/kmsAdminServiceUser/',
-		'/__/',
+		'/^__/',
 		'/newrow-admin/',
 		'/^connectors_framework/',
 		'/^EPKalturaProxyDummyUser/',
@@ -273,21 +276,24 @@ function getAllUserExclusionPatterns(array $additionalPatterns = []): array {
 }
 
 /**
- * Checks whether an email matches any of the provided exclusion patterns.
+ * Checks whether an email or puserId matches any of the provided exclusion patterns.
  *
  * @param string $email
+ * @param string $puserId
  * @param array<int,string> $patterns
  * @return bool
  */
-function shouldExcludeUserByPatterns(string $email, array $patterns): bool {
+function shouldExcludeUserByPatterns(string $email, string $puserId, array $patterns): bool {
 	$email = trim($email);
+	$puserId = trim($puserId);
 
-	if ($email === '' || empty($patterns)) {
+	if (($email === '' && $puserId === '') || empty($patterns)) {
 		return false;
 	}
 
 	foreach ($patterns as $pattern) {
-		if (@preg_match($pattern, $email) === 1) {
+		if (($email !== '' && @preg_match($pattern, $email) === 1) ||
+			($puserId !== '' && @preg_match($pattern, $puserId) === 1)) {
 			return true;
 		}
 	}
@@ -300,7 +306,7 @@ function shouldExcludeUserByPatterns(string $email, array $patterns): bool {
  * Large email lists are processed in chunks to avoid oversized queries.
  *
  * @param int $partnerId
- * @param array<string>|string|null $kuserEmailsFromListCsv
+ * @param array<int,array{email:string,puserId?:string}>|null $kuserEmailsFromListCsv Map keyed by kuserId with email/puserId, or null when no CSV is provided.
  * @param array<int,string> $ignoreEmailPatterns
  * @return array
  * @throws PropelException
@@ -314,15 +320,24 @@ function countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv = nul
 	$emailChunks = [[]];
 
 	if (!empty($kuserEmailsFromListCsv)) {
-		$emailList = is_array($kuserEmailsFromListCsv) ? $kuserEmailsFromListCsv : array_map('trim', explode(',', (string) $kuserEmailsFromListCsv));
-		$emailList = array_values(array_unique(array_filter($emailList, function ($value) use ($ignoreEmailPatterns) {
+		$emailList = [];
 
-			if ($value === '') {
-				return false;
+		foreach ($kuserEmailsFromListCsv as $value) {
+			$email = trim((string) ($value['email'] ?? ''));
+			$puserId = trim((string) ($value['puserId'] ?? ''));
+
+			if ($email === '') {
+				continue;
 			}
 
-			return !shouldExcludeUserByPatterns(trim((string) $value), $ignoreEmailPatterns);
-		})));
+			if (shouldExcludeUserByPatterns($email, $puserId, $ignoreEmailPatterns)) {
+				continue;
+			}
+
+			$emailList[] = $email;
+		}
+
+		$emailList = array_values(array_unique($emailList));
 
 		if (empty($emailList)) {
 			return [];
@@ -339,7 +354,7 @@ function countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv = nul
 
 		if (!empty($ignoreEmailPatterns) && !empty($chunkEmails)) {
 			$chunkEmails = array_values(array_filter($chunkEmails, function ($email) use ($ignoreEmailPatterns) {
-				return !shouldExcludeUserByPatterns(trim((string) $email), $ignoreEmailPatterns);
+				return !shouldExcludeUserByPatterns(trim((string) $email), '', $ignoreEmailPatterns);
 			}));
 		}
 
@@ -393,7 +408,7 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], ar
 	$duplicates = [];
 	$duplicateEmails = [];
 	$shouldIgnore = function (string $email) use ($ignoreEmailPatterns): bool {
-		return shouldExcludeUserByPatterns($email, $ignoreEmailPatterns);
+		return shouldExcludeUserByPatterns($email, '', $ignoreEmailPatterns);
 	};
 
 	foreach ($rows as $row) {
@@ -1042,6 +1057,7 @@ function summarizeUserCollections(array $withEmailUsers, array $noEmailUsers): a
 		$uniqueUserIds[$kuserId] = true;
 
 		$email = trim((string) $user->getEmail());
+
 		if ($email === '') {
 			$withEmailEmptyCount++;
 		} else {
@@ -1070,11 +1086,11 @@ function summarizeUserCollections(array $withEmailUsers, array $noEmailUsers): a
  * If the CSV file is provided, processes user IDs in chunks from the file and retrieves users accordingly.
  *
  * @param int $partnerId
- * @param string|null $userListCsv Optional. Path to the CSV file containing a list of user IDs. If null, all users for the partner are retrieved.
+ * @param string $userListCsv Optional. Path to the CSV file containing a list of user IDs. If null, all users for the partner are retrieved.
  * @return array Associative array containing:
  *               - 'noEmailUsers': Array of users without associated email addresses.
  *               - 'withEmailUsers': Array of users with associated email addresses.
- *               - 'kuserEmailsFromListCsv': Array of email addresses extracted from 'withEmailUsers', or null if no CSV file is provided.
+ *               - 'kuserEmailsFromListCsv': Map keyed by kuserId with ['email' => string, 'puserId' => string], or null if no CSV file is provided.
  */
 function getUsersByPartnerAndCsv(int $partnerId, string $userListCsv = ''): array {
 
@@ -1101,9 +1117,14 @@ function getUsersByPartnerAndCsv(int $partnerId, string $userListCsv = ''): arra
 			}
 		}
 
-		$kuserEmailsFromListCsv = array_map(function ($user) {
-			return $user->getEmail();
-		}, $withEmailUsers);
+		$kuserEmailsFromListCsv = [];
+
+		foreach ($withEmailUsers as $user) {
+			$kuserEmailsFromListCsv[$user->getId()] = [
+				'email' => $user->getEmail(),
+				'puserId' => $user->getPuserId(),
+			];
+		}
 	}
 
 	$normalizedBuckets = normalizeUserEmailBuckets($withEmailUsers, $noEmailUsers);
