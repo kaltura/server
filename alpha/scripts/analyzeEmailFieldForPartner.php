@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . '/bootstrap.php');
+require_once __DIR__ . '/bootstrap.php';
 
 // parse the command line
 $script = basename($argv[0]);
@@ -8,7 +8,7 @@ $help = <<<HELP
 Usage:
   php $script --partner-id=<partnerId> [--real-run] [--update-login-email] [--check-duplications]
 			  [--set-puser-as-email-when-puser-is-email] [--metadata-profile-ids=<ids>]
-			  [--user-list-csv=<path>] [--ignore-email-pattern=<regex>]... [--help]
+			  [--metadata-all-users] [--user-list-csv=<path>] [--ignore-email-pattern=<regex>]... [--help]
 
 Required options:
   --partner-id                        Partner ID to analyze.
@@ -22,6 +22,7 @@ Runtime options:
 
 Additional data options:
   --metadata-profile-ids=<ids>        Comma separated metadata profile IDs to enrich duplicate reporting with the KMS Roles.
+  --metadata-all-users                 Fetch metadata roles for all processed users (requires --metadata-profile-ids).
   --user-list-csv=<path>              CSV file containing a 'puserId' column to scope processing otherwise it process the whole Partner users.
   --ignore-email-pattern=<regex>      Ignore users whose email (or related identifiers) matches the provided PCRE.
 									  May be provided multiple times for different patterns.
@@ -42,6 +43,7 @@ $longOptions = [
 	'check-duplications',
 	'set-puser-as-email-when-puser-is-email',
 	'metadata-profile-ids:',
+	'metadata-all-users',
 	'user-list-csv:',
 	'ignore-email-pattern:',
 	'help',
@@ -90,6 +92,15 @@ if (!empty($userListCsv) && !is_readable($userListCsv)) {
 	die("User list file not found or not readable: $userListCsv\n");
 }
 
+$metadataAllUsers = isset($options['metadata-all-users']);
+
+$metadataAllUsersWithoutProfiles = $metadataAllUsers && empty($metadataProfileIds);
+
+if ($metadataAllUsersWithoutProfiles) {
+	fwrite(STDERR, "Error: --metadata-all-users requires --metadata-profile-ids with at least one profile id to avoid wide metadata scans.\n");
+	exit(1);
+}
+
 $runModeLabel = $dryRun ? 'dryRun' : 'realRun';
 KalturaLog::log('Starting to analyze users for partner [' . $partnerId . '] Run is a [' . $runModeLabel . '].' . (!empty($userListCsv) ? " Using user list from file [$userListCsv]." : ''));
 
@@ -103,20 +114,25 @@ KalturaLog::log('Applying email exclusion patterns: ' . implode(', ', $emailExcl
 
 $withEmailUsers = array_values(array_filter($withEmailUsers, function ($user) use ($emailExclusionPatterns) {
 	$email = trim((string) $user->getEmail());
-	return !shouldExcludeUserByPatterns($email, $emailExclusionPatterns);
+	$puserId = trim((string) $user->getPuserId());
+
+	return !shouldExcludeUserByPatterns($email, $puserId, $emailExclusionPatterns);
 }));
 
-if (is_array($kuserEmailsFromListCsv)) {
-	$kuserEmailsFromListCsv = array_values(array_filter($kuserEmailsFromListCsv, function ($email) use ($emailExclusionPatterns) {
-		return !shouldExcludeUserByPatterns(trim((string) $email), $emailExclusionPatterns);
-	}));
-}
+$noEmailUsers = array_values(array_filter($noEmailUsers, function ($user) use ($emailExclusionPatterns) {
+	$email = trim((string) $user->getEmail());
+	$puserId = trim((string) $user->getPuserId());
 
-if (is_array($noEmailUsers)) {
-	$noEmailUsers = array_values(array_filter($noEmailUsers, function ($user) use ($emailExclusionPatterns) {
-		$emailFromPuserId = trim((string) $user->getPuserId());
-		return !shouldExcludeUserByPatterns(trim((string) $emailFromPuserId), $emailExclusionPatterns);
-	}));
+	return !shouldExcludeUserByPatterns($email, $puserId, $emailExclusionPatterns);
+}));
+
+if ($kuserEmailsFromListCsv !== null) {
+	$kuserEmailsFromListCsv = array_filter($kuserEmailsFromListCsv, function ($userData) use ($emailExclusionPatterns) {
+		$email = trim((string) ($userData['email'] ?? ''));
+		$puserId = trim((string) ($userData['puserId'] ?? ''));
+
+		return !shouldExcludeUserByPatterns($email, $puserId, $emailExclusionPatterns);
+	});
 }
 
 $usersResultsEmailMap = buildEmailUsageMap($withEmailUsers);
@@ -128,16 +144,14 @@ $report = updateUserForSharedUsers($withEmailUsers, $dryRun, $partner->getAdminS
 KalturaLog::log('Users needing externalId update: ' . count($report['externalIdUpdates']));
 KalturaLog::log('Users needing loginEmail update: ' . count($report['loginEmailUpdates']));
 
-$duplicates = array();
+$duplicates = [];
 
-if ($checkDuplications)
-{
+if ($checkDuplications) {
 	KalturaLog::log('Checking for duplicated emails for partner [' . $partnerId . ']' . (!empty($userListCsv) ? ' By provided CSV List.' : '.'));
 	$duplicates = countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv ?? null, $emailExclusionPatterns);
 }
 
-
-$userUpdateReportFile = prepareAndWriteUserUpdateReport($withEmailUsers,$noEmailUsers, $report, $duplicates, $partnerId, $metadataProfileIds, $checkDuplications, $emailExclusionPatterns, $usersResultsEmailMap);
+$userUpdateReportFile = prepareAndWriteUserUpdateReport($withEmailUsers, $noEmailUsers, $report, $duplicates, $partnerId, $metadataProfileIds, $checkDuplications, $emailExclusionPatterns, $usersResultsEmailMap, $metadataAllUsers);
 
 $externalIdUpdatesCount = count($report['externalIdUpdates'] ?? []);
 $loginEmailUpdatesCount = count($report['loginEmailUpdates'] ?? []);
@@ -166,7 +180,6 @@ if ($checkDuplications) {
 
 KalturaLog::log("Done Running for partner [$partnerId]. Report file: $userUpdateReportFile");
 
-
 function noEmailPercentage($noEmailUsersCount, $totalUsers): int {
 	if ($totalUsers <= 0) {
 		return 0;
@@ -175,14 +188,24 @@ function noEmailPercentage($noEmailUsersCount, $totalUsers): int {
 	return (int) floor(($noEmailUsersCount * 100) / $totalUsers);
 }
 
-
 function getUsers($partnerId, $hasEmail, $puserIds = null): array {
 	$emailCriteria = new Criteria();
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 	$emailCriteria->add(kuserPeer::TYPE, KuserType::USER);
 	$emailCriteria->add(kuserPeer::IS_ADMIN, 0, Criteria::EQUAL);
-	$emailCriteria->add(kuserPeer::EMAIL, null, $hasEmail ? Criteria::ISNOTNULL : Criteria::ISNULL);
+
+	if ($hasEmail) {
+		// Treat empty-string emails as "no email"
+		$emailNotNull = $emailCriteria->getNewCriterion(kuserPeer::EMAIL, null, Criteria::ISNOTNULL);
+		$emailNotEmpty = $emailCriteria->getNewCriterion(kuserPeer::EMAIL, '', Criteria::NOT_EQUAL);
+		$emailCriteria->add($emailNotNull);
+		$emailCriteria->addAnd($emailNotEmpty);
+	} else {
+		$emailIsNull = $emailCriteria->getNewCriterion(kuserPeer::EMAIL, null, Criteria::ISNULL);
+		$emailIsEmpty = $emailCriteria->getNewCriterion(kuserPeer::EMAIL, '', Criteria::EQUAL);
+		$emailCriteria->add($emailIsNull->addOr($emailIsEmpty));
+	}
 
 	if (!empty($puserIds)) {
 		$emailCriteria->add(kuserPeer::PUSER_ID, $puserIds, Criteria::IN);
@@ -196,8 +219,8 @@ function getUserByEmail($partnerId, $email): array {
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId, Criteria::EQUAL);
 	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 	$emailCriteria->add(kuserPeer::TYPE, KuserType::USER);
-	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
-	$emailCriteria->add(kuserPeer::EMAIL, $email,  Criteria::EQUAL);
+	$emailCriteria->add(kuserPeer::IS_ADMIN, [0, 1], Criteria::IN);
+	$emailCriteria->add(kuserPeer::EMAIL, $email, Criteria::EQUAL);
 
 	return kuserPeer::doSelect($emailCriteria);
 }
@@ -209,15 +232,14 @@ function getUserByEmail($partnerId, $email): array {
  * @param array<int,string> $additionalPatterns Additional PCRE patterns provided via CLI.
  * @return array<int,string>
  */
-function getAllUserExclusionPatterns(array $additionalPatterns = []): array
-{
+function getAllUserExclusionPatterns(array $additionalPatterns = []): array {
 	$patterns = [
 		'/service\.kaltura\.com/',
 		'/cncscp/',
 		'/kmsSaaSAdmin/',
 		'/WebcastingAdmin/',
 		'/kmsAdminServiceUser/',
-		'/__/',
+		'/^__/',
 		'/newrow-admin/',
 		'/^connectors_framework/',
 		'/^EPKalturaProxyDummyUser/',
@@ -254,22 +276,24 @@ function getAllUserExclusionPatterns(array $additionalPatterns = []): array
 }
 
 /**
- * Checks whether an email matches any of the provided exclusion patterns.
+ * Checks whether an email or puserId matches any of the provided exclusion patterns.
  *
  * @param string $email
+ * @param string $puserId
  * @param array<int,string> $patterns
  * @return bool
  */
-function shouldExcludeUserByPatterns(string $email, array $patterns): bool
-{
+function shouldExcludeUserByPatterns(string $email, string $puserId, array $patterns): bool {
 	$email = trim($email);
+	$puserId = trim($puserId);
 
-	if ($email === '' || empty($patterns)) {
+	if (($email === '' && $puserId === '') || empty($patterns)) {
 		return false;
 	}
 
 	foreach ($patterns as $pattern) {
-		if (@preg_match($pattern, $email) === 1) {
+		if (($email !== '' && @preg_match($pattern, $email) === 1) ||
+			($puserId !== '' && @preg_match($pattern, $puserId) === 1)) {
 			return true;
 		}
 	}
@@ -282,9 +306,10 @@ function shouldExcludeUserByPatterns(string $email, array $patterns): bool
  * Large email lists are processed in chunks to avoid oversized queries.
  *
  * @param int $partnerId
- * @param array<string>|string|null $kuserEmailsFromListCsv
+ * @param array<int,array{email:string,puserId?:string}>|null $kuserEmailsFromListCsv Map keyed by kuserId with email/puserId, or null when no CSV is provided.
  * @param array<int,string> $ignoreEmailPatterns
  * @return array
+ * @throws PropelException
  */
 function countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv = null, array $ignoreEmailPatterns = []): array {
 
@@ -295,15 +320,24 @@ function countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv = nul
 	$emailChunks = [[]];
 
 	if (!empty($kuserEmailsFromListCsv)) {
-		$emailList = is_array($kuserEmailsFromListCsv) ? $kuserEmailsFromListCsv : array_map('trim', explode(',', (string) $kuserEmailsFromListCsv));
-		$emailList = array_values(array_unique(array_filter($emailList, function ($value) use ($ignoreEmailPatterns) {
+		$emailList = [];
 
-			if ($value === '') {
-				return false;
+		foreach ($kuserEmailsFromListCsv as $value) {
+			$email = trim((string) ($value['email'] ?? ''));
+			$puserId = trim((string) ($value['puserId'] ?? ''));
+
+			if ($email === '') {
+				continue;
 			}
 
-			return !shouldExcludeUserByPatterns(trim((string) $value), $ignoreEmailPatterns);
-		})));
+			if (shouldExcludeUserByPatterns($email, $puserId, $ignoreEmailPatterns)) {
+				continue;
+			}
+
+			$emailList[] = $email;
+		}
+
+		$emailList = array_values(array_unique($emailList));
 
 		if (empty($emailList)) {
 			return [];
@@ -320,7 +354,7 @@ function countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv = nul
 
 		if (!empty($ignoreEmailPatterns) && !empty($chunkEmails)) {
 			$chunkEmails = array_values(array_filter($chunkEmails, function ($email) use ($ignoreEmailPatterns) {
-				return !shouldExcludeUserByPatterns(trim((string) $email), $ignoreEmailPatterns);
+				return !shouldExcludeUserByPatterns(trim((string) $email), '', $ignoreEmailPatterns);
 			}));
 		}
 
@@ -351,14 +385,13 @@ function countUsersWithDuplicatedEmail($partnerId, $kuserEmailsFromListCsv = nul
  * @return array
  * @throws PropelException
  */
-function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], array $ignoreEmailPatterns = []): array
-{
+function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], array $ignoreEmailPatterns = []): array {
 	$countField = 'COUNT(kuser.EMAIL)';
 	$emailCriteria = new Criteria();
 	$emailCriteria->add(kuserPeer::PARTNER_ID, $partnerId);
 	$emailCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 	$emailCriteria->add(kuserPeer::TYPE, KuserType::USER);
-	$emailCriteria->add(kuserPeer::IS_ADMIN, array(0, 1), Criteria::IN);
+	$emailCriteria->add(kuserPeer::IS_ADMIN, [0, 1], Criteria::IN);
 	$emailCriteria->add(kuserPeer::EMAIL, null, Criteria::ISNOTNULL);
 
 	if (!empty($emailFilter)) {
@@ -375,7 +408,7 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], ar
 	$duplicates = [];
 	$duplicateEmails = [];
 	$shouldIgnore = function (string $email) use ($ignoreEmailPatterns): bool {
-		return shouldExcludeUserByPatterns($email, $ignoreEmailPatterns);
+		return shouldExcludeUserByPatterns($email, '', $ignoreEmailPatterns);
 	};
 
 	foreach ($rows as $row) {
@@ -394,7 +427,7 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], ar
 		KalturaLog::log("email [" . $emailValue . "] is duplicated [" . $row['COUNT(kuser.EMAIL)'] . "] times");
 		$duplicates[] = [
 			$emailValue,
-			$row['COUNT(kuser.EMAIL)']
+			$row['COUNT(kuser.EMAIL)'],
 		];
 
 		$duplicateEmails[] = $emailValue;
@@ -409,7 +442,7 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], ar
 	$baseCriteria->add(kuserPeer::PARTNER_ID, $partnerId);
 	$baseCriteria->add(kuserPeer::STATUS, KuserStatus::DELETED, Criteria::NOT_EQUAL);
 	$baseCriteria->add(kuserPeer::TYPE, KuserType::USER);
-	$baseCriteria->add(kuserPeer::IS_ADMIN, array(0,1), Criteria::IN);
+	$baseCriteria->add(kuserPeer::IS_ADMIN, [0, 1], Criteria::IN);
 
 	foreach (array_chunk($duplicateEmails, $chunkSize) as $emailsChunk) {
 		$duplicateUsersCriteria = clone $baseCriteria;
@@ -473,7 +506,7 @@ function fetchDuplicateUsersByEmails(int $partnerId, array $emailFilter = [], ar
  *               'loginEmailUpdates' for users whose login email was updated.
  * @throws PropelException
  */
-function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $adminSecret, bool $updateLoginEmail, bool $setPuserAsEmailWhenPuserIsEmail, array $usersResultsEmailMap, bool $listByCSV): array {
+function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $adminSecret, bool $updateLoginEmail, bool $setPuserAsEmailWhenPuserIsEmail, array &$usersResultsEmailMap, bool $listByCSV): array {
 	KalturaLog::log('Processing users with email for updates.');
 
 	$report = ['externalIdUpdates' => [], 'loginEmailUpdates' => [], 'puserAsEmailUpdates' => []];
@@ -481,7 +514,7 @@ function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $a
 	if (sizeof($usersWithEmail) > 0) {
 
 		/* @var $user kuser */
-		foreach($usersWithEmail as $user) {
+		foreach ($usersWithEmail as $user) {
 			$KuserEmail = $user->getEmail();
 			KalturaLog::log('Processing user [' . $KuserEmail . ']');
 			// if need to update loginEmail. checks if it has loginData, then checks if the loginEmail is in the expected format for Shared Users, if not, updating it.
@@ -522,7 +555,7 @@ function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $a
 
 					if (!$listByCSV) {
 						// When we are not listing by CSV, we can use the existing email map to check for existing users with this email, instead of fetching from DB each time.
-						$emailKey = strtolower(trim((string)$user->getPuserId()));
+						$emailKey = strtolower(trim((string) $user->getPuserId()));
 						$existingUserWithPuserAsEmail = isset($usersResultsEmailMap[$emailKey]) && !isset($usersResultsEmailMap[$emailKey][$user->getId()]);
 					} else {
 						// When listing by CSV, we don't have the full email map, so we need to fetch from DB each time.
@@ -561,10 +594,8 @@ function updateUserForSharedUsers(array $usersWithEmail, bool $dryRun, string $a
 					KalturaLog::log('Dry RUN - would copy email [' . $externalId . '] for puser|kuser [' . $user->getPuserId() . ' | ' . $user->getId() . ']');
 				}
 			}
-
 		}
 	}
-
 
 	return $report;
 }
@@ -598,7 +629,7 @@ function writeArrayToCsv($header, $rows): string {
 
 	fputcsv($fp, $header);
 
-	foreach($rows as $row) {
+	foreach ($rows as $row) {
 		fputcsv($fp, $row);
 	}
 
@@ -615,8 +646,7 @@ function writeArrayToCsv($header, $rows): string {
  * @param array $metadataProfileIds Metadata profile IDs that require role columns.
  * @return array
  */
-function buildReportHeaders(bool $includeDuplicateColumns, array $metadataProfileIds): array
-{
+function buildReportHeaders(bool $includeDuplicateColumns, array $metadataProfileIds): array {
 	$headers = ['kuserId', 'email', 'puserId', 'loginEmail', 'FirstName', 'LastName', 'CreatedAt', 'externalId', 'isAdmin', 'needsLoginEmailUpdate', 'needsExternalIdUpdate', 'puserSetAsEmail', 'status', 'isValidForEP', 'regOrigin'];
 
 	if ($includeDuplicateColumns) {
@@ -642,8 +672,7 @@ function buildReportHeaders(bool $includeDuplicateColumns, array $metadataProfil
  *     userIds: array<int>
  * }
  */
-function normalizeDuplicateData(array $duplicates, array $emailUsageMap = []): array
-{
+function normalizeDuplicateData(array $duplicates, array $emailUsageMap = []): array {
 	$duplicateEmailCounts = [];
 	$duplicatesByKuserId = [];
 	$userDerivedEmailCounts = [];
@@ -711,25 +740,24 @@ function normalizeDuplicateData(array $duplicates, array $emailUsageMap = []): a
 }
 
 /**
- * Resolves metadata roles for duplicated users and returns the final profile list.
+ * Resolves metadata roles for the provided users and returns the final profile list.
  *
  * @param int $partnerId
- * @param array $duplicateUserIds
+ * @param array $userIds
  * @param array $metadataProfileIds
  * @return array{roles: array<int,array>, profileIds: array<int>}
  */
-function resolveMetadataRoles(int $partnerId, array $duplicateUserIds, array $metadataProfileIds): array
-{
+function resolveMetadataRoles(int $partnerId, array $userIds, array $metadataProfileIds): array {
 	$requestedProfileIds = !empty($metadataProfileIds) ? array_values(array_unique($metadataProfileIds)) : [];
 
-	if (empty($duplicateUserIds)) {
+	if (empty($userIds)) {
 		return [
 			'roles' => [],
 			'profileIds' => $requestedProfileIds,
 		];
 	}
 
-	$metadataFetchResult = fetchMetadataRolesForUsers($partnerId, $duplicateUserIds, $requestedProfileIds);
+	$metadataFetchResult = fetchMetadataRolesForUsers($partnerId, $userIds, $requestedProfileIds);
 	$metadataRolesByUser = $metadataFetchResult['roles'];
 	$discoveredProfileIds = $metadataFetchResult['profileIds'];
 
@@ -757,10 +785,9 @@ function resolveMetadataRoles(int $partnerId, array $duplicateUserIds, array $me
  * @param int $partnerId
  * @return array{rows: array<int,array>, processedUserIds: array<int,bool>}
  */
-function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmailCounts, array $ownedEntryCountsByKuserId, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns, int $partnerId): array
-	{
-		$rows = [];
-		$processedUserIds = [];
+function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmailCounts, array $ownedEntryCountsByKuserId, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns, int $partnerId): array {
+	$rows = [];
+	$processedUserIds = [];
 
 	foreach ($withEmailUsers as $user) {
 		$kuserId = $user->getId();
@@ -771,7 +798,7 @@ function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmail
 		$lastName = $user->getLastName();
 		$createdAt = $user->getCreatedAt();
 		$externalId = $user->getExternalId();
-		$isAdmin = $user->getIsAdmin();
+		$isAdmin = $user->getIsAdmin() ? "true" : "false";
 		$needsLoginEmailUpdate = isset($loginEmailUpdateIds[$kuserId]) ? 'yes' : 'no';
 		$needsExternalIdUpdate = isset($externalIdUpdateIds[$kuserId]) ? 'yes' : 'no';
 		$needsPuserAsEmailUpdate = isset($puserAsEmailUpdateIds[$kuserId]) ? 'yes' : 'no';
@@ -801,7 +828,7 @@ function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmail
 				if ($hasDupMetadata) {
 					$row[] = $metadataRolesByUser[$kuserId][$profileId] ?? 'not-found';
 				} else {
-					$row[] = 'not-checked';
+					$row[] = 'not-checked-no-duplicate';
 				}
 			}
 		}
@@ -817,13 +844,14 @@ function buildRowsForUsersWithEmail(array $withEmailUsers, array $duplicateEmail
  *
  * @param array<int,kuser> $noEmailUsers
  * @param array<int,int> $metadataProfileIds
+ * @param array<int,array> $metadataRolesByUser
  * @param array<int,int> $puserAsEmailUpdateIds
  * @param bool $includeDuplicateColumns
+ * @param bool $metadataFetchedForAllUsers
  *
  * @return array{rows: array<int,array>, processedUserIds: array<int,bool>}
  */
-function buildRowsForUsersWithoutEmail(array $noEmailUsers, array $metadataProfileIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns): array
-{
+function buildRowsForUsersWithoutEmail(array $noEmailUsers, array $metadataProfileIds, array $metadataRolesByUser, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns, bool $metadataFetchedForAllUsers): array {
 	$rows = [];
 	$processedUserIds = [];
 
@@ -838,7 +866,7 @@ function buildRowsForUsersWithoutEmail(array $noEmailUsers, array $metadataProfi
 		$lastName = $user->getLastName();
 		$createdAt = $user->getCreatedAt();
 		$externalId = $user->getExternalId();
-		$isAdmin = $user->getIsAdmin();
+		$isAdmin = $user->getIsAdmin() ? "true" : "false";
 		$status = getUserStatusEnumLabel($user->getStatus());
 		$puserAsEmail = isset($puserAsEmailUpdateIds[$kuserId]) ? 'yes' : 'no';
 		$isValidForEP = isUserValidEP($user);
@@ -853,7 +881,11 @@ function buildRowsForUsersWithoutEmail(array $noEmailUsers, array $metadataProfi
 
 		if (!empty($metadataProfileIds)) {
 			foreach ($metadataProfileIds as $profileId) {
-				$row[] = 'not-checked';
+				if ($metadataFetchedForAllUsers) {
+					$row[] = $metadataRolesByUser[$kuserId][$profileId] ?? 'not-found';
+				} else {
+					$row[] = 'not-checked-no-duplicate';
+				}
 			}
 		}
 
@@ -878,8 +910,7 @@ function buildRowsForUsersWithoutEmail(array $noEmailUsers, array $metadataProfi
  * @param bool $includeDuplicateColumns
  * @return array
  */
-function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $processedUserIds, array $duplicateEmailCounts, array $ownedEntryCountsByKuserId, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns): array
-{
+function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $processedUserIds, array $duplicateEmailCounts, array $ownedEntryCountsByKuserId, array $metadataProfileIds, array $metadataRolesByUser, array $loginEmailUpdateIds, array $externalIdUpdateIds, array $puserAsEmailUpdateIds, bool $includeDuplicateColumns): array {
 	$rows = [];
 
 	foreach ($duplicatesByKuserId as $dupUserId => $dup) {
@@ -902,7 +933,7 @@ function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $proce
 			$dup['lastName'] ?? '',
 			$dup['createdAt'] ?? '',
 			$dup['externalId'] ?? '',
-			$dup['isAdmin'] ?? '',
+			$dup['isAdmin'] ? "true" : "false",
 			isset($loginEmailUpdateIds[$dupUserId]) ? 'yes' : 'no',
 			isset($externalIdUpdateIds[$dupUserId]) ? 'yes' : 'no',
 			isset($puserAsEmailUpdateIds[$dupUserId]) ? 'yes' : 'no',
@@ -941,17 +972,33 @@ function buildRowsForDuplicateOnlyUsers(array $duplicatesByKuserId, array $proce
  * @param bool $includeDuplicateColumns Whether to append duplicate metrics columns.
  * @param array<int,string>|null $noEmailExclusionPatterns Patterns used to exclude users without emails.
  * @param array $emailUsageMap Map of normalized email => array of userIds (built from full user set) used to backfill counts.
+ * @param bool $fetchMetadataForAllUsers When true, fetch metadata roles for all processed users, not only duplicates.
  * @return string The filename of the generated report.
  * @throws Exception
  */
-function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $noEmailUsers, array $report, array $duplicates, int $partnerId, array $metadataProfileIds = [], bool $includeDuplicateColumns = true, ?array $noEmailExclusionPatterns = null, array $emailUsageMap = []): string
-{
+function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $noEmailUsers, array $report, array $duplicates, int $partnerId, array $metadataProfileIds = [], bool $includeDuplicateColumns = true, ?array $noEmailExclusionPatterns = null, array $emailUsageMap = [], bool $fetchMetadataForAllUsers = false): string {
 	$normalizedDuplicates = normalizeDuplicateData($duplicates, $emailUsageMap);
 	$duplicateEmailCounts = $normalizedDuplicates['emailCounts'];
 	$duplicatesByKuserId = $normalizedDuplicates['byKuserId'];
 	$duplicateUserIds = $normalizedDuplicates['userIds'];
 
-	$metadataResolution = resolveMetadataRoles($partnerId, $duplicateUserIds, $metadataProfileIds);
+	$metadataUserIds = $duplicateUserIds;
+
+	if ($fetchMetadataForAllUsers) {
+		$metadataUserIds = array_merge(
+			$duplicateUserIds,
+			array_map(function ($user) {
+				return (int) $user->getId();
+			}, $withEmailUsers),
+			array_map(function ($user) {
+				return (int) $user->getId();
+			}, $noEmailUsers)
+		);
+
+		$metadataUserIds = array_values(array_unique(array_filter($metadataUserIds)));
+	}
+
+	$metadataResolution = resolveMetadataRoles($partnerId, $metadataUserIds, $metadataProfileIds);
 	$metadataRolesByUser = $metadataResolution['roles'];
 	$metadataProfileIds = $metadataResolution['profileIds'];
 
@@ -971,19 +1018,19 @@ function prepareAndWriteUserUpdateReport(array $withEmailUsers, array $noEmailUs
 	$reportRows = $usersWithEmailRows['rows'];
 	$processedUserIds = $usersWithEmailRows['processedUserIds'];
 
-	$noEmailRows = buildRowsForUsersWithoutEmail($noEmailUsers, $metadataProfileIds, $puserAsEmailUpdateIds, $includeDuplicateColumns);
+	$metadataFetchedForAllUsers = $fetchMetadataForAllUsers && !empty($metadataProfileIds);
+	$noEmailRows = buildRowsForUsersWithoutEmail($noEmailUsers, $metadataProfileIds, $metadataRolesByUser, $puserAsEmailUpdateIds, $includeDuplicateColumns, $metadataFetchedForAllUsers);
 	$reportRows = array_merge($reportRows, $noEmailRows['rows']);
 	$processedUserIds += $noEmailRows['processedUserIds'];
 
 	$duplicateOnlyRows = buildRowsForDuplicateOnlyUsers($duplicatesByKuserId, $processedUserIds, $duplicateEmailCounts, $ownedEntryCountsByKuserId, $metadataProfileIds, $metadataRolesByUser, $loginEmailUpdateIds, $externalIdUpdateIds, $puserAsEmailUpdateIds, $includeDuplicateColumns);
-	
+
 	array_push($reportRows, ...$duplicateOnlyRows);
 
 	return writeArrayToCsv($headers, $reportRows);
 }
 
-function summarizeDuplicateData(array $duplicates, array $emailUsageMap = []): array
-{
+function summarizeDuplicateData(array $duplicates, array $emailUsageMap = []): array {
 	if (empty($duplicates)) {
 		return [
 			'duplicateEmailsCount' => 0,
@@ -999,8 +1046,7 @@ function summarizeDuplicateData(array $duplicates, array $emailUsageMap = []): a
 	];
 }
 
-function summarizeUserCollections(array $withEmailUsers, array $noEmailUsers): array
-{
+function summarizeUserCollections(array $withEmailUsers, array $noEmailUsers): array {
 	$withEmailCount = count($withEmailUsers);
 	$withEmailEmptyCount = 0;
 	$withEmailValidCount = 0;
@@ -1011,6 +1057,7 @@ function summarizeUserCollections(array $withEmailUsers, array $noEmailUsers): a
 		$uniqueUserIds[$kuserId] = true;
 
 		$email = trim((string) $user->getEmail());
+
 		if ($email === '') {
 			$withEmailEmptyCount++;
 		} else {
@@ -1039,11 +1086,11 @@ function summarizeUserCollections(array $withEmailUsers, array $noEmailUsers): a
  * If the CSV file is provided, processes user IDs in chunks from the file and retrieves users accordingly.
  *
  * @param int $partnerId
- * @param string|null $userListCsv Optional. Path to the CSV file containing a list of user IDs. If null, all users for the partner are retrieved.
+ * @param string $userListCsv Optional. Path to the CSV file containing a list of user IDs. If null, all users for the partner are retrieved.
  * @return array Associative array containing:
  *               - 'noEmailUsers': Array of users without associated email addresses.
  *               - 'withEmailUsers': Array of users with associated email addresses.
- *               - 'kuserEmailsFromListCsv': Array of email addresses extracted from 'withEmailUsers', or null if no CSV file is provided.
+ *               - 'kuserEmailsFromListCsv': Map keyed by kuserId with ['email' => string, 'puserId' => string], or null if no CSV file is provided.
  */
 function getUsersByPartnerAndCsv(int $partnerId, string $userListCsv = ''): array {
 
@@ -1056,7 +1103,7 @@ function getUsersByPartnerAndCsv(int $partnerId, string $userListCsv = ''): arra
 		$noEmailUsers = [];
 		$withEmailUsers = [];
 
-		foreach($userListChunk as $puserIds) {
+		foreach ($userListChunk as $puserIds) {
 			KalturaLog::log('Processing user IDs in chunk: [' . implode(',', $puserIds) . ']');
 			$chunkNoEmailUsers = getUsers($partnerId, false, $puserIds);
 			$chunkWithEmailUsers = getUsers($partnerId, true, $puserIds);
@@ -1070,12 +1117,47 @@ function getUsersByPartnerAndCsv(int $partnerId, string $userListCsv = ''): arra
 			}
 		}
 
-		$kuserEmailsFromListCsv = array_map(function ($user) {
-			return $user->getEmail();
-		}, $withEmailUsers);
+		$kuserEmailsFromListCsv = [];
+
+		foreach ($withEmailUsers as $user) {
+			$kuserEmailsFromListCsv[$user->getId()] = [
+				'email' => $user->getEmail(),
+				'puserId' => $user->getPuserId(),
+			];
+		}
 	}
 
-	return ['noEmailUsers' => $noEmailUsers, 'withEmailUsers' => $withEmailUsers, 'kuserEmailsFromListCsv' => $kuserEmailsFromListCsv ?? null];
+	$normalizedBuckets = normalizeUserEmailBuckets($withEmailUsers, $noEmailUsers);
+
+	return ['noEmailUsers' => $normalizedBuckets['noEmailUsers'], 'withEmailUsers' => $normalizedBuckets['withEmailUsers'], 'kuserEmailsFromListCsv' => $kuserEmailsFromListCsv ?? null];
+}
+
+/**
+ * Moves users with empty/invalid email values from the with-email bucket into the no-email bucket.
+ *
+ * @param array<int,kuser> $withEmailUsers
+ * @param array<int,kuser> $noEmailUsers
+ * @return array{withEmailUsers: array<int,kuser>, noEmailUsers: array<int,kuser>}
+ */
+function normalizeUserEmailBuckets(array $withEmailUsers, array $noEmailUsers): array {
+	$validWithEmailUsers = [];
+
+	foreach ($withEmailUsers as $user) {
+		$emailRaw = $user->getEmail();
+		$email = trim((string) $emailRaw);
+
+		if ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+			$noEmailUsers[] = $user;
+			continue;
+		}
+
+		$validWithEmailUsers[] = $user;
+	}
+
+	return [
+		'withEmailUsers' => $validWithEmailUsers,
+		'noEmailUsers' => $noEmailUsers,
+	];
 }
 
 function fetchMetadataRolesForUsers(int $partnerId, array $kuserIds, array $metadataProfileIds = [], int $chunkSize = 100): array {
@@ -1084,9 +1166,10 @@ function fetchMetadataRolesForUsers(int $partnerId, array $kuserIds, array $meta
 
 	if (empty($kuserIds)) {
 		$initialProfiles = !empty($metadataProfileIds) ? array_values(array_unique($metadataProfileIds)) : [];
+
 		return [
 			'roles' => [],
-			'profileIds' => $initialProfiles
+			'profileIds' => $initialProfiles,
 		];
 	}
 
@@ -1120,9 +1203,17 @@ function fetchMetadataRolesForUsers(int $partnerId, array $kuserIds, array $meta
 
 			$simpleXml = new SimpleXMLElement($xml);
 			$roleNodes = $simpleXml->xpath('.//role');
-			$roleValue = isset($roleNodes[0]) ? strval($roleNodes[0]) : '';
-			$objectId = (int)$metadataObject->getObjectId();
-			$profileId = (int)$metadataObject->getMetadataProfileId();
+			$roleValueRaw = isset($roleNodes[0]) ? strval($roleNodes[0]) : '';
+			$roleValueTrimmed = trim($roleValueRaw);
+
+			if ($roleValueTrimmed === '') {
+				$xmlTrimmed = trim((string) $xml);
+				$roleValue = $xmlTrimmed !== '' ? $xmlTrimmed : 'metadata-exists-for-profile-missing-role-value';
+			} else {
+				$roleValue = $roleValueRaw;
+			}
+			$objectId = (int) $metadataObject->getObjectId();
+			$profileId = (int) $metadataObject->getMetadataProfileId();
 
 			if (!isset($chunkRoles[$objectId])) {
 				$chunkRoles[$objectId] = [];
@@ -1151,7 +1242,7 @@ function fetchMetadataRolesForUsers(int $partnerId, array $kuserIds, array $meta
 
 	return [
 		'roles' => $rolesByUser,
-		'profileIds' => $profileIds
+		'profileIds' => $profileIds,
 	];
 }
 
@@ -1277,8 +1368,7 @@ function isUserValidEP(Kuser $user): string {
 /**
  * Safely extracts regOrigin from attendance/registration info that may be JSON, array, or object.
  */
-function extractRegOrigin($attendanceInfo)
-{
+function extractRegOrigin($attendanceInfo) {
 	if (is_string($attendanceInfo)) {
 		$decoded = json_decode($attendanceInfo, true);
 
