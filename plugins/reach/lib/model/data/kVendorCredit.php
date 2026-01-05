@@ -148,29 +148,106 @@ class kVendorCredit
 		return (intval(time() / 86400) == (intval($this->lastSyncTime / 86400)));
 	}
 
-	public function syncCredit($reachProfileId, $partnerId)
-	{
+	public function syncCreditPayPerUse($reachProfileId, $partnerId) {
 		$c = new Criteria();
-		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId , Criteria::EQUAL);
+		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
+		$c->add(EntryVendorTaskPeer::STATUS, EntryVendorTaskStatus::READY, Criteria::EQUAL);
+		$c->add(EntryVendorTaskPeer::FINISH_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
+		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$c->addGroupByColumn(EntryVendorTaskPeer::CATALOG_ITEM_ID);
+		$c->addSelectColumn(EntryVendorTaskPeer::CATALOG_ITEM_ID);
+
+		$stmt = EntryVendorTaskPeer::doSelectStmt($c);
+		$allCatalogIds = $stmt->fetchAll(PDO::FETCH_COLUMN); // return distict catalog items
+
+		// Step 2: Extract Pay Per Used catalog items (filter by payPerUse flag)
+		$payPerUseCatalogIds = array();
+		if (!empty($allCatalogIds)) {
+			$catalogItems = VendorCatalogItemPeer::retrieveByPKs($allCatalogIds);
+			foreach ($catalogItems as $catalogItem) {
+				if ($catalogItem->getPayPerUse()) {
+					$payPerUseCatalogIds[] = $catalogItem->getId();
+				}
+			}
+		}
+
+		// Step 3: Calculate only Pay Per Use credit for this sync period
+		$totalPayPerUsePrice = 0;
+		if (!empty($payPerUseCatalogIds)) {
+			$c = new Criteria();
+			$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
+			$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $payPerUseCatalogIds, Criteria::IN);
+			$c->add(EntryVendorTaskPeer::STATUS, EntryVendorTaskStatus::READY, Criteria::EQUAL);
+			$c->add(EntryVendorTaskPeer::FINISH_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
+			$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+			$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+			$c->addSelectColumn('SUM('. EntryVendorTaskPeer::PRICE .')');
+			$this->addAdditionalCriteria($c);
+
+			$stmt = EntryVendorTaskPeer::doSelectStmt($c);
+			$row = $stmt->fetch(PDO::FETCH_NUM);
+			$totalPayPerUsePrice = $row[0] ? $row[0] : 0;
+		}
+
+		return $totalPayPerUsePrice;
+	}
+
+	public function syncCreditNotPayPerUse($reachProfileId, $partnerId)
+	{
+		// Step 1: Get distinct catalog items based on queueTime
+		$c = new Criteria();
+		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
 		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
 		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
 		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$c->addSelectColumn('SUM('. EntryVendorTaskPeer::PRICE .')');
-		$this->addAdditionalCriteria($c);
+		$c->addGroupByColumn(EntryVendorTaskPeer::CATALOG_ITEM_ID);
+		$c->addSelectColumn(EntryVendorTaskPeer::CATALOG_ITEM_ID);
 
-		$now = time();
 		$stmt = EntryVendorTaskPeer::doSelectStmt($c);
-		$row = $stmt->fetch(PDO::FETCH_NUM);
+		$allCatalogIds = $stmt->fetchAll(PDO::FETCH_COLUMN); // return distict catalog items
 
-		$totalUsedCredit = $this->getSyncedCredit();
-
-		$totalPrice = $row[0];
-		if($totalPrice)
-		{
-			$totalUsedCredit += $totalPrice;
+		// Step 2: Extract non-PPU catalog items (filter by payPerUse flag)
+		$nonPpuCatalogIds = array();
+		if (!empty($allCatalogIds)) {
+			$catalogItems = VendorCatalogItemPeer::retrieveByPKs($allCatalogIds);
+			foreach ($catalogItems as $catalogItem) {
+				if (!$catalogItem->getPayPerUse()) {
+					$nonPpuCatalogIds[] = $catalogItem->getId();
+				}
+			}
 		}
 
+		// Step 3: Calculate only non-PPU credit for this sync period
+		$totalNonPpuPrice = 0;
+		if (!empty($nonPpuCatalogIds)) {
+			$c = new Criteria();
+			$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
+			$c->add(EntryVendorTaskPeer::CATALOG_ITEM_ID, $nonPpuCatalogIds, Criteria::IN);
+			$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
+			$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
+			$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+			$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+			$c->addSelectColumn('SUM('. EntryVendorTaskPeer::PRICE .')');
+			$this->addAdditionalCriteria($c);
+
+			$stmt = EntryVendorTaskPeer::doSelectStmt($c);
+			$row = $stmt->fetch(PDO::FETCH_NUM);
+			$totalNonPpuPrice = $row[0] ? $row[0] : 0;
+		}
+
+		// Return only the non-PPU portion calculated in this run
+		return $totalNonPpuPrice;
+	}
+
+	public function syncCredit($reachProfileId, $partnerId)
+	{
+		$now = time();
+		$totalUsedCredit = $this->getSyncedCredit();
+		$totalPayPerUsePrice = $this->syncCreditPayPerUse($reachProfileId, $partnerId);
+		$totalNonPayPerUsedCredit = $this->syncCreditNotPayPerUse($reachProfileId, $partnerId);
+		$totalUsedCredit += ($totalNonPayPerUsedCredit + $totalPayPerUsePrice);
 		$this->setSyncedCredit($totalUsedCredit);
 		$this->setLastSyncTime($now);
 
