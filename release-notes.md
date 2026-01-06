@@ -1,3 +1,24 @@
+# Venus-22.10.0
+## Add user entries update batch ##
+- Issue Type: Task
+- Issue ID: PLAT-25619
+
+### Configuration ###
+Add the following to batch.ini under KAsyncCopyCaptions worker
+
+```
+[KAsyncUpdateUserEntries : JobHandlerWorker]
+id													= 810
+friendlyName										= Bulk Update User Entry
+type												= KAsyncUpdateUserEntries
+scriptPath											= batches/RecycleBin/KAsyncUpdateUserEntriesExe.php
+```
+
+### Deployment Scripts ###
+
+    php deployment/updates/scripts/add_permissions/2025_12_30_update_user_entry_permission.php
+
+
 # Venus-22.8.0
 ## Index flavor_params field to elastic and allow in advanced search ##
 - Issue Type: Task

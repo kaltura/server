@@ -1,0 +1,9 @@
+<?php
+/**
+ * @package deployment
+ * @subpackage Venus.roles_and_permissions
+ */
+
+$addPermissionsAndItemsScript = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/permissions/addPermissionsAndItems.php';
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.userentry.ini';
+passthru("php $addPermissionsAndItemsScript $config");

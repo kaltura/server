@@ -73,6 +73,7 @@ enabledWorkers.KAsyncExportCsv                      = 0
 enabledWorkers.KAsyncLiveEntryArchive               = 0
 enabledWorkers.KAsyncStorageUpdate                  = 1
 enabledWorkers.KAsyncRecycleBin                     = 1
+enabledWorkers.KAsyncUpdateUserEntries            = 1
 
 
 [mainTemplate : template]
@@ -879,3 +880,9 @@ type                                                = KAsyncStorageUpdate
 scriptPath                                          = batches/StorageUpdate/KAsyncStorageUpdateExe.php
 sleepBetweenStopStart                               = 86400
 params.debugMode                                    = 1
+
+[KAsyncUpdateUserEntries : JobHandlerWorker]
+id													= 810
+friendlyName										= Update User Entries
+type												= KAsyncUpdateUserEntries
+scriptPath											= batches/RecycleBin/KAsyncUpdateUserEntriesExe.php

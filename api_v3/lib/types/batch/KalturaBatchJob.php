@@ -448,6 +448,10 @@ class KalturaBatchJob extends KalturaObject implements IFilterable
 				$this->data = new KalturaLiveEntryArchiveJobData();
 				break;
 
+			case 'kUpdateUserEntriesData':
+				$this->data = new KalturaUpdateUserEntriesData();
+				break;
+
 			default:
 				if($dbData instanceof kBulkUploadJobData)
 				{
