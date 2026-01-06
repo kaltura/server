@@ -52,6 +52,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 	 * 
 	 * @var string
 	 * @filter eq,in,notin
+	 * @maxLength 100
 	 */
 	public $userId;
 	

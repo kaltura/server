@@ -9,10 +9,9 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 {
     	protected $tempXmlPath;
 	const CORTEX_API_LOGIN = 'API/Authentication/v1.0/Login';
-	const CORTEX_API_SEND_METADATA = 'API/v2.2/DataTable/Documents.Video.General-Library-Video:Update';
 	const CORTEX_API_UPLOAD_NEW_MEDIA = 'API/UploadMedia/v3.0/UploadNewMedia';
 	const CORTEX_API_UPLOAD_CAPTIONS = 'webapi/mediafile/captions/420_v1';
-	const CORTEX_API_GET_METADATA = 'API/v2.2/DataTable/Documents.Video.General-Library-Video:Read';
+	const CORTEX_API_ENDPOINT = 'API/v2.2/DataTable/Documents.Video.General-Library-[TYPE]:[ACTION]';
 	const CORTEX_URL_ASSET_FIELD_VALUE = 'asset-management/[RECORD_ID]?WS=AssetManagement”';
 	const CORTEX_KALTURA_METADATA_FIELD_ID = 'CoreFieldUniqueidentifier';
 	const CORTEX_KALTURA_METADATA_FIELD_CREATED_DATE = 'CoreFieldCreateDate';
@@ -87,7 +86,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		sleep(30);
 		if (kFile::checkFileExists($data->providerData->thumbAssetFilePath))
 		{
-			$this->uploadThumbnail($data->providerData->thumbAssetFilePath);
+			$this->uploadThumbnail($data->providerData->thumbAssetFilePath, $data->providerData);
 		}
 		$this->submitMetadata($data->providerData);
 		if(isset($data->providerData->captionsInfo))
@@ -117,7 +116,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			{
 				return;
 			}
-			$result = $this->getMetadataFromCortex();
+			$result = $this->getMetadataFromCortex($apiDistributionJobProviderData);
 			if(!$result)
 			{
 				$this->throwError("Failed to get metadata from Cortex");
@@ -177,7 +176,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 		}
 		catch(Exception $e)
 		{
-			$this->throwError("Cant do metadata.list for entry $entryId, Msg:".$e->getMessage());
+			$this->throwError("Metadata for entry $entryId could not be retrieved, msg:" . $e->getMessage());
 		}
 		if($metadataListResponse->totalCount == 0)
 		{
@@ -207,12 +206,12 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @return SimpleXMLElement
 	 * @throws Exception
 	 */
-	protected function getMetadataFromCortex()
+	protected function getMetadataFromCortex(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
 		$params = array(
 			'CoreField.unique-identifier' => $this->getCortexSystemId()
 		);
-		return $this->requestCortex($params, self::CORTEX_API_GET_METADATA);
+		return $this->requestCortex($params, $this->getApiEndpointByMediaType($apiDistributionJobProviderData, TRUE));
 	}
 	/**
 	 * @return void
@@ -408,12 +407,25 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$metadata["CoreField.Creation-Date:"] = $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE] ? date('Y-m-d', $fieldValues[CortexApiDistributionField::MEDIA_CREATION_DATE]) : '';
 			$metadata["MAY.Legacy-Keywords:"] = $fieldValues[CortexApiDistributionField::MEDIA_KEYWORDS] ? str_replace(',', ', ', $fieldValues[CortexApiDistributionField::MEDIA_KEYWORDS]) : '';
 			$metadata["MAY.Job-Number:"] = $metadataFields[self::CORTEX_KALTURA_METADATA_FIELD_JOB_NUMBER];
-			$result = $this->requestCortex($metadata, self::CORTEX_API_SEND_METADATA);
+			$result = $this->requestCortex($metadata, $this->getApiEndpointByMediaType($apiDistributionJobProviderData, FALSE));
 			$this->setRecordId($result->RecordID ?? '');
 		}
 		catch(Exception $e)
 		{}
 	}
+
+	/**
+	 * @param KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData
+	 * @param bool                                        $readApi
+	 * @return string
+	 */
+	protected function getApiEndpointByMediaType(KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData, bool $readApi)  {
+		$type = $apiDistributionJobProviderData->mediaType == KalturaMediaType::AUDIO ? 'Audio' : 'Video';
+		$endPointType = str_replace(self::CORTEX_API_ENDPOINT, '[TYPE]', $type);
+		$endPoint = str_replace($endPointType, '[ACTION]', ($readApi ? 'Read' : 'Update'));
+		return $endPoint;
+	}
+
 	/**
 	 * @param KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData
 	 * @return bool
@@ -484,7 +496,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 	 * @param string $thumbAssetFilePath
 	 * @throws Exception
 	 */
-	protected function uploadThumbnail($thumbAssetFilePath)
+	protected function uploadThumbnail($thumbAssetFilePath, KalturaCortexApiDistributionJobProviderData $apiDistributionJobProviderData)
 	{
 		try
 		{
@@ -493,8 +505,7 @@ class CortexApiDistributionEngine extends DistributionEngine implements
 			$metadata = array();
 			$metadata["CoreField.Identifier"] = $this->getCortexSystemId();
 			$metadata["CoreField.Representative_DO:"] = "[DataTable/v2.2/Documents.Image.Default:Read?CoreField.Identifier=$imageSystemId]";
-			$this->requestCortex($metadata, self::CORTEX_API_SEND_METADATA);
-			KalturaLog::info("Cortex: setting thumbnail succeeded, ImageIdentifier: $imageSystemId, VideoIdentifier:".$this->getCortexSystemId());
+			$this->requestCortex($metadata, $this->getApiEndpointByMediaType($apiDistributionJobProviderData, FALSE));			KalturaLog::info("Cortex: setting thumbnail succeeded, ImageIdentifier: $imageSystemId, VideoIdentifier:".$this->getCortexSystemId());
 		}
 		catch(Exception $e)
 		{
