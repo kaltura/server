@@ -223,8 +223,8 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 
 	public static function getCaptionElasticSearchData($entry)
 	{
-
 		$entryId = $entry->getId();
+		$originalEntryId = $entryId;
 
 		// For live entries with redirectEntryId, index captions from the redirect target
 		if ($entry instanceof LiveEntry) {
@@ -234,6 +234,27 @@ class CaptionSearchPlugin extends KalturaPlugin implements IKalturaPending, IKal
 				$redirectEntry = entryPeer::retrieveByPK($redirectEntryId);
 				if ($redirectEntry) {
 					$entryId = $redirectEntryId;
+				}
+			}
+		}
+		// For clip entries, check if they have a sourceEntryId or rootEntryId in their custom data
+		// This is important for clips created from entries with captions
+		else if ($entry->getType() == entryType::MEDIA_CLIP) {
+			$sourceEntryId = $entry->getFromCustomData('sourceEntryId');
+			if ($sourceEntryId) {
+				KalturaLog::info("Clip entry {$entryId} has sourceEntryId {$sourceEntryId}, checking for captions");
+				$sourceEntry = entryPeer::retrieveByPK($sourceEntryId);
+				if ($sourceEntry && $sourceEntry->getStatus() != entryStatus::DELETED) {
+					// Check if the source entry has captions
+					$sourceCaptionAssets = assetPeer::retrieveByEntryId($sourceEntryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+					if ($sourceCaptionAssets && count($sourceCaptionAssets)) {
+						// If the clip already has captions, use those. Otherwise, use source entry captions.
+						$clipCaptionAssets = assetPeer::retrieveByEntryId($originalEntryId, array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)), array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
+						if (!$clipCaptionAssets || !count($clipCaptionAssets)) {
+							$entryId = $sourceEntryId;
+							KalturaLog::info("Using source entry {$sourceEntryId} captions for clip {$originalEntryId}");
+						}
+					}
 				}
 			}
 		}
