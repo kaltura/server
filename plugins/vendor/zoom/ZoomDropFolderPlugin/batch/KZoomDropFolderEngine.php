@@ -319,20 +319,32 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId)
 	{
 		$lockKey = $uuid . '_' . $recordingStartTime;
-		$newEntry = new KalturaMediaEntry();
-		$newEntry->sourceType = KalturaSourceType::URL;
-		$newEntry->mediaType = KalturaMediaType::VIDEO;
-		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
-		$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
-		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
-		if ($userId)
+		$resourceReservation = new kResourceReservation(kZoomRecordingProcessor::ZOOM_LOCK_TTL, true);
+		if(!$resourceReservation->reserve($lockKey))
 		{
-			$newEntry->userId = $userId;
+			KalturaLog::debug("Entry creation for {$lockKey} is being processed by another system");
+			return null; // Let the other system (Event) handle it
 		}
-		KBatchBase::impersonate($this->dropFolder->partnerId);
-		$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
-		KBatchBase::unimpersonate();
-		return $entry;
+		try {
+			$newEntry = new KalturaMediaEntry();
+			$newEntry->sourceType = KalturaSourceType::URL;
+			$newEntry->mediaType = KalturaMediaType::VIDEO;
+			$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
+			$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
+			$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
+			if ($userId)
+			{
+				$newEntry->userId = $userId;
+			}
+			KBatchBase::impersonate($this->dropFolder->partnerId);
+			$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
+			KBatchBase::unimpersonate();
+			return $entry;
+		}
+		finally
+		{
+			// Lock automatically expires via TTL
+		}
 	}
 
 	protected function updateDropFolderLastMeetingHandled($lastHandledMeetingTime)
