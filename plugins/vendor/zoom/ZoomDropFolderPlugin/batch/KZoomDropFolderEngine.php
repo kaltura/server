@@ -318,6 +318,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId)
 	{
+		$lockKey = $uuid . '_' . $recordingStartTime;
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
