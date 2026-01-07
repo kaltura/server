@@ -343,7 +343,22 @@ class kFlowHelper
 				kJobsManager::addCapturaThumbJob($entryThumbnail->getPartnerId(), $entryThumbnail->getEntryId(), $entryThumbnail->getId(), $srcSyncKey, $flavorAsset->getId(), $srcAssetType, $thumbParamsOutput);
 			}
 		}
-		
+
+		$replacingEntry = $dbBatchJob->getEntry();
+		if ($replacingEntry &&
+			$replacingEntry->getIsTemporary() &&
+			kReplacementHelper::shouldSyncFlavorInfo($flavorAsset, $flavorAsset->getEntryId()))
+		{
+			try {
+				kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($flavorAsset);
+			} catch (PropelException $e)
+			{
+				$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
+				$dbBatchJob->setMessage("Failed to copy asset  " . $flavorAsset->getId() . " " . $e->getMessage());;
+				$dbBatchJob->save();
+			}
+		}
+
 		return $dbBatchJob;
 	}
 
