@@ -882,7 +882,7 @@ sleepBetweenStopStart                               = 86400
 params.debugMode                                    = 1
 
 [KAsyncUpdateUserEntries : JobHandlerWorker]
-id													= 810
+id													= 820
 friendlyName										= Update User Entries
 type												= KAsyncUpdateUserEntries
 scriptPath											= batches/RecycleBin/KAsyncUpdateUserEntriesExe.php
