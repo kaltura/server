@@ -1577,6 +1577,19 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return true;
 	}
 
+	private static function entryHasCaptions($entry)
+	{
+		$entryAssets = assetPeer::retrieveByEntryId($entry->getId());
+		foreach($entryAssets as $entryAsset)
+		{
+			if($entryAsset instanceof captionAsset)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @param entry $entry
 	 * @param Partner|null $toPartner
@@ -1732,9 +1745,10 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->addCapability(QuizPlugin::getCapabilityCoreValue());
 		}
 
-
-		$newEntry->setBlockAutoTranscript($copyCaptions);
-
+		if (self::entryHasCaptions($entry))
+		{
+			$newEntry->setBlockAutoTranscript($copyCaptions);
+		}
 		// save the entry
  		$newEntry->save();
 
