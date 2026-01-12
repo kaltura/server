@@ -702,44 +702,47 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 			}
 		}
 	}
-	
+
+	private function ensureKusersExist(string $entitledUsersArray, $partnerId)
+	{
+		$entitledUsers = explode(',', $this->$entitledUsersArray);
+		$validUsers = array();
+
+		foreach ($entitledUsers as $puserId)
+		{
+			$puserId = trim($puserId);
+			kuserPeer::setUseCriteriaFilter(false);
+			$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $puserId);
+			kuserPeer::setUseCriteriaFilter(true);
+
+			if ($kuser && $kuser->getStatus() === KuserStatus::DELETED)
+			{
+				continue;
+			}
+
+			elseif (!$kuser)
+			{
+				kuserPeer::createKuserForPartner($partnerId, $puserId);
+			}
+
+			$validUsers[] = $puserId;
+		}
+
+		return $validUsers;
+	}
+
 	public function validateUsers()
 	{
 		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
-		
-		if(!$this->isNull('entitledUsersEdit'))
-		{
-			$entitledUsersEdit = explode(',', $this->entitledUsersEdit);
 
-			foreach ($entitledUsersEdit as $puserId)
-			{
-				$puserId = trim($puserId);
-				kuserPeer::createKuserForPartner($partnerId, $puserId);
-			}
-		}
-			
-		if(!$this->isNull('entitledUsersPublish'))
+		foreach (['entitledUsersEdit', 'entitledUsersPublish', 'entitledUsersView'] as $entitledUsersList)
 		{
-			$entitledPusersPublish = explode(',', $this->entitledUsersPublish);
-	
-			foreach ($entitledPusersPublish as $puserId)
+			if (!$this->isNull($entitledUsersList))
 			{
-				$puserId = trim($puserId);
-				kuserPeer::createKuserForPartner($partnerId, $puserId);
+				$validUsers = $this->ensureKusersExist($entitledUsersList, $partnerId);
+				$this->$entitledUsersList = implode(',', $validUsers);
 			}
 		}
-		
-		if(!$this->isNull('entitledUsersView'))
-		{
-			$entitledPusersView = explode(',', $this->entitledUsersView);
-	
-			foreach ($entitledPusersView as $puserId)
-			{
-				$puserId = trim($puserId);
-				kuserPeer::createKuserForPartner($partnerId, $puserId);
-			}
-		}
-		
 	}
 
 	/* (non-PHPdoc)
