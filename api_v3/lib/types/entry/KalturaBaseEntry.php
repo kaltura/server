@@ -716,6 +716,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 
 			if ($kuser && $kuser->getStatus() === KuserStatus::DELETED)
 			{
+				KalturaLog::debug("User $puserId has DELETED status for partner $partnerId, skipping entitlement\n");
 				continue;
 			}
 
