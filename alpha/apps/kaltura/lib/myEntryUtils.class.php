@@ -1580,9 +1580,9 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 	private static function entryHasCaptions($entry)
 	{
 		$entryAssets = assetPeer::retrieveByEntryId($entry->getId());
-		foreach($entryAssets as $entryAsset)
+		foreach ($entryAssets as $entryAsset)
 		{
-			if($entryAsset instanceof captionAsset)
+			if ($entryAsset instanceof captionAsset)
 			{
 				return true;
 			}
