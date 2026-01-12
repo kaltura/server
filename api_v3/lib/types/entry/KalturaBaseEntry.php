@@ -703,9 +703,8 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		}
 	}
 
-	private function ensureKusersExist(string $entitledUsersArray, $partnerId)
+	private function ensureKusersExist(array $entitledUsers, $partnerId)
 	{
-		$entitledUsers = explode(',', $this->$entitledUsersArray);
 		$validUsers = array();
 
 		foreach ($entitledUsers as $puserId)
