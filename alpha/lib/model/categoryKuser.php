@@ -406,6 +406,9 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 			case CategoryKuserPermissionLevel::MEMBER:
 				$permissionNamesArr[] = PermissionName::CATEGORY_VIEW;
 				break;
+			case CategoryKuserPermissionLevel::NONE:
+				$permissionNamesArr[] = PermissionName::CATEGORY_SUBSCRIBE;
+				break;
 		}
 		
 		return $permissionNamesArr;

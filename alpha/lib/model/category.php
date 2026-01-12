@@ -1067,6 +1067,9 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 				
 			case CategoryKuserPermissionLevel::MODERATOR:
 				return 'MODERATOR';
+
+			case CategoryKuserPermissionLevel::NONE:
+                return 'NONE';
 		}
 		
 		return '';
