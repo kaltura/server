@@ -1744,7 +1744,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
 			$newEntry->addCapability(QuizPlugin::getCapabilityCoreValue());
 		}
-
+		// If we clone an entry with captions, we want to prevent auto-caption from ordering a new caption:
 		if (self::entryHasCaptions($entry))
 		{
 			$newEntry->setBlockAutoTranscript($copyCaptions);
