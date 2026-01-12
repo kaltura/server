@@ -137,7 +137,10 @@ class SphinxCategoryKuserCriteria extends SphinxCriteria
 	        $negativePermissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
 	        break;
 	      case CategoryKuserPermissionLevel::NONE:
-              $negativePermissionNamesArr[] = PermissionName::CATEGORY_SUBSCRIBE;
+              $negativePermissionNamesArr[] = PermissionName::CATEGORY_EDIT;
+			  $negativePermissionNamesArr[] = PermissionName::CATEGORY_MODERATE;
+			  $negativePermissionNamesArr[] = PermissionName::CATEGORY_CONTRIBUTE;
+			  $negativePermissionNamesArr[] = PermissionName::CATEGORY_VIEW;
               break;
 	    }
 	    
