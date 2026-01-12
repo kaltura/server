@@ -739,7 +739,7 @@ class KalturaBaseEntry extends KalturaObject implements IRelatedFilterable, IApi
 		{
 			if (!$this->isNull($entitledUsersList))
 			{
-				$validUsers = $this->ensureKusersExist($entitledUsersList, $partnerId);
+				$validUsers = $this->ensureKusersExist(explode(',', $this->$entitledUsersList), $partnerId);
 				$this->$entitledUsersList = implode(',', $validUsers);
 			}
 		}
