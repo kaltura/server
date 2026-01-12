@@ -145,7 +145,8 @@ class kZoomOauth extends kOAuth
 	 */
 	public static function updateObjectWithFreshTokens($object, $freshTokens)
 	{
-		if (!$freshTokens || !$object) {
+		if (!$freshTokens || !$object) 
+		{
 			return;
 		}
 
