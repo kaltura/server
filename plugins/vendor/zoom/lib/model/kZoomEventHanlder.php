@@ -321,6 +321,11 @@ class kZoomEventHanlder
 						{
 							$parentEntry = self::createEntry($recording->uuid, $partnerId, $zoomVendorIntegration->getEnableZoomTranscription(),
 							                                 $recordingFile->recordingStart, $conversionProfileId);
+							if (!$parentEntry)
+							{
+								KalturaLog::debug("Another system is creating the parent entry, skipping drop folder file creation");
+								continue; // Skip this recording file
+							}
 							$zoomDropFolderFile->setIsParentEntry(true);
 						}
 					}
@@ -437,6 +442,10 @@ class kZoomEventHanlder
 	
 	protected static function createEntry($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId)
 	{
+		if (empty($recordingStartTime))
+		{
+			throw new kCoreException("Recording start time is null or empty for UUID: {$uuid}");
+		}
 		$lockKey = $uuid . '_' . $recordingStartTime;
 		$resourceReservation = new kResourceReservation(kZoomRecordingProcessor::ZOOM_LOCK_TTL, true);
 		if(!$resourceReservation->reserve($lockKey))
@@ -444,36 +453,31 @@ class kZoomEventHanlder
 			KalturaLog::debug("Entry creation for {$lockKey} is being processed by another system");
 			return null; // Let the other system (Watcher) handle it
 		}
-		try {
-			$templateEntry = null;
-			$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
-			$defaultEntryId = $conversionProfile->getDefaultEntryId();
-			if ($defaultEntryId)
-			{
-				$templateEntry = entryPeer::retrieveByPKNoFilter($defaultEntryId, null, false);
-			}
 
-			$newEntry = new entry();
-			if ($templateEntry)
-			{
-				$newEntry->copyTemplate($templateEntry, true);
-			}
-
-			$newEntry->setType(entryType::MEDIA_CLIP);
-			$newEntry->setSourceType(EntrySourceType::URL);
-			$newEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-			$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime);
-			$newEntry->setStatus(entryStatus::NO_CONTENT);
-			$newEntry->setPartnerId($partnerId);
-			$newEntry->setBlockAutoTranscript($enableTranscriptionViaZoom);
-			$newEntry->setConversionProfileId($conversionProfileId);
-			$newEntry->save();
-			return $newEntry;
-		}
-		finally
+		$templateEntry = null;
+		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+		$defaultEntryId = $conversionProfile->getDefaultEntryId();
+		if ($defaultEntryId)
 		{
-			// Lock automatically expires via TTL
+			$templateEntry = entryPeer::retrieveByPKNoFilter($defaultEntryId, null, false);
 		}
+
+		$newEntry = new entry();
+		if ($templateEntry)
+		{
+			$newEntry->copyTemplate($templateEntry, true);
+		}
+
+		$newEntry->setType(entryType::MEDIA_CLIP);
+		$newEntry->setSourceType(EntrySourceType::URL);
+		$newEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
+		$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime);
+		$newEntry->setStatus(entryStatus::NO_CONTENT);
+		$newEntry->setPartnerId($partnerId);
+		$newEntry->setBlockAutoTranscript($enableTranscriptionViaZoom);
+		$newEntry->setConversionProfileId($conversionProfileId);
+		$newEntry->save();
+		return $newEntry;
 	}
 	
 	protected static function loadDropFolderFiles($dropFolderId, $fileName)

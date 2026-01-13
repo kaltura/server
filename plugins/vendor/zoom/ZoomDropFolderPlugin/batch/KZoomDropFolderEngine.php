@@ -280,6 +280,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID],
 									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START], $userId);
+									if (!$parentEntry)
+									{
+										KalturaLog::debug("Another system (ZOOM EVENT) is creating the parent entry, skipping drop folder file creation");
+										continue; // Skip this recording file
+									}
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 								}
 							}
@@ -318,6 +323,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId)
 	{
+		if (empty($recordingStartTime))
+		{
+			throw new kCoreException("Recording start time is null or empty for UUID: {$uuid}");
+		}
 		$lockKey = $uuid . '_' . $recordingStartTime;
 		$resourceReservation = new kResourceReservation(kZoomRecordingProcessor::ZOOM_LOCK_TTL, true);
 		if(!$resourceReservation->reserve($lockKey))
@@ -325,26 +334,22 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			KalturaLog::debug("Entry creation for {$lockKey} is being processed by another system");
 			return null; // Let the other system (Event) handle it
 		}
-		try {
-			$newEntry = new KalturaMediaEntry();
-			$newEntry->sourceType = KalturaSourceType::URL;
-			$newEntry->mediaType = KalturaMediaType::VIDEO;
-			$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
-			$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
-			$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
-			if ($userId)
-			{
-				$newEntry->userId = $userId;
-			}
-			KBatchBase::impersonate($this->dropFolder->partnerId);
-			$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
-			KBatchBase::unimpersonate();
-			return $entry;
-		}
-		finally
+
+		$newEntry = new KalturaMediaEntry();
+		$newEntry->sourceType = KalturaSourceType::URL;
+		$newEntry->mediaType = KalturaMediaType::VIDEO;
+		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
+		$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
+		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
+		if ($userId)
 		{
-			// Lock automatically expires via TTL
+			$newEntry->userId = $userId;
 		}
+		KBatchBase::impersonate($this->dropFolder->partnerId);
+		$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
+		KBatchBase::unimpersonate();
+		return $entry;
+
 	}
 
 	protected function updateDropFolderLastMeetingHandled($lastHandledMeetingTime)
