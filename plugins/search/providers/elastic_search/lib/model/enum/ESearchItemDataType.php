@@ -8,4 +8,5 @@ interface ESearchItemDataType extends BaseEnum
 	const CAPTION = 'caption';
 	const METADATA = 'metadata';
 	const CUE_POINTS = 'cue_points';
+	const ATTACHMENTS = 'attachments';
 }

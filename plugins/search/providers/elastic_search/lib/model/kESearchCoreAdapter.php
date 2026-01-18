@@ -25,7 +25,8 @@ class kESearchCoreAdapter
 	private static $innerHitsObjectType = array(
 		'caption' => ESearchItemDataType::CAPTION,
 		'metadata' => ESearchItemDataType::METADATA,
-		'cue_points' => ESearchItemDataType::CUE_POINTS
+		'cue_points' => ESearchItemDataType::CUE_POINTS,
+		'attachments' => ESearchItemDataType::ATTACHMENTS
 	);
 
 	public static function transformElasticToCoreObject($elasticResults, $coreSearchObject)
@@ -151,6 +152,7 @@ class kESearchCoreAdapter
 			case ESearchItemDataType::CAPTION:
 			case ESearchItemDataType::METADATA:
 			case ESearchItemDataType::CUE_POINTS:
+			case ESearchItemDataType::ATTACHMENTS:
 				return $objectResult[self::HITS_KEY][self::TOTAL_KEY];
 			default:
 			{

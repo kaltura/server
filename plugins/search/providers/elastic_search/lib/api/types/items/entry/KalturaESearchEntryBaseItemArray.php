@@ -54,7 +54,10 @@ class KalturaESearchEntryBaseItemArray extends KalturaTypedArray
 				case 'ESearchNestedOperator':
 					$nObj = new KalturaESearchNestedOperator();
 					break;
-					
+
+				case 'ESearchAttachmentItem':
+					$nObj = new KalturaESearchAttachmentItem();
+					break;
 				default:
 					$nObj = KalturaPluginManager::loadObject('KalturaESearchEntryBaseItem', get_class($obj));
 					break;
