@@ -43,20 +43,27 @@ class GroupUserService extends KalturaBaseService
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupUser->userId );
 		}
 
+		$lockKey = 'groupUser_add_' . $partnerId . '_' . $groupUser->groupId . '_' . md5($groupUser->userId);
+		return kLock::runLocked($lockKey, array($this, 'addGroupUserImpl'), array($groupUser, $partnerId, $kuser, $kgroup));
+	}
+
+	/**
+	 * implement of add new GroupUser
+	 */
+	function addGroupUserImpl(KalturaGroupUser $groupUser, $partnerId, $kuser, $kgroup)
+	{
 		//verify kuser does not belongs to kgroup
 		$kuserKgroup = KuserKgroupPeer::retrieveByKuserIdAndKgroupId($kuser->getId(), $kgroup->getId());
 		if($kuserKgroup)
 			throw new KalturaAPIException (KalturaErrors::GROUP_USER_ALREADY_EXISTS);
 
-		$this->validateKuserkGroupCoExistence($kgroup, $kuser->getId());
-
-		$this->validateMaxGroupsPerUser($partnerId, $kuser->getId());
-
+		// Rest of the existing logic...
 		$dbGroupUser = $groupUser->toInsertableObject();
-		$dbGroupUser->setPartnerId($this->getPartnerId());
+		$dbGroupUser->setPartnerId($partnerId);
 		$dbGroupUser->setGroupType($kgroup->getType());
 		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
 		$dbGroupUser->save();
+
 		$groupUser->fromObject($dbGroupUser);
 
 		return $groupUser;
