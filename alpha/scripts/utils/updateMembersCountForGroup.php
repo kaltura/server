@@ -18,7 +18,7 @@ if ($argc == 3 && $argv[2] == 'realrun') {
 KalturaStatement::setDryRun($dryrun);
 KalturaLog::debug("dryrun value: [$dryrun]\n");
 
-$kuser = kuser::getKuserById($groupId);
+$kuser = kuserPeer::retrieveByPK($groupId);
 $currentMembersCount = $kuser->getMembersCount();
 KalturaLog::debug("Current members count for group with ID $groupId is $currentMembersCount\n");
 
@@ -39,3 +39,6 @@ $kuser->setMembersCount($numOfUsersMembers);
 $kuser->save();
 
 KalturaLog::debug("Updated membersCount from $currentMembersCount to $numOfUsersMembers for group with ID $groupId\n");
+
+kEventsManager::flushEvents();
+kMemoryManager::clearMemory();
