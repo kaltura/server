@@ -188,14 +188,6 @@ class kVendorCredit
 			}
 		}
 
-		$this->addAdditionalCriteria($c);
-
-		$stmt = EntryVendorTaskPeer::doSelectStmt($c);
-		$row = $stmt->fetch(PDO::FETCH_NUM);
-
-		$payPerUsePrice = $row[0] ? $row[0] : 0;
-		$totalPrice += $payPerUsePrice;
-
 		if($totalPrice)
 		{
 			$totalUsedCredit += $totalPrice;
