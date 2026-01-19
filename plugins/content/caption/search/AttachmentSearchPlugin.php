@@ -44,7 +44,8 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 			$accuracy = null;
 			$syncKey = $attachmentAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_ATTACHMENT_FILE_SIZE_FOR_INDEXING);
-			if(!$content){
+			if(!$content)
+			{
 				continue;
 			}
 
