@@ -64,7 +64,6 @@ class GroupUserService extends KalturaBaseService
 		$dbGroupUser->setGroupType($kgroup->getType());
 		$dbGroupUser->setStatus(KuserKgroupStatus::ACTIVE);
 		$dbGroupUser->save();
-
 		$groupUser->fromObject($dbGroupUser);
 
 		return $groupUser;
