@@ -59,4 +59,5 @@ interface BatchJobType extends BaseEnum
 	const STORAGE_PERIODIC_DELETE_LOCAL = 55;
 	const REACH_JOB_CLEANER = 56;
 	const MULTI_CLIP_CONCAT = 57;
+	const UPDATE_USER_ENTRIES = 58;
 }

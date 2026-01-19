@@ -2106,4 +2106,16 @@ class kJobsManager
 		}
 		return false;
 	}
+
+	public static function addUpdateUserEntriesJob($partnerId, $entryId, $oldUserEntryStatus, $newUserEntryStatus)
+	{
+		$data = new kUpdateUserEntriesData();
+		$data->setOldStatus($oldUserEntryStatus);
+		$data->setNewStatus($newUserEntryStatus);
+
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+		$batchJob->setEntryId($entryId);
+		return self::addJob($batchJob, $data, BatchJobType::UPDATE_USER_ENTRIES);
+	}
 }

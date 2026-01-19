@@ -223,13 +223,15 @@ class embedPlaykitJsAction extends sfAction
 			if ($this->getRequestParameter(self::EMBED_FACTORY_PARAM_NAME, false))
 			{
 				$configAsJson = $this->getPlayerConfigAsJson($i18nContent, $extraModulesNames);
-				$bundleContent = 'window.KalturaPlayers=(window.KalturaPlayers||{});' .
-								 "\nwindow.KalturaPlayers[$this->uiconfId]={};" .
-								 "\nwindow.KalturaPlayers[$this->uiconfId]['config'] = $configAsJson;" .
-								 "\nwindow.KalturaPlayers[$this->uiconfId]['lib'] = (() =>{
-								 	$bundleContentParts[1]
-									return KalturaPlayer;
-									})()";
+				$playerUniqueName = 'KalturaPlayer_'.$this->uiconfId;
+				//replace all instance names of global var KaLturaPlayer with unique name per uiconf
+				$dedicatedUiConfBundleContent = preg_replace('/\bKalturaPlayer\b/', $playerUniqueName ,$bundleContentParts[1]);
+				$bundleContent = " \n $dedicatedUiConfBundleContent;\n
+								 \nwindow.KalturaPlayers=(window.KalturaPlayers||{});
+								 \nwindow.KalturaPlayers[$this->uiconfId]={};
+								 \nwindow.KalturaPlayers[$this->uiconfId]['config'] = $configAsJson;
+								\nwindow.KalturaPlayers[{$this->uiconfId}]['lib'] = window.$playerUniqueName;\n
+								";
 			}
 		}
 

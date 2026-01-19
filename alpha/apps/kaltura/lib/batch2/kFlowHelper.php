@@ -25,6 +25,8 @@ class kFlowHelper
 
 	const DAYS = 'days';
 	const HOURS = 'hours';
+
+	const MAX_USER_ENTRIES_TO_RECYCLE = 50;
 	
 	
 	/**
@@ -341,7 +343,22 @@ class kFlowHelper
 				kJobsManager::addCapturaThumbJob($entryThumbnail->getPartnerId(), $entryThumbnail->getEntryId(), $entryThumbnail->getId(), $srcSyncKey, $flavorAsset->getId(), $srcAssetType, $thumbParamsOutput);
 			}
 		}
-		
+
+		$replacingEntry = $dbBatchJob->getEntry();
+		if ($replacingEntry &&
+			$replacingEntry->getIsTemporary() &&
+			kReplacementHelper::shouldSyncFlavorInfo($flavorAsset, $flavorAsset->getEntryId()))
+		{
+			try {
+				kReplacementHelper::copyReadyReplacingEntryAssetToReplacedEntry($flavorAsset);
+			} catch (PropelException $e)
+			{
+				$dbBatchJob->setStatus(BatchJob::BATCHJOB_STATUS_FAILED);
+				$dbBatchJob->setMessage("Failed to copy asset  " . $flavorAsset->getId() . " " . $e->getMessage());;
+				$dbBatchJob->save();
+			}
+		}
+
 		return $dbBatchJob;
 	}
 
@@ -3033,6 +3050,16 @@ class kFlowHelper
 		$userEntryCriteria->add(UserEntryPeer::ENTRY_ID, $entry->getId());
 		$userEntryCriteria->add(UserEntryPeer::STATUS, array($oldUserEntryStatus), Criteria::IN);
 		UserEntryPeer::setUseCriteriaFilter(false);
+
+		$userEntriesCount = UserEntryPeer::doCount($userEntryCriteria);
+		KalturaLog::info("Found $userEntriesCount user entries for entry id [{$entry->getId()}] with status [$oldUserEntryStatus] to update to status [$newUserEntryStatus]");
+		$groupLimit = kConf::get('recycle_bin_userentry_threshold', kConfMapNames::LOCAL_SETTINGS, self::MAX_USER_ENTRIES_TO_RECYCLE);
+		if ($groupLimit < $userEntriesCount)
+		{
+			kJobsManager::addUpdateUserEntriesJob($entry->getPartnerId(), $entry->getId(), $oldUserEntryStatus, $newUserEntryStatus);
+			return;
+		}
+
 		$userEntriesList = UserEntryPeer::doSelect($userEntryCriteria);
 		UserEntryPeer::setUseCriteriaFilter(true);
 		if (!$userEntriesList)

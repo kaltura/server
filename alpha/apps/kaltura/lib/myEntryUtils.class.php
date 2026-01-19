@@ -1577,6 +1577,19 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		return true;
 	}
 
+	private static function entryHasCaptions($entry)
+	{
+		$entryAssets = assetPeer::retrieveByEntryId($entry->getId());
+		foreach ($entryAssets as $entryAsset)
+		{
+			if ($entryAsset instanceof captionAsset)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @param entry $entry
 	 * @param Partner|null $toPartner
@@ -1731,10 +1744,11 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 			$newEntry->putInCustomData(QuizPlugin::QUIZ_DATA,$quizData);
 			$newEntry->addCapability(QuizPlugin::getCapabilityCoreValue());
 		}
-
-
-		$newEntry->setBlockAutoTranscript($copyCaptions);
-
+		// If we clone an entry with captions, we want to prevent auto-caption from ordering a new caption:
+		if (self::entryHasCaptions($entry))
+		{
+			$newEntry->setBlockAutoTranscript($copyCaptions);
+		}
 		// save the entry
  		$newEntry->save();
 
