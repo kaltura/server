@@ -98,9 +98,13 @@ class ESearchAttachmentItem extends ESearchNestedObjectItem
 		}
 
 		if($boolOperator == kESearchBoolQuery::MUST_KEY && !array_key_exists($this->getFieldName(), self::$field_boost_values))
+		{
 			$attachmentBoolQuery->addToFilter($query);
+		}
 		else
+		{
 			$attachmentBoolQuery->addByOperatorType($boolOperator, $query);
+		}
 	}
 
 	public function shouldAddLanguageSearch()

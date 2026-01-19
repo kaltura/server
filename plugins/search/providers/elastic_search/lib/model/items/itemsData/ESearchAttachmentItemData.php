@@ -189,10 +189,15 @@ class ESearchAttachmentItemData extends ESearchItemData
 		$this->setPageNumber($objectResult['_source']['page_number']);
 		$this->setFileName($objectResult['_source']['file_name']);
 		$this->setAssetId($objectResult['_source']['asset_id']);
-		if (isset($objectResult['_source']['accuracy']))
-			$this->setAccuracy($objectResult['_source']['accuracy']);
-		if (isset($objectResult['_source']['tags']))
-			$this->setTags($objectResult['_source']['tags']);
 
+		if (isset($objectResult['_source']['accuracy']))
+		{
+			$this->setAccuracy($objectResult['_source']['accuracy']);
+		}
+
+		if (isset($objectResult['_source']['tags']))
+		{
+			$this->setTags($objectResult['_source']['tags']);
+		}
 	}
 }

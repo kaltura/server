@@ -48,7 +48,8 @@ class mdAttachmentContentManager extends kAttachmentContentManager
 		{
 			$strippedPage = $this->stripMarkdown($page);
 
-			if (!empty($strippedPage)) {
+			if (!empty($strippedPage))
+			{
 				$itemsData[] = array(
 					'content' => array(array('text' => $strippedPage)),
 				);
@@ -104,6 +105,5 @@ class mdAttachmentContentManager extends kAttachmentContentManager
 		];
 		$text = preg_replace($patterns, $replacements, $text);
 		return strip_tags($text);
-
 	}
 }
