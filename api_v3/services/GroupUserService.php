@@ -57,7 +57,8 @@ class GroupUserService extends KalturaBaseService
 		if($kuserKgroup)
 			throw new KalturaAPIException (KalturaErrors::GROUP_USER_ALREADY_EXISTS);
 
-		// Rest of the existing logic...
+		$this->validateKuserkGroupCoExistence($kgroup, $kuser->getId());
+		$this->validateMaxGroupsPerUser($partnerId, $kuser->getId());
 		$dbGroupUser = $groupUser->toInsertableObject();
 		$dbGroupUser->setPartnerId($partnerId);
 		$dbGroupUser->setGroupType($kgroup->getType());
