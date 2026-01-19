@@ -323,7 +323,7 @@ class kZoomEventHanlder
 							                                 $recordingFile->recordingStart, $conversionProfileId);
 							if (!$parentEntry)
 							{
-								KalturaLog::debug("Another system is creating the parent entry, skipping drop folder file creation");
+								KalturaLog::debug("Another system (Watcher) is creating the parent entry, skipping drop folder file creation");
 								continue; // Skip this recording file
 							}
 							$zoomDropFolderFile->setIsParentEntry(true);
@@ -457,13 +457,13 @@ class kZoomEventHanlder
 		$templateEntry = null;
 		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
 		$defaultEntryId = $conversionProfile->getDefaultEntryId();
-		if ($defaultEntryId)
+		if($defaultEntryId)
 		{
 			$templateEntry = entryPeer::retrieveByPKNoFilter($defaultEntryId, null, false);
 		}
 
 		$newEntry = new entry();
-		if ($templateEntry)
+		if($templateEntry)
 		{
 			$newEntry->copyTemplate($templateEntry, true);
 		}
@@ -471,7 +471,7 @@ class kZoomEventHanlder
 		$newEntry->setType(entryType::MEDIA_CLIP);
 		$newEntry->setSourceType(EntrySourceType::URL);
 		$newEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime);
+		$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid. $recordingStartTime);
 		$newEntry->setStatus(entryStatus::NO_CONTENT);
 		$newEntry->setPartnerId($partnerId);
 		$newEntry->setBlockAutoTranscript($enableTranscriptionViaZoom);

@@ -349,7 +349,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		$entry = KBatchBase::$kClient->baseEntry->add($newEntry);
 		KBatchBase::unimpersonate();
 		return $entry;
-
 	}
 
 	protected function updateDropFolderLastMeetingHandled($lastHandledMeetingTime)
