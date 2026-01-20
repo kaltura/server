@@ -21,6 +21,11 @@ class playManifestAction extends kalturaAction
 	const ENTRY_TYPE_VOD = 'vod';
 	const ENTRY_TYPE_LIVE = 'live';
 
+	const HEADER = 'header';
+	const URL_PARAM = 'url param';
+	const KS_HEADER = 'X-Kaltura-Ks';
+	const ks = 'ks';
+
 	/**
 	 * When this list start to contain plugins - 
 	 * conside moving it to either kConf or as a function on the enum.
@@ -176,7 +181,20 @@ class playManifestAction extends kalturaAction
 		}
 		
 		// initalize the context
-		$ksStr = $this->getRequestParameter("ks");
+		$ksHeader = $this->getRequest()->getHttpHeader(self::KS_HEADER);
+		$ksStr	= $this->getRequestParameter(self::ks);
+		$ksSource = self::URL_PARAM;
+		if ($ksHeader)
+		{
+			$ksStr = $ksHeader;
+			$ksSource = self::HEADER;
+		}
+
+		if ($ksStr)
+		{
+			KalturaLog::log("KS provided by [$ksSource]");
+		}
+
 		if($ksStr && !$urlToken)
 		{
 			try 
