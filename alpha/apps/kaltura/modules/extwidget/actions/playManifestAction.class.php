@@ -24,7 +24,7 @@ class playManifestAction extends kalturaAction
 	const HEADER = 'header';
 	const URL_PARAM = 'url param';
 	const KS_HEADER = 'X-Kaltura-Ks';
-	const ks = 'ks';
+
 
 	/**
 	 * When this list start to contain plugins - 
@@ -182,7 +182,7 @@ class playManifestAction extends kalturaAction
 		
 		// initalize the context
 		$ksHeader = $this->getRequest()->getHttpHeader(self::KS_HEADER);
-		$ksStr	= $this->getRequestParameter(self::ks);
+		$ksStr	= $this->getRequestParameter("ks");
 		$ksSource = self::URL_PARAM;
 		if ($ksHeader)
 		{
