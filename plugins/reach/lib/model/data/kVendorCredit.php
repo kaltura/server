@@ -155,37 +155,35 @@ class kVendorCredit
 		$totalPrice = 0;
 		$syncStartDate = $this->getSyncCreditStartDate();
 
-		// Get all tasks that might need to be counted
-		$c = new Criteria();
-		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId, Criteria::EQUAL);
-		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
-		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		// Query 1: For pay-per-use tasks (filter by finish_time)
+		$payPerUseC = new Criteria();
+		$payPerUseC->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId, Criteria::EQUAL);
+		$payPerUseC->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$payPerUseC->add(EntryVendorTaskPeer::STATUS, EntryVendorTaskStatus::READY, Criteria::EQUAL);
+		$payPerUseC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		$payPerUseC->add(EntryVendorTaskPeer::FINISH_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
+		$payPerUseC->add(EntryVendorTaskPeer::CUSTOM_DATA, '%"isPayPerUse";b:1%', Criteria::LIKE);
 
-		// We'll need to retrieve the actual objects to check the custom data
-		$entryVendorTasks = EntryVendorTaskPeer::doSelect($c);
+		$payPerUseTasks = EntryVendorTaskPeer::doSelect($payPerUseC);
 
-		// Process each task according to its type (pay-per-use vs regular)
-		foreach ($entryVendorTasks as $task)
-		{
-			/* @var $task EntryVendorTask */
-			if ($task->getIsPayPerUse())
-			{
-				// For pay-per-use tasks, check if finish_time is >= syncStartDate
-				if ($task->getStatus() == EntryVendorTaskStatus::READY &&
-					$task->getFinishTime() >= $syncStartDate)
-				{
-					$totalPrice += $task->getPrice();
-				}
-			}
-			else
-			{
-				// For regular tasks, check if queue_time is >= syncStartDate
-				if ($task->getQueueTime() >= $syncStartDate)
-				{
-					$totalPrice += $task->getPrice();
-				}
-			}
+		// Query 2: For non-pay-per-use tasks (filter by queue_time)
+		$regularC = new Criteria();
+		$regularC->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId, Criteria::EQUAL);
+		$regularC->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$regularC->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
+		$regularC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		$regularC->add(EntryVendorTaskPeer::QUEUE_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
+		$regularC->add(EntryVendorTaskPeer::CUSTOM_DATA, '%"isPayPerUse";b:0%', Criteria::LIKE);
+
+		$regularTasks = EntryVendorTaskPeer::doSelect($regularC);
+
+		// Calculate total price from both sets of tasks
+		foreach ($payPerUseTasks as $task) {
+			$totalPrice += $task->getPrice();
+		}
+
+		foreach ($regularTasks as $task) {
+			$totalPrice += $task->getPrice();
 		}
 
 		if($totalPrice)
