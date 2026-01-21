@@ -178,7 +178,7 @@ class playManifestAction extends kalturaAction
 		}
 		
 		// initalize the context
-		$ksStr	= $this->getRequestParameter("ks");
+		$ksStr = $this->getRequestParameter("ks");
 		$ksHeader = $this->getRequest()->getHttpHeader(self::KS_HEADER);
 		if ($ksHeader)
 		{
