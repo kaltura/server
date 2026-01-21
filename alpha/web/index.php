@@ -2,7 +2,7 @@
 if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
 {
 	header('Access-Control-Allow-Origin: *');
-	header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Range, Cache-Control,X-Kaltura-Ks');
+	header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Range, Cache-Control, X-Kaltura-Ks');
 	header('Access-Control-Allow-Methods: POST, GET, HEAD, OPTIONS');
 	header('Access-Control-Expose-Headers: Server, Content-Length, Content-Range, Date, Cache-Control, Content-Encoding');
 	exit;
