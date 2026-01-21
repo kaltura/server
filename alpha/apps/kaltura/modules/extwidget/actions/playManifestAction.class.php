@@ -21,10 +21,7 @@ class playManifestAction extends kalturaAction
 	const ENTRY_TYPE_VOD = 'vod';
 	const ENTRY_TYPE_LIVE = 'live';
 
-	const HEADER = 'header';
-	const URL_PARAM = 'url param';
 	const KS_HEADER = 'X-Kaltura-Ks';
-
 
 	/**
 	 * When this list start to contain plugins - 
@@ -181,18 +178,16 @@ class playManifestAction extends kalturaAction
 		}
 		
 		// initalize the context
-		$ksHeader = $this->getRequest()->getHttpHeader(self::KS_HEADER);
 		$ksStr	= $this->getRequestParameter("ks");
-		$ksSource = self::URL_PARAM;
+		$ksHeader = $this->getRequest()->getHttpHeader(self::KS_HEADER);
 		if ($ksHeader)
 		{
 			$ksStr = $ksHeader;
-			$ksSource = self::HEADER;
 		}
 
 		if ($ksStr)
 		{
-			KalturaLog::log("KS provided by [$ksSource]");
+			KalturaLog::log("KS received: " . $ksStr);
 		}
 
 		if($ksStr && !$urlToken)
