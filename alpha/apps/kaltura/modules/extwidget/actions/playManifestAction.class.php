@@ -183,10 +183,6 @@ class playManifestAction extends kalturaAction
 		if ($ksHeader)
 		{
 			$ksStr = $ksHeader;
-		}
-
-		if ($ksStr)
-		{
 			KalturaLog::log("KS received: " . $ksStr);
 		}
 
