@@ -15,7 +15,7 @@ class VendorVideoAnalysisCatalogItem extends VendorCatalogItem
 
 	public function isDuplicateTask($entryId, $entryObjectType, $partnerId): bool
 	{
-		return false;
+		return parent::isDuplicateTask($entryId, $entryObjectType, $partnerId);
 	}
 
 	public function isEntryTypeSupported($type, $mediaType = null): bool
