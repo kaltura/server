@@ -12,10 +12,8 @@ if (is_file($argv[1])) {
 	$groupIds = file($argv[1]) or die (' Error: cannot open file at: "' . $argv[1] . '"' . PHP_EOL);
 } elseif (strpos($argv[1], ',')) {
 	$groupIds = explode(',', $argv[1]);
-} elseif (strpos($argv[1], '_')) {
-	$groupIds[] = $argv[1];
 } else {
-	die (' Error: invalid input supplied at: "' . $argv[1] . '"' . PHP_EOL);
+	$groupIds[] = array($argv[1]);
 }
 
 $dryRun = true;
