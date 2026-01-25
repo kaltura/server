@@ -1145,7 +1145,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 					$data2 = str_replace('<EndTransition type', '<EndTransition cross="0" type', $content);
 					return $data2;
 				}
-				$content = json_encode($content);
+				
 				return $content;
 			}
 		}
