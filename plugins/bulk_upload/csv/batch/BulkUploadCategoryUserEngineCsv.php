@@ -103,14 +103,21 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
 			$bulkUploadResult->errorDescription = "Wrong value passed for property status.";
 	    }
-	    		
+
 		if ($bulkUploadResult->permissionLevel && !$this->isValidEnumValue('KalturaCategoryUserPermissionLevel', $bulkUploadResult->permissionLevel))
 	    {
 	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
 			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
 			$bulkUploadResult->errorDescription = "Wrong value passed for property permissionLevel.";
 	    }
-	    		
+
+		if ($bulkUploadResult->permissionLevel && $bulkUploadResult->permissionLevel == KalturaCategoryUserPermissionLevel::NONE)
+		{
+			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "NONE permission (4) level is not allowed. Users without permissions should not be added to categories. Use allowed permission value";
+		}
+
 		if ($bulkUploadResult->updateMethod && !$this->isValidEnumValue('KalturaUpdateMethodType', $bulkUploadResult->updateMethod))
 	    {
 	        $bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
