@@ -322,13 +322,13 @@ class kBusinessPostConvertDL
     			{
     				kFlowHelper::handleStaticContent($entry);
     			}
-    			
-			if( self::shouldUpdateEntry($entry, $currentFlavorAsset, $currentReadyBehavior ))
-			{
-				kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
-			}	
+				
+				if( self::shouldUpdateEntry($entry, $currentFlavorAsset, $currentReadyBehavior ))
+				{
+					kBatchManager::updateEntry($currentFlavorAsset->getEntryId(), entryStatus::READY);
+				}	
                         
-			// mark the context root job as finished only if all conversion jobs are completed
+				// mark the context root job as finished only if all conversion jobs are completed
     			if($rootBatchJob && $rootBatchJob->getJobType() == BatchJobType::CONVERT_PROFILE)
     				kJobsManager::updateBatchJob($rootBatchJob, BatchJob::BATCHJOB_STATUS_FINISHED);
 			}
