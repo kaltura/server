@@ -1504,4 +1504,28 @@ HTML;
 		return false;
 	}
 
+	/**
+	 * @param KalturaPlaylist $playlist
+	 * @param entry $dbPlaylist
+	 * @return void
+	 * @throws KalturaAPIException
+	 */
+	public static function validateDataContent(KalturaPlaylist $playlist, entry $dbPlaylist)
+	{
+		$typesToValidate = array(PlaylistType::STATIC_LIST, PlaylistType::PATH);
+		if ($playlist->playlistContent == null || !in_array($dbPlaylist->getMediaType(), $typesToValidate))
+		{
+			return;
+		}
+
+		$entryIdsList = explode(',', $playlist->playlistContent);
+		foreach ($entryIdsList as $entryId)
+		{
+			$trimmedEntryId = preg_replace('/null/', '', trim($entryId));
+			if ($trimmedEntryId)
+			{
+				self::validatePlaylistInnerEntry($trimmedEntryId);
+			}
+		}
+	}
 }
