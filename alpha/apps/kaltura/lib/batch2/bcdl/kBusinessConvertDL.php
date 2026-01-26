@@ -21,15 +21,7 @@ class kBusinessConvertDL
 			KalturaLog::err("Temp entry id [" . $replacedEntry->getReplacingEntryId() . "] not found");
 			return;
 		}
-
-		$lockName = 'replacement_' . $replacedEntry->getId() . '_' . $replacingEntry->getId();
-		$lock = kLock::create($lockName);
-		if ($lock && !$lock->lock())
-		{
-			KalturaLog::debug('Could not lock ' . $lockName);
-			return;
-		}
-
+		
 		if($replacingEntry->getSyncFlavorsOnceReady())
 		{
 			KalturaLog::debug('Function already ran from a different process for replacedEntry: ' . $replacedEntry->getId() . ' replacing Entry: ' . $replacingEntry->getId());
@@ -54,11 +46,6 @@ class kBusinessConvertDL
 
 		$allReadyAssets = assetPeer::retrieveByIds(array_merge($existingReadyAssetIds, $nonExistingReadyAssetIds));
 		kReplacementHelper::exportReadyReplacedFlavors($replacedEntry->getPartnerId(), $replacingEntry->getId(), $allReadyAssets);
-
-		if($lock)
-		{
-			$lock->unlock();
-		}
 
 		//flush deffered events to re-index sphinx before temp entry deletion
 		kEventsManager::flushEvents();
