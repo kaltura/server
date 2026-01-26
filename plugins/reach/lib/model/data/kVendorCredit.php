@@ -158,7 +158,6 @@ class kVendorCredit
 		$queueC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
 		$queueC->add(EntryVendorTaskPeer::STATUS, [EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY], Criteria::IN);
 		$queueC->add(EntryVendorTaskPeer::QUEUE_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
-		$queueC->add(EntryVendorTaskPeer::FINISH_TIME, null, Criteria::ISNULL);
 
 		$queueTasks = EntryVendorTaskPeer::doSelect($queueC);
 
