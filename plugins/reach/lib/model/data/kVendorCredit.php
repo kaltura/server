@@ -151,42 +151,48 @@ class kVendorCredit
 	public function syncCredit($reachProfileId, $partnerId)
 	{
 		$now = time();
-		$totalUsedCredit = $this->getSyncedCredit();
-		$totalPrice = 0;
 		$syncStartDate = $this->getSyncCreditStartDate();
 
-		// Query 1: For pay-per-use tasks (filter by finish_time)
-		$payPerUseC = new Criteria();
-		$payPerUseC->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId, Criteria::EQUAL);
-		$payPerUseC->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$payPerUseC->add(EntryVendorTaskPeer::STATUS, EntryVendorTaskStatus::READY, Criteria::EQUAL);
-		$payPerUseC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
-		$payPerUseC->add(EntryVendorTaskPeer::FINISH_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
-		$payPerUseC->add(EntryVendorTaskPeer::CUSTOM_DATA, '%"isPayPerUse";b:1%', Criteria::LIKE);
+		$totalUsedCredit = $this->getSyncedCredit();
+		$totalPrice = 0;
 
-		$payPerUseTasks = EntryVendorTaskPeer::doSelect($payPerUseC);
+		$c = new Criteria();
+		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
+		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		$c->add(
+			EntryVendorTaskPeer::STATUS,
+			[
+				EntryVendorTaskStatus::PENDING,
+				EntryVendorTaskStatus::PROCESSING,
+				EntryVendorTaskStatus::READY,
+			],
+			Criteria::IN
+		);
+		$c->add(
+			EntryVendorTaskPeer::QUEUE_TIME,
+			$syncStartDate,
+			Criteria::GREATER_EQUAL
+		);
 
-		// Query 2: For non-pay-per-use tasks (filter by queue_time)
-		$regularC = new Criteria();
-		$regularC->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId, Criteria::EQUAL);
-		$regularC->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$regularC->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
-		$regularC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
-		$regularC->add(EntryVendorTaskPeer::QUEUE_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
-		$regularC->add(EntryVendorTaskPeer::CUSTOM_DATA, '%"isPayPerUse";b:0%', Criteria::LIKE);
+		$tasks = EntryVendorTaskPeer::doSelect($c);
 
-		$regularTasks = EntryVendorTaskPeer::doSelect($regularC);
-
-		// Calculate total price from both sets of tasks
-		foreach ($payPerUseTasks as $task) {
-			$totalPrice += $task->getPrice();
+		foreach ($tasks as $task)
+		{
+			if ($task->getIsPayPerUse())
+			{
+				if ($task->getFinishTime() && $task->getFinishTime() >= $syncStartDate)
+				{
+					$totalPrice += $task->getPrice();
+				}
+			}
+			else
+			{
+				$totalPrice += $task->getPrice();
+			}
 		}
 
-		foreach ($regularTasks as $task) {
-			$totalPrice += $task->getPrice();
-		}
-
-		if($totalPrice)
+		if ($totalPrice)
 		{
 			$totalUsedCredit += $totalPrice;
 		}
@@ -196,6 +202,7 @@ class kVendorCredit
 
 		return $totalUsedCredit;
 	}
+
 
 	/***
 	 * @param $includeOverages should return current credit including overageCredit info or not (Default is true)
