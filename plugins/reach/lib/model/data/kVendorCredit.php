@@ -143,11 +143,6 @@ class kVendorCredit
 	{
 	}
 
-	public function isSynced()
-	{
-		return (intval(time() / 86400) == (intval($this->lastSyncTime / 86400)));
-	}
-
 	public function syncCredit($reachProfileId, $partnerId)
 	{
 		$now = time();
@@ -156,37 +151,38 @@ class kVendorCredit
 		$totalUsedCredit = $this->getSyncedCredit();
 		$totalPrice = 0;
 
-		$c = new Criteria();
-		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
-		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
-		$c->add(
-			EntryVendorTaskPeer::STATUS,
-			[
-				EntryVendorTaskStatus::PENDING,
-				EntryVendorTaskStatus::PROCESSING,
-				EntryVendorTaskStatus::READY,
-			],
-			Criteria::IN
-		);
-		$c->add(
-			EntryVendorTaskPeer::QUEUE_TIME,
-			$syncStartDate,
-			Criteria::GREATER_EQUAL
-		);
+		/* Query 1: Queue-based (non PPU) */
+		$queueC = new Criteria();
+		$queueC->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
+		$queueC->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$queueC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		$queueC->add(EntryVendorTaskPeer::STATUS, [EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY], Criteria::IN);
+		$queueC->add(EntryVendorTaskPeer::QUEUE_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
+		$queueC->add(EntryVendorTaskPeer::FINISH_TIME, null, Criteria::ISNULL);
 
-		$tasks = EntryVendorTaskPeer::doSelect($c);
+		$queueTasks = EntryVendorTaskPeer::doSelect($queueC);
 
-		foreach ($tasks as $task)
+		foreach ($queueTasks as $task)
+		{
+			if (!$task->getIsPayPerUse())
+			{
+				$totalPrice += $task->getPrice();
+			}
+		}
+
+		/* Query 2: Finish-based (PPU) */
+		$finishC = new Criteria();
+		$finishC->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
+		$finishC->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$finishC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		$finishC->add(EntryVendorTaskPeer::STATUS, EntryVendorTaskStatus::READY);
+		$finishC->add(EntryVendorTaskPeer::FINISH_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
+
+		$finishedTasks = EntryVendorTaskPeer::doSelect($finishC);
+
+		foreach ($finishedTasks as $task)
 		{
 			if ($task->getIsPayPerUse())
-			{
-				if ($task->getFinishTime() && $task->getFinishTime() >= $syncStartDate)
-				{
-					$totalPrice += $task->getPrice();
-				}
-			}
-			else
 			{
 				$totalPrice += $task->getPrice();
 			}
