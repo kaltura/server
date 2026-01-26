@@ -43,7 +43,7 @@ class GroupUserService extends KalturaBaseService
 			throw new KalturaAPIException ( KalturaErrors::GROUP_NOT_FOUND, $groupUser->userId );
 		}
 
-		$lockKey = 'groupUser_add_' . $partnerId . '_' . $groupUser->groupId . '_' . md5($groupUser->userId);
+		$lockKey = 'groupUser_add_' . $partnerId . '_' . md5($groupUser->groupId . '_' . $groupUser->userId);
 		return kLock::runLocked($lockKey, array($this, 'addGroupUserImpl'), array($groupUser, $partnerId, $kuser, $kgroup));
 	}
 
