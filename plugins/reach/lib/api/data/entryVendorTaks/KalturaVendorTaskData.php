@@ -6,19 +6,19 @@
  */
 abstract class KalturaVendorTaskData extends KalturaObject implements IApiObjectFactory
 {
-	
+
 	/**
 	 * The duration of the entry for which the task was created for in milliseconds
 	 * @var int
 	 * @readonly
 	 */
 	public $entryDuration;
-	
+
 	private static $map_between_objects = array
 	(
 		'entryDuration',
 	);
-	
+
 	/* (non-PHPdoc)
 	 * @see KalturaCuePoint::getMapBetweenObjects()
 	 */
@@ -26,7 +26,7 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 	{
 		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
 	}
-	
+
 	/* (non-PHPdoc)
  	 * @see KalturaObject::toObject($object_to_fill, $props_to_skip)
  	 */
@@ -36,10 +36,10 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 		{
 			$dbObject = new kVendorTaskData();
 		}
-		
+
 		return parent::toObject($dbObject, $propsToSkip);
 	}
-	
+
 	/* (non-PHPdoc)
  	 * @see IApiObjectFactory::getInstance($sourceObject, KalturaDetachedResponseProfile $responseProfile)
  	 */
@@ -84,12 +84,16 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 			case 'kMetadataEnrichmentVendorTaskData':
 				$taskData = new KalturaMetadataEnrichmentVendorTaskData();
 				break;
+
+			case 'kSpeechToVideoVendorTaskData':
+				$taskData = new KalturaSpeechToVideoVendorTaskData();
+				break;
 		}
-		
+
 		if ($taskData)
 			/* @var $object KalturaVendorTaskData */
 			$taskData->fromObject($sourceObject, $responseProfile);
-		
+
 		return $taskData;
 	}
 

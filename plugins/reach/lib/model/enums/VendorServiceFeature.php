@@ -2,7 +2,7 @@
 /**
  * @package plugins.reach
  * @subpackage model.enum
- */ 
+ */
 interface VendorServiceFeature extends BaseEnum
 {
 	const CAPTIONS                        = 1;
@@ -24,4 +24,5 @@ interface VendorServiceFeature extends BaseEnum
 	const SENTIMENT_ANALYSIS              = 17;
 	const DOCUMENT_ENRICHMENT             = 18;
 	const SIGN_LANGUAGE          		  = 19;
+	const SPEECH_TO_VIDEO          		  = 20;
 }
