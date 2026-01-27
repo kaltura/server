@@ -143,6 +143,11 @@ class kVendorCredit
 	{
 	}
 
+	public function isSynced()
+	{
+		return (intval(time() / 86400) == (intval($this->lastSyncTime / 86400)));
+	}
+
 	public function syncCredit($reachProfileId, $partnerId)
 	{
 		$now = time();
