@@ -2,17 +2,6 @@
 
 require_once (__DIR__ . '/../../bootstrap.php');
 
-define("DEBUG", "debug");
-define("EXECUTE", "execute");
-
-//Debug mode iis set for testing only will be removed for final version
-if(count($argv) < 2)
-	die("Usage: 2026_01_27_update_AD_flavor_params_tags.php @execution_mode(debug|execute)@\n");
-
-$executionMode = $argv[1];
-if(!in_array($executionMode, array("debug", "execute")))
-	die("Usage: 2026_01_27_update_AD_flavor_params_tags.php @execution_mode(debug|execute)@, invalid execution mode\n");
-
 function getAudioDescriptionFlavorParams()
 {
 	$c = new Criteria();
@@ -37,12 +26,8 @@ foreach ($audioDescriptionFlavorParams as $flavorParam)
 	$currentTags = array_unique($currentTags);
 	KalturaLog::debug("New asset tags are: " . print_r($currentTags, true));
 
-	if($executionMode == DEBUG)
-		continue;
-
 	$flavorParam->setTags(implode(",", $currentTags));
 	$flavorParam->save();
 }
-
 
 KalturaLog::debug("Done flavor params update");
