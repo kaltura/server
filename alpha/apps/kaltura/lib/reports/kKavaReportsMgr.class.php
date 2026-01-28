@@ -6905,7 +6905,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			return;
 		}
-		$metrics_count = count($result[0]) - 1;
+		$metrics_count = max(count($result[0]) - 1, 0);
 		$empty_values = array_fill(0, $metrics_count, 0);
 
 		$data = $result[1];
