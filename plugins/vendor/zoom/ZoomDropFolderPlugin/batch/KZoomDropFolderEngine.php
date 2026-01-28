@@ -280,11 +280,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID],
 									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START], $userId);
-									if (!$parentEntry)
-									{
-										KalturaLog::debug("Another system (ZOOM EVENT) is creating the parent entry, skipping drop folder file creation");
-										continue; // Skip this recording file
-									}
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 								}
 							}
@@ -323,18 +318,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId)
 	{
-		if (empty($recordingStartTime))
-		{
-			throw new kCoreException("Recording start time is null or empty for UUID: {$uuid}");
-		}
-		$lockKey = $uuid . '_' . $recordingStartTime;
-		$resourceReservation = new kResourceReservation(kZoomRecordingProcessor::ZOOM_LOCK_TTL, true);
-		if(!$resourceReservation->reserve($lockKey))
-		{
-			KalturaLog::debug("Entry creation for {$lockKey} is being processed by another system");
-			return null; // Let the other system (Event) handle it
-		}
-
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
