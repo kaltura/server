@@ -185,20 +185,45 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
 		if($data->sslCertificate)
 		{
-			if($data->sslCertificateType == KalturaHttpNotificationCertificateType::PEM)
-				$curlWrapper->setOpt( CURLOPT_SSLCERT, $data->sslCertificate);
+			$tempCertFile = tempnam($this->tempFolderPath, 'cert_');
+
+			if ($tempCertFile)
+			{
+				file_put_contents($tempCertFile, $data->sslCertificate);
+
+				if($data->sslCertificateType == KalturaHttpNotificationCertificateType::PEM)
+				{
+					$curlWrapper->setOpt(CURLOPT_SSLCERT, $tempCertFile);
+				}
+				else
+				{
+					$curlWrapper->setOpt(CURLOPT_CAINFO, $tempCertFile);
+					$curlWrapper->setOpt(CURLOPT_SSL_VERIFYPEER, true);
+				}
+			}
 			else
 			{
-				$curlWrapper->setOpt( CURLOPT_CAINFO, $data->sslCertificate);
-				$curlWrapper->setOpt( CURLOPT_SSL_VERIFYPEER, true);
+				KalturaLog::err("Failed to create temporary file for SSL certificate");
+			}
+		}
+
+		if ($data->sslKey)
+		{
+			$tempKeyFile = tempnam($this->tempFolderPath, 'key_');
+
+			if ($tempKeyFile)
+			{
+				file_put_contents($tempKeyFile, $data->sslKey);
+				$curlWrapper->setOpt(CURLOPT_SSLKEY, $tempKeyFile);
+			}
+			else
+			{
+				KalturaLog::err("Failed to create temporary file for SSL key");
 			}
 		}
 
 		if($data->username || $data->password)
 			$curlWrapper->setOpt( CURLOPT_USERPWD, $data->username . ':' . $data->password);
-
-		if($data->sslKey)
-			$curlWrapper->setOpt( CURLOPT_SSLKEY, $data->sslKey);
 
 		if($data->sslKeyType)
 			$curlWrapper->setOpt( CURLOPT_SSLKEYTYPE, $data->sslKeyType);
@@ -216,6 +241,16 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		$body = strip_tags(substr($results, $header_size));
 
 		$curlWrapper->close();
+
+		if (isset($tempCertFile) && $tempCertFile && file_exists($tempCertFile))
+		{
+			unlink($tempCertFile);
+		}
+
+		if (isset($tempKeyFile) && $tempKeyFile && file_exists($tempKeyFile))
+		{
+			unlink($tempKeyFile);
+		}
 
 		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results] Headers [$headers] Body [$body]");
 		if(!$results || !in_array($httpCode, array(KCurlHeaderResponse::HTTP_STATUS_OK, KCurlHeaderResponse::HTTP_STATUS_NO_CONTENT)))

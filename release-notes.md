@@ -1,3 +1,12 @@
+# Venus-22.12.0
+## Add 'dash' tag to  audio description flavor params ##
+- Issue Type: Task
+- Issue ID: SUP-51159
+
+### Deployment Scripts ###
+
+    php deployment/updates/scripts/2026_01_27_update_audio_description_flavor_params_tags.php
+
 # Venus-22.10.0
 ## Add user entries update batch ##
 - Issue Type: Task

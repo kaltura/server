@@ -859,8 +859,9 @@ class kFlowManager implements kBatchJobStatusEventConsumer, kObjectAddedEventCon
 			KalturaLog::err("Real entry id [" . $object->getReplacedEntryId() . "] not found");
 			return true;
 		}
-		
-		kBusinessConvertDL::replaceEntry($entry, $object);
+
+		$lockKey = 'replaceEntry' . $entry->getId() . '_' . $object->getId();
+		kLock::runLocked($lockKey, array('kBusinessConvertDL', 'replaceEntry'), array($entry,$object));
 		return true;
 	}
 	
