@@ -41,7 +41,6 @@ class EntryVendorTaskService extends KalturaBaseService
 
 		if($dbVendorCatalogItem->requiresPayment())
 		{
-			$unitsUsed = kReachUtils::getPricingUnits($dbVendorCatalogItem, $entryObject, $entryObjectType, $taskJobData, $unitsUsed);
 			$this->validateEntryVendorTaskPayment($entryId, $entryObjectType, $dbVendorCatalogItem, $entryObject, $dbReachProfile, $unitsUsed);
 		}
 
@@ -82,6 +81,11 @@ class EntryVendorTaskService extends KalturaBaseService
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($vendorCatalogItemId);
 		$dbTaskData = $entryVendorTask->taskJobData ? $entryVendorTask->taskJobData->toObject() : null;
 		$unitsUsed = $entryVendorTask->unitsUsed;
+
+		if($dbVendorCatalogItem->requiresPayment())
+		{
+			$unitsUsed = kReachUtils::getPricingUnits($dbVendorCatalogItem, $entryObject, $entryVendorTask->entryObjectType, $dbTaskData, $unitsUsed);
+		}
 
 		$this->validateEntryVendorTask($entryObject, $dbVendorCatalogItem, $dbReachProfile, $vendorTaskObjectHandler, $entryVendorTask->entryObjectType,  $unitsUsed, $dbTaskData);
 
