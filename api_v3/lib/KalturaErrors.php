@@ -857,5 +857,10 @@ class KalturaErrors extends APIErrors
 	const INVALID_APP_GUID = "INVALID_APP_GUID;APP_GUID;App GUID [\"@APP_GUID@\"] is not a valid Mongo DB Object ID";
 	const APP_GUID_NOT_FOUND = "APP_GUID_NOT_FOUND;APP_GUID;App GUID [\"@APP_GUID@\"] not found";
 	const MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE = "MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE;;Must filter on at least 'users' or 'appGuid' or 'userRole'";
-}
 
+	/*
+	 * Shortlink service
+	 */
+	const INVALID_SHORT_LINK = "INVALID_SHORT_LINK;ID;Invalid short link [@ID@]";
+	const EXPIRED_SHORT_LINK = "EXPIRED_SHORT_LINK;ID;Expired short link [@ID@]";
+}

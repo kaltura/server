@@ -172,6 +172,8 @@ class ShortLinkService extends KalturaBaseService
 	 * @ksIgnored
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INVALID_SHORT_LINK
+	 * @throws KalturaErrors::EXPIRED_SHORT_LINK
 	 */		
 	function gotoAction($id, $proxy = false)
 	{
@@ -180,10 +182,27 @@ class ShortLinkService extends KalturaBaseService
 		$dbShortLink = ShortLinkPeer::retrieveByPK($id);
 	
 		if (!$dbShortLink)
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		}
 
-		if($proxy)
+		$status = $dbShortLink->getStatus();
+		$expiryTime = $dbShortLink->getExpiresAt();
+
+		if ($status == KalturaShortLinkStatus::DELETED || $status == KalturaShortLinkStatus::DISABLED)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_SHORT_LINK, $id);
+		}
+
+		if ($expiryTime && strtotime($expiryTime) < time())
+		{
+			throw new KalturaAPIException(KalturaErrors::EXPIRED_SHORT_LINK, $id);
+		}
+
+		if ($proxy)
+		{
 			kFileUtils::dumpUrl($dbShortLink->getFullUrl(), true, true);
+		}
 		
 		header('Location: ' . $dbShortLink->getFullUrl());
 		die;
