@@ -851,7 +851,62 @@
 						}
 					}
 				},
-				"metadata" :{
+                "attachment_assets":   {
+                  "type": "nested",
+                  "properties": {
+                    "content": {
+                      "type": "text",
+                      "analyzer": "kaltura_text",
+                      "fields": {
+                        "ngrams": {
+                          "type": "text",
+                          "analyzer": "kaltura_ngrams"
+                        },
+                        "raw": {
+                          "type": "keyword",
+                          "normalizer": "kaltura_keyword_normalizer"
+                        }
+                      }
+                    },
+                    "attachment_asset_id": {
+                      "type": "keyword",
+                      "normalizer": "kaltura_keyword_normalizer"
+                    },
+                    "page_number": {
+                      "type": "integer"
+                    },
+                    "file_name": {
+                      "type": "keyword",
+                      "normalizer": "kaltura_keyword_normalizer"
+                    },
+                    "attachment_tags": {
+                      "type": "text",
+                      "analyzer": "kaltura_text",
+                      "fields": {
+                        "ngrams": {
+                          "type": "text",
+                          "analyzer": "kaltura_ngrams"
+                        },
+                        "raw": {
+                          "type": "keyword",
+                          "normalizer": "kaltura_keyword_normalizer"
+                        }
+                      }
+                    },
+                    "accuracy": {
+                      "type": "integer"
+                    },
+                    "asset_type": {
+                      "type": "keyword",
+                      "normalizer": "kaltura_keyword_normalizer"
+                    },
+                    "asset_sub_type" : {
+                      "type": "keyword",
+                      "normalizer": "kaltura_keyword_normalizer"
+                    }
+                  }
+                },
+                "metadata" :{
 					"type"  : "nested",
 					"properties"  : {
 						"metadata_id" : {

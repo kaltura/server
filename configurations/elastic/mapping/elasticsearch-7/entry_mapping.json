@@ -863,7 +863,7 @@
                     }
                   }
                 },
-                "asset_id": {
+                "attachment_asset_id": {
                   "type": "keyword",
                   "normalizer": "kaltura_keyword_normalizer"
                 },
@@ -874,7 +874,7 @@
                   "type": "keyword",
                   "normalizer": "kaltura_keyword_normalizer"
                 },
-                "tags": {
+                "attachment_tags": {
                   "type": "text",
                   "analyzer": "kaltura_text",
                   "fields": {
