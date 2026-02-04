@@ -38,8 +38,22 @@ class ShortLinkService extends KalturaBaseService
 	function listAction(KalturaShortLinkFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaShortLinkFilter;
-			
+		}
+
+		if (!kCurrentContext::$is_admin_session)
+		{
+			$puser = kCurrentContext::$ks_uid;
+
+			if ($filter->userIdEqual !== null && $puser !== $filter->userIdEqual)
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_RETRIEVE_ANOTHER_USER_USING_NON_ADMIN_SESSION, $filter->userIdEqual);
+			}
+
+			$filter->userIdEqual = $puser;
+		}
+
 		$shortLinkFilter = $filter->toFilter($this->getPartnerId());
 		
 		$c = new Criteria();
@@ -47,7 +61,10 @@ class ShortLinkService extends KalturaBaseService
 		$count = ShortLinkPeer::doCount($c);
 		
 		if (! $pager)
+		{
 			$pager = new KalturaFilterPager ();
+		}
+
 		$pager->attachToCriteria ( $c );
 		$list = ShortLinkPeer::doSelect($c);
 		
