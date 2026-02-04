@@ -36,12 +36,17 @@ class mdAttachmentContentManager extends kAttachmentContentManager
 
 	public function parse($content)
 	{
-		$itemsData =  $this->parseMarkdown($content);
+		$itemsData = $this->parseMarkdown($content);
 		return $itemsData;
 	}
 
 	public function parseMarkdown($content)
 	{
+		if (empty($content))
+		{
+			return array();
+		}
+
 		$pages = preg_split(self::PAGE_BREAK_REGEX, $content);
 		$itemsData = array();
 		foreach ($pages as $page)

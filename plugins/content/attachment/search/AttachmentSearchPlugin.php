@@ -8,8 +8,10 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 
 	public static function getElasticSearchData(BaseObject $object)
 	{
-		if($object instanceof entry && self::isAllowedPartner($object->getPartnerId()))
+		if ($object instanceof entry && self::isAllowedPartner($object->getPartnerId()))
+		{
 			return self::getAttachmentElasticSearchData($object);
+		}
 
 		return null;
 	}
@@ -25,18 +27,20 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 			array(asset::ASSET_STATUS_READY, asset::ASSET_STATUS_EXPORTING));
 
 
-		if(!$attachmentAssets || !count($attachmentAssets))
+		if (!$attachmentAssets || !count($attachmentAssets))
+		{
 			return null;
+		}
 
 		$data = array();
 		$attachmentData = array();
 		foreach($attachmentAssets as $attachmentAsset)
 		{
 			// initial check - to be removed later down the road
-			if(!($attachmentAsset instanceof MarkdownAsset) ||
-				($attachmentAsset instanceof MarkdownAsset && (int)$attachmentAsset->getProviderType() !== MarkdownProviderType::KAI ))
+			if (!($attachmentAsset instanceof MarkdownAsset) ||
+				($attachmentAsset instanceof MarkdownAsset && (int)$attachmentAsset->getProviderType() !== MarkdownProviderType::KAI))
 			{
-				KalturaLog::err("Skipping Elastic index. Provider type [". $attachmentAsset->getProviderType() . "] on asset id " . $attachmentAsset->getId() ."isn't KAI.");
+				KalturaLog::err("Skipping Elastic index. Provider type [" . $attachmentAsset->getProviderType() . "] on asset id " . $attachmentAsset->getId() . "isn't KAI.");
 				continue;
 			}
 
@@ -44,20 +48,20 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 			$accuracy = null;
 			$syncKey = $attachmentAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_ATTACHMENT_FILE_SIZE_FOR_INDEXING);
-			if(!$content)
+			if (!$content)
 			{
 				continue;
 			}
 
 			$attachmentContentManager = kAttachmentContentManager::getCoreContentManager($attachmentAsset->getContainerFormat());
-			if(!$attachmentContentManager)
+			if (!$attachmentContentManager)
 			{
 				KalturaLog::err("Attachment content manager not found for format [" . $attachmentAsset->getContainerFormat() . "]");
 				continue;
 			}
 
 			$items = $attachmentContentManager->parse($content);
-			if(!$items)
+			if (!$items)
 			{
 				continue;
 			}

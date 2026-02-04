@@ -1,6 +1,7 @@
 <?php
 
-class KalturaESearchAttachmentItemData extends KalturaESearchItemData {
+class KalturaESearchAttachmentItemData extends KalturaESearchItemData
+{
 	/**
 	 * @var int
 	 */
