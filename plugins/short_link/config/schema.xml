@@ -2,7 +2,7 @@
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.shortLink">
 	<table skipSql="false" abstract="false" name="short_link" reloadOnInsert="true">
 		<column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="varchar" size="5" />
-		<column primaryKey="false" required="true"  lazyLoad="false" name="int_id" type="integer" autoIncrement="true" />
+		<column primaryKey="false" required="true"  lazyLoad="false" name="int_id" type="bigint" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="expires_at" type="timestamp" />
@@ -12,6 +12,7 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="system_name" type="varchar" size="63" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="full_url" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="int_id">
 			<index-column name="int_id" />
 		</index>
