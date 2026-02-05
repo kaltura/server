@@ -1,6 +1,6 @@
 <?php
 require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
-echo "Starting script to update entitlement puser for entry\n";
+echo "Starting script to update entitle View for entry\n";
 
 define('SLEEP_INTERVAL_IN_SEC', 30);
 
@@ -56,8 +56,6 @@ foreach ($entriesIds as $entryId)
 	$entitledUserPuser = array();
 	$entitledUserPuser[$kuser->getId()] = $kuser->getPuserId();
 
-	$entry->putInCustomData("entitledUserPuserEdit", serialize($entitledUserPuser) );
-	$entry->putInCustomData("entitledUserPuserPublish", serialize($entitledUserPuser));
 	$entry->putInCustomData("entitledUserPuserView", serialize($entitledUserPuser));
 
 	$entry->save();
