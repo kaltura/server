@@ -495,7 +495,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PAGE_LOAD,
 		self::EVENT_TYPE_BUTTON_CLICKED,
 		self::EVENT_TYPE_QR_CODE_SCANNED,
-		self::EVENT_TYPE_DOCUMENT_IMPRESSION
+		self::EVENT_TYPE_DOCUMENT_IMPRESSION,
 	);
 
 	protected static $media_type_count_aggrs = array(
