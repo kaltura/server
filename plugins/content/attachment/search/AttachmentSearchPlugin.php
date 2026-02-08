@@ -69,7 +69,7 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 			$accuracy = ($attachmentAsset instanceof MarkdownAsset) ? $attachmentAsset->getAccuracy() : null;
 			$assetName = $attachmentAsset->getFilename();
 
-			self::getElasticLines($attachmentData,
+			self::getElasticContent($attachmentData,
 				$items,
 				$attachmentAsset->getId(),
 				$assetName,
@@ -84,7 +84,7 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 		return $data;
 	}
 
-	protected static function getElasticLines(&$attachmentData, $items, $assetId, $assetName, $assetType, $assetSubType, $tags = null, $accuracy = null)
+	protected static function getElasticContent(&$attachmentData, $items, $assetId, $assetName, $assetType, $assetSubType, $tags = null, $accuracy = null)
 	{
 		$pageNumber = 1;
 		foreach ($items as $item)
@@ -142,7 +142,8 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 	public static function isAllowedPartner($partnerId)
 	{
 		$partner = PartnerPeer::retrieveByPK($partnerId);
-		if(!$partner) {
+		if(!$partner)
+		{
 			return false;
 		}
 

@@ -20,12 +20,17 @@ class kAttachmentFlowManager implements kObjectDeletedEventConsumer, kObjectAdde
 		return true;
 	}
 
-
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::objectAdded
+	 */
 	public function objectAdded(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		return $this->indexEntry($object);
 	}
 
+	/* (non-PHPdoc)
+	 * @see kObjectAddedEventConsumer::shouldConsumeAddedEvent
+	 */
 	public function shouldConsumeAddedEvent(BaseObject $object)
 	{
 		if (class_exists('AttachmentAsset') && $object instanceof AttachmentAsset
@@ -38,11 +43,17 @@ class kAttachmentFlowManager implements kObjectDeletedEventConsumer, kObjectAdde
 		return false;
 	}
 
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::objectDeleted()
+	 */
 	public function objectDeleted(BaseObject $object, BatchJob $raisedJob = null)
 	{
 		return $this->indexEntry($object);
 	}
 
+	/* (non-PHPdoc)
+	 * @see kObjectDeletedEventConsumer::shouldConsumeDeletedEvent()
+	 */
 	public function shouldConsumeDeletedEvent(BaseObject $object)
 	{
 		if (class_exists('AttachmentAsset') && $object instanceof AttachmentAsset
