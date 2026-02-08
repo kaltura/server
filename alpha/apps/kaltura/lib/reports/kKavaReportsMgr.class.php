@@ -495,6 +495,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PAGE_LOAD,
 		self::EVENT_TYPE_BUTTON_CLICKED,
 		self::EVENT_TYPE_QR_CODE_SCANNED,
+		self::EVENT_TYPE_DOCUMENT_IMPRESSION
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -577,7 +578,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_POLL_RECEIVED => 'count_poll_received',
 		self::EVENT_TYPE_PAGE_LOAD => 'count_page_loaded',
 		self::EVENT_TYPE_BUTTON_CLICKED => 'count_button_clicked',
-		self::EVENT_TYPE_QR_CODE_SCANNED => 'count_qr_code_scanned'
+		self::EVENT_TYPE_QR_CODE_SCANNED => 'count_qr_code_scanned',
+		self::EVENT_TYPE_DOCUMENT_IMPRESSION => 'count_document_impression',
 	);
 
 	//global transform
