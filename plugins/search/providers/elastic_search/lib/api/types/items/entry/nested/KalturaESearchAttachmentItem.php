@@ -21,7 +21,7 @@ class KalturaESearchAttachmentItem extends KalturaESearchEntryAbstractNestedItem
 		KalturaESearchAttachmentFieldName::CONTENT => ESearchAttachmentFieldName::CONTENT,
 		KalturaESearchAttachmentFieldName::FILE_NAME => ESearchAttachmentFieldName::FILE_NAME,
 		KalturaESearchAttachmentFieldName::PAGE_NUMBER => ESearchAttachmentFieldName::PAGE_NUMBER,
-		KalturaESearchAttachmentFieldName::ASSET_ID => ESearchAttachmentFieldName::ASSET_ID
+		KalturaESearchAttachmentFieldName::ATTACHMENT_ASSET_ID => ESearchAttachmentFieldName::ATTACHMENT_ASSET_ID
 	);
 
 	protected function getMapBetweenObjects()

@@ -14,7 +14,7 @@ class ESearchAttachmentItem extends ESearchNestedObjectItem
 		ESearchAttachmentFieldName::CONTENT => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, "ESearchItemType::EXISTS"=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
 		ESearchAttachmentFieldName::FILE_NAME => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH,'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL),
 		ESearchAttachmentFieldName::PAGE_NUMBER => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
-		ESearchAttachmentFieldName::ASSET_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH)
+		ESearchAttachmentFieldName::ATTACHMENT_ASSET_ID => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH)
 	);
 
 

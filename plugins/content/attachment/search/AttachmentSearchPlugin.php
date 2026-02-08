@@ -29,7 +29,7 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 
 		if (!$attachmentAssets || !count($attachmentAssets))
 		{
-			return null;
+			return array();
 		}
 
 		$data = array();
@@ -90,7 +90,7 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 		foreach ($items as $item)
 		{
 			$page = array(
-				'asset_id' => $assetId,
+				'attachment_asset_id' => $assetId,
 				'file_name' => $assetName,
 				'asset_type' => $assetType,
 				'asset_sub_type' => $assetSubType,

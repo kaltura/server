@@ -65,50 +65,30 @@ class mdAttachmentContentManager extends kAttachmentContentManager
 
 	public function stripMarkdown($text)
 	{
-		$patterns = [
-			self::CODE_BLOCKS_REGEX,          // Remove code block markers
-			self::INLINE_CODE_REGEX,          // Inline code - keep content
-			self::HEADERS_REGEX,              // Headers - keep content
-			self::BOLD_ASTERISKS_REGEX,       // Bold asterisks - keep content
-			self::ITALIC_ASTERISKS_REGEX,     // Italic asterisks - keep content
-			self::BOLD_UNDERSCORES_REGEX,     // Bold underscores - keep content
-			self::ITALIC_UNDERSCORES_REGEX,   // Italic underscores - keep content
-			self::STRIKETHROUGH_REGEX,        // Strikethrough - keep content
-			self::LINKS_REGEX,                // Links - keep text and URL
-			self::REFERENCE_LINKS_REGEX,      // Reference links - keep text
-			self::IMAGES_REGEX,               // Images - keep alt text
-			self::HORIZONTAL_RULES_REGEX,     // Horizontal rules - remove
-			self::BLOCKQUOTES_REGEX,          // Blockquotes - keep content
-			self::UNORDERED_LISTS_REGEX,      // Unordered lists - keep content
-			self::ORDERED_LISTS_REGEX,        // Ordered lists - keep content
-			self::TABLE_PIPES_REGEX,          // Table pipes - replace with space
-			self::TABLE_SEPARATORS_REGEX,     // Table separators - remove
-			self::REFERENCE_DEFINITIONS_REGEX, // Reference definitions - remove
-			self::HTML_ELEMENTS_REGEX,
-			self::XML_TAGS_REGEX
+		$patternReplacements = [
+			self::CODE_BLOCKS_REGEX          => '',      // Remove code block markers
+			self::INLINE_CODE_REGEX          => '$1',    // Inline code - keep content
+			self::HEADERS_REGEX              => '$1',    // Headers - keep content
+			self::BOLD_ASTERISKS_REGEX       => '$1',    // Bold asterisks - keep content
+			self::ITALIC_ASTERISKS_REGEX     => '$1',    // Italic asterisks - keep content
+			self::BOLD_UNDERSCORES_REGEX     => '$1',    // Bold underscores - keep content
+			self::ITALIC_UNDERSCORES_REGEX   => '$1',    // Italic underscores - keep content
+			self::STRIKETHROUGH_REGEX        => '$1',    // Strikethrough - keep content
+			self::LINKS_REGEX                => '$1 $2', // Links - keep text and URL
+			self::REFERENCE_LINKS_REGEX      => '$1',    // Reference links - keep text
+			self::IMAGES_REGEX               => '$1',    // Images - keep alt text
+			self::HORIZONTAL_RULES_REGEX     => '',      // Horizontal rules - remove
+			self::BLOCKQUOTES_REGEX          => '$1',    // Blockquotes - keep content
+			self::UNORDERED_LISTS_REGEX      => '$1',    // Unordered lists - keep content
+			self::ORDERED_LISTS_REGEX        => '$1',    // Ordered lists - keep content
+			self::TABLE_PIPES_REGEX          => ' ',     // Table pipes - replace with space
+			self::TABLE_SEPARATORS_REGEX     => '',      // Table separators - remove
+			self::REFERENCE_DEFINITIONS_REGEX => '',     // Reference definitions - remove
+			self::HTML_ELEMENTS_REGEX        => '',      // Remove HTML comments and tags
+			self::XML_TAGS_REGEX             => '$1',    // Keep XML tag names without angle brackets
 		];
 
-		$replacements = [
-			'',                    // Remove code block markers
-			'$1',                  // Keep inline code content
-			'$1',                  // Keep header content
-			'$1',                  // Keep bold content
-			'$1',                  // Keep italic content
-			'$1',                  // Keep strikethrough content
-			'$1 $2',              // Keep link text and URL
-			'$1',                  // Keep reference link text
-			'$1',                  // Keep image alt text
-			'',                    // Remove horizontal rules
-			'$1',                  // Keep blockquote content
-			'$1',                  // Keep list content
-			'$1',                  // Keep list content
-			' ',                   // Replace pipes with spaces
-			'',                    // Remove table separators
-			'',                    // Remove reference definitions
-			'',                    // Remove HTML comments and tags
-			'$1',                  // Keep XML tag names without angle brackets
-		];
-		$text = preg_replace($patterns, $replacements, $text);
+		$text = preg_replace(array_keys($patternReplacements), array_values($patternReplacements), $text);
 		return strip_tags($text);
 	}
 }
