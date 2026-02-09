@@ -863,4 +863,5 @@ class KalturaErrors extends APIErrors
 	 */
 	const INVALID_SHORT_LINK = "INVALID_SHORT_LINK;ID;Invalid short link [@ID@]";
 	const EXPIRED_SHORT_LINK = "EXPIRED_SHORT_LINK;ID;Expired short link [@ID@]";
+	const SHORT_LINK_UNIQUE_ID_ALREADY_EXISTS = "SHORT_LINK_UNIQUE_ID_ALREADY_EXISTS;UNIQUE_ID;Short link unique id [@UNIQUE_ID@] already exists";
 }

@@ -24,6 +24,7 @@ class ShortLinkFilter extends baseObjectFilter
 				"_in_system_name",
 				"_eq_status",
 				"_in_status",
+				"_eq_unique_id"
 			) , NULL );
 
 		$this->allowed_order_fields = array("created_at" , "updated_at", "expires_at");
