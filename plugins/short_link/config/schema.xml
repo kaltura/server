@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <database defaultPhpNamingMethod="underscore" heavyIndexing="false" name="propel" defaultIdMethod="native" package="plugins.shortLink">
 	<table skipSql="false" abstract="false" name="short_link" reloadOnInsert="true">
-		<column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="varchar" size="5" />
+		<column primaryKey="true"  required="true"  lazyLoad="false" name="id" type="varchar" size="20" />
 		<column primaryKey="false" required="true"  lazyLoad="false" name="int_id" type="bigint" autoIncrement="true" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="created_at" type="timestamp" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="updated_at" type="timestamp" />
@@ -12,17 +12,31 @@
 		<column primaryKey="false" required="false" lazyLoad="false" name="system_name" type="varchar" size="63" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="full_url" type="varchar" size="255" />
 		<column primaryKey="false" required="false" lazyLoad="false" name="status" type="integer" />
+		<column primaryKey="false" required="false" lazyLoad="false" name="unique_id" type="varchar" size="63" />
 		<column primaryKey="false" required="false" autoIncrement="false" lazyLoad="false" name="custom_data" type="longvarchar" />
 		<index name="int_id">
 			<index-column name="int_id" />
 		</index>
-		<index name="partner_id">
+		<index name="partner_id_status">
 			<index-column name="partner_id" />
+			<index-column name="status" />
 		</index>
 		<index name="kuser_partner_name">
 			<index-column name="partner_id" />
 			<index-column name="kuser_id" />
 			<index-column name="system_name" />
+		</index>
+		<index name="expires_at">
+			<index-column name="expires_at" />
+		</index>
+		<index name="partner_unique_id">
+			<index-column name="partner_id" />
+			<index-column name="unique_id" />
+		</index>
+		<index name="partner_kuser_status">
+			<index-column name="partner_id" />
+			<index-column name="kuser_id" />
+			<index-column name="status" />
 		</index>
 	</table>
 </database>

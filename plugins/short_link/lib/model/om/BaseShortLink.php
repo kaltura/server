@@ -86,6 +86,12 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	protected $status;
 
 	/**
+	 * The value for the unique_id field.
+	 * @var        string
+	 */
+	protected $unique_id;
+
+	/**
 	 * The value for the custom_data field.
 	 * @var        string
 	 */
@@ -334,6 +340,16 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	public function getStatus()
 	{
 		return $this->status;
+	}
+
+	/**
+	 * Get the [unique_id] column value.
+	 * 
+	 * @return     string
+	 */
+	public function getUniqueId()
+	{
+		return $this->unique_id;
 	}
 
 	/**
@@ -681,6 +697,29 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 	} // setStatus()
 
 	/**
+	 * Set the value of [unique_id] column.
+	 * 
+	 * @param      string $v new value
+	 * @return     ShortLink The current object (for fluent API support)
+	 */
+	public function setUniqueId($v)
+	{
+		if(!isset($this->oldColumnsValues[ShortLinkPeer::UNIQUE_ID]))
+			$this->oldColumnsValues[ShortLinkPeer::UNIQUE_ID] = $this->unique_id;
+
+		if ($v !== null) {
+			$v = (string) $v;
+		}
+
+		if ($this->unique_id !== $v) {
+			$this->unique_id = $v;
+			$this->modifiedColumns[] = ShortLinkPeer::UNIQUE_ID;
+		}
+
+		return $this;
+	} // setUniqueId()
+
+	/**
 	 * Set the value of [custom_data] column.
 	 * 
 	 * @param      string $v new value
@@ -748,7 +787,8 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 			$this->system_name = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
 			$this->full_url = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
 			$this->status = ($row[$startcol + 10] !== null) ? (int) $row[$startcol + 10] : null;
-			$this->custom_data = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->unique_id = ($row[$startcol + 11] !== null) ? (string) $row[$startcol + 11] : null;
+			$this->custom_data = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
 			$this->resetModified();
 
 			$this->setNew(false);
@@ -758,7 +798,7 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 			}
 
 			// FIXME - using NUM_COLUMNS may be clearer.
-			return $startcol + 12; // 12 = ShortLinkPeer::NUM_COLUMNS - ShortLinkPeer::NUM_LAZY_LOAD_COLUMNS).
+			return $startcol + 13; // 13 = ShortLinkPeer::NUM_COLUMNS - ShortLinkPeer::NUM_LAZY_LOAD_COLUMNS).
 
 		} catch (Exception $e) {
 			throw new PropelException("Error populating ShortLink object", $e);
@@ -1322,6 +1362,9 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 				return $this->getStatus();
 				break;
 			case 11:
+				return $this->getUniqueId();
+				break;
+			case 12:
 				return $this->getCustomData();
 				break;
 			default:
@@ -1356,7 +1399,8 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 			$keys[8] => $this->getSystemName(),
 			$keys[9] => $this->getFullUrl(),
 			$keys[10] => $this->getStatus(),
-			$keys[11] => $this->getCustomData(),
+			$keys[11] => $this->getUniqueId(),
+			$keys[12] => $this->getCustomData(),
 		);
 		return $result;
 	}
@@ -1422,6 +1466,9 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 				$this->setStatus($value);
 				break;
 			case 11:
+				$this->setUniqueId($value);
+				break;
+			case 12:
 				$this->setCustomData($value);
 				break;
 		} // switch()
@@ -1459,7 +1506,8 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 		if (array_key_exists($keys[8], $arr)) $this->setSystemName($arr[$keys[8]]);
 		if (array_key_exists($keys[9], $arr)) $this->setFullUrl($arr[$keys[9]]);
 		if (array_key_exists($keys[10], $arr)) $this->setStatus($arr[$keys[10]]);
-		if (array_key_exists($keys[11], $arr)) $this->setCustomData($arr[$keys[11]]);
+		if (array_key_exists($keys[11], $arr)) $this->setUniqueId($arr[$keys[11]]);
+		if (array_key_exists($keys[12], $arr)) $this->setCustomData($arr[$keys[12]]);
 	}
 
 	/**
@@ -1482,6 +1530,7 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 		if ($this->isColumnModified(ShortLinkPeer::SYSTEM_NAME)) $criteria->add(ShortLinkPeer::SYSTEM_NAME, $this->system_name);
 		if ($this->isColumnModified(ShortLinkPeer::FULL_URL)) $criteria->add(ShortLinkPeer::FULL_URL, $this->full_url);
 		if ($this->isColumnModified(ShortLinkPeer::STATUS)) $criteria->add(ShortLinkPeer::STATUS, $this->status);
+		if ($this->isColumnModified(ShortLinkPeer::UNIQUE_ID)) $criteria->add(ShortLinkPeer::UNIQUE_ID, $this->unique_id);
 		if ($this->isColumnModified(ShortLinkPeer::CUSTOM_DATA)) $criteria->add(ShortLinkPeer::CUSTOM_DATA, $this->custom_data);
 
 		return $criteria;
@@ -1588,6 +1637,8 @@ abstract class BaseShortLink extends BaseObject  implements Persistent {
 		$copyObj->setFullUrl($this->full_url);
 
 		$copyObj->setStatus($this->status);
+
+		$copyObj->setUniqueId($this->unique_id);
 
 		$copyObj->setCustomData($this->custom_data);
 

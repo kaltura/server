@@ -23,11 +23,14 @@ CREATE TABLE `short_link`
 	`system_name` VARCHAR(63),
 	`full_url` VARCHAR(255),
 	`status` INTEGER,
+	`unique_id` VARCHAR(63),
 	`custom_data` text,
 	PRIMARY KEY (`id`),
 	KEY `int_id`(`int_id`),
-	KEY `partner_id`(`partner_id`),
-	KEY `kuser_partner_name`(`partner_id`, `kuser_id`, `system_name`)
+	KEY `expires_at`(`expires_at`),
+	KEY `kuser_partner_name`(`partner_id`, `kuser_id`, `system_name`),
+	KEY `partner_unique_id`(`partner_id`, `unique_id`),
+	KEY `partner_kuser_status`(`partner_id`, `kuser_id`, `status`),
 )Type=InnoDB;
 
 # This restores the fkey checks, after having unset them earlier

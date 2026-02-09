@@ -37,8 +37,8 @@ class ShortLinkTableMap extends TableMap {
 		$this->setPackage('plugins.shortLink');
 		$this->setUseIdGenerator(true);
 		// columns
-		$this->addPrimaryKey('ID', 'Id', 'VARCHAR', true, 5, null);
-		$this->addColumn('INT_ID', 'IntId', 'INTEGER', true, null, null);
+		$this->addPrimaryKey('ID', 'Id', 'VARCHAR', true, 20, null);
+		$this->addColumn('INT_ID', 'IntId', 'BIGINT', true, null, null);
 		$this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
 		$this->addColumn('EXPIRES_AT', 'ExpiresAt', 'TIMESTAMP', false, null, null);
@@ -48,6 +48,8 @@ class ShortLinkTableMap extends TableMap {
 		$this->addColumn('SYSTEM_NAME', 'SystemName', 'VARCHAR', false, 63, null);
 		$this->addColumn('FULL_URL', 'FullUrl', 'VARCHAR', false, 255, null);
 		$this->addColumn('STATUS', 'Status', 'INTEGER', false, null, null);
+		$this->addColumn('UNIQUE_ID', 'UniqueId', 'VARCHAR', false, 63, null);
+		$this->addColumn('CUSTOM_DATA', 'CustomData', 'LONGVARCHAR', false, null, null);
 		// validators
 	} // initialize()
 
