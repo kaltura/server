@@ -297,6 +297,21 @@ moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
 moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
 moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
+
+# Ursa-22.13.0
+## Add Immersive Agents Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25697
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableImmersiveAgent.enabled = true
+moduls.enableImmersiveAgent.permissionType = 2
+moduls.enableImmersiveAgent.label = "Enable Immersive Agents"
+moduls.enableImmersiveAgent.permissionName = FEATURE_ALLOW_IMMERSIVE_AGENTS
+moduls.enableImmersiveAgent.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 ## Add new firebase notifications ##
 * Issue Type: Task
 * Issue ID: PLAT-25184
