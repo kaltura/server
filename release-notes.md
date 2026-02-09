@@ -12042,3 +12042,18 @@ Update script:
 
      - deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.template.xml
      - php deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.php
+
+
+# Venus-22.13.0
+
+## Add partner and permissions for video avatar microservice ##
+* Issue Type: Task
+* Issue ID: PLAT-25701
+
+### Configuration ###
+None.
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_02_09_video_avatar_add_partner.php
