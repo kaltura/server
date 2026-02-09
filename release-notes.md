@@ -1,3 +1,17 @@
+# Ursa-22.13.0
+## Add Immersive Agents Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25697
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableImmersiveAgents.enabled = true
+moduls.enableImmersiveAgents.permissionType = 2
+moduls.enableImmersiveAgents.label = "Enable Immersive Agents"
+moduls.enableImmersiveAgents.permissionName = FEATURE_ALLOW_IMMERSIVE_AGENTS
+moduls.enableImmersiveAgents.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Venus-22.12.0
 ## Add 'dash' tag to  audio description flavor params ##
 - Issue Type: Task
@@ -296,20 +310,6 @@ moduls.enableFoldersCapabilities.permissionType = 2
 moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
 moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
 moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
-```
-
-# Ursa-22.13.0
-## Add Immersive Agents Capabilities
-* Issue Type: Task
-* Issue ID: PLAT-25697
-### Deployment ###
-Add the following to admin.ini
-```
-moduls.enableImmersiveAgents.enabled = true
-moduls.enableImmersiveAgents.permissionType = 2
-moduls.enableImmersiveAgents.label = "Enable Immersive Agents"
-moduls.enableImmersiveAgents.permissionName = FEATURE_ALLOW_IMMERSIVE_AGENTS
-moduls.enableImmersiveAgents.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
 ## Add new firebase notifications ##
