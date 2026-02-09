@@ -861,4 +861,5 @@ class KalturaErrors extends APIErrors
 	/*
 	 * Shortlink service
 	 */
-	const CANNOT_RETRIEVE_ANOTHER_USERS_SHORT_LINK = "CANNOT_RETRIEVE_ANOTHER_USERS_SHORT_LINK;USER_ID;cannot retrieve another user's [\"@USER_ID@\"] short link using non-admin session";}
+	const CANNOT_RETRIEVE_ANOTHER_USERS_SHORT_LINK = "CANNOT_RETRIEVE_ANOTHER_USERS_SHORT_LINK;USER_ID;cannot retrieve another user's [\"@USER_ID@\"] short link using non-admin session";
+}
