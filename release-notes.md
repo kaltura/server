@@ -305,11 +305,11 @@ moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
 ### Deployment ###
 Add the following to admin.ini
 ```
-moduls.enableImmersiveAgent.enabled = true
-moduls.enableImmersiveAgent.permissionType = 2
-moduls.enableImmersiveAgent.label = "Enable Immersive Agents"
-moduls.enableImmersiveAgent.permissionName = FEATURE_ALLOW_IMMERSIVE_AGENTS
-moduls.enableImmersiveAgent.group = GROUP_ENABLE_DISABLE_FEATURES
+moduls.enableImmersiveAgents.enabled = true
+moduls.enableImmersiveAgents.permissionType = 2
+moduls.enableImmersiveAgents.label = "Enable Immersive Agents"
+moduls.enableImmersiveAgents.permissionName = FEATURE_ALLOW_IMMERSIVE_AGENTS
+moduls.enableImmersiveAgents.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
 
 ## Add new firebase notifications ##
