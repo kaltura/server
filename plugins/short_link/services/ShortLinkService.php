@@ -38,16 +38,36 @@ class ShortLinkService extends KalturaBaseService
 	function listAction(KalturaShortLinkFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaShortLinkFilter;
-			
+		}
+
+		if (!kCurrentContext::$is_admin_session)
+		{
+			if (!kCurrentContext::$ks_uid)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			}
+
+			if ($filter->userIdEqual !== null && kCurrentContext::$ks_uid != $filter->userIdEqual)
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_RETRIEVE_ANOTHER_USERS_SHORT_LINK, $filter->userIdEqual);
+			}
+
+			$filter->userIdEqual = kCurrentContext::$ks_uid;
+		}
+
 		$shortLinkFilter = $filter->toFilter($this->getPartnerId());
 		
 		$c = new Criteria();
 		$shortLinkFilter->attachToCriteria($c);
 		$count = ShortLinkPeer::doCount($c);
 		
-		if (! $pager)
-			$pager = new KalturaFilterPager ();
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+
 		$pager->attachToCriteria ( $c );
 		$list = ShortLinkPeer::doSelect($c);
 		

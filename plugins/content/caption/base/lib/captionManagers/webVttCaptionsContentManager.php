@@ -181,7 +181,13 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 					'content' => array(array('text' => $text))
 				);
 			}elseif ($foundFirstTimeCode == false)
+			{
+				if (preg_match('/^\s*\d+\s*$/', $line))
+				{
+					continue;// skip numeric-only lines / index lines
+				}
 				$this->headerInfo[] = $line . self::UNIX_LINE_ENDING;
+			}
 		};
 		if (count($this->parsingErrors) > 0)
 		{

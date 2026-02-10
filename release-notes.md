@@ -11,6 +11,19 @@ Replace the tokens: @VIDEO_AVATAR_PARTNER_ADMIN_SECRET@, @VIDEO_AVATAR_PARTNER_S
 
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2026_02_09_video_avatar_add_partner.php
+    
+## Add Immersive Agents Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25697
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableImmersiveAgents.enabled = true
+moduls.enableImmersiveAgents.permissionType = 2
+moduls.enableImmersiveAgents.label = "Enable Immersive Agents"
+moduls.enableImmersiveAgents.permissionName = FEATURE_ALLOW_IMMERSIVE_AGENTS
+moduls.enableImmersiveAgents.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 
 # Venus-22.12.0
 ## Add 'dash' tag to  audio description flavor params ##
@@ -311,6 +324,7 @@ moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
 moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
 moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
+
 ## Add new firebase notifications ##
 * Issue Type: Task
 * Issue ID: PLAT-25184
