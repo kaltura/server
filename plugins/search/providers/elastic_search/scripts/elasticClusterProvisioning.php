@@ -526,7 +526,7 @@ class elasticClusterProvisioning
 		}
 		
 		$aliasJson = implode(',', $actions);
-		$cmd = "curl -s -H 'Content-Type: application/json' -XPOST $this->elasticHost:9200/_aliases -d '{\"actions\": [$aliasJson]}'";
+		$cmd = "curl -s -H 'Content-Type: application/json' -XPOST $this->elasticHost:$this->elasticPort/_aliases -d '{\"actions\": [$aliasJson]}'";
 		list($output, $resultCode) = $this->execCmd($cmd, true );
 		$res = isset($output[0]) ? json_decode($output[0], true) : null;
 		if (isset($res["acknowledged"]) && $res["acknowledged"])
