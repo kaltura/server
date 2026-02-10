@@ -5,9 +5,9 @@
 * Issue ID: PLAT-25701
 
 ### Configuration ###
-None.
+Replace the tokens: @VIDEO_AVATAR_PARTNER_ADMIN_SECRET@, @VIDEO_AVATAR_PARTNER_SECRET@ in the ini file and remove ".template" from the file name:
 
-deployment/base/scripts/init_data/01.Partner.template.ini
+    deployment/base/scripts/init_data/01.Partner.template.ini
 
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2026_02_09_video_avatar_add_partner.php
