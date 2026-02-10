@@ -1,4 +1,8 @@
 <?php
+
+require_once __DIR__ . '/../../../../../infra/cache/kCacheManager.php';
+require_once __DIR__ . '/../../../../../infra/general/kResourceReservation.php';
+
 /**
  * @package plugins.ZoomDropFolder
  */
