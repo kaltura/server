@@ -1,5 +1,7 @@
 <?php
 
+use general\kResourceReservation;
+
 /**
  * The ScheduleEventResource service enables you create and manage (update, delete, retrieve, etc.) the connections between recording events and the resources required for these events (cameras, capture devices, etc.).
  * @service scheduleEventResource

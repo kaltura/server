@@ -1,5 +1,7 @@
 <?php
 
+use general\kResourceReservation;
+
 /**
  * The ScheduleEvent service enables you to create and manage (update, delete, retrieve, etc.) scheduled recording events.
  * @service scheduleEvent

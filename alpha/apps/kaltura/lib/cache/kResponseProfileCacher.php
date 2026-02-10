@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 class kResponseProfileCacher implements kObjectChangedEventConsumer, kObjectDeletedEventConsumer, kObjectAddedEventConsumer
 {
 	const VIEW_RESPONSE_PROFILE_OBJECT_SPECIFIC = 'objectSpecific';

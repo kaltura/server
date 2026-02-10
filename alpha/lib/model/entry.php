@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 /**
  * Subclass for representing a row from the 'entry' table.
  *

@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 require_once(dirname(__FILE__).'/../bootstrap.php');
 
 define('MAX_FILESYNC_ID_PREFIX', 'fileSyncMaxId-dc');

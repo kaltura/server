@@ -3,6 +3,9 @@
  * @package Core
  * @subpackage externalWidgets
  */
+
+use cache\kCacheManager;
+
 require_once ( MODULES . "/partnerservices2/actions/getwidgetAction.class.php" );
 
 /**

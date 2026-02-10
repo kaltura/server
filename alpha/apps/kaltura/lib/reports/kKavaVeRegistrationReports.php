@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kKavaVeRegistrationReports extends kKavaReportsMgr
 {
 	const VE_REGISTRATION_QUERY_CACHE_EXPIRATION = 30;

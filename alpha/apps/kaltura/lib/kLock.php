@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 /**
  * @package Core
  * @subpackage utils

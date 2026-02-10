@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 /**
  * @service filesyncImportBatch
  * @package plugins.multiCenters

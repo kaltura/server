@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 /**
  * @package Core
  * @subpackage externalWidgets

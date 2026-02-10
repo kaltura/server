@@ -5,6 +5,7 @@
 //use FlixTech\SchemaRegistryApi\Registry\BlockingRegistry;
 //use FlixTech\SchemaRegistryApi\Registry\PromisingRegistry;
 //use GuzzleHttp\Client;
+use cache\kCacheManager;
 
 /**
  * @package plugins.kafkaNotification

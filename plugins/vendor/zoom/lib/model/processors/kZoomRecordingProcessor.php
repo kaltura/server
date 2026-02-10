@@ -1,4 +1,7 @@
 <?php
+
+use general\kResourceReservation;
+
 /**
  * @package plugins.vendor
  * @subpackage zoom.model

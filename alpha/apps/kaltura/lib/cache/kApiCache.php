@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 require_once(dirname(__FILE__) . '/../../../../../infra/cache/kApcWrapper.php');
 require_once(dirname(__FILE__) . '/kApiCacheBase.php');
 require_once(dirname(__FILE__) . '/../../../../config/kConf.php');

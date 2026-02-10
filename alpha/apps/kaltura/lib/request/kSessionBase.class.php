@@ -5,6 +5,9 @@
  * @package server-infra
  * @subpackage request
  */
+
+use cache\kCacheManager;
+
 require_once(dirname(__FILE__) . '/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../../../../../infra/general/KCryptoWrapper.class.php');

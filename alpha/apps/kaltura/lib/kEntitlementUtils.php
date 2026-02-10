@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 /**
  * kEntitlementUtils is all utils needed for entitlement use cases.
  * @package Core

@@ -1,5 +1,14 @@
 <?php
 
+namespace general;
+
+use BinaryResourceReservation;
+use cache\kCacheManager;
+use KalturaLog;
+use kConf;
+use kCurrentContext;
+use ResourceReservation;
+
 class kResourceReservation
 {
 	/**

@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 /**
  * The Storage Profile service allows you to export your Kaltura content to external storage volumes.
  * This service is disabled by default, please contact your account manager if you wish to enable it for your partner.

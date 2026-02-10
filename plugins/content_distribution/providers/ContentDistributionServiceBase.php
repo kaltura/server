@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 abstract class ContentDistributionServiceBase extends KalturaBaseService {
 	
 	const CACHE_CREATION_TIME_SUFFIX = ".time";

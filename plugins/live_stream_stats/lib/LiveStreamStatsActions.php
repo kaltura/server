@@ -4,6 +4,8 @@
  * @subpackage cache
  */
 
+use cache\kCacheManager;
+
 require_once(dirname(__FILE__) . '/../../../api_v3/lib/KalturaResponseCacher.php');
 
 /**

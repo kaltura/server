@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedEventConsumer, kObjectInvalidateCacheEventConsumer
 {
 	// -------------------

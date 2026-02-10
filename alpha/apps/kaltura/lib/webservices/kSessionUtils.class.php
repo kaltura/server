@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kSessionUtils
 {
 	const REQUIED_TICKET_NOT_ACCESSIBLE = 'N';

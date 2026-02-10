@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 /**
  *  @package server-infra
  *  @subpackage cache

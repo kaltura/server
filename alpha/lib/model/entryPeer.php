@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 /**
  * Subclass for performing query and update operations on the 'entry' table.
  *

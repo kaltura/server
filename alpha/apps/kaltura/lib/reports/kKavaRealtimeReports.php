@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kKavaRealtimeReports extends kKavaReportsMgr
 {
 	const REALTIME_QUERY_CACHE_EXPIRATION = 30;

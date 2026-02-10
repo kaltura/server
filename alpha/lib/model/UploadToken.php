@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 /**
  * Subclass for representing a row from the 'upload_token' table.
  *

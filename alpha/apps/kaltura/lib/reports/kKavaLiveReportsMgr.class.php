@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kKavaLiveReportsMgr extends kKavaBase
 {
 	const MIN_RESULTS = 1000;

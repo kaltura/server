@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kJobsCacher
 {
 	CONST TIME_IN_CACHE = 10;

@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 fclose(STDOUT);		// hide the log messages written to stdout
 
 require_once(dirname(__FILE__).'/../bootstrap.php');

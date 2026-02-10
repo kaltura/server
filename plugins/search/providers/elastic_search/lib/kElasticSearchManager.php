@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 /**
  * @package plugins.elasticSearch
  * @subpackage lib

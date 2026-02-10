@@ -3,6 +3,9 @@
  * @package api
  * @subpackage cache
  */
+
+use cache\kCacheManager;
+
 require_once(dirname(__FILE__) . '/../../alpha/apps/kaltura/lib/cache/kApiCache.php');
 
 /**

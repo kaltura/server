@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 class kUploadTokenMgr
 {
 	const NO_EXTENSION_IDENTIFIER = 'noex';

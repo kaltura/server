@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 function setCacheExpiry($entriesCount , $feedId)
 {
 	$expiryArr = kConf::hasMap("v3cache_getfeed_expiry") ? kConf::getMap("v3cache_getfeed_expiry") : array();

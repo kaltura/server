@@ -1,4 +1,7 @@
 <?php
+
+use cache\kCacheManager;
+
 /**
  * Uses the memcached extension,
  * This requires 2 things : 

@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kDropFolderAllocator
 {
 	CONST TIME_IN_CACHE_FOR_LOCK = 5;

@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 require_once (dirname(__FILE__).'/../bootstrap.php');
 
 $lockTimeout = 5;

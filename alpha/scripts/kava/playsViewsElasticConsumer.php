@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 require_once(__DIR__ . '/../../../../../kava-utils/lib/StreamQueue.php');
 require_once(__DIR__ . '/../bootstrap.php');
 require_once(__DIR__ . '/playsViewsCommon.php');

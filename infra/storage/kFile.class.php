@@ -4,6 +4,8 @@
  * @subpackage Storage
  */
 
+use cache\kCacheManager;
+
 require_once(dirname(__FILE__) . '/shared_file_system_managers/kSharedFileSystemMgr.php');
 require_once(dirname(__FILE__) . '/../cache/kApcWrapper.php');
 

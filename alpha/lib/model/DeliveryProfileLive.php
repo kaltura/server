@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 abstract class DeliveryProfileLive extends DeliveryProfile {
 	const DEFAULT_MAINTENANCE_DC = -1;
 	const SHOULD_REDIRECT = "should_redirect";

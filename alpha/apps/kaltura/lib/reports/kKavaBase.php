@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kKavaNoResultsException extends kException
 {
 }

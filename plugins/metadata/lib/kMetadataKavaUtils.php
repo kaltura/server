@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 /**
  * @package plugins.metadata
  * @subpackage lib

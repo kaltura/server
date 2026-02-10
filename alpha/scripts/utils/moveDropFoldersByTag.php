@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 if($argc < 3)
 	die("Usage $argv[0] <Tag> <DC from> <DC to>\r\n");
 

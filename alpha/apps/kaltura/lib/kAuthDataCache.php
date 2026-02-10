@@ -1,5 +1,7 @@
 <?php
 
+use cache\kCacheManager;
+
 class kAuthDataCache
 {
 	const DEFAULT_TIME_IN_CACHE_FOR_AUTH_CACHED_DATA = 1800; //half an hour
