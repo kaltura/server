@@ -43,6 +43,11 @@ class kClipAttributes extends kOperationAttributes
 	 */
 	private $cropAlignment;
 
+	/**
+	 * @var  array<kOverlayAttributes>
+	 */
+	private $overlayAttributesArray;
+
 
 	/* (non-PHPdoc)
 	 * @see kOperationAttributes::toArray()
@@ -55,7 +60,8 @@ class kClipAttributes extends kOperationAttributes
 			'globalOffsetInDestination' => $this->globalOffsetInDestination,
 			'effectArray' => $this->effectArray,
 			'cropAlignment' => $this->cropAlignment,
-			'captionAttributes' => $this->captionAttributes
+			'captionAttributes' => $this->captionAttributes,
+			'overlayAttributesArray' => $this->overlayAttributesArray
 		);
 	}
 	
@@ -177,5 +183,21 @@ class kClipAttributes extends kOperationAttributes
 	public function setCaptionAttributes($captionAttributes)
 	{
 		return $this->captionAttributes = $captionAttributes;
+	}
+
+	/**
+	 * @return kOverlayAttributes
+	 */
+	public function getOverlayAttributes()
+	{
+		return $this->overlayAttributes;
+	}
+
+	/**
+	 * @param kOverlayAttributes $overlayAttributes
+	 */
+	public function setOverlayAttributes($overlayAttributes)
+	{
+		return $this->overlayAttributes = $overlayAttributes;
 	}
 }

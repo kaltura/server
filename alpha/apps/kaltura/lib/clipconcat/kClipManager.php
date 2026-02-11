@@ -18,6 +18,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const CROP = 'crop';
 	const CROP_DATA_ARRAY = 'cropDataArray';
 	const SUBTITLES_DATA_ARRAY = 'subtitlesDataArray';
+	const OVERLAY_DATA_ARRAY = 'overlayDataArray';
 	const CONVERSION_PARAMS = 'conversionParams';
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
 	const CLIPS_DURATION = 'clipsDuration';
@@ -1864,6 +1865,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$filters = array();
 		$filters["crop"] = $this->getCropFilterForConcat($jobData, $clipIndex);
+		$filters["overlay"] = $this->getOverlayFilterForConcat($jobData, $clipIndex);
 		$filters["effects"] = $this->getEffectsFilterForConcat($jobData, $operationAttributesSorted, $clipIndex);
 		$filters["scale"] = $this->getPaddedScaleFiltersForConcat($jobData, $clipIndex);
 
@@ -1922,6 +1924,20 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$padFilter = $this->getPadFilter($ow, $oh, $iw, $ih);
 			$filter = $scaleFilter. "[vscale];[vscale]" . $padFilter;
 		}
+		return $filter;
+	}
+
+	protected function getOverlayFilterForConcat($jobData, $clipIndex)
+	{
+		$filter = "";
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$overlayData = $this->getOverlayDataFromConversionParams($conversionParams, $clipIndex);
+
+		if($this->shouldOverlayOnConcat($jobData, $clipIndex))
+		{
+			//getOverlayFilterForConcat
+		}
+
 		return $filter;
 	}
 
@@ -2005,6 +2021,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return $imageToVideo && $cropped;
 	}
 
+	protected function shouldOverlayOnConcat($jobData, $clipIndex)
+	{
+		/** @var kClipConcatJobData $jobData */
+
+		$conversionParams = $this->getJobDataConversionParams($jobData);
+		return $this->isOverlayClip($conversionParams, $clipIndex);
+	}
+
 	protected function isCroppedClip($conversionParams, $clipIndex)
 	{
 		$cropData = $this->getCropDataFromConversionParams($conversionParams, $clipIndex);
@@ -2015,6 +2039,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		$subtitleData = $this->getSubtitlesDataFromConversionParams($conversionParams, $clipIndex);
 		return count($subtitleData) > 0;
+	}
+
+	protected function isOverlayClip($conversionParams, $clipIndex)
+	{
+		$overlayData = $this->getOverlayDataFromConversionParams($conversionParams, $clipIndex);
+		return count($overlayData) > 0;
 	}
 
 	protected function allowEffectsOnConvert($conversionData, $singleAttributeIndex)
@@ -2041,6 +2071,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		$subtitleDataArray = isset($conversionParams[self::SUBTITLES_DATA_ARRAY]) ? $conversionParams[self::SUBTITLES_DATA_ARRAY] : array();
 		return isset($subtitleDataArray[$clipIndex]) ? $subtitleDataArray[$clipIndex] : array();
+	}
+
+	protected function getOverlayDataFromConversionParams($conversionParams, $clipIndex)
+	{
+		$overlayDataArray = isset($conversionParams[self::OVERLAY_DATA_ARRAY]) ? $conversionParams[self::OVERLAY_DATA_ARRAY] : array();
+		return isset($overlayDataArray[$clipIndex]) ? $overlayDataArray[$clipIndex] : array();
 	}
 
 	protected function getScaleFilter($ow, $oh, $iw = "iw", $ih = "ih")
