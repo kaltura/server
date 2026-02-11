@@ -12,3 +12,6 @@ $script = realpath(dirname(__FILE__) . '/../../../../') . '/alpha/scripts/utils/
 
 $config = realpath(dirname(__FILE__) . '/../../../') . '/permissions/partner.-27.ini';
 passthru("php $script $config");
+
+$config = realpath(dirname(__FILE__)) . '/../../../permissions/service.session.ini';
+passthru("php $script $config");
