@@ -793,6 +793,8 @@ class myPlaylistUtils
 			{
 				$entry_filter->set ( "_eq_display_in_search" , null );
 			}
+			
+			//Setting search scope to avoid override of display_in_search criteria
 			$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
 			$entry_filter->attachToCriteria( $c );
 
