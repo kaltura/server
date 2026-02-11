@@ -794,7 +794,8 @@ class myPlaylistUtils
 			{
 				$entry_filter->set ( "_eq_display_in_search" , null );
 			}
-			
+			$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
+
 			$entry_filter->attachToCriteria( $c );
 
 			// add some hard-coded criteria
@@ -823,7 +824,6 @@ class myPlaylistUtils
 			{
 				self::addSchedulingToCriteria($c, $entry_filter);
 			}
-			
 			self::addModerationToCriteria($c);
 			$c = entryPeer::prepareEntitlementCriteriaAndFilters( $c );
 			$entry_ids_list_for_filter = $c->getFetchedIds();
@@ -1289,7 +1289,8 @@ HTML;
 		}
 		elseif ($playlistEntry->getMediaType() == PlaylistType::DYNAMIC)
 		{
-			$playListEntries = myPlaylistUtils::executePlaylist($partnerId, $playlistEntry, null, true);
+			$filter = new entryFilter();
+			$playListEntries = myPlaylistUtils::executePlaylist($partnerId, $playlistEntry, $filter, true);
 			foreach ($playListEntries as $entry)
 			{
 				if($entry->getId() === $entryId)
