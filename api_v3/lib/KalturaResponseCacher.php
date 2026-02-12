@@ -748,6 +748,14 @@ class KalturaResponseCacher extends kApiCache
 		$result = '';
 		foreach ($params as $curKey => $value)
 		{
+			if($key == 'ip_addr')
+			{
+				// get ip addr and remove the dots
+				$result = kCurrentContext::$user_ip ? kCurrentContext::$user_ip : infraRequestUtils::getRemoteAddress();
+				$result = str_replace('.', '', $result);
+				break;
+			}
+			
 			if (is_array($value))
 			{
 				// recurse into the nested param
