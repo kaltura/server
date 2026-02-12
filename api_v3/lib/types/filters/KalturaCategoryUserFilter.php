@@ -84,7 +84,7 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 				return $response;
 			}
 
-			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId());
+			$kgroupIds = KuserKgroupPeer::retrieveKgroupIdsByKuserId($kuser->getId(), false);
 			if (!is_null($kgroupIds) && is_array($kgroupIds))
 				$userIds = $kgroupIds;
 			$userIds[] = $kuser->getId();
