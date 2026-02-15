@@ -1,3 +1,15 @@
+# Venus-22.14.0
+## Index attachment_assets to elastic and allow ##
+- Issue Type: Task
+- Issue ID: PLAT-25536
+
+### Deployment scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentation on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port' and execute the curl command
+
+      curl -X PUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"attachment_assets":{"type":"nested","properties":{"content":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}},"attachment_asset_id":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"},"page_number":{"type":"integer"},"file_name":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"},"attachment_tags":{"type":"text","analyzer":"kaltura_text","fields":{"ngrams":{"type":"text","analyzer":"kaltura_ngrams"},"raw":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}},"accuracy":{"type":"integer"},"asset_type":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"},"asset_sub_type":{"type":"keyword","normalizer":"kaltura_keyword_normalizer"}}}}}'
+
 # Venus-22.8.0
 ## Index flavor_params field to elastic and allow in advanced search ##
 - Issue Type: Task
