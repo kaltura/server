@@ -1,3 +1,11 @@
+# Venus-22.14.0
+## Deploy new Flavor params and conversion profile for PPT conversion ##
+- Issue Type: Task
+- Issue ID: PLAT-25702
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/2026_02_15_deploy_video_avatar_flavor_params.php
+
 # Venus-22.13.0
 
 ## Add partner and permissions for video avatar microservice ##
