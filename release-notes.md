@@ -1,5 +1,5 @@
 # Venus-22.14.0
-## Deploy new Flavor params and conversion profile for PPT conversion ##
+## Conversion profile for Video Avatar ##
 - Issue Type: Task
 - Issue ID: PLAT-25702
 
