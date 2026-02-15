@@ -1067,6 +1067,8 @@ class KalturaEntryService extends KalturaBaseService
 	 */
 	protected function add(KalturaBaseEntry $entry, $conversionProfileId = null)
 	{
+		$this->validateKS($entry);
+
 		$dbEntry = $this->duplicateTemplateEntry($conversionProfileId, $entry->templateEntryId, self::getCoreEntry($entry->type));
 		if ($dbEntry)
 		{
@@ -1541,7 +1543,25 @@ class KalturaEntryService extends KalturaBaseService
 		if (!$this->getKs() || !$this->getKs()->isAdmin())
 			throw new KalturaAPIException(KalturaErrors::PROPERTY_VALIDATION_ADMIN_PROPERTY, $property);	
 	}
-	
+	/**
+	 * validate if the user is allowed to update the entry
+	 * @param entry $dbEntry
+	 * @throws KalturaAPIException
+	 */
+	protected function validateKS(KalturaBaseEntry $entry)
+	{
+		if ((!$this->getKs() || !$this->getKs()->isAdmin()))
+		{
+			// non admin cannot specify a different user on the entry other than himself
+			$ksPuser = $this->getKuser()->getPuserId();
+			if (strtolower($entry->userId) != strtolower($ksPuser))
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
+			}
+		}
+	}
+
+
 	/**
 	 * Throws an error if trying to set invalid Access Control Profile
 	 * 
