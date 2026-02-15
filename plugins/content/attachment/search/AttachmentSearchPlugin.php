@@ -5,6 +5,8 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 {
 	const PLUGIN_NAME = 'attachmentSearch';
 	const MAX_ATTACHMENT_FILE_SIZE_FOR_INDEXING = 900000;
+	const MARKDOWN_ASSET = 'MarkdownAsset';
+	const ATTACHMENT_ASSET = 'AttachmentAsset';
 
 	public static function getElasticSearchData(BaseObject $object)
 	{
@@ -65,7 +67,7 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 				continue;
 			}
 
-			$accuracy = ($attachmentAsset instanceof MarkdownAsset) ? $attachmentAsset->getAccuracy() : null;
+			$accuracy = self::getAssetAccuracy($attachmentAsset);
 			$assetName = $attachmentAsset->getFilename();
 
 			self::getElasticContent($attachmentData,
@@ -81,6 +83,18 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 
 		$data['attachment_assets'] = $attachmentData;
 		return $data;
+	}
+
+	private static function getAssetAccuracy($attachmentAsset)
+	{
+		switch (get_class($attachmentAsset)) {
+			case self::MARKDOWN_ASSET:
+				return $attachmentAsset->getAccuracy();
+
+			case self::ATTACHMENT_ASSET:
+			default:
+				return null;
+		}
 	}
 
 	protected static function getElasticContent(&$attachmentData, $items, $assetId, $assetName, $assetType, $assetSubType, $tags = null, $accuracy = null)
