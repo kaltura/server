@@ -2,13 +2,18 @@
 /**
  * @package api
  * @subpackage objects
- * @abstract
  */
-class KalturaOverlayAttributes extends KalturaObject
+class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 {
 	/**
 	 * Only KalturaEntryResource and KalturaAssetResource are supported
 	 * @var KalturaContentResource
 	 */
-	public $overlayResource;
+	public $resource;
+
+	/**
+	 * Only KalturaReplaceBackgroundAttributes is supported
+	 * @var KalturaMediaCompositionAttributesArray
+	 */
+	public $resourceMediaCompositionAttributesArray;
 }

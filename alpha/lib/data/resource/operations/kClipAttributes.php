@@ -44,9 +44,9 @@ class kClipAttributes extends kOperationAttributes
 	private $cropAlignment;
 
 	/**
-	 * @var  array<kOverlayAttributes>
+	 * @var  array<kMediaCompositionAttributes>
 	 */
-	private $overlayAttributesArray;
+	private $mediaCompositionAttributesArray;
 
 
 	/* (non-PHPdoc)
@@ -61,7 +61,7 @@ class kClipAttributes extends kOperationAttributes
 			'effectArray' => $this->effectArray,
 			'cropAlignment' => $this->cropAlignment,
 			'captionAttributes' => $this->captionAttributes,
-			'overlayAttributesArray' => $this->overlayAttributesArray
+			'$mediaCompositionAttributesArray' => $this->mediaCompositionAttributesArray
 		);
 	}
 	
@@ -186,18 +186,18 @@ class kClipAttributes extends kOperationAttributes
 	}
 
 	/**
-	 * @return kOverlayAttributes
+	 * @return array
 	 */
-	public function getOverlayAttributes()
+	public function getMediaCompositionAttributesArray()
 	{
-		return $this->overlayAttributes;
+		return $this->mediaCompositionAttributesArray;
 	}
 
 	/**
-	 * @param kOverlayAttributes $overlayAttributes
+	 * @param array $mediaCompositionAttributesArray
 	 */
-	public function setOverlayAttributes($overlayAttributes)
+	public function setMediaCompositionAttributesArray($mediaCompositionAttributesArray)
 	{
-		return $this->overlayAttributes = $overlayAttributes;
+		return $this->mediaCompositionAttributesArray = $mediaCompositionAttributesArray;
 	}
 }

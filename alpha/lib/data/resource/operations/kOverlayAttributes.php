@@ -3,9 +3,58 @@
  * @package Core
  * @subpackage model.data
  */
-abstract class kOverlayAttributes
+class kOverlayAttributes extends kMediaCompositionAttributes
 {
-	abstract public function toArray();
+	/**
+	 * @var kContentResource
+	 */
+	private $resource;
 
-	abstract public function getApiType();
+	/**
+	 * @var array<kMediaCompositionAttributes>
+	 */
+	private $resourceMediaCompositionAttributesArray;
+
+
+	/**
+	 * @return kContentResource $resource
+	 */
+	public function getResource()
+	{
+		return $this->resource;
+	}
+
+	/**
+	 * @param kContentResource $resource
+	 */
+	public function setResource(kContentResource $resource)
+	{
+		$this->resource = $resource;
+	}
+
+	/**
+	 * @return array<kMediaCompositionAttributes>
+	 */
+	public function getResourceMediaCompositionAttributesArray()
+	{
+		return $this->resourceMediaCompositionAttributesArray;
+	}
+
+	/**
+	 * @param array<kMediaCompositionAttributes> $resourceMediaCompositionAttributesArray
+	 */
+	public function setResourceMediaCompositionAttributesArray($resourceMediaCompositionAttributesArray)
+	{
+		$this->resourceMediaCompositionAttributesArray = $resourceMediaCompositionAttributesArray;
+	}
+
+	public function toArray()
+	{
+		return array();
+	}
+
+	public function getApiType()
+	{
+		return 'KalturaOverlayAttributes';
+	}
 }

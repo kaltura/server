@@ -10,7 +10,13 @@ class KalturaConcatJobData extends KalturaJobData
 	 * @var KalturaStringArray
 	 */
 	public $srcFiles;
-	
+
+	/**
+	 * Additional input files to be used in conversion pre concatenation
+	 * @var KalturaStringArray
+	 */
+	public $inputFiles;
+
 	/**
 	 * Output file
 	 * @var string
