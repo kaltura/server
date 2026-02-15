@@ -64,6 +64,16 @@ class ElasticSearchPlugin extends KalturaPlugin implements IKalturaEventConsumer
 		if ($baseClass == 'ESearchItemData' && $enumValue == ESearchItemDataType::CAPTION)
 			return new ESearchCaptionItemData();
 
+		if ($baseClass == 'KalturaESearchItemData' && $enumValue == KalturaESearchItemDataType::ATTACHMENTS)
+		{
+			return new KalturaESearchAttachmentItemData();
+		}
+
+		if ($baseClass == 'ESearchItemData' && $enumValue == ESearchItemDataType::ATTACHMENTS)
+		{
+			return new ESearchAttachmentItemData();
+		}
+
 		if ($baseClass == 'KalturaESearchItemData' && $enumValue == KalturaESearchItemDataType::METADATA)
 			return new KalturaESearchMetadataItemData();
 
