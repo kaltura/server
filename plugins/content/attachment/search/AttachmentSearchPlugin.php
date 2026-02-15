@@ -36,16 +36,15 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 		$attachmentData = array();
 		foreach($attachmentAssets as $attachmentAsset)
 		{
-			// initial check - to be removed later down the road
+			// Only index MarkdownAssets with KAI provider type during initial rollout.
 			if (!($attachmentAsset instanceof MarkdownAsset) ||
 				($attachmentAsset instanceof MarkdownAsset && (int)$attachmentAsset->getProviderType() !== MarkdownProviderType::KAI))
 			{
-				KalturaLog::err("Skipping Elastic index. Provider type [" . $attachmentAsset->getProviderType() . "] on asset id " . $attachmentAsset->getId() . "isn't KAI.");
+				KalturaLog::err("Skipping Elastic index. Provider type [" . $attachmentAsset->getProviderType() . "] on asset id " . $attachmentAsset->getId());
 				continue;
 			}
 
 
-			$accuracy = null;
 			$syncKey = $attachmentAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$content = kFileSyncUtils::file_get_contents($syncKey, true, false, self::MAX_ATTACHMENT_FILE_SIZE_FOR_INDEXING);
 			if (!$content)
@@ -136,7 +135,8 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 	public static function dependsOn()
 	{
 		$attachmentDependency = new KalturaDependency(AttachmentPlugin::getPluginName());
-		return array($attachmentDependency);
+		$markdownDependency = new KalturaDependency(MarkdownPlugin::getPluginName());
+		return array($attachmentDependency, $markdownDependency);
 	}
 
 	public static function isAllowedPartner($partnerId)
