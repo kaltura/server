@@ -38,16 +38,36 @@ class ShortLinkService extends KalturaBaseService
 	function listAction(KalturaShortLinkFilter $filter = null, KalturaFilterPager $pager = null)
 	{
 		if (!$filter)
+		{
 			$filter = new KalturaShortLinkFilter;
-			
+		}
+
+		if (!kCurrentContext::$is_admin_session)
+		{
+			if (!kCurrentContext::$ks_uid)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID);
+			}
+
+			if ($filter->userIdEqual !== null && kCurrentContext::$ks_uid != $filter->userIdEqual)
+			{
+				throw new KalturaAPIException(KalturaErrors::CANNOT_RETRIEVE_ANOTHER_USERS_SHORT_LINK, $filter->userIdEqual);
+			}
+
+			$filter->userIdEqual = kCurrentContext::$ks_uid;
+		}
+
 		$shortLinkFilter = $filter->toFilter($this->getPartnerId());
 		
 		$c = new Criteria();
 		$shortLinkFilter->attachToCriteria($c);
 		$count = ShortLinkPeer::doCount($c);
 		
-		if (! $pager)
-			$pager = new KalturaFilterPager ();
+		if (!$pager)
+		{
+			$pager = new KalturaFilterPager();
+		}
+
 		$pager->attachToCriteria ( $c );
 		$list = ShortLinkPeer::doSelect($c);
 		
@@ -172,6 +192,8 @@ class ShortLinkService extends KalturaBaseService
 	 * @ksIgnored
 	 * 
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
+	 * @throws KalturaErrors::INVALID_SHORT_LINK
+	 * @throws KalturaErrors::EXPIRED_SHORT_LINK
 	 */		
 	function gotoAction($id, $proxy = false)
 	{
@@ -180,10 +202,27 @@ class ShortLinkService extends KalturaBaseService
 		$dbShortLink = ShortLinkPeer::retrieveByPK($id);
 	
 		if (!$dbShortLink)
+		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $id);
+		}
 
-		if($proxy)
+		$status = $dbShortLink->getStatus();
+		$expiryTime = $dbShortLink->getExpiresAt();
+
+		if ($status == KalturaShortLinkStatus::DELETED || $status == KalturaShortLinkStatus::DISABLED)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_SHORT_LINK, $id);
+		}
+
+		if ($expiryTime && strtotime($expiryTime) < time())
+		{
+			throw new KalturaAPIException(KalturaErrors::EXPIRED_SHORT_LINK, $id);
+		}
+
+		if ($proxy)
+		{
 			kFileUtils::dumpUrl($dbShortLink->getFullUrl(), true, true);
+		}
 		
 		header('Location: ' . $dbShortLink->getFullUrl());
 		die;

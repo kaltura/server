@@ -13,11 +13,6 @@ class VendorVideoAnalysisCatalogItem extends VendorCatalogItem
 		$this->setServiceFeature(VendorServiceFeature::VIDEO_ANALYSIS);
 	}
 
-	public function isDuplicateTask($entryId, $entryObjectType, $partnerId): bool
-	{
-		return false;
-	}
-
 	public function isEntryTypeSupported($type, $mediaType = null): bool
 	{
 		$supportedMediaTypes = [entry::ENTRY_MEDIA_TYPE_VIDEO];
