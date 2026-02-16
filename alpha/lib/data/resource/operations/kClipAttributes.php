@@ -61,7 +61,7 @@ class kClipAttributes extends kOperationAttributes
 			'effectArray' => $this->effectArray,
 			'cropAlignment' => $this->cropAlignment,
 			'captionAttributes' => $this->captionAttributes,
-			'$mediaCompositionAttributesArray' => $this->mediaCompositionAttributesArray
+			'mediaCompositionAttributesArray' => $this->mediaCompositionAttributesArray
 		);
 	}
 	

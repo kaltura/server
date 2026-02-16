@@ -28,7 +28,7 @@ class kReplaceBackgroundAttributes extends kMediaCompositionAttributes
 
 	public function toArray()
 	{
-		return array();
+		return array('resource' => $this->resource);
 	}
 
 	public function getApiType()

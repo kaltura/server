@@ -50,7 +50,10 @@ class kOverlayAttributes extends kMediaCompositionAttributes
 
 	public function toArray()
 	{
-		return array();
+		return array(
+			'resource' => $this->resource,
+			'resourceMediaCompositionAttributesArray' => $this->resourceMediaCompositionAttributesArray
+		);
 	}
 
 	public function getApiType()
