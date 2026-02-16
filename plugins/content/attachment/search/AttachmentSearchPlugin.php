@@ -19,7 +19,7 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 	}
 
 
-	public static function getAttachmentElasticSearchData($entry): array | null
+	public static function getAttachmentElasticSearchData($entry): array
 	{
 		$attachmentAssets = assetPeer::retrieveByEntryId($entry->getId(),
 			array(
