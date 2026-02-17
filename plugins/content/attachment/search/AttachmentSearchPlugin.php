@@ -87,7 +87,8 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 
 	private static function getAssetAccuracy($attachmentAsset)
 	{
-		switch (get_class($attachmentAsset)) {
+		switch (get_class($attachmentAsset))
+		{
 			case self::MARKDOWN_ASSET:
 				return $attachmentAsset->getAccuracy();
 
@@ -127,7 +128,8 @@ class AttachmentSearchPlugin extends KalturaPlugin implements IKalturaPending, I
 
 			$content = kString::stripUtf8InvalidChars($content);
 
-			if (strlen($content) > kElasticSearchManager::MAX_LENGTH) {
+			if (strlen($content) > kElasticSearchManager::MAX_LENGTH)
+			{
 				$chunks = str_split($content, kElasticSearchManager::MAX_LENGTH);
 			}
 			else
