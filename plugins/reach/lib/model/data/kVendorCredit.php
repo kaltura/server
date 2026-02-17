@@ -181,6 +181,7 @@ class kVendorCredit
 		$finishC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
 		$finishC->add(EntryVendorTaskPeer::STATUS, EntryVendorTaskStatus::READY);
 		$finishC->add(EntryVendorTaskPeer::FINISH_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
+		$finishC->add(EntryVendorTaskPeer::UPDATED_AT, $syncStartDate, Criteria::GREATER_EQUAL);
 
 		$finishedTasks = EntryVendorTaskPeer::doSelect($finishC);
 
