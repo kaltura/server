@@ -188,7 +188,7 @@ class ESearchAttachmentItemData extends ESearchItemData
 		$this->setAssetSubType($objectResult['_source']['asset_sub_type']);
 		$this->setPageNumber($objectResult['_source']['page_number']);
 		$this->setFileName($objectResult['_source']['file_name']);
-		$this->setAssetId($objectResult['_source']['asset_id']);
+		$this->setAssetId($objectResult['_source']['attachment_asset_id']);
 
 		if (isset($objectResult['_source']['accuracy']))
 		{
