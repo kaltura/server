@@ -2,7 +2,6 @@
 
 class EntryHandler implements VendorTaskObjectHandler
 {
-	const MINIMUM_DURATION_IN_SECONDS = 10;
 
 	public static function shouldAddEntryVendorTask($taskObject, $vendorCatalogItem): bool
 	{
@@ -46,7 +45,7 @@ class EntryHandler implements VendorTaskObjectHandler
 
 		if ($vendorCatalogItem->isEntryUnderMinimumDuration($taskObject))
 		{
-			KalturaLog::log("Entry [{$taskObject->getId()}] is under the limit of " . self::MINIMUM_DURATION_IN_SECONDS . " seconds, entry vendor task object wont be created for it");
+			KalturaLog::log("Entry [{$taskObject->getId()}] is under the minimum duration limit, entry vendor task object wont be created for it");
 			return false;
 		}
 
