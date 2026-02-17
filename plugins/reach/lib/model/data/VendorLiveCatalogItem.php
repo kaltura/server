@@ -51,4 +51,9 @@ class VendorLiveCatalogItem extends VendorCaptionsCatalogItem implements IVendor
 
 		return in_array($type, $supportedTypes);
 	}
+
+	public function isEntryUnderMinimumDuration(entry $entry)
+	{
+		return false;
+	}
 }
