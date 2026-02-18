@@ -1,6 +1,6 @@
 <?php
 
-require_once(KALTURA_ROOT_PATH . '/alpha/apps/kaltura/lib/cache/kCacheManager.php');
+require_once(KALTURA_ROOT_PATH . '/infra/cache/kCacheManager.php');
 require_once(KALTURA_ROOT_PATH . '/vendor/facebook-sdk-php-v5-customized/autoload.php');
 
 /**

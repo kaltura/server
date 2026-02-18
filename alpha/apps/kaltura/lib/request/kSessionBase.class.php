@@ -6,7 +6,7 @@
  * @subpackage request
  */
 require_once(dirname(__FILE__) . '/infraRequestUtils.class.php');
-require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../../../../infra/cache/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../../../../../infra/general/KCryptoWrapper.class.php');
 require_once(dirname(__FILE__) . '/../../../../../infra/general/kConfMapNames.php');
 
