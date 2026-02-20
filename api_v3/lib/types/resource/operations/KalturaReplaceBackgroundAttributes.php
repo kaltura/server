@@ -10,4 +10,27 @@ class KalturaReplaceBackgroundAttributes extends KalturaMediaCompositionAttribut
 	 * @var KalturaContentResource
 	 */
 	public $resource;
+
+	private static $map_between_objects = array
+	(
+		"resource"
+	);
+
+	public function getMapBetweenObjects()
+	{
+		return array_merge(parent::getMapBetweenObjects(), self::$map_between_objects);
+	}
+
+	public function toObject($object_to_fill = null, $props_to_skip = array())
+	{
+		$this->validateForUsage($object_to_fill, $props_to_skip);
+
+		if(!$object_to_fill)
+		{
+			$object_to_fill = new kReplaceBackgroundAttributes();
+		}
+		$object_to_fill->setResource($this->resource->toObject());
+
+		return parent::toObject($object_to_fill, $props_to_skip);
+	}
 }

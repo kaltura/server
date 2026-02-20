@@ -67,6 +67,7 @@ class KalturaConcatJobData extends KalturaJobData
 	private static $map_between_objects = array
 	(
 		'srcFiles',
+		'inputFiles',
 		'destFilePath',
 		'flavorAssetId',
 		'offset',

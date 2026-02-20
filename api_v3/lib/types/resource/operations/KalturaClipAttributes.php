@@ -89,6 +89,16 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 				$renderCaptionAttribute = $captionAttribute;
 			}
 		}
+
+		$mediaCompositionAttribute = null;
+		foreach ($this->mediaCompositionAttributesArray as $Attribute)
+		{
+			if($mediaCompositionAttribute)
+			{
+				throw new KalturaAPIException(KalturaErrors::MULTIPLE_PARAMETER_NOT_SUPPORTED, 'mediaCompositionAttributes');
+			}
+			$mediaCompositionAttribute = $Attribute;
+		}
 	}
 
 	public function toObject($object_to_fill = null, $props_to_skip = array())
