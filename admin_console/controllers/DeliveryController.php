@@ -424,10 +424,14 @@ class DeliveryController extends Zend_Controller_Action
 		switch($filterType)
 		{
 			case 'by-delivery-id':
-				$filter->idEqual = $filterInput;
+				if ($filterInput != '') {
+					$filter->idEqual = $filterInput;
+				}
 				break;
 			case 'byid':
-				$filter->partnerIdEqual = $filterInput;
+				if ($filterInput != '') {
+					$filter->partnerIdEqual = $filterInput;
+				}
 				break;
 			default:
 				// No filter applied
