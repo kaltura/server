@@ -32,11 +32,6 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 	{
 		$this->validateForUsage($object_to_fill, $props_to_skip);
 
-		if(is_null($this->resourceMediaCompositionAttributesArray) || !count($this->resourceMediaCompositionAttributesArray))
-		{
-			return $this->resource->toObject();
-		}
-
 		if(!$object_to_fill)
 		{
 			$object_to_fill = new kOverlayAttributes();

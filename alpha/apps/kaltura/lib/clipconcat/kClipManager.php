@@ -1411,7 +1411,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			// each clipConcatJob represent a single operation resource
 			foreach ($clipConcatJobs as $key => $clipConcatJob)
 			{
-				KalturaLog::debug("Going To Start Concat Job " . $key + 1 . "/$concatJobsCount for Multi Clip Concat");
+				KalturaLog::debug("Going To Start Concat Job " . ($key + 1) . "/$concatJobsCount for Multi Clip Concat");
 
 				if($clipConcatJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 				{
@@ -1482,7 +1482,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		if($mediaCompositionAttribute instanceof kOverlayAttributes || $mediaCompositionAttribute instanceof kReplaceBackgroundAttributes)
 		{
-			$entryId = $mediaCompositionAttribute->getResource()->getOriginEntryId();
+			$resource = $mediaCompositionAttribute->getResource();
+			$entryId = $resource->getOriginEntryId();
 		}
 		if(!$entryId)
 		{
@@ -1502,6 +1503,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		else
 		{
 			$assets = assetPeer::retrieveByEntryId($entryId, array(assetType::FLAVOR));
+			if (is_null($assets) || count($assets) == 0)
+			{
+				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
+			}
 			return $this->getOriginalAssetFilePath($assets);
 		}
 	}
@@ -1653,32 +1658,48 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$composedVideoStreamName = '[vcomposed]';
 		$audioMapName = "0:a";
 
-		$index = 0;
+		$fileNameIndex = 0;
 		foreach ($operationAttribute->getMediaCompositionAttributesArray() as $mediaCompositionAttributes)
 		{
-			$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $index);
-			$index++;
+			$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
+			$fileNameIndex++;
 
 			if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
-				$filterComplex =
-					"[1:v]scale=iw*0.3:ih*0.3,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];
-					[2:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src];
-					[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2];
-					[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect];
-					[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle];
-					[0:v][front_circle]overlay=x=main_w-overlay_w-main_w*0.03:y=main_h-overlay_h-main_h*0.03:format=auto:shortest=1$composedVideoStreamName;
-					[1:a]asetpts=PTS-STARTPTS,volume=0.333[a_secondary];[0:a]asetpts=PTS-STARTPTS,volume=0.333[a_main];
-					[a_secondary][a_main]amix=inputs=2:duration=shortest:dropout_transition=0[aout]";
+				$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
+				$overlayCircleOnVideoFilter = "[0:v][front_circle]overlay=x=main_w-overlay_w-main_w*0.03:y=main_h-overlay_h-main_h*0.03:format=auto:shortest=1$composedVideoStreamName";
+				$defineAudioVolumesFilter = "[1:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[0:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
+				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:dropout_transition=0[aout]";
 				$audioMapName = '"[aout]"';
+
 				$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
-				if($attributesArray)
+				if(isset($attributesArray[0]))
 				{
-					foreach ($attributesArray as $attributes)
-					{
-						$cmdFileNames .= $this->getFileInputCommandByEntryType($attributes, $index);
-						$index++;
-					}
+					$scaleAndRemoveBGColor = "[1:v]scale=iw*0.3:ih*0.3,chromakey=0x6FED48:0.14:0.08,format=rgba[fg]";
+					$normalizeImage = "[2:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src]";
+					$alignSizes = "[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2]";
+					$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
+					$replaceBackgroundImage = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
+
+					$filterComplex =
+						"$replaceBackgroundImage;
+						$createCircleShapeFilter;
+						$overlayCircleOnVideoFilter;
+						$defineAudioVolumesFilter;
+						$combineAudioFilter";
+
+					$cmdFileNames .= $this->getFileInputCommandByEntryType($attributesArray[0], $fileNameIndex);
+					$fileNameIndex++;
+				}
+				else
+				{
+					$scaleOverlayVideo = "[1:v]scale=iw*0.3:ih*0.3[front_rect]";
+					$filterComplex =
+						"$scaleOverlayVideo;
+						$createCircleShapeFilter;
+						$overlayCircleOnVideoFilter;
+						$defineAudioVolumesFilter;
+						$combineAudioFilter";
 				}
 			}
 			else if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
