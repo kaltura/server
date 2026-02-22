@@ -1240,13 +1240,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	 * @return array
 	 * @throws kCoreException
 	 */
-	protected function getSingleAssetFilePath($assets, $isOriginal = false)
+	protected function getOriginalAssetFilePath($assets)
 	{
 		foreach ($assets as $asset)
 		{
 			/**
 			 * @var flavorAsset $asset */
-			if ($isOriginal && !$asset->getIsOriginal())
+			if (!$asset->getIsOriginal())
 			{
 				continue;
 			}
@@ -1407,7 +1407,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$convertCommands = array();
 			$inputFiles = array();
 			$concatJobsCount = count($clipConcatJobs);
-			// TODO check note
+
 			// each clipConcatJob represent a single operation resource
 			foreach ($clipConcatJobs as $key => $clipConcatJob)
 			{
@@ -1464,7 +1464,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$allCompositionAttributesFiles[] = $this->getConvertInputFilesFromMediaComposition($mediaCompositionAttribute);
 			if($mediaCompositionAttribute instanceof kOverlayAttributes)
 			{
-				// TODO - this is one layer
+				// Process one layer of nested mediaCompositionAttribute
 				$resourceCompositionArray = $mediaCompositionAttribute->getResourceMediaCompositionAttributesArray();
 				if($resourceCompositionArray)
 				{
@@ -1486,14 +1486,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		if(!$entryId)
 		{
-			// TODO throw
-			return ;
+			return;
 		}
 		$resourceEntry = entryPeer::retrieveByPK($entryId);
 		if (is_null($resourceEntry))
 		{
-			// TODO throw
-			return;
+			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 		}
 
 		if($resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -1504,7 +1502,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		else
 		{
 			$assets = assetPeer::retrieveByEntryId($entryId, array(assetType::FLAVOR));
-			return $this->getSingleAssetFilePath($assets, true);
+			return $this->getOriginalAssetFilePath($assets);
 		}
 	}
 
@@ -1615,19 +1613,23 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$entryId = $resource->getOriginEntryId();
 				if ($entryId)
 				{
-					return entryPeer::retrieveByPK($entryId);
+					$entry = entryPeer::retrieveByPK($entryId);
+					if(!$entry)
+					{
+						throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+					}
+					return $entry;
 				}
 			}
 		}
 	}
 
-	protected function getFileCommandByType($mediaCompositionAttributes, $key)
+	protected function getFileInputCommandByEntryType($mediaCompositionAttributes, $key)
 	{
 		$resourceEntry = $this->getMediaCompositionAttributesResourceEntry($mediaCompositionAttributes);
 		if(!$resourceEntry)
 		{
-			return "";
-			// TODO check throw error
+			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "resource");
 		}
 		if($resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
@@ -1638,8 +1640,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function getConvertOverlayCommand($jobData, kClipAttributes $operationAttribute, $sortedFilters)
 	{
+		// overlay command is based on inputFiles order in concat jobData
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
-
 		if(!$flavorParamsObj)
 		{
 			return "-";
@@ -1654,26 +1656,37 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$index = 0;
 		foreach ($operationAttribute->getMediaCompositionAttributesArray() as $mediaCompositionAttributes)
 		{
-			$cmdFileNames .= $this->getFileCommandByType($mediaCompositionAttributes, $index);
+			$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $index);
 			$index++;
 
 			if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
-				$filterComplex = "[1:v]scale=iw*0.3:ih*0.3,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];[2:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src];[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2];[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect];[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle];[0:v][front_circle]overlay=x=main_w-overlay_w-main_w*0.03:y=main_h-overlay_h-main_h*0.03:format=auto:shortest=1$composedVideoStreamName;[1:a]asetpts=PTS-STARTPTS,volume=0.333[a_avatar];[0:a]asetpts=PTS-STARTPTS,volume=0.333[a_broll];[a_avatar][a_broll]amix=inputs=2:duration=shortest:dropout_transition=0[aout]";
+				$filterComplex =
+					"[1:v]scale=iw*0.3:ih*0.3,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];
+					[2:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src];
+					[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2];
+					[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect];
+					[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle];
+					[0:v][front_circle]overlay=x=main_w-overlay_w-main_w*0.03:y=main_h-overlay_h-main_h*0.03:format=auto:shortest=1$composedVideoStreamName;
+					[1:a]asetpts=PTS-STARTPTS,volume=0.333[a_secondary];[0:a]asetpts=PTS-STARTPTS,volume=0.333[a_main];
+					[a_secondary][a_main]amix=inputs=2:duration=shortest:dropout_transition=0[aout]";
 				$audioMapName = '"[aout]"';
 				$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
 				if($attributesArray)
 				{
 					foreach ($attributesArray as $attributes)
 					{
-						$cmdFileNames .= $this->getFileCommandByType($attributes, $index);
+						$cmdFileNames .= $this->getFileInputCommandByEntryType($attributes, $index);
 						$index++;
 					}
 				}
 			}
 			else if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
 			{
-				$filterComplex = "[0:v]setpts=PTS-STARTPTS,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];[1:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];[bg][fg2]overlay=0:0:format=auto:shortest=1$composedVideoStreamName";
+				$filterComplex =
+					"[0:v]setpts=PTS-STARTPTS,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];
+					[1:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];
+					[bg][fg2]overlay=0:0:format=auto:shortest=1$composedVideoStreamName";
 			}
 		}
 

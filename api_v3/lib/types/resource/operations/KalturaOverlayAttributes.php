@@ -53,4 +53,32 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+
+		$this->validatePropertyNotNull('resource');
+		$this->resource->validateForUsage($sourceObject, $propertiesToSkip);
+
+		if(isset($this->resourceMediaCompositionAttributesArray[0]))
+		{
+			$mediaAttributes = $this->resourceMediaCompositionAttributesArray[0];
+			if(count($this->resourceMediaCompositionAttributesArray) > 1)
+			{
+				throw new KalturaAPIException(KalturaErrors::RESOURCE_MEDIA_COMPOSITION_COUNT_EXCEEDED_MAX_ALLOWED_COUNT, 1);
+			}
+
+			if($mediaAttributes instanceof KalturaOverlayAttributes)
+			{
+				throw new KalturaAPIException(KalturaErrors::MULTIPLE_PARAMETER_NOT_SUPPORTED, "KalturaOverlayAttributes");
+			}
+
+			$mediaAttributes->validateForUsage($sourceObject, $propertiesToSkip);
+
+		}
+	}
 }

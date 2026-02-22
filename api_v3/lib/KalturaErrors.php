@@ -205,6 +205,7 @@ class KalturaErrors extends APIErrors
 	const CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION = "CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION;MAX_DURATION;clips durations exceeded max allowed duration \"@MAX_DURATION@\" in seconds";
 
 	const RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;count of clip resources exceeded limit of \"@MAX_COUNT@\"";
+	const RESOURCE_MEDIA_COMPOSITION_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCE_COMPOSITION_ARRAY_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;count of resource media composition attributes exceeded limit of \"@MAX_COUNT@\"";
 
 
 	/**

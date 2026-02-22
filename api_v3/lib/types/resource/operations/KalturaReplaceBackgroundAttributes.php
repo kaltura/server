@@ -33,4 +33,15 @@ class KalturaReplaceBackgroundAttributes extends KalturaMediaCompositionAttribut
 
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
+
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
+	 */
+	public function validateForUsage($sourceObject, $propertiesToSkip = array())
+	{
+		parent::validateForUsage($sourceObject, $propertiesToSkip);
+
+		$this->validatePropertyNotNull('resource');
+		$this->resource->validateForUsage($sourceObject, $propertiesToSkip);
+	}
 }
