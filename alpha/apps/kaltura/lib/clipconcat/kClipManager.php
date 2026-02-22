@@ -1381,7 +1381,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$deleteEntry = $clipConcatJobData->getTempEntryId();
 			}
-//			$this->deleteEntry($deleteEntry);
+			$this->deleteEntry($deleteEntry);
 		}
 	}
 
@@ -1442,7 +1442,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					// assume concatenated assets have the same actualFlavorParamsId and take the last
 					$lastAssetId = $flavorAssetId ? $flavorAssetId : $lastAssetId;
 				}
-//				$this->deleteEntry($jobData->getTempEntryId());
+				$this->deleteEntry($jobData->getTempEntryId());
 			}
 
 			// use no filter because we delete the entry
