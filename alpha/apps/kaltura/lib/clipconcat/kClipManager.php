@@ -1658,6 +1658,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$composedVideoStreamName = '[vcomposed]';
 		$audioMapName = "0:a";
 		$mainFileNameIndex = 0;
+		$BGColor = "0x6FED48";
+		$overlayScalePercentage = 0.3;
 
 		$fileNameIndex = 0;
 		foreach ($operationAttribute->getMediaCompositionAttributesArray() as $mediaCompositionAttributes)
@@ -1669,7 +1671,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$backgroundFileNameIndex = 1;
 				$filterComplex =
-					"[$mainFileNameIndex:v]setpts=PTS-STARTPTS,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];
+					"[$mainFileNameIndex:v]setpts=PTS-STARTPTS,chromakey=$BGColor:0.14:0.08,format=rgba[fg];
 					[$backgroundFileNameIndex:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];
 					[bg][fg2]overlay=0:0:format=auto:shortest=1$composedVideoStreamName";
 			}
@@ -1677,8 +1679,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
 				$overlayFileNameIndex = 1;
+				$marginsPercentage = 0.03;
 				$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
-				$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-main_w*0.03:y=main_h-overlay_h-main_h*0.03:format=auto:shortest=1$composedVideoStreamName";
+				$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-main_w*$marginsPercentage:y=main_h-overlay_h-main_h*$marginsPercentage:format=auto:shortest=1$composedVideoStreamName";
 				$defineAudioVolumesFilter = "[$overlayFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
 				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:dropout_transition=0[aout]";
 				$audioMapName = '"[aout]"';
@@ -1688,7 +1691,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				if(isset($attributesArray[0]))
 				{
 					$backgroundFileNameIndex = 2;
-					$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=iw*0.3:ih*0.3,chromakey=0x6FED48:0.14:0.08,format=rgba[fg]";
+					$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
 					$normalizeImage = "[$backgroundFileNameIndex:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src]";
 					$alignSizes = "[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2]";
 					$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
@@ -1705,7 +1708,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				}
 				else
 				{
-					$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*0.3:ih*0.3[front_rect]";
+					$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage" . "[front_rect]";
 					$filterComplex =
 						"$scaleOverlayVideo;
 						$createCircleShapeFilter;
