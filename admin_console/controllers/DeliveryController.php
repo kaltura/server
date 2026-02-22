@@ -425,7 +425,7 @@ class DeliveryController extends Zend_Controller_Action
 		{
 			case 'by-delivery-id':
 				if ($filterInput != '') {
-					$filter->idEqual = $filterInput;
+					$filter->idIn = $filterInput;
 				}
 				break;
 			case 'byid':
