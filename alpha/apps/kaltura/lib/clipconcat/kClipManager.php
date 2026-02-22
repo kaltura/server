@@ -1657,6 +1657,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$cmdFileNames = " -i __inFileName__ ";
 		$composedVideoStreamName = '[vcomposed]';
 		$audioMapName = "0:a";
+		$mainFileNameIndex = 0;
 
 		$fileNameIndex = 0;
 		foreach ($operationAttribute->getMediaCompositionAttributesArray() as $mediaCompositionAttributes)
@@ -1664,25 +1665,36 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
 			$fileNameIndex++;
 
-			if($mediaCompositionAttributes instanceof kOverlayAttributes)
+			if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
 			{
+				$backgroundFileNameIndex = 1;
+				$filterComplex =
+					"[$mainFileNameIndex:v]setpts=PTS-STARTPTS,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];
+					[$backgroundFileNameIndex:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];
+					[bg][fg2]overlay=0:0:format=auto:shortest=1$composedVideoStreamName";
+			}
+
+			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
+			{
+				$overlayFileNameIndex = 1;
 				$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
-				$overlayCircleOnVideoFilter = "[0:v][front_circle]overlay=x=main_w-overlay_w-main_w*0.03:y=main_h-overlay_h-main_h*0.03:format=auto:shortest=1$composedVideoStreamName";
-				$defineAudioVolumesFilter = "[1:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[0:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
+				$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-main_w*0.03:y=main_h-overlay_h-main_h*0.03:format=auto:shortest=1$composedVideoStreamName";
+				$defineAudioVolumesFilter = "[$overlayFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
 				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:dropout_transition=0[aout]";
 				$audioMapName = '"[aout]"';
 
 				$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
+
 				if(isset($attributesArray[0]))
 				{
-					$scaleAndRemoveBGColor = "[1:v]scale=iw*0.3:ih*0.3,chromakey=0x6FED48:0.14:0.08,format=rgba[fg]";
-					$normalizeImage = "[2:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src]";
+					$backgroundFileNameIndex = 2;
+					$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=iw*0.3:ih*0.3,chromakey=0x6FED48:0.14:0.08,format=rgba[fg]";
+					$normalizeImage = "[$backgroundFileNameIndex:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src]";
 					$alignSizes = "[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2]";
 					$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
-					$replaceBackgroundImage = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
-
+					$replaceOverlayBackground = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
 					$filterComplex =
-						"$replaceBackgroundImage;
+						"$replaceOverlayBackground;
 						$createCircleShapeFilter;
 						$overlayCircleOnVideoFilter;
 						$defineAudioVolumesFilter;
@@ -1693,7 +1705,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				}
 				else
 				{
-					$scaleOverlayVideo = "[1:v]scale=iw*0.3:ih*0.3[front_rect]";
+					$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*0.3:ih*0.3[front_rect]";
 					$filterComplex =
 						"$scaleOverlayVideo;
 						$createCircleShapeFilter;
@@ -1701,13 +1713,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 						$defineAudioVolumesFilter;
 						$combineAudioFilter";
 				}
-			}
-			else if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
-			{
-				$filterComplex =
-					"[0:v]setpts=PTS-STARTPTS,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];
-					[1:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];
-					[bg][fg2]overlay=0:0:format=auto:shortest=1$composedVideoStreamName";
 			}
 		}
 
