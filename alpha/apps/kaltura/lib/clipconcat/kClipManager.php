@@ -18,7 +18,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const CROP = 'crop';
 	const CROP_DATA_ARRAY = 'cropDataArray';
 	const SUBTITLES_DATA_ARRAY = 'subtitlesDataArray';
-	const OVERLAY_DATA_ARRAY = 'overlayDataArray';
 	const CONVERSION_PARAMS = 'conversionParams';
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
 	const CLIPS_DURATION = 'clipsDuration';
@@ -717,13 +716,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$resourcesData[$key][self::SUBTITLES_DATA_ARRAY] = $subtitlesArray;
 			}
 
-			// TODO: maybe not needed
-			$overlayArray = $this->getMediaCompositionArray($resourceData[self::OPERATION_ATTRIBUTES_ARRAY]);
-			if(count($overlayArray) > 0)
-			{
-				$resourcesData[$key][self::OVERLAY_DATA_ARRAY] = $overlayArray;
-			}
-
 			if($mediaInfoObj->getAudioChannels())
 			{
 				$allAudioChannels[] = $mediaInfoObj->getAudioChannels();
@@ -841,27 +833,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$subtitlesDataArray[] = $this->getSubtitlesData($operationAttribute->getCaptionAttributes());
 		}
 		return $subtitlesDataArray;
-	}
-
-	protected function getMediaCompositionArray($operationAttributes)
-	{
-		$mediaCompositionAttributesArray = array();
-		foreach ($operationAttributes as $operationAttribute)
-		{
-			$mediaCompositionAttributesArray[] = $operationAttribute->getMediaCompositionAttributesArray();
-		}
-		return $mediaCompositionAttributesArray;
-	}
-
-	protected function getMediaCompositionAttributeByType($mediaCompositionAttributesArray, $coreType)
-	{
-		foreach ($mediaCompositionAttributesArray as $mediaCompositionAttributes)
-		{
-			if($mediaCompositionAttributes instanceOf $coreType)
-			{
-				return $mediaCompositionAttributes;
-			}
-		}
 	}
 
 	protected function getRenderCaptionAttribute($captionAttributes)
@@ -1491,13 +1462,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		foreach ($mediaCompositionAttributes as $mediaCompositionAttribute)
 		{
 			$allCompositionAttributesFiles[] = $this->getConvertInputFilesFromMediaComposition($mediaCompositionAttribute);
-			if($mediaCompositionAttribute instanceof kOverlayAttributes && $mediaCompositionAttribute->getResourceMediaCompositionAttributesArray())
+			if($mediaCompositionAttribute instanceof kOverlayAttributes)
 			{
-				$resourceCompositionArray = $mediaCompositionAttribute->getResourceMediaCompositionAttributesArray();
 				// TODO - this is one layer
-				foreach ($resourceCompositionArray as  $compositionAttribute)
+				$resourceCompositionArray = $mediaCompositionAttribute->getResourceMediaCompositionAttributesArray();
+				if($resourceCompositionArray)
 				{
-					$allCompositionAttributesFiles[] = $this->getConvertInputFilesFromMediaComposition($compositionAttribute);
+					foreach ($resourceCompositionArray as $compositionAttribute)
+					{
+						$allCompositionAttributesFiles[] = $this->getConvertInputFilesFromMediaComposition($compositionAttribute);
+					}
 				}
 			}
 		}
@@ -1518,9 +1492,20 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$resourceEntry = entryPeer::retrieveByPK($entryId);
 		if (is_null($resourceEntry))
 		{
-			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
+			// TODO throw
+			return;
 		}
-		return $this->getSingleAssetFilePath($resourceEntry, true);
+
+		if($resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
+			$syncKey = $resourceEntry->getSyncKey(kEntryFileSyncSubType::DATA);
+			return kFileSyncUtils::getLocalFilePathForKey($syncKey);
+		}
+		else
+		{
+			$assets = assetPeer::retrieveByEntryId($entryId, array(assetType::FLAVOR));
+			return $this->getSingleAssetFilePath($assets, true);
+		}
 	}
 
 	protected function getConvertCommandForFile($jobData, $operationAttributesSorted, $clipIndex)
@@ -1529,8 +1514,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$operationAttribute = $operationAttributesSorted[$clipIndex];
 		$sortedFilters = $this->getSortedFiltersComplexForConcat($jobData, $operationAttributesSorted, $clipIndex);
 		$imageToVideo = $this->getJobDataConversionParams($jobData, self::IMAGE_TO_VIDEO);
-		$overlay = $this->getJobDataConversionParams($jobData, self::OVERLAY_DATA_ARRAY);
-		if(true)
+		$mediaCompositionAttributes = $operationAttribute->getMediaCompositionAttributesArray();
+		if($mediaCompositionAttributes && count($mediaCompositionAttributes) > 0)
 		{
 			return $this->getConvertOverlayCommand($jobData, $operationAttribute, $sortedFilters);
 		}
@@ -1636,6 +1621,21 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
+	protected function getFileCommandByType($mediaCompositionAttributes, $key)
+	{
+		$resourceEntry = $this->getMediaCompositionAttributesResourceEntry($mediaCompositionAttributes);
+		if(!$resourceEntry)
+		{
+			return "";
+			// TODO check throw error
+		}
+		if($resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
+			return " -loop 1 -i __inFileName".$key."__ ";
+		}
+		return " -i __inFileName".$key."__ ";
+	}
+
 	protected function getConvertOverlayCommand($jobData, kClipAttributes $operationAttribute, $sortedFilters)
 	{
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
@@ -1648,32 +1648,54 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$conversionParams = $this->getJobDataConversionParams($jobData);
 
 		$cmdFileNames = " -i __inFileName__ ";
-		KalturaLog::debug("==================== " . print_r($operationAttribute, true));
+		$composedVideoStreamName = '[vcomposed]';
+		$audioMapName = "0:a";
 
-		foreach ($operationAttribute->getMediaCompositionAttributesArray() as $key => $mediaCompositionAttributes)
+		$index = 0;
+		foreach ($operationAttribute->getMediaCompositionAttributesArray() as $mediaCompositionAttributes)
 		{
-			$resourceEntry = $this->getMediaCompositionAttributesResourceEntry($mediaCompositionAttributes);
-			if(!$resourceEntry)
+			$cmdFileNames .= $this->getFileCommandByType($mediaCompositionAttributes, $index);
+			$index++;
+
+			if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
-				KalturaLog::debug("====================");
-				return "-";
-				// TODO check throw error
+				$filterComplex = "[1:v]scale=iw*0.3:ih*0.3,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];[2:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src];[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2];[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect];[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle];[0:v][front_circle]overlay=x=main_w-overlay_w-main_w*0.03:y=main_h-overlay_h-main_h*0.03:format=auto:shortest=1$composedVideoStreamName;[1:a]asetpts=PTS-STARTPTS,volume=0.333[a_avatar];[0:a]asetpts=PTS-STARTPTS,volume=0.333[a_broll];[a_avatar][a_broll]amix=inputs=2:duration=shortest:dropout_transition=0[aout]";
+				$audioMapName = '"[aout]"';
+				$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
+				if($attributesArray)
+				{
+					foreach ($attributesArray as $attributes)
+					{
+						$cmdFileNames .= $this->getFileCommandByType($attributes, $index);
+						$index++;
+					}
+				}
 			}
-			if($resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
+			else if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
 			{
-				$cmdFileNames .= " -loop 1 -i __inFileName".$key."__ ";
-			}
-			else if($resourceEntry->getMediaType() == KalturaMediaType::VIDEO)
-			{
-				$cmdFileNames .= " -i __inFileName".$key."__ ";
+				$filterComplex = "[0:v]setpts=PTS-STARTPTS,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];[1:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];[bg][fg2]overlay=0:0:format=auto:shortest=1$composedVideoStreamName";
 			}
 		}
+
+		if(!$filterComplex)
+		{
+			return "-";
+		}
+
 		$cmdStr = $cmdFileNames;
-		$composedVideoStreamName = "[vcomposed]";
-		$filterComplexAdd = '[0:v]setpts=PTS-STARTPTS,chromakey=0x6FED48:0.14:0.08,format=rgba[fg];[1:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];[bg][fg2]overlay=0:0:format=auto:shortest=1' . $composedVideoStreamName;
-		$filterComplex = $filterComplexAdd . $this->getMappedSortedFiltersComplex($sortedFilters, $composedVideoStreamName);
+		$mappedSortedFilters = $this->getMappedSortedFiltersComplex($sortedFilters, $composedVideoStreamName);
+		$filterComplex .= $mappedSortedFilters;
+		if($mappedSortedFilters == "")
+		{
+			$outVideoStreamName = '"' . $composedVideoStreamName . '"';
+		}
+		else
+		{
+			$outVideoStreamName = '[vout]';
+			$filterComplex .= $outVideoStreamName;
+		}
 		$cmdStr .= $this->getAspectCommand($conversionParams, $sortedFilters);
-		$cmdStr .= " -filter_complex '$filterComplex'" . ' -map "[vout]" -map 0:a';
+		$cmdStr .= " -filter_complex \"$filterComplex\" -map $outVideoStreamName -map $audioMapName";
 		$cmdStr .= " -c:v libx264 -subq 5 -qcomp 0.6 -qmin 10 -qmax 50 -qdiff 4";
 		$cmdStr .= " -coder 1 -refs 2 -x264opts stitchable -vprofile main -force_key_frames expr:'gte(t,n_forced*2)'";
 
@@ -2035,7 +2057,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$filters = array();
 		$filters["crop"] = $this->getCropFilterForConcat($jobData, $clipIndex);
-//		$filters["overlay"] = $this->getOverlayFilterForConcat($jobData, $clipIndex);
 		$filters["effects"] = $this->getEffectsFilterForConcat($jobData, $operationAttributesSorted, $clipIndex);
 		$filters["scale"] = $this->getPaddedScaleFiltersForConcat($jobData, $clipIndex);
 
@@ -2094,37 +2115,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$padFilter = $this->getPadFilter($ow, $oh, $iw, $ih);
 			$filter = $scaleFilter. "[vscale];[vscale]" . $padFilter;
 		}
-		return $filter;
-	}
-
-	protected function getOverlayFilterForConcat($jobData, $clipIndex)
-	{
-		/** @var kClipConcatJobData $jobData */
-
-		$filter = "";
-		$conversionParams = $this->getJobDataConversionParams($jobData);
-		$overlayDataArray = $this->getOverlayDataFromConversionParams($conversionParams, $clipIndex);
-
-		foreach($overlayDataArray as $key => $overlayData)
-		{
-			if($overlayData)
-			{
-				if($overlayData->overlayResource)
-				{
-					$filter = '"[1:v]chromakey=0x6FED48:0.24:0.06[fg];[2:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];[bg][fg2]overlay=0:0:format=auto[scene_v];0:v][scene_v]overlay=x=W-w-100:y=H-h-100:format=auto:shortest=1[vout];[1:a]asetpts=PTS-STARTPTS,volume=0.333[a_scene];[0:a]asetpts=PTS-STARTPTS,volume=0.333[a_base];[a_scene][a_base]amix=inputs=2:duration=first:dropout_transition=0[aout]" -map "[vout]" -map "[aout]" -c:v libx264 -profile:v high -level 4.1 -crf 18 -preset medium -pix_fmt yuv420p -c:a aac -b:a 192k -shortest /tmp/output_of_scene0.mp4';
-				}
-
-//				-i /tmp/kaltura_speak.mp4 \
-//  -i /tmp/scene0.mp4 \
-//  -loop 1 -i /tmp/background.jpg \
-//  -filter_complex "[1:v]chromakey=0x6FED48:0.24:0.06[fg];[2:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];[bg][fg2]overlay=0:0:format=auto[scene_v];0:v][scene_v]overlay=x=W-w-100:y=H-h-100:format=auto:shortest=1[vout];[1:a]asetpts=PTS-STARTPTS,volume=0.333[a_scene];[0:a]asetpts=PTS-STARTPTS,volume=0.333[a_base];[a_scene][a_base]amix=inputs=2:duration=first:dropout_transition=0[aout]" -map "[vout]" -map "[aout]" -c:v libx264 -profile:v high -level 4.1 -crf 18 -preset medium -pix_fmt yuv420p -c:a aac -b:a 192k -shortest /tmp/output_of_scene0.mp4
-//				$extraParams .= '-loop 1 -i /tmp/background.jpg -filter_complex "[0:v]chromakey=0x6FED48:0.24:0.06[fg];[1:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];[bg][fg2]overlay=0:0:format=auto[vout]" -map "[vout]" -map 0:a? -c:v libx264 -profile:v high -level 4.1 -crf 18 -preset medium -pix_fmt yuv420p -c:a aac -b:a 192k -shortest';
-
-
-//				'-loop 1 -i /tmp/background.jpg -filter_complex "[0:v]chromakey=0x6FED48:0.24:0.06[fg];[1:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];[bg][fg2]overlay=0:0:format=auto[vout]" -map "[vout]" -map 0:a? -c:v libx264 -profile:v high -level 4.1 -crf 18 -preset medium -pix_fmt yuv420p -c:a aac -b:a 192k -shortest'
-			}
-		}
-
 		return $filter;
 	}
 
@@ -2220,12 +2210,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return count($subtitleData) > 0;
 	}
 
-	protected function isOverlayClip($conversionParams, $clipIndex)
-	{
-		$overlayData = $this->getOverlayDataFromConversionParams($conversionParams, $clipIndex);
-		return count($overlayData) > 0;
-	}
-
 	protected function allowEffectsOnConvert($conversionData, $singleAttributeIndex)
 	{
 		// do not apply effects if already using filter complex
@@ -2250,12 +2234,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		$subtitleDataArray = isset($conversionParams[self::SUBTITLES_DATA_ARRAY]) ? $conversionParams[self::SUBTITLES_DATA_ARRAY] : array();
 		return isset($subtitleDataArray[$clipIndex]) ? $subtitleDataArray[$clipIndex] : array();
-	}
-
-	protected function getOverlayDataFromConversionParams($conversionParams, $clipIndex)
-	{
-		$overlayDataArray = isset($conversionParams[self::OVERLAY_DATA_ARRAY]) ? $conversionParams[self::OVERLAY_DATA_ARRAY] : array();
-		return isset($overlayDataArray[$clipIndex]) ? $overlayDataArray[$clipIndex] : array();
 	}
 
 	protected function getScaleFilter($ow, $oh, $iw = "iw", $ih = "ih")
