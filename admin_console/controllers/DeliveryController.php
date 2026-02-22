@@ -45,24 +45,57 @@ class DeliveryController extends Zend_Controller_Action
 		$filter = $this->getDeliveryProfileFilterFromRequest($request);
 
 		$partnerId = $filter->partnerIdEqual;
+
+		// When filtering by delivery profile ID, fetch profiles directly instead of using list API
+		$filterType = $request->getParam('filter_type');
+		$deliveryProfileObjects = null;
+		if ($filterType === 'by-delivery-id' && $filter->idIn) {
+			$deliveryProfileIds = explode(',', $filter->idIn);
+			$deliveryProfileObjects = array();
+
+			foreach ($deliveryProfileIds as $id) {
+				$id = trim($id);
+				if (empty($id)) {
+					continue;
+				}
+
+				try {
+					// Fetch each delivery profile individually
+					$deliveryProfile = $client->deliveryProfile->get($id);
+					$deliveryProfileObjects[] = $deliveryProfile;
+				} catch (Exception $e) {
+					// Invalid delivery profile ID - skip it
+					continue;
+				}
+			}
+		}
+
 		if ($partnerId) {
 			$newForm->getElement('newPartnerId')->setValue($partnerId);
 		}
-	
+
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($client->deliveryProfile, "listAction", $partnerId, $filter);
-		$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		if ($deliveryProfileObjects !== null) {
+			// Use custom paginator for delivery profile ID search
+			$paginatorAdapter = new Infra_ArrayPaginator($deliveryProfileObjects);
+			$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		} else {
+			// Use standard filter paginator for other searches
+			$paginatorAdapter = new Infra_FilterPaginator($client->deliveryProfile, "listAction", $partnerId, $filter);
+			$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		}
+
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
-	
+
 		// popule the form
 		$form->populate($request->getParams());
-	
+
 		// set view
 		$this->view->form = $form;
 		$this->view->newForm = $newForm;
 		$this->view->paginator = $paginator;
-	
+
 	}
 	
 	protected function getDeliveryProfiles($client, $partnerId, $streamerType, $dpIds = null, $deliveryType = 'VOD') {
