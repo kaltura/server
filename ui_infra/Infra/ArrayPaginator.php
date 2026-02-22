@@ -41,4 +41,28 @@ class Infra_ArrayPaginator implements Zend_Paginator_Adapter_Interface
 	{
 		return count($this->items);
 	}
+
+	/**
+	 * @return int
+	 */
+	public function getTotalCount()
+	{
+		return count($this->items);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasError()
+	{
+		return false;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getErrorDescription()
+	{
+		return null;
+	}
 }
