@@ -1411,7 +1411,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			// each clipConcatJob represent a single operation resource
 			foreach ($clipConcatJobs as $key => $clipConcatJob)
 			{
-				KalturaLog::debug("Going To Start Concat Job $key/$concatJobsCount for Multi Clip Concat");
+				KalturaLog::debug("Going To Start Concat Job " . $key + 1 . "/$concatJobsCount for Multi Clip Concat");
 
 				if($clipConcatJob->getStatus() != BatchJob::BATCHJOB_STATUS_FINISHED)
 				{
@@ -1515,7 +1515,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$mediaCompositionAttributes = $operationAttribute->getMediaCompositionAttributesArray();
 		if($mediaCompositionAttributes && count($mediaCompositionAttributes) > 0)
 		{
-			return $this->getConvertOverlayCommand($jobData, $operationAttribute, $sortedFilters);
+			return $this->getConvertMediaCompositionCommand($jobData, $operationAttribute, $sortedFilters);
 		}
 		else if($imageToVideo)
 		{
@@ -1638,9 +1638,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return " -i __inFileName".$key."__ ";
 	}
 
-	protected function getConvertOverlayCommand($jobData, kClipAttributes $operationAttribute, $sortedFilters)
+	protected function getConvertMediaCompositionCommand($jobData, kClipAttributes $operationAttribute, $sortedFilters)
 	{
-		// overlay command is based on inputFiles order in concat jobData
+		// media composition command is based on inputFiles order in concat jobData
 		$flavorParamsObj = assetParamsPeer::getTempAssetParamByPk(kClipAttributes::SYSTEM_DEFAULT_FLAVOR_PARAMS_ID);
 		if(!$flavorParamsObj)
 		{

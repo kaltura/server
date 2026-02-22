@@ -1937,7 +1937,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			/** @var kOperationResource $resource **/
 			$resourceObj = $resource->getResource();
-			$sourceEntry = $this->getValidatedEntryForResource($resourceObj); // TODO validate composition attributes resources
+			$sourceEntry = $this->getValidatedEntryForResource($resourceObj);
 			$sourceEntryId = $sourceEntry->getId();
 			$sourceEntryIds[] = $sourceEntryId;
 
