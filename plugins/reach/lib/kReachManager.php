@@ -856,7 +856,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		// Set pay-per-use flag from catalog item
   		$isPayPerUse = $vendorCatalogItem->getPayPerUse();
-  		if ($isPayPerUse)
+  		if($isPayPerUse)
   		{	
       		$entryVendorTask->setIsPayPerUse($isPayPerUse);
   		}
