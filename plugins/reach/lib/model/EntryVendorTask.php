@@ -37,6 +37,7 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	const CUSTOM_DATA_SERVICE_FEATURE = 	'serviceFeature';
 	const CUSTOM_DATA_TURN_AROUND_TIME =	'turnAroundTime';
 	const CUSTOM_DATA_EXTERNAL_TASK_ID =      'externalTaskId';
+	const CUSTOM_DATA_IS_PAY_PER_USE =        'isPayPerUse';
 	const SEVEN_DAYS =			 604800;
 	const BUSINESS_DAY_FRIDAY = 5;      //Monday is 1
 	const BUSINESS_DAY_NEXT_MONDAY = 8;
@@ -154,6 +155,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function setExternalTaskId($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_EXTERNAL_TASK_ID, $v);
+	}
+
+	public function setIsPayPerUse($v)
+	{
+		$this->putInCustomData(self::CUSTOM_DATA_IS_PAY_PER_USE, $v);
 	}
 
 
@@ -277,6 +283,11 @@ class EntryVendorTask extends BaseEntryVendorTask implements IRelatedObject, IIn
 	public function getExternalTaskId()
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_EXTERNAL_TASK_ID);
+	}
+
+	public function getIsPayPerUse()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_IS_PAY_PER_USE, null, false);
 	}
 
 	public function isScheduled()

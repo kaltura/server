@@ -150,26 +150,67 @@ class kVendorCredit
 
 	public function syncCredit($reachProfileId, $partnerId)
 	{
+		// Get the lookback window for PPU tasks (default 7 days)
+		// This ensures we catch PPU tasks that were queued before lastSync but finished after
+		$lookbackWindow = kConf::get('reach_sync_credit_lookback_window', 'local', 604800); // 7 days in seconds
+		$syncStartDate = $this->getSyncCreditStartDate();
+		$lookbackStartDate = $syncStartDate - $lookbackWindow;
+
+		KalturaLog::info("Starting credit sync for reach profile [$reachProfileId] partner [$partnerId] with sync start date [$syncStartDate] and lookback start date [$lookbackStartDate]");
+
+		// Single query with lookback window to fetch all tasks (PPU and non-PPU)
+		// Uses indexed reach_profile_queue_time composite index for optimal performance
 		$c = new Criteria();
-		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId , Criteria::EQUAL);
+		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId, Criteria::EQUAL);
 		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
-		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
 		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $lookbackStartDate, Criteria::GREATER_EQUAL);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$c->addSelectColumn('SUM('. EntryVendorTaskPeer::PRICE .')');
 		$this->addAdditionalCriteria($c);
 
 		$now = time();
-		$stmt = EntryVendorTaskPeer::doSelectStmt($c);
-		$row = $stmt->fetch(PDO::FETCH_NUM);
+		$tasks = EntryVendorTaskPeer::doSelect($c);
 
 		$totalUsedCredit = $this->getSyncedCredit();
+		$ppuTasksCount = 0;
+		$nonPpuTasksCount = 0;
+		$ppuCredit = 0;
+		$nonPpuCredit = 0;
 
-		$totalPrice = $row[0];
-		if($totalPrice)
+		// Iterate through tasks and filter by isPayPerUse flag in PHP
+		foreach ($tasks as $task)
 		{
-			$totalUsedCredit += $totalPrice;
+			/** @var EntryVendorTask $task */
+			$taskPrice = $task->getPrice();
+
+			// Check if this is a pay-per-use task using the flag
+			$isPayPerUse = $task->getIsPayPerUse();
+
+			if ($isPayPerUse)
+			{
+				// PPU tasks: count only if status is READY and finish_time >= syncStartDate
+				// This ensures we only count PPU tasks that were actually completed and priced after last sync
+				if ($task->getStatus() == EntryVendorTaskStatus::READY && $task->getFinishTime() >= $syncStartDate)
+				{
+					$totalUsedCredit += $taskPrice;
+					$ppuCredit += $taskPrice;
+					$ppuTasksCount++;
+				}
+			}
+			else
+			{
+				// Non-PPU tasks: count if queue_time >= syncStartDate
+				// These tasks are charged immediately upon creation
+				if ($task->getQueueTime() >= $syncStartDate)
+				{
+					$totalUsedCredit += $taskPrice;
+					$nonPpuCredit += $taskPrice;
+					$nonPpuTasksCount++;
+				}
+			}
 		}
+
+		KalturaLog::info("Credit sync completed: PPU tasks [$ppuTasksCount] with credit [$ppuCredit], Non-PPU tasks [$nonPpuTasksCount] with credit [$nonPpuCredit], Total credit [$totalUsedCredit]");
 
 		$this->setSyncedCredit($totalUsedCredit);
 		$this->setLastSyncTime($now);
