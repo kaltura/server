@@ -289,7 +289,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 
 		// Set isPayPerUse flag based on catalog item
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($object_to_fill->getCatalogItemId());
-		if ($dbVendorCatalogItem)
+		if ($dbVendorCatalogItem && $dbVendorCatalogItem->getPayPerUse())
 		{
 			$object_to_fill->setIsPayPerUse($dbVendorCatalogItem->getPayPerUse());
 		}
