@@ -307,7 +307,7 @@ class embedPlaykitJsAction extends sfAction
 				$uiConf->provider->env->$key = $value;
 		}
 
-		if($this->getRequestParameter( v2RedirectUtils::V2REDIRECT_PARAM_NAME))
+		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
 		{
 			$uiConf->provider->partnerId = $this->uiConf->getPartnerId();
 		}
