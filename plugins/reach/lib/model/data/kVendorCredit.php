@@ -163,6 +163,7 @@ class kVendorCredit
 		$c = new Criteria();
 		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId, Criteria::EQUAL);
 		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
+		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
 		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $lookbackStartDate, Criteria::GREATER_EQUAL);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
 		$this->addAdditionalCriteria($c);
@@ -181,12 +182,6 @@ class kVendorCredit
 		{
 			/** @var EntryVendorTask $task */
 			$taskPrice = $task->getPrice();
-
-			// Skip tasks with no price
-			if (!$taskPrice || $taskPrice == 0)
-			{
-				continue;
-			}
 
 			// Check if this is a pay-per-use task using the flag
 			$isPayPerUse = $task->getIsPayPerUse();
