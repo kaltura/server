@@ -860,8 +860,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
   		{	
       		$entryVendorTask->setIsPayPerUse($isPayPerUse);
   		}
-		
-		if(!$isPayPerUse)
+		else
 		{
 			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, null, $unitsUsed);
 			$entryVendorTask->setPrice($taskPrice);
