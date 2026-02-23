@@ -1237,7 +1237,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	/**
 	 * @param $assets
-	 * @return array
+	 * @return string | null
 	 * @throws kCoreException
 	 */
 	protected function getOriginalAssetFilePath($assets)
@@ -1507,7 +1507,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				throw new KalturaAPIException(KalturaErrors::FLAVOR_ASSET_IS_NOT_READY);
 			}
-			return $this->getOriginalAssetFilePath($assets);
+			$filePath = $this->getOriginalAssetFilePath($assets);
+			if (!$filePath)
+			{
+				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
+			}		
 		}
 	}
 
