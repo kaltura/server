@@ -223,6 +223,13 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $externalTaskId;
 
+	/**
+	 * Indicates if the task is pay-per-use based on the catalog item
+	 * @var bool
+	 * @readonly
+	 */
+	public $isPayPerUse;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -256,7 +263,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'serviceType',
 		'serviceFeature',
 		'turnAroundTime',
-		'externalTaskId'
+		'externalTaskId',
+		'isPayPerUse'
 	);
 	
 	/* (non-PHPdoc)
@@ -279,6 +287,13 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 
 		$object_to_fill = parent::toInsertableObject($object_to_fill, $props_to_skip);
 
+		// Set isPayPerUse flag based on catalog item
+		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($object_to_fill->getCatalogItemId());
+		if ($dbVendorCatalogItem)
+		{
+			$object_to_fill->setIsPayPerUse($dbVendorCatalogItem->getPayPerUse());
+		}
+
 		$jobData = $this->taskJobData;
 		if ($this->isScheduled() && !$jobData->scheduledEventId)
 		{
@@ -288,7 +303,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			$taskData->setScheduledEventId($event->getId());
 			$object_to_fill->setTaskJobData($taskData);
 		}
-		
+
 		return $object_to_fill;
 	}
 
