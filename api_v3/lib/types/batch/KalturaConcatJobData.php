@@ -10,7 +10,13 @@ class KalturaConcatJobData extends KalturaJobData
 	 * @var KalturaStringArray
 	 */
 	public $srcFiles;
-	
+
+	/**
+	 * Additional input files to be used in conversion pre concatenation
+	 * @var KalturaStringArray
+	 */
+	public $inputFiles;
+
 	/**
 	 * Output file
 	 * @var string
@@ -61,6 +67,7 @@ class KalturaConcatJobData extends KalturaJobData
 	private static $map_between_objects = array
 	(
 		'srcFiles',
+		'inputFiles',
 		'destFilePath',
 		'flavorAssetId',
 		'offset',

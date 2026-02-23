@@ -9,6 +9,11 @@ class kConcatJobData extends kJobData
 	 * @var array
 	 */
 	private $srcFiles;
+
+	/**
+	 * @var array
+	 */
+	private $inputFiles;
 	
 	/**
 	 * @var string
@@ -194,5 +199,21 @@ class kConcatJobData extends kJobData
 	public function setMultiSource($multiSource)
 	{
 		$this->multiSource = $multiSource;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getInputFiles()
+	{
+		return $this->inputFiles;
+	}
+
+	/**
+	 * @param array $inputFiles
+	 */
+	public function setInputFiles($inputFiles)
+	{
+		$this->inputFiles = $inputFiles;
 	}
 }
