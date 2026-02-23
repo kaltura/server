@@ -315,6 +315,10 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$object_to_fill = parent::toUpdatableObject($object_to_fill, $props_to_skip);
 
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($object_to_fill->getCatalogItemId());
+		if ($dbVendorCatalogItem && $dbVendorCatalogItem->getPayPerUse()) 
+		{  
+    		$object_to_fill->setIsPayPerUse(true);  
+		}
 		$payPerUsePrice = kReachUtils::getPayPerUsePrice($this, $object_to_fill, $dbVendorCatalogItem);
 		if(is_numeric($payPerUsePrice))
 		{
