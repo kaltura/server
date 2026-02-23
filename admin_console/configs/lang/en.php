@@ -1361,6 +1361,7 @@ return array(
 	// Delivery profiles
 	'delivery-profiles-configuration intro text' => "Here you can configure your delivery profiles",
 	'delivery-profiles-configuration results count' => "Results",
+	'Delivery Profile ID' => 'Delivery Profile ID',
 	"Kaltura_Client_Enum_DeliveryProfileType::EDGE_CAST_HTTP" => "EDGE_CAST_HTTP",
 	"Kaltura_Client_Enum_DeliveryProfileType::EDGE_CAST_RTMP" => "EDGE_CAST_RTMP",
 	"Kaltura_Client_Enum_DeliveryProfileType::KONTIKI_HTTP" => "KONTIKI_HTTP",
