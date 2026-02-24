@@ -28,6 +28,12 @@ class EntryVendorTaskService extends KalturaBaseService
 	{
 		$entryId = $entryObject->getId();
 
+		if ($dbVendorCatalogItem->isEntryUnderMinimumDuration($entryObject))
+		{
+			KalturaLog::log("Entry [{$entryId}] is under the minimum duration limit, entry vendor task object wont be created for it");
+			throw new KalturaAPIException(KalturaReachErrors::ENTRY_TOO_SHORT, $entryId);
+		}
+
 		if (!$vendorTaskObjectHandler->isFeatureTypeSupportedForTaskObject($entryObject, $dbVendorCatalogItem))
 		{
 			$featureType = $dbVendorCatalogItem->getServiceFeature();
