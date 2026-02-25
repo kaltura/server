@@ -134,8 +134,8 @@ function checkCache()
 	}
 	else if (strpos($uri, "/kwidget") !== false)	
 	{
-		require_once(dirname(__FILE__)."/../../infra/cache/kCacheManager.php");
-
+		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kCacheManager.php");
+		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		if ($cache)
 		{
@@ -191,7 +191,7 @@ function checkCache()
 	}
 	else if (strpos($uri, "/thumbnail") !== false)	
 	{
-		require_once(dirname(__FILE__)."/../../infra/cache/kCacheManager.php");
+		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kCacheManager.php");
 		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		if ($cache)
@@ -223,7 +223,7 @@ function checkCache()
 	}	
 	else if (strpos($uri, "/embedIframe/") !== false)
 	{
-		require_once(dirname(__FILE__)."/../../infra/cache/kCacheManager.php");
+		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kCacheManager.php");
 		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		if ($cache)
