@@ -406,8 +406,56 @@ class myPartnerUtils
 				return requestUtils::getCdnHost($protocol);
 		}
 	}
-	
-	
+
+	public static function getRegionalCdnHost($partnerId = null, $protocol = null, $hostType = null, $requestedUrl = null)
+	{
+		if (!empty($requestedUrl) && strpos($requestedUrl, '://') !== false )
+		{
+			$parsedUrl = parse_url($requestedUrl);
+			if($parsedUrl)
+			{
+				$requestedUrl = $parsedUrl['host'] ?? $requestedUrl;
+				$protocol = $parsedUrl['scheme'] ?? $protocol;
+			}
+		}
+
+		$protocol = $protocol ?: infraRequestUtils::getProtocol();
+		if (!empty($requestedUrl))
+		{
+			$url = "$protocol://" . $requestedUrl;
+		}
+		else
+		{
+			$url = self::getCdnHost($partnerId, $protocol, $hostType);
+		}
+
+		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
+		foreach ($headerMapping as $headerKey => $suffix)
+		{
+			if (!empty($_SERVER[$headerKey]))
+			{
+				return self::applyCdnSuffix($url, $suffix, $protocol);
+			}
+		}
+
+		return $url;
+	}
+
+	private static function applyCdnSuffix($url, $suffix, $protocol)
+	{
+		$parsedUrl = parse_url($url);
+		if ($parsedUrl === false || !isset($parsedUrl['host']))
+		{
+			$newHost = $url . '.' . $suffix;
+			return $protocol . '://' . $newHost;
+		}
+
+
+		$host = $parsedUrl['host'];
+		$newHost = $host . '.' . $suffix;
+		return $protocol . '://' . $newHost . ($parsedUrl['path'] ?? '');
+	}
+
 	public static function getPlayServerHost($partner_id, $protocol = null)
 	{
 		if(is_null($protocol))
@@ -426,7 +474,7 @@ class myPartnerUtils
 	public static function getThumbnailHost ($partner_id, $protocol = null)
 	{
 	    $partner = PartnerPeer::retrieveByPK( $partner_id );
-	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol, "thumbnail");
+	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getRegionalCdnHost($partner_id, $protocol, "thumbnail");
 	    
 	    // in case the request came through https, force https url
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
