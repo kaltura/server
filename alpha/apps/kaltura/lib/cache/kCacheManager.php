@@ -90,7 +90,7 @@ class kCacheManager
 		$className = $sectionConfig['class'];
 		$className = "k{$className}CacheWrapper";
 
-		require_once(__DIR__ . '/' . $className . '.php');
+		require_once(__DIR__ . '/../../../../../infra/cache/' . $className . '.php');
 		$cache = new $className;
 				
 		// initialize the cache
