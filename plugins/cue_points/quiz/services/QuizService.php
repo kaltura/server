@@ -206,7 +206,7 @@ class QuizService extends KalturaBaseService
 		$finalPath .= "/ks/".$ksStr;
 
 		$partnerId = $this->getPartnerId();
-		$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+		$downloadUrl = myPartnerUtils::getRegionalCdnHost($partnerId) . $finalPath;
 
 		return $downloadUrl;
 	}

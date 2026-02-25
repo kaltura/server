@@ -213,8 +213,8 @@ class kBroadcastUrlManager
 		
 		if(PermissionPeer::isValidForPartner("FEATURE_HYBRID_ECDN", $entry->getPartnerId()))
 			$this->useOldUrlPattern = true;
-		
-		$url = "$protocol://$hostname";
+
+		$url = myPartnerUtils::getRegionalCdnHost(null, $protocol, null, $hostname);
 		if ($protocol == kBroadcastUrlManager::PROTOCOL_RTSP)
 		{
 			$url .= "/" . $entry->getId() . '_%i';

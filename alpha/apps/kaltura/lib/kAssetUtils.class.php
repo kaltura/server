@@ -88,7 +88,7 @@ class kAssetUtils
 
 		if($asset instanceof flavorAsset && $servePlayManifest)
 		{
-			$url =  requestUtils::getApiCdnHost() . $asset->getPlayManifestUrl($playManifestClientTag , $storageId);
+			$url =  myPartnerUtils::getRegionalCdnHost() . $asset->getPlayManifestUrl($playManifestClientTag , $storageId);
 		}
 		else
 		{
@@ -129,7 +129,7 @@ class kAssetUtils
 			$deliveryProfileProtocols = $urlManager->getMediaProtocols();
 			if (!is_null($deliveryProfileProtocols) && !in_array($protocol, explode(',',$deliveryProfileProtocols)))
 				$protocol = infraRequestUtils::PROTOCOL_HTTP;
-			$url = $protocol . "://" . $url;
+			$url = myPartnerUtils::getRegionalCdnHost(null, $protocol, null, $url);
 		}
 		
 		return $url;

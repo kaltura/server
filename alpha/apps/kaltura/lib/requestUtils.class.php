@@ -259,7 +259,7 @@ class requestUtils extends infraRequestUtils
 	public static function getRequestHost()
 	{
 		$protocol = self::getRequestProtocol();
-		return "$protocol://".kConf::get("www_host");
+		return myPartnerUtils::getRegionalCdnHost(null, $protocol, null, kConf::get("www_host"));
 	}
 	
 	public static function getRequestHostId()

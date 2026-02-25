@@ -605,10 +605,10 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							(!$config->storageId || in_array($config->storageId, kStorageExporter::getPeriodicStorageIds())) )
 						{
 							$protocol = $config->deliveryProfile->getDynamicAttributes()->getMediaProtocol();
-							$host = $protocol . '://' . $config->deliveryProfile->getHostName();
+							$host = myPartnerUtils::getRegionalCdnHost(null, $protocol, null, $config->deliveryProfile->getHostName());
 						}
 						else
-							$host = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
+							$host = myPartnerUtils::getRegionalCdnHost($captionAsset->getPartnerId());
 
 						$versionStr = '';
 						if ($captionAsset->getVersion() > 1)
@@ -806,5 +806,3 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 		}
 	}
 }
-
-

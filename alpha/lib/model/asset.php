@@ -626,7 +626,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 		if($useCdn)
 		{
 			// TODO in that case we should use the serve flavor and the url manager in order to support secured and signed urls
-			$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+			$downloadUrl = myPartnerUtils::getRegionalCdnHost($partnerId) . $finalPath;
 		}
 		else
 			$downloadUrl = requestUtils::getRequestHost() . $finalPath;

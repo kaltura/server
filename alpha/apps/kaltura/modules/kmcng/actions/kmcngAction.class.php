@@ -40,7 +40,7 @@ class kmcngAction extends kalturaAction
 		{
 			if (!$requestSecureProtocol)
 			{
-				header("Location: " . infraRequestUtils::PROTOCOL_HTTPS . "://" . $_SERVER['SERVER_NAME'] . $_SERVER["REQUEST_URI"]);
+				header("Location: " . myPartnerUtils::getRegionalCdnHost(null, infraRequestUtils::PROTOCOL_HTTPS, null, $_SERVER['SERVER_NAME'] . $_SERVER["REQUEST_URI"]));
 				die();
 			}
 			header("Strict-Transport-Security: max-age=63072000; includeSubdomains; preload");
