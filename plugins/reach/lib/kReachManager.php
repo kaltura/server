@@ -854,7 +854,13 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());
 
-		if(!$vendorCatalogItem->getPayPerUse())
+		// Set pay-per-use flag from catalog item
+  		$isPayPerUse = $vendorCatalogItem->getPayPerUse();
+  		if($isPayPerUse)
+  		{	
+      		$entryVendorTask->setIsPayPerUse($isPayPerUse);
+  		}
+		else
 		{
 			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, null, $unitsUsed);
 			$entryVendorTask->setPrice($taskPrice);

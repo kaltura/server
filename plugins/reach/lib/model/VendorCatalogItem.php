@@ -49,6 +49,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_NOTES = 'notes';
 	const CUSTOM_ADMIN_TAGS_TO_EXCLUDE = 'admin_tags_to_exclude';
 	const CUSTOM_DATA_PAY_PER_USE = 'payPerUse';
+	const MINIMUM_DURATION_IN_SECONDS = 10;
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -403,6 +404,11 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	}
 
 	public function isEntryDurationExceeding(entry $entry)
+	{
+		return false;
+	}
+
+	public function isEntryUnderMinimumDuration(entry $entry)
 	{
 		return false;
 	}

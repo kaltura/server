@@ -150,59 +150,73 @@ class kVendorCredit
 
 	public function syncCredit($reachProfileId, $partnerId)
 	{
-		$now = time();
+		// Get the lookback window for PPU tasks (default 7 days)
+		// This ensures we catch PPU tasks that were queued before lastSync but finished after
+		$lookbackWindow = kConf::get('reach_sync_credit_lookback_window', 'local', 604800); // 7 days in seconds
 		$syncStartDate = $this->getSyncCreditStartDate();
+		$lookbackStartDate = $syncStartDate - $lookbackWindow;
+
+		KalturaLog::info("Starting credit sync for reach profile [$reachProfileId] partner [$partnerId] with sync start date [$syncStartDate] and lookback start date [$lookbackStartDate]");
+
+		// Single query with lookback window to fetch all tasks (PPU and non-PPU)
+		// Uses indexed reach_profile_queue_time composite index for optimal performance
+		$c = new Criteria();
+		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId, Criteria::EQUAL);
+		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
+		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
+		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $lookbackStartDate, Criteria::GREATER_EQUAL);
+		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
+		$this->addAdditionalCriteria($c);
+
+		$now = time();
+		$tasks = EntryVendorTaskPeer::doSelect($c);
 
 		$totalUsedCredit = $this->getSyncedCredit();
-		$totalPrice = 0;
+		$ppuTasksCount = 0;
+		$nonPpuTasksCount = 0;
+		$ppuCredit = 0;
+		$nonPpuCredit = 0;
 
-		/* Query 1: Queue-based (non PPU) */
-		$queueC = new Criteria();
-		$queueC->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
-		$queueC->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$queueC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
-		$queueC->add(EntryVendorTaskPeer::STATUS, [EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY], Criteria::IN);
-		$queueC->add(EntryVendorTaskPeer::QUEUE_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
-
-		$queueTasks = EntryVendorTaskPeer::doSelect($queueC);
-
-		foreach ($queueTasks as $task)
+		// Iterate through tasks and filter by isPayPerUse flag in PHP
+		foreach ($tasks as $task)
 		{
-			if (!$task->getIsPayPerUse())
+			/** @var EntryVendorTask $task */
+			$taskPrice = $task->getPrice();
+
+			// Check if this is a pay-per-use task using the flag
+			$isPayPerUse = $task->getIsPayPerUse();
+
+			if ($isPayPerUse)
 			{
-				$totalPrice += $task->getPrice();
+				// PPU tasks: count only if status is READY and finish_time >= syncStartDate
+				// This ensures we only count PPU tasks that were actually completed and priced after last sync
+				if ($task->getStatus() == EntryVendorTaskStatus::READY && $task->getFinishTime() >= $syncStartDate)
+				{
+					$totalUsedCredit += $taskPrice;
+					$ppuCredit += $taskPrice;
+					$ppuTasksCount++;
+				}
+			}
+			else
+			{
+				// Non-PPU tasks: count if queue_time >= syncStartDate
+				// These tasks are charged immediately upon creation
+				if ($task->getQueueTime() >= $syncStartDate)
+				{
+					$totalUsedCredit += $taskPrice;
+					$nonPpuCredit += $taskPrice;
+					$nonPpuTasksCount++;
+				}
 			}
 		}
 
-		/* Query 2: Finish-based (PPU) */
-		$finishC = new Criteria();
-		$finishC->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId);
-		$finishC->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
-		$finishC->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
-		$finishC->add(EntryVendorTaskPeer::STATUS, EntryVendorTaskStatus::READY);
-		$finishC->add(EntryVendorTaskPeer::FINISH_TIME, $syncStartDate, Criteria::GREATER_EQUAL);
-
-		$finishedTasks = EntryVendorTaskPeer::doSelect($finishC);
-
-		foreach ($finishedTasks as $task)
-		{
-			if ($task->getIsPayPerUse())
-			{
-				$totalPrice += $task->getPrice();
-			}
-		}
-
-		if ($totalPrice)
-		{
-			$totalUsedCredit += $totalPrice;
-		}
+		KalturaLog::info("Credit sync completed: PPU tasks [$ppuTasksCount] with credit [$ppuCredit], Non-PPU tasks [$nonPpuTasksCount] with credit [$nonPpuCredit], Total credit [$totalUsedCredit]");
 
 		$this->setSyncedCredit($totalUsedCredit);
 		$this->setLastSyncTime($now);
 
 		return $totalUsedCredit;
 	}
-
 
 	/***
 	 * @param $includeOverages should return current credit including overageCredit info or not (Default is true)

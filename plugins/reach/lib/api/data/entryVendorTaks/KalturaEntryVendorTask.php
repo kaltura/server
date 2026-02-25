@@ -289,7 +289,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 
 		// Set isPayPerUse flag based on catalog item
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($object_to_fill->getCatalogItemId());
-		if ($dbVendorCatalogItem)
+		if ($dbVendorCatalogItem && $dbVendorCatalogItem->getPayPerUse())
 		{
 			$object_to_fill->setIsPayPerUse($dbVendorCatalogItem->getPayPerUse());
 		}
@@ -303,7 +303,7 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 			$taskData->setScheduledEventId($event->getId());
 			$object_to_fill->setTaskJobData($taskData);
 		}
-		
+
 		return $object_to_fill;
 	}
 
@@ -315,6 +315,10 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		$object_to_fill = parent::toUpdatableObject($object_to_fill, $props_to_skip);
 
 		$dbVendorCatalogItem = VendorCatalogItemPeer::retrieveByPK($object_to_fill->getCatalogItemId());
+		if ($dbVendorCatalogItem && $dbVendorCatalogItem->getPayPerUse()) 
+		{  
+    		$object_to_fill->setIsPayPerUse(true);  
+		}
 		$payPerUsePrice = kReachUtils::getPayPerUsePrice($this, $object_to_fill, $dbVendorCatalogItem);
 		if(is_numeric($payPerUsePrice))
 		{
