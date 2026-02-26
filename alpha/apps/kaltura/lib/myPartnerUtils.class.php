@@ -414,7 +414,10 @@ class myPartnerUtils
 			$parsedUrl = parse_url($requestedUrl);
 			if($parsedUrl)
 			{
-				$requestedUrl = $parsedUrl['host'] ?? $requestedUrl;
+				$requestedUrl = $parsedUrl['host']
+					. (isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '')
+					. (isset($parsedUrl['path']) ? $parsedUrl['path'] : '')
+					. (isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '');
 				$protocol = $parsedUrl['scheme'] ?? $protocol;
 			}
 		}
@@ -450,10 +453,13 @@ class myPartnerUtils
 			return $protocol . '://' . $newHost;
 		}
 
+		$newHost = $parsedUrl['host'] . '.' . $suffix;
+		$port = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
+		$path = $parsedUrl['path'] ?? '';
+		$query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
+		$fragment = isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : '';
+		return $protocol . '://' . $newHost . $port . $path . $query . $fragment;
 
-		$host = $parsedUrl['host'];
-		$newHost = $host . '.' . $suffix;
-		return $protocol . '://' . $newHost . ($parsedUrl['path'] ?? '');
 	}
 
 	public static function getPlayServerHost($partner_id, $protocol = null)
