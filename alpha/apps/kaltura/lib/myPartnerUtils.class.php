@@ -414,22 +414,23 @@ class myPartnerUtils
 			$parsedUrl = parse_url($requestedUrl);
 			if($parsedUrl)
 			{
-				$requestedUrl = $parsedUrl['host']
-					. (isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '')
-					. (isset($parsedUrl['path']) ? $parsedUrl['path'] : '')
-					. (isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '');
 				$protocol = $parsedUrl['scheme'] ?? $protocol;
 			}
 		}
 
 		$protocol = $protocol ?: infraRequestUtils::getProtocol();
-		if (!empty($requestedUrl))
+		if (!empty($requestedUrl) && strpos($requestedUrl, 'http') === false &&  strpos($requestedUrl, 'https') === false )
 		{
 			$url = "$protocol://" . $requestedUrl;
 		}
-		else
+		else if (empty($requestedUrl))
 		{
 			$url = self::getCdnHost($partnerId, $protocol, $hostType);
+		}
+
+		if (empty($url))
+		{
+			$url = $requestedUrl;
 		}
 
 		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
@@ -453,13 +454,18 @@ class myPartnerUtils
 			return $protocol . '://' . $newHost;
 		}
 
-		$newHost = $parsedUrl['host'] . '.' . $suffix;
-		$port = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
-		$path = $parsedUrl['path'] ?? '';
-		$query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
-		$fragment = isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : '';
-		return $protocol . '://' . $newHost . $port . $path . $query . $fragment;
+		$parsedUrl['host'] = $parsedUrl['host'] . '.' . $suffix;
+		return self::buildUrlFromParts($protocol, $parsedUrl);
+	}
 
+	private static function buildUrlFromParts($protocol, $parsedUrl)
+	{
+		$url = $protocol . '://' . $parsedUrl['host'];
+		$url .= isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
+		$url .= $parsedUrl['path'] ?? '';
+		$url .= isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
+		$url .= isset($parsedUrl['fragment']) ? '#' . $parsedUrl['fragment'] : '';
+		return $url;
 	}
 
 	public static function getPlayServerHost($partner_id, $protocol = null)
