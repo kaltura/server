@@ -262,6 +262,7 @@ class PartnerController extends Zend_Controller_Action
 			return;
 
 		$url = $this->createKmcRedirectionUrl($ks, $partnerId);
+		$url = Kaltura_PartnerUtils::getRegional($url);
 		$this->getResponse()->setRedirect($url);
 	}
 
@@ -272,6 +273,7 @@ class PartnerController extends Zend_Controller_Action
 			return;
 
 		$url = $this->createNewKmcRedirectionUrl($ks);
+		$url = Kaltura_PartnerUtils::getRegionalCdnHost($url);
 		$this->getResponse()->setRedirect($url);
 	}
 	
@@ -284,6 +286,7 @@ class PartnerController extends Zend_Controller_Action
 		}
 		
 		$url = $this->createEpRedirectionUrl($ks);
+		$url = Kaltura_PartnerUtils::getRegionalCdnHost($url);
 		$this->getResponse()->setRedirect($url);
 	}
 

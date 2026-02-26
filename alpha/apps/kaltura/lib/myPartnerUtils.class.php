@@ -409,7 +409,7 @@ class myPartnerUtils
 
 	public static function getRegionalCdnHost($partnerId = null, $protocol = null, $hostType = null, $requestedUrl = null)
 	{
-		if (!empty($requestedUrl) && strpos($requestedUrl, '://') !== false )
+		if (!empty($requestedUrl) && strpos($requestedUrl, '://') !== false)
 		{
 			$parsedUrl = parse_url($requestedUrl);
 			if($parsedUrl)
