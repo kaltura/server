@@ -555,6 +555,7 @@ class kMultiFlavorManifestRenderer extends kManifestRenderer
 			foreach ($this->flavors as &$flavor)
 			{
 				$flavor['url'] = self::urlJoin($baseUrl, $flavor['url']);
+				$flavor['url'] = myPartnerUtils::getRegionalCdnHost(null, null, null, $flavor['url'] );
 				unset($flavor['urlPrefix']);		// no longer need the prefix
 			}
 			return;
