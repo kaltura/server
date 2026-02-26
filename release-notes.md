@@ -1,3 +1,18 @@
+# Venus-22.14.0
+
+## Add models sdk permission
+* Issue Type: Task
+* Issue ID: PLAT-25736
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableModelsSdk.enabled = true
+moduls.enableModelsSdk.permissionType = 2
+moduls.enableModelsSdk.label = "Enable models sdk"
+moduls.enableModelsSdk.permissionName = FEATURE_ALLOW_MODELS_SDK
+moduls.enableModelsSdk.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 # Venus-22.13.0
 
 ## Add partner and permissions for video avatar microservice ##
