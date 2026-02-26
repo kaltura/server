@@ -1511,7 +1511,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if (!$filePath)
 			{
 				throw new KalturaAPIException(KalturaErrors::ORIGINAL_FLAVOR_ASSET_IS_MISSING);
-			}		
+			}
+			return $filePath;
 		}
 	}
 
