@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) . '/../../../../../infra/cache/kApcWrapper.php');
 require_once(dirname(__FILE__) . '/kApiCacheBase.php');
 require_once(dirname(__FILE__) . '/../../../../config/kConf.php');
 require_once(dirname(__FILE__) . '/../request/infraRequestUtils.class.php');
-require_once(dirname(__FILE__) . '/../../../../../infra/cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../request/kSessionBase.class.php');
 require_once(dirname(__FILE__) . '/../request/kIpAddressUtils.php');
 require_once(dirname(__FILE__) . '/../request/kGeoUtils.php');
