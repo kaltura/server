@@ -1259,7 +1259,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			if ($fileSync[0]->getFullPath())
 			{
-				return $fileSync[0]->getFullPath();
+				return kFile::realPath($fileSync[0]->getFullPath(), false);
 			}
 		}
 	}
