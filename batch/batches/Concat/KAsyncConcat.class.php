@@ -155,7 +155,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				continue;
 			}
 			$inFileName = $srcFiles[$key];
-			$resolvedInFilePath  = kFile::realPath($inFileName);
+			$resolvedInFilePath = kFile::realPath($inFileName);
 			$outFilename = $this->localTempPath . DIRECTORY_SEPARATOR . basename($inFileName) . ".convert.mpegts";
 			$conversionCmd = str_replace("__inFileName__", "\"$resolvedInFilePath\"", $conversionCommand->value);
 
@@ -163,7 +163,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			{
 				foreach ($data->inputFiles[$key]->value as $ind => $inputFile)
 				{
-					$inputResolvedFilePath  = kFile::realPath($inputFile);
+					$inputResolvedFilePath = kFile::realPath($inputFile);
 					$conversionCmd = str_replace("__inFileName$ind"."__", "\"$inputResolvedFilePath\"", $conversionCmd);
 				}
 			}
