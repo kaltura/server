@@ -1252,14 +1252,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			$syncKey = $asset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET);
 			$fileSync = kFileSyncUtils::getReadyFileSyncForKey($syncKey);
-			//fileSync should be local
-			if (!$fileSync[1])
+			if (isset($fileSync[0]))
 			{
-				continue;
-			}
-			if ($fileSync[0]->getFullPath())
-			{
-				return kFile::realPath($fileSync[0]->getFullPath(), false);
+				$fullPath = $fileSync[0]->getFullPath();
+				return kFile::realPath($fullPath, false);
 			}
 		}
 	}
