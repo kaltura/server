@@ -1,3 +1,17 @@
+# Venus-22.15.0
+
+## Add Conversation Manager partner
+* Issue Type: Task
+* Issue ID: PLAT-25731
+
+### Configuration ###
+Replace the tokens: @CONVERSATION_MANAGER_PARTNER_ADMIN_SECRET@, @CONVERSATION_MANAGER_PARTNER_SECRET@ in the ini file and remove ".template" from the file name:
+
+    deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2026_03_01_conversation_manager_add_partner.php
+
 # Venus-22.13.0
 
 ## Add partner and permissions for video avatar microservice ##
