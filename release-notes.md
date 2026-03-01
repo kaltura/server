@@ -1,4 +1,4 @@
-# Venus-22.13.0
+# Venus-22.14.0
 ## Extend short link to support larger volume of objects ##
 - Issue Type: Task
 - Issue ID: PLAT-25698
@@ -6,6 +6,32 @@
 ### Deployment Scripts ###
 
     mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2026_03_01_alter_short_link_table.sql
+
+# Venus-22.13.0
+## Add partner and permissions for video avatar microservice ##
+* Issue Type: Task
+* Issue ID: PLAT-25701
+
+### Configuration ###
+Replace the tokens: @VIDEO_AVATAR_PARTNER_ADMIN_SECRET@, @VIDEO_AVATAR_PARTNER_SECRET@ in the ini file and remove ".template" from the file name:
+
+    deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_02_09_video_avatar_add_partner.php
+    
+## Add Immersive Agents Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25697
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableImmersiveAgents.enabled = true
+moduls.enableImmersiveAgents.permissionType = 2
+moduls.enableImmersiveAgents.label = "Enable Immersive Agents"
+moduls.enableImmersiveAgents.permissionName = FEATURE_ALLOW_IMMERSIVE_AGENTS
+moduls.enableImmersiveAgents.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 
 # Venus-22.12.0
 ## Add 'dash' tag to  audio description flavor params ##
@@ -306,6 +332,7 @@ moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
 moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
 moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
+
 ## Add new firebase notifications ##
 * Issue Type: Task
 * Issue ID: PLAT-25184

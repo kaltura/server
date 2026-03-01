@@ -12,6 +12,7 @@ class elasticClusterProvisioning
 	const BEACON_CLUSTER_TYPE = 'beacon';
 	const DEFAULT_REPLICATION_FACTOR = 1;
 	const DEFAULT_REFRESH_INTERVAL = '1s';
+	const DEFAULT_PORT = 9200;
 	
 	// variables
 	private $verbose;
@@ -19,6 +20,7 @@ class elasticClusterProvisioning
 	
 	private $tmpDirectory;
 	private $elasticHost;
+	private $elasticPort;
 	private $elasticCurlHost;
 	private $elasticDesiredVersion;
 	private $elasticClusterName;
@@ -118,7 +120,10 @@ class elasticClusterProvisioning
 		$this->elasticHost = $elasticHost;
 		logLine("\033[31mNOTICE:\033[39m Setting elastic host to [$this->elasticHost]");
 		
-		$this->elasticCurlHost = "curl -s -H 'Content-Type: application/json' $this->elasticHost:9200";
+		$this->elasticPort = isset($options['elasticPort']) ? $options['elasticPort'] : self::DEFAULT_PORT;
+		logLine("\033[31mNOTICE:\033[39m Setting elastic port to [$this->elasticPort]");
+
+		$this->elasticCurlHost = "curl -s -H 'Content-Type: application/json' $this->elasticHost:$this->elasticPort";
 		logLine("\033[31mNOTICE:\033[39m Setting elastic curl host to [$this->elasticCurlHost]");
 		
 		$this->elasticDesiredVersion = isset($options['elasticVersion']) ? $options['elasticVersion'] : self::DEFAULT_DESIRED_VERSION;
@@ -435,7 +440,7 @@ class elasticClusterProvisioning
 		$mapPath = "{$this->tmpDirectory}{$mapName}";
 		logLine("Creating [$elasticIndexFullName] using map [$mapPath] to [$this->elasticClusterName] elastic cluster");
 		
-		$cmd = "curl -s -H 'Content-Type: application/json' -XPUT $this->elasticHost:9200/$elasticIndexFullName --data-binary \"@$mapPath\"";
+		$cmd = "curl -s -H 'Content-Type: application/json' -XPUT $this->elasticHost:$this->elasticPort/$elasticIndexFullName --data-binary \"@$mapPath\"";
 		list($output, $resultCode) = $this->execCmd($cmd, true);
 		$res = isset($output[0]) ? json_decode($output[0], true) : null;
 		if (isset($res['errors']) && $res['errors'] || isset($res['error']) && $res['error'])
@@ -482,7 +487,7 @@ class elasticClusterProvisioning
 		}
 		
 		$aliasJson = implode(',', $actions);
-		$cmd = "curl -s -H 'Content-Type: application/json' -XPOST $this->elasticHost:9200/_aliases -d '{\"actions\": [$aliasJson]}'";
+		$cmd = "curl -s -H 'Content-Type: application/json' -XPOST $this->elasticHost:$this->elasticPort/_aliases -d '{\"actions\": [$aliasJson]}'";
 		list($output, $resultCode) = $this->execCmd($cmd, true );
 		$res = isset($output[0]) ? json_decode($output[0], true) : null;
 		if (isset($res["acknowledged"]) && $res["acknowledged"])
@@ -521,7 +526,7 @@ class elasticClusterProvisioning
 		}
 		
 		$aliasJson = implode(',', $actions);
-		$cmd = "curl -s -H 'Content-Type: application/json' -XPOST $this->elasticHost:9200/_aliases -d '{\"actions\": [$aliasJson]}'";
+		$cmd = "curl -s -H 'Content-Type: application/json' -XPOST $this->elasticHost:$this->elasticPort/_aliases -d '{\"actions\": [$aliasJson]}'";
 		list($output, $resultCode) = $this->execCmd($cmd, true );
 		$res = isset($output[0]) ? json_decode($output[0], true) : null;
 		if (isset($res["acknowledged"]) && $res["acknowledged"])
@@ -541,7 +546,7 @@ class elasticClusterProvisioning
 		foreach ($this->createdIndices as $indexName)
 		{
 			logLine("Setting index [$indexName] replication factor to [$replicationFactor]");
-			$cmd = "curl -s -H 'Content-Type: application/json' -XPUT $this->elasticHost:9200/$indexName/_settings -d '{\"number_of_replicas\": $replicationFactor}'";
+			$cmd = "curl -s -H 'Content-Type: application/json' -XPUT $this->elasticHost:$this->elasticPort/$indexName/_settings -d '{\"number_of_replicas\": $replicationFactor}'";
 			list($output, $resultCode) = $this->execCmd($cmd, true);
 			$res = isset($output[0]) ? json_decode($output[0], true) : null;
 			if (isset ($res["acknowledged"]) && $res["acknowledged"])
@@ -564,7 +569,7 @@ class elasticClusterProvisioning
 		foreach ($this->createdIndices as $indexName)
 		{
 			logLine("Setting index [$indexName] refresh interval to [$refreshInterval]");
-			$cmd = "curl -s -H 'Content-Type: application/json' -XPUT $this->elasticHost:9200/$indexName/_settings -d '{\"refresh_interval\": \"$refreshInterval\"}'";
+			$cmd = "curl -s -H 'Content-Type: application/json' -XPUT $this->elasticHost:$this->elasticPort/$indexName/_settings -d '{\"refresh_interval\": \"$refreshInterval\"}'";
 			list($output, $resultCode) = $this->execCmd($cmd, true);
 			$res = isset($output[0]) ? json_decode($output[0], true) : null;
 			if (isset($res["acknowledged"]) && $res["acknowledged"])
@@ -659,6 +664,7 @@ $longOptions = array(
 	'replicationFactor::',
 	'refreshInterval::',
 	'serverRootDirectory::',
+	'elasticPort::',
 );
 $options = getopt($shortOptions, $longOptions);
 
@@ -671,7 +677,7 @@ To execute: $argv[0] --host=[elasticClusterHost] --clusterType=[(esearch)||(beac
 Required options:
 	--host=[elasticClusterHost] - the elastic cluster host
 	--clusterType=[(esearch) || (beacon)] - which cluster to generate
-	
+
 Available options:
 	--getMappingsFromLocal - will take elastic index mappings from local 'server' directory (default is 'false')
 	--createSubIndexes - created index with mapping type '*_sub.json' like 'kaltura_entry_dedicated'
@@ -679,6 +685,7 @@ Available options:
 	--testRun - set all indices with a prefix of 'test_'
 	--verbose - more output logs
 	
+	--elasticPort=[port] - the port to use for elasticsearch (default is '9200')
 	--elasticVersion=[num] - the major elastic desired version (default is '7')
 	--elasticServerDirectoryName=[directory_name] - if 'elasticVersion' option was changed, you can change directory name for the mapping.json files
 	--serverVersion=[version] - the server version from which to pull mapping.json files (default is 'master')
