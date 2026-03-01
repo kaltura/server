@@ -224,7 +224,7 @@ class ScheduledTaskProfileService extends KalturaBaseService
 		$finalPath .="$requestId";
 		$ksStr = $this->getPartnerKs($partnerId, $requestId);
 		$finalPath .= "/ks/".$ksStr;
-		$downloadUrl = myPartnerUtils::getCdnHost($partnerId) . $finalPath;
+		$downloadUrl = myPartnerUtils::getRegionalCdnHost($partnerId) . $finalPath;
 
 		return $downloadUrl;
 	}
