@@ -1869,6 +1869,16 @@ class Partner extends BasePartner
 		if (kIpAddressUtils::isInternalIp())
 			return true;
 
+		// Check if the requested IP address is in the allowed list of IPs for this partner (if such list exists)
+		$allowedIps =  kConf::get('internal_partner_access_allowed_ips', kConfMapNames::SECURITY, null);
+		if ($allowedIps)
+		{
+			if (kIpAddressUtils::isIpInRanges(infraRequestUtils::getRemoteAddress(), $allowedIps))
+			{
+				return true;
+			}
+		}
+
 		if ($this->getEnforceHttpsApi() && infraRequestUtils::getProtocol() != infraRequestUtils::PROTOCOL_HTTPS)
 		{
 			KalturaLog::err('Action was accessed over HTTP while the partner is configured for HTTPS access only');
