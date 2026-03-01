@@ -5,7 +5,7 @@
 
 ### Deployment Scripts ###
 
-    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2023_07_20_alter_short_link_table.sql
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2026_03_01_alter_short_link_table.sql
 
 # Venus-22.12.0
 ## Add 'dash' tag to  audio description flavor params ##

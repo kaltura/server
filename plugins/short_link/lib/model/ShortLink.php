@@ -94,7 +94,7 @@ class ShortLink extends BaseShortLink implements IBaseObject {
 		$dcId = (int) $currentDc["id"];
 		$currentDcChars = $dcChars[$dcId];
 		
-		$keyLength = kConf::get("short_linkl_key_length", kConfMapNames::RUNTIME_CONFIG, 8);
+		$keyLength = kConf::get("short_link_key_length", kConfMapNames::RUNTIME_CONFIG, 8);
 		
 		for ($i = 0; $i < 10; $i++)
 		{
