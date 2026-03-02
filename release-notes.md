@@ -1,3 +1,12 @@
+# Venus-22.14.0
+
+## Add systemPartner get permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: FEC-14895
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_03_02_self_serve_add_permission_systempartner_getconfiguration.php
+
 # Venus-22.13.0
 
 ## Add partner and permissions for video avatar microservice ##
