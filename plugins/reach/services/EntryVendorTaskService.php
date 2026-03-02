@@ -28,7 +28,7 @@ class EntryVendorTaskService extends KalturaBaseService
 	{
 		$entryId = $entryObject->getId();
 
-		if ($dbVendorCatalogItem->isEntryUnderMinimumDuration($entryObject))
+		if ($entryObject instanceof entry && $dbVendorCatalogItem->isEntryUnderMinimumDuration($entryObject))
 		{
 			throw new KalturaAPIException(KalturaReachErrors::ENTRY_TOO_SHORT, $entryId);
 		}
