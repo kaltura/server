@@ -26,7 +26,7 @@ abstract class BaseShortLinkPeer {
 	const TM_CLASS = 'ShortLinkTableMap';
 	
 	/** The total number of columns. */
-	const NUM_COLUMNS = 11;
+	const NUM_COLUMNS = 13;
 
 	/** The number of lazy-loaded columns. */
 	const NUM_LAZY_LOAD_COLUMNS = 0;
@@ -64,6 +64,12 @@ abstract class BaseShortLinkPeer {
 	/** the column name for the STATUS field */
 	const STATUS = 'short_link.STATUS';
 
+	/** the column name for the UNIQUE_ID field */
+	const UNIQUE_ID = 'short_link.UNIQUE_ID';
+
+	/** the column name for the CUSTOM_DATA field */
+	const CUSTOM_DATA = 'short_link.CUSTOM_DATA';
+
 	/**
 	 * An identiy map to hold any loaded instances of ShortLink objects.
 	 * This must be public so that other peer classes can access this when hydrating from JOIN
@@ -80,11 +86,11 @@ abstract class BaseShortLinkPeer {
 	 * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
 	 */
 	private static $fieldNames = array (
-		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'CreatedAt', 'UpdatedAt', 'ExpiresAt', 'PartnerId', 'KuserId', 'Name', 'SystemName', 'FullUrl', 'Status', ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'createdAt', 'updatedAt', 'expiresAt', 'partnerId', 'kuserId', 'name', 'systemName', 'fullUrl', 'status', ),
-		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::CREATED_AT, self::UPDATED_AT, self::EXPIRES_AT, self::PARTNER_ID, self::KUSER_ID, self::NAME, self::SYSTEM_NAME, self::FULL_URL, self::STATUS, ),
-		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'created_at', 'updated_at', 'expires_at', 'partner_id', 'kuser_id', 'name', 'system_name', 'full_url', 'status', ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id', 'IntId', 'CreatedAt', 'UpdatedAt', 'ExpiresAt', 'PartnerId', 'KuserId', 'Name', 'SystemName', 'FullUrl', 'Status', 'UniqueId', 'CustomData', ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'intId', 'createdAt', 'updatedAt', 'expiresAt', 'partnerId', 'kuserId', 'name', 'systemName', 'fullUrl', 'status', 'uniqueId', 'customData', ),
+		BasePeer::TYPE_COLNAME => array (self::ID, self::INT_ID, self::CREATED_AT, self::UPDATED_AT, self::EXPIRES_AT, self::PARTNER_ID, self::KUSER_ID, self::NAME, self::SYSTEM_NAME, self::FULL_URL, self::STATUS, self::UNIQUE_ID, self::CUSTOM_DATA, ),
+		BasePeer::TYPE_FIELDNAME => array ('id', 'int_id', 'created_at', 'updated_at', 'expires_at', 'partner_id', 'kuser_id', 'name', 'system_name', 'full_url', 'status', 'unique_id', 'custom_data', ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
 	/**
@@ -94,11 +100,11 @@ abstract class BaseShortLinkPeer {
 	 * e.g. self::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
 	 */
 	private static $fieldKeys = array (
-		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'ExpiresAt' => 4, 'PartnerId' => 5, 'KuserId' => 6, 'Name' => 7, 'SystemName' => 8, 'FullUrl' => 9, 'Status' => 10, ),
-		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'expiresAt' => 4, 'partnerId' => 5, 'kuserId' => 6, 'name' => 7, 'systemName' => 8, 'fullUrl' => 9, 'status' => 10, ),
-		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::EXPIRES_AT => 4, self::PARTNER_ID => 5, self::KUSER_ID => 6, self::NAME => 7, self::SYSTEM_NAME => 8, self::FULL_URL => 9, self::STATUS => 10, ),
-		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'created_at' => 2, 'updated_at' => 3, 'expires_at' => 4, 'partner_id' => 5, 'kuser_id' => 6, 'name' => 7, 'system_name' => 8, 'full_url' => 9, 'status' => 10, ),
-		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, )
+		BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'IntId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, 'ExpiresAt' => 4, 'PartnerId' => 5, 'KuserId' => 6, 'Name' => 7, 'SystemName' => 8, 'FullUrl' => 9, 'Status' => 10, 'UniqueId' => 11, 'CustomData' => 12, ),
+		BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'intId' => 1, 'createdAt' => 2, 'updatedAt' => 3, 'expiresAt' => 4, 'partnerId' => 5, 'kuserId' => 6, 'name' => 7, 'systemName' => 8, 'fullUrl' => 9, 'status' => 10, 'uniqueId' => 11, 'customData' => 12, ),
+		BasePeer::TYPE_COLNAME => array (self::ID => 0, self::INT_ID => 1, self::CREATED_AT => 2, self::UPDATED_AT => 3, self::EXPIRES_AT => 4, self::PARTNER_ID => 5, self::KUSER_ID => 6, self::NAME => 7, self::SYSTEM_NAME => 8, self::FULL_URL => 9, self::STATUS => 10, self::UNIQUE_ID => 11, self::CUSTOM_DATA => 12, ),
+		BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'int_id' => 1, 'created_at' => 2, 'updated_at' => 3, 'expires_at' => 4, 'partner_id' => 5, 'kuser_id' => 6, 'name' => 7, 'system_name' => 8, 'full_url' => 9, 'status' => 10, 'unique_id' => 11, 'custom_data' => 12, ),
+		BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
 	);
 
 	/**
@@ -179,6 +185,8 @@ abstract class BaseShortLinkPeer {
 		$criteria->addSelectColumn(ShortLinkPeer::SYSTEM_NAME);
 		$criteria->addSelectColumn(ShortLinkPeer::FULL_URL);
 		$criteria->addSelectColumn(ShortLinkPeer::STATUS);
+		$criteria->addSelectColumn(ShortLinkPeer::UNIQUE_ID);
+		$criteria->addSelectColumn(ShortLinkPeer::CUSTOM_DATA);
 	}
 
 	/**
@@ -493,7 +501,7 @@ abstract class BaseShortLinkPeer {
 				// the default case
 				$criteria->addAnd(self::PARTNER_ID, $partnerId);
 			}
-			elseif ($partnerGroup == myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
+			elseif ($partnerGroup === myPartnerUtils::ALL_PARTNERS_WILD_CHAR)
 			{
 				// all is allowed - don't add anything to the criteria
 			}
@@ -863,6 +871,15 @@ abstract class BaseShortLinkPeer {
 	 * @return array
 	 */
 	public static function getAtomicColumns()
+	{
+		return array();
+	}
+	
+	/**
+	 * Return array of custom-data fields that shouldn't be auto-updated.
+	 * @return array
+	 */
+	public static function getAtomicCustomDataFields()
 	{
 		return array();
 	}

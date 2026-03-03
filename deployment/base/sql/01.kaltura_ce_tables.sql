@@ -2277,8 +2277,8 @@ CREATE TABLE  IF NOT EXISTS `vendor_integration` (
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `short_link` (
-  `id` varchar(5) NOT NULL,
-  `int_id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` varchar(20) NOT NULL,
+  `int_id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `expires_at` datetime DEFAULT NULL,
@@ -2288,9 +2288,15 @@ CREATE TABLE IF NOT EXISTS `short_link` (
   `system_name` varchar(63) DEFAULT NULL,
   `full_url` text DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
+  `unique_id` varchar(63) DEFAULT NULL,
+  `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `int_id` (`int_id`),
-  KEY `kuser_partner_name` (`partner_id`,`kuser_id`,`system_name`)
+  KEY `kuser_partner_name` (`partner_id`,`kuser_id`,`system_name`),
+  KEY `expires_at` (`expires_at`),
+  KEY `partner_id_status` (`partner_id`,`status`),
+  KEY `partner_unique_id` (`partner_id`,`unique_id`),
+  KEY `partner_kuser_status` (`partner_id`,`kuser_id`,`status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPRESSED;
 
 
