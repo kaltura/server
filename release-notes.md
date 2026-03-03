@@ -55,6 +55,13 @@ Replace the tokens: @CONVERSATION_MANAGER_PARTNER_ADMIN_SECRET@, @CONVERSATION_M
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2026_03_02_self_serve_add_permission_systempartner_getconfiguration.php
 
+## Add permissions for session impersonate ##
+* Issue Type: Task
+* Issue ID: PLAT-25743
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2026_03_03_session_impersonate_permission.php
+
 # Venus-22.13.0
 ## Add partner and permissions for video avatar microservice ##
 * Issue Type: Task
