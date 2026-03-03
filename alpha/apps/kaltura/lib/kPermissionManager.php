@@ -1235,7 +1235,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return true;
 	}
 
-	protected static function handlePermissions($permission)
+	protected static function handlePermissions(Permission $permission)
 	{
 		switch ($permission->getName())
 		{
@@ -1250,10 +1250,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			case PermissionName::FEATURE_MEDIA_REPURPOSING_NG_PERMISSION:
 				self::handleMediaRepurposingNGPermission($permission);
 				return;
+
+			case PermissionName::FEATURE_ENABLE_INTERACTIONS_PERMISSION:
+				self::handleInteractionsPermission($permission);
+				return;
 		}
 	}
 
-	protected static function handleMediaRepurposingNGPermission($permission)
+	protected static function handleMediaRepurposingNGPermission(Permission $permission)
 	{
 		if ($permission->getStatus() == PermissionStatus::ACTIVE)
 		{
@@ -1261,7 +1265,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 	}
 
-	protected static function handleGamePluginPermission($permission)
+	protected static function handleGamePluginPermission(Permission $permission)
 	{
 		$partner = PartnerPeer::retrieveByPK($permission->getPartnerId());
 		$enablePermission = $permission->getStatus() == PermissionStatus::ACTIVE;
@@ -1269,7 +1273,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$partner->save();
 	}
 
-	protected static function handleRecycleBinPermission($permission)
+	protected static function handleRecycleBinPermission(Permission $permission)
 	{
 		if ($permission->getStatus() == PermissionStatus::ACTIVE)
 		{
@@ -1280,6 +1284,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			self::disableRecycleBinScheduledTaskProfile($permission->getPartnerId());
 		}
+	}
+
+	protected static function handleInteractionsPermission(Permission $permission)
+	{
+		$partner = PartnerPeer::retrieveByPK($permission->getPartnerId());
+		$enablePermission = $permission->getStatus() == PermissionStatus::ACTIVE;
+		$partner->setEnableInteractions($enablePermission);
+		$partner->save();
 	}
 
 	protected static function enableRequiredPluginsPermissions($partnerId, $permissionName)

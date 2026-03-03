@@ -43,6 +43,11 @@ class kClipAttributes extends kOperationAttributes
 	 */
 	private $cropAlignment;
 
+	/**
+	 * @var  array<kMediaCompositionAttributes>
+	 */
+	private $mediaCompositionAttributesArray;
+
 
 	/* (non-PHPdoc)
 	 * @see kOperationAttributes::toArray()
@@ -55,7 +60,8 @@ class kClipAttributes extends kOperationAttributes
 			'globalOffsetInDestination' => $this->globalOffsetInDestination,
 			'effectArray' => $this->effectArray,
 			'cropAlignment' => $this->cropAlignment,
-			'captionAttributes' => $this->captionAttributes
+			'captionAttributes' => $this->captionAttributes,
+			'mediaCompositionAttributesArray' => $this->mediaCompositionAttributesArray
 		);
 	}
 	
@@ -177,5 +183,21 @@ class kClipAttributes extends kOperationAttributes
 	public function setCaptionAttributes($captionAttributes)
 	{
 		return $this->captionAttributes = $captionAttributes;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getMediaCompositionAttributesArray()
+	{
+		return $this->mediaCompositionAttributesArray;
+	}
+
+	/**
+	 * @param array $mediaCompositionAttributesArray
+	 */
+	public function setMediaCompositionAttributesArray($mediaCompositionAttributesArray)
+	{
+		return $this->mediaCompositionAttributesArray = $mediaCompositionAttributesArray;
 	}
 }

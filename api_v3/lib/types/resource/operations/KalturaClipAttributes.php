@@ -43,15 +43,21 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 	 */
 	public $captionAttributes;
 
+	/**
+	 * @var KalturaMediaCompositionAttributesArray
+	 */
+	public $mediaCompositionAttributesArray;
+
 
 	private static $map_between_objects = array
 	(
-	 	"offset" , 
+	 	"offset" ,
 	 	"duration",
 		"globalOffsetInDestination",
 		"effectArray",
 		"captionAttributes",
-		"cropAlignment"
+		"cropAlignment",
+		"mediaCompositionAttributesArray"
 	);
 
 	public function getMapBetweenObjects ( )
@@ -82,6 +88,16 @@ class KalturaClipAttributes extends KalturaOperationAttributes
 				}
 				$renderCaptionAttribute = $captionAttribute;
 			}
+		}
+
+		$mediaCompositionAttribute = null;
+		foreach ($this->mediaCompositionAttributesArray as $Attribute)
+		{
+			if($mediaCompositionAttribute)
+			{
+				throw new KalturaAPIException(KalturaErrors::MULTIPLE_PARAMETER_NOT_SUPPORTED, 'mediaCompositionAttributes');
+			}
+			$mediaCompositionAttribute = $Attribute;
 		}
 	}
 

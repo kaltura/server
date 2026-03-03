@@ -99,6 +99,8 @@ class KalturaReachErrors implements kReachErrors
 
 	const CATALOG_ITEMS_ARE_NOT_LINKED = "CATALOG_ITEMS_ARE_NOT_LINKED;FIRST_CATALOG_ITEM_ID,SECOND_CATALOG_ITEM_ID; catalog item [@FIRST_CATALOG_ITEM_ID@] is not linked to catalog item [@SECOND_CATALOG_ITEM_ID@]";
 
+	const ENTRY_TOO_SHORT = "ENTRY_TOO_SHORT;ENTRY_ID;The entry [@ENTRY_ID@] is under the minimum duration limit, entry vendor task object wont be created for it";
+
 	/* Credit */
 	
 	const OVERAGE_CREDIT_CANNOT_BE_NEGATIVE = "OVERAGE_CREDIT_CANNOT_BE_NEGATIVE;;Overage credit value cannot be negative";

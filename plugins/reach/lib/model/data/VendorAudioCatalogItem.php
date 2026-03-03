@@ -35,4 +35,9 @@ class VendorAudioCatalogItem extends VendorCatalogItem
 	{
 		return $this->getFromCustomData(self::CUSTOM_DATA_CLEAR_AUDIO_FLAVOR_PARAMS_ID);
 	}
+
+	public function isEntryUnderMinimumDuration(entry $entry)
+	{
+		return $entry->getDuration() < VendorCatalogItem::MINIMUM_DURATION_IN_SECONDS;
+	}
 }

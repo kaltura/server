@@ -152,37 +152,39 @@ class CategoryEntryService extends KalturaBaseService
 		
 		$dbCategoryEntry->reSetCategoryFullIds();
 		$dbCategoryEntry->save();
-		
-		
-		$entry = entryPeer::retrieveByPK($dbCategoryEntry->getEntryId());	
-		if($entry)
+
+		if(!PermissionPeer::isValidForPartner(PermissionName::FEATURE_DISABLE_CATEGORY_LIMIT, $this->getPartnerId()))
 		{
-			$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entryId);
-			
-			$categoriesIds = array();
-			foreach($categoryEntries as $categoryEntry)
+			$entry = entryPeer::retrieveByPK($dbCategoryEntry->getEntryId());
+			if($entry)
 			{
-				$categoriesIds[] = $categoryEntry->getCategoryId();
-			}
-			
-			$categories = categoryPeer::retrieveByPKs($categoriesIds);
-			
-			$isCategoriesModified = false;
-			$categoriesFullName = array();
-			foreach($categories as $category)
-			{
-				if($category->getPrivacyContexts() == null)
+				$categoryEntries = categoryEntryPeer::retrieveActiveByEntryId($entryId);
+
+				$categoriesIds = array();
+				foreach($categoryEntries as $categoryEntry)
 				{
-					$categoriesFullName[] = $category->getFullName();
-					$isCategoriesModified = true;
+					$categoriesIds[] = $categoryEntry->getCategoryId();
 				}
-			} 
-				
-			$entry->setCategories(implode(',', $categoriesFullName));
-			categoryEntryPeer::syncEntriesCategories($entry, $isCategoriesModified);
-			$entry->save();
+
+				$categories = categoryPeer::retrieveByPKs($categoriesIds);
+
+				$isCategoriesModified = false;
+				$categoriesFullName = array();
+				foreach($categories as $category)
+				{
+					if($category->getPrivacyContexts() == null)
+					{
+						$categoriesFullName[] = $category->getFullName();
+						$isCategoriesModified = true;
+					}
+				}
+
+				$entry->setCategories(implode(',', $categoriesFullName));
+				categoryEntryPeer::syncEntriesCategories($entry, $isCategoriesModified);
+				$entry->save();
+			}
 		}
-		
+
 		return $dbCategoryEntry->getId();
 				
 	}
