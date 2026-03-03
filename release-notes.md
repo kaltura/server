@@ -1,4 +1,17 @@
 # Venus-22.14.0
+## Add models sdk permission
+* Issue Type: Task
+* Issue ID: PLAT-25736
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableModelsSdk.enabled = true
+moduls.enableModelsSdk.permissionType = 2
+moduls.enableModelsSdk.label = "Enable models sdk"
+moduls.enableModelsSdk.permissionName = FEATURE_ALLOW_MODELS_SDK
+moduls.enableModelsSdk.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
 ## Extend short link to support larger volume of objects ##
 - Issue Type: Task
 - Issue ID: PLAT-25698
@@ -21,7 +34,6 @@ moduls.enableInteractions.basePermissionType =
 moduls.enableInteractions.basePermissionName =
 moduls.enableInteractions.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
-
 
 ## Add Conversation Manager partner
 * Issue Type: Task
