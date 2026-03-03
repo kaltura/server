@@ -11,6 +11,12 @@ Replace the tokens: @CONVERSATION_MANAGER_PARTNER_ADMIN_SECRET@, @CONVERSATION_M
 
 ### Deployment Scripts ###
 	php deployment/updates/scripts/add_permissions/2026_03_01_conversation_manager_add_partner.php
+## Add systemPartner get permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: FEC-14895
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_03_02_self_serve_add_permission_systempartner_getconfiguration.php
 
 # Venus-22.13.0
 
