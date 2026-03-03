@@ -1,11 +1,9 @@
 # Venus-22.14.0
-# Venus-22.13.0
 ## Extend short link to support larger volume of objects ##
 - Issue Type: Task
 - Issue ID: PLAT-25698
 
 ### Deployment Scripts ###
-
     mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2026_03_01_alter_short_link_table.sql
 
 ## Add Interactions feature flag ##
