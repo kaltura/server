@@ -94,13 +94,15 @@ class ShortLink extends BaseShortLink implements IBaseObject {
 		$dcId = (int) $currentDc["id"];
 		$currentDcChars = $dcChars[$dcId];
 		
+		$keyLength = kConf::get("short_link_key_length", kConfMapNames::RUNTIME_CONFIG, 8);
+		
 		for ($i = 0; $i < 10; $i++)
 		{
 			$dcChar = substr($currentDcChars, rand(0, strlen($currentDcChars) - 1), 1);
 			if(!$dcChar)
 				$dcChar = '0';
 				
-			$id = $dcChar . kString::generateStringId(4);
+			$id = $dcChar . kString::generateStringId($keyLength-1); //-1 because we already added one char for dc
 			ShortLinkPeer::setUseCriteriaFilter(false);
 			$existingObject = ShortLinkPeer::retrieveByPK($id);
 			ShortLinkPeer::setUseCriteriaFilter(true);
