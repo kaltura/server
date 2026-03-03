@@ -1251,7 +1251,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 				self::handleMediaRepurposingNGPermission($permission);
 				return;
 
-			case PermissionName::FEATURE_INTERACTIONS_PERMISSION:
+			case PermissionName::FEATURE_ENABLE_INTERACTIONS_PERMISSION:
 				self::handleInteractionsPermission($permission);
 				return;
 		}
