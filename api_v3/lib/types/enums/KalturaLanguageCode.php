@@ -11,6 +11,9 @@ class KalturaLanguageCode extends KalturaStringEnum
 	const SQ = 'sq';
 	const AM = 'am';
 	const AR = 'ar';
+	const AR_LB = 'ar_lb';
+	const AR_QA = 'ar_qa';
+	const AR_SA = 'ar_sa';
 	const HY = 'hy';
 	const AS_ = 'as';
 	const AY = 'ay';
