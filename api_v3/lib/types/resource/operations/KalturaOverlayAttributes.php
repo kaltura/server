@@ -76,4 +76,19 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 
 		}
 	}
+
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($source_object, $responseProfile);
+
+		if($this->shouldGet('resource', $responseProfile))
+		{
+			$resource = $source_object->getResource();
+			if($resource instanceof kFileSyncResource)
+			{
+				$this->resource = new KalturaFileSyncResource();
+				$this->resource->fromObject($resource, $responseProfile);
+			}
+		}
+	}
 }
