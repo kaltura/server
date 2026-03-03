@@ -20,7 +20,7 @@ Replace the tokens: @CONVERSATION_MANAGER_PARTNER_ADMIN_SECRET@, @CONVERSATION_M
 
 ## Add permissions for session impersonate ##
 * Issue Type: Task
-* Issue ID: PLAT-25731
+* Issue ID: PLAT-25743
 
 ### Deployment Scripts ###
 	php deployment/updates/scripts/add_permissions/2026_03_03_session_impersonate_permission.php
