@@ -12,6 +12,7 @@ define('PARTNER_PARENT_ID', 'pp');
 define('PARTNER_SERVICE_EDITION', 'se');
 define('PARTNER_ACCOUNT_TYPE','at');
 define('PARTNER_GS_ENABLED', 'gs');
+define('PARTNER_INTERACTIONS_ENABLED', 'inter');
 
 define('ENTRY_KUSER_ID', 'ku');
 define('ENTRY_TYPE', 't');
@@ -120,6 +121,16 @@ function getPartnerGameServiceEnabled($customData)
 	return false;
 }
 
+function getPartnerInteractionsEnabled($customData)
+{
+	if (isset($customData['enableInteractions']) && $customData['enableInteractions'])
+	{
+		return true;
+	}
+
+	return false;
+}
+
 function getEntrySourceTypeInt($sourceType, $adminTags, $customData)
 {
 	global $sourceFromAdminTag, $externalSources;
@@ -187,6 +198,7 @@ function getPartnerUpdates($updatedAt)
 				PARTNER_SERVICE_EDITION => $row['PARTNER_PACKAGE'],
 				PARTNER_ACCOUNT_TYPE => getPartnerAccountType($customData),
 				PARTNER_GS_ENABLED => getPartnerGameServiceEnabled($customData),
+				PARTNER_INTERACTIONS_ENABLED => getPartnerInteractionsEnabled($customData)
 			);
 			$info = json_encode($info);
 		}
