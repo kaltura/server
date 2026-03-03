@@ -34,6 +34,21 @@ class KalturaReplaceBackgroundAttributes extends KalturaMediaCompositionAttribut
 		return parent::toObject($object_to_fill, $props_to_skip);
 	}
 
+	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($source_object, $responseProfile);
+
+		if($this->shouldGet('resource', $responseProfile))
+		{
+			$resource = $source_object->getResource();
+			if($resource instanceof kFileSyncResource)
+			{
+				$this->resource = new KalturaFileSyncResource();
+				$this->resource->fromObject($resource, $responseProfile);
+			}
+		}
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::validateForUsage($sourceObject, $propertiesToSkip)
 	 */

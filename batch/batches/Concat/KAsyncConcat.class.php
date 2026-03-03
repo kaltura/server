@@ -163,7 +163,7 @@ class KAsyncConcat extends KJobHandlerWorker
 			{
 				foreach ($data->inputFiles[$key]->value as $ind => $inputFile)
 				{
-					$inputResolvedFilePath = kFile::realPath($inputFile);
+					$inputResolvedFilePath = kFile::realPath($inputFile->value);
 					$conversionCmd = str_replace("__inFileName$ind"."__", "\"$inputResolvedFilePath\"", $conversionCmd);
 				}
 			}
