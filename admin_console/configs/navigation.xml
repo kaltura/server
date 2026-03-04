@@ -110,11 +110,16 @@
 				<controller>index</controller>
 				<action>testme-doc</action>
 			</testme-doc>
+			<entry-restoration>
+				<label>Entry Restoration</label>
+				<controller>index</controller>
+				<action>entry-restoration</action>
+			</entry-restoration>
 			<apc>
 				<label>APC</label>
 				<controller>index</controller>
 				<action>apc</action>
-			</apc>			
+			</apc>
             <memcache>
 				<label>Memcache</label>
 				<controller>index</controller>
