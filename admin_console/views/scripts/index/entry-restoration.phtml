@@ -1,0 +1,178 @@
+<h2>Bulk Entry Restoration</h2>
+
+<p>This tool allows you to restore multiple deleted entries in bulk. You can provide entry IDs via file upload, comma-separated list, or a single entry ID.</p>
+
+<?php if (count($this->errors)): ?>
+<div class="error">
+	<ul>
+		<?php foreach($this->errors as $error): ?>
+		<li><?php echo htmlspecialchars($error); ?></li>
+		<?php endforeach; ?>
+	</ul>
+</div>
+<?php endif; ?>
+
+<form method="post" action="<?php echo $this->url(array('controller' => 'index', 'action' => 'entry-restoration'), null, true); ?>" enctype="multipart/form-data" id="frmEntryRestoration">
+	<fieldset>
+		<p style="margin-bottom: 15px;">
+			<label for="partnerId" style="display: inline-block; width: 120px; font-weight: bold;">Partner ID:</label>
+			<input type="text" name="partnerId" id="partnerId" required style="width: 200px;" />
+		</p>
+
+		<p style="margin-bottom: 15px;">
+			<label for="inputMode" style="display: inline-block; width: 120px; font-weight: bold;">Input Mode:</label>
+			<select name="inputMode" id="inputMode" onchange="toggleInputMode()" style="width: 350px;">
+				<option value="textarea" selected>Comma-separated or Line-separated List</option>
+				<option value="single">Single Entry ID</option>
+				<option value="file">File Upload (one entry ID per line)</option>
+			</select>
+		</p>
+
+		<p id="entryIdsField" style="margin-bottom: 15px;">
+			<label for="entryIds" style="display: inline-block; width: 120px; font-weight: bold; vertical-align: top;">Entry IDs:</label>
+			<textarea name="entryIds" id="entryIds" rows="8" cols="70" style="width: 500px; font-family: monospace; vertical-align: top;"></textarea>
+		</p>
+
+		<p id="entryFileField" style="display:none; margin-bottom: 15px;">
+			<label for="entryFile" style="display: inline-block; width: 120px; font-weight: bold;">Upload File:</label>
+			<input type="file" name="entryFile" id="entryFile" accept=".txt,.csv" />
+		</p>
+
+		<p style="margin-bottom: 15px; padding-left: 120px;">
+			<label>
+				<input type="checkbox" name="dryRun" id="dryRun" value="true" checked />
+				Dry Run (validation only, no actual restoration)
+			</label>
+		</p>
+
+		<p style="margin-bottom: 10px; padding-left: 120px;">
+			<button type="submit">Validate/Restore Entries</button>
+		</p>
+	</fieldset>
+</form>
+
+<script type="text/javascript">
+function toggleInputMode() {
+	var mode = document.getElementById('inputMode').value;
+	var entryIdsField = document.getElementById('entryIdsField');
+	var entryFileField = document.getElementById('entryFileField');
+
+	if (mode === 'file') {
+		entryIdsField.style.display = 'none';
+		entryFileField.style.display = 'block';
+		document.getElementById('entryIds').required = false;
+		document.getElementById('entryFile').required = true;
+	} else {
+		entryIdsField.style.display = 'block';
+		entryFileField.style.display = 'none';
+		document.getElementById('entryIds').required = true;
+		document.getElementById('entryFile').required = false;
+
+		if (mode === 'single') {
+			document.getElementById('entryIds').rows = 1;
+			document.getElementById('entryIds').placeholder = 'Enter a single entry ID';
+		} else {
+			document.getElementById('entryIds').rows = 10;
+			document.getElementById('entryIds').placeholder = 'Enter entry IDs separated by commas or newlines';
+		}
+	}
+}
+</script>
+
+<?php if (isset($this->results) && count($this->results) > 0): ?>
+<div id="results" class="clear">
+	<?php
+	// Calculate statistics
+	$totalEntries = count($this->results);
+	$successCount = 0;
+	$errorCount = 0;
+	foreach($this->results as $result) {
+		if ($result->restored) {
+			$successCount++;
+		} else {
+			$errorCount++;
+		}
+	}
+	?>
+
+	<h2>
+		Restoration Results
+		<span>(<?php echo $totalEntries; ?> <?php echo $totalEntries == 1 ? 'entry' : 'entries'; ?>)</span>
+		<?php if (isset($this->isDryRun) && $this->isDryRun): ?>
+		<span style="color: #ff9800; font-size: 12px; font-weight: normal;"> - Dry Run (Validation Only)</span>
+		<?php endif; ?>
+	</h2>
+
+	<p style="margin: 10px 0;">
+		<strong>Restorable:</strong> <span style="color: green;"><?php echo $successCount; ?></span> |
+		<strong>Not Restorable:</strong> <span style="color: red;"><?php echo $errorCount; ?></span>
+	</p>
+
+	<table class="clear">
+		<thead>
+			<tr>
+				<th>Entry ID</th>
+				<th>Restorable</th>
+				<th>Status/Error</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+			foreach($this->results as $result):
+				$rowClass = $this->cycle(array('odd', 'even'))->next();
+			?>
+			<tr class="<?php echo $rowClass; ?>">
+				<td><?php echo htmlspecialchars($result->entryId); ?></td>
+				<td style="<?php echo $result->restored ? 'color:green; font-weight: bold;' : 'color:red; font-weight: bold;'; ?>">
+					<?php echo $result->restored ? 'Yes' : 'No'; ?>
+				</td>
+				<td style="<?php echo $result->restored ? 'color:green;' : 'color:red;'; ?>">
+					<?php
+						if ($result->restored) {
+							echo isset($this->isDryRun) && $this->isDryRun ? 'Ready to restore' : 'Successfully restored';
+						} else {
+							echo htmlspecialchars($result->error ? $result->error : 'Cannot be restored');
+						}
+					?>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+		</tbody>
+	</table>
+
+	<?php if (isset($this->isDryRun) && $this->isDryRun): ?>
+		<?php
+		// Only include entries that passed validation
+		$validEntries = array();
+		foreach($this->results as $result) {
+			if ($result->restored) {
+				$validEntries[] = $result->entryId;
+			}
+		}
+		?>
+		<br />
+		<?php if (count($validEntries) > 0): ?>
+		<div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px 20px; margin: 20px 0;">
+			<form method="post" action="<?php echo $this->url(array('controller' => 'index', 'action' => 'entry-restoration'), null, true); ?>" style="margin: 0; text-align: center;">
+				<input type="hidden" name="partnerId" value="<?php echo htmlspecialchars($_POST['partnerId']); ?>" />
+				<input type="hidden" name="entryIds" value="<?php echo htmlspecialchars(implode(',', $validEntries)); ?>" />
+				<input type="hidden" name="dryRun" value="false" />
+				<input type="hidden" name="inputMode" value="textarea" />
+				<p style="color: #856404; font-weight: bold; margin: 0 0 10px 0;">
+					<strong>Warning:</strong> This will actually restore the validated entries. This action cannot be undone automatically.
+				</p>
+				<button type="submit" style="background: #E8E8E8; background-image: none;">
+					Proceed with Real Restoration (<?php echo count($validEntries); ?> <?php echo count($validEntries) == 1 ? 'entry' : 'entries'; ?>)
+				</button>
+			</form>
+		</div>
+		<?php else: ?>
+		<div style="background: #f8d7da; border: 1px solid #f5c6cb; padding: 20px; margin: 20px 0;">
+			<p style="color: #721c24; font-weight: bold; margin: 0;">
+				No entries are eligible for restoration. Please fix the errors above and try again.
+			</p>
+		</div>
+		<?php endif; ?>
+	<?php endif; ?>
+</div>
+<?php endif; ?>

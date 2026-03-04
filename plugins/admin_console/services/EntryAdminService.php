@@ -88,6 +88,119 @@ class EntryAdminService extends KalturaBaseService
 	}
 
 	/**
+	 * Bulk restore deleted entries.
+	 *
+	 * @action bulkRestoreDeletedEntries
+	 * @param KalturaBulkRestoreEntryData $bulkRestoreData
+	 * @return KalturaEntryRestoreResultListResponse
+	 */
+	public function bulkRestoreDeletedEntriesAction(KalturaBulkRestoreEntryData $bulkRestoreData)
+	{
+		$partnerId = $bulkRestoreData->partnerId;
+		$entryIdsString = $bulkRestoreData->entryIds;
+		$dryRun = $bulkRestoreData->dryRun;
+
+		// Parse entry IDs from comma-separated or newline-separated string
+		$entryIds = array();
+		$rawEntryIds = preg_split('/[\s,]+/', trim($entryIdsString), -1, PREG_SPLIT_NO_EMPTY);
+
+		foreach ($rawEntryIds as $entryId) {
+			$entryId = trim($entryId);
+			if (!empty($entryId)) {
+				$entryIds[] = $entryId;
+			}
+		}
+
+		$results = array();
+
+		// Process each entry
+		foreach ($entryIds as $entryId) {
+			$result = new KalturaEntryRestoreResult();
+			$result->entryId = $entryId;
+			$result->restored = false;
+			$result->error = null;
+
+			try {
+				// Validate entry exists and belongs to the specified partner
+				// Disable criteria filter to retrieve deleted entries
+				entryPeer::setUseCriteriaFilter(false);
+				$deletedEntry = entryPeer::retrieveByPKNoFilter($entryId);
+				entryPeer::setUseCriteriaFilter(true);
+
+				if (!$deletedEntry) {
+					$result->error = "Entry not found";
+					$results[] = $result;
+					continue;
+				}
+
+				if ($deletedEntry->getPartnerId() != $partnerId) {
+					$result->error = "Entry does not belong to specified partner";
+					$results[] = $result;
+					continue;
+				}
+
+				if ($deletedEntry->getStatus() != entryStatus::DELETED) {
+					$result->error = "Entry is not deleted (current status: " . $deletedEntry->getStatus() . ")";
+					$results[] = $result;
+					continue;
+				}
+
+				// Retrieve file syncs and assets
+				$fileSyncs = array();
+				$deletedAssets = array();
+				$this->retrieveEntryFileSyncsAndAssets($deletedEntry, $fileSyncs, $deletedAssets);
+
+				// Validate entry can be restored
+				if (!$this->validateEntryForRestoreDelete($deletedEntry, $fileSyncs, $deletedAssets)) {
+					$result->error = "Entry assets are in wrong status for restore";
+					$results[] = $result;
+					continue;
+				}
+
+				// If not a dry run, perform the actual restoration
+				if (!$dryRun) {
+					// Restore file syncs
+					$this->restoreFileSyncs($fileSyncs);
+
+					// Restore assets
+					$this->restoreAssets($deletedAssets);
+
+					// Restore category entries
+					$this->restoreCategoryEntries($deletedEntry);
+
+					// Restore metadata
+					$this->restoreMetadata($deletedEntry);
+
+					// Restore entry status
+					$this->restoreEntryStatus($deletedEntry);
+
+					kEventsManager::flushEvents();
+					kMemoryManager::clearMemory();
+				}
+
+				$result->restored = true;
+				$result->error = $dryRun ? "Validation passed - entry can be restored" : "Successfully restored";
+
+			} catch (Exception $e) {
+				KalturaLog::err("Error restoring entry [$entryId]: " . $e->getMessage());
+				$result->error = "Error: " . $e->getMessage();
+			}
+
+			$results[] = $result;
+		}
+
+		$response = new KalturaEntryRestoreResultListResponse();
+		$arrayResult = new KalturaEntryRestoreResultArray();
+		foreach ($results as $result) {
+			$arrayResult[] = $result;
+		}
+		$response->objects = $arrayResult;
+		$response->totalCount = count($results);
+
+		return $response;
+	}
+
+	/**
 	 * Restore deleted entry.
 	 *
 	 * @action restoreDeletedEntry
@@ -100,73 +213,29 @@ class EntryAdminService extends KalturaBaseService
 		if (!$deletedEntry)
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $entryId);
 
-		$fileSyncKeys = array();
-		foreach (entry::getEntryFileSyncSubTypes() as $entrySubType) {
-			$fileSyncKeys[] = $deletedEntry->getSyncKey($entrySubType);
-		}
-
-		$c = new Criteria();
-		$c->add(assetPeer::ENTRY_ID, $entryId, Criteria::EQUAL);
-		assetPeer::setUseCriteriaFilter(false);
-		$deletedAssets = assetPeer::doSelect($c);
-		assetPeer::setUseCriteriaFilter(true);
-
-		foreach($deletedAssets as $deletedAsset)
-		{
-			array_push($fileSyncKeys, $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG));
-		}
-
-		$c = new Criteria();
-		$c->add(MetadataPeer::OBJECT_TYPE, MetadataObjectType::ENTRY);
-		$c->add(MetadataPeer::OBJECT_ID, $entryId);
-		$c->add(MetadataPeer::STATUS, Metadata::STATUS_DELETED, Criteria::EQUAL);
-		MetadataPeer::setUseCriteriaFilter(false);
-		$deletedMetadataObjects = MetadataPeer::doSelect($c);
-		MetadataPeer::setUseCriteriaFilter(true);
-
-		foreach ($deletedMetadataObjects as $metadata)
-		{
-			$fileSyncKeys[] = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
-		}
-
+		// Retrieve file syncs and assets
 		$fileSyncs = array();
-		FileSyncPeer::setUseCriteriaFilter(false);
-		foreach ($fileSyncKeys as $fileSyncKey)
-		{
-			$fileSyncs = array_merge($fileSyncs, FileSyncPeer::retrieveAllByFileSyncKey($fileSyncKey));
-		}
-		FileSyncPeer::setUseCriteriaFilter(true);
+		$deletedAssets = array();
+		$this->retrieveEntryFileSyncsAndAssets($deletedEntry, $fileSyncs, $deletedAssets);
 
+		// Validate entry can be restored
 		if (!$this->validateEntryForRestoreDelete($deletedEntry, $fileSyncs, $deletedAssets))
 			throw new KalturaAPIException(KalturaAdminConsoleErrors::ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE, $entryId);
 
+		// Restore file syncs
 		$this->restoreFileSyncs($fileSyncs);
 
-		//restore assets
-		foreach($deletedAssets as $deletedAsset)
-		{
-			$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
-			$deletedAsset->setDeletedAt(null);
-			$deletedAsset->save();
-		}
+		// Restore assets
+		$this->restoreAssets($deletedAssets);
 
+		// Restore category entries
 		$this->restoreCategoryEntries($deletedEntry);
+
+		// Restore metadata
 		$this->restoreMetadata($deletedEntry);
-		//restore entry
-		$deletedEntry->setStatusReady();
-		$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);
-		$deletedEntry->setData($deletedEntry->getFromCustomData("deleted_original_data"),true); //data should be resotred even if it's NULL
 
-		// Read previousDisplayInSearchStatus FIRST (while it still has a value)
-		if ($deletedEntry->getDisplayInSearch() === KalturaEntryDisplayInSearchType::RECYCLED) {
-			$deletedEntry->setDisplayInSearch($deletedEntry->getPreviousDisplayInSearchStatus());
-		}
-
-		// THEN clear the recycle bin fields
-		$deletedEntry->setRecycledAt(null);
-		$deletedEntry->setPreviousDisplayInSearchStatus(null);
-
-		$deletedEntry->save();
+		// Restore entry status
+		$this->restoreEntryStatus($deletedEntry);
 
 		kEventsManager::flushEvents();
 		kMemoryManager::clearMemory();
@@ -264,6 +333,103 @@ class EntryAdminService extends KalturaBaseService
 				$fileSync->setStatus(FileSync::FILE_SYNC_STATUS_ERROR);
 			$fileSync->save();
 		}
+	}
+
+	/**
+	 * Retrieve file syncs, assets, and metadata for an entry
+	 * Used for both validation and restoration of deleted entries
+	 *
+	 * @param entry $entry
+	 * @param array $fileSyncs Output parameter - will be populated with file syncs
+	 * @param array $deletedAssets Output parameter - will be populated with deleted assets
+	 * @return void
+	 */
+	protected function retrieveEntryFileSyncsAndAssets(entry $entry, &$fileSyncs, &$deletedAssets)
+	{
+		$entryId = $entry->getId();
+
+		// Get file sync keys for entry
+		$fileSyncKeys = array();
+		foreach (entry::getEntryFileSyncSubTypes() as $entrySubType) {
+			$fileSyncKeys[] = $entry->getSyncKey($entrySubType);
+		}
+
+		// Get deleted assets
+		$c = new Criteria();
+		$c->add(assetPeer::ENTRY_ID, $entryId, Criteria::EQUAL);
+		assetPeer::setUseCriteriaFilter(false);
+		$deletedAssets = assetPeer::doSelect($c);
+		assetPeer::setUseCriteriaFilter(true);
+
+		// Add asset file sync keys
+		foreach($deletedAssets as $deletedAsset)
+		{
+			array_push($fileSyncKeys, $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG));
+		}
+
+		// Get deleted metadata objects
+		$c = new Criteria();
+		$c->add(MetadataPeer::OBJECT_TYPE, MetadataObjectType::ENTRY);
+		$c->add(MetadataPeer::OBJECT_ID, $entryId);
+		$c->add(MetadataPeer::STATUS, Metadata::STATUS_DELETED, Criteria::EQUAL);
+		MetadataPeer::setUseCriteriaFilter(false);
+		$deletedMetadataObjects = MetadataPeer::doSelect($c);
+		MetadataPeer::setUseCriteriaFilter(true);
+
+		// Add metadata file sync keys
+		foreach ($deletedMetadataObjects as $metadata)
+		{
+			$fileSyncKeys[] = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		}
+
+		// Retrieve all file syncs
+		$fileSyncs = array();
+		FileSyncPeer::setUseCriteriaFilter(false);
+		foreach ($fileSyncKeys as $fileSyncKey)
+		{
+			$fileSyncs = array_merge($fileSyncs, FileSyncPeer::retrieveAllByFileSyncKey($fileSyncKey));
+		}
+		FileSyncPeer::setUseCriteriaFilter(true);
+	}
+
+	/**
+	 * Restore assets for an entry
+	 *
+	 * @param array $deletedAssets
+	 * @return void
+	 */
+	protected function restoreAssets(array $deletedAssets)
+	{
+		foreach($deletedAssets as $deletedAsset)
+		{
+			$deletedAsset->setStatus(asset::ASSET_STATUS_READY);
+			$deletedAsset->setDeletedAt(null);
+			$deletedAsset->save();
+		}
+	}
+
+	/**
+	 * Restore entry status and metadata
+	 *
+	 * @param entry $entry
+	 * @return void
+	 */
+	protected function restoreEntryStatus(entry $entry)
+	{
+		$entry->setStatusReady();
+		$entry->setThumbnail($entry->getFromCustomData("deleted_original_thumb"), true);
+		$entry->setData($entry->getFromCustomData("deleted_original_data"), true);
+
+		// Read previousDisplayInSearchStatus FIRST (while it still has a value)
+		if ($entry->getDisplayInSearch() === KalturaEntryDisplayInSearchType::RECYCLED) {
+			$entry->setDisplayInSearch($entry->getPreviousDisplayInSearchStatus());
+		}
+
+		// THEN clear the recycle bin fields
+		$entry->setRecycledAt(null);
+		$entry->setPreviousDisplayInSearchStatus(null);
+
+		$entry->save();
 	}
 
 	protected function validateEntryForRestoreDelete(entry $entry, array $fileSyncs, array $assets)
