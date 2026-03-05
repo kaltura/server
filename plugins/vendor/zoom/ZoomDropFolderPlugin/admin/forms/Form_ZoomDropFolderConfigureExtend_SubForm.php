@@ -24,9 +24,8 @@ class Form_ZoomDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigur
 		));
 
 		$this->addElement('text', 'fileProcessingGracePeriod', array(
-			'label'			=> 'File Processing Grace Period (seconds):',
+			'label'			=> 'File Processing Grace Period:',
 			'filters'		=> array('StringTrim'),
-			'description'	=> 'Time to wait for recordings to complete processing before skipping them (e.g., 10800 for 3 hours, 21600 for 6 hours)',
 		));
 	}
 
