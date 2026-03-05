@@ -76,8 +76,9 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		}
 		
 		$bulkUploadResult = $this->validateBulkUploadResult($bulkUploadResult);
-		
-		$this->bulkUploadResults[] = $bulkUploadResult;
+		if($bulkUploadResult) {
+			$this->bulkUploadResults[] = $bulkUploadResult;
+		}
 	}
     
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
