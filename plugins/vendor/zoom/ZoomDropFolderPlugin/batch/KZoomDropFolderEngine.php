@@ -82,7 +82,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		if($fileInStatusProcessingExists)
 		{
-			$fileProcessingGracePeriod = $this->getZoomParam('fileProcessingGracePeriod');
+			$fileProcessingGracePeriod = $this->dropFolder->fileProcessingGracePeriod;
 			if($secondsFromMidnight <= $fileProcessingGracePeriod)
 			{
 				KalturaLog::info("DropFolderId {$this->dropFolder->id}: A new day is here, but found files in status Processing. Waiting for status completed");

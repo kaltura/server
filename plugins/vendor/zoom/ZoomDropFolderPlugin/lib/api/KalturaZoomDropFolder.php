@@ -65,13 +65,19 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	 * @var time
 	 */
 	public $lastHandledMeetingTime;
-	
+
+	/**
+	 * @var int
+	 */
+	public $fileProcessingGracePeriod;
+
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
 	private static $map_between_objects = array(
 		'zoomVendorIntegrationId',
-		'lastHandledMeetingTime'
+		'lastHandledMeetingTime',
+		'fileProcessingGracePeriod'
 	);
 	
 	public function getMapBetweenObjects()
