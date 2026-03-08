@@ -858,15 +858,63 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		{
 			throw new KalturaBatchException("Missing entry id element", KalturaBatchJobAppErrors::BULK_MISSING_MANDATORY_PARAMETER);
 		}
-		
+
 		KBatchBase::impersonate($this->currentPartnerId);;
-		$result = KBatchBase::$kClient->baseEntry->delete($entryId);
-		KBatchBase::unimpersonate();
-		
+		try {
+			// Validate entry exists before attempting delete to prevent race conditions
+			// This follows the same pattern as handleItemUpdate() which calls baseEntry->get() first
+			$existingEntry = KBatchBase::$kClient->baseEntry->get($entryId);
+
+			if (!$existingEntry) {
+				throw new KalturaBatchException(
+					"Entry [{$entryId}] not found or inaccessible for deletion",
+					KalturaBatchJobAppErrors::BULK_ITEM_NOT_FOUND
+				);
+			}
+
+			KalturaLog::info("Deleting entry [{$entryId}] with referenceId [{$existingEntry->referenceId}]");
+
+			// Perform deletion
+			$result = KBatchBase::$kClient->baseEntry->delete($entryId);
+
+			// Validate deletion result
+			if (!$result) {
+				KalturaLog::warning("Delete operation for entry [{$entryId}] returned no result");
+			}
+
+			KalturaLog::info("Successfully deleted entry [{$entryId}]");
+		}
+		catch (KalturaAPIException $apiEx) {
+			// Handle specific API errors with clear messages instead of generic "Internal server error"
+			KBatchBase::unimpersonate();
+			$errorCode = $apiEx->getCode();
+			$errorMessage = $apiEx->getMessage();
+
+			KalturaLog::err("API error while deleting entry [{$entryId}]: Code={$errorCode}, Message={$errorMessage}");
+
+			// Re-throw with more specific error context
+			throw new KalturaBatchException(
+				"Failed to delete entry [{$entryId}]: {$errorMessage}",
+				KalturaBatchJobAppErrors::BULK_ITEM_FAILED
+			);
+		}
+		catch (Exception $e) {
+			// Handle unexpected errors
+			KBatchBase::unimpersonate();
+			KalturaLog::err("Unexpected error while deleting entry [{$entryId}]: " . $e->getMessage());
+			throw new KalturaBatchException(
+				"Unexpected error deleting entry [{$entryId}]: {$e->getMessage()}",
+				KalturaBatchJobAppErrors::BULK_ITEM_FAILED
+			);
+		}
+		finally {
+			KBatchBase::unimpersonate();
+		}
+
 		$bulkUploadResult = $this->createUploadResult($item, KalturaBulkUploadAction::DELETE);
 		if($this->exceededMaxRecordsEachRun) // exit if we have proccessed max num of items
 			return;
-		
+
 		$bulkUploadResult->entryId = $entryId;
 		$this->addBulkUploadResult($bulkUploadResult);
 	}
