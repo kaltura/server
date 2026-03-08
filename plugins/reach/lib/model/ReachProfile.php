@@ -478,7 +478,6 @@ class ReachProfile extends BaseReachProfile
 		$fullFilledCatalogItemIds = array();
 		if(!is_array($this->getRulesArray()) || !count($this->getRulesArray()))
 			return $fullFilledCatalogItemIds;
-		
 		$context = new kContextDataResult();
 		foreach ($this->getRulesArray() as $rule)
 		{
@@ -531,8 +530,13 @@ class ReachProfile extends BaseReachProfile
 					/* @var $action kRuleAction */
 					if($action->getType() == ReachPlugin::getRuleActionTypeCoreValue(ReachRuleActionType::ADD_ENTRY_VENDOR_TASK))
 					{
-						/* $var $action kAddEntryVendorTaskAction */
-						$fullFilledCatalogItemIds = array_merge($fullFilledCatalogItemIds, explode(",", $action->getCatalogItemIds()));
+						/* @var $action kAddEntryVendorTaskAction */
+						$objectType = $action->getEntryObjectType();
+						if(!isset($fullFilledCatalogItemIds[$objectType]))
+						{
+							$fullFilledCatalogItemIds[$objectType] = array();
+						}
+						$fullFilledCatalogItemIds[$objectType] = array_merge($fullFilledCatalogItemIds[$objectType], explode(",", $action->getCatalogItemIds()));
 					}
 				}
 			}
@@ -540,7 +544,7 @@ class ReachProfile extends BaseReachProfile
 			if($fulfilled && $rule->getStopProcessing())
 				break;
 		}
-		
+
 		return $fullFilledCatalogItemIds;
 	}
 

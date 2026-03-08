@@ -245,6 +245,14 @@ class KalturaFlavorParams extends KalturaAssetParams
 	 * @var int
 	 */
 	public $clipDuration;
+
+	/**
+	 * Audio languages extracted from multiStream field
+	 *
+	 * @var KalturaStringArray
+	 * @readonly
+	 */
+	public $audioLanguages;
 	
 	private static $map_between_objects = array
 	(
@@ -289,6 +297,7 @@ class KalturaFlavorParams extends KalturaAssetParams
 		"chunkedEncodeMode",
 		"clipOffset",
 		"clipDuration",
+		"audioLanguages",
 	);
 	
 	public function getMapBetweenObjects()
@@ -305,7 +314,30 @@ class KalturaFlavorParams extends KalturaAssetParams
 	{
 		return array();
 	}
-	
+
+	protected function extractAudioLanguagesFromMultiStream($assetParamsDb)
+	{
+		$audioLanguages = new KalturaStringArray();
+		$multiStreamJson = $assetParamsDb->getMultiStream();
+		$multiStreamObj = $multiStreamJson ? json_decode($multiStreamJson) : null;
+		if ($multiStreamObj)
+		{
+			if (isset($multiStreamObj->audio->languages) && count($multiStreamObj->audio->languages) > 0)
+			{
+				foreach ($multiStreamObj->audio->languages as $languageCode)
+				{
+					$language = languageCodeManager::getObjectFromThreeCode($languageCode);
+					$languageName = isset($language[languageCodeManager::KALTURA_NAME]) ? $language[languageCodeManager::KALTURA_NAME] : $languageCode;
+					
+					$stringObject = new KalturaString();
+					$stringObject->value = $languageName;
+					$audioLanguages[] = $stringObject;
+				}
+			}
+		}
+		return $audioLanguages;
+	}
+
 	/* (non-PHPdoc)
 	 * @see KalturaObject::toObject()
 	 */
@@ -315,5 +347,11 @@ class KalturaFlavorParams extends KalturaAssetParams
 			$object = new flavorParams();
 			
 		return parent::toObject($object, $skip);
+	}
+
+	public function doFromObject($assetParamsDb, KalturaDetachedResponseProfile $responseProfile = null)
+	{
+		parent::doFromObject($assetParamsDb, $responseProfile);
+		$this->audioLanguages = $this->extractAudioLanguagesFromMultiStream($assetParamsDb);
 	}
 }

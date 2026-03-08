@@ -21,6 +21,8 @@ class playManifestAction extends kalturaAction
 	const ENTRY_TYPE_VOD = 'vod';
 	const ENTRY_TYPE_LIVE = 'live';
 
+	const KS_HEADER = 'X-Kaltura-Ks';
+
 	/**
 	 * When this list start to contain plugins - 
 	 * conside moving it to either kConf or as a function on the enum.
@@ -177,6 +179,13 @@ class playManifestAction extends kalturaAction
 		
 		// initalize the context
 		$ksStr = $this->getRequestParameter("ks");
+		$ksHeader = $this->getRequest()->getHttpHeader(self::KS_HEADER);
+		if ($ksHeader)
+		{
+			$ksStr = $ksHeader;
+			KalturaLog::log("KS received: " . $ksStr);
+		}
+
 		if($ksStr && !$urlToken)
 		{
 			try 
@@ -1584,5 +1593,7 @@ class playManifestAction extends kalturaAction
 			//live delivery profile is defined according to source entry
 			$this->deliveryAttributes->setEntryId($sourceEntry->getEntryId());
 		}
+		
+		$this->deliveryAttributes->setSimuliveEventId($event->getId());
 	}
 }

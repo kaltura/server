@@ -49,6 +49,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	const CUSTOM_DATA_NOTES = 'notes';
 	const CUSTOM_ADMIN_TAGS_TO_EXCLUDE = 'admin_tags_to_exclude';
 	const CUSTOM_DATA_PAY_PER_USE = 'payPerUse';
+	const MINIMUM_DURATION_IN_SECONDS = 10;
 
 	public function setAllowResubmission($allowResubmission)
 	{
@@ -156,34 +157,66 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return $privileges;
 	}
 
-	protected function getPuserId($entry)
-	{
-		return '';
-	}
-
 	/**
-	 * @param $entryId
+	 * @param $objectId
 	 * @param $shouldModerateOutput
 	 * @param $turnaroundTime
+	 * @param $entryObjectType
+	 * @param $disableDefaultEntryFilter
 	 * @return string
 	 * @throws Exception
 	 */
-	public function generateReachVendorKs($entryId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $disableDefaultEntryFilter = false)
+	public function generateReachVendorKs($objectId, $shouldModerateOutput = false, $turnaroundTime = dateUtils::DAY, $entryObjectType = EntryObjectType::ENTRY, $disableDefaultEntryFilter = false)
 	{
-		$entry = $disableDefaultEntryFilter ? entryPeer::retrieveByPKNoFilter($entryId) : entryPeer::retrieveByPK($entryId);
-		if (!$entry)
-			throw new Exception("Entry Id [$entryId] not Found to create REACH Vendor limited session");
+		switch ($entryObjectType)
+		{
+			case EntryObjectType::ASSET:
+			case EntryObjectType::ENTRY:
+				$entryId = self::getEntryId($objectId, $entryObjectType);
+				$entry = $disableDefaultEntryFilter ? entryPeer::retrieveByPKNoFilter($entryId) : entryPeer::retrieveByPK($entryId);
+				if (!$entry)
+				{
+					throw new Exception("Entry Id [$entryId] not Found to create REACH Vendor limited session");
+				}
+				$partner = $entry->getPartner();
+				$privileges = $this->getPrivileges($entryId, $shouldModerateOutput);
+				break;
 
-		$partner = $entry->getPartner();
-		$privileges = $this->getPrivileges($entryId, $shouldModerateOutput);
-		$puser_id = $this->getPuserId($entry);
+			default:
+				throw new Exception("Failed to get user and privileges for unsupported Entry Object Type [$entryObjectType] Object Id [$objectId]");
+		}
 
 		$limitedKs = '';
-		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), $puser_id, $limitedKs, $turnaroundTime, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null, false);
+		$result = kSessionUtils::startKSession($partner->getId(), $partner->getSecret(), '', $limitedKs, $turnaroundTime, kSessionBase::SESSION_TYPE_USER, '', $privileges, null, null, false);
 		if ($result < 0)
+		{
 			throw new Exception('Failed to create REACH Vendor limited session for partner '.$partner->getId());
+		}
 
 		return $limitedKs;
+	}
+
+	protected function getEntryId($objectId, $entryObjectType)
+	{
+		if(!$entryObjectType)
+		{
+			$entryObjectType = EntryObjectType::ENTRY;
+		}
+
+		switch ($entryObjectType)
+		{
+			case EntryObjectType::ASSET:
+				$asset = assetPeer::retrieveByIdNoFilter($objectId);
+				if (!$asset)
+				{
+					throw new Exception("Asset Id [$objectId] not Found to create REACH Vendor limited session");
+				}
+				return $asset->getEntryId();
+
+			case EntryObjectType::ENTRY:
+				return $objectId;
+
+		}
 	}
 	
 	public function getKsExpiry()
@@ -219,6 +252,10 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 				$sourceFlavor = assetPeer::retrieveOriginalByEntryId($entryId);
 				return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
 
+			case EntryObjectType::ASSET:
+				$sourceFlavor = assetPeer::retrieveById($entryId);
+				return $sourceFlavor != null ? $sourceFlavor->getVersion() : 0;
+
 			default:
 				return 0;
 		}
@@ -240,15 +277,31 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array("vendorCatalogItem:id=".strtolower($this->getId()));
 	}
 
+	public function getLinkedCatalogItems(): array
+	{
+		$notes  = json_decode($this->getNotes(), true) ?? [];
+		$linked_catalog_items = $notes['linked_catalog_items'] ?? '';
+		if (!$linked_catalog_items)
+		{
+			return [];
+		}
+		return array_map('trim', explode(',', $linked_catalog_items));
+	}
+
+
 	public function isDuplicateTask($entryId, $entryObjectType, $partnerId)
 	{
 		$version = $this->getTaskVersion($entryId, $entryObjectType);
-		$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryId, $this->getId(), $partnerId, $version);
-		if($activeTask)
+		$catalog_item_ids = [$this->getId()];
+		$catalog_item_ids = array_merge($catalog_item_ids, $this->getLinkedCatalogItems());
+		foreach ($catalog_item_ids as $id)
 		{
-			return true;
+			$activeTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryId, $id, $partnerId, $version);
+			if($activeTask)
+			{
+				return true;
+			}
 		}
-
 		return false;
 	}
 
@@ -262,6 +315,11 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		}
 
 		return $supported;
+	}
+
+	public function isAssetSupported($asset): bool
+	{
+		return false;
 	}
 
 	public function getTaskJobData($object)
@@ -345,25 +403,12 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 		return array_map("trim", explode(',', $adminTagsToExclude));
 	}
 
-	public function isFeatureTypeSupportedForEntry($entryObject, $entryObjectType)
+	public function isEntryDurationExceeding(entry $entry)
 	{
-		if(!$entryObjectType)
-		{
-			$entryObjectType = EntryObjectType::ENTRY;
-		}
-
-		switch ($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				$supportedType = $this->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType());
-				return !$this->isEntryDurationExceeding($entryObject) && $supportedType;
-
-			default:
-				return false;
-		}
+		return false;
 	}
 
-	public function isEntryDurationExceeding(entry $entry)
+	public function isEntryUnderMinimumDuration(entry $entry)
 	{
 		return false;
 	}

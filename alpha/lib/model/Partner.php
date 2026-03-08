@@ -129,6 +129,8 @@ class Partner extends BasePartner
 	
 	const CUSTOM_ANALYTICS_DOMAIN = 'custom_analytics_domain';
 
+	const ENABLE_INTERACTIONS = 'enableInteractions';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -795,6 +797,7 @@ class Partner extends BasePartner
 		$newDisabled = array_diff($disabled, $v, $primaryAdminSecretArray);
 		$this->setDisabledAdditionalAdminSecrets($newDisabled);
 		$this->putInCustomData( "enabledAdditionalAdminSecrets", $v);
+		kSessionUtils::deleteSecretCacheKey($this->getId());
 	}
 
 	/**
@@ -2456,5 +2459,15 @@ class Partner extends BasePartner
 	public function setAllowedEmailDomainsForAdmins($v)
 	{
 		return $this->putInCustomData(self::ALLOWED_EMAIL_DOMAINS_FOR_ADMINS, $v);
+	}
+
+	public function getEnableInteractions()
+	{
+		return $this->getFromCustomData(self::ENABLE_INTERACTIONS, null, false);
+	}
+
+	public function setEnableInteractions($v)
+	{
+		return $this->putInCustomData(self::ENABLE_INTERACTIONS, $v);
 	}
 }

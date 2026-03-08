@@ -128,11 +128,11 @@ class KalturaCategoryUserFilter extends KalturaCategoryUserBaseFilter
 		}	
 
 		$categories = array();
-		if ($this->categoryIdEqual)
+		if (isset($this->categoryIdEqual))
 		{
 			$categories[] = categoryPeer::retrieveByPK($this->categoryIdEqual);
 		}
-		elseif($this->categoryIdIn)
+		elseif (isset($this->categoryIdIn))
 		{
 			$categories = categoryPeer::retrieveByPKs(explode(',', $this->categoryIdIn));
 		}

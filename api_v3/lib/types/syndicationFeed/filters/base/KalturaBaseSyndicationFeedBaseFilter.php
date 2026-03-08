@@ -6,8 +6,20 @@
  */
 abstract class KalturaBaseSyndicationFeedBaseFilter extends KalturaFilter
 {
+	/**
+	 * @var string
+	 */
+	public $idEqual;
+
+	/**
+	 * @var string
+	 */
+	public $idIn;
+
 	static private $map_between_objects = array
 	(
+		"idEqual" => "_eq_id",
+		"idIn" => "_in_id"
 	);
 
 	static private $order_by_map = array

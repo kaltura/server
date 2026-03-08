@@ -21,6 +21,8 @@ class kBatchManager
 	{
 		return self::$currentUpdatingJob;
 	}
+
+	public const AUDIO_DESCRIPTION_SUFFIX = ' - Audio Description';
 	
 	/**
 	 * batch createFlavorAsset orgenize a convert job data 
@@ -286,6 +288,12 @@ class kBatchManager
 				$flavorAsset->setLanguage($lang);
 			}
 		}
+
+		if(isset($flavorParams) && in_array('audio_description', $flavorParams->getTagsArray()))
+		{
+			self::setAudioDescriptionLabel($flavorAsset, $flavorParams);
+		}
+
 		$flavorAsset->save();
 
 //		if(!$flavorAsset->hasTag(flavorParams::TAG_MBR))
@@ -415,4 +423,19 @@ public static function updateEntry($entryId, $status)
 		return $entry;
 	}
 
+	public static function setAudioDescriptionLabel($flavorAsset, $flavorParams)
+	{
+		if(!in_array('audio_description', $flavorParams->getTagsArray()))
+		{
+			return;
+		}
+
+		$currentLabel = $flavorAsset->getLabel();
+		if (!$currentLabel)
+		{
+			$lang = $flavorAsset->getLanguage() . self::AUDIO_DESCRIPTION_SUFFIX;
+			$flavorAsset->setLabel($lang);
+			$flavorAsset->save();
+		}
+	}
 }

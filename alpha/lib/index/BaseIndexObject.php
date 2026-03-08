@@ -253,6 +253,12 @@ abstract class BaseIndexObject
 			return null;
 		}
 		
+		$hasDedicatedIndex = self::hasSphinxDedicatedPartnerIndex($originalValue, $IndexObjectName);
+		if ($hasDedicatedIndex)
+		{
+			return kSphinxSearchManager::SPHINX_DEDICATED_INDEX . '_' . $originalValue;
+		}
+		
 		$splitIndexFactor = self::getSplitIndexFactor($IndexObjectName);
 		if(!$splitIndexFactor)
 		{
@@ -260,5 +266,44 @@ abstract class BaseIndexObject
 		}
 
 		return abs((intval($originalValue/10)))%$splitIndexFactor;
+	}
+	
+	public static function hasSphinxDedicatedPartnerIndex($partnerId, $IndexObjectName): bool
+	{
+		// Check if this partner has a dedicated index for this object type
+		$indexName = kSphinxSearchManager::getSphinxIndexName($IndexObjectName);
+		$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinx_dynamic_config', array());
+
+		if(!isset($dedicatedPartnerIndexMap[$partnerId]))
+		{
+			return false;
+		}
+
+		$indices = array_map('trim', explode(',', $dedicatedPartnerIndexMap[$partnerId]));
+		$hasDedicatedIndex = in_array($indexName, $indices);
+		KalturaLog::debug("Dedicated index for partner ID [$partnerId] and index object name [$IndexObjectName] - res = " . ($hasDedicatedIndex ? 'true' : 'false'));
+		return $hasDedicatedIndex;
+	}
+	
+	public static function getPartnersWithDedicatedSphinxIndex($indexName)
+	{
+		$partnersWithDedicatedIndex[$indexName] = array();
+		$dedicatedPartnerIndexMap = kConf::get('dedicate_index_partner_list', 'sphinx_dynamic_config', array());
+		
+		if (empty($dedicatedPartnerIndexMap))
+		{
+			return $partnersWithDedicatedIndex;
+		}
+		
+		foreach ($dedicatedPartnerIndexMap as $partnerId => $indices)
+		{
+			if (strpos($indices, $indexName) !== false)
+			{
+				$partnersWithDedicatedIndex[$indexName][] = $partnerId;
+			}
+		}
+		
+		KalturaLog::debug("Partners with dedicated index [$indexName] are [" . implode(', ', $partnersWithDedicatedIndex[$indexName]) . "]");
+		return $partnersWithDedicatedIndex;
 	}
 }

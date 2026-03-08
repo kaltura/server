@@ -8,7 +8,7 @@
 require_once(dirname(__FILE__) . '/infraRequestUtils.class.php');
 require_once(dirname(__FILE__) . '/../cache/kCacheManager.php');
 require_once(dirname(__FILE__) . '/../../../../../infra/general/KCryptoWrapper.class.php');
-require_once(dirname(__FILE__) . '/../../../../config/kConfMapNames.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/general/kConfMapNames.php');
 
 /** 
  * @package server-infra
@@ -59,6 +59,7 @@ class kSessionBase
 	const PRIVILEGE_VIRTUAL_EVENT_ID = "virtualeventid";
 	const PRIVILEGE_SEARCH_CONTEXT = "searchcontext";
 	const WIDGET_PRIVILEGE = 'view:*,widget:1';
+	const PRIVILEGE_DISABLE_ACP_SESSION_TYPE_CHECK = "disablesessiontypecheck";
 	const SECRETS_CACHE_PREFIX = 'partner_secrets_ksver_';
 	
 	const INVALID_SESSION_KEY_PREFIX = 'invalid_session_';

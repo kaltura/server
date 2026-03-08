@@ -51,6 +51,12 @@ class ESearchQueryHighlightsAttributes
 	 */
 	public function addFieldToHighlight($baseFieldName, $field)
 	{
+		//ignore field name '_id' due to new elastic limitation
+		if($field == kESearchCoreAdapter::ID_KEY)
+		{
+			return;
+		}
+
 		if(!array_key_exists($field ,$this->fieldsToHighlight[$this->scope]))
 		{
 			$this->fieldsToHighlight[$this->scope][$field] = new stdClass();

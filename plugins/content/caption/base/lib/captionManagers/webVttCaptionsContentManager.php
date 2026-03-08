@@ -137,8 +137,7 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 	{
 		return new webVttCaptionsContentManager();
 	}
-
-
+	
 	/**
 	 * @param $content
 	 * @return array
@@ -168,15 +167,27 @@ class webVttCaptionsContentManager extends kCaptionsContentManager
 				$foundFirstTimeCode = true;
 				$start = $this->parseCaptionTime($matches[1]);
 				$stop = $this->parseCaptionTime($matches[2]);
+				$styleInfo = isset($matches[3]) ? trim($matches[3]) : '';
 				$text = '';
 				while (trim($line = self::getNextValueFromArray($fileContentArray)) !== '')
 				{
 					$line = $this->handleTextLines($line);
 					$text .= $line . self::UNIX_LINE_ENDING;
 				}
-				$itemsData[] = array('startTime' => $start, 'endTime' => $stop, 'content' => array(array('text' => $text)));
+				$itemsData[] = array(
+					'startTime' => $start,
+					'endTime' => $stop,
+					'styleInfo' => $styleInfo,
+					'content' => array(array('text' => $text))
+				);
 			}elseif ($foundFirstTimeCode == false)
+			{
+				if (preg_match('/^\s*\d+\s*$/', $line))
+				{
+					continue;// skip numeric-only lines / index lines
+				}
 				$this->headerInfo[] = $line . self::UNIX_LINE_ENDING;
+			}
 		};
 		if (count($this->parsingErrors) > 0)
 		{

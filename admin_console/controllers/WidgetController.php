@@ -5,6 +5,7 @@
  */
 class WidgetController extends Zend_Controller_Action
 {
+	const HTML5_URL = 'html5_url';
 	public function listAction()
 	{
 		$request = $this->getRequest();
@@ -92,6 +93,11 @@ class WidgetController extends Zend_Controller_Action
 			if ($form->isValid($request->getParams()))
 			{
 				$uiConfUpdate = $form->getObject('Kaltura_Client_AdminConsole_Type_UiConfAdmin', $request->getPost());
+				$html5url = $request->getParam(self::HTML5_URL);
+				if ($uiConfUpdate->html5Url === null && $uiConf->html5Url !== $html5url)
+				{
+					$uiConfUpdate->html5Url = '';
+				}
 				$uiConf = $adminConsolePlugin->uiConfAdmin->update($id, $uiConfUpdate);
 				$form->populateFromObject($uiConf);
 				$form->setAttrib('class', 'valid');
@@ -134,6 +140,11 @@ class WidgetController extends Zend_Controller_Action
 			if ($form->isValid($request->getParams()))
 			{
 				$uiConfUpdate = $form->getObject('Kaltura_Client_AdminConsole_Type_UiConfAdmin', $request->getPost());
+				$html5url = $request->getParam(self::HTML5_URL);
+				if ($uiConfUpdate->html5Url === null && $uiConf->html5Url !== $html5url)
+				{
+					$uiConfUpdate->html5Url = '';
+				}
 				$uiConf = $adminConsolePlugin->uiConfAdmin->update($id, $uiConfUpdate);
 				$form->populateFromObject($uiConf);
 				$form->setAttrib('class', 'valid');

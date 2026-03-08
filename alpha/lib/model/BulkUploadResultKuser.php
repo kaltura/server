@@ -23,6 +23,7 @@ class BulkUploadResultKuser extends BulkUploadResult
 	const GROUP = "group";
 	const EXTERNAL_ID = "external_id";
 	const CAPABILITIES = "capabilities";
+	const GROUP_USER_CREATION_MODE = "group_user_creation_mode";
     
     /* (non-PHPdoc)
      * @see BulkUploadResult::handleRelatedObjects()
@@ -99,5 +100,15 @@ class BulkUploadResultKuser extends BulkUploadResult
 	public function setCapabilities($v)
 	{
 		$this->putInCustomData(self::CAPABILITIES, $v);
+	}
+
+	public function getGroupUserCreationMode()
+	{
+		return $this->getFromCustomData(self::GROUP_USER_CREATION_MODE);
+	}
+
+	public function setGroupUserCreationMode($v)
+	{
+		$this->putInCustomData(self::GROUP_USER_CREATION_MODE, $v);
 	}
 }

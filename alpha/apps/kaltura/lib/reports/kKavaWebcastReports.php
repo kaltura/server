@@ -245,7 +245,7 @@ class kKavaWebcastReports extends kKavaReportsMgr
 
 	);
 
-	public static function getReportDef($report_type, $input_filter)
+	public static function getReportDef($report_type, $input_filter, $response_options = null)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))

@@ -83,7 +83,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
         ESearchEntryFilterFields::DURATION_TYPE,
         ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE,
         ESearchEntryFilterFields::ROOM_TYPE,
-	ESearchEntryFilterFields::BROADCAST_ENTRY_ID,
+		ESearchEntryFilterFields::BROADCAST_ENTRY_ID,
     );
 
     protected static $specialFields = array(
@@ -146,7 +146,8 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
 
         $advanceFilterAdapter = new ESearchQueryFromAdvancedSearch();
         $advanceSearch = $advanceFilterAdapter->processAdvanceFilter($filter->getAdvancedSearch());
-        if ($advanceSearch) {
+        if ($advanceSearch)
+		{
             $this->searchItems[] = $advanceSearch;
         }
 
@@ -398,7 +399,7 @@ class ESearchEntryQueryFromFilter extends ESearchQueryFromFilter
             ESearchEntryFilterFields::EXTERNAL_SOURCE_TYPE => ESearchEntryFieldName::EXTERNAL_SOURCE_TYPE,
             ESearchEntryFilterFields::RECYCLED_AT => ESearchEntryOrderByFieldName::RECYCLED_AT,
             ESearchEntryFilterFields::ROOM_TYPE => ESearchEntryFieldName::ROOM_TYPE,
-	    ESearchEntryFilterFields::BROADCAST_ENTRY_ID => ESearchEntryFieldName::BROADCAST_ENTRY_ID,
+	    	ESearchEntryFilterFields::BROADCAST_ENTRY_ID => ESearchEntryFieldName::BROADCAST_ENTRY_ID,
         );
 
         if (array_key_exists($field, $fieldsMap)) {

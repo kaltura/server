@@ -218,16 +218,18 @@ class dfxpCaptionsContentManager extends kCaptionsContentManager
 		
 		return $itemsData;
 	}
-	
+
 	private function parseDfxpStrTTTime($timeStr)
 	{
 		$matches = null;
-		if(preg_match('/(\d+)s/', $timeStr))
+		if (preg_match('/^(\d+(?:\.\d+)?)s$/', $timeStr, $matches)) {
 			return intval($matches[1]) * 1000;
-			
+		}
+
 		return kXml::timeToInteger($timeStr);
 	}
-	
+
+
 	/* (non-PHPdoc)
 	 * @see kCaptionsContentManager::getContent()
 	 */

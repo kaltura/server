@@ -12,9 +12,17 @@ class KalturaAddEntryVendorTaskAction extends KalturaRuleAction
 	 */
 	public $catalogItemIds;
 
+	/**
+	 *  Entry Object Type
+	 *
+	 * @var KalturaEntryObjectType
+	 */
+	public $entryObjectType;
+
 	private static $mapBetweenObjects = array
 	(
 		'catalogItemIds',
+		'entryObjectType',
 	);
 
 	/**

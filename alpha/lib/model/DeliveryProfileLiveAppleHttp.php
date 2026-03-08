@@ -143,7 +143,10 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			$flavor['bitrate'] = $flavor['bitrate'] / 1024;
 			$flavor['width'] = $kLiveStreamParams->getWidth();
 			$flavor['height'] = $kLiveStreamParams->getHeight();
-			
+			if ($kLiveStreamParams->getCodec() != flavorParams::VIDEO_CODEC_H264 && $kLiveStreamParams->getCodec() != flavorParams::VIDEO_CODEC_H265)
+			{
+				$flavor['codecs'] = $kLiveStreamParams->getCodec();
+			}
 			$this->addLanguageInfo($flavor, $kLiveStreamParams);
 				
 			$flavors[] = $flavor;
@@ -268,6 +271,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 		$edgeServerIds = $this->params->getEdgeServerIds();
 		$this->addFallbackM3u8Flavors($edgeServerIds, $flavors, $primaryManifestUrl, $primaryStreamInfo );
 		$this->buildM3u8Flavors($primaryManifestUrl, $flavors, $primaryStreamInfo);
+		$hasH265 = DeliveryProfileLive::hasH265Codec($primaryStreamInfo);
 		if($backupManifestUrl && ($this->getForceProxy() || count($flavors) == 0))
 		{
 			//Until a full solution will be made on the liveServer side we need to manually sync bitrates Between primary and backup streams
@@ -275,6 +279,7 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 
 			$this->addFallbackM3u8Flavors($edgeServerIds, $flavors, $backupManifestUrl, $backupStreamInfo, $primaryFlavorBitrateInfo);
 			$this->buildM3u8Flavors($backupManifestUrl, $flavors, $backupStreamInfo, $primaryFlavorBitrateInfo);
+			$hasH265 = $hasH265 || DeliveryProfileLive::hasH265Codec($backupStreamInfo);
 		}
 
 		foreach ($flavors as $index => $flavor)
@@ -289,8 +294,20 @@ class DeliveryProfileLiveAppleHttp extends DeliveryProfileLive {
 			unset($flavors[$index]['index']);
 		}
 
+		$hasAudioOnlyFlavor = $this->hasAudioOnlyFlavor($flavors);
+		if($hasAudioOnlyFlavor && $hasH265)
+		{
+			//If audio flavors are present and fmp4 is supported, force unmuxed segments
+			$flavors = $this->forceUnmuxedSegments($flavors);
+		}
+
 		return $flavors;
 
+	}
+
+	protected function updateFlavorUrl(&$flavor)
+	{
+		$flavor['urlPrefix'] = str_replace(".m3u8", "-" . ($this->isAudioFlavor($flavor) ? "a" : "v") . ".m3u8", $flavor['urlPrefix']);
 	}
 
 	public function getRenderer($flavors)

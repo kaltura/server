@@ -40,26 +40,10 @@ class kReachUtils
 		return $tokens * $pricePerUnit;
 	}
 
-	public static function retrieveEntryObject($entryObjectType, $entryId)
-	{
-		if(!$entryObjectType)
-		{
-			$entryObjectType = EntryObjectType::ENTRY;
-		}
-
-		switch($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				return entryPeer::retrieveByPK($entryId);
-
-			default:
-				return null;
-		}
-	}
-
 	public static function validateEntryObjectExists(EntryVendorTask $dbEntryVendorTask)
 	{
-		$dbEntry = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($dbEntryVendorTask->getEntryObjectType());
+		$dbEntry = $vendorTaskObjectHandler->getTaskObjectById($dbEntryVendorTask->getEntryId());
 		if (!$dbEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbEntryVendorTask->getEntryId());
@@ -355,6 +339,9 @@ class kReachUtils
 			'minimalRefundTime',
 			'minimalOrderTime',
 			'durationLimit',
+			'startTimeBuffer',
+			'endTimeBuffer',
+			'payPerUse'
 		);
 	}
 
@@ -417,9 +404,13 @@ class kReachUtils
 
 		foreach (self::$getCsvHeaders() as $field)
 		{
-			if (isset($values[$field]))
-			{
-				$csvData[$field] = $values[$field];
+			if (isset($values[$field])) {
+				if ($values[$field] === false)
+				{
+					$csvData[$field] = '0';
+				} else {
+					$csvData[$field] = $values[$field];
+				}
 			}
 			else
 			{
@@ -552,6 +543,7 @@ class kReachUtils
 
 	public static function getPayPerUsePrice($entryVendorTask, $dbEntryVendorTask, $dbVendorCatalogItem)
 	{
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($dbEntryVendorTask->getEntryObjectType());
 		if ($entryVendorTask->status == EntryVendorTaskStatus::READY && $dbVendorCatalogItem->getPayPerUse())
 		{
 			$unitsUsed = is_numeric($entryVendorTask->unitsUsed) ? $entryVendorTask->unitsUsed : $dbEntryVendorTask->getUnitsUsed();
@@ -559,7 +551,7 @@ class kReachUtils
 			{
 				throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, 'unitsUsed');
 			}
-			$entryObject = kReachUtils::retrieveEntryObject($dbEntryVendorTask->getEntryObjectType(), $dbEntryVendorTask->getEntryId());
+			$entryObject = $vendorTaskObjectHandler->getTaskObjectById($dbEntryVendorTask->getEntryId());
 			return $dbVendorCatalogItem->calculateTaskPrice($entryObject, $dbEntryVendorTask->getEntryObjectType(), null, $unitsUsed);
 		}
 	}

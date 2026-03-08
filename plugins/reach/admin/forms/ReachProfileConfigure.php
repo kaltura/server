@@ -259,11 +259,13 @@ class Form_ReachProfileConfigure extends ConfigureForm
 		$newRule = array();
 		$newRule['ruleType'] = $ruleType;
 		$catalogItemIds = array();
+		$entryObjectType = null;
 		$booleanEventNotificationIds = array();
 		foreach ($rule->actions as $action)
 		{
 			/* @var Kaltura_Client_Reach_Type_AddEntryVendorTaskAction $action */
 			$catalogItemIds[] = $action->catalogItemIds;
+			$entryObjectType = $action->entryObjectType;
 		}
 		if (isset($rule->conditions))
 		{
@@ -275,6 +277,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 			$newRule['booleanEventNotificationIds'] = implode(', ', $booleanEventNotificationIds);
 		}
 		$newRule['catalogItemIds'] = implode(', ', $catalogItemIds);
+		$newRule['entryObjectType'] = $entryObjectType;
 		return $newRule;
 	}
 
@@ -292,6 +295,7 @@ class Form_ReachProfileConfigure extends ConfigureForm
 				{
 					$action = new Kaltura_Client_Reach_Type_AddEntryVendorTaskAction();
 					$action->catalogItemIds = $rule->catalogItemIds;
+					$action->entryObjectType = $rule->entryObjectType;
 					$description = (empty($rule->description) || $rule->description == self::ADMIN_CONSOLE_RULE_PREFIX) ? (self::ADMIN_CONSOLE_RULE_PREFIX . mt_rand(100000, 999999)) : $rule->description;
 					$condition = new Kaltura_Client_Type_BooleanEventNotificationCondition();
 					if (isset($rule->booleanEventNotificationIds))

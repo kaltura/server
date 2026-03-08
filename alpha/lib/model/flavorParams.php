@@ -50,6 +50,7 @@ class flavorParams extends assetParams
 	const VIDEO_CODEC_H265 = "h265";
 	const VIDEO_CODEC_AV1  = "av1";
 	const VIDEO_CODEC_COPY = "copy";
+	const VIDEO_CODEC_HVC1 = "hvc1";
 	
 	const AUDIO_CODEC_NONE = "";
 	const AUDIO_CODEC_MP3 = "mp3";

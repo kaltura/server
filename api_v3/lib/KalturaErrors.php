@@ -115,6 +115,8 @@ class KalturaErrors extends APIErrors
 
 	const INVALID_SCHEDULE_EVENT_TYPE = "INVALID_SCHEDULE_EVENT_TYPE;ID;Schedule Event id [@ID@] is of inappropriate type for action";
 
+	const CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE = "CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE;;cannot update feature name [@NAME@] on schedule event";
+
 	const FEATURE_NAME_NOT_FOUND = "FEATURE_NAME_NOT_FOUND;NAME;LiveFeature with name [@NAME@] not found";
 
 	const LOCK_TIMED_OUT = "LOCK_TIMED_OUT;;Timed out while attempting to grab lock";
@@ -201,7 +203,9 @@ class KalturaErrors extends APIErrors
 	const CYCLE_IN_PARENTAGE = "CYCLE_IN_PARENTAGE;;Invalid cycle detected in the parent child connection of this entry";
 
 	const CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION = "CLIPS_DURATIONS_EXCEEDED_MAX_ALLOWED_DURATION;MAX_DURATION;clips durations exceeded max allowed duration \"@MAX_DURATION@\" in seconds";
-	const RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;clips durations exceeded max allowed duration \"@MAX_COUNT@\" in seconds";
+
+	const RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCES_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;count of clip resources exceeded limit of \"@MAX_COUNT@\"";
+	const RESOURCE_MEDIA_COMPOSITION_COUNT_EXCEEDED_MAX_ALLOWED_COUNT = "RESOURCE_MEDIA_COMPOSITION_COUNT_EXCEEDED_MAX_ALLOWED_COUNT;MAX_COUNT;count of resource media composition attributes exceeded limit of \"@MAX_COUNT@\"";
 
 
 	/**
@@ -860,5 +864,12 @@ class KalturaErrors extends APIErrors
 	const INVALID_APP_GUID = "INVALID_APP_GUID;APP_GUID;App GUID [\"@APP_GUID@\"] is not a valid Mongo DB Object ID";
 	const APP_GUID_NOT_FOUND = "APP_GUID_NOT_FOUND;APP_GUID;App GUID [\"@APP_GUID@\"] not found";
 	const MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE = "MUST_FILTER_USERS_OR_APP_GUID_OR_USER_ROLE;;Must filter on at least 'users' or 'appGuid' or 'userRole'";
-}
 
+	/*
+	 * Shortlink service
+	 */
+	const CANNOT_RETRIEVE_ANOTHER_USERS_SHORT_LINK = "CANNOT_RETRIEVE_ANOTHER_USERS_SHORT_LINK;USER_ID;cannot retrieve another user's [\"@USER_ID@\"] short link using non-admin session";
+	const INVALID_SHORT_LINK = "INVALID_SHORT_LINK;ID;Invalid short link [@ID@]";
+	const EXPIRED_SHORT_LINK = "EXPIRED_SHORT_LINK;ID;Expired short link [@ID@]";
+	const SHORT_LINK_UNIQUE_ID_ALREADY_EXISTS = "SHORT_LINK_UNIQUE_ID_ALREADY_EXISTS;UNIQUE_ID;Short link unique id [@UNIQUE_ID@] already exists";
+}

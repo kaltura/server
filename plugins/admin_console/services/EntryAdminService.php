@@ -116,6 +116,19 @@ class EntryAdminService extends KalturaBaseService
 			array_push($fileSyncKeys, $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_ASSET), $deletedAsset->getSyncKey(asset::FILE_SYNC_ASSET_SUB_TYPE_CONVERT_LOG));
 		}
 
+		$c = new Criteria();
+		$c->add(MetadataPeer::OBJECT_TYPE, MetadataObjectType::ENTRY);
+		$c->add(MetadataPeer::OBJECT_ID, $entryId);
+		$c->add(MetadataPeer::STATUS, Metadata::STATUS_DELETED, Criteria::EQUAL);
+		MetadataPeer::setUseCriteriaFilter(false);
+		$deletedMetadataObjects = MetadataPeer::doSelect($c);
+		MetadataPeer::setUseCriteriaFilter(true);
+
+		foreach ($deletedMetadataObjects as $metadata)
+		{
+			$fileSyncKeys[] = $metadata->getSyncKey(Metadata::FILE_SYNC_METADATA_DATA);
+		}
+
 		$fileSyncs = array();
 		FileSyncPeer::setUseCriteriaFilter(false);
 		foreach ($fileSyncKeys as $fileSyncKey)
@@ -143,6 +156,16 @@ class EntryAdminService extends KalturaBaseService
 		$deletedEntry->setStatusReady();
 		$deletedEntry->setThumbnail($deletedEntry->getFromCustomData("deleted_original_thumb"), true);
 		$deletedEntry->setData($deletedEntry->getFromCustomData("deleted_original_data"),true); //data should be resotred even if it's NULL
+
+		// Read previousDisplayInSearchStatus FIRST (while it still has a value)
+		if ($deletedEntry->getDisplayInSearch() === KalturaEntryDisplayInSearchType::RECYCLED) {
+			$deletedEntry->setDisplayInSearch($deletedEntry->getPreviousDisplayInSearchStatus());
+		}
+
+		// THEN clear the recycle bin fields
+		$deletedEntry->setRecycledAt(null);
+		$deletedEntry->setPreviousDisplayInSearchStatus(null);
+
 		$deletedEntry->save();
 
 		kEventsManager::flushEvents();
@@ -219,7 +242,10 @@ class EntryAdminService extends KalturaBaseService
 			if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_FILE
 				|| $fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_URL)
 			{
-				$shouldUnDelete = true;
+				if (kFile::checkFileExists($fileSync->getFullPath()))
+				{
+					$shouldUnDelete = true;
+				}
 			}
 			else if ($fileSync->getFileType() == FileSync::FILE_SYNC_FILE_TYPE_LINK){
 				$linkedId = $fileSync->getLinkedId();

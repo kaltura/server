@@ -123,7 +123,18 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 	 */
 	public function dispatch(KalturaEventNotificationTemplate $eventNotificationTemplate, KalturaEventNotificationDispatchJobData &$data)
 	{
-		$this->sendEmail($eventNotificationTemplate, $data);
+		/* @var KalturaEmailNotificationTemplate $eventNotificationTemplate */
+		/* @var KalturaEmailNotificationDispatchJobData $data */
+
+		$configuration = kConf::get('messaging_client', kConfMapNames::LOCAL_SETTINGS, array());
+		if (isset($configuration['enable_messaging_client']) && $configuration['enable_messaging_client'])
+		{
+			$this->sendEmailWithMessagingClient($eventNotificationTemplate, $data);
+		}
+		else
+		{
+			$this->sendEmail($eventNotificationTemplate, $data);
+		}
 	}
 
 	/**
@@ -147,15 +158,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		if($data->messageID)
 			$this::$mailer->MessageID = $data->messageID;
 
-		$contentParameters = array();
-		if(is_array($data->contentParameters) && count($data->contentParameters))
-		{
-			foreach($data->contentParameters as $contentParameter)
-			{
-				/* @var $contentParameter KalturaKeyValue */
-				$contentParameters['{' .$contentParameter->key. '}'] = strip_tags($contentParameter->value);
-			}		
-		}
+		$contentParameters = $this->getContentParameters($data);
 			
 		if($data->to)
 		{
@@ -224,24 +227,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		}
 		KalturaLog::info("Sender [{$this::$mailer->FromName}<{$this::$mailer->From}>]");
 		
-		$subject = $emailNotificationTemplate->subject;
-		$body = $emailNotificationTemplate->body;
-
-		$footer = $this->getEmailFooter();
-		if(!is_null($footer))
-		{
-			$body .= "\n" . $footer;
-		}
-		
-		if(is_array($contentParameters) && count($contentParameters))
-		{		
-			$subject = str_replace(array_keys($contentParameters), $contentParameters, $subject);
-			$body = str_replace(array_keys($contentParameters), $contentParameters, $body);
-		}
-				
-		KalturaLog::info("Subject [$subject]");
-		KalturaLog::info("Body [$body]");
-		
+		list($subject, $body) = $this->getSubjectAndBody($emailNotificationTemplate, $contentParameters);
 		$this::$mailer->Subject = $subject;
 		$this::$mailer->Body = $body;
 	
@@ -308,6 +294,29 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		
 		return true;
 	}
+
+	protected function getSubjectAndBody($emailNotificationTemplate, $contentParameters)
+	{
+		$subject = $emailNotificationTemplate->subject;
+		$body = $emailNotificationTemplate->body;
+
+		$footer = $this->getEmailFooter();
+		if(!is_null($footer))
+		{
+			$body .= "\n" . $footer;
+		}
+
+		if(is_array($contentParameters) && count($contentParameters))
+		{
+			$subject = str_replace(array_keys($contentParameters), $contentParameters, $subject);
+			$body = str_replace(array_keys($contentParameters), $contentParameters, $body);
+		}
+
+		KalturaLog::info("Subject [$subject]");
+		KalturaLog::info("Body [$body]");
+
+		return array($subject, $body);
+	}
 	
 	private function getEmailFooter()
 	{
@@ -337,5 +346,99 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		$recipients = $recipientEngine->getRecipients($contentParameters);
 		
 		return $recipients;
+	}
+
+	protected function getContentParameters(KalturaEmailNotificationDispatchJobData $data)
+	{
+		$contentParameters = array();
+		if (is_array($data->contentParameters) && count($data->contentParameters))
+		{
+			foreach($data->contentParameters as $contentParameter)
+			{
+				/* @var $contentParameter KalturaKeyValue */
+				$contentParameters['{' .$contentParameter->key. '}'] = strip_tags($contentParameter->value);
+			}
+		}
+
+		return $contentParameters;
+	}
+
+	protected function prepareRecipients(?KalturaEmailNotificationRecipientJobData $recipientData, $contentParameters)
+	{
+		if (!$recipientData)
+		{
+			return array();
+		}
+
+		$recipients = $this->getRecipientArray($recipientData, $contentParameters);
+		foreach ($recipients as $email => $name)
+		{
+			if (!filter_var($email, FILTER_VALIDATE_EMAIL))
+			{
+				continue;
+			}
+			KalturaLog::info("Adding recipient $name<$email>");
+		}
+
+		return array_keys($recipients);
+	}
+
+	protected function prepareMessageParamsMap($subject, $body)
+	{
+		$msgParamsMap = array('user' => array('type' => 'User'));
+		$msgParamsMap = array_merge($msgParamsMap, KMessagingClient::getMessageParamsFromString($subject));
+		$msgParamsMap = array_merge($msgParamsMap, KMessagingClient::getMessageParamsFromString($body));
+
+		return $msgParamsMap;
+	}
+
+	protected function prepareMessageParams($msgParamsMap, KalturaEmailNotificationDispatchJobData $data)
+	{
+		$mapKeys = array_keys($msgParamsMap);
+		$msgParams = array('user' => array('type' => 'User', 'value' => 'Message.userId'));
+		foreach ($data->contentParameters as $contentParameter)
+		{
+			/* @var $contentParameter KalturaKeyValue */
+			$paramNameConverted = str_replace('_', '', $contentParameter->key);
+			if (!in_array($paramNameConverted, $mapKeys))
+			{
+				continue;
+			}
+			$msgParams = array_merge($msgParams, array($paramNameConverted => array('type' => 'String', 'value' => $contentParameter->value)));
+		}
+
+		return $msgParams;
+	}
+
+	protected function sendEmailWithMessagingClient(KalturaEmailNotificationTemplate $emailNotificationTemplate, KalturaEmailNotificationDispatchJobData $data)
+	{
+		$ks = KBatchBase::$kClient->getKs();
+		$messagingClient = new KMessagingClient($ks);
+
+		$partnerId = $emailNotificationTemplate->partnerId;
+		$appGuid = $messagingClient->getAppGuid($partnerId);
+		if (!$appGuid)
+		{
+			throw new Exception("AppGuid is required for sending an email notification for partner id [$partnerId]");
+		}
+
+		$contentParameters = $this->getContentParameters($data);
+
+		$recipientsTo = $this->prepareRecipients($data->to, $contentParameters);
+		$recipientsCc = $data->cc ? implode(',', $this->prepareRecipients($data->cc, $contentParameters)) : null;
+		$recipientsBcc = $data->bcc ? implode(',', $this->prepareRecipients($data->bcc, $contentParameters)) : null;
+
+		list($subject, $body) = $this->getSubjectAndBody($emailNotificationTemplate, $contentParameters);
+
+		$msgParamsMap = array('user' => array('type' => 'User'));
+
+		$emailTemplateToAdd = new MessagingClientEmailTemplate($partnerId, $appGuid, $emailNotificationTemplate->systemName, $emailNotificationTemplate->systemName,
+			$emailNotificationTemplate->description, $messagingClient->getDefaultSender($partnerId, $appGuid), $recipientsCc, $recipientsBcc, $subject, $body, $msgParamsMap);
+		$emailTemplate = $messagingClient->addEmailTemplate($emailTemplateToAdd);
+
+		$msgParams = array('user' => array('type' => 'User', 'value' => 'Message.userId'));
+
+		$data = new MessagingClientEmailData($partnerId, $emailTemplate['appGuid'], $emailTemplate['id'], $recipientsTo, $msgParams);
+		return $messagingClient->sendEmail($data);
 	}
 }

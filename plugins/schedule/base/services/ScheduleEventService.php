@@ -276,36 +276,59 @@ class ScheduleEventService extends KalturaBaseService
 	 */
 	public function updateLiveFeatureAction($scheduledEventId, $featureName, KalturaLiveFeature $liveFeature)
 	{
-		$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
-		if(!$dbScheduleEvent)
+		$lockName = "schedule_event" . $scheduledEventId;
+		$lock = kLock::create($lockName);
+		if ($lock && !$lock->lock())
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduledEventId);
+			KalturaLog::err('Could not lock ' . $lockName);
+			throw new KalturaAPIException(KalturaErrors::CANNOT_UPDATE_SCHEDULE_EVENT_FEATURE, $featureName);
 		}
 
-		if(!$dbScheduleEvent instanceof LiveStreamScheduleEvent)
+		try
 		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_SCHEDULE_EVENT_TYPE, $scheduledEventId);
-		}
-
-		$featureFound = false;
-		$featureList = $dbScheduleEvent->getLiveFeatures();
-		foreach ($featureList as $index => $feature)
-		{
-			if ($feature->getSystemName() == $featureName)
+			$dbScheduleEvent = ScheduleEventPeer::retrieveByPK($scheduledEventId);
+			if (!$dbScheduleEvent)
 			{
-				$featureList[$index] = $liveFeature->toUpdatableObject($feature);
-				$featureFound = true;
-				break;
+				throw new KalturaAPIException(KalturaErrors::INVALID_OBJECT_ID, $scheduledEventId);
+			}
+
+			if (!$dbScheduleEvent instanceof LiveStreamScheduleEvent)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_SCHEDULE_EVENT_TYPE, $scheduledEventId);
+			}
+
+			$featureFound = false;
+			$featureList = $dbScheduleEvent->getLiveFeatures();
+			foreach ($featureList as $index => $feature)
+			{
+				if ($feature->getSystemName() == $featureName)
+				{
+					$featureList[$index] = $liveFeature->toUpdatableObject($feature);
+					$featureFound = true;
+					break;
+				}
+			}
+
+			if (!$featureFound)
+			{
+				throw new KalturaAPIException(KalturaErrors::FEATURE_NAME_NOT_FOUND, $featureName);
+			}
+
+			$dbScheduleEvent->setLiveFeatures($featureList);
+			$dbScheduleEvent->save();
+		}
+		catch(Exception $e)
+		{
+			KalturaLog::err('Error in updateLiveFeatureAction');
+			throw $e;
+		}
+		finally
+		{
+			if ($lock)
+			{
+				$lock->unlock();
 			}
 		}
-
-		if(!$featureFound)
-		{
-			throw new KalturaAPIException(KalturaErrors::FEATURE_NAME_NOT_FOUND, $featureName);
-		}
-
-		$dbScheduleEvent->setLiveFeatures($featureList);
-		$dbScheduleEvent->save();
 
 		$scheduleEvent = KalturaScheduleEvent::getInstance($dbScheduleEvent, $this->getResponseProfile());
 		$scheduleEvent->fromObject($dbScheduleEvent, $this->getResponseProfile());

@@ -59,7 +59,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		$charset = "abcdefghijklmnopqrstuvwxyz";
 		if ($useupper) $charset .= "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		if ($usenumbers) $charset .= "0123456789";
-		if ($usespecial) $charset .= "~@#$%^*()_+-={}|]["; // Note: using all special characters this reads: "~!@#$%^&*()_+`-={}|\\]?[\":;'><,./";
+		if ($usespecial) $charset .= "~!@#$%^*-=+?()[]{}"; // Note: using all special characters this reads: "~!@#$%^&*()_+`-={}\\]?[\":;'><,./";
 		if ($minlength > $maxlength) $length = mt_rand ($maxlength, $minlength);
 		else $length = mt_rand ($minlength, $maxlength);
 		$key = "";
@@ -421,24 +421,55 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		return $loginData;
 	}
-	
+
+	// Retrieves all partner IDs where the kuser associated with the given loginDataId is active.
+	public static function getPartnerIdsByLoginData($loginDataId)
+	{
+		if (!$loginDataId) 
+		{
+			return array();
+		}
+
+		$criteria = new Criteria();
+		$criteria->addSelectColumn(kuserPeer::PARTNER_ID);
+		$criteria->add(kuserPeer::LOGIN_DATA_ID, $loginDataId);
+		$criteria->add(kuserPeer::STATUS, KuserStatus::ACTIVE);
+		kuserPeer::setUseCriteriaFilter(false);
+		$partnerIds = kuserPeer::doSelectStmt($criteria)->fetchAll(PDO::FETCH_COLUMN);
+		kuserPeer::setUseCriteriaFilter(true);
+
+		return $partnerIds;
+	}
+
 	public static function setInitialPassword($hashKey, $newPassword)
 	{
 		// might throw exception
 		$hashKey = str_replace('.','=', $hashKey);
 		$loginData = self::isHashKeyValid($hashKey);
-		
+
 		if (!$loginData) {
 			throw new kUserException ('', kUserException::NEW_PASSWORD_HASH_KEY_INVALID);
 		}
-		
+
 		self::checkPasswordValidation($newPassword, $loginData);
-		
+
 		$loginData->resetPassword($newPassword);
 		myPartnerUtils::initialPasswordSetForFreeTrial($loginData);
 
 		kuserPeer::setUseCriteriaFilter(false);
-		$dbUser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $loginData->getConfigPartnerId());
+		$partner_id = $loginData->getLastLoginPartnerId();
+		$dbUser = null;
+		if($partner_id)
+		{
+			$dbUser = kuserPeer::getByLoginDataAndPartner($loginData->getId(),$partner_id);
+		}
+		if (!$partner_id || !$dbUser){
+			$valid_partner_ids= self::getPartnerIdsByLoginData($loginData->getId());
+			if(count($valid_partner_ids))
+			{
+				$dbUser = kuserPeer::getByLoginDataAndPartner($loginData->getId(), $valid_partner_ids[0]);
+			}
+		}
 		kuserPeer::setUseCriteriaFilter(true);
 		if (!$dbUser)
 		{
@@ -453,7 +484,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 		return true;
 	}
-	
+
 	public static function getPassResetLink($hashKey, $linkType = resetPassLinkType::KMC, $dynamicLink = null)
 	{
 		if (!$hashKey) {
@@ -752,23 +783,30 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 
 	public static function setLastLoginFields($loginData, $kuser)
 	{
-		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
-		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
+		/* @var $kuser kuser */
+		/* @var $loginData UserLoginData */
+		
 		$isAdmin = $kuser->getIsAdmin();
+		$partnerId = $kuser->getPartnerId();
+		
+		$userLoginEmailToIgnore =  kConf::getMap('UserLoginNoUpdate');
 		$updateTimeLimit = $loginData->getUpdatedAt(null) + 5 < time();
-		$ignorePartner = in_array($kuser->getPartnerId(), kConf::get('no_save_of_last_login_partner_for_partner_ids'));
+		$ignoreUser = isset ($userLoginEmailToIgnore[$loginData->getLoginEmail()]);
+		$ignorePartner = in_array($partnerId, kConf::get('no_save_of_last_login_partner_for_partner_ids'));
+		
 		if ($isAdmin && !$ignoreUser && $updateTimeLimit && !$ignorePartner)
 		{
-			$loginData->setLastLoginPartnerId($kuser->getPartnerId());
+			$loginData->setLastLoginPartnerId($partnerId);
 		}
-		$loginData->save();
 		
 		$currentTime = time();
-		$dbLastLoginTime = $kuser->getLastLoginTime();
+		$dbLastLoginTime = $loginData->getLastLoginTimeForPartner($partnerId);
 		if(!$ignoreUser && (!$dbLastLoginTime || $dbLastLoginTime < $currentTime - self::LAST_LOGIN_TIME_UPDATE_INTERVAL))
-			$kuser->setLastLoginTime($currentTime);
+		{
+			$loginData->setLastLoginTimeForPartner($partnerId, $currentTime);
+		}
 		
-		$kuser->save();
+		$loginData->save();
 		return $kuser;
 	}
 	

@@ -83,7 +83,7 @@ class KalturaVendorCatalogItemFilter extends KalturaVendorCatalogItemBaseFilter
 		}
 
 		$responseObjects = KalturaVendorCatalogItemArray::fromDbArray($list, $responseProfile);
-		if ($this->partnerIdEqual)
+		if ($partnerIdEqual)
 		{
 			$catalogItemFields = VendorCatalogItemPeer::doSelectStmt($c);
 			foreach ($responseObjects as $responseObject)

@@ -65,6 +65,7 @@ class kQueryCache
 	const CACHE_VERSION = '2';
 
 	const SPHINX_LAG_KEY = 'QCCSPH-SphinxLag';	// the lags of the different sphinx servers in the current DC
+	const SPHINX_CNAME_MAP = 'QCCSPH-SphinxCnameMap'; // the mapping of sphinx hostnames to CNAME's in the current DC
 
 	protected static $s_memcacheKeys = null;
 	protected static $s_memcacheQueries = null;

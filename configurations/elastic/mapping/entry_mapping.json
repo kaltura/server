@@ -483,6 +483,10 @@
 					"type" : "keyword",
 					"normalizer" : "kaltura_keyword_normalizer"
 				},
+				"flavor_params" : {
+					"type" : "keyword",
+					"normalizer" : "kaltura_keyword_normalizer"
+				},
 				"categories_names" : {
 					"type" : "keyword",
 					"normalizer" : "kaltura_keyword_normalizer"
@@ -837,6 +841,13 @@
 						"label" : {
 							"type" : "keyword",
 							"normalizer" : "kaltura_keyword_normalizer"
+						},
+						"accuracy": {
+							"type": "integer"
+						},
+						"usage": {
+							"type": "keyword",
+							"normalizer": "kaltura_keyword_normalizer"
 						}
 					}
 				},

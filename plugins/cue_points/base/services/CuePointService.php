@@ -222,7 +222,29 @@ class CuePointService extends KalturaBaseService
 			$filter = new KalturaCuePointFilter();
 		else
 			$this->resetUserContentFilter($filter);
-		return $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
+
+		$response = $filter->getTypeListResponse($pager, $this->getResponseProfile(), $this->getCuePointType());
+
+		// Patch: filter out cue points with parent_id starting with '0_' if DC is 0 and parent_id_equal=0
+		$curr_dc = kDataCenterMgr::getCurrentDcId();
+		if ($curr_dc === "0")
+		{
+			if (isset($filter->parentIdEqual) && ($filter->parentIdEqual === "0" ))
+			{
+				$filteredObjects = array();
+				foreach ($response->objects as $cuePoint)
+				{
+					if ($cuePoint->parentId === $filter->parentIdEqual)
+					{
+						$filteredObjects[] = $cuePoint;
+					}
+				}
+				$response->objects = $filteredObjects;
+				$response->totalCount = count($filteredObjects);
+			}
+		}
+
+		return $response;
 	}
 	
 	/**

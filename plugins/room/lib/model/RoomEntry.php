@@ -9,6 +9,7 @@ class RoomEntry extends entry
 	const CUSTOM_DATA_ROOM_TYPE = 'roomType';
 	const CUSTOM_DATA_BROADCAST_ENTRY_ID = 'broadcastEntryId';
 	const CUSTOM_DATA_TEMPLATE_ROOM_ENTRY_ID = 'templateRoomEntryId';
+	const CUSTOM_DATA_RECORDED_ENTRY_ID = 'recordedEntryId';
 
 	public function getRoomType()
 	{
@@ -25,6 +26,11 @@ class RoomEntry extends entry
 		return $this->getFromCustomData(self::CUSTOM_DATA_TEMPLATE_ROOM_ENTRY_ID);
 	}
 
+    public function getRecordedEntryId()
+    {
+        return $this->getFromCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_ID);
+    }
+
 	public function setRoomType($v)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_ROOM_TYPE, $v);
@@ -39,6 +45,11 @@ class RoomEntry extends entry
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_TEMPLATE_ROOM_ENTRY_ID, $v);
 	}
+
+    public function setRecordedEntryId($v)
+    {
+        $this->putInCustomData(self::CUSTOM_DATA_RECORDED_ENTRY_ID, $v);
+    }
 	
 	public function getObjectParams($params = null)
 	{

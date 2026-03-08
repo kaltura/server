@@ -238,4 +238,5 @@ class AttachmentPlugin extends KalturaPlugin implements IKalturaServices, IKaltu
 	{
 		return self::getObjectFeatureTypeCoreValue(AttachmentObjectFeatureType::ATTACHMENT);
 	}
+
 }

@@ -316,7 +316,7 @@ class kKavaVpaasReports extends kKavaReports
 		return $rows;
 	}
 
-	public static function getReportDef($report_type, $input_filter)
+	public static function getReportDef($report_type, $input_filter, $response_options = null)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))
@@ -326,7 +326,7 @@ class kKavaVpaasReports extends kKavaReports
 		
 		if (isset($report_def[self::REPORT_BASE_DEF]))
 		{
-			$report_def = array_merge(parent::getReportDef($report_def[self::REPORT_BASE_DEF], $input_filter), $report_def);
+			$report_def = array_merge(parent::getReportDef($report_def[self::REPORT_BASE_DEF], $input_filter, $response_options), $report_def);
 		}
 
 		if (isset($report_def[self::REPORT_JOIN_GRAPHS]))

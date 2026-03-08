@@ -21,6 +21,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	{
 		$mapObjectType = array("entry" => objectType::ENTRY,
 			"LiveStreamEntry" => objectType::ENTRY,
+			"ExternalMediaEntry" => objectType::ENTRY,
 			"category" => objectType::CATEGORY,
 			"asset" => objectType::ASSET,
 			"flavorAsset" => objectType::FLAVORASSET,
@@ -44,48 +45,92 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return null;
 	}
 
-	private function addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object)
+	private function retrieveCatalogItems($allowedCatalogItemIds)
 	{
 		$catalogItemIdsToAdd = array_unique($allowedCatalogItemIds);
+		$catalogItemsToAdd = [];
+		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
+		{
+			//Validate the existence of the catalog item
+			$catalogItemToAdd = VendorCatalogItemPeer::retrieveByPK($catalogItemIdToAdd);
+			if (!$catalogItemToAdd) {
+				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd could not be retrieved, skipping");
+				continue;
+			}
+			$catalogItemsToAdd[] = $catalogItemToAdd;
+		}
+		return $catalogItemsToAdd;
+	}
 
-		//If both the entry and reach profile don't exist, there's no need to hit the loop
-		$entry = entryPeer::retrieveByPK($entryId);
-		$entryObjectType = EntryObjectType::ENTRY;
+	private function addingEntryVendorTaskByObjectIds($taskObjectType,  $allowedCatalogItemIds, $profileId, $object)
+	{
+		$vendorTaskObjectHandler = HandlerFactory::getHandlerAutomaticFlow($taskObjectType);
+		if(!$vendorTaskObjectHandler)
+		{
+			KalturaLog::log("Could not get vendor task handler for type {$taskObjectType}");
+			return true;
+		}
+		$taskObjects = $vendorTaskObjectHandler->getTaskObjectsByEventObject($object);
+		$catalogItemsToAdd = $this->retrieveCatalogItems($allowedCatalogItemIds);
+
 		$reachProfile = ReachProfilePeer::retrieveActiveByPk($profileId);
-		if(!$entry || !$reachProfile)
+		if(!$taskObjects || !$reachProfile)
 		{
 			KalturaLog::log('Not all mandatory objects were found, tasks will not be added');
 			return true;
 		}
 
-		$reachRestrainAdminTag = kConf::get("reach_restrain_admin_tag", kConfMapNames::RUNTIME_CONFIG, null);
-		if(in_array($reachRestrainAdminTag, $entry->getAdminTagsArr()))
+		foreach ($taskObjects as $taskObject)
 		{
-			KalturaLog::log("Entry has reach restraining admin tag [$reachRestrainAdminTag], tasks will not be added");
-			return true;
-		}
 
-		foreach ($catalogItemIdsToAdd as $catalogItemIdToAdd)
-		{
-			//Validate the existence of the catalog item
-			$catalogItemToAdd = VendorCatalogItemPeer::retrieveByPK($catalogItemIdToAdd);
-			if(!$catalogItemToAdd)
+			if($vendorTaskObjectHandler->hasRestrainingAdminTag($taskObject, $profileId))
 			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd could not be retrieved, skipping");
-				continue;
+				KalturaLog::log('tasks will not be added');
+				return true;
 			}
 
-			$featureType = $catalogItemToAdd->getServiceFeature();
-			if(!$catalogItemToAdd->isFeatureTypeSupportedForEntry($entry, $entryObjectType))
+			foreach ($catalogItemsToAdd as $catalogItemToAdd)
 			{
-				KalturaLog::log("Catalog item with ID $catalogItemIdToAdd with feature type $featureType is not supported for entry Id $entryId");
-				continue;
-			}
+				$featureType = $catalogItemToAdd->getServiceFeature();
 
-			//Pass the object Id as the context of the task
-			$taskJobData = $catalogItemToAdd->getTaskJobData($object);
-			self::addEntryVendorTaskByObjectIds($entry, $entryObjectType, $catalogItemToAdd, $reachProfile, $this->getContextByObjectType($object), $taskJobData);
+				if($this->shouldSkipAutoRule($object, $taskObject->getEntryId(), $featureType))
+				{
+					continue;
+				}
+
+				if(!$vendorTaskObjectHandler->isFeatureTypeSupportedForTaskObject($taskObject, $catalogItemToAdd))
+				{
+					KalturaLog::log("Catalog item with ID {$catalogItemToAdd->getId()} with feature type $featureType is not supported for object Id {$taskObject->getId()}");
+					continue;
+				}
+
+				//Pass the object Id as the context of the task
+				$taskJobData = $catalogItemToAdd->getTaskJobData($object);
+				self::addEntryVendorTaskByObjectIds($taskObject, $catalogItemToAdd, $reachProfile, $vendorTaskObjectHandler, $this->getContextByObjectType($object), $taskJobData);
+			}
 		}
+	}
+
+	private function shouldSkipAutoRule($object, $entryId, $featureType)
+	{
+		if ($featureType == VendorServiceFeature::CAPTIONS)
+		{
+			if ($object instanceof entry && $object->getBlockAutoTranscript())
+			{
+				KalturaLog::log("Skip the entry automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+				return true;
+			}
+			else
+			{
+				$entry = entryPeer::retrieveByPK($entryId);
+				if ($entry && $entry->getBlockAutoTranscript())
+				{
+					KalturaLog::log("Skip the automatic rule if it's a caption or transcript and 'Block Auto Transcript' is enabled");
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/* (non-PHPdoc)
@@ -96,19 +141,19 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$scope = $event->getScope();
 		$partnerId = $scope->getPartnerId();
 		$object = $scope->getObject();
-		$entryId = $object->getEntryId();
 		foreach (self::$booleanNotificationTemplatesFulfilled as $booleanNotificationTemplate)
 		{
 			$profileId = $booleanNotificationTemplate[self::PROFILE_ID];
 			$fullFieldCatalogItemIds = $booleanNotificationTemplate[self::ACTION][0]->getCatalogItemIds();
+			$taskObjectType = $booleanNotificationTemplate[self::ACTION][0]->getEntryObjectType();
 			$fullFieldCatalogItemIdsArr = array_map('trim', explode(',', $fullFieldCatalogItemIds));
 			$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIdsArr, $partnerId);
 			if(!count($allowedCatalogItemIds))
 			{
-				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . implode(',', $fullFieldCatalogItemIds) . ']');
+				KalturaLog::debug('None of the fulfilled catalog item ids are active on partner, [' . $fullFieldCatalogItemIds . ']');
 				continue;
 			}
-			$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profileId, $object);
+			$this->addingEntryVendorTaskByObjectIds($taskObjectType, $allowedCatalogItemIds, $profileId, $object);
 		}
 		return true;
 	}
@@ -227,6 +272,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			return true;
 		}
+
+		if ($object instanceof asset && $object->getStatus() == asset::ASSET_STATUS_READY)
+		{
+			return true;
+		}
 		return false;
 	}
 
@@ -238,7 +288,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		if ($object instanceof EntryVendorTask && $object->getStatus() == EntryVendorTaskStatus::PENDING)
 			return true;
 
-		if($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
+		if(($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType())) ||
+			($object instanceof LiveStreamScheduleEvent && $object->getTemplateEntryId()))
 		{
 			$event = new kObjectCreatedEvent($object);
 
@@ -271,6 +322,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			if ($this->shouldConsumeEvent($event))
 				return true;
+
 			if (in_array(entryPeer::LENGTH_IN_MSECS, $modifiedColumns))
 			{
 				return true;
@@ -281,12 +333,24 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
-		if ($object instanceof flavorAsset
-			&& in_array(assetPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == asset::ASSET_STATUS_READY
-			&& myEntryUtils::isEntryReady($object->getEntryId()))
+		if (($object instanceof LiveStreamScheduleEvent && $object->getStatus() != ScheduleEventStatus::DELETED &&  $object->getTemplateEntryId()))
 		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			if ($this->shouldConsumeEvent($event))
+				return true;
+		}
+
+		if ($object instanceof asset && in_array(assetPeer::STATUS, $modifiedColumns))
+		{
+
+			if ($object instanceof CaptionAsset && $object->getStatus() == asset::ASSET_STATUS_READY)
+			{
+				$event = new kObjectChangedEvent($object,$modifiedColumns);
+				return $this->shouldConsumeEvent($event);
+			}
+
 			return true;
+
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -294,12 +358,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			$this->buildingReachArrays($event, $event->getScope()->getPartnerId(), $event->getScope(), false);
 			return true;
-		}
-
-		if ($object instanceof CaptionAsset && in_array(assetPeer::STATUS, $modifiedColumns) && $object->getStatus() == asset::ASSET_STATUS_READY)
-		{
-			$event = new kObjectChangedEvent($object,$modifiedColumns);
-			return $this->shouldConsumeEvent($event);
 		}
 
 		return false;
@@ -340,6 +398,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			$this->checkAutomaticRules($object, true);
 		}
 
+		if ($object instanceof asset && $object->getStatus() == asset::ASSET_STATUS_READY)
+		{
+			$this->checkAutomaticRules($object, true);
+		}
+
 		return true;
 	}
 
@@ -360,7 +423,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			}
 		}
 
-		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
+		if (($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType())) ||
+			($object instanceof LiveStreamScheduleEvent && $object->getTemplateEntryId()))
 		{
 			$this->initReachProfileForPartner($object->getPartnerId());
 			if (count(self::$booleanNotificationTemplatesFulfilled))
@@ -378,51 +442,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	 */
 	public function objectChanged(BaseObject $object, array $modifiedColumns)
 	{
-		if ($object instanceof EntryVendorTask && in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns))
+		if($object instanceof EntryVendorTask && in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns))
 		{
-			if($object->getStatus() == EntryVendorTaskStatus::PENDING
-				&& $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) == EntryVendorTaskStatus::PENDING_MODERATION)
-			{
-				if ($object->isScheduled())
-				{
-					$object->addSchedulingData();
-				}
-				if(!kReachUtils::isPayPerUseTask($object))
-				{
-					$this->updateReachProfileCreditUsage($object);
-				}
-			}
-			if($object->getStatus() == EntryVendorTaskStatus::READY && kReachUtils::isPayPerUseTask($object))
-			{
-				$this->updateReachProfileCreditUsage($object);
-			}
-		}
-
-		if ($object instanceof EntryVendorTask
-			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == EntryVendorTaskStatus::ERROR
-			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::SCHEDULED))
-		)
-		{
-			return $this->handleErrorTask($object);
-		}
-
-		if ($object instanceof EntryVendorTask
-			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == EntryVendorTaskStatus::ABORTED
-			&& in_array($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS), array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED))
-		)
-		{
-			return $this->handleAbortTask($object);
-		}
-
-		if ($object instanceof EntryVendorTask
-			&& in_array(EntryVendorTaskPeer::STATUS, $modifiedColumns)
-			&& $object->getStatus() == EntryVendorTaskStatus::READY
-		)
-		{
-			$this->addLabelAddition($object);
-			return $this->invalidateAccessKey($object);
+			$this->handleEntryVendorTaskStatusChanged($object);
 		}
 
 		if ($object instanceof entry && ReachPlugin::isEntryTypeSupportedForReach($object->getType()))
@@ -448,14 +470,21 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				}
 				if(in_array($object->getStatus(), array(entryStatus::DELETED, entryStatus::ERROR_CONVERTING, entryStatus::ERROR_CONVERTING)))
 				{
-					return $this->abortTasks($object);
+					$this->abortObjectTasks($object, EntryObjectType::ENTRY);
 				}
 			}
 		}
 
-		if ($object instanceof flavorAsset && !$object->getentry()->getBlockAutoTranscript())
+		if ($object instanceof flavorAsset && !$object->getentry()->getBlockAutoTranscript()
+			&& $object->getStatus() == asset::ASSET_STATUS_READY
+			&& myEntryUtils::isEntryReady($object->getEntryId()))
 		{
 			return $this->handleEntryReady($object->getentry());
+		}
+
+		if ($object instanceof AttachmentAsset && in_array($object->getStatus(), array(asset::ASSET_STATUS_DELETED, asset::ASSET_STATUS_ERROR, asset::ASSET_STATUS_NOT_APPLICABLE)))
+		{
+			$this->abortObjectTasks($object, EntryObjectType::ASSET);
 		}
 
 		if ($object instanceof categoryEntry && in_array(categoryEntryPeer::STATUS, $modifiedColumns) && $object->getStatus() == CategoryEntryStatus::ACTIVE)
@@ -472,10 +501,61 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			$event = new kObjectChangedEvent($object,$modifiedColumns);
 			$this->consumeEvent($event);
+		}
 
+		if ($object instanceof LiveStreamScheduleEvent && $object->getStatus() != ScheduleEventStatus::DELETED &&  $object->getTemplateEntryId())
+		{
+			$event = new kObjectChangedEvent($object,$modifiedColumns);
+			$this->consumeEvent($event);
 		}
 
 		return true;
+	}
+
+	protected function handleEntryVendorTaskStatusChanged($object)
+	{
+		$oldStatus = $object->getColumnsOldValue(EntryVendorTaskPeer::STATUS);
+		$newStatus = $object->getStatus();
+
+		switch ($newStatus)
+		{
+			case EntryVendorTaskStatus::PENDING:
+				if($object->getColumnsOldValue(EntryVendorTaskPeer::STATUS) == EntryVendorTaskStatus::PENDING_MODERATION)
+				{
+					if ($object->isScheduled())
+					{
+						$object->addSchedulingData();
+					}
+					if(!kReachUtils::isPayPerUseTask($object))
+					{
+						$this->updateReachProfileCreditUsage($object);
+					}
+				}
+				return;
+
+			case EntryVendorTaskStatus::READY:
+				if(kReachUtils::isPayPerUseTask($object))
+				{
+					$this->updateReachProfileCreditUsage($object);
+				}
+				$this->addLabelAddition($object);
+				$this->invalidateAccessKey($object);
+				return;
+
+			case EntryVendorTaskStatus::ERROR:
+				if(in_array($oldStatus, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::SCHEDULED)))
+				{
+					$this->handleErrorTask($object);
+				}
+				return;
+
+			case EntryVendorTaskStatus::ABORTED:
+				if(in_array($oldStatus, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::SCHEDULED)))
+				{
+					$this->handleAbortTask($object);
+				}
+				return;
+		}
 	}
 	
 	/* (non-PHPdoc)
@@ -512,7 +592,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 				KalturaLog::log("Catalog item [" . $pendingEntryReadyTask->getCatalogItemId() . " not found] ");
 				continue;
 			}
-			$pendingEntryReadyTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry()));
+			$pendingEntryReadyTask->setAccessKey($dbVendorCatalogItem->generateReachVendorKs($pendingEntryReadyTask->getEntryId(), $pendingEntryReadyTask->getIsOutputModerated(), $pendingEntryReadyTask->getAccessKeyExpiry(), $pendingEntryReadyTask->getEntryObjectType()));
 			if(!$dbVendorCatalogItem->getPayPerUse() && $pendingEntryReadyTask->getPrice() == 0)
 			{
 				$vendorCatalogItem = $pendingEntryReadyTask->getCatalogItem();
@@ -687,11 +767,12 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return true;
 	}
 
-	public static function addEntryVendorTaskByObjectIds($entryObject, $entryObjectType, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, $context = null, $taskJobData = null)
+	public static function addEntryVendorTaskByObjectIds($entryObject, VendorCatalogItem $vendorCatalogItem, ReachProfile $reachProfile, VendorTaskObjectHandler $vendorTaskObjectHandler, $context = null, $taskJobData = null)
 	{
 		$entryId = $entryObject->getId();
 		$partnerId = $entryObject->getPartnerId();
 		$vendorCatalogItemId = $vendorCatalogItem->getId();
+		$entryObjectType = $vendorTaskObjectHandler->getTaskObjectType();
 
 		$targetVersion = $vendorCatalogItem->getTaskVersion($entryId, $entryObjectType);
 		if ($vendorCatalogItem->isDuplicateTask($entryId, $entryObjectType, $partnerId))
@@ -722,7 +803,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		}
 
 
-		if(!self::shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile))
+		if(!$vendorTaskObjectHandler->shouldAddEntryVendorTaskByTaskObject($entryObject, $vendorCatalogItem, $reachProfile))
 		{
 			return true;
 		}
@@ -739,50 +820,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	public static function shouldAddEntryVendorTaskByObject($entryObject, $entryObjectType, $vendorCatalogItem, $reachProfile)
-	{
-		if(!$entryObjectType)
-		{
-			$entryObjectType = EntryObjectType::ENTRY;
-		}
-
-		switch($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				if (!$vendorCatalogItem->isEntryTypeSupported($entryObject->getType(), $entryObject->getMediaType()))
-				{
-					KalturaLog::log("Entry of type [{$entryObject->getType()}] is not supported by Reach");
-					return false;
-				}
-
-				if (!kReachUtils::areFlavorsReady($entryObject, $reachProfile))
-				{
-					KalturaLog::log("Not all flavor params IDs [{$reachProfile->getFlavorParamsIds()}] are ready yet");
-					return false;
-				}
-
-				if($entryObject->getParentEntryId())
-				{
-					KalturaLog::log("Entry [{$entryObject->getId()}] is a child entry, entry vendor task object wont be created for it");
-					return false;
-				}
-
-				if ($vendorCatalogItem->isEntryDurationExceeding($entryObject))
-				{
-					KalturaLog::log("Entry [{$entryObject->getId()}] is exceeding the catalogItem's limit, entry vendor task object wont be created for it");
-					return false;
-				}
-				return true;
-
-			default:
-				return false;
-		}
-
-	}
-
 	public static function addEntryVendorTask($entryObject, $entryObjectType, ReachProfile $reachProfile, VendorCatalogItem $vendorCatalogItem, $validateModeration = true, $version = 0, $context = null, $creationMode = EntryVendorTaskCreationMode::MANUAL, $unitsUsed = null)
 	{
-		if(!kReachManager::shouldAddEntryVendorTask($entryObject, $entryObjectType, $vendorCatalogItem))
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryObjectType);
+		if(!$vendorTaskObjectHandler::shouldAddEntryVendorTask($entryObject, $vendorCatalogItem))
 		{
 			return null;
 		}
@@ -795,8 +836,8 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setReachProfileId($reachProfile->getId());
 		$entryVendorTask->setPartnerId($reachProfile->getPartnerId());
-		$entryVendorTask->setKuserId(self::getTaskKuserId($entryObject, $entryObjectType));
-		$entryVendorTask->setUserId(self::getTaskPuserId($entryObject, $entryObjectType));
+		$entryVendorTask->setKuserId($vendorTaskObjectHandler->getTaskKuserId($entryObject));
+		$entryVendorTask->setUserId($vendorTaskObjectHandler->getTaskPuserId($entryObject));
 		$entryVendorTask->setVendorPartnerId($vendorCatalogItem->getVendorPartnerId());
 		$entryVendorTask->setVersion($version);
 		$entryVendorTask->setEntryObjectType($entryObjectType);
@@ -808,7 +849,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$accessKeyExpiry = $vendorCatalogItem->getKsExpiry();
 		$entryVendorTask->setIsOutputModerated($shouldModerateOutput);
 		$entryVendorTask->setAccessKeyExpiry($accessKeyExpiry);
-		$entryVendorTask->setAccessKey($vendorCatalogItem->generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry));
+		$entryVendorTask->setAccessKey($vendorCatalogItem->generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, $entryVendorTask->getEntryObjectType()));
 		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());
@@ -851,37 +892,6 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		return $entryVendorTask;
 	}
 
-	protected static function shouldAddEntryVendorTask($entryObject, $entryObjectType, $vendorCatalogItem)
-	{
-		if(!$entryObjectType)
-		{
-			$entryObjectType = EntryObjectType::ENTRY;
-		}
-
-		switch ($entryObjectType)
-		{
-			case EntryObjectType::ENTRY:
-				/** @var $entryObject entry */
-				//Check if the entry is temporary, if so, dont create the task
-				if($entryObject->getIsTemporary())
-				{
-					KalturaLog::debug("Entry [{$entryObject->getId()}] is temporary, entry vendor task object wont be created for it");
-					return false;
-				}
-
-				//Check if static content and the catalog item is excluding static content, if so, dont create the task
-				if(count($vendorCatalogItem->getAdminTagsToExcludeArray()) && array_intersect($vendorCatalogItem->getAdminTagsToExcludeArray(), $entryObject->getAdminTagsArr()))
-				{
-					KalturaLog::debug("Entry [{$entryObject->getId()}] has admin tags that are excluded by the catalog item, entry vendor task object wont be created for it");
-					return false;
-				}
-				return true;
-
-			default:
-				return false;
-		}
-	}
-
 	protected static function getEntryVendorTaskStatus($reachProfile, $vendorCatalogItem, $entry, $entryObjectType, $validateModeration)
 	{
 		$status = EntryVendorTaskStatus::PENDING;
@@ -911,59 +921,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		return $status;
 	}
-	
-	protected static function getTaskKuserId($entryObject, $entryObjectType)
-	{
-		$kuserId = kCurrentContext::getCurrentKsKuserId();
-		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
-		{
-			if(!$entryObjectType)
-			{
-				$entryObjectType = EntryObjectType::ENTRY;
-			}
-
-			switch ($entryObjectType)
-			{
-				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-				case EntryObjectType::ENTRY:
-					return $entryObject->getKuserId();
-
-				default:
-					return null;
-			}
-		}
-		return $kuserId;
-	}
-	
-	protected static function getTaskPuserId($entryObject, $entryObjectType)
-	{
-		$puserId = kCurrentContext::$ks_uid;
-		if(kCurrentContext::$ks_partner_id <= PartnerPeer::GLOBAL_PARTNER)
-		{
-			if(!$entryObjectType)
-			{
-				$entryObjectType = EntryObjectType::ENTRY;
-			}
-
-			switch ($entryObjectType)
-			{
-				//For automatic dispatched tasks make sure to set the entry creator user as the entry owner
-				case EntryObjectType::ENTRY:
-					return $entryObject->getPuserId();
-
-				default:
-					return null;
-			}
-		}
-		
-		return $puserId;
-	}
 
 	private function checkAutomaticRules($object, $checkEmptyRulesOnly = false)
 	{
 		$scope = new kScope();
-		$entryId = $object->getEntryId();
-		$scope->setEntryId($entryId);
+		$scope->setEntryId($object->getEntryId());
 		$this->initReachProfileForPartner($object->getPartnerId());
 		if (self::$reachProfilesFilteredThatIncludesRegularRules)
 		{
@@ -971,48 +933,42 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 			{
 				/* @var $profile ReachProfile */
 				$fullFieldCatalogItemIds = $profile->fulfillsRules($scope, $checkEmptyRulesOnly);
-				if (!count($fullFieldCatalogItemIds))
+				foreach($fullFieldCatalogItemIds as $taskObjectType => $catalogItemIds)
 				{
-					continue;
+					if (!count($catalogItemIds))
+					{
+						continue;
+					}
+					$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($catalogItemIds, $object->getPartnerId());
+					if(!count($allowedCatalogItemIds))
+					{
+						KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $catalogItemIds) . "]");
+						continue;
+					}
+					$this->addingEntryVendorTaskByObjectIds($taskObjectType, $allowedCatalogItemIds, $profile->getId(), $object);
 				}
-				$allowedCatalogItemIds = PartnerCatalogItemPeer::retrieveActiveCatalogItemIds($fullFieldCatalogItemIds, $object->getPartnerId());
-				if(!count($allowedCatalogItemIds))
-				{
-					KalturaLog::debug("None of the fulfilled catalog item ids are active on partner, [" . implode(",", $fullFieldCatalogItemIds) . "]");
-					continue;
-				}
-				$this->addingEntryVendorTaskByObjectIds($entryId, $allowedCatalogItemIds, $profile->getId(), $object);
 			}
 		}
 		return true;
 	}
 
-	private function abortTasks(entry $entry)
+	protected function abortObjectTasks($entryObject, $entryObjectType)
 	{
-		//Delete all pending tasks
-		$entryStatusErrorMessage = $this->getAbortEntryStatusMessage($entry->getStatus());
-		$pendingModerationTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entry->getId(), $entry->getPartnerId());
-		foreach ($pendingModerationTasks as $pendingModerationTask)
-		{
-			/* @var $pendingModerationTask EntryVendorTask */
-			$pendingModerationTask->setStatus(EntryVendorTaskStatus::ABORTED);
-			$pendingModerationTask->setErrDescription("Task was aborted by server, associated entry [{$entry->getId()}] $entryStatusErrorMessage");
-			$pendingModerationTask->save();
-		}
+		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryObjectType);
+		$message = $vendorTaskObjectHandler->getAbortStatusMessage($entryObject->getStatus());
+		$pendingEntryTasks = EntryVendorTaskPeer::retrievePendingByEntryId($entryObject->getId(), $entryObject->getPartnerId());
+		$this->abortTasks($entryObject->getId(), $pendingEntryTasks, $message);
 	}
 
-	private function getAbortEntryStatusMessage($status)
+	private function abortTasks($objectId, $pendingTasks, $errorMessage)
 	{
-		switch ($status)
+		foreach ($pendingTasks as $pendingTask)
 		{
-			case entryStatus::DELETED:
-				return "deleted";
-			case entryStatus::ERROR_CONVERTING:
-				return "error occurred while converting";
-			case entryStatus::ERROR_IMPORTING:
-				return "error occurred while importing";
-			default:
-				return "invalid status provided";
+			//Delete all pending tasks
+			/* @var $pendingTask EntryVendorTask */
+			$pendingTask->setStatus(EntryVendorTaskStatus::ABORTED);
+			$pendingTask->setErrDescription("Task was aborted by server, associated object [{$objectId}] $errorMessage");
+			$pendingTask->save();
 		}
 	}
 

@@ -5,6 +5,8 @@
  */
 class embedPlaykitJsAction extends sfAction
 {
+	const COMPRESSED_PREFIX = "COMPRESSED,";
+
 	const UI_CONF_ID_PARAM_NAME = "uiconf_id";
 	const PARTNER_ID_PARAM_NAME = "partner_id";
 	const VERSIONS_PARAM_NAME = "versions";
@@ -19,6 +21,7 @@ class embedPlaykitJsAction extends sfAction
 	const IFRAME_EMBED_PARAM_NAME = "iframeembed";
 	const IFRAME_EMBED_TYPE = "iframeEmbedType";
 	const AUTO_EMBED_PARAM_NAME = "autoembed";
+	const INCLUDE_SOURCE_MAP_PARAM_NAME = 'includeSourceMap';
 	const LATEST = "{latest}";
 	const BETA = "{beta}";
 	const CANARY = "{canary}";
@@ -31,6 +34,8 @@ class embedPlaykitJsAction extends sfAction
 	const NO_ANALYTICS_PLAYER_VERSION = '0.56.0';
 	const NO_UICONF_FOR_KALTURA_DATA = '1.9.0';
 	const RAPT = "rapt";
+	const DEFAULT_MAX_OBJECT_CACHE_SIZE = 4 * 1024 * 1024; // 4MB
+	const FAILED_TO_SAVE_BUNDLE_IN_CACHE = "FAILED_TO_SAVE_BUNDLE_IN_CACHE";
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -51,7 +56,9 @@ class embedPlaykitJsAction extends sfAction
 	private $playerConfig = null;
 	private $uiConfUpdatedAt = null;
 	private $regenerate = false;
+	private $includeSourceMap = 'false';
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
+	private $maxObjectCacheSize;
 
 	public function execute()
 	{
@@ -59,14 +66,14 @@ class embedPlaykitJsAction extends sfAction
 		KExternalErrors::setResponseErrorCode(KExternalErrors::HTTP_STATUS_NOT_FOUND);
 
 		$this->initMembers();
-
-		$bundleContent = $this->bundleCache->get($this->bundle_name);
-		$i18nContent = $this->bundleCache->get($this->bundle_i18n_name);
-		$extraModulesNames = unserialize($this->bundleCache->get($this->bundle_extra_modules_names));
+		$bundleContent = self::getCacheData($this, 'bundleCache', $this->bundle_name);
+		$i18nContent = self::getCacheData($this, 'bundleCache', $this->bundle_i18n_name);
+		$extraModulesNames = unserialize(self::getCacheData($this,'bundleCache', $this->bundle_extra_modules_names));
 		KalturaLog::debug("Fetch bundle content from cache for key [{$this->bundle_name}], result: [" . !empty($bundleContent) . "]");
-
-		if (!$bundleContent || $this->regenerate)
+		$i18nContentNeeded = is_array($this->uiConfLangs) && count($this->uiConfLangs) > 1;
+		if (!$bundleContent || (!$i18nContent && $i18nContentNeeded)|| $this->regenerate)
 		{
+			KalturaLog::debug("bundleContent: " . $bundleContent . " i18nContent: " . $i18nContent . " i18nContentNeeded ".$i18nContentNeeded . " regenerate: " . $this->regenerate);
 			list($bundleContent, $i18nContent, $extraModulesNames) = kLock::runLocked($this->bundle_name, array("embedPlaykitJsAction", "buildBundleLocked"), array($this), 2, 30);
 		}
 
@@ -88,11 +95,11 @@ class embedPlaykitJsAction extends sfAction
 		//if bundle not exists or explicitly should be regenerated build it
 		if(!$context->regenerate)
 		{
-			$bundleContent = $context->bundleCache->get($context->bundle_name);
-			if ($bundleContent)
+			$bundleContent = self::getCacheData($context, 'bundleCache', $context->bundle_name);
+			$i18nContent = self::getCacheData($context, 'bundleCache', $context->bundle_i18n_name);
+			if ($bundleContent && $i18nContent)
 			{
-				$i18nContent = $context->bundleCache->get($context->bundle_i18n_name);
-				$extraModulesNames = unserialize($context->bundleCache->get($context->bundle_extra_modules_names));
+				$extraModulesNames = unserialize(self::getCacheData($context, 'bundleCache', $context->bundle_extra_modules_names));
 				return array($bundleContent, $i18nContent, $extraModulesNames);
 			}
 		}
@@ -104,7 +111,11 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " wrong config object");
 		}
 
-		$url = $context->bundlerUrl . "/build?config=" . base64_encode($config) . "&name=" . $context->bundle_name . "&source=" . base64_encode($context->sourcesPath);
+		$url = $context->bundlerUrl . '/build?config=' . base64_encode($config) .
+			'&name=' . $context->bundle_name .
+			'&source=' . base64_encode($context->sourcesPath) .
+			'&includeSourceMap=' . $context->includeSourceMap;
+
 		$content = KCurlWrapper::getContent($url, array('Content-Type: application/json'), true);
 
 		if (!$content)
@@ -125,19 +136,19 @@ class embedPlaykitJsAction extends sfAction
                 KExternalErrors::dieError(KExternalErrors::BUNDLE_CREATION_FAILED, $config . " bundle created with wrong content");
             }
         }
-		
+
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
-		$bundleSaved =  $context->bundleCache->set($context->bundle_name, $bundleContent);
-		
+		$bundleSaved = self::setCacheData($context, 'bundleCache', $context->bundle_name, $bundleContent);
+
 		$sourceMapContent = base64_decode($content['sourceMap']);
-		$context->sourceMapsCache->set($context->bundle_name, $sourceMapContent);
-		
+		self::setCacheData($context, 'sourceMapsCache', $context->bundle_name, $sourceMapContent, false);
+
 		$i18nContent = isset($content['i18n']) ? base64_decode($content['i18n']) : "";
-		$context->bundleCache->set($context->bundle_i18n_name, $i18nContent);
-		
+		self::setCacheData($context, 'bundleCache', $context->bundle_i18n_name, $i18nContent);
+
 		$extraModules = isset($content['extraModules']) ? $content['extraModules'] : array();
-		$extraModulesNames = self::getExtraModuleNames($extraModules);
-		$context->bundleCache->set($context->bundle_extra_modules_names, serialize($extraModulesNames));
+		$extraModulesNames = self::getExtraModuleNames($extraModules);;
+		self::setCacheData($context, 'bundleCache', $context->bundle_extra_modules_names, serialize($extraModulesNames));
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
@@ -145,7 +156,36 @@ class embedPlaykitJsAction extends sfAction
 
 		return array($bundleContent, $i18nContent, $extraModulesNames);
 	}
-	
+
+	protected static function setCacheData($context, $cacheType, $key, $data, $shouldCompress = true)
+	{
+		//If length of data is over 4MB compress it before caching
+		if($shouldCompress && strlen($data) > $context->maxObjectCacheSize)
+		{
+			$data = self::COMPRESSED_PREFIX . gzcompress($data);
+			if(strlen($data) > $context->maxObjectCacheSize)
+			{
+				KalturaMonitorClient::sendErrorEvent(self::FAILED_TO_SAVE_BUNDLE_IN_CACHE);
+			}
+			return $context->$cacheType->set($key, $data);
+		}
+		else
+		{
+			return $context->$cacheType->set($key, $data);
+		}
+	}
+
+	protected static function getCacheData($context, $cacheType, $key)
+	{
+		$data = $context->$cacheType->get($key);
+		if($data && strpos($data, self::COMPRESSED_PREFIX) === 0)
+		{
+			$data = substr($data, strlen(self::COMPRESSED_PREFIX));
+			$data = gzuncompress($data);
+		}
+		return $data;
+	}
+
 	private static function getExtraModuleNames($extraModules = array())
 	{
 		$extraModuleNames = array();
@@ -157,7 +197,7 @@ class embedPlaykitJsAction extends sfAction
 			}
 			$extraModuleNames[] = $extraModule['name'];
 		}
-		
+
 		return $extraModuleNames;
 	}
 
@@ -182,12 +222,16 @@ class embedPlaykitJsAction extends sfAction
 			//Embed factory is only relevant in dynamic embed
 			if ($this->getRequestParameter(self::EMBED_FACTORY_PARAM_NAME, false))
 			{
-				$bundleContent = "function getNamespacedKalturaPlayer() {  
-										$bundleContent
-										return KalturaPlayer;
-									}; 
-								const kalturaPlayerFactory = getNamespacedKalturaPlayer();
-								export { kalturaPlayerFactory }";
+				$configAsJson = $this->getPlayerConfigAsJson($i18nContent, $extraModulesNames);
+				$playerUniqueName = 'KalturaPlayer_'.$this->uiconfId;
+				//replace all instance names of global var KaLturaPlayer with unique name per uiconf
+				$dedicatedUiConfBundleContent = preg_replace('/\bKalturaPlayer\b/', $playerUniqueName ,$bundleContentParts[1]);
+				$bundleContent = " \n $dedicatedUiConfBundleContent;\n
+								 \nwindow.KalturaPlayers=(window.KalturaPlayers||{});
+								 \nwindow.KalturaPlayers[$this->uiconfId]={};
+								 \nwindow.KalturaPlayers[$this->uiconfId]['config'] = $configAsJson;
+								\nwindow.KalturaPlayers[{$this->uiconfId}]['lib'] = window.$playerUniqueName;\n
+								";
 			}
 		}
 
@@ -207,15 +251,20 @@ class embedPlaykitJsAction extends sfAction
 		$uiConfData->uiConfData->name = $this->uiConf->getName();
 	}
 
-	private function appendConfig($content, $i18nContent, $extraModulesNames = null)
+	private function getPlayerConfigAsJson($i18nContent, $extraModulesNames = null)
 	{
 		$uiConf = $this->playerConfig;
 		$this->mergeEnvConfig($uiConf);
 		$this->mergeI18nConfig($uiConf, $i18nContent);
 		$this->mergeExtraModuleNames($uiConf, $extraModulesNames);
 		$this->addUiConfData($uiConf);
-		$uiConfJson = json_encode($uiConf);
+		return json_encode($uiConf);
 
+	}
+
+	private function appendConfig($content, $i18nContent, $extraModulesNames = null)
+	{
+		$uiConfJson = $this->getPlayerConfigAsJson($i18nContent, $extraModulesNames);
 
 		if ($uiConfJson === false)
 		{
@@ -258,6 +307,11 @@ class embedPlaykitJsAction extends sfAction
 				$uiConf->provider->env->$key = $value;
 		}
 
+		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
+		{
+			$uiConf->provider->partnerId = $this->uiConf->getPartnerId();
+		}
+
 		//todo - add unisphereLoaderUrl
 		$uiConf->provider->unisphereLoaderUrl =
 			MicroServiceUnisphereLoader::buildServiceUrl(
@@ -285,19 +339,19 @@ class embedPlaykitJsAction extends sfAction
 			$uiConf->ui->translations = (object) $this->arrayMergeRecursive($i18nArr, $uiConfI18nArr);
 		}
 	}
-	
+
 	private function mergeExtraModuleNames($uiConf, $extraModulesNames)
 	{
 		if(!$extraModulesNames || !count($extraModulesNames))
 		{
 			return;
 		}
-		
+
 		if(!property_exists($uiConf, 'plugins'))
 		{
 			$uiConf->plugins = new stdClass();
 		}
-		
+
 		foreach($extraModulesNames as $extraModulesName)
 		{
 			$uiConf->plugins->$extraModulesName = new stdClass();
@@ -502,7 +556,7 @@ class embedPlaykitJsAction extends sfAction
 		$iframe_embed_type = $this->getRequestParameter(self::IFRAME_EMBED_TYPE);
 		$loadContentMethod = "";
 		if (!is_null($entry_id)) {
-		    $loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
+			$loadContentMethod = "kalturaPlayer.loadMedia({\"entryId\":\"$entry_id\"});";
 		} elseif (!is_null($playlist_id)) {
 			$loadContentMethod = "kalturaPlayer.loadPlaylist({\"playlistId\":\"$playlist_id\"});";
 			if($iframe_embed_type === self::RAPT) {
@@ -542,25 +596,40 @@ class embedPlaykitJsAction extends sfAction
 			KExternalErrors::dieError(KExternalErrors::INVALID_PARAMETER, "Invalid config object");
 		}
 
-		$v2tov7ConfigJs='';
-		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
-		{
-			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
-			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
-
-		}
+		// Player setup
 		$kalturaPlayer = "KalturaPlayer.setup(config);";
 		if($iframe_embed_type === self::RAPT)
 		{
 			$kalturaPlayer = "PathKalturaPlayer.setup(config);";
 		}
 
+		// Player content loading
+		$loadPlayerJs = "
+			var kalturaPlayer = $kalturaPlayer;
+			$loadContentMethod
+		";
+
+		$v2tov7ConfigJs = '';
+		if($this->getRequestParameter(v2RedirectUtils::V2REDIRECT_PARAM_NAME))
+		{
+			$v2ToV7config = v2RedirectUtils::addV2toV7config($this->getRequestParameter(v2RedirectUtils::FLASHVARS_PARAM_NAME), $this->uiconfId);
+			$v2tov7ConfigJs = 'config = window.__buildV7Config('.JSON_encode($v2ToV7config).',config)';
+			if ($this->getRequestParameter(self::AUTO_EMBED_PARAM_NAME)) {
+				$originalLoadPlayerJs = $loadPlayerJs;
+				$loadPlayerJs = "
+                  if (!document.getElementById(config.targetId)) {
+                    document.write(`<div id='\${config.targetId}' style='width:560px; height:395px;'></div>`);
+                  }
+                  $originalLoadPlayerJs
+                  ";
+			}
+		}
+
 		$autoEmbedCode = "
 		try {
 			var config=$config;
 			$v2tov7ConfigJs
-			var kalturaPlayer = $kalturaPlayer
-			$loadContentMethod
+			$loadPlayerJs
 		} catch (e) {
 			console.error(e.message);
 		}
@@ -645,7 +714,7 @@ class embedPlaykitJsAction extends sfAction
 			$loadVersionTagMapFromKConf = kConf::get("loadFromKConf_".$tag, kConfMapNames::EMBED_PLAYKIT, null);
 			if($loadVersionMapFromKConf || $loadVersionTagMapFromKConf)
 			{
-				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);	
+				list($versionConfig,$tagVersionNumber) = $this->getVersionMap($tag, $version);
 			}
 			else
 			{
@@ -818,6 +887,9 @@ class embedPlaykitJsAction extends sfAction
 		//Get should force regenration
 		$this->regenerate = $this->getRequestParameter(self::REGENERATE_PARAM_NAME);
 
+		//Should we include player source map in the request result
+		$this->includeSourceMap = $this->getRequestParameter(self::INCLUDE_SOURCE_MAP_PARAM_NAME, 'false');
+
 		//Get the list of partner 0 uiconf tags for uiconfs that contain {latest} and {beta} lists
 		$embedPlaykitConf = kConf::getMap(kConfMapNames::EMBED_PLAYKIT);
 		if (isset($embedPlaykitConf[self::EMBED_PLAYKIT_UICONF_TAGS_KEY_NAME]))
@@ -840,6 +912,8 @@ class embedPlaykitJsAction extends sfAction
 
 			if (array_key_exists('play_kit_js_cache_version', $playkitConfig))
 				$this->sourceMapLoader = rtrim($playkitConfig['playkit_js_source_map_loader']);
+
+			$this->maxObjectCacheSize = $playkitConfig['max_object_cache_size'] ?? self::DEFAULT_MAX_OBJECT_CACHE_SIZE;
 
 
 		}

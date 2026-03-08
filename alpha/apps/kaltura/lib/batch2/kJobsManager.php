@@ -1165,10 +1165,11 @@ class kJobsManager
 	 * @param array $conversionCommands
 	 * @return BatchJob
 	 */
-	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $shouldSort = true, $offset = null, $duration = null, $conversionCommands = array())
+	public static function addConcatJob(BatchJob $parentJob = null, flavorAsset $asset, array $files, $shouldSort = true, $offset = null, $duration = null, $conversionCommands = array(), $inputFiles = array())
 	{
 		$jobData = new kConcatJobData();
- 		$jobData->setSrcFiles($files);
+		$jobData->setSrcFiles($files);
+		$jobData->setInputFiles($inputFiles);
 		$jobData->setFlavorAssetId($asset->getId());
 		$jobData->setOffset($offset);
 		$jobData->setDuration($duration);
@@ -2105,5 +2106,17 @@ class kJobsManager
 			return true;
 		}
 		return false;
+	}
+
+	public static function addUpdateUserEntriesJob($partnerId, $entryId, $oldUserEntryStatus, $newUserEntryStatus)
+	{
+		$data = new kUpdateUserEntriesData();
+		$data->setOldStatus($oldUserEntryStatus);
+		$data->setNewStatus($newUserEntryStatus);
+
+		$batchJob = new BatchJob();
+		$batchJob->setPartnerId($partnerId);
+		$batchJob->setEntryId($entryId);
+		return self::addJob($batchJob, $data, BatchJobType::UPDATE_USER_ENTRIES);
 	}
 }

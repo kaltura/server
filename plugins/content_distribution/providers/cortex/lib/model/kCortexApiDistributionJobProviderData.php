@@ -24,6 +24,10 @@ class kCortexApiDistributionJobProviderData extends kConfigurableDistributionJob
 	 * @var int
 	 */
 	private $distributionProfileId;
+	/**
+	 * @var int
+	 */
+	private $mediaType;
 
 	/**
 	 * @return int $distributionProfileId
@@ -87,9 +91,25 @@ class kCortexApiDistributionJobProviderData extends kConfigurableDistributionJob
 	public function setCaptionsInfo($captionsInfo)
 	{
 		$this->captionsInfo = $captionsInfo;
-	}	
-	
-    
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMediaType()
+	{
+		return $this->mediaType;
+	}
+
+	/**
+	 * @param int $mediaType
+	 * @return void
+	 */
+	public function setMediaType($mediaType)
+	{
+		$this->mediaType = $mediaType;
+	}
+
 	public function __construct(kDistributionJobData $distributionJobData = null)
 	{
 		parent::__construct($distributionJobData);

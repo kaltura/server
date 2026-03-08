@@ -319,6 +319,7 @@ class kKavaReportsMgr extends kKavaBase
 	const REPORT_ROW_FILTER_BY_COLUMN = 'report_row_filter_by_column';
 	const REPORT_MAX_RESULT_SIZE = 'report_max_result_size';
 	const REPORT_ENRICH_EDIT_CONTEXT_FROM_FILTER = 'report_enrich_edit_context_from_filter';
+	const REPORT_FRIENDLY_DEF = 'report_friendly_definition';
 
 	// report settings - graph
 	const REPORT_GRANULARITY = 'report_granularity';
@@ -406,6 +407,25 @@ class kKavaReportsMgr extends kKavaBase
 	const SCHEDULE_EVENT_PAST_DATE = 1577836800; // 1.1.2020
 	const SCHEDULE_EVENT_DURATION = 94608000; // 3 years
 
+	// analytics beacon consts
+	const SERVICE = 'service';
+	const ACTION = 'action';
+	const SERVICE_ANALYTICS = 'analytics';
+	const ACTION_TRACKEVENT = 'trackEvent';
+	const EVENT_TYPE = 'eventType';
+	const API_CALL_EVENT_TYPE = 10005;
+	const PARTNER_ID = 'partnerId';
+	const API_ACTION = 'apiAction';
+	const API_NAME = 'apiName';
+	const API_VALUE = 'apiValue';
+	const API_INFO = 'apiInfo';
+	const KS = 'ks';
+	const CUSTOM_REPORT_ACTION_NAME = 'getCsvFromStringParams';
+	const REPORTS_SERVICE = 'reports';
+	const INTERNAL_ANALYTICS_HOST = 'internal_analytics_host';
+	const PARTNER_ID_PARAM = 'partner_id';
+	const DEFAULT_HTTP_PORT = '80';
+
 	protected static $event_type_count_aggrs = array(
 		self::EVENT_TYPE_PLAY,
 		self::EVENT_TYPE_PLAYER_IMPRESSION,
@@ -475,6 +495,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_PAGE_LOAD,
 		self::EVENT_TYPE_BUTTON_CLICKED,
 		self::EVENT_TYPE_QR_CODE_SCANNED,
+		self::EVENT_TYPE_DOCUMENT_IMPRESSION,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -557,7 +578,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_POLL_RECEIVED => 'count_poll_received',
 		self::EVENT_TYPE_PAGE_LOAD => 'count_page_loaded',
 		self::EVENT_TYPE_BUTTON_CLICKED => 'count_button_clicked',
-		self::EVENT_TYPE_QR_CODE_SCANNED => 'count_qr_code_scanned'
+		self::EVENT_TYPE_QR_CODE_SCANNED => 'count_qr_code_scanned',
+		self::EVENT_TYPE_DOCUMENT_IMPRESSION => 'count_document_impression',
 	);
 
 	//global transform
@@ -2551,15 +2573,15 @@ class kKavaReportsMgr extends kKavaBase
 		return $report_def;
 	}
 
-	protected static function getReportDefFromReportClass($report_type, $input_filter = null)
+	protected static function getReportDefFromReportClass($report_type, $input_filter = null, $response_options = null)
 	{
 		$report_class = self::getReportClassName($report_type);
-		return $report_class ? $report_class::getReportDef($report_type, $input_filter) : null;
+		return $report_class ? $report_class::getReportDef($report_type, $input_filter, $response_options) : null;
 	}
 
-	protected static function getReportDefinition($report_type, $input_filter = null)
+	protected static function getReportDefinition($report_type, $input_filter = null, $response_options = null)
 	{
-		$report_def = self::getReportDefFromReportClass($report_type, $input_filter);
+		$report_def = self::getReportDefFromReportClass($report_type, $input_filter, $response_options);
 		return $report_def ? self::buildReportDef($report_def) : null;
 	}
 
@@ -2982,7 +3004,8 @@ class kKavaReportsMgr extends kKavaBase
 			'industries' => array(self::DRUID_DIMENSION => self::DIMENSION_INDUSTRY),
 			'playback_modes' => array(self::DRUID_DIMENSION => self::DIMENSION_PLAYBACK_MODE),
 			'companies' => array(self::DRUID_DIMENSION => self::DIMENSION_COMPANY),
-			'event_session_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_SESSION_CONTEXT_ID)
+			'event_session_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_SESSION_CONTEXT_ID),
+			'video_codec' => array(self::DRUID_DIMENSION => self::DIMENSION_VIDEO_CODEC),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -4119,7 +4142,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::init();
 		
-		$report_def = self::getReportDefinition($report_type, $input_filter);
+		$report_def = self::getReportDefinition($report_type, $input_filter, $response_options);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
@@ -6550,7 +6573,7 @@ class kKavaReportsMgr extends kKavaBase
 			$page_index = 1;
 		
 		// run the query
-		$report_def = self::getReportDefinition($report_type, $input_filter);
+		$report_def = self::getReportDefinition($report_type, $input_filter, $response_options);
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
 			$partner_id = Partner::ADMIN_CONSOLE_PARTNER_ID;
@@ -6884,7 +6907,7 @@ class kKavaReportsMgr extends kKavaBase
 		{
 			return;
 		}
-		$metrics_count = count($result[0]) - 1;
+		$metrics_count = max(count($result[0]) - 1, 0);
 		$empty_values = array_fill(0, $metrics_count, 0);
 
 		$data = $result[1];
@@ -7220,7 +7243,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::init();
 
-		$report_def = self::getReportDefinition($report_type, $input_filter);
+		$report_def = self::getReportDefinition($report_type, $input_filter, $response_options);
 		
 		if (isset($report_def[self::REPORT_SKIP_PARTNER_FILTER]))
 		{
@@ -7417,7 +7440,7 @@ class kKavaReportsMgr extends kKavaBase
 		}
 		else
 		{
-			$partner_id = $params['partner_id'];
+			$partner_id = $params[self::PARTNER_ID_PARAM];
 		}
 
 		// apply param processing
@@ -7611,6 +7634,17 @@ class kKavaReportsMgr extends kKavaBase
 			$header = self::mapMetricsToHeaders($header);
 		}
 
+		if (kConf::hasParam(self::INTERNAL_ANALYTICS_HOST))
+		{
+			$stats_host = explode(':', kConf::get(self::INTERNAL_ANALYTICS_HOST));
+			$customReportEventContent = self::getCustomReportAnalyticsEventContent($id, $params, $partner_id);
+			requestUtils::sendAnalyticsBeacon(
+				$customReportEventContent,
+				$stats_host[0],
+				isset($stats_host[1]) ? $stats_host[1] : self::DEFAULT_HTTP_PORT
+			);
+		}
+
 		return array($header, $data);
 	}
 
@@ -7666,7 +7700,7 @@ class kKavaReportsMgr extends kKavaBase
 
 		list($headers_for_total, $headers_for_table) = explode(';', $headers);
 
-		$report_def = self::getReportDefinition($report_type, $input_filter);
+		$report_def = self::getReportDefinition($report_type, $input_filter, $response_options);
 
 		if (isset($report_def[self::REPORT_JOIN_REPORTS]) || isset($report_def[self::REPORT_JOIN_GRAPHS]) || isset($report_def[self::REPORT_GRAPH_METRICS]))
 		{
@@ -7812,5 +7846,36 @@ class kKavaReportsMgr extends kKavaBase
 			$timestamp = self::timestampToDateId($timestamp, $tz);
 			$row[$timePosition] = $timestamp;
 		}
+	}
+
+	protected static function getCustomReportAnalyticsEventContent($id, $params, $partner_id)
+	{
+		$api_info = '';
+		foreach ($params as $key => $value)
+		{
+			if ($key != self::PARTNER_ID_PARAM)
+			{
+				$api_info .= "$key=$value;";
+			}
+		}
+
+		$content = array(
+			self::SERVICE => self::SERVICE_ANALYTICS,
+			self::ACTION => self::ACTION_TRACKEVENT,
+			self::EVENT_TYPE => self::API_CALL_EVENT_TYPE,
+			self::PARTNER_ID => $partner_id,
+			self::API_ACTION => self::CUSTOM_REPORT_ACTION_NAME,
+			self::API_NAME => self::REPORTS_SERVICE,
+			self::API_VALUE => $id,
+			self::API_INFO => $api_info
+		);
+
+		$req_params = infraRequestUtils::getRequestParams();
+		if (isset($req_params[self::KS]))
+		{
+			$content[self::KS] = $req_params[self::KS];
+		}
+
+		return $content;
 	}
 }

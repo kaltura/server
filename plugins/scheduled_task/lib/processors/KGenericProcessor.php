@@ -93,6 +93,14 @@ class KGenericProcessor
 
 	protected static function getUpdateDay($waitDays = 0) {
 		$now = intval(time() / 86400);  // as num of sec in day to get day number
+		
+		if (!is_numeric($waitDays))
+		{
+			// Handle cases where $waitDays is not a number
+			// This happen for scheduled_task_profile object that was save before input validation was added at: plugins/scheduled_task/admin/forms/MediaRepurposingTasksSubForm.php:30
+			$waitDays = 0;
+		}
+		
 		return $now - $waitDays;
 	}
 

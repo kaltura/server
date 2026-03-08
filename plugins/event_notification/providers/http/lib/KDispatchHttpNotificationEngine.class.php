@@ -77,6 +77,7 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 			$headers[] = "X-KALTURA-HASH-ALGO: $shaType";
 		}
 
+		$isContentTypeSet = false;
 		if(is_array($data->customHeaders) && count($data->customHeaders))
 		{
 			foreach($data->customHeaders as $customHeader)
@@ -92,14 +93,20 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
 				if ($key == 'Authorization')
 				{
-					$value = $this->handleOauth2($data->url, $value);
+					$value = $this->handleOauth2($data->url, $value, $httpNotificationTemplate->partnerId);
 				}
+
+				if (strtolower($key) == 'content-type')
+				{
+					$isContentTypeSet = true;
+				}
+
 
 				$headers[] = "$key: $value";
 			}
 		}
 
-		if($data->contentType)
+		if($data->contentType && !$isContentTypeSet)
 		{
 			$headers[] = "Content-Type: " . $data->contentType;
 		}
@@ -178,20 +185,45 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
 		if($data->sslCertificate)
 		{
-			if($data->sslCertificateType == KalturaHttpNotificationCertificateType::PEM)
-				$curlWrapper->setOpt( CURLOPT_SSLCERT, $data->sslCertificate);
+			$tempCertFile = tempnam($this->tempFolderPath, 'cert_');
+
+			if ($tempCertFile)
+			{
+				file_put_contents($tempCertFile, $data->sslCertificate);
+
+				if($data->sslCertificateType == KalturaHttpNotificationCertificateType::PEM)
+				{
+					$curlWrapper->setOpt(CURLOPT_SSLCERT, $tempCertFile);
+				}
+				else
+				{
+					$curlWrapper->setOpt(CURLOPT_CAINFO, $tempCertFile);
+					$curlWrapper->setOpt(CURLOPT_SSL_VERIFYPEER, true);
+				}
+			}
 			else
 			{
-				$curlWrapper->setOpt( CURLOPT_CAINFO, $data->sslCertificate);
-				$curlWrapper->setOpt( CURLOPT_SSL_VERIFYPEER, true);
+				KalturaLog::err("Failed to create temporary file for SSL certificate");
+			}
+		}
+
+		if ($data->sslKey)
+		{
+			$tempKeyFile = tempnam($this->tempFolderPath, 'key_');
+
+			if ($tempKeyFile)
+			{
+				file_put_contents($tempKeyFile, $data->sslKey);
+				$curlWrapper->setOpt(CURLOPT_SSLKEY, $tempKeyFile);
+			}
+			else
+			{
+				KalturaLog::err("Failed to create temporary file for SSL key");
 			}
 		}
 
 		if($data->username || $data->password)
 			$curlWrapper->setOpt( CURLOPT_USERPWD, $data->username . ':' . $data->password);
-
-		if($data->sslKey)
-			$curlWrapper->setOpt( CURLOPT_SSLKEY, $data->sslKey);
 
 		if($data->sslKeyType)
 			$curlWrapper->setOpt( CURLOPT_SSLKEYTYPE, $data->sslKeyType);
@@ -210,6 +242,16 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 
 		$curlWrapper->close();
 
+		if (isset($tempCertFile) && $tempCertFile && file_exists($tempCertFile))
+		{
+			unlink($tempCertFile);
+		}
+
+		if (isset($tempKeyFile) && $tempKeyFile && file_exists($tempKeyFile))
+		{
+			unlink($tempKeyFile);
+		}
+
 		KalturaLog::info("HTTP Request httpCode [" . $httpCode . "] Results [$results] Headers [$headers] Body [$body]");
 		if(!$results || !in_array($httpCode, array(KCurlHeaderResponse::HTTP_STATUS_OK, KCurlHeaderResponse::HTTP_STATUS_NO_CONTENT)))
 		{
@@ -221,11 +263,15 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		return true;
 	}
 
-	protected function handleOauth2($url, $value)
+	protected function handleOauth2($url, $value, $partnerId)
 	{
-		if (str_contains($url, 'fcm.googleapis.com') && $value == 'firebase')
+
+		if (str_contains($url, 'fcm.googleapis.com') && str_contains($value, 'firebase'))
 		{
-			$accessTokens = kFirebaseOauth::requestAuthorizationTokens($value);
+			$explodedParts = explode('-', $value);
+			$entryId = $explodedParts[1] ?? null;
+			$firebaseSpecificJson = $entryId ? $this->getServiceAccountJsonFromEntry($entryId, $partnerId) : null;
+			$accessTokens = kFirebaseOauth::requestAuthorizationTokens($firebaseSpecificJson, $entryId);
 			if (!$accessTokens || !isset($accessTokens[kFirebaseOauth::ACCESS_TOKEN]))
 			{
 				KalturaLog::err('Error: Failed requesting access token');
@@ -236,5 +282,29 @@ class KDispatchHttpNotificationEngine extends KDispatchEventNotificationEngine
 		}
 
 		return $value;
+	}
+
+	protected function getServiceAccountJsonFromEntry($entryId, $partnerId)
+	{
+		try{
+			KBatchBase::impersonate($partnerId);
+			$entry = KBatchBase::$kClient->baseEntry->get($entryId);
+			if(empty($entry->partnerData))
+			{
+				throw new Exception('partnerData is empty');
+			}
+			if(!is_array(json_decode($entry->partnerData, true)))
+			{
+				throw new Exception('Cant decode partnerData');
+			}
+		}
+		catch(Exception $e)
+		{
+			KBatchBase::unimpersonate();
+			KalturaLog::err('Error: Failed retrieving service account JSON from entry '. $entryId. " ,Msg:".$e->getMessage());
+			return null;
+		}
+		KBatchBase::unimpersonate();
+		return trim($entry->partnerData);
 	}
 }

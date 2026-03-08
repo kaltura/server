@@ -76,7 +76,7 @@ class KalturaReachErrors implements kReachErrors
 
 	const FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY = "FEATURE_TYPE_NOT_SUPPORTED_FOR_ENTRY;FEATURE,ID;Requesting tasks of feature [@FEATURE@] for entry id [@ID@] is not supported";
 
-	const ENTRY_NOT_READY = "ENTRY_NOT_READY;;Ordering task is not allowed for entries which are not ins status ready";
+	const ENTRY_NOT_READY_FOR_ORDER = "ENTRY_NOT_READY;STATUS;Ordering task is not allowed for entries which is in status [@STATUS@]";
 	
 	const CANNOT_EXTEND_ACCESS_KEY = "CANNOT_EXTEND_ACCESS_KEY;;Extending accessKey for non processing task is not allowed";
 	
@@ -96,6 +96,10 @@ class KalturaReachErrors implements kReachErrors
 
 	const REQUIRE_CAPTION = "REQUIRE_CAPTION;CATALOG_ITEM_ID;Caption Asset must be provided for catalog item [@CATALOG_ITEM_ID@]";
 	const ENTRY_OBJECT_TYPE_NOT_SUPPORTED = "ENTRY_OBJECT_TYPE_NOT_SUPPORTED;ENTRY_OBJECT_TYPE;Entry object type [@ENTRY_OBJECT_TYPE@] is not supported";
+
+	const CATALOG_ITEMS_ARE_NOT_LINKED = "CATALOG_ITEMS_ARE_NOT_LINKED;FIRST_CATALOG_ITEM_ID,SECOND_CATALOG_ITEM_ID; catalog item [@FIRST_CATALOG_ITEM_ID@] is not linked to catalog item [@SECOND_CATALOG_ITEM_ID@]";
+
+	const ENTRY_TOO_SHORT = "ENTRY_TOO_SHORT;ENTRY_ID;The entry [@ENTRY_ID@] is under the minimum duration limit, entry vendor task object wont be created for it";
 
 	/* Credit */
 	

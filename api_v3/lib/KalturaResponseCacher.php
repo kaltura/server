@@ -21,6 +21,8 @@ class KalturaResponseCacher extends kApiCache
 
 	const ON_ERROR = '_onError';
 	
+	const API_RATE_LIMIT_IP_KEY = "ip_addr";
+	
 	static protected $rateLimitKey;
 
 	static protected $cachedContentHeaders = array('content-type', 'content-disposition', 'content-length', 'content-transfer-encoding');
@@ -118,7 +120,7 @@ class KalturaResponseCacher extends kApiCache
 			if (is_numeric($key) && is_array($value) && array_key_exists('ks', $value))
 			{
 				$curKs = $value['ks'];
-				if (strpos($curKs, ':result') !== false)
+				if (!is_string($curKs) || (strpos($curKs, ':result') !== false))
 					continue;				// the ks is the result of some sub request
 				
 				if ($ks && $ks != $curKs)
@@ -746,6 +748,15 @@ class KalturaResponseCacher extends kApiCache
 	protected static function getApiParamValueWildcard($params, $key)
 	{
 		$result = '';
+		
+		if($key == self::API_RATE_LIMIT_IP_KEY)
+		{
+			// get ip addr and remove the dots
+			$result = kCurrentContext::$user_ip ? kCurrentContext::$user_ip : infraRequestUtils::getRemoteAddress();
+			$result = str_replace('.', '', $result);
+			return $result;
+		}
+		
 		foreach ($params as $curKey => $value)
 		{
 			if (is_array($value))

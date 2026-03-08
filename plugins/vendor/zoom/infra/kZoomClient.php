@@ -21,6 +21,9 @@ class kZoomClient extends kVendorClient
 	const API_GET_MEETING_RECORDING = '/v2/meetings/@meetingId@/recordings';
 	const API_GET_MEETING = '/v2/meetings/@meetingId@';
 
+	const MAX_RETRIES = 3;
+	const RETRY_DELAY_MS = 1000; // 1 second fixed delay
+
 	protected $accountId;
 	protected $zoomAuthType;
 	protected $zoomTokensHelper;
@@ -224,42 +227,135 @@ class kZoomClient extends kVendorClient
 	}
 	
 	/**
-	 * @param string $apiPath
-	 * @return mixed
+	 * Makes a call to the Zoom API with automatic token refresh and retry capabilities
+	 *
+	 * @param string $apiPath The API endpoint path
+	 * @param array $options Optional cURL options
+	 * @return mixed The decoded JSON response or null on failure
 	 * @throws Exception
 	 */
 	public function callZoom(string $apiPath, array $options = array())
 	{
 		KalturaLog::info('Calling zoom api: ' . $apiPath);
-		$curlWrapper = new KCurlWrapper();
-		$curlWrapper->setOpts($options);
-		
-		$url = $this->generateContextualUrl($apiPath);
-		$token = $this->accessToken;
 
-		$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array(
-			"authorization: Bearer {$token}",
-			"content-type: application/json"
-		));
-		$response = $curlWrapper->exec($url);
-		$httpCode = $curlWrapper->getHttpCode();
-		$this->handleCurlResponse($response, $httpCode, $curlWrapper);
-		if (!$response)
+		$maxRetries = self::MAX_RETRIES;
+		$attempt = 0;
+		$lastError = null;
+		$tokenRefreshed = false;
+
+		while ($attempt <= $maxRetries)
 		{
-			$data = $curlWrapper->getErrorMsg();
-			KalturaLog::debug('Zoom API call failed: ' . $data);
+			$curlWrapper = new KCurlWrapper();
+			$curlWrapper->setOpts($options);
+
+			$url = $this->generateContextualUrl($apiPath);
+			$token = $this->accessToken;
+
+			$curlWrapper->setOpt(CURLOPT_HTTPHEADER , array("authorization: Bearer {$token}","content-type: application/json"));
+			$response = $curlWrapper->exec($url);
+			$httpCode = $curlWrapper->getHttpCode();
+			$this->handleCurlResponse($response, $httpCode, $curlWrapper);
+
+			if ($response)
+			{
+				$data = json_decode($response, true);
+				KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
+
+				// Check for invalid token errors and refresh once
+				if (!$tokenRefreshed && $this->isInvalidTokenError($data))
+				{
+					KalturaLog::info('Detected invalid token, attempting refresh');
+					if ($this->refreshAccessTokenIfInvalid()) 
+					{
+						$tokenRefreshed = true;
+						KalturaLog::info('Token refreshed, retrying API call');
+						continue; // Retry with new token
+					}
+				}
+				
+				return $data;
+			}
+			// Check if error is retryable
+			$lastError = $curlWrapper->getErrorMsg();
+			if (!$this->isRetryableError($lastError, $httpCode)) 
+			{
+				KalturaLog::info('Zoom API call failed with non-retryable error: ' . $lastError);
+				return null;
+			}
+
+			$attempt++;
+			if ($attempt <= $maxRetries) 
+			{
+				KalturaLog::info("Zoom API call failed (attempt $attempt/$maxRetries), retrying after " . self::RETRY_DELAY_MS . "ms. Error: $lastError");
+				usleep(self::RETRY_DELAY_MS * 1000); // Convert to microseconds
+			}
 		}
-		else
+
+		KalturaLog::info("Zoom API call failed after $maxRetries retries: $lastError");
+		return null;
+	}
+
+	/**
+	 * Attempts to refresh the access token if it's invalid
+	 *
+	 * @param bool $tokenRefreshed Flag indicating if a token refresh has already been attempted
+	 * @return bool True if the token was successfully refreshed, false otherwise
+	 */
+	protected function refreshAccessTokenIfInvalid()
+	{
+		
+		KalturaLog::info('Attempting to refresh Zoom access token');
+		/* @var ZoomVendorIntegration $vendorIntegration */
+		$vendorIntegration = VendorIntegrationPeer::retrieveSingleVendorPerPartner($this->accountId, VendorTypeEnum::ZOOM_ACCOUNT);
+		if (!$vendorIntegration) 
 		{
-			$data = json_decode($response, true);
-			KalturaLog::debug('Zoom API call response: ' . print_r($data, true));
+			KalturaLog::error('Failed to retrieve vendor integration for account ID: ' . $this->accountId);
+			return false;
 		}
-		return $data;
+
+		$freshTokens = kZoomOauth::refreshTokens($vendorIntegration, $this);
+		if (!$freshTokens) 
+		{
+			KalturaLog::error('Failed to refresh tokens');
+			return false;
+		}
+
+		KalturaLog::info('Zoom access token successfully refreshed');
+		return true;
+	}
+
+	/**
+	 * Checks if a response indicates an invalid access token error
+	 *
+	 * @param array $data The response data from Zoom API
+	 * @return bool True if the response indicates an invalid token error
+	 */
+	protected function isInvalidTokenError($data)
+	{
+		return isset($data['code']) && $data['code'] == 200 &&
+		       (strpos($data['message'], 'Invalid access token') !== false);
+	}
+
+	protected function isRetryableError($errorMsg, $httpCode)
+	{
+		// Retry on SSL/connection errors
+		if (strpos($errorMsg, 'SSL') !== false || strpos($errorMsg, 'Connection') !== false || strpos($errorMsg, 'timeout') !== false) 
+		{
+			return true;
+		}
+
+		// Retry on 5xx server errors and 429 rate limiting
+		if ($httpCode >= 500 || $httpCode == 429) 
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	protected function generateContextualUrl($apiPath)
 	{
-		return $this->baseURL . $apiPath . '?';
+		return $this->baseURL . $apiPath;
 	}
 	
 	public function getRefreshToken()

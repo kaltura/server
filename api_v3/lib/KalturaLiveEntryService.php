@@ -292,7 +292,14 @@ class KalturaLiveEntryService extends KalturaEntryService
 			$recordedEntry->setTags($dbEntry->getTags());
 			$recordedEntry->setStatus(entryStatus::NO_CONTENT);
 			multiLingualUtils::copyMultiLingualValues($recordedEntry, $dbEntry);
-			
+			if ($dbEntry->getLicenseType() !== null)
+			{
+				$recordedEntry->setLicenseType($dbEntry->getLicenseType());
+			}
+			else
+			{
+				$recordedEntry->setLicenseType(KalturaLicenseType::UNKNOWN);
+			}
 			$recordedEntry->setConversionProfileId($dbEntry->getRecordedEntryConversionProfile());
 
 			// make the recorded entry to be "hidden" in search so it won't return in entry list action

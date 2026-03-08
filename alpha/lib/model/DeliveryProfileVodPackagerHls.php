@@ -1,6 +1,31 @@
 <?php
 
-class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
+class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp
+{
+	protected $serveAsFmp4 = false;
+	
+	/**
+	 * @return array $flavors
+	 */
+	public function buildServeFlavors()
+	{
+		$flavors = $this->buildHttpFlavorsArray();
+		$flavors = $this->sortFlavors($flavors);
+		
+		$hasAudioOnlyFlavor = $this->hasAudioOnlyFlavor($flavors);
+		if($hasAudioOnlyFlavor && $this->serveAsFmp4)
+		{
+			//If audio flavors are present and fmp4 is supported, force unmuxed segments
+			$flavors = $this->forceUnmuxedSegments($flavors);
+		}
+		
+		return $flavors;
+	}
+
+	protected function updateFlavorUrl(&$flavor)
+	{
+		$flavor['url'] .= "/index-" . ($this->isAudioFlavor($flavor) ? "a" : "v") . "1.m3u8";
+	}
 	
 	protected function doGetFlavorAssetUrl(asset $flavorAsset) 
 	{
@@ -67,10 +92,25 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		}
 
 		$parentFlavors = parent::buildHttpFlavorsArray();
+		$this->serveAsFmp4 = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
+		if($this->params->getSimuliveEventId())
+		{
+			$simuliveEvent = ScheduleEventPeer::retrieveByPK($this->params->getSimuliveEventId());
+			if($simuliveEvent)
+			{
+				$res = kSimuliveUtils::getEventDetailsByEvent($simuliveEvent);
+				$assets = array_values(array_map((function($assets) { return $assets[0]; }), $res[1] ));
+				$this->serveAsFmp4 = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback(array_filter($assets));
+			}
+		}
 		
-		$dpSupportFmp4Playback = $this->getSupportFmp4();
-		$assetsRequireFMP4Playback = VodPackagerDeliveryUtils::doAssetsRequireFMP4Playback($this->params->getflavorAssets());
-		if($dpSupportFmp4Playback && $assetsRequireFMP4Playback)
+		//TO-DO: Once we verify codecs are well calculated, we can remove this check, until than include only when serveAsFmp4 is true
+		if(!$this->serveAsFmp4)
+		{
+			$this->removeCodecsString($parentFlavors);
+		}
+		
+		if($this->serveAsFmp4)
 		{
 			foreach ($parentFlavors as &$parentFlavor)
 			{
@@ -80,8 +120,16 @@ class DeliveryProfileVodPackagerHls extends DeliveryProfileAppleHttp {
 		
 		$mergedFlavors = array_merge($flavors, $parentFlavors);
 		return $mergedFlavors;
-
 	}
-
+	
+	private function removeCodecsString($flavors)
+	{
+		foreach ($flavors as &$flavor)
+		{
+			$flavor['codecs'] = '';
+		}
+		
+		return $flavors;
+	}
 
 }

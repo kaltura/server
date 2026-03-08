@@ -12,12 +12,19 @@ class kFirebaseOauth
 
 	const URL = 'https://oauth2.googleapis.com/token';
 
+	protected static string $cacheKey = 'firebase_oauth_tokens';
+
 	/**
-	 * @param $authCode
+	 * @param string     $firebaseSpecificJson
+	 * @param string $cacheIdentifier
 	 * @return array|void
 	 */
-	public static function requestAuthorizationTokens($authCode)
+	public static function requestAuthorizationTokens($firebaseSpecificJson, $cacheIdentifier = null)
 	{
+		if ($cacheIdentifier)
+		{
+			self::$cacheKey = self::$cacheKey . '_' . $cacheIdentifier;
+		}
 		$accessTokens = self::getTokensFromCache();
 		if ($accessTokens)
 		{
@@ -25,10 +32,8 @@ class kFirebaseOauth
 			return $accessTokens;
 		}
 
-		KalturaLog::info('Requesting authorization tokens from Firebase');
-
 		$header = self::getHeaderData();
-		$jwt = self::createFirebaseJwt(self::URL);
+		$jwt = self::createFirebaseJwt(self::URL, $firebaseSpecificJson);
 		if (!$jwt)
 		{
 			return null;
@@ -100,7 +105,7 @@ class kFirebaseOauth
 
 	protected static function getCacheKey()
 	{
-		return 'firebase_oauth_tokens';
+		return self::$cacheKey;
 	}
 
 	/**
@@ -111,9 +116,9 @@ class kFirebaseOauth
 		return array('Content-Type: application/x-www-form-urlencoded');
 	}
 
-	protected static function createFirebaseJwt($url)
+	protected static function createFirebaseJwt($url, $firebaseSpecificJson)
 	{
-		$serviceAccountJson = self::getServiceAccountJson();
+		$serviceAccountJson = $firebaseSpecificJson ?? self::getServiceAccountJson();
 		if (!$serviceAccountJson)
 		{
 			KalturaLog::err('Error: Failed retrieving service account JSON');

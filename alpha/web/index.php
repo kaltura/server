@@ -2,7 +2,7 @@
 if($_SERVER['REQUEST_METHOD'] == 'OPTIONS')
 {
 	header('Access-Control-Allow-Origin: *');
-	header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Range, Cache-Control');
+	header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Range, Cache-Control, X-Kaltura-Ks');
 	header('Access-Control-Allow-Methods: POST, GET, HEAD, OPTIONS');
 	header('Access-Control-Expose-Headers: Server, Content-Length, Content-Range, Date, Cache-Control, Content-Encoding');
 	exit;
@@ -135,7 +135,7 @@ function checkCache()
 	else if (strpos($uri, "/kwidget") !== false)	
 	{
 		require_once(dirname(__FILE__)."/../apps/kaltura/lib/cache/kCacheManager.php");
-
+		
 		$cache = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_PS2);
 		if ($cache)
 		{
@@ -268,4 +268,3 @@ define('SF_ENVIRONMENT',	'prod');
 define('SF_DEBUG',			false);
 
 require_once(__DIR__ . '/../bootstrap.php');
-

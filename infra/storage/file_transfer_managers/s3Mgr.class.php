@@ -273,8 +273,9 @@ class s3Mgr extends kFileTransferMgr
 				$options
 			);
 			
-			if($fp)
+			if(is_resource($fp) && get_resource_type($fp) === 'stream')
 			{
+				KalturaLog::debug("Closing file pointer for file: " . $local_file);
 				fclose($fp);
 			}
 
@@ -283,8 +284,9 @@ class s3Mgr extends kFileTransferMgr
 		}
 		catch (Exception $e)
 		{
-			if ($fp)
+			if(is_resource($fp) && get_resource_type($fp) === 'stream')
 			{
+				KalturaLog::debug("Closing file pointer for file: " . $local_file);
 				fclose($fp);
 			}
 			KalturaLog::err("error uploading file " . $local_file . " s3 info: " . $e->getMessage());

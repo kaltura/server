@@ -50,6 +50,11 @@ class ESearchParams extends BaseObject
 	 */
 	protected $objectIdsNotIn;
 
+	/**
+	 * @var ESearchScoreFunctionParams
+	 */
+	protected $scoreFunctionParams;
+
 
 
 	/**
@@ -183,5 +188,22 @@ class ESearchParams extends BaseObject
 	public function setIgnoreSynonym($ignoreSynonym)
 	{
 		$this->ignoreSynonym = $ignoreSynonym;
+	}
+
+	/**
+	 * @param ESearchScoreFunctionParams $scoreFunctionParams
+	 * @return void
+	 */
+	public function setScoreFunctionParams($scoreFunctionParams)
+	{
+		$this->scoreFunctionParams = $scoreFunctionParams;
+	}
+
+	/**
+	 * @return ESearchScoreFunctionParams
+	 */
+	public function getScoreFunctionParams()
+	{
+		return $this->scoreFunctionParams;
 	}
 }

@@ -9,11 +9,17 @@ require_once(dirname(__FILE__) . '/kInfraBaseCacheWrapper.php');
  */
 class kApcCacheWrapper extends kInfraBaseCacheWrapper
 {
+	private $defaultExpiry = null;
+	
 	/* (non-PHPdoc)
 	 * @see kBaseCacheWrapper::init()
 	 */
 	protected function doInit($config)
 	{
+		if(isset($config['defaultExpiry']) && $config['defaultExpiry'] && is_numeric($config['defaultExpiry']))
+		{
+			$this->defaultExpiry = $config['defaultExpiry'];
+		}
 		return kApcWrapper::apcEnabled();
 	}
 
@@ -30,6 +36,11 @@ class kApcCacheWrapper extends kInfraBaseCacheWrapper
 	 */
 	protected function doSet($key, $var, $expiry = 0)
 	{
+		if($this->defaultExpiry)
+		{
+			$expiry = $this->defaultExpiry;
+		}
+		
 		return kApcWrapper::apcStore($key, $var, $expiry);
 	}
 	

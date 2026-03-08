@@ -51,7 +51,6 @@ class KalturaVendorAudioDescriptionCatalogItem extends KalturaVendorCatalogItem
 		$this->validatePropertyNotNull(array("flavorParamsId"));
 		$this->validatePropertyNotNull(array("clearAudioFlavorParamsId"));
 		
-		$this->validateServiceType();
 		$this->validateFlavorParamsId($this->flavorParamsId);
 		$this->validateFlavorParamsId($this->clearAudioFlavorParamsId);
 		
@@ -71,11 +70,6 @@ class KalturaVendorAudioDescriptionCatalogItem extends KalturaVendorCatalogItem
 			$this->validateFlavorParamsId($this->clearAudioFlavorParamsId);
 		}
 		
-		if(isset($this->serviceType) && $this->serviceType!= $sourceObject->getServiceType())
-		{
-			$this->validateServiceType();
-		}
-		
 		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 	
@@ -84,12 +78,6 @@ class KalturaVendorAudioDescriptionCatalogItem extends KalturaVendorCatalogItem
 		$flavorParams = assetParamsPeer::retrieveByPK($id);
 		if (!$flavorParams)
 			throw new KalturaAPIException(KalturaErrors::FLAVOR_PARAMS_ID_NOT_FOUND, $id);
-	}
-	
-	protected function validateServiceType()
-	{
-		if($this->serviceType != KalturaVendorServiceType::HUMAN)
-			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_ONLY_HUMAN_ALLOWED);
 	}
 	
 	/* (non-PHPdoc)

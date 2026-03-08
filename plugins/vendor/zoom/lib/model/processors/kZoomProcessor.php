@@ -86,7 +86,7 @@ abstract class kZoomProcessor
 		$zoomUser = new kZoomUser();
 		$zoomUser->setOriginalName($hostEmail);
 		$zoomUser->setProcessedName(kZoomEventHanlder::processZoomUserName($hostEmail, $zoomIntegration, $this->zoomClient));
-		$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
+		$dbUser = $this->getKalturaUser($partnerId, $zoomUser, $zoomIntegration);
 		if (!$dbUser)
 		{
 			if ($zoomIntegration->getCreateUserIfNotExist())
@@ -107,12 +107,28 @@ abstract class kZoomProcessor
 	 * @param kZoomUser $kZoomUser
 	 * @return kuser
 	 */
-	protected function getKalturaUser($partnerId, $kZoomUser)
+	protected function getKalturaUser($partnerId, $kZoomUser, $zoomIntegration)
 	{
+		KalturaLog::debug('Finding Zoom user name: ' . $kZoomUser->getProcessedName());
 		$dbUser = kuserPeer::getKuserByPartnerAndUid($partnerId, $kZoomUser->getProcessedName(), true);
 		if (!$dbUser)
 		{
-			$dbUser = kuserPeer::getKuserByEmail($kZoomUser->getOriginalName(), $partnerId);
+			switch ($zoomIntegration->getUserSearchMethod())
+			{
+				case kZoomUsersSearchMethod::EXTERNAL:
+				{
+					KalturaLog::debug('Could not find by id. Searching by external_id');
+					$dbUser = kZoomEventHanlder::getKuserExternalId($kZoomUser->getProcessedName());
+					break;
+				}
+				case kZoomUsersSearchMethod::EMAIL:
+				default:
+				{
+					KalturaLog::debug('Could not find by id. Searching by email');
+					$dbUser = kuserPeer::getKuserByEmail($kZoomUser->getOriginalName(), $partnerId);
+					break;
+				}
+			}
 		}
 
 		return $dbUser;

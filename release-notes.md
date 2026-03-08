@@ -1,3 +1,357 @@
+# Venus-22.14.0
+## Add models sdk permission
+* Issue Type: Task
+* Issue ID: PLAT-25736
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableModelsSdk.enabled = true
+moduls.enableModelsSdk.permissionType = 2
+moduls.enableModelsSdk.label = "Enable models sdk"
+moduls.enableModelsSdk.permissionName = FEATURE_ALLOW_MODELS_SDK
+moduls.enableModelsSdk.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Extend short link to support larger volume of objects ##
+- Issue Type: Task
+- Issue ID: PLAT-25698
+
+### Deployment Scripts ###
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2026_03_01_alter_short_link_table.sql
+
+## Add Interactions feature flag ##
+* Issue Type: Task
+* Issue ID: PLAT-25735
+
+### Configuration ###
+Add the following to admin.ini
+```
+moduls.enableInteractions.enabled = true
+moduls.enableInteractions.permissionType = 2
+moduls.enableInteractions.label = "Enable Interactions"
+moduls.enableInteractions.permissionName = FEATURE_ENABLE_INTERACTIONS_PERMISSION
+moduls.enableInteractions.basePermissionType =
+moduls.enableInteractions.basePermissionName =
+moduls.enableInteractions.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Add Conversation Manager partner
+* Issue Type: Task
+* Issue ID: PLAT-25731
+
+### Configuration ###
+Replace the tokens: @CONVERSATION_MANAGER_PARTNER_ADMIN_SECRET@, @CONVERSATION_MANAGER_PARTNER_SECRET@ in the ini file and remove ".template" from the file name:
+
+    deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2026_03_01_conversation_manager_add_partner.php
+
+
+## Add systemPartner get permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: FEC-14895
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_03_02_self_serve_add_permission_systempartner_getconfiguration.php
+
+## Add permissions for session impersonate ##
+* Issue Type: Task
+* Issue ID: PLAT-25743
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2026_03_03_session_impersonate_permission.php
+
+# Venus-22.13.0
+## Add partner and permissions for video avatar microservice ##
+* Issue Type: Task
+* Issue ID: PLAT-25701
+
+### Configuration ###
+Replace the tokens: @VIDEO_AVATAR_PARTNER_ADMIN_SECRET@, @VIDEO_AVATAR_PARTNER_SECRET@ in the ini file and remove ".template" from the file name:
+
+    deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_02_09_video_avatar_add_partner.php
+    
+## Add Immersive Agents Capabilities
+* Issue Type: Task
+* Issue ID: PLAT-25697
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableImmersiveAgents.enabled = true
+moduls.enableImmersiveAgents.permissionType = 2
+moduls.enableImmersiveAgents.label = "Enable Immersive Agents"
+moduls.enableImmersiveAgents.permissionName = FEATURE_ALLOW_IMMERSIVE_AGENTS
+moduls.enableImmersiveAgents.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+# Venus-22.12.0
+## Add 'dash' tag to  audio description flavor params ##
+- Issue Type: Task
+- Issue ID: SUP-51159
+
+### Deployment Scripts ###
+
+    php deployment/updates/scripts/2026_01_27_update_audio_description_flavor_params_tags.php
+
+# Venus-22.10.0
+## Add user entries update batch ##
+- Issue Type: Task
+- Issue ID: PLAT-25619
+
+### Configuration ###
+Add the following to batch.ini under KAsyncCopyCaptions worker
+
+```
+[KAsyncUpdateUserEntries : JobHandlerWorker]
+id													= 810
+friendlyName										= Bulk Update User Entry
+type												= KAsyncUpdateUserEntries
+scriptPath											= batches/RecycleBin/KAsyncUpdateUserEntriesExe.php
+```
+
+### Deployment Scripts ###
+
+    php deployment/updates/scripts/add_permissions/2025_12_30_update_user_entry_permission.php
+
+
+# Venus-22.8.0
+## Index flavor_params field to elastic and allow in advanced search ##
+- Issue Type: Task
+- Issue ID: KAM-270
+### Deployment scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port' and execute the curl command
+
+    curl -X PUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"flavor_params": {"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}'
+
+# Venus-22.7.0
+
+## Add action reset_catalogItem to EntryVendorTask service  ##
+* Issue Type: Task
+* Issue ID: Plat 25581
+
+### Deployment scripts ###
+
+php deployment/updates/scripts/add_permissions/2025_11_13_add_entryvendortask_reset.php
+
+## Add caption accuracy and usage fields to entry list filter ##
+- Issue Type: Task
+- Issue ID: PLAT-25558
+### Deployment scripts ###
+
+##### Note: command below is for elastic 7.x.x version. If you have a different version, please refer to elastic documentations on how to update index mapping. #####
+Replace 'esearch_host', 'esearch_port' and execute the curl command
+
+    curl -X PUT "http://@ESEARCH_HOST@:@ESEARCH_PORT@/kaltura_entry/_mapping" -H 'Content-Type: application/json' -d'{"properties":{"caption_assets":{"type": "nested","properties":{"accuracy":{"type":"integer"},"usage":{"type": "keyword","normalizer": "kaltura_keyword_normalizer"}}}}}'
+
+## Add ANALYTICS_BASE permission to beacon service ##
+- Issue Type: Story
+- Issue ID: PLAT-25375
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_11_18_update_list_beacon_permission.php
+
+# Venus-22.6.0
+
+## Update caption asset http notification template ##
+* Issue Type: Task
+* Issue ID: SUP-49863
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+If the event notification template does not exist in the system use "add scripts", otherwise use "update scripts".
+First replace all tokens in the XML file below and remove ".template" from the file name, then run the php deployment script.
+
+Add script:
+- deployment/updates/scripts/xml/2025_10_29_addCaptionAssetHttpNotification.template.xml
+- php deployment/updates/scripts/2025_10_29_deploy_add_caption_asset_http_notification.php
+
+Update script:
+- deployment/updates/scripts/xml/2025_10_29_updateCaptionAssetHttpNotification.template.xml
+- php deployment/updates/scripts/2025_10_29_deploy_update_caption_asset_http_notification.php
+
+Permission script:
+- php deployment/updates/scripts/add_permissions/2025_01_19_eventNotification_update_eventDelayedConditions_permission.php
+
+
+# Venus-22.5.0
+## Add Audio Description and Dubbing flavors to the list of available flavors ##
+- Issue Type: Task
+- Issue ID: PLAT-25292, PLAT-25448, PLAT-25447, PLAT-25446
+### Deployment scripts ###
+	php deployment/updates/scripts/2025_09_21_deploy_AD_and_dubbing_flavor_params.php
+
+# Venus-22.4.0
+## Add partner and permissions for In-App Messaging ##
+- Issue Type: Task
+- Issue ID: PLAT-25503
+
+### Configuration ###
+Replace the tokens: @IN_APP_MESSAGING_PARTNER_ADMIN_SECRET@ , @IN_APP_MESSAGING_PARTNER_SECRET@  in the ini file and remove ".template" from the file name:
+
+    /opt/kaltura/app/deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+    php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2025_09_28_add_in_app_messaging_partner.php
+
+# Venus-22.3.0
+## Activate scheule events related kafka notification by default ##
+- Issue Type: Task
+- Issue ID: N/A
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	deployment/updates/scripts/xml/notifications/2025_09_09_update_kafka_schedule_event_events.template.xml
+
+### Deployment scripts ###
+	php deployment/updates/scripts/2025_09_09_update_schedule_event_kafka_notifications.php
+
+## Update status of kafka event notification to active for category entry create/update ##
+- Issue Type: Task
+- Issue ID: KAM-136
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_09_07_update_category_entry_kafka_notifications.template.xml
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_09_07_update_category_entry_kafka_notifications.php
+
+# Venus-22.1.0
+## Add custom headers and content-type settings to HTTP notification template config
+- Issue Type: Task
+- Issue ID: PSVAMB-47872
+#### Deployment ####
+- Generate Clients
+
+# Venus-22.0.0
+## Add activeLiveEventTime info to get playback context
+- Issue Type: Feature
+- Issue ID: PLAT-25383
+
+### Configuration ###
+None.
+
+### Deployment Scripts ###
+None
+
+### Known Issues & Limitations ###
+    The api is called without a widget KS to exploit CDN cache
+
+## Add ANALYTICS_BASE permission to WEBCAST_PRODUCER_DEVICE_ROLE
+- Issue Type: Task
+- Issue ID: KME-2830
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_07_22_update_webcast_producer_role.php
+
+## Add permissions for Agents Manager ##
+- Issue Type: Task
+- Issue ID: KAM-61
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_07_23_add_agents_manager_permissions.php
+
+# Ursa-21.20.0
+## Add ability to search Kaltura user by Zoom external ID
+- Issue Type: Task
+- Issue ID: PLAT-25290
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2025_07_14_update_esearch_permissions.php
+
+## Markdown Plugin ##
+* Issue Type: Feature
+* Issue ID: No-Plat
+
+### Configuration ###
+To enable this plugin add the following to your plugins.ini file:
+	- Markdown
+
+### Deployment ###
+    - php /opt/kaltura/app/deployment/base/scripts/installPlugins.php
+    - You would also need to generate new clients 
+
+# Ursa-21.19.0
+## Add partner and permissions for Agents Manager ##
+- Issue Type: Task
+- Issue ID: KAM-61
+
+### Configuration ###
+First replace all tokens from the ini file below (under Agents Manager section) and remove ".template" from the file name:
+
+deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2025_06_30_agents_manager_add_partner.php
+
+
+## Add kafka event notification for category entry create/update and support pushing entry events when agents are enabled ##
+- Issue Type: Task
+- Issue ID: KAM-6
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_19_add_kafka_category_entry_events.template.xml
+    /opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_19_update_kafka_entry_notifications.template.xml
+
+    Add the following to admin.ini
+    moduls.enableAgents.enabled = true
+    moduls.enableAgents.permissionType = 2
+    moduls.enableAgents.label = "Enable Agents Framework"
+    moduls.enableAgents.permissionName = FEATURE_AGENTS_FRAMEWORK_PERMISSION
+    moduls.enableAgents.group = GROUP_ENABLE_DISABLE_FEATURES
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_06_19_add_categorey_entry_kafka_events.php
+    php /opt/kaltura/app/deployment/updates/scripts/2025_06_19_update_user_kafka_events.php 
+
+## Add 4K flavor params support flag
+* Issue Type: Feature
+* Issue ID: PLAT-25201
+
+Note that for this to work you need to make sure to add the appropriate support on the delivery server as well.
+In our case we use: https://github.com/kaltura/nginx-vod-module
+When using 4k h265 flavors the serveFlavor will add /container/fmp4/ to the serveFlavor url's.
+The vod module location in this case will force serving the segments as fmp4 and forcing serving it in unmuxed mode.
+
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.4kFlavorSet.enabled = true
+moduls.4kFlavorSet.permissionType = 2
+moduls.4kFlavorSet.label = V2 flavor set - Enable 4K
+moduls.4kFlavorSet.permissionName = FEATURE_4K_FLAVORS
+moduls.4kFlavorSet.basePermissionType =
+moduls.4kFlavorSet.basePermissionName =
+moduls.4kFlavorSet.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+### Deployment scripts ### 
+    php /opt/kaltura/app/deployment/updates/scripts/2025_05_29_deploy_4k_flavor_params.php
+
+# Ursa-21.18.0
+## Add kafka event notification for schedule event create/update/delete ##
+- Issue Type: Task
+- Issue ID: MCRSRV-281
+
+### Configuration ###
+    Replace all tokens (SERVICE_URL, ADMIN_CONSOLE_PARTNER_ADMIN_SECRET) from the template XML file below and remove ".template" from the file name:
+	/opt/kaltura/app/deployment/updates/scripts/xml/notifications/2025_06_16_add_kafka_schedule_event_events.template.xml
+
+    Make sure the following plugin is enabled in your plugins.ini file:
+	ScheduleEventNotifications
+
+### Deployment scripts ###
+	php /opt/kaltura/app/deployment/updates/scripts/2025_06_16_add_schedule_event_events.php
+
 # Ursa-21.16.0
 ## Add Kafka Event Notifications for Folders
 * Issue Type: Task
@@ -33,6 +387,7 @@ moduls.enableFoldersCapabilities.label = "Enable Folders Capabilities"
 moduls.enableFoldersCapabilities.permissionName = FEATURE_ENABLE_FOLDERS_CAPABILITIES
 moduls.enableFoldersCapabilities.group = GROUP_ENABLE_DISABLE_FEATURES
 ```
+
 ## Add new firebase notifications ##
 * Issue Type: Task
 * Issue ID: PLAT-25184
@@ -235,6 +590,7 @@ add kava_external_client_tags section to local.ini with:
     php /opt/kaltura/app/deployment/updates/scripts/add_permissions/2024_10_31_add_ai_partner.php
 
 # Ursa-21.3.0
+
 ## Enable embed & social stream in EP ##
 * Issue Type: Task
 * Issue ID: PLAT-24999
@@ -11758,3 +12114,22 @@ Internal indication for api time properties and support for times that are relat
 0 = PID1
 1 = PID2
 `
+
+
+
+# Venus-22.5.0
+
+## Update Entry Approved or Rejected  in category template ##
+* Issue Type: Task
+* Issue ID: SUP-49053
+
+#### Configuration ####
+None.
+
+### Deployment scripts ###
+Replace all tokens in the XML file below.  Remove ".template" from the file name.  Run the php deployment script.
+
+Update script:
+
+     - deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.template.xml
+     - php deployment/updates/scripts/xml/2025_09_04_updateEntryApprovedOrRejectedInCategory.php

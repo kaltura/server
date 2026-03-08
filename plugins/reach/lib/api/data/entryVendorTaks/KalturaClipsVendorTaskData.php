@@ -36,6 +36,7 @@ class KalturaClipsVendorTaskData extends KalturaLocalizedVendorTaskData
 	 * For example: [{"title": "Title of the first clip", "description": "Description of the first clip", "tags": "Tagged-Example", "start": 127, "duration": 30}]
 	 *
 	 * @var string
+	 * @deprecated Please use outputJson instead.
 	 */
 	public $clipsOutputJson;
 

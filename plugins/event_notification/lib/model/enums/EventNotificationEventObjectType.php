@@ -44,4 +44,6 @@ interface EventNotificationEventObjectType extends BaseEnum
 	const REACH_PROFILE = 41;
 	const ENTRY_VENDOR_TASK = 42;
 	const GROUPUSER = 43;
+
+	const USER_ENTRY = 44;
 }

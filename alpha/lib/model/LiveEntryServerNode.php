@@ -200,7 +200,7 @@ class LiveEntryServerNode extends EntryServerNode
 		}
 		
 		$recordStatus = $liveEntry->getRecordStatus();
-		if($recordStatus && $recordStatus !== RecordStatus::DISABLED)
+		if($recordStatus && $recordStatus !== RecordStatus::DISABLED && $this->getServerType() === EntryServerNodeType::LIVE_PRIMARY)
 		{
 			$recordedEntryId = $liveEntry->getRecordedEntryId();
 			$recordedEntry = $recordedEntryId ? entryPeer::retrieveByPK($recordedEntryId) : null;

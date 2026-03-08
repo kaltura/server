@@ -288,8 +288,8 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 			self::REPORT_JOIN_REPORTS => array(
 				array(
 					self::REPORT_UNION_DATA_SOURCES => array(self::DATASOURCE_HISTORICAL, self::DATASOURCE_MEETING_HISTORICAL),
-					self::REPORT_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
-					self::REPORT_TOTAL_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+					self::REPORT_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+					self::REPORT_TOTAL_METRICS => array(self::METRIC_VOD_VIEW_PERIOD_PLAY_TIME, self::METRIC_UNION_LIVE_MEETING_VIEW_TIME, self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME, self::METRIC_UNIQUE_PERCENTILES_RATIO, self::EVENT_TYPE_MEETING_RAISE_HAND, self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO, self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
 				),
 				array(
 					self::REPORT_DATA_SOURCE => self::DATASOURCE_CNC_EVENTS,
@@ -302,7 +302,6 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 				'live_view_time' => self::METRIC_UNION_LIVE_MEETING_VIEW_TIME,
 				'total_view_time' => self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME,
 				'avg_completion_rate' => self::METRIC_UNIQUE_PERCENTILES_RATIO,
-				'engagement_rate' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO,
 				'count_reaction_clicked' => self::EVENT_TYPE_REACTION_CLICKED,
 				'count_raise_hand_clicked' => self::EVENT_TYPE_MEETING_RAISE_HAND,
 				'combined_live_engaged_users_play_time_ratio' => self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
@@ -361,11 +360,14 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::DRUID_VALUES => array(self::VALUE_UNKNOWN, "0", "")
 				)
 			),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
 			self::REPORT_METRICS => array(
 				self::METRIC_UNIQUE_COMBINED_LIVE_VIEW_PERIOD_USERS,
 				self::METRIC_COMBINED_LIVE_ENGAGED_USERS_RATIO,
 				self::METRIC_UNIQUE_VOD_VIEW_PERIOD_USERS,
-				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO
+				self::METRIC_VOD_UNIQUE_PERCENTILES_RATIO,
+				self::METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME,
+				self::METRIC_COMBINED_LIVE_ENGAGED_USERS_PLAY_TIME_RATIO,
 			)
 		),
 
@@ -390,11 +392,54 @@ class kKavaEventPlatformReports extends kKavaReportsMgr
 					self::REPORT_METRICS => array(self::EVENT_TYPE_MESSAGE_LIKED, self::EVENT_TYPE_REACTION_CLICKED, self::EVENT_TYPE_GROUP_MESSAGE_SENT)
 				)
 			)
-		)
+		),
 
+		ReportType::EP_LATEST_DOWNLOADED_ATTACHMENTS => array(
+			self::REPORT_DATA_SOURCE =>  self::DATASOURCE_HISTORICAL,
+			self::REPORT_DIMENSION_MAP => array(
+				'extract_time' => array(
+					self::DRUID_TYPE => self::DRUID_EXTRACTION,
+					self::DRUID_DIMENSION => self::DIMENSION_TIME,
+					self::DRUID_OUTPUT_NAME => self::DIMENSION_EXTRACT_TIME,
+					self::DRUID_EXTRACTION_FUNC => array(
+						self::DRUID_TYPE => self::DRUID_TIME_FORMAT
+					),
+				),
+				'entry_id' => self::DIMENSION_ENTRY_ID,
+				'entry_name' => self::DIMENSION_ENTRY_ID,
+				'attachment_id' => self::DIMENSION_FLAVOR_ID,
+				'attachment_name' => self::DIMENSION_FLAVOR_ID,
+				'attachment_ext' => self::DIMENSION_FLAVOR_ID,
+			),
+			self::REPORT_ENRICH_DEF => array(
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'extract_time',
+					self::REPORT_ENRICH_FUNC => self::ENRICH_FOREACH_KEYS_FUNC,
+					self::REPORT_ENRICH_CONTEXT => 'kKavaReportsMgr::timestampToUnixtime',
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => 'entry_name',
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
+				),
+				array(
+					self::REPORT_ENRICH_OUTPUT => array('attachment_name', 'attachment_ext'),
+					self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
+					self::REPORT_ENRICH_CONTEXT => array(
+						'peer' => 'assetPeer',
+						'columns' => array('CUSTOM_DATA.filename', 'FILE_EXT'),
+					),
+				),
+			),
+			self::REPORT_FORCE_TOTAL_COUNT => true,
+			self::REPORT_METRICS => array(self::EVENT_TYPE_DOWNLOAD_ATTACHMENT_CLICKED),
+			self::REPORT_ORDER_BY => array(
+				self::DRUID_DIMENSION => 'extract_time',
+				self::DRUID_DIRECTION => '-'
+			),
+		),
 	);
 
-	public static function getReportDef($report_type, $input_filter)
+	public static function getReportDef($report_type, $input_filter, $response_options = null)
 	{
 		$report_def = isset(self::$reports_def[$report_type]) ? self::$reports_def[$report_type] : null;
 		if (is_null($report_def))

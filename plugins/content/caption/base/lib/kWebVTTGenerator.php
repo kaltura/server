@@ -166,7 +166,6 @@ class kWebVTTGenerator
 
 		$segmentStartTime = ($segmentIndex - 1) * $segmentDuration * 1000;
 		$segmentEndTime = $segmentIndex * $segmentDuration * 1000;
-
 		$result = implode('', $headerInfo);
 		if ($localTimestamp != 10000)
 		{
@@ -190,8 +189,9 @@ class kWebVTTGenerator
 			// make sure the content does not contain 2 consecutive newlines
 			$content = preg_replace('/\n+/', "\n", str_replace("\r", '', $content));
 
+			$styleInfo = !empty($curCaption["styleInfo"]) ? ' ' . $curCaption["styleInfo"] : '';
 			$result .= self::formatWebVTTTimeStamp($curCaption["startTime"]) . ' --> ' .
-				self::formatWebVTTTimeStamp($curCaption["endTime"]) ."\n";
+				self::formatWebVTTTimeStamp($curCaption["endTime"]) . $styleInfo . "\n";
 			$result .= trim($content) . "\n\n";
 		}
 		$result .="\n\n\n";

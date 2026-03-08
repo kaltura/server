@@ -60,12 +60,14 @@ class ESearchEntryItem extends ESearchItem
 		'captions_content' => array('ESearchItemType::EXACT_MATCH'=> ESearchItemType::EXACT_MATCH, 'ESearchItemType::PARTIAL'=> ESearchItemType::PARTIAL, 'ESearchItemType::STARTS_WITH'=> ESearchItemType::STARTS_WITH, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
 		'last_played_at' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE, 'ESearchItemType::EXISTS'=> ESearchItemType::EXISTS),
 		'plays' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
+		'views' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'rank' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'votes' => array('ESearchItemType::RANGE'=>ESearchItemType::RANGE),
 		'display_in_search' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
 		'recycled_at' => array('ESearchItemType::RANGE' => ESearchItemType::RANGE),
 		'room_type' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
 		'broadcast_entry_id' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH, 'ESearchItemType::EXISTS' => ESearchItemType::EXISTS, ESearchUnifiedItem::UNIFIED),
+		'flavor_params' => array('ESearchItemType::EXACT_MATCH' => ESearchItemType::EXACT_MATCH),
 	);
 
 	protected static $field_boost_values = array(

@@ -45,6 +45,12 @@ abstract class LiveEntry extends entry
 		$copyObj->setExplicitLive($this->getExplicitLive());
 		$copyObj->setDvrStatus($this->getDvrStatus());
 		$copyObj->setDvrWindow($this->getDvrWindow());
+
+		$recordingOptions = $this->getRecordingOptions();
+		if($recordingOptions)
+		{
+			$copyObj->setRecordingOptions($recordingOptions);
+		}
 	}
 	
 	/* (non-PHPdoc)

@@ -167,12 +167,7 @@ class KalturaAsset extends KalturaObject implements IRelatedFilterable, IApiObje
 	     {
 	         case KalturaAssetType::FLAVOR:
 	         {
-				 if (strpos($sourceObject->getTags(), 'audio_description') === false)
-				 {
-					 $object = new KalturaFlavorAsset();
-					 break;
-				 }
-				 $object = new KalturaAudioDescriptionFlavorAsset();
+				 $object = new KalturaFlavorAsset();
 				 break;
 	         }
 	         case KalturaAssetType::LIVE:

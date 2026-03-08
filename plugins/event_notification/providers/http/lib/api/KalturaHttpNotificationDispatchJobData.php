@@ -164,6 +164,7 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 		'method',
 		'data',
 		'timeout',
+		'contentType',
 		'connectTimeout',
 		'username',
 		'password',
@@ -202,8 +203,7 @@ class KalturaHttpNotificationDispatchJobData extends KalturaEventNotificationDis
 			$dataObject = KalturaHttpNotificationData::getInstance($srcObj->getDataObject());
 			if($dataObject)
 			{
-				//Temporary disable setting content type.
-				//$this->contentType = $dataObject->getContentType();
+				$this->contentType = $dataObject->getContentType();
 				$this->data = $dataObject->getData($srcObj);
 			}
 		}

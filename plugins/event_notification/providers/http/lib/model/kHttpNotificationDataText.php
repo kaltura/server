@@ -9,7 +9,12 @@ class kHttpNotificationDataText extends kHttpNotificationData
 	 * @var kStringValue
 	 */
 	protected $content;
-	
+
+	/**
+	 * @var string
+	 */
+	protected $contentType;
+
 	/**
 	 * Contains the calculated data to be sent
 	 * @var string
@@ -30,6 +35,16 @@ class kHttpNotificationDataText extends kHttpNotificationData
 	public function setContent(kStringValue $content)
 	{
 		$this->content = $content;
+	}
+
+	public function getContentType()
+	{
+		return $this->contentType;
+	}
+
+	public function setContentType(string $contentType)
+	{
+		$this->contentType = $contentType;
 	}
 	
 	/* (non-PHPdoc)

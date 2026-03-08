@@ -16,6 +16,9 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	const DYNAMIC_ATTRIBUTES_FULL_SUPPORT = 0;		// the profile fully supports the required attirbutes
 	const DYNAMIC_ATTRIBUTES_PARTIAL_SUPPORT = 1;	// the profile may support the required attirbutes however its better to try and find a more suitable profile
 	const DYNAMIC_ATTRIBUTES_NO_SUPPORT = 2;		// the profile doesn't support the required attirbutes
+
+	const AUDIO_CODEC = 'audioCodec';
+	const AUDIO_LANGUAGE_NAME = 'audioLanguageName';
 	
 	/**
 	 * @var DeliveryProfileDynamicAttributes
@@ -468,6 +471,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 	
 		$bitrate = ($flavor && is_callable(array($flavor, 'getVideoBitrate')) ? $flavor->getVideoBitrate() : 0);
 		$frameRate = ($flavor && is_callable(array($flavor, 'getFrameRate')) ? $flavor->getFrameRate() : 0);
+		$codecString = ($flavor && is_callable(array($flavor, 'getCodecString')) ? $flavor->getCodecString() : '');
 		$width =   ($flavor ? $flavor->getWidth()   : 0);
 		$height =  ($flavor ? $flavor->getHeight()  : 0);
 
@@ -485,6 +489,7 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 				'defaultAudio' => $isDefaultAudio,
 				'type' => $type,
 				'frameRate' => $frameRate,
+				'codecs' => $codecString
 			);
 	}
 	
@@ -590,6 +595,16 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		return $this->getFromCustomData("pricingProfile");
 	}
 
+	public function setIsNonDRM($v)
+	{
+		$this->putInCustomData('isNonDRM', $v);
+	}
+
+	public function getIsNonDRM()
+	{
+		return $this->getFromCustomData('isNonDRM', null, false);
+	}
+
 	public function getRegionPrice($region)
 	{
 		$pricingProfile = $this->getPricingProfile();
@@ -622,5 +637,38 @@ abstract class DeliveryProfile extends BaseDeliveryProfile implements IBaseObjec
 		$dpPath = parse_url($dp->getUrl(), PHP_URL_PATH);
 		
 		return $path === $dpPath;
+	}
+
+	protected function isAudioFlavor($flavor)
+	{
+		return isset($flavor[self::AUDIO_CODEC]) || isset($flavor[self::AUDIO_LANGUAGE_NAME]);
+	}
+
+	protected function hasAudioOnlyFlavor($flavors)
+	{
+		foreach ($flavors as $flavor)
+		{
+			if ($this->isAudioFlavor($flavor))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	protected function forceUnmuxedSegments($flavors)
+	{
+		$newFlavors = array();
+		foreach ($flavors as $flavor)
+		{
+			$this->updateFlavorUrl($flavor);
+			$newFlavors[] = $flavor;
+		}
+
+		//Order video flavors after audio flavors and serve them as unmuxed segments
+		usort($newFlavors, function ($a, $b) {return $this->isAudioFlavor($a) ? -1 : 1;});
+
+		return $newFlavors;
 	}
 }

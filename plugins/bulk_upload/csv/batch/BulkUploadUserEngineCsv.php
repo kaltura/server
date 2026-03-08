@@ -110,6 +110,13 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$bulkUploadResult->errorDescription = "Wrong value passed for property gender [$bulkUploadResult->gender]";
 		}
 
+		if ($bulkUploadResult->groupUserCreationMode && !self::isValidEnumValue("KalturaGroupUserCreationMode", $bulkUploadResult->groupUserCreationMode))
+		{
+			$bulkUploadResult->status = KalturaBulkUploadResultStatus::ERROR;
+			$bulkUploadResult->errorType = KalturaBatchJobErrorTypes::APP;
+			$bulkUploadResult->errorDescription = "Wrong value passed for property groupUserCreationMode [$bulkUploadResult->groupUserCreationMode]";
+		}
+
 		if ($bulkUploadResult->action == KalturaBulkUploadAction::ADD_OR_UPDATE)
 		{
 		    KBatchBase::impersonate($this->currentPartnerId);;
@@ -321,6 +328,7 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 		    "dateOfBirth",
 			"partnerData",
 			"group",
+			"groupUserCreationMode",
 			"userRole",
 			"externalId",
 			"capabilities",
@@ -479,7 +487,14 @@ class BulkUploadUserEngineCsv extends BulkUploadEngineCsv
 			$groupUser = new KalturaGroupUser();
 			$groupUser->userId = $groupUserParams->userId;
 			$groupUser->groupId = $groupUserParams->group;
-			$groupUser->creationMode = KalturaGroupUserCreationMode::AUTOMATIC;
+			if (isset($groupUserParams->groupUserCreationMode))
+			{
+				$groupUser->creationMode = $groupUserParams->groupUserCreationMode;
+			}
+			else
+			{
+				$groupUser->creationMode = KalturaGroupUserCreationMode::AUTOMATIC;
+			}
 			if (isset($groupUserParams->userRole))
 			{
 				$groupUser->userRole = $groupUserParams->userRole;

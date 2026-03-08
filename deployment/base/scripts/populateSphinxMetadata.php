@@ -10,8 +10,21 @@ if($argc > 1 && is_numeric($argv[1]))
 	$c->add(MetadataPeer::UPDATED_AT, $argv[1], Criteria::GREATER_EQUAL);
 if($argc > 2 && is_numeric($argv[2]))
 	$c->add(MetadataPeer::PARTNER_ID, $argv[2], Criteria::EQUAL);
-if($argc > 3 && is_numeric($argv[3]))
-	$c->add(MetadataPeer::ID, $argv[3], Criteria::GREATER_EQUAL);
+if($argc > 3)
+{
+	if(is_numeric($argv[3]))
+	{
+		$c->add(MetadataPeer::ID, $argv[3], Criteria::GREATER_EQUAL);
+	}
+	elseif(strpos($argv[3], '-') !== false) 
+	{
+		list($minId, $maxId) = explode('-', $argv[3], 2);
+		if(is_numeric($minId) && is_numeric($maxId)) {
+			$c->add(MetadataPeer::ID, $minId, Criteria::GREATER_EQUAL);
+			$c->addAnd(MetadataPeer::ID, $maxId, Criteria::LESS_THAN);
+		}
+	}
+}
 if($argc > 4)
 	MetadataPeer::setUseCriteriaFilter((bool)$argv[4]);
 
@@ -47,5 +60,5 @@ while(count($metadatas))
 	$metadatas = MetadataPeer::doSelect($c, $con);
 }
 
-KalturaLog::log('Done. Curent time: ' . time());
+KalturaLog::log('Done. Current time: ' . time());
 exit(0);

@@ -148,6 +148,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 		$handleParticipantMode = $this->zoomIntegration->getHandleParticipantsMode();
 		if ($validatedUsers && $handleParticipantMode != kHandleParticipantsMode::IGNORE)
 		{
+			KalturaLog::debug("Entitled users as co-viewers and co-publishers, users: " . print_r($validatedUsers, true));
 			switch ($handleParticipantMode)
 			{
 				case kHandleParticipantsMode::ADD_AS_CO_PUBLISHERS:
@@ -163,6 +164,7 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 	protected function getValidatedUsers($zoomUsers, $partnerId, $createIfNotFound, $userToExclude)
 	{
 		$validatedUsers=array();
+		KalturaLog::debug('User to exclude: ' .$userToExclude);
 		if(!$zoomUsers)
 		{
 			return $zoomUsers;
@@ -170,14 +172,19 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 
 		foreach ($zoomUsers as $zoomUser)
 		{
+			KalturaLog::debug('User to process: ' .$zoomUser->getProcessedName());
+			if (strtolower($zoomUser->getProcessedName()) === $userToExclude)
+			{
+				continue;
+			}
 			/* @var $zoomUser kZoomUser */
-			$dbUser = $this->getKalturaUser($partnerId, $zoomUser);
+			$dbUser = $this->getKalturaUser($partnerId, $zoomUser, $this->zoomIntegration);
 			if($dbUser)
 			{
-                		if ($dbUser->getStatus() == KuserStatus::BLOCKED)
-                		{
-                    			continue;
-                		}
+                if ($dbUser->getStatus() == KuserStatus::BLOCKED)
+                {
+                    continue;
+                }
 				if (strtolower($dbUser->getPuserId()) !== $userToExclude)
 				{
 					$validatedUsers[] = $dbUser->getPuserId();
@@ -185,11 +192,10 @@ abstract class kZoomRecordingProcessor extends kZoomProcessor
 			}
 			elseif($createIfNotFound)
 			{
-				kuserPeer::createKuserForPartner($partnerId, $zoomUser->getProcessedName());
 				$validatedUsers[] = $zoomUser->getProcessedName();
 			}
 		}
-
+		KalturaLog::debug('Additional users : [' . print_r($validatedUsers, true) . ']');
 		return $validatedUsers;
 	}
 

@@ -4,11 +4,15 @@ require_once(__DIR__ . '/../../../../../kava-utils/lib/StreamQueue.php');
 require_once(__DIR__ . '/../bootstrap.php');
 require_once(__DIR__ . '/playsViewsCommon.php');
 
+define('ROOT_DIR', realpath(dirname(__FILE__) . '/../../../'));
+
+const DEFAULT_PROM_FILE = '/etc/node_exporter/data/playsViewsElasticConsumer.prom';
+
 class playsViewsElasticConsumer extends BaseConsumer
 {
 	protected function processMessage($message)
 	{
-		global $elasticClient, $indexConfig, $explicitPartnerIds;
+		global $elasticClient, $indexConfig, $explicitPartnerIds, $memcInstances, $maxLastPlayedAt;
 		$data = json_decode($message, true);
 		$entryId = $data['entry_id'];
 		unset($data['entry_id']);
@@ -25,6 +29,19 @@ class playsViewsElasticConsumer extends BaseConsumer
 		}
 		
 		$doc = array_map('intval', $data);
+		if (isset($data['last_played_at']))
+		{
+			$lastPlayedAt = $data['last_played_at'];
+			if ($lastPlayedAt > $maxLastPlayedAt)
+			{
+				foreach ($memcInstances as $memc)
+				{
+					$memc->set(MEMC_KEY_LAST_PLAYED_AT . "_$this->consumerId", $lastPlayedAt);
+				}
+				$maxLastPlayedAt = $lastPlayedAt;
+			}
+		}
+
 		$indexName = isset($indexConfig[$partnerId]) ? $indexConfig[$partnerId] : ElasticIndexMap::ELASTIC_ENTRY_INDEX;
 		$index = kBaseESearch::getSplitIndexNamePerPartner($indexName, $partnerId);
 		$params = array(
@@ -49,31 +66,108 @@ class playsViewsElasticConsumer extends BaseConsumer
 	}
 }
 
+/* =============================== MAIN =============================== */
 // parse the command line
 if ($argc < 2)
 {
-	echo "Usage:\n\t" . basename(__file__) . " <id>\n";
+	echo "Usage:\n\t" . basename(__file__) . " <bulk_size>\n";
 	exit(1);
 }
 
-$id = $argv[1];
-$consumerId = getenv(CLUSTER_ID_VAR . "_$id");
-$bulkSize = getenv(BULK_SIZE_VAR);
+// get the bulk size from the command line argument or use the default value
+$bulkSize = is_numeric($argv[1]) ? intval($argv[1]) : 250;
+
+// load cluster configurations
+$config = kConf::get('elasticPopulateSettings', 'elastic_populate', array());
+if (empty($config))
+{
+	$hostname = $_SERVER["HOSTNAME"] ?? gethostname();
+	$configFile = ROOT_DIR . "/configurations/elastic/populate/$hostname.ini";
+	
+	if (!file_exists($configFile))
+	{
+		$message = "Configuration file [$configFile] not found";
+		KalturaLog::err($message);
+		writeFailure($message);
+		exit(1);
+	}
+	
+	$config = parse_ini_file($configFile);
+	KalturaLog::debug("Configuration file [$configFile] loaded successfully - values: " . print_r($config, true));
+}
+
+$consumerId = $config['elasticCluster'] ?? null;	// the consumer id to use
+$host = $config['elasticServer'] ?? null;			// the host endpoint
+$port = $config['elasticPort'] ?? null;				// the port to connect
+
+// add support for opensearch distribution, if 'opensearch' is set in the config we will use elastic 7+ syntax
+$distribution = $config['distribution'] ?? null;
+if ($distribution === elasticClient::OPENSEARCH_DISTRIBUTION)
+{
+	KalturaLog::debug("Found distribution config value [$distribution] - using elastic 7 syntax");
+	$version = elasticClient::ELASTIC_MAJOR_VERSION_7;
+}
+else
+{
+	$version = $config['elasticVersion'] ?? null;
+}
 
 try
 {
+	// kConf will throw Exception if paramName not found
 	$topicsPath = kConf::get(CONF_TOPICS_PATH);
+	
+	// this should be a valid AWS region, e.g. 'us-east-1' - we load it as an environment variable (via bash) before calling the script
+	$region = getenv(KAVA_AWS_REGION);
+	if (empty($region))
+	{
+		throw new Exception("AWS region environment variable [" . KAVA_AWS_REGION . "] is not set or empty");
+	}
+
+	// validate the configuration values
+	if (is_null($consumerId) || is_null($host) || is_null($port) || is_null($version))
+	{
+		throw new Exception("Missing configuration values: consumerId [$consumerId] host [$host], port [$port], version [$version]");
+	}
+	
+	// load cache sections for playsViews to update last_played_at key for monitoring
+	$memcInstances = array();
+	
+	$cacheSections = kCacheManager::getCacheSectionNames(kCacheManager::CACHE_TYPE_PLAYS_VIEWS);
+	if(!$cacheSections)
+	{
+		throw new Exception("No cache sections found for [ " . kCacheManager::CACHE_TYPE_PLAYS_VIEWS . " ] cache type");
+	}
+	
+	foreach ($cacheSections as $cacheSection)
+	{
+		$cacheStore = kCacheManager::getCache($cacheSection);
+		if (!$cacheStore)
+			continue;
+		
+		$memcInstances[] = $cacheStore;
+	}
+	
+	// validate we have at least one memcache instance
+	if (empty($memcInstances))
+	{
+		throw new Exception("Could not connect to any [ " . kCacheManager::CACHE_TYPE_PLAYS_VIEWS . " ] cache");
+	}
 }
-catch (Exception $ex)
+catch (Exception $e)
 {
-	Utils::errorLog('Missing topics path config');
+	KalturaLog::err($e->getMessage());
+	writeFailure($e);
 	exit(1);
 }
 
-Utils::writeLog('Info: started, pid=' . getmypid());
+KalturaLog::log('Started, pid=' . getmypid());
+KalturaLog::log("Starting playsViewsElasticConsumer for consumerId [$consumerId] and bulkSize [$bulkSize]");
+KalturaLog::log("Elastic Client host [$host] port [$port] version [$version]");
+KalturaLog::log("Memcache connected " . print_r($memcInstances, true));
 
 // connect to elastic
-$elasticClient = new elasticClient();
+$elasticClient = new elasticClient($host, $port, $version);
 $elasticClient->setBulkSize($bulkSize);
 
 //read dedicated indices config
@@ -113,6 +207,7 @@ if (!array_intersect(array('https', 'http'), stream_get_wrappers()))
 
 $consumer = new playsViewsElasticConsumer($topicsPath, PLAYSVIEWS_TOPIC, $consumerId);
 
+$maxLastPlayedAt = 0;
 //uncomment if rate limit is needed
 //$consumer->setMessagesPerSecond(100);
 $consumer->consumeQueue();
@@ -125,5 +220,39 @@ try
 catch(Exception $e)
 {
 	KalturaLog::err($e->getMessage());
+	writeFailure($e);
 }
-Utils::writeLog('Info: done');
+
+writeSuccess();
+KalturaLog::log('done');
+
+/* =============================== FUNCTIONS =============================== */
+function writeSuccess($filePath = null): void
+{
+	$filePath = $filePath ?? DEFAULT_PROM_FILE;
+	createDirPath($filePath);
+	
+	$description = 'Successfully finished playsViewsElasticConsumer.php script';
+	$timestamp = time();
+	$date = date("Y-m-d H:i:s", $timestamp);
+	$hostname = gethostname();
+	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host_name=\"$hostname\", description=\"$description\", success=\"true\"} $timestamp" . PHP_EOL;
+	
+	file_put_contents($filePath, $data, LOCK_EX);
+}
+
+function writeFailure($e, $filePath = null): void
+{
+	$filePath = $filePath ?? DEFAULT_PROM_FILE;
+	createDirPath($filePath);
+	
+	$description = 'Error in playsViewsElasticConsumer.php script';
+	$timestamp = time();
+	$date = date("Y-m-d H:i:s", $timestamp);
+	$hostname = gethostname();
+	$message = $e instanceof Exception ? $e->getMessage() : $e;
+	$code = $e instanceof Exception ? $e->getCode() : 0;
+	$data = "plays_views_elastic_consumer{timestamp=\"$date\", host_name=\"$hostname\", description=\"$description\", success=\"false\", message=\"$message\", code=\"$code\"} $timestamp" . PHP_EOL;
+	
+	file_put_contents($filePath, $data, LOCK_EX);
+}

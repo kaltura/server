@@ -51,4 +51,8 @@ class VendorCaptionsCatalogItem extends VendorCatalogItem
 		return $taskPrice;
 	}
 
+	public function isEntryUnderMinimumDuration(entry $entry)
+	{
+		return $entry->getDuration() < VendorCatalogItem::MINIMUM_DURATION_IN_SECONDS;
+	}
 } // VendorCaptionsCatalogItem

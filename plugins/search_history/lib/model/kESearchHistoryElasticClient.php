@@ -19,7 +19,14 @@ class kESearchHistoryElasticClient
 
 	public function __construct()
 	{
-		$this->client = new elasticClient();
+		$searchHistoryConfig = kConf::get('search_history', 'elastic', array());
+		
+		// Values are set to 'null' to maintain backward compatibility for elasticClient() constructor
+		$host = $searchHistoryConfig['elasticHost'] ?? null;
+		$port = $searchHistoryConfig['elasticPort'] ?? null;
+		$elasticVersion = $searchHistoryConfig['elasticVersion'] ?? null;
+		
+		$this->client = new elasticClient($host, $port, $elasticVersion);
 	}
 
 	public function deleteSearchTermForUser($searchTerm)

@@ -10,7 +10,11 @@ class kMetadataEnrichmentVendorTaskData extends kLocalizedVendorTaskData
 
 	public string $instruction = "";
 
-	public ?string $outputJson = null;
+	public bool $shouldApply = false;
+
+	public string $applyMode = "";
+
+	public array $overrideFields = [];
 
 	public function getDetailLevel(): string
 	{
@@ -32,13 +36,33 @@ class kMetadataEnrichmentVendorTaskData extends kLocalizedVendorTaskData
 		$this->instruction = $instruction;
 	}
 
-	public function getOutputJson(): ?string
+	public function getShouldApply(): bool
 	{
-		return $this->outputJson;
+		return $this->shouldApply;
 	}
 
-	public function setOutputJson(?string $outputJson): void
+	public function setShouldApply(bool $shouldApply): void
 	{
-		$this->outputJson = $outputJson;
+		$this->shouldApply = $shouldApply;
+	}
+
+	public function getApplyMode(): string
+	{
+		return $this->applyMode;
+	}
+
+	public function setApplyMode(string $applyMode): void
+	{
+		$this->applyMode = $applyMode;
+	}
+
+	public function getOverrideFields(): array
+	{
+		return $this->overrideFields;
+	}
+
+	public function setOverrideFields(array $overrideFields): void
+	{
+		$this->overrideFields = $overrideFields;
 	}
 }

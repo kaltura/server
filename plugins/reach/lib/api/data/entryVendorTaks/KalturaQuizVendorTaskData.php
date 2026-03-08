@@ -46,8 +46,17 @@ class KalturaQuizVendorTaskData extends KalturaLocalizedVendorTaskData
 	 * Quiz entry Id
 	 *
 	 * @var string
+	 * @deprecated please use outputJson instead.
 	 */
 	public $quizOutput;
+
+	/**
+	 * Instructions describing what should be taken into account during the quiz creation process.
+	 *
+	 * @insertonly
+	 * @var string
+	 */
+	public $instruction;
 
 	private static $map_between_objects = array
 	(
@@ -57,6 +66,7 @@ class KalturaQuizVendorTaskData extends KalturaLocalizedVendorTaskData
 		'formalStyle',
 		'createQuiz',
 		'quizOutput',
+		'instruction'
 	);
 
 	public function getMapBetweenObjects()

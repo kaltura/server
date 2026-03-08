@@ -12,6 +12,7 @@ class kQuizVendorTaskData extends kLocalizedVendorTaskData
 	public $formalStyle = null;
 	public $createQuiz = True;
 	public $quizOutput = null;
+	public $instruction = "";
 
 	public function getNumberOfQuestions(): int
 	{
@@ -71,5 +72,15 @@ class kQuizVendorTaskData extends kLocalizedVendorTaskData
 	public function setQuizOutput(?string $quizOutput): void
 	{
 		$this->quizOutput = $quizOutput;
+	}
+
+	public function getInstruction(): string
+	{
+		return $this->instruction;
+	}
+
+	public function setInstruction(string $instruction): void
+	{
+		$this->instruction = $instruction;
 	}
 }

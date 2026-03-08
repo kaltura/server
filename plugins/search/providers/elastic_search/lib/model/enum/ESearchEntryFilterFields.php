@@ -61,4 +61,5 @@ class ESearchEntryFilterFields extends KalturaEnum
 	const RECYCLED_AT = 'recycled_at';
 	const ROOM_TYPE = 'room_type';
 	const BROADCAST_ENTRY_ID = 'broadcast_entry_id';
+	const FLAVOR_PARAMS_IDS = 'flavor_params_ids';
 }

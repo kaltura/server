@@ -213,7 +213,7 @@ class CaptionAssetService extends KalturaAssetService
 		if (!$dbEntry || !in_array($dbEntry->getType(), $this->getEnabledMediaTypes()) || !in_array($dbEntry->getMediaType(), array(KalturaMediaType::VIDEO, KalturaMediaType::AUDIO)))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $dbCaptionAsset->getEntryId());
 
-		if( $captionAsset->isDefault )
+		if($captionAsset->isDefault && !$dbCaptionAsset->getDefault())
 		{
 			$this->setAsDefaultAction($dbCaptionAsset->getId());
 		}
@@ -719,8 +719,8 @@ class CaptionAssetService extends KalturaAssetService
 		$entryKuserId = $entry->getKuserId();
 		$thisKuserId = $this->getKuser()->getId();
 		$isNotAdmin = !kCurrentContext::$ks_object->isAdmin();
-		
-		if(!$entry || ($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId))  
+
+		if($isNotAdmin && !is_null($entryKuserId) && $entryKuserId != $thisKuserId && !$entry->isEntitledKuserEdit($thisKuserId))
 			throw new KalturaAPIException(KalturaErrors::ENTRY_ID_NOT_FOUND, $captionAsset->getEntryId());
 			
 		$entryCaptionAssets = assetPeer::retrieveByEntryId($captionAsset->getEntryId(), array(CaptionPlugin::getAssetTypeCoreValue(CaptionAssetType::CAPTION)));

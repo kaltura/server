@@ -787,7 +787,6 @@ class myPlaylistUtils
 				// set a smaller limit incase the filter's limit is to high
 				$entry_filter->setLimit ( $current_limit );
 			}
-
 			// read the _eq_display_in_search field but ignore it because it's part of a more complex criterion
 			$display_in_search = $entry_filter->get( "_eq_display_in_search");
 			if ( $display_in_search >= 2 )
@@ -795,6 +794,8 @@ class myPlaylistUtils
 				$entry_filter->set ( "_eq_display_in_search" , null );
 			}
 			
+			//Setting search scope to avoid override of display_in_search criteria
+			$entry_filter->setPartnerSearchScope ( baseObjectFilter::MATCH_KALTURA_NETWORK_AND_PRIVATE );
 			$entry_filter->attachToCriteria( $c );
 
 			// add some hard-coded criteria
@@ -823,7 +824,6 @@ class myPlaylistUtils
 			{
 				self::addSchedulingToCriteria($c, $entry_filter);
 			}
-			
 			self::addModerationToCriteria($c);
 			$c = entryPeer::prepareEntitlementCriteriaAndFilters( $c );
 			$entry_ids_list_for_filter = $c->getFetchedIds();
@@ -1267,7 +1267,7 @@ HTML;
 			return false;
 		}
 		
-		if($playlistEntry->getMediaType() == PlaylistType::STATIC_LIST || $playlistEntry->getMediaType() == PlaylistType::PATH )
+		if($playlistEntry->getMediaType() == PlaylistType::STATIC_LIST || $playlistEntry->getMediaType() == PlaylistType::PATH)
 		{
 			// assume static playlist
 			$static_playlist_str = $playlistEntry->getDataContent();
@@ -1282,6 +1282,21 @@ HTML;
 			foreach ($playlistEntries as $entry)
 			{
 				if($entry->getRedirectEntryId() == $entryId)
+				{
+					return true;
+				}
+			}
+		}
+		elseif ($playlistEntry->getMediaType() == PlaylistType::DYNAMIC)
+		{
+			$playListEntries = myPlaylistUtils::executePlaylist($partnerId, $playlistEntry, null, true);
+			foreach ($playListEntries as $entry)
+			{
+				if($entry->getId() === $entryId)
+				{
+					return true;
+				}
+				if($entry->getRedirectEntryId()== $entryId)
 				{
 					return true;
 				}
@@ -1489,4 +1504,28 @@ HTML;
 		return false;
 	}
 
+	/**
+	 * @param KalturaPlaylist $playlist
+	 * @param entry $dbPlaylist
+	 * @return void
+	 * @throws KalturaAPIException
+	 */
+	public static function validateDataContent(KalturaPlaylist $playlist, entry $dbPlaylist)
+	{
+		$typesToValidate = array(PlaylistType::STATIC_LIST, PlaylistType::PATH);
+		if ($playlist->playlistContent == null || !in_array($dbPlaylist->getMediaType(), $typesToValidate))
+		{
+			return;
+		}
+
+		$entryIdsList = explode(',', $playlist->playlistContent);
+		foreach ($entryIdsList as $entryId)
+		{
+			$trimmedEntryId = preg_replace('/null/', '', trim($entryId));
+			if ($trimmedEntryId)
+			{
+				self::validatePlaylistInnerEntry($trimmedEntryId);
+			}
+		}
+	}
 }

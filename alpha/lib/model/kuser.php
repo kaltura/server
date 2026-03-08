@@ -658,6 +658,7 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	
 	/**
 	 * Set last_login_time parameter to $time (in custom_data)
+	 * Was moved to user_login_data to avoid kuser object invalidation on login
 	 * @param int $time timestamp
 	 */
 	public function setLastLoginTime($time)
@@ -670,7 +671,20 @@ class kuser extends Basekuser implements IIndexable, IRelatedObject, IElasticInd
 	 */
 	public function getLastLoginTime()
 	{
-		return $this->getFromCustomData('last_login_time');
+		$lastLoginTime = null;
+		$loginData = $this->getLoginData();
+		
+		if($loginData)
+		{
+			$lastLoginTime = $loginData->getLastLoginTimeForPartner($this->getPartnerId());
+		}
+		
+		if(!$lastLoginTime)
+		{
+			$lastLoginTime = $this->getFromCustomData('last_login_time');
+		}
+		
+		return $lastLoginTime;
 	}
 
 	public function setKsPrivileges($ksPrivileges)

@@ -18,6 +18,20 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 				$object->secureHashingAlgo = $properties['secureHashingAlgo'];
 			}
 
+			if (isset($properties['customHeaders']) && $properties['customHeaders'])
+			{
+				$object->customHeaders = [];
+				$headersStr = explode(',', $properties['customHeaders']);
+				foreach ($headersStr as $headerStr)
+				{
+					list ($key, $value) = explode(':', $headerStr);
+					$keyValuePair = new Kaltura_Client_Type_KeyValue();
+					$keyValuePair->key = $key;
+					$keyValuePair->value = $value;
+					$object->customHeaders[] = $keyValuePair;
+				}
+			}
+
 			if(!isset($properties['dataType']) || !$properties['dataType'])
 				return $object;
 			
@@ -28,6 +42,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 					$object->data->apiObjectType = $properties['objectType'];
 					$object->data->format = $properties['objectFormat'];
 					$object->data->code = $properties['object'];
+					$object->data->responseProfileId = $properties['responseProfileId'];
 					break;
 					
 				case 'map':
@@ -40,6 +55,8 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 					
 					$object->data = new Kaltura_Client_HttpNotification_Type_HttpNotificationDataText();
 					$object->data->content = $stringField;
+					$object->data->contentType = $properties['contentType'];
+
 					break;
 			}
 		}
@@ -58,7 +75,17 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			return;
 
 		$this->getElement('secureHashingAlgo')->setValue($object->secureHashingAlgo);
-		
+
+		if (count($object->customHeaders))
+		{
+			$headerStrArr = [];
+			foreach ($object->customHeaders as $header)
+			{
+				$headerStrArr[] = $header->key . ':' . $header->value;
+			}
+			$this->getElement('customHeaders')->setValue(implode(',', $headerStrArr));
+		}
+
 		if(!$object->data)
 			return;
 			
@@ -70,6 +97,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 		{
 			$this->getElement('dataType')->setValue('text');
 			$this->getElement('freeText')->setValue($object->data->content->value);
+			$this->getElement('contentType')->setValue($object->data->contentType);
 		}
 		elseif($object->data instanceof Kaltura_Client_HttpNotification_Type_HttpNotificationObjectData)
 		{
@@ -77,6 +105,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			$this->getElement('objectType')->setValue($object->data->apiObjectType);
 			$this->getElement('objectFormat')->setValue($object->data->format);
 			$this->getElement('object')->setValue($object->data->code);
+			$this->getElement('responseProfileId')->setValue($object->data->responseProfileId);
 		}
 	}
 	
@@ -116,7 +145,25 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'size'			=> 60,
 			'filters'		=> array('StringTrim'),
 		));
-		
+
+		$this->addElement('select', 'method', array(
+			'label'			=> 'Method:',
+			'filters'		=> array('StringTrim'),
+			'multiOptions' 	=> array(
+				Kaltura_Client_HttpNotification_Enum_HttpNotificationMethod::POST => 'POST',
+				Kaltura_Client_HttpNotification_Enum_HttpNotificationMethod::GET => 'GET',
+				Kaltura_Client_HttpNotification_Enum_HttpNotificationMethod::PUT => 'PUT',
+				Kaltura_Client_HttpNotification_Enum_HttpNotificationMethod::DELETE => 'DELETE',
+			),
+		));
+
+		$this->addElement('textarea', "customHeaders", array(
+			'label' 		=> "Custom Headers (Array: enter item comma separated. for key-value insert: key:value)",
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+			'value'			=>	'N/A',
+		));
+
 		$this->addElement('select', 'dataType', array(
 			'label'			=> 'Data Type:',
 			'filters'		=> array('StringTrim'),
@@ -133,6 +180,11 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'label'			=> 'Object:',
 			'filters'		=> array('StringTrim'),
 			'readonly'		=> true,
+		));
+
+		$this->addElement('text', 'responseProfileId', array(
+			'label'			=> 'Response profile ID:',
+			'filters'		=> array('StringTrim'),
 		));
 		
 		$this->addElement('text', 'objectType', array(
@@ -152,7 +204,7 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			),
 		));
 			
-		$this->addDisplayGroup(array('object', 'objectType', 'objectFormat'), 
+		$this->addDisplayGroup(array('object', 'objectType', 'objectFormat', 'responseProfileId'),
 			'frmObject', 
 			array(
 				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmObject'))),
@@ -162,11 +214,19 @@ class Form_HttpNotificationTemplateConfiguration extends Form_EventNotificationT
 			'label'			=> 'Text:',
 			'filters'		=> array('StringTrim'),
 		));
+
+		$this->addElement('text', 'contentType', array(
+			'label'			=> 'Content Type:',
+			'filters'		=> array('StringTrim'),
+			'value'			=> 'application/json'
+		));
 			
-		$this->addDisplayGroup(array('freeText'), 
+		$this->addDisplayGroup(array('freeText', 'contentType'),
 			'frmFreeText', 
 			array(
 				'decorators' 	=> array('FormElements', 'Fieldset', array('HtmlTag', array('tag' => 'div', 'style' => 'display: none', 'id' => 'frmFreeText'))),
 		));
 	}
+
+
 }

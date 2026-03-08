@@ -459,7 +459,9 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$entry = $this->createEntryFromItem($item, $existingEntry->type, $existingEntry); //Creates the entry from the item element
 		
 		$this->handleTypedElement($entry, $item); //Sets the typed element values (Mix, Media, ...)
-		
+		// Handle pre-process plugins first
+		$this->handlePreProcessPlugins($item, $existingEntry);
+
 		$thumbAssets = array();
 		$thumbAssetsResources = array();
 		$flavorAssets = array();
@@ -634,6 +636,26 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		$this->updateObjectsResults(array($entry), array($updatedEntryBulkUploadResult));
 
 		$this->handlePluginAddedData($item, $existingEntry);
+	}
+
+	/**
+	 * Handle pre-process plugins before content processing
+	 */
+	protected function handlePreProcessPlugins(SimpleXMLElement $item, $entry)
+	{
+		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandlerPreProcess');
+		foreach ($pluginsInstances as $pluginsInstance)
+		{
+			try
+			{
+				/* @var $pluginsInstance IKalturaBulkUploadXmlHandlerPreProcess */
+				$pluginsInstance->configureBulkUploadXmlHandler($this);
+				$pluginsInstance->handleItemUpdated($entry, $item);
+			} catch (Exception $e)
+			{
+			    KalturaLog::err('Plugin processing failed: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
+			}
+		}
 	}
 	
 	/**
@@ -2631,6 +2653,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		foreach ($pluginsInstances as $pluginsInstance)
 		{
 			/* @var $pluginsInstance IKalturaBulkUploadXmlHandler */
+
 			try
 			{
 				$pluginsInstance->configureBulkUploadXmlHandler($this);

@@ -509,6 +509,9 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			if (!$ipAllowed)
 				throw new kCoreException("Admin console partner used from an unallowed address", kCoreException::PARTNER_BLOCKED);
 		}
+
+		self::checkImpersonatedAccessAllowed();
+
 		self::$ksUserId = !self::isEmpty(kCurrentContext::$ks_uid) ? kCurrentContext::$ks_uid : null;
 		if (self::$ksPartnerId != Partner::BATCH_PARTNER_ID)
 			self::$kuser = !self::isEmpty(kCurrentContext::getCurrentKsKuser()) ? kCurrentContext::getCurrentKsKuser() : null;
@@ -539,7 +542,57 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		
 		return true;
 	}
-	
+
+	public static function checkImpersonatedAccessAllowed()
+	{
+		$enforceInternalPartnerAccess = kConf::get('enforce_internal_partner_access', kConfMapNames::SECURITY, null);
+		$internalPartnerAccessAllowedIps = kConf::get('internal_partner_access_allowed_ips', kConfMapNames::SECURITY, null);
+		$excludePartnerIds = kConf::get('enforce_internal_exclude_partner_ids', kConfMapNames::SECURITY, array());
+		if(!$internalPartnerAccessAllowedIps)
+		{
+			KalturaLog::debug("internalPartnerAccessAllowedIps not defined");
+			return;
+		}
+
+		$ipAddress = $_SERVER['REMOTE_ADDR'];
+		KalturaLog::debug("ipAddress [$ipAddress] internalPartnerAccessAllowedIps [" . print_r($internalPartnerAccessAllowedIps, true) . "]");
+
+		$ksPartnerId = !self::isEmpty(kCurrentContext::$ks_partner_id) ? kCurrentContext::$ks_partner_id : null;
+		$softImpersonatedPartnerId = !self::isEmpty(kCurrentContext::$partner_id) ? kCurrentContext::$partner_id : null;
+		$impersonatingPartnerId = !self::isEmpty(kCurrentContext::$master_partner_id) ? kCurrentContext::$master_partner_id : null;
+		KalturaLog::debug("ksPartnerId [$ksPartnerId], softImpersonatedPartnerId [$softImpersonatedPartnerId], impersonatingPartnerId [$impersonatingPartnerId]");
+
+		if (in_array($ksPartnerId, $excludePartnerIds) || in_array($impersonatingPartnerId, $excludePartnerIds))
+		{
+			KalturaLog::debug("Impersonate used from an excluded partner");
+			return;
+		}
+
+		if (kCurrentContext::$is_admin_session &&
+			(($impersonatingPartnerId && $impersonatingPartnerId < 0) || ($ksPartnerId && $ksPartnerId < 0)))
+		{
+			$ipAllowed = false;
+			$ipRanges = explode(',', $internalPartnerAccessAllowedIps);
+			foreach ($ipRanges as $curRange)
+			{
+				if (kIpAddressUtils::isIpInRange($ipAddress, $curRange))
+				{
+					$ipAllowed = true;
+					break;
+				}
+			}
+			if (!$ipAllowed)
+			{
+				KalturaLog::debug("Impersonate used from an un-allowed address");
+				KalturaMonitorClient::sendErrorEvent("BLOCKED_IMPERSONATE_INTERNAL_PARTNER");
+				if($enforceInternalPartnerAccess)
+				{
+					throw new kCoreException("Impersonate used from an un-allowed address", kCoreException::ACCESS_UNAUTHORIZED);
+				}
+			}
+		}
+	}
+
 	public static function getRoleIds(Partner $operatingPartner = null, kuser $kuser = null)
 	{
 		$roleIds = null;
@@ -1077,7 +1130,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 	}
 	
 	/**
-	 * @return return current permission names
+	 * @return array current permission names
 	 */
 	public static function getCurrentPermissions()
 	{
@@ -1182,7 +1235,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		return true;
 	}
 
-	protected static function handlePermissions($permission)
+	protected static function handlePermissions(Permission $permission)
 	{
 		switch ($permission->getName())
 		{
@@ -1197,10 +1250,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 			case PermissionName::FEATURE_MEDIA_REPURPOSING_NG_PERMISSION:
 				self::handleMediaRepurposingNGPermission($permission);
 				return;
+
+			case PermissionName::FEATURE_ENABLE_INTERACTIONS_PERMISSION:
+				self::handleInteractionsPermission($permission);
+				return;
 		}
 	}
 
-	protected static function handleMediaRepurposingNGPermission($permission)
+	protected static function handleMediaRepurposingNGPermission(Permission $permission)
 	{
 		if ($permission->getStatus() == PermissionStatus::ACTIVE)
 		{
@@ -1208,7 +1265,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		}
 	}
 
-	protected static function handleGamePluginPermission($permission)
+	protected static function handleGamePluginPermission(Permission $permission)
 	{
 		$partner = PartnerPeer::retrieveByPK($permission->getPartnerId());
 		$enablePermission = $permission->getStatus() == PermissionStatus::ACTIVE;
@@ -1216,7 +1273,7 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		$partner->save();
 	}
 
-	protected static function handleRecycleBinPermission($permission)
+	protected static function handleRecycleBinPermission(Permission $permission)
 	{
 		if ($permission->getStatus() == PermissionStatus::ACTIVE)
 		{
@@ -1227,6 +1284,14 @@ class kPermissionManager implements kObjectCreatedEventConsumer, kObjectChangedE
 		{
 			self::disableRecycleBinScheduledTaskProfile($permission->getPartnerId());
 		}
+	}
+
+	protected static function handleInteractionsPermission(Permission $permission)
+	{
+		$partner = PartnerPeer::retrieveByPK($permission->getPartnerId());
+		$enablePermission = $permission->getStatus() == PermissionStatus::ACTIVE;
+		$partner->setEnableInteractions($enablePermission);
+		$partner->save();
 	}
 
 	protected static function enableRequiredPluginsPermissions($partnerId, $permissionName)
