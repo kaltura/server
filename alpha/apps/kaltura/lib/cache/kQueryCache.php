@@ -312,7 +312,23 @@ class kQueryCache
 		}
 					
 		// get the cache key and update the api cache
-		$origCacheKey = self::CACHE_PREFIX_QUERY . $queryType . md5(serialize($criteria) . self::CACHE_VERSION);
+		$regionalSuffix = '';
+		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
+		if (!$headerMapping)
+		{
+			return null;
+		}
+
+		foreach ($headerMapping as $headerKey => $suffix)
+		{
+			if (!empty($_SERVER[$headerKey]))
+			{
+				$regionalSuffix = $suffix;
+				break;
+			}
+		}
+
+		$origCacheKey = self::CACHE_PREFIX_QUERY . $queryType . md5(serialize($criteria) . self::CACHE_VERSION . $regionalSuffix);
 		if ($cacheQuery)
 		{
 			kApiCache::addInvalidationKeys($invalidationKeys, $maxInvalidationTime);
