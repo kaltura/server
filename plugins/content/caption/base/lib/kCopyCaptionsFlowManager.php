@@ -254,6 +254,25 @@ class kCopyCaptionsFlowManager implements  kObjectAddedEventConsumer, kObjectCha
 	{
 		/* @var $multiClipConcatJobData kMultiClipConcatJobData*/
 		$multiClipConcatJobData = $dbBatchJob->getData();
+
+		// do not add a copyCaptions job if an overlay attribute is found
+		foreach ($multiClipConcatJobData->getOperationResources() as $operationResource)
+		{
+			$attributes = $operationResource->getOperationAttributes();
+			if(isset($attributes[0]) && $attributes[0] instanceof kClipAttributes)
+			{
+				$compositionAttributes = $attributes[0]->getMediaCompositionAttributesArray();
+				foreach ($compositionAttributes as $compositionAttribute)
+				{
+					if($compositionAttribute instanceof kOverlayAttributes)
+					{
+						KalturaLog::debug("kOverlayAttributes found - Skip copy captions");
+						return;
+					}
+				}
+			}
+		}
+
 		$destEntryId = $multiClipConcatJobData->getDestEntryId();
 		$globalOffset = 0;
 		$kClipDescriptionArray = array();
