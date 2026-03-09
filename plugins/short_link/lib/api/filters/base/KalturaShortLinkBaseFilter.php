@@ -24,6 +24,7 @@ abstract class KalturaShortLinkBaseFilter extends KalturaFilter
 		"systemNameIn" => "_in_system_name",
 		"statusEqual" => "_eq_status",
 		"statusIn" => "_in_status",
+		"uniqueIdEqual" => "_eq_unique_id",
 	);
 
 	static private $order_by_map = array
@@ -125,4 +126,9 @@ abstract class KalturaShortLinkBaseFilter extends KalturaFilter
 	 * @var string
 	 */
 	public $statusIn;
+	
+	/**
+	 * @var string
+	 */
+	public $uniqueIdEqual;
 }

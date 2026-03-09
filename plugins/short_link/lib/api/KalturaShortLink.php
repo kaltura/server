@@ -60,6 +60,13 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 	 * @var string
 	 */
 	public $fullUrl;
+	
+	/**
+	 * @var string
+	 * @filter eq
+	 * @insertonly
+	 */
+	public $uniqueId;
 
 	/**
 	 * @var KalturaShortLinkStatus
@@ -80,6 +87,7 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 		'systemName',
 		'fullUrl',
 		'status',
+		'uniqueId',
 		'expiresAt',
 	 );
 		 
@@ -96,5 +104,22 @@ class KalturaShortLink extends KalturaObject implements IFilterable
 	public function getFilterDocs()
 	{
 		return array();
+	}
+	
+	/* (non-PHPdoc)
+	 * @see KalturaObject::validateForInsert()
+	 */
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		parent::validateForInsert($propertiesToSkip);
+		
+		if($this->uniqueId)
+		{
+			$existingShortLink = ShortLinkPeer::retrieveByUniqueId($this->uniqueId);
+			if($existingShortLink)
+			{
+				throw new KalturaAPIException(KalturaErrors::SHORT_LINK_UNIQUE_ID_ALREADY_EXISTS, $this->uniqueId);
+			}
+		}
 	}
 }

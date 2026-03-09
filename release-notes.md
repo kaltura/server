@@ -1,5 +1,68 @@
-# Venus-22.13.0
+# Venus-22.14.0
+## Add models sdk permission
+* Issue Type: Task
+* Issue ID: PLAT-25736
+### Deployment ###
+Add the following to admin.ini
+```
+moduls.enableModelsSdk.enabled = true
+moduls.enableModelsSdk.permissionType = 2
+moduls.enableModelsSdk.label = "Enable models sdk"
+moduls.enableModelsSdk.permissionName = FEATURE_ALLOW_MODELS_SDK
+moduls.enableModelsSdk.group = GROUP_ENABLE_DISABLE_FEATURES
+```
 
+## Extend short link to support larger volume of objects ##
+- Issue Type: Task
+- Issue ID: PLAT-25698
+
+### Deployment Scripts ###
+    mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < deployment/updates/sql/2026_03_01_alter_short_link_table.sql
+
+## Add Interactions feature flag ##
+* Issue Type: Task
+* Issue ID: PLAT-25735
+
+### Configuration ###
+Add the following to admin.ini
+```
+moduls.enableInteractions.enabled = true
+moduls.enableInteractions.permissionType = 2
+moduls.enableInteractions.label = "Enable Interactions"
+moduls.enableInteractions.permissionName = FEATURE_ENABLE_INTERACTIONS_PERMISSION
+moduls.enableInteractions.basePermissionType =
+moduls.enableInteractions.basePermissionName =
+moduls.enableInteractions.group = GROUP_ENABLE_DISABLE_FEATURES
+```
+
+## Add Conversation Manager partner
+* Issue Type: Task
+* Issue ID: PLAT-25731
+
+### Configuration ###
+Replace the tokens: @CONVERSATION_MANAGER_PARTNER_ADMIN_SECRET@, @CONVERSATION_MANAGER_PARTNER_SECRET@ in the ini file and remove ".template" from the file name:
+
+    deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2026_03_01_conversation_manager_add_partner.php
+
+
+## Add systemPartner get permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: FEC-14895
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_03_02_self_serve_add_permission_systempartner_getconfiguration.php
+
+## Add permissions for session impersonate ##
+* Issue Type: Task
+* Issue ID: PLAT-25743
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2026_03_03_session_impersonate_permission.php
+
+# Venus-22.13.0
 ## Add partner and permissions for video avatar microservice ##
 * Issue Type: Task
 * Issue ID: PLAT-25701

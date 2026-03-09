@@ -27,44 +27,75 @@ class DeliveryController extends Zend_Controller_Action
 	
 	public function deliveryProfilesConfigurationAction()
 	{
-	
+
 		$request = $this->getRequest();
 		$page = $this->_getParam('page', 1);
 		$pageSize = $this->_getParam('pageSize', 10);
-	
+
 		$client = Infra_ClientHelper::getClient();
-		$form = new Form_PartnerIdFilter();
+		$form = new Form_Delivery_DeliveryProfileFilter();
 		$form->populate($request->getParams());
-		
+
 		$newForm = new Form_NewDeliveryProfile();
 		$newForm->populate($request->getParams());
-	
+
 		$action = $this->view->url(array('controller' => 'delivery', 'action' => 'delivery-profiles-configuration'), null, true);
 		$form->setAction($action);
-	
-		$partnerId = null;
-		if ($request->getParam('filter_input') != '') {
-			$partnerId = $request->getParam('filter_input');
+
+		$filter = $this->getDeliveryProfileFilterFromRequest($request);
+
+		$partnerId = $filter->partnerIdEqual;
+
+		// When filtering by delivery profile ID, fetch profiles directly instead of using list API
+		$filterType = $request->getParam('filter_type');
+		$deliveryProfileObjects = null;
+		if ($filterType === 'by-delivery-id' && $filter->idIn) {
+			$deliveryProfileIds = explode(',', $filter->idIn);
+			$deliveryProfileObjects = array();
+
+			foreach ($deliveryProfileIds as $id) {
+				$id = trim($id);
+				if (empty($id)) {
+					continue;
+				}
+
+				try {
+					// Fetch each delivery profile individually
+					$deliveryProfile = $client->deliveryProfile->get($id);
+					$deliveryProfileObjects[] = $deliveryProfile;
+				} catch (Exception $e) {
+					// Invalid delivery profile ID - skip it
+					continue;
+				}
+			}
+		}
+
+		if ($partnerId) {
 			$newForm->getElement('newPartnerId')->setValue($partnerId);
 		}
-		
-		$filter = new Kaltura_Client_Type_DeliveryProfileFilter();
-		$filter->partnerIdEqual = $partnerId;
-	
+
 		// get results and paginate
-		$paginatorAdapter = new Infra_FilterPaginator($client->deliveryProfile, "listAction", $partnerId, $filter);
-		$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		if ($deliveryProfileObjects !== null) {
+			// Use custom paginator for delivery profile ID search
+			$paginatorAdapter = new Infra_ArrayPaginator($deliveryProfileObjects);
+			$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		} else {
+			// Use standard filter paginator for other searches
+			$paginatorAdapter = new Infra_FilterPaginator($client->deliveryProfile, "listAction", $partnerId, $filter);
+			$paginator = new Infra_Paginator($paginatorAdapter, $request);
+		}
+
 		$paginator->setCurrentPageNumber($page);
 		$paginator->setItemCountPerPage($pageSize);
-	
-		// popule the form
+
+		// populate the form
 		$form->populate($request->getParams());
-	
+
 		// set view
 		$this->view->form = $form;
 		$this->view->newForm = $newForm;
 		$this->view->paginator = $paginator;
-	
+
 	}
 	
 	protected function getDeliveryProfiles($client, $partnerId, $streamerType, $dpIds = null, $deliveryType = 'VOD') {
@@ -397,23 +428,49 @@ class DeliveryController extends Zend_Controller_Action
 		$this->view->form->getElement("objectType")->setValue($type);
 	}
 	
-	public function updateDeliveryProfileStatusAction() 
+	public function updateDeliveryProfileStatusAction()
 	{
 		$request = $this->getRequest();
 		$status = $request->getParam('status');
 		$partnerId =  $request->getParam('partnerId');
 		$deliveryProfileId =  $request->getParam('deliveryProfileId');
-		
+
 		$client = Infra_ClientHelper::getClient();
 		$deliveryProfileService = new Kaltura_Client_DeliveryProfileService($client);
-		
+
 		Infra_ClientHelper::impersonate($partnerId);
-		
+
 		$deliveryProfile = new Kaltura_Client_Type_DeliveryProfile();
 		$deliveryProfile->status = $status;
 		$deliveryProfileService->update($deliveryProfileId, $deliveryProfile);
-		
+
 		Infra_ClientHelper::unimpersonate();
 		echo $this->_helper->json('ok', false);
+	}
+
+	protected function getDeliveryProfileFilterFromRequest(Zend_Controller_Request_Abstract $request)
+	{
+		$filter = new Kaltura_Client_Type_DeliveryProfileFilter();
+		$filterType = $request->getParam('filter_type');
+		$filterInput = $request->getParam('filter_input');
+
+		switch($filterType)
+		{
+			case 'by-delivery-id':
+				if ($filterInput != '') {
+					$filter->idIn = $filterInput;
+				}
+				break;
+			case 'byid':
+				if ($filterInput != '') {
+					$filter->partnerIdEqual = $filterInput;
+				}
+				break;
+			default:
+				// No filter applied
+				break;
+		}
+
+		return $filter;
 	}
 }

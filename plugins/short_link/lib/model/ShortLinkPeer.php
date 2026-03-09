@@ -13,7 +13,20 @@
  * @package plugins.shortLink
  * @subpackage model
  */
-class ShortLinkPeer extends BaseShortLinkPeer {
+class ShortLinkPeer extends BaseShortLinkPeer
+{
+	/**
+	 * @return void
+	 */
+	public static function setDefaultCriteriaFilter ()
+	{
+		if(is_null(self::$s_criteria_filter))
+			self::$s_criteria_filter = new criteriaFilter();
+		
+		$c = new Criteria();
+		$c->add(self::STATUS, ShortLinkStatus::DELETED, Criteria::NOT_EQUAL);
+		self::$s_criteria_filter->setFilter($c);
+	}
 
 	/**
 	 * Retrieve all objects by kuser id
@@ -30,6 +43,18 @@ class ShortLinkPeer extends BaseShortLinkPeer {
 			$criteria->add(ShortLinkPeer::PARTNER_ID, $partnerId);
 
 		return ShortLinkPeer::doSelect($criteria, $con);
+	}
+	
+	/**
+	 * @param $uniqueId
+	 * @return ShortLink|null
+	 * @throws PropelException
+	 */
+	public static function retrieveByUniqueId($uniqueId)
+	{
+		$criteria = new Criteria();
+		$criteria->add(ShortLinkPeer::UNIQUE_ID, $uniqueId);
+		return ShortLinkPeer::doSelectOne($criteria);
 	}
 	
 } // ShortLinkPeer
