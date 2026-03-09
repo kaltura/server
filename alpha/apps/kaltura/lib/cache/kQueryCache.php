@@ -314,11 +314,6 @@ class kQueryCache
 		// get the cache key and update the api cache
 		$regionalSuffix = '';
 		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
-		if (!$headerMapping)
-		{
-			return null;
-		}
-
 		foreach ($headerMapping as $headerKey => $suffix)
 		{
 			if (!empty($_SERVER[$headerKey]))
