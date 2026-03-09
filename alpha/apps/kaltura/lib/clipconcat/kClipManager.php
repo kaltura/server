@@ -1681,9 +1681,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$overlayFileNameIndex = 1;
 				$marginsPercentage = 0.074;
 				$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
-				$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-min(main_w\,main_h)*$marginsPercentage:y=main_h-overlay_h-min(main_w\,main_h)*$marginsPercentage:format=auto:shortest=1$composedVideoStreamName";
+				$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-min(main_w\,main_h)*$marginsPercentage:y=main_h-overlay_h-min(main_w\,main_h)*$marginsPercentage:format=auto$composedVideoStreamName";
 				$defineAudioVolumesFilter = "[$overlayFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
-				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:duration=shortest:dropout_transition=0[aout]";
+				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
 				$audioMapName = '"[aout]"';
 
 				$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
