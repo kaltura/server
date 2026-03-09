@@ -79,6 +79,10 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		if ($bulkUploadResult) {
 			$this->bulkUploadResults[] = $bulkUploadResult;
 		}
+		else
+		{
+			KalturaLog::warning("Validation failed for bulk upload result, skipping entry");
+		}
 	}
     
 	protected function validateBulkUploadResult (KalturaBulkUploadResult $bulkUploadResult)
