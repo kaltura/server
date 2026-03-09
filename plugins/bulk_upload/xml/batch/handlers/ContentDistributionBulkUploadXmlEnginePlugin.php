@@ -170,8 +170,18 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 		if($entryDistributionId)
 		{
 			$updatedEntryDistribution = $distributionPlugin->entryDistribution->update($entryDistributionId, $entryDistribution);
+
 			if($submitWhenReady && $updatedEntryDistribution->dirtyStatus == KalturaEntryDistributionFlag::UPDATE_REQUIRED)
-				$distributionPlugin->entryDistribution->submitUpdate($entryDistributionId);
+			{
+				try
+				{
+					$distributionPlugin->entryDistribution->submitUpdate($entryDistributionId);
+				}
+				catch (KalturaAPIException $e)
+				{
+					 KalturaLog::debug("Entry distribution with id [$entryDistributionId] error on submitUpdate, skipping. Error: " . $e->getMessage());
+				}
+			}
 		}
 		else
 		{
