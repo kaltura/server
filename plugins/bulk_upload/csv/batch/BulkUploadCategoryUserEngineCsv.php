@@ -76,7 +76,7 @@ class BulkUploadCategoryUserEngineCsv extends BulkUploadEngineCsv
 		}
 		
 		$bulkUploadResult = $this->validateBulkUploadResult($bulkUploadResult);
-		if($bulkUploadResult) {
+		if ($bulkUploadResult) {
 			$this->bulkUploadResults[] = $bulkUploadResult;
 		}
 	}
