@@ -383,24 +383,23 @@ class KAsyncConcat extends KJobHandlerWorker
 		 * otherwise - convert to AAC
 		 */
 		$audioParamStr = null;
-		$normalizeAudioCmd = "";
 		if($hasAudio)
 		{
-			if(count(array_unique($audioFormats)) == 1 && $audioFormats[0] =="aac")
-			{
-				$audioParamStr = "-c:a copy";
-			}
-			else
-			{
-				$audioParamStr = "-c:a libfdk_aac";
-			}
 			if($normalizeAudio)
 			{
-				$normalizeAudioCmd = " -filter_complex \"[0:a]loudnorm=I=-16:TP=-1.5:LRA=11[aout]\" ";
-				$audioParamStr = " -map [aout] -bsf:a aac_adtstoasc ";
+				$audioParamStr = " -filter_complex \"[0:a]loudnorm=I=-16:TP=-1.5:LRA=11[aout]\"  -map [aout] -bsf:a aac_adtstoasc";
 			}
 			else
 			{
+				if(count(array_unique($audioFormats)) == 1 && $audioFormats[0] =="aac")
+				{
+					$audioParamStr = "-c:a copy";
+				}
+				else
+				{
+					$audioParamStr = "-c:a libfdk_aac";
+				}
+
 				$audioParamStr .= " -bsf:a aac_adtstoasc";
 				$audioParamStr .= $multiSource ? " -map a:0 " : " -map a ";
 			}
@@ -427,7 +426,7 @@ class KAsyncConcat extends KJobHandlerWorker
 				$cmdStr .= "-protocol_whitelist \"concat,file,subfile,https,http,tls,tcp,file\" ";
 			}
 
-			$cmdStr .= "$probeSizeAndAnalyzeDurationStr $concatStr $videoParamStr $normalizeAudioCmd $audioParamStr";
+			$cmdStr .= "$probeSizeAndAnalyzeDurationStr $concatStr $videoParamStr $audioParamStr";
 		}
 		$cmdStr .= " $clipStr -f mp4 -y $outFilename 2>&1";
 	
