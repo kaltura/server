@@ -118,10 +118,13 @@ class KAsyncConcat extends KJobHandlerWorker
 		$attemptNum = 1;
 		$totalAttempts = isset(KBatchBase::$taskConfig->params->totalAttempts) ? KBatchBase::$taskConfig->params->totalAttempts : 3;
 
+		// identify overlay flow - to be replaced by proper normalize audio option in the API
+		$hasAdditionalFiles = isset($data->inputFiles) && count($data->inputFiles) > 0;
+
 		do
 		{
 			KalturaLog::info('Concat attempt ' . $attemptNum . ' out of: ' . $totalAttempts);
-			$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration, $data->shouldSort, $data->multiSource, $attemptNum);
+			$result = $this->concatFiles($ffmpegBin, $ffprobeBin, $srcFiles, $localTempFilePath, $data->offset, $data->duration, $data->shouldSort, $data->multiSource, $attemptNum, $hasAdditionalFiles);
 			$attemptNum++;
 		}
 		while (!$result && $attemptNum <= $totalAttempts);
@@ -234,7 +237,7 @@ class KAsyncConcat extends KJobHandlerWorker
 	 * @return boolean
 	 * @throws kApplicativeException
 	 */
-	protected function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $multiSource = false, $attempt = 1)
+	protected function concatFiles($ffmpegBin, $ffprobeBin, array $filesArr, $outFilename, $clipStart = null, $clipDuration = null, $shouldSort = true, $multiSource = false, $attempt = 1, $normalizeAudio = false)
 	{
 		$fixLargeDeltaFlag = null;
 		$chunkBr = null;
@@ -382,16 +385,24 @@ class KAsyncConcat extends KJobHandlerWorker
 		$audioParamStr = null;
 		if($hasAudio)
 		{
-			if(count(array_unique($audioFormats)) == 1 && $audioFormats[0] =="aac")
+			if($normalizeAudio)
 			{
-				$audioParamStr = "-c:a copy";
+				$audioParamStr = " -filter_complex \"[0:a]loudnorm=I=-16:TP=-1.5:LRA=11[aout]\"  -map [aout] -bsf:a aac_adtstoasc";
 			}
 			else
 			{
-				$audioParamStr = "-c:a libfdk_aac";
+				if(count(array_unique($audioFormats)) == 1 && $audioFormats[0] =="aac")
+				{
+					$audioParamStr = "-c:a copy";
+				}
+				else
+				{
+					$audioParamStr = "-c:a libfdk_aac";
+				}
+
+				$audioParamStr .= " -bsf:a aac_adtstoasc";
+				$audioParamStr .= $multiSource ? " -map a:0 " : " -map a ";
 			}
-			$audioParamStr .= " -bsf:a aac_adtstoasc";
-			$audioParamStr .= $multiSource ? " -map a:0 " : " -map a ";
 		}
 
 		$probeSizeAndAnalyzeDurationStr = self::getProbeSizeAndAnalyzeDuration($attempt);

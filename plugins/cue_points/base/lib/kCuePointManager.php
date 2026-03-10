@@ -68,6 +68,25 @@ class kCuePointManager implements kBatchJobStatusEventConsumer, kObjectDeletedEv
 		$destEntryId = $data->getDestEntryId();
 		$partnerId = $data->getPartnerId();
 		$resourcesClipDescriptionArray = array();
+
+		// do not add a copyCuePoints job or add chapters if an overlay attribute is found
+		foreach ($data->getOperationResources() as $operationResource)
+		{
+			$attributes = $operationResource->getOperationAttributes();
+			if(isset($attributes[0]) && $attributes[0] instanceof kClipAttributes)
+			{
+				$compositionAttributes = $attributes[0]->getMediaCompositionAttributesArray();
+				foreach ($compositionAttributes as $compositionAttribute)
+				{
+					if($compositionAttribute instanceof kOverlayAttributes)
+					{
+						KalturaLog::debug("kOverlayAttributes found - Skip copy Cue Points and add chapters");
+						return;
+					}
+				}
+			}
+		}
+
 		foreach ($data->getOperationResources() as $key => $operationResource)
 		{
 			$resource = $operationResource->getResource();
