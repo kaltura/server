@@ -54,26 +54,17 @@ class DropFolderService extends KalturaBaseService
 			$dropFolder->fileSizeCheckInterval = DropFolder::FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE;
 		}
 
-		// Handle empty string or null for fileProcessingGracePeriod
-		KalturaLog::debug("DROP FOLDER SERVICE DEBUG: fileProcessingGracePeriod received = " . var_export($dropFolder->fileProcessingGracePeriod, true) . " (type: " . gettype($dropFolder->fileProcessingGracePeriod) . ")");
 
 		// Convert to integer if it's a numeric string
 		if (is_string($dropFolder->fileProcessingGracePeriod) && is_numeric($dropFolder->fileProcessingGracePeriod)) {
 			$dropFolder->fileProcessingGracePeriod = (int)$dropFolder->fileProcessingGracePeriod;
-			KalturaLog::debug("DROP FOLDER SERVICE DEBUG: Converted string to int: " . $dropFolder->fileProcessingGracePeriod);
 		}
 
 		if (is_null($dropFolder->fileProcessingGracePeriod) || $dropFolder->fileProcessingGracePeriod === '' || $dropFolder->fileProcessingGracePeriod === 0) {
-			KalturaLog::debug("DROP FOLDER SERVICE DEBUG: Setting default value");
 			$dropFolder->fileProcessingGracePeriod = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
-		} else {
-			KalturaLog::debug("DROP FOLDER SERVICE DEBUG: Using user-provided value: " . $dropFolder->fileProcessingGracePeriod);
 		}
 
-		// Validate fileProcessingGracePeriod does not exceed maximum value
-		KalturaLog::debug("DROP FOLDER SERVICE DEBUG: Validating: " . $dropFolder->fileProcessingGracePeriod . " > " . DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE . " ?");
 		if ($dropFolder->fileProcessingGracePeriod > DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE) {
-			KalturaLog::debug("DROP FOLDER SERVICE DEBUG: THROWING EXCEPTION - value too large!");
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'fileProcessingGracePeriod');
 		}
 
