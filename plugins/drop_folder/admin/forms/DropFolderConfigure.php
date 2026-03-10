@@ -310,10 +310,6 @@ class Form_DropFolderConfigure extends Infra_Form
 		}
 	    $object = parent::loadObject($object, $properties, $add_underscore, $include_empty_fields);
 
-		// DEBUG: Log what was set on the object after loadObject
-		error_log("DROP FOLDER FORM DEBUG: After loadObject, fileProcessingGracePeriod = " .
-			(isset($object->fileProcessingGracePeriod) ? $object->fileProcessingGracePeriod : 'NOT SET'));
-
 		$extendTypeSubForm = $this->getSubForm(self::EXTENSION_SUBFORM_NAME);
 		if ($extendTypeSubForm) {
 		    $object =  $extendTypeSubForm->getObject($object, $objectType, $properties, $add_underscore, $include_empty_fields);
