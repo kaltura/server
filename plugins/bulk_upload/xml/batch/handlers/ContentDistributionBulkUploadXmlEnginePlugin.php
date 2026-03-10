@@ -179,14 +179,7 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 				}
 				else
 				{
-					try
-					{
-						$distributionPlugin->entryDistribution->submitUpdate($entryDistributionId);
-					}
-					catch (Exception $e)
-					{
-						KalturaLog::debug("Entry distribution with id [$entryDistributionId], submitUpdate error: " . $e->getMessage());
-					}
+					$distributionPlugin->entryDistribution->submitUpdate($entryDistributionId);
 				}
 			}
 		}
