@@ -289,12 +289,6 @@ class Form_DropFolderConfigure extends Infra_Form
 		    $properties = array_merge($properties[self::EXTENSION_SUBFORM_NAME], $properties);
 		}
 
-		// DEBUG: Log what value is coming from the form
-		error_log("DROP FOLDER FORM DEBUG: fileProcessingGracePeriod from form = " .
-			(isset($properties['fileProcessingGracePeriod']) ? $properties['fileProcessingGracePeriod'] : 'NOT SET'));
-		error_log("DROP FOLDER FORM DEBUG: file_processing_grace_period from form = " .
-			(isset($properties['file_processing_grace_period']) ? $properties['file_processing_grace_period'] : 'NOT SET'));
-
 	    $object = KalturaPluginManager::loadObject('Kaltura_Client_DropFolder_Type_DropFolder', $properties['type']);
 
 		$fileHandlerType = $properties['fileHandlerType'];
