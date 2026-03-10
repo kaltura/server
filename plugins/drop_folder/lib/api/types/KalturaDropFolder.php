@@ -222,32 +222,22 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 			$dbObject = new DropFolder();
 		$this->trimStringProperties(array ('path'));
 
-		// DEBUG: Log all property values to see what's coming in
-		KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: === ENTRY POINT === Class: " . get_class($this));
-		KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: fileSizeCheckInterval = " . var_export($this->fileSizeCheckInterval, true));
-		KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: fileProcessingGracePeriod = " . var_export($this->fileProcessingGracePeriod, true));
-		KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: autoFileDeleteDays = " . var_export($this->autoFileDeleteDays, true));
-
 		// Set fileProcessingGracePeriod BEFORE calling parent to preserve user value
 		// (parent may not recognize this property due to reflection cache)
 		$fileProcessingGracePeriodValue = $this->fileProcessingGracePeriod;
-		KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: fileProcessingGracePeriod stored in variable = " . var_export($fileProcessingGracePeriodValue, true) . " (type: " . gettype($fileProcessingGracePeriodValue) . ")");
 
 		// Convert to integer if it's a numeric string
 		if (is_string($fileProcessingGracePeriodValue) && is_numeric($fileProcessingGracePeriodValue)) {
 			$fileProcessingGracePeriodValue = (int)$fileProcessingGracePeriodValue;
-			KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: Converted string to int: " . $fileProcessingGracePeriodValue);
 		}
 
 		// Set default if empty
 		if (is_null($fileProcessingGracePeriodValue) || $fileProcessingGracePeriodValue === '' || $fileProcessingGracePeriodValue === 0) {
 			$fileProcessingGracePeriodValue = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
-			KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: Value was empty, set to default: " . $fileProcessingGracePeriodValue);
 		}
 
 		// Validate maximum value
 		if ($fileProcessingGracePeriodValue > DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE) {
-			KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: Value " . $fileProcessingGracePeriodValue . " exceeds maximum " . DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE . ", throwing exception");
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'fileProcessingGracePeriod');
 		}
 
@@ -256,7 +246,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		// Explicitly set fileProcessingGracePeriod to ensure it's saved
 		if (!is_null($fileProcessingGracePeriodValue) && !in_array('fileProcessingGracePeriod', $skip))
 		{
-			KalturaLog::debug("DROP FOLDER TOOBJECT DEBUG: Calling setFileProcessingGracePeriod with " . $fileProcessingGracePeriodValue);
 			$dbObject->setFileProcessingGracePeriod($fileProcessingGracePeriodValue);
 		}
 
