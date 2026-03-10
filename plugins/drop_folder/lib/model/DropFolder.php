@@ -57,12 +57,8 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 		}
 
 		$currentValue = $this->getFileProcessingGracePeriod();
-		KalturaLog::debug("DROP FOLDER PREINSERT DEBUG: fileProcessingGracePeriod before preInsert = " . var_export($currentValue, true));
 		if (is_null($currentValue)) {
-			KalturaLog::debug("DROP FOLDER PREINSERT DEBUG: Value is null, setting default");
 			$this->setFileProcessingGracePeriod(DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE);
-		} else {
-			KalturaLog::debug("DROP FOLDER PREINSERT DEBUG: Value already set, keeping it as: " . $currentValue);
 		}
 
 		return $ret;
@@ -193,7 +189,6 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 
 	public function setFileProcessingGracePeriod($seconds)
 	{
-		KalturaLog::debug("DROP FOLDER MODEL DEBUG: setFileProcessingGracePeriod called with value = " . var_export($seconds, true));
 		$this->putInCustomData(self::CUSTOM_DATA_FILE_PROCESSING_GRACE_PERIOD, $seconds);
 	}
 
