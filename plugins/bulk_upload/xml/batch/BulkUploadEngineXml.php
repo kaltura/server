@@ -641,7 +641,7 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 	/**
 	 * Handle pre-process plugins before content processing
 	 */
-	protected function handlePreProcessPlugins(SimpleXMLElement $item, $entry)
+	protected function handlePreProcessPlugins(SimpleXMLElement $item, $entry, $isAdd = false)
 	{
 		$pluginsInstances = KalturaPluginManager::getPluginInstances('IKalturaBulkUploadXmlHandlerPreProcess');
 		foreach ($pluginsInstances as $pluginsInstance)
@@ -650,8 +650,16 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 			{
 				/* @var $pluginsInstance IKalturaBulkUploadXmlHandlerPreProcess */
 				$pluginsInstance->configureBulkUploadXmlHandler($this);
-				$pluginsInstance->handleItemUpdated($entry, $item);
-			} catch (Exception $e)
+				if($isAdd)
+				{
+					$pluginsInstance->handleItemAdded($entry, $item);
+				}
+				else
+				{
+					$pluginsInstance->handleItemUpdated($entry, $item);
+				}
+			}
+			catch (Exception $e)
 			{
 			    KalturaLog::err('Plugin processing failed: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
 			}
@@ -971,7 +979,10 @@ class BulkUploadEngineXml extends KBulkUploadEngine
 		}
 		
 		list($createdEntry, $nonCriticalErrors) = $this->sendItemAddData($entry, $resource, $noParamsFlavorAssets, $noParamsFlavorResources, $noParamsThumbAssets, $noParamsThumbResources, $flavorAssets);
-		
+
+		// Handle pre-process plugins first
+		$this->handlePreProcessPlugins($item, $createdEntry, true);
+
 		if (isset ($item->categories))
 			$createdEntryBulkUploadResult = $this->createCategoryAssociations($createdEntry->id, $item->categories, $createdEntryBulkUploadResult);
 		$createdEntryBulkUploadResult->errorDescription .= $nonCriticalErrors;
