@@ -19,6 +19,8 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	const AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE = 0;
 	const FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE = '600'; // 600 seconds = 10 minutes
 	const FILE_NAME_PATTERNS_DEFAULT_VALUE = '*';
+	const FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE = 10800; // 10800 seconds = 3 hours
+	const FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE = 21600; // 21600 seconds = 6 hours
 	const INCREMENTAL = 'incremental';
 	const LAST_FILE_TIMESTAMP = 'last_file_timestamp'; 
 	const METADATA_PROFILE_ID = 'metadata_profile_id';
@@ -52,8 +54,17 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 		
 		if (is_null($this->getAutoFileDeleteDays())) {
 			$this->setAutoFileDeleteDays(DropFolder::AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE);
-		}    	
-    	
+		}
+
+		$currentValue = $this->getFileProcessingGracePeriod();
+		KalturaLog::debug("DROP FOLDER PREINSERT DEBUG: fileProcessingGracePeriod before preInsert = " . var_export($currentValue, true));
+		if (is_null($currentValue)) {
+			KalturaLog::debug("DROP FOLDER PREINSERT DEBUG: Value is null, setting default");
+			$this->setFileProcessingGracePeriod(DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE);
+		} else {
+			KalturaLog::debug("DROP FOLDER PREINSERT DEBUG: Value already set, keeping it as: " . $currentValue);
+		}
+
 		return $ret;
 	}
 
@@ -135,6 +146,7 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	const CUSTOM_DATA_IGNORE_FILE_NAME_PATTERNS = 'ignore_file_name_patterns';
 	const CUSTOM_DATA_LAST_ACCESSED_AT = 'last_accessed_at';
 	const CUSTOM_DATA_FILE_DELETE_REGEX = 'file_delete_regex';
+	const CUSTOM_DATA_FILE_PROCESSING_GRACE_PERIOD = 'file_processing_grace_period';
 
 	
 	// File size check interval - value in seconds
@@ -167,6 +179,22 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	public function setFileDeleteRegex($fileDeleteRegex)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FILE_DELETE_REGEX, $fileDeleteRegex);
+	}
+
+	// File processing grace period
+
+	/**
+	 * @return int
+	 */
+	public function getFileProcessingGracePeriod()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DATA_FILE_PROCESSING_GRACE_PERIOD);
+	}
+
+	public function setFileProcessingGracePeriod($seconds)
+	{
+		KalturaLog::debug("DROP FOLDER MODEL DEBUG: setFileProcessingGracePeriod called with value = " . var_export($seconds, true));
+		$this->putInCustomData(self::CUSTOM_DATA_FILE_PROCESSING_GRACE_PERIOD, $seconds);
 	}
 
 	// Automatic file delete days

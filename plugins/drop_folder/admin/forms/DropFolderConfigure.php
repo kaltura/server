@@ -188,6 +188,13 @@ class Form_DropFolderConfigure extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 
+		$this->addElement('text', 'fileProcessingGracePeriod', array(
+			'label' 		=> 'File processing grace period (seconds):',
+			'description'	=> 'Time to wait before processing a file. Leave empty for default: 10800 (3 hours). Maximum: 21600 (6 hours).',
+			'required'		=> false,
+			'filters'		=> array('StringTrim'),
+		));
+
 		$fileDeletePolicies = new Kaltura_Form_Element_EnumSelect('fileDeletePolicy', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy'));
 		$fileDeletePolicies->setLabel('File Deletion Policy:');
 		$fileDeletePolicies->setRequired(true);
@@ -282,6 +289,12 @@ class Form_DropFolderConfigure extends Infra_Form
 		    $properties = array_merge($properties[self::EXTENSION_SUBFORM_NAME], $properties);
 		}
 
+		// DEBUG: Log what value is coming from the form
+		error_log("DROP FOLDER FORM DEBUG: fileProcessingGracePeriod from form = " .
+			(isset($properties['fileProcessingGracePeriod']) ? $properties['fileProcessingGracePeriod'] : 'NOT SET'));
+		error_log("DROP FOLDER FORM DEBUG: file_processing_grace_period from form = " .
+			(isset($properties['file_processing_grace_period']) ? $properties['file_processing_grace_period'] : 'NOT SET'));
+
 	    $object = KalturaPluginManager::loadObject('Kaltura_Client_DropFolder_Type_DropFolder', $properties['type']);
 
 		$fileHandlerType = $properties['fileHandlerType'];
@@ -302,6 +315,10 @@ class Form_DropFolderConfigure extends Infra_Form
 				$handlerConfigForm = KalturaPluginManager::loadObject('Form_BaseFileHandlerConfig', $fileHandlerType);
 		}
 	    $object = parent::loadObject($object, $properties, $add_underscore, $include_empty_fields);
+
+		// DEBUG: Log what was set on the object after loadObject
+		error_log("DROP FOLDER FORM DEBUG: After loadObject, fileProcessingGracePeriod = " .
+			(isset($object->fileProcessingGracePeriod) ? $object->fileProcessingGracePeriod : 'NOT SET'));
 
 		$extendTypeSubForm = $this->getSubForm(self::EXTENSION_SUBFORM_NAME);
 		if ($extendTypeSubForm) {

@@ -23,11 +23,11 @@ class DropFolderService extends KalturaBaseService
 	
 	/**
 	 * Allows you to add a new KalturaDropFolder object
-	 * 
+	 *
 	 * @action add
 	 * @param KalturaDropFolder $dropFolder
 	 * @return KalturaDropFolder
-	 * 
+	 *
 	 * @throws KalturaErrors::PROPERTY_VALIDATION_CANNOT_BE_NULL
 	 * @throws KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND
 	 * @throws KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS
@@ -43,28 +43,52 @@ class DropFolderService extends KalturaBaseService
 		$dropFolder->validatePropertyNotNull('path');
 		$dropFolder->validatePropertyNotNull('partnerId');
 		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0, true);
+		$dropFolder->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
 		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0, true);
 		$dropFolder->validatePropertyNotNull('fileHandlerType');
 		$dropFolder->validatePropertyNotNull('fileHandlerConfig');
-		
+
 		// validate values
-		
+
 		if (is_null($dropFolder->fileSizeCheckInterval)) {
 			$dropFolder->fileSizeCheckInterval = DropFolder::FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE;
 		}
-		
+
+		// Handle empty string or null for fileProcessingGracePeriod
+		KalturaLog::debug("DROP FOLDER SERVICE DEBUG: fileProcessingGracePeriod received = " . var_export($dropFolder->fileProcessingGracePeriod, true) . " (type: " . gettype($dropFolder->fileProcessingGracePeriod) . ")");
+
+		// Convert to integer if it's a numeric string
+		if (is_string($dropFolder->fileProcessingGracePeriod) && is_numeric($dropFolder->fileProcessingGracePeriod)) {
+			$dropFolder->fileProcessingGracePeriod = (int)$dropFolder->fileProcessingGracePeriod;
+			KalturaLog::debug("DROP FOLDER SERVICE DEBUG: Converted string to int: " . $dropFolder->fileProcessingGracePeriod);
+		}
+
+		if (is_null($dropFolder->fileProcessingGracePeriod) || $dropFolder->fileProcessingGracePeriod === '' || $dropFolder->fileProcessingGracePeriod === 0) {
+			KalturaLog::debug("DROP FOLDER SERVICE DEBUG: Setting default value");
+			$dropFolder->fileProcessingGracePeriod = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
+		} else {
+			KalturaLog::debug("DROP FOLDER SERVICE DEBUG: Using user-provided value: " . $dropFolder->fileProcessingGracePeriod);
+		}
+
+		// Validate fileProcessingGracePeriod does not exceed maximum value
+		KalturaLog::debug("DROP FOLDER SERVICE DEBUG: Validating: " . $dropFolder->fileProcessingGracePeriod . " > " . DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE . " ?");
+		if ($dropFolder->fileProcessingGracePeriod > DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE) {
+			KalturaLog::debug("DROP FOLDER SERVICE DEBUG: THROWING EXCEPTION - value too large!");
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'fileProcessingGracePeriod');
+		}
+
 		if (is_null($dropFolder->fileNamePatterns)) {
 			$dropFolder->fileNamePatterns = DropFolder::FILE_NAME_PATTERNS_DEFAULT_VALUE;
 		}
-		
+
 		if (!kDataCenterMgr::dcExists($dropFolder->dc)) {
 			throw new KalturaAPIException(KalturaErrors::DATA_CENTER_ID_NOT_FOUND, $dropFolder->dc);
 		}
-		
+
 		if (!PartnerPeer::retrieveByPK($dropFolder->partnerId)) {
 			throw new KalturaAPIException(KalturaErrors::INVALID_PARTNER_ID, $dropFolder->partnerId);
 		}
-		
+
 		if (!DropFolderPlugin::isAllowedPartner($dropFolder->partnerId))
 		{
 			throw new KalturaAPIException(KalturaErrors::PLUGIN_NOT_AVAILABLE_FOR_PARTNER, DropFolderPlugin::getPluginName(), $dropFolder->partnerId);
@@ -77,34 +101,34 @@ class DropFolderService extends KalturaBaseService
 				throw new KalturaAPIException(KalturaDropFolderErrors::DROP_FOLDER_ALREADY_EXISTS, $dropFolder->path);
 			}
 		}
-		
+
 		if (!is_null($dropFolder->conversionProfileId)) {
 			$conversionProfileDb = conversionProfile2Peer::retrieveByPK($dropFolder->conversionProfileId);
 			if (!$conversionProfileDb) {
 				throw new KalturaAPIException(KalturaErrors::INGESTION_PROFILE_ID_NOT_FOUND, $dropFolder->conversionProfileId);
 			}
 		}
-		
+
 		// save in database
 		$dbDropFolder = $dropFolder->toInsertableObject();
 		$dbDropFolder->save();
-		
+
 		// return the saved object
 		$dropFolder = KalturaDropFolder::getInstanceByType($dbDropFolder->getType());
 		$dropFolder->fromObject($dbDropFolder, $this->getResponseProfile());
 		return $dropFolder;
-		
+
 	}
-	
+
 	/**
 	 * Retrieve a KalturaDropFolder object by ID
-	 * 
+	 *
 	 * @action get
-	 * @param int $dropFolderId 
+	 * @param int $dropFolderId
 	 * @return KalturaDropFolder
-	 * 
+	 *
 	 * @throws KalturaErrors::INVALID_OBJECT_ID
-	 */		
+	 */
 	public function getAction($dropFolderId)
 	{
 		$dbDropFolder = DropFolderPeer::retrieveByPK($dropFolderId);
@@ -141,8 +165,14 @@ class DropFolderService extends KalturaBaseService
 		}
 		
 		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0, true);
+		$dropFolder->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
 		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0, true);
-		
+
+		// Validate fileProcessingGracePeriod does not exceed maximum value
+		if (!is_null($dropFolder->fileProcessingGracePeriod) && $dropFolder->fileProcessingGracePeriod > DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE) {
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'fileProcessingGracePeriod');
+		}
+
 		if (!is_null($dropFolder->path) && $dropFolder->path != $dbDropFolder->getPath() && $dropFolder->type == KalturaDropFolderType::LOCAL) 
 		{
 			$existingDropFolder = DropFolderPeer::retrieveByPathDefaultFilter($dropFolder->path);
