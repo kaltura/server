@@ -33,6 +33,8 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 	const PERMISSION_NAME_FIELD_INDEX_PREFIX = "per";
 	
 	const STATUS_FIELD_PREFIX = "status";
+	
+	const CUSTOM_DTA_KUSER_TYPE = "kuser_type";
 
 	public function __construct()
 	{
@@ -71,6 +73,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 		if (!$kuser)
 		    throw new kCoreException("Invalid user Id [{$puserId}]", kCoreException::INVALID_USER_ID );
 			
+		$this->setKuserType($kuser->getType());
 		parent::setKuserId($kuser->getId());
 		parent::setScreenName($kuser->getScreenName());
 	}
@@ -439,5 +442,15 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 		}
 		
 		parent::save($con);
+	}
+	
+	private function setKuserType($type)
+	{
+		$this->putInCustomData(self::CUSTOM_DTA_KUSER_TYPE, $type);
+	}
+	
+	public function getKuserType()
+	{
+		return $this->getFromCustomData(self::CUSTOM_DTA_KUSER_TYPE);
 	}
 } // categoryKuser

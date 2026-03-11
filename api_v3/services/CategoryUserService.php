@@ -30,7 +30,7 @@ class CategoryUserService extends KalturaBaseService
 		if ($kuser->getType() == KuserType::APPLICATIVE_GROUP &&
 			(
 				(isset($categoryUser->permissionLevel) && $categoryUser->permissionLevel != KalturaCategoryUserPermissionLevel::NONE) ||
-				($category->getDefaultPermissionLevel() != KalturaCategoryUserPermissionLevel::NONE)
+				(!isset($categoryUser->permissionLevel) && $category->getDefaultPermissionLevel() != KalturaCategoryUserPermissionLevel::NONE)
 			)
 		)
 		{
