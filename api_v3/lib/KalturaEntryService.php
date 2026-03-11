@@ -1620,7 +1620,7 @@ class KalturaEntryService extends KalturaBaseService
 		{
 			// non admin cannot specify a different user on the entry other than himself
 			$ksPuser = $this->getKuser()->getPuserId();
-			if (strtolower($entry->userId) != strtolower($ksPuser))
+			if (!is_null($entry->userId) && strtolower($entry->userId) != strtolower($ksPuser))
 			{
 				throw new KalturaAPIException(KalturaErrors::INVALID_KS, "", ks::INVALID_TYPE, ks::getErrorStr(ks::INVALID_TYPE));
 			}
