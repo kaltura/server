@@ -380,7 +380,8 @@ class myPartnerUtils
 				{
 					$urlResult = preg_replace('/^https?/', $protocol, $partner->getCdnHost());
 				}
-				else {
+				else
+				{
 					$urlResult = requestUtils::getThumbnailCdnHost($protocol);
 				}
 				break;
@@ -444,6 +445,7 @@ class myPartnerUtils
 				if (!empty($_SERVER[$headerKey]))
 				{
 					$urlResult = $urlResult . "." . $suffix;
+					break;
 				}
 			}
 		}
