@@ -416,7 +416,7 @@ class myPartnerUtils
 					$urlResult = self::getCdnHost($partner_id, $protocol, 'api');
 				}
 				break;
-			case 'apphome_url': //  not sure this is correct "case"
+			case 'apphome_url':
 				$urlResult = kConf::get('apphome_url');
 				break;
 			case 'analytics_report':
