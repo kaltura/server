@@ -173,9 +173,9 @@ class ContentDistributionBulkUploadXmlEnginePlugin extends KalturaPlugin impleme
 
 			if($submitWhenReady && $updatedEntryDistribution->dirtyStatus == KalturaEntryDistributionFlag::UPDATE_REQUIRED)
 			{
-				if($updatedEntryDistribution->status == KalturaEntryDistributionStatus::UPDATING)
+				if(in_array($updatedEntryDistribution->status, array(KalturaEntryDistributionStatus::UPDATING, KalturaEntryDistributionStatus::SUBMITTING)))
 				{
-					KalturaLog::debug("Entry distribution with id [$entryDistributionId] is in status UPDATING. Skipping submitUpdate ");
+					KalturaLog::debug("Entry distribution with id [$entryDistributionId] is in status [$updatedEntryDistribution->status]. Skipping submitUpdate ");
 				}
 				else
 				{
