@@ -606,7 +606,7 @@ class myReportsMgr
 			throw new Exception ( "Failed to generate session for partner [$partner_id] of type User");
 			
 		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/report.csv";
+		$url = myPartnerUtils::getCdnHost($partner_id, null, 'analytics_report', true)  . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/report.csv";
 		return $url;
 	}
 	

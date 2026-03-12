@@ -349,8 +349,9 @@ class myPartnerUtils
 	}
 	
 	
-	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null )
+	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null, $supportsHeader = false )
 	{
+		$urlResult = '';
 		$protocol = infraRequestUtils::getProtocol();
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
@@ -364,7 +365,7 @@ class myPartnerUtils
 				{
 					$cdnHost .= ":".$_SERVER['SERVER_PORT'];
 				}
-				return $cdnHost;
+				$urlResult = $cdnHost;
 			}
 		}
 
@@ -373,38 +374,81 @@ class myPartnerUtils
 			case 'thumbnail':
 				if ($partner && $partner->getThumbnailHost())
 				{
-					return preg_replace('/^https?/', $protocol, $partner->getThumbnailHost());
+					$urlResult =  preg_replace('/^https?/', $protocol, $partner->getThumbnailHost());
 				}
-				if ($partner && $partner->getCdnHost())
+				else if ($partner && $partner->getCdnHost())
 				{
-					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
+					$urlResult = preg_replace('/^https?/', $protocol, $partner->getCdnHost());
 				}
-				return requestUtils::getThumbnailCdnHost($protocol);
+				else {
+					$urlResult = requestUtils::getThumbnailCdnHost($protocol);
+				}
+				break;
 			case 'api':
 				if ($protocol == 'https')
 				{
 					$apiHost = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
-					return 'https://' . $apiHost;
+					$urlResult = 'https://' . $apiHost;
 				}
 				else
 				{
 					$apiHost = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
-					return 'http://' . $apiHost;
+					$urlResult = 'http://' . $apiHost;
+				}
+				break;
+			case 'cdn_api':
+				if ($protocol == 'https' && kConf::hasParam('cdn_api_host_https'))
+				{
+					$urlResult = 'https://' . kConf::get('cdn_api_host_https');
+				}
+				else
+				{
+					$urlResult = 'http://' . kConf::get('cdn_api_host');
 				}
 				break;
 			case 'serviceUrl':
 				if ($partner && $partner->getHost())
 				{
-					return preg_replace('/^https?/', $protocol, $partner->getHost());
+					$urlResult = preg_replace('/^https?/', $protocol, $partner->getHost());
 				}
-				return self::getCdnHost($partner_id, $protocol, 'api');
+				else
+				{
+					$urlResult = self::getCdnHost($partner_id, $protocol, 'api');
+				}
+				break;
+			case 'apphome_url': //  not sure this is correct "case"
+				$urlResult = kConf::get('apphome_url');
+				break;
+			case 'analytics_report':
+				$urlResult = kDataCenterMgr::getCurrentDcUrl();
+				break;
+			case 'www_host':
+				$urlResult = requestUtils::getRequestHost();
+				break;
 			default:
 				if ($partner && $partner->getCdnHost())
 				{
-					return preg_replace('/^https?/', $protocol, $partner->getCdnHost());
+					$urlResult = preg_replace('/^https?/', $protocol, $partner->getCdnHost());
 				}
-				return requestUtils::getCdnHost($protocol);
+				else
+				{
+					$urlResult = requestUtils::getCdnHost($protocol);
+				}
 		}
+
+		if ($supportsHeader)
+		{
+			$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
+			foreach ($headerMapping as $headerKey => $suffix)
+			{
+				if (!empty($_SERVER[$headerKey]))
+				{
+					$urlResult = $urlResult . "." . $suffix;
+				}
+			}
+		}
+
+		return $urlResult;
 	}
 	
 	
@@ -423,10 +467,10 @@ class myPartnerUtils
 		return $playServerHost;
 	}
 	
-	public static function getThumbnailHost ($partner_id, $protocol = null)
+	public static function getThumbnailHost ($partner_id, $protocol = null, $supportsHeader = false )
 	{
 	    $partner = PartnerPeer::retrieveByPK( $partner_id );
-	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol, "thumbnail");
+	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol, "thumbnail", $supportsHeader);
 	    
 	    // in case the request came through https, force https url
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
