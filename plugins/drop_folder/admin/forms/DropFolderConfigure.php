@@ -188,13 +188,6 @@ class Form_DropFolderConfigure extends Infra_Form
 			'filters'		=> array('StringTrim'),
 		));
 
-		$this->addElement('text', 'fileProcessingGracePeriod', array(
-			'label' 		=> 'File processing grace period (seconds):',
-			'description'	=> 'Time to wait before processing a file. Leave empty for default: 10800 (3 hours). Maximum: 21600 (6 hours).',
-			'required'		=> false,
-			'filters'		=> array('StringTrim'),
-		));
-
 		$fileDeletePolicies = new Kaltura_Form_Element_EnumSelect('fileDeletePolicy', array('enum' => 'Kaltura_Client_DropFolder_Enum_DropFolderFileDeletePolicy'));
 		$fileDeletePolicies->setLabel('File Deletion Policy:');
 		$fileDeletePolicies->setRequired(true);
