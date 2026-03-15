@@ -56,11 +56,6 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 			$this->setAutoFileDeleteDays(DropFolder::AUTO_FILE_DELETE_DAYS_DEFAULT_VALUE);
 		}
 
-		$currentValue = $this->getFileProcessingGracePeriod();
-		if (is_null($currentValue)) {
-			$this->setFileProcessingGracePeriod(DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE);
-		}
-
 		return $ret;
 	}
 
@@ -142,7 +137,6 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	const CUSTOM_DATA_IGNORE_FILE_NAME_PATTERNS = 'ignore_file_name_patterns';
 	const CUSTOM_DATA_LAST_ACCESSED_AT = 'last_accessed_at';
 	const CUSTOM_DATA_FILE_DELETE_REGEX = 'file_delete_regex';
-	const CUSTOM_DATA_FILE_PROCESSING_GRACE_PERIOD = 'file_processing_grace_period';
 
 	
 	// File size check interval - value in seconds
@@ -175,21 +169,6 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	public function setFileDeleteRegex($fileDeleteRegex)
 	{
 		$this->putInCustomData(self::CUSTOM_DATA_FILE_DELETE_REGEX, $fileDeleteRegex);
-	}
-
-	// File processing grace period
-
-	/**
-	 * @return int
-	 */
-	public function getFileProcessingGracePeriod()
-	{
-		return $this->getFromCustomData(self::CUSTOM_DATA_FILE_PROCESSING_GRACE_PERIOD);
-	}
-
-	public function setFileProcessingGracePeriod($seconds)
-	{
-		$this->putInCustomData(self::CUSTOM_DATA_FILE_PROCESSING_GRACE_PERIOD, $seconds);
 	}
 
 	// Automatic file delete days

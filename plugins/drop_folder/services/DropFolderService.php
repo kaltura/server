@@ -43,7 +43,6 @@ class DropFolderService extends KalturaBaseService
 		$dropFolder->validatePropertyNotNull('path');
 		$dropFolder->validatePropertyNotNull('partnerId');
 		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0, true);
-		$dropFolder->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
 		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0, true);
 		$dropFolder->validatePropertyNotNull('fileHandlerType');
 		$dropFolder->validatePropertyNotNull('fileHandlerConfig');
@@ -52,20 +51,6 @@ class DropFolderService extends KalturaBaseService
 
 		if (is_null($dropFolder->fileSizeCheckInterval)) {
 			$dropFolder->fileSizeCheckInterval = DropFolder::FILE_SIZE_CHECK_INTERVAL_DEFAULT_VALUE;
-		}
-
-
-		// Convert to integer if it's a numeric string
-		if (is_string($dropFolder->fileProcessingGracePeriod) && is_numeric($dropFolder->fileProcessingGracePeriod)) {
-			$dropFolder->fileProcessingGracePeriod = (int)$dropFolder->fileProcessingGracePeriod;
-		}
-
-		if (is_null($dropFolder->fileProcessingGracePeriod) || $dropFolder->fileProcessingGracePeriod === '' || $dropFolder->fileProcessingGracePeriod === 0) {
-			$dropFolder->fileProcessingGracePeriod = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
-		}
-
-		if ($dropFolder->fileProcessingGracePeriod > DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE) {
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'fileProcessingGracePeriod');
 		}
 
 		if (is_null($dropFolder->fileNamePatterns)) {
@@ -156,13 +141,7 @@ class DropFolderService extends KalturaBaseService
 		}
 		
 		$dropFolder->validatePropertyMinValue('fileSizeCheckInterval', 0, true);
-		$dropFolder->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
 		$dropFolder->validatePropertyMinValue('autoFileDeleteDays', 0, true);
-
-		// Validate fileProcessingGracePeriod does not exceed maximum value
-		if (!is_null($dropFolder->fileProcessingGracePeriod) && $dropFolder->fileProcessingGracePeriod > DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE) {
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'fileProcessingGracePeriod');
-		}
 
 		if (!is_null($dropFolder->path) && $dropFolder->path != $dbDropFolder->getPath() && $dropFolder->type == KalturaDropFolderType::LOCAL) 
 		{

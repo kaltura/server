@@ -67,12 +67,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public $fileSizeCheckInterval;
 
 	/**
-	 * The amount of time, in seconds, to wait before processing a drop folder file
-	 * @var int
-	 */
-	public $fileProcessingGracePeriod;
-
-	/**
 	 * @var KalturaDropFolderFileDeletePolicy
 	 */
 	public $fileDeletePolicy;
@@ -190,7 +184,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		'dc',
 		'path',
 		'fileSizeCheckInterval',
-		'fileProcessingGracePeriod',
 		'fileDeletePolicy',
 		'fileDeleteRegex',
 		'autoFileDeleteDays',
@@ -222,32 +215,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 			$dbObject = new DropFolder();
 		$this->trimStringProperties(array ('path'));
 
-		// Set fileProcessingGracePeriod BEFORE calling parent to preserve user value
-		// (parent may not recognize this property due to reflection cache)
-		$fileProcessingGracePeriodValue = $this->fileProcessingGracePeriod;
-
-		// Convert to integer if it's a numeric string
-		if (is_string($fileProcessingGracePeriodValue) && is_numeric($fileProcessingGracePeriodValue)) {
-			$fileProcessingGracePeriodValue = (int)$fileProcessingGracePeriodValue;
-		}
-
-		// Set default if empty
-		if (is_null($fileProcessingGracePeriodValue) || $fileProcessingGracePeriodValue === '' || $fileProcessingGracePeriodValue === 0) {
-			$fileProcessingGracePeriodValue = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
-		}
-
-		// Validate maximum value
-		if ($fileProcessingGracePeriodValue > DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE) {
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'fileProcessingGracePeriod');
-		}
-
 		parent::toObject($dbObject, $skip);
-
-		// Explicitly set fileProcessingGracePeriod to ensure it's saved
-		if (!is_null($fileProcessingGracePeriodValue) && !in_array('fileProcessingGracePeriod', $skip))
-		{
-			$dbObject->setFileProcessingGracePeriod($fileProcessingGracePeriodValue);
-		}
 
 		if ($this->fileHandlerConfig)
 		{
@@ -261,13 +229,6 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($source_object, $responseProfile);
-
-		// Explicitly load fileProcessingGracePeriod from database object
-		// (parent may not recognize this property due to reflection cache)
-		if ($this->shouldGet('fileProcessingGracePeriod', $responseProfile))
-		{
-			$this->fileProcessingGracePeriod = $source_object->getFileProcessingGracePeriod();
-		}
 
 		if($this->shouldGet('fileHandlerConfig', $responseProfile))
 		{
