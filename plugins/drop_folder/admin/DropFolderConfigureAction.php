@@ -111,7 +111,6 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 				$dropFolder->fileNamePatterns = '*';
 			if (is_null($dropFolderId)) {
 				$dropFolder->status = Kaltura_Client_DropFolder_Enum_DropFolderStatus::ENABLED;
-
 				$responseDropFolder = $dropFolderPluginClient->dropFolder->add($dropFolder);
 			}
 			else {
