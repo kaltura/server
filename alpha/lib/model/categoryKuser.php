@@ -34,7 +34,7 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 	
 	const STATUS_FIELD_PREFIX = "status";
 	
-	const CUSTOM_DTA_KUSER_TYPE = "kuser_type";
+	const CUSTOM_DATA_KUSER_TYPE = "kuser_type";
 
 	public function __construct()
 	{
@@ -446,11 +446,11 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 	
 	private function setKuserType($type)
 	{
-		$this->putInCustomData(self::CUSTOM_DTA_KUSER_TYPE, $type);
+		$this->putInCustomData(self::CUSTOM_DATA_KUSER_TYPE, $type);
 	}
 	
 	public function getKuserType()
 	{
-		return $this->getFromCustomData(self::CUSTOM_DTA_KUSER_TYPE);
+		return $this->getFromCustomData(self::CUSTOM_DATA_KUSER_TYPE);
 	}
 } // categoryKuser
