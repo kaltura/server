@@ -200,7 +200,7 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 			$url = str_replace('\\', '/', $url);
 			if ($tokenizeUrl)
 			{
-				$dpUrlPath = myPartnerUtils::getCdnHost($asset->getPartnerId(), null, null, true);
+				$dpUrlPath = !is_null($this->getUrl()) ? parse_url($this->getUrl(), PHP_URL_PATH) : '';
 				$url = rtrim($dpUrlPath,'/').'/'.ltrim($url,'/');
 				$tokenizer = $this->getTokenizer();
 				if ($tokenizer)
@@ -587,4 +587,3 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
 	}
 }
-
