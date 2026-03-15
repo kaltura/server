@@ -214,9 +214,7 @@ class KalturaDropFolder extends KalturaObject implements IFilterable
 		if (is_null($dbObject))
 			$dbObject = new DropFolder();
 		$this->trimStringProperties(array ('path'));
-
 		parent::toObject($dbObject, $skip);
-
 		if ($this->fileHandlerConfig)
 		{
 			$dbFileHandlerConfig = $this->fileHandlerConfig->toObject();
