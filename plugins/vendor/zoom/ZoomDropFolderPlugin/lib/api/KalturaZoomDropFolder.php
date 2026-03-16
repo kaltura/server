@@ -162,8 +162,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		{
 			$dbObject = new ZoomDropFolder();
 		}
-
-		// Handle fileProcessingGracePeriod validation and defaults
+		
 		$fileProcessingGracePeriodValue = $this->fileProcessingGracePeriod;
 
 		// Convert to integer if it's a numeric string
@@ -180,7 +179,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
 		$dbObject = parent::toObject($dbObject, $skip);
-		
+
 		if (!is_null($fileProcessingGracePeriodValue) && !in_array('fileProcessingGracePeriod', $skip))
 		{
 			$dbObject->setFileProcessingGracePeriod($fileProcessingGracePeriodValue);
