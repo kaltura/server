@@ -144,11 +144,6 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	
 	public function toObject($dbObject = null, $skip = array())
 	{
-		if (!$dbObject)
-		{
-			$dbObject = new ZoomDropFolder();
-		}
-
 		if ($this->description)
 		{
 			/* @var ZoomVendorIntegration $vendorIntegration */
@@ -159,6 +154,11 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 			}
 			$vendorIntegration->setZoomAccountDescription($this->description);
 			$vendorIntegration->save();
+		}
+
+		if (!$dbObject)
+		{
+			$dbObject = new ZoomDropFolder();
 		}
 
 		// Handle fileProcessingGracePeriod validation and defaults
