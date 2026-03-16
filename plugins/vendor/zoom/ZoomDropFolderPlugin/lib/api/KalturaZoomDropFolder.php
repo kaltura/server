@@ -91,8 +91,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($sourceObject, $responseProfile);
-
-		// Explicitly load fileProcessingGracePeriod from source object
+		
 		if ($this->shouldGet('fileProcessingGracePeriod', $responseProfile))
 		{
 			$value = $sourceObject->getFileProcessingGracePeriod();
@@ -162,7 +161,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		{
 			$dbObject = new ZoomDropFolder();
 		}
-		
+
 		$fileProcessingGracePeriodValue = $this->fileProcessingGracePeriod;
 
 		// Convert to integer if it's a numeric string
