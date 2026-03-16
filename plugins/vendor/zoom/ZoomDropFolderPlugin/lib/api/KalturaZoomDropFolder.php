@@ -171,7 +171,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		}
 
 		// Set default if empty
-		if (is_null($fileProcessingGracePeriodValue) || $fileProcessingGracePeriodValue === '' || $fileProcessingGracePeriodValue === 0)
+		if (is_null($fileProcessingGracePeriodValue) || $fileProcessingGracePeriodValue === '')
 		{
 			$fileProcessingGracePeriodValue = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
 		}
