@@ -11,6 +11,9 @@ class KalturaLanguage extends KalturaStringEnum
 	const SQ = 'Albanian';
 	const AM = 'Amharic';
 	const AR = 'Arabic';
+	const AR_LB = 'Arabic (Lebanon)';
+	const AR_QA = 'Arabic (Qatar)';
+	const AR_SA = 'Arabic (Saudi Arabia)';
 	const HY = 'Armenian';
 	const AS_ = 'Assamese';
 	const AY = 'Aymara';

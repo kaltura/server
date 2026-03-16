@@ -1659,7 +1659,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$audioMapName = "0:a";
 		$mainFileNameIndex = 0;
 		$BGColor = "0x6FED48";
-		$overlayScalePercentage = 0.3;
+		$overlayScalePercentage = 0.4;
 
 		$fileNameIndex = 0;
 		foreach ($operationAttribute->getMediaCompositionAttributesArray() as $mediaCompositionAttributes)
@@ -1679,11 +1679,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
 				$overlayFileNameIndex = 1;
-				$marginsPercentage = 0.03;
+				$marginsPercentage = 0.074;
 				$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
-				$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-main_w*$marginsPercentage:y=main_h-overlay_h-main_h*$marginsPercentage:format=auto:shortest=1$composedVideoStreamName";
+				$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-min(main_w\,main_h)*$marginsPercentage:y=main_h-overlay_h-min(main_w\,main_h)*$marginsPercentage:format=auto$composedVideoStreamName";
 				$defineAudioVolumesFilter = "[$overlayFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
-				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:dropout_transition=0[aout]";
+				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
 				$audioMapName = '"[aout]"';
 
 				$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
@@ -1691,7 +1691,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				if(isset($attributesArray[0]))
 				{
 					$backgroundFileNameIndex = 2;
-					$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
+					$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=min(ih\,iw)*$overlayScalePercentage:min(ih\,iw)*$overlayScalePercentage,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
 					$normalizeImage = "[$backgroundFileNameIndex:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src]";
 					$alignSizes = "[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2]";
 					$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
