@@ -69,6 +69,8 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	/**
 	 * The amount of time, in seconds, to wait before processing a drop folder file
 	 * @var int
+	 * @minValue 0
+	 * @maxValue 21600
 	 */
 	public $fileProcessingGracePeriod;
 
@@ -176,12 +178,6 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 			$fileProcessingGracePeriodValue = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
 		}
 
-		// Validate maximum value
-		if ($fileProcessingGracePeriodValue > DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE)
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, 'fileProcessingGracePeriod');
-		}
-
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
 		$dbObject = parent::toObject($dbObject, $skip);
 
@@ -197,7 +193,15 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
+		$this->validatePropertyMaxValue('fileProcessingGracePeriod', DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE, true);
 		return parent::validateForInsert($propertiesToSkip);
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
+		$this->validatePropertyMaxValue('fileProcessingGracePeriod', DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE, true);
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
 }
