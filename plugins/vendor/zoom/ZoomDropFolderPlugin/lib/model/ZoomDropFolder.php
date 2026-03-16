@@ -82,7 +82,7 @@ class ZoomDropFolder extends RemoteDropFolder
 	public function preInsert(PropelPDO $con = null)
 	{
 		$ret = parent::preInsert($con);
-		
+
 		$currentValue = $this->getFileProcessingGracePeriod();
 		if (is_null($currentValue))
 		{

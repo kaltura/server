@@ -180,8 +180,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
 		$dbObject = parent::toObject($dbObject, $skip);
-
-		// Explicitly set fileProcessingGracePeriod to ensure it's saved
+		
 		if (!is_null($fileProcessingGracePeriodValue) && !in_array('fileProcessingGracePeriod', $skip))
 		{
 			$dbObject->setFileProcessingGracePeriod($fileProcessingGracePeriodValue);
