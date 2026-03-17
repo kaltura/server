@@ -156,16 +156,8 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		}
 
 		$fileProcessingGracePeriodValue = $this->fileProcessingGracePeriod;
-
-		// Set default if empty
-		if (is_null($fileProcessingGracePeriodValue) || $fileProcessingGracePeriodValue === '')
-		{
-			$fileProcessingGracePeriodValue = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
-		}
-
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
 		$dbObject = parent::toObject($dbObject, $skip);
-		$dbObject->setFileProcessingGracePeriod($fileProcessingGracePeriodValue);
 
 		return $dbObject;
 	}
