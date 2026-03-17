@@ -34,9 +34,8 @@ class DropFolderConfigureAction extends KalturaApplicationPlugin
 			{
 				$partnerId = $this->_getParam('partnerId');
 				$dropFolderType = $this->_getParam('type');
-				$postData = $request->getPost();
 				$dropFolderForm = $this->getDropFolderConfigure($dropFolderType, $partnerId, $dropFolderType);
-				$action->view->formValid = $this->processForm($dropFolderForm, $postData, $partnerId, $dropFolderId);
+				$action->view->formValid = $this->processForm($dropFolderForm, $request->getPost(), $partnerId, $dropFolderId);
 				if(!is_null($dropFolderId))
 				{
 					$dropFolder = $dropFolderForm->getObject("Kaltura_Client_DropFolder_Type_DropFolder", $request->getPost(), false, true);
