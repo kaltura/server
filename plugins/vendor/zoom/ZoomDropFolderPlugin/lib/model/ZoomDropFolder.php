@@ -10,12 +10,12 @@ class ZoomDropFolder extends RemoteDropFolder
 	const ZOOM_VENDOR_INTEGRATION_ID = 'zoom_vendor_integration_id';
 	const LAST_HANDLED_MEETING_TIME = 'last_handled_meeting_time';
 	const FILE_PROCESSING_GRACE_PERIOD = 'file_processing_grace_period';
-
+	
 	/**
 	 * @var string
 	 */
 	protected $zoomVendorIntegrationId;
-
+	
 	/**
 	 * @var time
 	 */
@@ -82,16 +82,9 @@ class ZoomDropFolder extends RemoteDropFolder
 	public function preInsert(PropelPDO $con = null)
 	{
 		$ret = parent::preInsert($con);
-
-		$currentValue = $this->getFileProcessingGracePeriod();
-		if (is_null($currentValue))
-		{
-			$this->setFileProcessingGracePeriod(DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE);
-		}
-
 		return $ret;
 	}
-
+	
 	public function getImportJobData()
 	{
 		return new kDropFolderImportJobData();

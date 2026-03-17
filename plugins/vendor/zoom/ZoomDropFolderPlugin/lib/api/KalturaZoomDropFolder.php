@@ -69,11 +69,11 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	/**
 	 * The amount of time, in seconds, to wait before processing a drop folder file
 	 * @var int
-	 * @minValue 0
+	 * @minValue 3600
 	 * @maxValue 21600
 	 */
 	public $fileProcessingGracePeriod;
-
+	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
@@ -92,17 +92,10 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	{
 		parent::doFromObject($sourceObject, $responseProfile);
 		
-		if ($this->shouldGet('fileProcessingGracePeriod', $responseProfile))
-		{
-			$value = $sourceObject->getFileProcessingGracePeriod();
-			if (!is_null($value))
-			{
-				$this->fileProcessingGracePeriod = $value;
-			}
-		}
-
 		/* @var ZoomVendorIntegration $vendorIntegration */
 		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($this->zoomVendorIntegrationId);
+		$this->fileProcessingGracePeriod = $sourceObject->getFileProcessingGracePeriod();
+
 		try
 		{
 			if ($vendorIntegration)
@@ -140,7 +133,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		{
 			$this->errorDescription = $e->getMessage();
 		}
-
+		
 	}
 	
 	public function toObject($dbObject = null, $skip = array())
@@ -156,49 +149,16 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 			$vendorIntegration->setZoomAccountDescription($this->description);
 			$vendorIntegration->save();
 		}
-
+		
 		if (!$dbObject)
 		{
 			$dbObject = new ZoomDropFolder();
 		}
 
-		$fileProcessingGracePeriodValue = $this->fileProcessingGracePeriod;
-
-		// Convert to integer if it's a numeric string
-		if (is_string($fileProcessingGracePeriodValue) && is_numeric($fileProcessingGracePeriodValue))
-		{
-			$fileProcessingGracePeriodValue = (int)$fileProcessingGracePeriodValue;
-		}
-
-		// Set default if empty
-		if (is_null($fileProcessingGracePeriodValue) || $fileProcessingGracePeriodValue === '')
-		{
-			$fileProcessingGracePeriodValue = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
-		}
-
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
 		$dbObject = parent::toObject($dbObject, $skip);
 
-		if (!is_null($fileProcessingGracePeriodValue) && !in_array('fileProcessingGracePeriod', $skip))
-		{
-			$dbObject->setFileProcessingGracePeriod($fileProcessingGracePeriodValue);
-		}
-
 		return $dbObject;
-	}
-
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
-		$this->validatePropertyMaxValue('fileProcessingGracePeriod', DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE, true);
-		return parent::validateForInsert($propertiesToSkip);
-	}
-
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		$this->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
-		$this->validatePropertyMaxValue('fileProcessingGracePeriod', DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE, true);
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
 	}
 
 }

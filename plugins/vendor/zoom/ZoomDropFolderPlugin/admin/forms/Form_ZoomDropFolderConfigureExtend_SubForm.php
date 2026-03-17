@@ -17,7 +17,7 @@ class Form_ZoomDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigur
 			'disabled'		=> true,
 			'filters'		=> array('StringTrim'),
 		));
-
+		
 		$this->addElement('text', 'lastHandledMeetingTime', array(
 			'label'			=> 'Last Handled Meeting Time:',
 			'filters'		=> array('StringTrim'),
@@ -25,10 +25,10 @@ class Form_ZoomDropFolderConfigureExtend_SubForm extends Form_DropFolderConfigur
 
 		$this->addElement('text', 'fileProcessingGracePeriod', array(
 			'label'			=> 'File processing grace period (seconds):',
-			'description'	=> 'Time to wait before processing a file. Leave empty for default: 10800 (3 hours). Maximum: 21600 (6 hours).',
+			'description'	=> 'Time to wait before processing a file. Insert a value between 3600 (1 hour) and 21600 (6 hours)',
 			'required'		=> false,
 			'filters'		=> array('StringTrim'),
 		));
 	}
-
+	
 }
