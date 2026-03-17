@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<config>
+		<serviceUrl>http://www.kaltura.local</serviceUrl>
+		<partnerId>-2</partnerId>
+		<clientTag>Stand alone php 1.0.0</clientTag>
+		<curlTimeout>120</curlTimeout>
+		<userAgent>Stand alone php 1.0.0</userAgent>
+		<verifySSL objectType="bool">0</verifySSL>
+	</config>
+	<session>
+		<partnerId>-2</partnerId>
+		<secret>7f811fd0cde3f4eae0c94d640c42cc0b</secret>
+		<userId></userId>
+		<sessionType>2</sessionType>
+		<expiry>86400</expiry>
+		<privileges></privileges> 
+	</session>
+
+	<multirequest>
+		<request service="responseProfile" action="add" partnerId="0">
+			<responseProfile objectType="KalturaResponseProfile">
+				<type>1</type>
+				<name>pollVoteResponseProfile</name>
+				<systemName>pollVoteResponseProfile</systemName>
+				<fields>id,name,createdAt,updatedAt,parentId,partnerData,text,tags,userId,startTime,endTime</fields>
+				<relatedProfiles objectType="array">
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>pollVoteResponseProfile</name>
+						<type>1</type>
+						<fields>id,objectId,createdAt,xml</fields>
+						<filter objectType="KalturaMetadataFilter">
+							<metadataObjectTypeEqual>annotationMetadata.Annotation</metadataObjectTypeEqual>
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>id</parentProperty>
+								<filterProperty>objectIdEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
+				</relatedProfiles>
+			</responseProfile>
+		</request>
+	</multirequest>
+
+	<multirequest>
+		<request service="responseProfile" action="add" partnerId="0">
+			<responseProfile objectType="KalturaResponseProfile">
+				<type>1</type>
+				<name>QandA</name>
+				<systemName>QandA</systemName>
+				<fields>id,name,createdAt,updatedAt,parentId,partnerData,text,tags,userId,startTime,endTime,systemName</fields>
+				<relatedProfiles objectType="array">
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>QandA_ResponseProfile</name>
+						<type>1</type>
+						<fields>id,objectId,createdAt,xml</fields>
+						<filter objectType="KalturaMetadataFilter">
+							<metadataObjectTypeEqual>annotationMetadata.Annotation</metadataObjectTypeEqual>
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>id</parentProperty>
+								<filterProperty>objectIdEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>QandA_ResponseProfile_user</name>
+						<type>1</type>
+						<fields>id,screenName,email,firstName,lastName,country,state,city,zip,description</fields>
+						<filter objectType="KalturaUserFilter">
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>userId</parentProperty>
+								<filterProperty>idEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
+				</relatedProfiles>
+			</responseProfile>
+		</request>
+		<request service="responseProfile" action="add" partnerId="0">
+			<responseProfile objectType="KalturaResponseProfile">
+				<type>1</type>
+				<name>QandA_for_push</name>
+				<systemName>QandA_for_push</systemName>
+				<fields>id,name,createdAt,updatedAt,parentId,partnerData,text,tags,userId,startTime,endTime,systemName</fields>
+				<relatedProfiles objectType="array">
+					<item objectType="KalturaDetachedResponseProfile">
+						<name>QandA_ResponseProfile</name>
+						<type>1</type>
+						<fields>id,objectId,createdAt,xml</fields>
+						<filter objectType="KalturaMetadataFilter">
+							<metadataObjectTypeEqual>annotationMetadata.Annotation</metadataObjectTypeEqual>
+						</filter>
+						<mappings objectType="array">
+							<item objectType="KalturaResponseProfileMapping">
+								<parentProperty>id</parentProperty>
+								<filterProperty>objectIdEqual</filterProperty>
+							</item>
+						</mappings>
+					</item>
+				</relatedProfiles>
+			</responseProfile>
+		</request>
+	</multirequest>
+	
+</xml>

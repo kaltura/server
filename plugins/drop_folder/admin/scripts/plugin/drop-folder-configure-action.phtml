@@ -8,8 +8,16 @@
 ?>
 
 <script type="text/javascript">
+// Wait for jQuery to be available before defining functions
+(function() {
+	// Check if jQuery is loaded, if not wait a bit
+	if (typeof jQuery === 'undefined') {
+		setTimeout(arguments.callee, 50);
+		return;
+	}
 
-function fileDeletePolicy() {
+// Define functions globally so inline event handlers can access them
+window.fileDeletePolicy = function() {
 	$("select#fileDeletePolicy").each(function(inx, value){
 		var $input = $(value);
 		$input.change(function(){
@@ -49,9 +57,10 @@ function fileDeletePolicy() {
 		    	$autoFileDeleteDaysLabel.attr("hidden", false);
 		    }
 		}
-	});}
+	});
+};
 
-function handlerTypeChanged()
+window.handlerTypeChanged = function()
 {
 	curValue = jQuery('#frmDropFolderConfigure #fileHandlerType').val();
 	patterns = jQuery('#fileNamePatterns');
@@ -75,18 +84,21 @@ function handlerTypeChanged()
 		patternsLbl.show();
 		validateKS.show();
 		validateKSLbl.show();
-	}	
-}
+	}
+};
 
+// Execute initialization code when DOM is ready
 jQuery(function() {
 	handlerTypeChanged();
 	fileDeletePolicy();
-	
+
 	<?php if ($this->formValid): ?>
 		dialogDiv.dialog('close');
 		jQuery('#frmPaginator1').submit();
 	<?php endif; ?>
 });
+
+})(); // End of jQuery availability check
 
 </script>
 

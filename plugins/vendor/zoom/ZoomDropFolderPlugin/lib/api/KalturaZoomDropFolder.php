@@ -91,15 +91,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($sourceObject, $responseProfile);
-		
-		if ($this->shouldGet('fileProcessingGracePeriod', $responseProfile))
-		{
-			$value = $sourceObject->getFileProcessingGracePeriod();
-			if (!is_null($value))
-			{
-				$this->fileProcessingGracePeriod = $value;
-			}
-		}
+		$this->fileProcessingGracePeriod = $sourceObject->getFileProcessingGracePeriod();
 
 		/* @var ZoomVendorIntegration $vendorIntegration */
 		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($this->zoomVendorIntegrationId);
@@ -164,11 +156,6 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 
 		$fileProcessingGracePeriodValue = $this->fileProcessingGracePeriod;
 
-		// Convert to integer if it's a numeric string
-		if (is_string($fileProcessingGracePeriodValue) && is_numeric($fileProcessingGracePeriodValue))
-		{
-			$fileProcessingGracePeriodValue = (int)$fileProcessingGracePeriodValue;
-		}
 
 		// Set default if empty
 		if (is_null($fileProcessingGracePeriodValue) || $fileProcessingGracePeriodValue === '')
@@ -178,27 +165,8 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
 		$dbObject = parent::toObject($dbObject, $skip);
-
-		if (!is_null($fileProcessingGracePeriodValue) && !in_array('fileProcessingGracePeriod', $skip))
-		{
-			$dbObject->setFileProcessingGracePeriod($fileProcessingGracePeriodValue);
-		}
+		$dbObject->setFileProcessingGracePeriod($fileProcessingGracePeriodValue);
 
 		return $dbObject;
 	}
-
-	public function validateForInsert($propertiesToSkip = array())
-	{
-		$this->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
-		$this->validatePropertyMaxValue('fileProcessingGracePeriod', DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE, true);
-		return parent::validateForInsert($propertiesToSkip);
-	}
-
-	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
-	{
-		$this->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
-		$this->validatePropertyMaxValue('fileProcessingGracePeriod', DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE, true);
-		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
-	}
-
 }

@@ -39,8 +39,7 @@ if (isset($argv[1]))
 }
 else
 {
-	$root = myContentStorage::getFSContentRootPath();
-	$outputPathBase = "$root/content/clientlibs";
+	$outputPathBase = "/opt/kaltura/web/content/clientlibs";
 }
 
 if(!file_exists($outputPathBase))
