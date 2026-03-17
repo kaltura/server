@@ -349,7 +349,7 @@ class myPartnerUtils
 	}
 	
 	
-	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null, $supportsHeader = false )
+	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null, $regionalCdnSupport = false )
 	{
 		$urlResult = '';
 		$protocol = infraRequestUtils::getProtocol();
@@ -365,7 +365,7 @@ class myPartnerUtils
 				{
 					$cdnHost .= ":".$_SERVER['SERVER_PORT'];
 				}
-				$urlResult = $cdnHost;
+				return $cdnHost;
 			}
 		}
 
@@ -375,38 +375,35 @@ class myPartnerUtils
 				if ($partner && $partner->getThumbnailHost())
 				{
 					$urlResult =  preg_replace('/^https?/', $protocol, $partner->getThumbnailHost());
+					break;
 				}
-				else if ($partner && $partner->getCdnHost())
+
+				if ($partner && $partner->getCdnHost())
 				{
 					$urlResult = preg_replace('/^https?/', $protocol, $partner->getCdnHost());
+					break;
 				}
-				else
-				{
-					$urlResult = requestUtils::getThumbnailCdnHost($protocol);
-				}
+
+				$urlResult = requestUtils::getThumbnailCdnHost($protocol);
 				break;
 			case 'api':
-				if ($protocol == 'https')
+			case 'cdnApi':
+				$configKey = ($protocol == 'https') && kConf::hasParam('cdn_api_host_https') ? 'cdn_api_host_https' : 'cdn_api_host';
+
+				if (kConf::hasParam($configKey))
 				{
-					$apiHost = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
-					$urlResult = 'https://' . $apiHost;
+					$apiHost = kConf::get($configKey);
+					$urlResult = $protocol . '://' . $apiHost;
+					break;
 				}
-				else
+
+				if ($hostType == 'api')
 				{
-					$apiHost = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
-					$urlResult = 'http://' . $apiHost;
+					$apiHost = kConf::get('www_host');
+					$urlResult = $protocol . '://' . $apiHost;
+					break;
 				}
-				break;
-			case 'cdn_api':
-				if ($protocol == 'https' && kConf::hasParam('cdn_api_host_https'))
-				{
-					$urlResult = 'https://' . kConf::get('cdn_api_host_https');
-				}
-				else
-				{
-					$urlResult = 'http://' . kConf::get('cdn_api_host');
-				}
-				break;
+				return self::getCdnHost($partner_id, $protocol, null, $regionalCdnSupport);
 			case 'serviceUrl':
 				if ($partner && $partner->getHost())
 				{
@@ -417,13 +414,13 @@ class myPartnerUtils
 					$urlResult = self::getCdnHost($partner_id, $protocol, 'api');
 				}
 				break;
-			case 'apphome_url':
+			case 'apphomeUrl':
 				$urlResult = kConf::get('apphome_url');
 				break;
-			case 'analytics_report':
+			case 'reports':
 				$urlResult = kDataCenterMgr::getCurrentDcUrl();
 				break;
-			case 'www_host':
+			case 'baseHost':
 				$urlResult = requestUtils::getRequestHost();
 				break;
 			default:
@@ -437,22 +434,27 @@ class myPartnerUtils
 				}
 		}
 
-		if ($supportsHeader)
+		if ($regionalCdnSupport)
 		{
-			$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
-			foreach ($headerMapping as $headerKey => $suffix)
-			{
-				if (!empty($_SERVER[$headerKey]))
-				{
-					$urlResult = $urlResult . "." . $suffix;
-					break;
-				}
-			}
+			$urlResult = self::addRegionalCdnSuffix($urlResult);
 		}
 
 		return $urlResult;
 	}
-	
+
+	public static function addRegionalCdnSuffix($urlResult)
+	{
+		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
+		foreach ($headerMapping as $headerKey => $suffix)
+		{
+			if (!empty($_SERVER[$headerKey]))
+			{
+				$urlResult = $urlResult . "." . $suffix;
+				break;
+			}
+		}
+		return $urlResult;
+	}
 	
 	public static function getPlayServerHost($partner_id, $protocol = null)
 	{
@@ -469,10 +471,10 @@ class myPartnerUtils
 		return $playServerHost;
 	}
 	
-	public static function getThumbnailHost ($partner_id, $protocol = null, $supportsHeader = false )
+	public static function getThumbnailHost ($partner_id, $protocol = null)
 	{
 	    $partner = PartnerPeer::retrieveByPK( $partner_id );
-	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol, "thumbnail", $supportsHeader);
+	    if ( !$partner || (! $partner->getThumbnailHost() ) ) return self::getCdnHost($partner_id, $protocol, "thumbnail", true);
 	    
 	    // in case the request came through https, force https url
 		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')

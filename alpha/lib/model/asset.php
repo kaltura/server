@@ -629,7 +629,7 @@ class asset extends Baseasset implements ISyncableFile, IRelatedObject
 			$downloadUrl = myPartnerUtils::getCdnHost($partnerId, null, null, true) . $finalPath;
 		}
 		else
-			$downloadUrl = myPartnerUtils::getCdnHost($partnerId, null, 'www_host', true) . $finalPath;
+			$downloadUrl = myPartnerUtils::getCdnHost($partnerId, null, 'baseHost', true) . $finalPath;
 		
 		return $downloadUrl;
 	}

@@ -2052,7 +2052,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		else
 			$protocol = infraRequestUtils::PROTOCOL_HTTP;
 
-		$cdnApiHost = myPartnerUtils::getCdnHost($partnerId, $protocol, 'cdn_api', true);
+		$cdnApiHost = myPartnerUtils::getCdnHost($partnerId, $protocol, 'cdnApi', true);
 
 		$flavorIds = array();
 		$fileExtension = null;
