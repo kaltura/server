@@ -2,6 +2,8 @@
 /**
  * @package plugins.ZoomDropFolder
  */
+require_once(dirname(__FILE__) . '/../../lib/model/kZoomEntryLock.php');
+
 class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 {
 	const DEFAULT_ZOOM_QUERY_TIMERANGE = 259200; // 3 days
@@ -280,6 +282,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID],
 									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START], $userId);
+									if (!$parentEntry)
+									{
+										KalturaLog::debug("Another system (ZOOM EVENT) is creating the parent entry, skipping drop folder file creation");
+										continue; // Skip this recording file
+									}
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 								}
 							}
@@ -318,10 +325,53 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId)
 	{
+		$referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
+		list($lock, $proceedWithoutLock) = kZoomEntryLock::acquireLock($uuid, $recordingStartTime);
+
+		if ($proceedWithoutLock && !$lock)
+		{
+			// Lock creation failed, proceed without lock
+			return $this->createEntryImpl($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId, $referenceId);
+		}
+
+		if (!$lock)
+		{
+			// Lock acquisition failed, check if entry was created by another system
+			sleep(1);
+			$existingEntry = $this->getEntryByReferenceId($referenceId);
+			if ($existingEntry) {
+				KalturaLog::debug("Entry {$referenceId} was created by another system");
+				return $existingEntry;
+			}
+			return null;
+		}
+
+		try {
+			// Double-check if entry exists after acquiring lock
+			$existingEntry = $this->getEntryByReferenceId($referenceId);
+			if ($existingEntry)
+			{
+				KalturaLog::debug("Entry {$referenceId} already exists");
+				$lock->unlock();
+				return $existingEntry;
+			}
+
+			// Create the entry
+			$newEntry = $this->createEntryImpl($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId, $referenceId);
+			$lock->unlock();
+			return $newEntry;
+		} catch (Exception $e) {
+			$lock->unlock();
+			throw $e;
+		}
+	}
+
+	protected function createEntryImpl($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId, $referenceId)
+	{
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
-		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
+		$newEntry->referenceId = $referenceId;
 		$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
 		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		if ($userId)

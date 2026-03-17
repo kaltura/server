@@ -3,6 +3,7 @@
  * @package plugins.vendor
  * @subpackage zoom.model
  */
+require_once(dirname(__FILE__) . '/kZoomEntryLock.php');
 
 class kZoomEventHanlder
 {
@@ -321,6 +322,11 @@ class kZoomEventHanlder
 						{
 							$parentEntry = self::createEntry($recording->uuid, $partnerId, $zoomVendorIntegration->getEnableZoomTranscription(),
 							                                 $recordingFile->recordingStart, $conversionProfileId);
+							if (!$parentEntry)
+							{
+								KalturaLog::debug("Another system (Watcher) is creating the parent entry, skipping drop folder file creation");
+								continue; // Skip this recording file
+							}
 							$zoomDropFolderFile->setIsParentEntry(true);
 						}
 					}
@@ -434,8 +440,52 @@ class kZoomEventHanlder
 		}
 		return $entry;
 	}
-	
+
 	protected static function createEntry($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId)
+	{
+		$referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
+		list($lock, $proceedWithoutLock) = kZoomEntryLock::acquireLock($uuid, $recordingStartTime);
+
+		if ($proceedWithoutLock && !$lock)
+		{
+			// Lock creation failed, proceed without lock
+			return self::createEntryImpl($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId, $referenceId);
+		}
+
+		if (!$lock)
+		{
+			// Lock acquisition failed, check if entry was created by another system
+			sleep(1);
+			$existingEntry = self::getEntryByReferenceId($referenceId, $partnerId);
+			if ($existingEntry)
+			{
+				KalturaLog::debug("Entry {$referenceId} was created by another system");
+				return $existingEntry;
+			}
+			KalturaLog::debug("Entry {$referenceId} still not found after lock timeout");
+			return null;
+		}
+
+		try {
+			// Double-check if entry exists after acquiring lock
+			$existingEntry = self::getEntryByReferenceId($referenceId, $partnerId);
+			if ($existingEntry) {
+				KalturaLog::debug("Entry {$referenceId} already exists");
+				$lock->unlock();
+				return $existingEntry;
+			}
+
+			// Create the entry
+			$newEntry = self::createEntryImpl($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId, $referenceId);
+			$lock->unlock();
+			return $newEntry;
+		} catch (Exception $e) {
+			$lock->unlock();
+			throw $e;
+		}
+	}
+
+	protected static function createEntryImpl($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId, $referenceId)
 	{
 		$templateEntry = null;
 		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
@@ -454,7 +504,7 @@ class kZoomEventHanlder
 		$newEntry->setType(entryType::MEDIA_CLIP);
 		$newEntry->setSourceType(EntrySourceType::URL);
 		$newEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid. $recordingStartTime);
+		$newEntry->setReferenceId($referenceId);
 		$newEntry->setStatus(entryStatus::NO_CONTENT);
 		$newEntry->setPartnerId($partnerId);
 		$newEntry->setBlockAutoTranscript($enableTranscriptionViaZoom);
