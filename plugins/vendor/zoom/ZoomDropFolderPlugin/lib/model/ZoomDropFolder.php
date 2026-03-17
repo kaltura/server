@@ -10,7 +10,9 @@ class ZoomDropFolder extends RemoteDropFolder
 	const ZOOM_VENDOR_INTEGRATION_ID = 'zoom_vendor_integration_id';
 	const LAST_HANDLED_MEETING_TIME = 'last_handled_meeting_time';
 	const FILE_PROCESSING_GRACE_PERIOD = 'file_processing_grace_period';
-	
+
+	const FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE = 10800; // 10800 seconds = 3 hours
+
 	/**
 	 * @var string
 	 */
@@ -63,7 +65,11 @@ class ZoomDropFolder extends RemoteDropFolder
 	 */
 	public function getFileProcessingGracePeriod()
 	{
-		return $this->getFromCustomData(self::FILE_PROCESSING_GRACE_PERIOD);
+		$value = $this->getFromCustomData(self::FILE_PROCESSING_GRACE_PERIOD);
+		if (is_null($value)) {
+			return self::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
+		}
+		return $value;
 	}
 
 	/**
