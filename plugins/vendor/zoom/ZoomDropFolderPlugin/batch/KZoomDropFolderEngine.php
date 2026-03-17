@@ -284,7 +284,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START], $userId);
 									if (!$parentEntry)
 									{
-										KalturaLog::debug("Another system (ZOOM EVENT) is creating the parent entry, skipping drop folder file creation");
+										KalturaLog::debug("Failed to create entry, skipping drop folder file creation");
 										continue; // Skip this recording file
 									}
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);

@@ -324,7 +324,7 @@ class kZoomEventHanlder
 							                                 $recordingFile->recordingStart, $conversionProfileId);
 							if (!$parentEntry)
 							{
-								KalturaLog::debug("Another system (Watcher) is creating the parent entry, skipping drop folder file creation");
+								KalturaLog::debug("Failed to create entry, skipping drop folder file creation");
 								continue; // Skip this recording file
 							}
 							$zoomDropFolderFile->setIsParentEntry(true);
