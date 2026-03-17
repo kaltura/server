@@ -82,7 +82,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	public function doFromObject($sourceObject, KalturaDetachedResponseProfile $responseProfile = null)
 	{
 		parent::doFromObject($sourceObject, $responseProfile);
-		
+		$this->fileProcessingGracePeriod = $sourceObject->getFileProcessingGracePeriod();
 		/* @var ZoomVendorIntegration $vendorIntegration */
 		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($this->zoomVendorIntegrationId);
 		try
@@ -143,9 +143,34 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		{
 			$dbObject = new ZoomDropFolder();
 		}
-		
+
+		$fileProcessingGracePeriodValue = $this->fileProcessingGracePeriod;
+
+		// Set default if empty
+		if (is_null($fileProcessingGracePeriodValue) || $fileProcessingGracePeriodValue === '')
+		{
+			$fileProcessingGracePeriodValue = DropFolder::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
+		}
+
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
-		return parent::toObject($dbObject, $skip);
+		$dbObject = parent::toObject($dbObject, $skip);
+
+		return $dbObject;
 	}
 
+	public function validateForInsert($propertiesToSkip = array())
+	{
+		$this->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
+		$this->validatePropertyMaxValue('fileProcessingGracePeriod', DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE, true);
+		return parent::validateForInsert($propertiesToSkip);
+	}
+
+	public function validateForUpdate($sourceObject, $propertiesToSkip = array())
+	{
+		$this->validatePropertyMinValue('fileProcessingGracePeriod', 0, true);
+		$this->validatePropertyMaxValue('fileProcessingGracePeriod', DropFolder::FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE, true);
+		return parent::validateForUpdate($sourceObject, $propertiesToSkip);
+	}
+
+>>>>>>> Stashed changes
 }
