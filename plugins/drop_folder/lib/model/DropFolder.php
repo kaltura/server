@@ -25,6 +25,8 @@ class DropFolder extends BaseDropFolder implements IBaseObject
 	const CATEGORIES_METADATA_FIELD_NAME = 'categories_metadata_field_name';
 	const ENFORCE_ENTITLEMENT = 'enforce_entitlement';
 	const SHOULD_VALIDATE_KS = 'should_validate_ks';
+	const FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE = 10800; // 10800 seconds = 3 hours
+	const FILE_PROCESSING_GRACE_PERIOD_MAX_VALUE = 21600; // 21600 seconds = 6 hours
 
 	protected static $nonEssentialCustomDataFields = array('last_file_timestamp', 'last_accessed_at');
 	
