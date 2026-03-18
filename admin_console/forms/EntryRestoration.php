@@ -17,15 +17,6 @@ class Form_EntryRestoration extends Infra_Form
 			'Form',
 		));
 
-		// Partner ID
-		$partnerId = new Zend_Form_Element_Text('partnerId');
-		$partnerId->setLabel('Partner ID')
-			->setRequired(true)
-			->addFilter('StringTrim')
-			->addValidator('Digits')
-			->setAttrib('style', 'width: 600px !important; box-sizing: border-box;')
-			->setDecorators(array('ViewHelper', 'Label', array('HtmlTag', array('tag' => 'div', 'class' => 'form-field'))));
-		$this->addElement($partnerId);
 
 		// Input mode selector
 		$inputMode = new Zend_Form_Element_Select('inputMode');

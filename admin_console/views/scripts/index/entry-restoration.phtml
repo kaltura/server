@@ -34,7 +34,6 @@
 	min-width: 600px !important;
 	max-width: 600px !important;
 }
-#frmEntryRestoration #partnerId,
 #frmEntryRestoration #inputMode,
 #frmEntryRestoration #entryIds {
 	width: 600px !important;
@@ -155,15 +154,8 @@ window.addEventListener('DOMContentLoaded', function() {
 document.getElementById('frmEntryRestoration').addEventListener('submit', function(e) {
 	e.preventDefault();
 
-	var partnerId = document.getElementById('partnerId').value.trim();
 	var inputMode = document.getElementById('inputMode').value;
 	var entryIds = [];
-
-	// Validate partner ID
-	if (!partnerId || isNaN(partnerId)) {
-		alert('Please enter a valid Partner ID');
-		return false;
-	}
 
 	// Get entry IDs based on input mode
 	if (inputMode === 'file') {
@@ -190,7 +182,7 @@ document.getElementById('frmEntryRestoration').addEventListener('submit', functi
 				return;
 			}
 
-			startRestoration(partnerId, entryIds, inputMode);
+			startRestoration(entryIds);
 		};
 		reader.readAsText(fileInput.files[0]);
 		return false;
@@ -218,7 +210,7 @@ document.getElementById('frmEntryRestoration').addEventListener('submit', functi
 		return false;
 	}
 
-	startRestoration(partnerId, entryIds, inputMode);
+	startRestoration(entryIds);
 	return false;
 });
 
@@ -237,7 +229,7 @@ function parseEntryIds(text) {
 	return validIds;
 }
 
-function startRestoration(partnerId, entryIds) {
+function startRestoration(entryIds) {
 	// Show progress and results (keep form visible)
 	document.getElementById('progressContainer').style.display = 'block';
 	document.getElementById('resultsContainer').style.display = 'block';
@@ -272,7 +264,7 @@ function startRestoration(partnerId, entryIds) {
 		document.getElementById('progressText').innerHTML = 'Processing entry ' + processed + ' of ' + total + ': <strong>' + escapeHtml(entryId) + '</strong>';
 
 		// Call the restore API for this single entry
-		restoreSingleEntry(entryId, partnerId, function(result) {
+		restoreSingleEntry(entryId, function(result) {
 			console.log('Callback received result:', result);
 			if (result.success) {
 				successCount++;
@@ -304,14 +296,13 @@ function startRestoration(partnerId, entryIds) {
 	}
 }
 
-function restoreSingleEntry(entryId, partnerId, callback) {
-	console.log('Calling AJAX for entry:', entryId, 'partner:', partnerId);
+function restoreSingleEntry(entryId, callback) {
+	console.log('Calling AJAX for entry:', entryId);
 	jQuery.ajax({
 		url: '<?php echo $this->url(array('controller' => 'index', 'action' => 'restore-entry-ajax'), null, true); ?>',
 		type: 'POST',
 		data: {
-			entryId: entryId,
-			partnerId: partnerId
+			entryId: entryId
 		},
 		dataType: 'json',
 		success: function(response) {
