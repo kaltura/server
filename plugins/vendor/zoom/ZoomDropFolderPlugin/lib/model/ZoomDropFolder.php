@@ -65,11 +65,7 @@ class ZoomDropFolder extends RemoteDropFolder
 	 */
 	public function getFileProcessingGracePeriod()
 	{
-		$value = $this->getFromCustomData(self::FILE_PROCESSING_GRACE_PERIOD);
-		if (is_null($value)) {
-			return self::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE;
-		}
-		return $value;
+		return $this->getFromCustomData(self::FILE_PROCESSING_GRACE_PERIOD, null, self::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE);
 	}
 
 	/**
