@@ -146,9 +146,18 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script type="text/javascript">
+// Guard to prevent concurrent restoration runs
+var isRestoring = false;
+
 // Handle form submission
 document.getElementById('frmEntryRestoration').addEventListener('submit', function(e) {
 	e.preventDefault();
+
+	// Prevent concurrent restoration runs
+	if (isRestoring) {
+		alert('A restoration is already in progress. Please wait for it to complete.');
+		return false;
+	}
 
 	var inputMode = document.getElementById('inputMode').value;
 	var entryIds = [];
@@ -175,6 +184,15 @@ document.getElementById('frmEntryRestoration').addEventListener('submit', functi
 		var maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
 		if (file.size > maxFileSize) {
 			alert('File is too large. Maximum file size is 5MB.\n\nYour file size: ' + Math.round(file.size / 1024 / 1024 * 100) / 100 + 'MB');
+			return false;
+		}
+
+		// Check if FileReader is available (feature detection for older browsers)
+		if (typeof FileReader === 'undefined' || !window.FileReader) {
+			alert('File upload is not supported in your browser.\n\n' +
+				  'Please use one of the following alternatives:\n' +
+				  '1. Switch to "Comma-separated or Line-separated List" mode and paste the entry IDs directly, or\n' +
+				  '2. Use a modern browser that supports file upload (Chrome, Firefox, Safari, Edge)');
 			return false;
 		}
 
@@ -243,6 +261,13 @@ function parseEntryIds(text) {
 }
 
 function startRestoration(entryIds) {
+	// Set flag and disable submit button to prevent concurrent runs
+	isRestoring = true;
+	var submitButton = document.getElementById('cmdSubmit');
+	if (submitButton) {
+		submitButton.disabled = true;
+	}
+
 	// Show progress and results (keep form visible)
 	document.getElementById('progressContainer').style.display = 'block';
 	document.getElementById('resultsContainer').style.display = 'block';
@@ -262,7 +287,12 @@ function startRestoration(entryIds) {
 
 	function processNextEntry(index) {
 		if (index >= total) {
-			// All done
+			// All done - re-enable submit button and reset flag
+			isRestoring = false;
+			var submitButton = document.getElementById('cmdSubmit');
+			if (submitButton) {
+				submitButton.disabled = false;
+			}
 			document.getElementById('progressText').innerHTML = '<strong>Completed:</strong> ' + processed + ' of ' + total + ' entries processed';
 			updateSummaryStats();
 			return;

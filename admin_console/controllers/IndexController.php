@@ -102,29 +102,40 @@ class IndexController extends Zend_Controller_Action
 		// Handle file upload to extract entry IDs
 		if ($request->isPost()) {
 			$upload = new Zend_File_Transfer_Adapter_Http();
-			$files = $upload->getFileInfo();
 
-			if (count($files) && isset($files['entryFile']) && $files['entryFile']['size']) {
-				$file = $files['entryFile'];
+			// Only process if a file was actually uploaded
+			if ($upload->isUploaded('entryFile')) {
+				// Set up validators for file upload
+				$upload->addValidator('Extension', false, 'txt,csv');
+				$upload->addValidator('Size', false, 5 * 1024 * 1024); // 5MB max
 
-				// Validate file extension immediately
-				$fileName = $file['name'];
-				$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-				$allowedExtensions = array('txt', 'csv');
-
-				if (!in_array($fileExtension, $allowedExtensions)) {
-					$this->view->errors[] = "Invalid file type. Only .txt and .csv files are accepted. You uploaded: .$fileExtension";
+				// Validate the uploaded file
+				if (!$upload->isValid('entryFile')) {
+					// Get all error messages from validators
+					$messages = $upload->getMessages();
+					foreach ($messages as $message) {
+						$this->view->errors[] = $message;
+					}
 					return;
 				}
 
-				// Validate file size (5MB max)
-				$maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
-				if ($file['size'] > $maxFileSize) {
-					$this->view->errors[] = "File is too large. Maximum file size is 5MB.";
+				// Get file info after validation
+				$fileInfo = $upload->getFileInfo('entryFile');
+				$tmpName = $fileInfo['tmp_name'];
+
+				// Additional security check: verify it's an uploaded file
+				if (!is_uploaded_file($tmpName)) {
+					$this->view->errors[] = "Security error: File was not uploaded via HTTP POST.";
 					return;
 				}
 
-				$entryIds = file_get_contents($file['tmp_name']);
+				// Read the file contents
+				$entryIds = file_get_contents($tmpName);
+
+				if ($entryIds === false) {
+					$this->view->errors[] = "Failed to read uploaded file.";
+					return;
+				}
 
 				$entryIdsField = $this->view->entryRestorationForm->getElement('entryIds');
 				$entryIdsField->setValue($entryIds);
@@ -167,7 +178,7 @@ class IndexController extends Zend_Controller_Action
 			Infra_ClientHelper::unimpersonate();
 			$client = Infra_ClientHelper::getClient();
 			$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
-			$result = $adminConsolePlugin->entryAdmin->restoreDeletedEntry($entryId);
+			$adminConsolePlugin->entryAdmin->restoreDeletedEntry($entryId);
 
 			echo $this->_helper->json(array(
 				'success' => true,
@@ -197,6 +208,7 @@ class IndexController extends Zend_Controller_Action
 				'success' => false,
 				'status' => $status,
 				'message' => $errorMsg,
+				'code' => $errorCode,
 				'type' => $type
 			), false);
 		}
