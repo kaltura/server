@@ -5,7 +5,7 @@
  */
 class KalturaVendorImmersiveAgentCallCatalogItem extends KalturaVendorCatalogItem
 {
-	protected function getServiceFeature(): int
+	protected function getServiceFeature()
 	{
 		return VendorServiceFeature::IMMERSIVE_AGENT_CALL;
 	}

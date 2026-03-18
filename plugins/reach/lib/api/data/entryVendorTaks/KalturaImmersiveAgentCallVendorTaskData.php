@@ -26,7 +26,8 @@ class KalturaImmersiveAgentCallVendorTaskData extends KalturaVendorTaskData
 
 	public function toObject($dbObject = null, $propsToSkip = array())
 	{
-		if (!$dbObject) {
+		if (!$dbObject)
+		{
 			$dbObject = new kImmersiveAgentCallVendorTaskData();
 		}
 
