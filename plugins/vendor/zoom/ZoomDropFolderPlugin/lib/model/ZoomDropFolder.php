@@ -9,7 +9,10 @@ class ZoomDropFolder extends RemoteDropFolder
 	
 	const ZOOM_VENDOR_INTEGRATION_ID = 'zoom_vendor_integration_id';
 	const LAST_HANDLED_MEETING_TIME = 'last_handled_meeting_time';
-	
+	const FILE_PROCESSING_GRACE_PERIOD = 'file_processing_grace_period';
+
+	const FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE = 10800; // 10800 seconds = 3 hours
+
 	/**
 	 * @var string
 	 */
@@ -19,6 +22,11 @@ class ZoomDropFolder extends RemoteDropFolder
 	 * @var time
 	 */
 	protected $lastHandledMeetingTime;
+
+	/**
+	 * @var int
+	 */
+	protected $fileProcessingGracePeriod;
 	
 	/**
 	 * return string
@@ -50,6 +58,33 @@ class ZoomDropFolder extends RemoteDropFolder
 	public function setLastHandledMeetingTime($v)
 	{
 		$this->putInCustomData(self::LAST_HANDLED_MEETING_TIME, $v);
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getFileProcessingGracePeriod()
+	{
+		return $this->getFromCustomData(self::FILE_PROCESSING_GRACE_PERIOD, null, self::FILE_PROCESSING_GRACE_PERIOD_DEFAULT_VALUE);
+	}
+
+	/**
+	 * @param int $v
+	 */
+	public function setFileProcessingGracePeriod($v)
+	{
+		$this->putInCustomData(self::FILE_PROCESSING_GRACE_PERIOD, $v);
+	}
+
+	/**
+	 * Code to be run before inserting to database
+	 * @param PropelPDO $con
+	 * @return boolean
+	 */
+	public function preInsert(PropelPDO $con = null)
+	{
+		$ret = parent::preInsert($con);
+		return $ret;
 	}
 	
 	public function getImportJobData()
