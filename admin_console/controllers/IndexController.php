@@ -103,8 +103,27 @@ class IndexController extends Zend_Controller_Action
 		if ($request->isPost()) {
 			$upload = new Zend_File_Transfer_Adapter_Http();
 			$files = $upload->getFileInfo();
+
 			if (count($files) && isset($files['entryFile']) && $files['entryFile']['size']) {
 				$file = $files['entryFile'];
+
+				// Validate file extension immediately
+				$fileName = $file['name'];
+				$fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+				$allowedExtensions = array('txt', 'csv');
+
+				if (!in_array($fileExtension, $allowedExtensions)) {
+					$this->view->errors[] = "Invalid file type. Only .txt and .csv files are accepted. You uploaded: .$fileExtension";
+					return;
+				}
+
+				// Validate file size (5MB max)
+				$maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+				if ($file['size'] > $maxFileSize) {
+					$this->view->errors[] = "File is too large. Maximum file size is 5MB.";
+					return;
+				}
+
 				$entryIds = file_get_contents($file['tmp_name']);
 
 				$entryIdsField = $this->view->entryRestorationForm->getElement('entryIds');
@@ -119,17 +138,27 @@ class IndexController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender(true);
 
 		$request = $this->getRequest();
+
+		// Only accept POST requests for restore operations
+		if (!$request->isPost()) {
+			echo $this->_helper->json(array(
+				'success' => false,
+				'status' => 'Failed',
+				'message' => 'Only POST requests are allowed',
+				'type' => 'error'
+			), false);
+			return;
+		}
+
 		$entryId = $request->getParam('entryId');
 
-		header('Content-Type: application/json');
-
 		if (!$entryId) {
-			echo json_encode(array(
+			echo $this->_helper->json(array(
 				'success' => false,
 				'status' => 'Failed',
 				'message' => 'Entry ID is required',
 				'type' => 'error'
-			));
+			), false);
 			return;
 		}
 
@@ -140,35 +169,36 @@ class IndexController extends Zend_Controller_Action
 			$adminConsolePlugin = Kaltura_Client_AdminConsole_Plugin::get($client);
 			$result = $adminConsolePlugin->entryAdmin->restoreDeletedEntry($entryId);
 
-			echo json_encode(array(
+			echo $this->_helper->json(array(
 				'success' => true,
 				'status' => 'Restored',
 				'message' => 'Successfully restored',
 				'type' => 'success'
-			));
+			), false);
 		} catch (Exception $e) {
 			$errorMsg = $e->getMessage();
-			$errorCode = $e->getCode();
+			$errorCode = (string)$e->getCode();
 			$status = 'Failed';
 			$type = 'error';
 
 			// Categorize error types
-			if (strpos($errorCode, 'ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE') !== false ||
+			// Check message for error indicators since errorCode is typically numeric
+			if (stripos($errorMsg, 'ENTRY_ASSETS_WRONG_STATUS_FOR_RESTORE') !== false ||
 				stripos($errorMsg, 'wrong status') !== false ||
 				stripos($errorMsg, 'cannot be restored') !== false ||
 				stripos($errorMsg, 'not deleted') !== false ||
-				strpos($errorCode, 'ENTRY_ID_NOT_FOUND') !== false ||
+				stripos($errorMsg, 'ENTRY_ID_NOT_FOUND') !== false ||
 				stripos($errorMsg, 'not found') !== false) {
 				$status = 'Not Restorable';
 				$type = 'not_restorable';
 			}
 
-			echo json_encode(array(
+			echo $this->_helper->json(array(
 				'success' => false,
 				'status' => $status,
 				'message' => $errorMsg,
 				'type' => $type
-			));
+			), false);
 		}
 	}
 }

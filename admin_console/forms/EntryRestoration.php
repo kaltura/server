@@ -35,7 +35,6 @@ class Form_EntryRestoration extends Infra_Form
 		$entryIds = new Zend_Form_Element_Textarea('entryIds');
 		$entryIds->setLabel('Entry IDs')
 			->setAttrib('rows', 10)
-		->setAttrib('cols', 1)
 			->addFilter('StringTrim')
 			->setAttrib('style', 'width: 600px !important; box-sizing: border-box;')
 			->setDecorators(array('ViewHelper', 'Label', array('HtmlTag', array('tag' => 'div', 'class' => 'form-field', 'id' => 'entryIdsField'))));

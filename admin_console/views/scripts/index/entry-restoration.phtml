@@ -104,7 +104,7 @@ function toggleInputMode() {
 // Initialize on page load
 document.getElementById('inputMode').addEventListener('change', toggleInputMode);
 
-// Ensure the dropdown shows the selected value and fix field widths
+// Ensure the dropdown shows the selected value and sync UI state
 window.addEventListener('DOMContentLoaded', function() {
 	var inputMode = document.getElementById('inputMode');
 	if (inputMode) {
@@ -112,12 +112,8 @@ window.addEventListener('DOMContentLoaded', function() {
 		if (!inputMode.value) {
 			inputMode.value = 'textarea';
 		}
-	}
-
-	// Remove cols attribute from textarea
-	var entryIds = document.getElementById('entryIds');
-	if (entryIds) {
-		entryIds.removeAttribute('cols');
+		// Sync UI state with the current selected mode
+		toggleInputMode();
 	}
 });
 </script>
@@ -162,6 +158,23 @@ document.getElementById('frmEntryRestoration').addEventListener('submit', functi
 		var fileInput = document.getElementById('entryFile');
 		if (!fileInput.files || !fileInput.files[0]) {
 			alert('Please select a file');
+			return false;
+		}
+
+		// Validate file type (only .txt and .csv allowed)
+		var file = fileInput.files[0];
+		var fileName = file.name.toLowerCase();
+		var fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+
+		if (fileExtension !== '.txt' && fileExtension !== '.csv') {
+			alert('Invalid file type. Only .txt and .csv files are accepted.\n\nYou uploaded: ' + fileExtension);
+			return false;
+		}
+
+		// Validate file size (5MB max)
+		var maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+		if (file.size > maxFileSize) {
+			alert('File is too large. Maximum file size is 5MB.\n\nYour file size: ' + Math.round(file.size / 1024 / 1024 * 100) / 100 + 'MB');
 			return false;
 		}
 
@@ -265,7 +278,6 @@ function startRestoration(entryIds) {
 
 		// Call the restore API for this single entry
 		restoreSingleEntry(entryId, function(result) {
-			console.log('Callback received result:', result);
 			if (result.success) {
 				successCount++;
 			} else if (result.type === 'not_restorable') {
@@ -275,7 +287,6 @@ function startRestoration(entryIds) {
 			}
 
 			// Add result row
-			console.log('Adding result row to table');
 			addResultRow(result);
 			updateSummaryStats();
 
@@ -297,7 +308,6 @@ function startRestoration(entryIds) {
 }
 
 function restoreSingleEntry(entryId, callback) {
-	console.log('Calling AJAX for entry:', entryId);
 	jQuery.ajax({
 		url: '<?php echo $this->url(array('controller' => 'index', 'action' => 'restore-entry-ajax'), null, true); ?>',
 		type: 'POST',
@@ -306,7 +316,6 @@ function restoreSingleEntry(entryId, callback) {
 		},
 		dataType: 'json',
 		success: function(response) {
-			console.log('AJAX success response:', response);
 			callback({
 				entryId: entryId,
 				status: response.status,
@@ -316,7 +325,6 @@ function restoreSingleEntry(entryId, callback) {
 			});
 		},
 		error: function(xhr, status, error) {
-			console.log('AJAX error:', status, error, xhr.responseText);
 			callback({
 				entryId: entryId,
 				status: 'Failed',
@@ -331,7 +339,10 @@ function restoreSingleEntry(entryId, callback) {
 function addResultRow(result) {
 	var tbody = document.getElementById('resultsBody');
 	var row = tbody.insertRow();
-	row.className = result.success ? 'even' : 'odd';
+
+	// Apply zebra striping based on row index, not result status
+	var rowIndex = tbody.rows.length - 1;
+	row.className = (rowIndex % 2 === 1) ? 'odd' : '';
 
 	// Determine color based on result type
 	var statusColor = 'green';
