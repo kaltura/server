@@ -944,7 +944,7 @@ CREATE TABLE IF NOT EXISTS `entry_server_node` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Relationship between entry and server node';
 
 CREATE TABLE IF NOT EXISTS `entry_vendor_task` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `queue_time` datetime DEFAULT NULL,

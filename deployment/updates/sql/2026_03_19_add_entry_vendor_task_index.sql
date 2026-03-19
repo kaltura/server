@@ -1,1 +1,1 @@
-alter table entry_vendor_task add index reach_profile_finish_time(reach_profile_id, finish_time);
+alter table entry_vendor_task MODIFY COLUMN id BIGINT(20) NOT NULL AUTO_INCREMENT, add index reach_profile_finish_time(reach_profile_id, finish_time);
