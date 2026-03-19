@@ -1,3 +1,16 @@
+# Venus-22.16.0
+## Add Quota partner
+* Issue Type: Task
+* Issue ID: PLAT-25763
+
+### Configuration ###
+Replace the tokens: @QUOTA_PARTNER_ADMIN_SECRET@, @QUOTA_PARTNER_SECRET@ in the ini file and remove ".template" from the file name:
+
+    deployment/base/scripts/init_data/01.Partner.template.ini
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2026_03_18_quota_add_partner.php
+
 # Venus-22.14.0
 ## Add models sdk permission
 * Issue Type: Task
