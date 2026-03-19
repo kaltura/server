@@ -1,3 +1,11 @@
+# Venus-22.16.0
+## Add permissions for appToken get and list, session impersonate, partner get, and groupUser list
+* Issue Type: Task
+* Issue ID: PLAT-25755
+
+### Deployment Scripts ###
+	php deployment/updates/scripts/add_permissions/2026_03_19_app_token_get_permission.php
+
 # Venus-22.14.0
 ## Add models sdk permission
 * Issue Type: Task
