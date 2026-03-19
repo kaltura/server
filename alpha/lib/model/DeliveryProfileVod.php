@@ -587,4 +587,3 @@ abstract class DeliveryProfileVod extends DeliveryProfile {
 		return parent::supportsDeliveryDynamicAttributes($deliveryAttributes);
 	}
 }
-
