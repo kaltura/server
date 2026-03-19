@@ -337,7 +337,6 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 			if ($existingEntry)
 			{
 				KalturaLog::debug("Entry {$referenceId} already exists");
-				kZoomEntryLock::unlock($lock);
 				return $existingEntry;
 			}
 			// Create the entry if it not exists
