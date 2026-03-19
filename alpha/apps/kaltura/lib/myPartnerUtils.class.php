@@ -387,23 +387,27 @@ class myPartnerUtils
 				$urlResult = requestUtils::getThumbnailCdnHost($protocol);
 				break;
 			case 'api':
+				if ($protocol == 'https')
+				{
+					$apiHost = (kConf::hasParam('cdn_api_host_https')) ? kConf::get('cdn_api_host_https') : kConf::get('www_host');
+					$urlResult = 'https://' . $apiHost;
+				}
+				else
+				{
+					$apiHost = (kConf::hasParam('cdn_api_host')) ? kConf::get('cdn_api_host') : kConf::get('www_host');
+					$urlResult = 'http://' . $apiHost;
+				}
+				break;
 			case 'cdnApi':
-				$configKey = ($protocol == 'https') && kConf::hasParam('cdn_api_host_https') ? 'cdn_api_host_https' : 'cdn_api_host';
-
-				if (kConf::hasParam($configKey))
+				if ($protocol == 'https' && kConf::hasParam('cdn_api_host_https'))
 				{
-					$apiHost = kConf::get($configKey);
-					$urlResult = $protocol . '://' . $apiHost;
-					break;
+					$urlResult = 'https://' . kConf::get('cdn_api_host_https');
 				}
-
-				if ($hostType == 'api')
+				else
 				{
-					$apiHost = kConf::get('www_host');
-					$urlResult = $protocol . '://' . $apiHost;
-					break;
+					$urlResult = 'http://' . kConf::get('cdn_api_host');
 				}
-				return self::getCdnHost($partner_id, $protocol, null, $regionalCdnSupport);
+				break;
 			case 'serviceUrl':
 				if ($partner && $partner->getHost())
 				{
