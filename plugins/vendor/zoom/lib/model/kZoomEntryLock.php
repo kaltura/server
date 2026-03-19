@@ -3,21 +3,19 @@
  * Shared Zoom entry locking utility
  */
 require_once(dirname(__FILE__) . '/../../../../../../alpha/apps/kaltura/lib/cache/kCacheManager.php');
-require_once(dirname(__FILE__) . '/../../../../../../alpha/apps/kaltura/lib/locking/kLock.php');
 require_once(dirname(__FILE__) . '/../../../../../../alpha/apps/kaltura/lib/logging/KalturaLog.php');
 
 class kZoomEntryLock
 {
-	const LOCK_GRAB_TIMEOUT = 5; // seconds
 	const LOCK_HOLD_TIMEOUT = 30; // seconds
 
 	/**
 	 * Create and acquire lock for Zoom entry creation
 	 * @param string $uuid
 	 * @param string $recordingStartTime
-	 * @return array [kLock|null, bool $proceedWithoutLock]
+	 * @return object|null Lock object with store/key properties or null if lock acquisition failed
 	 */
-	public static function acquireLock($uuid, $recordingStartTime)
+	public static function acquireLock($uuid, $recordingStartTime): ?object
 	{
 		if (empty($recordingStartTime))
 		{
@@ -30,36 +28,23 @@ class kZoomEntryLock
 		$store = kCacheManager::getSingleLayerCache(kCacheManager::CACHE_TYPE_LOCK_KEYS);
 		if (!$store)
 		{
-			KalturaLog::err("Could not get cache store for lock, proceeding without lock");
-			return array(null, true); // proceedWithoutLock = true
+			KalturaLog::err("Could not get cache store for locking Zoom entry creation for UUID: {$uuid}");
+			throw new kCoreException("Lock cache unavailable, cannot acquire lock for Zoom entry creation");
 		}
 
 		// Use store directly for locking (similar to kClipManager pattern)
 		if (!$store->add($lockKey, true, self::LOCK_HOLD_TIMEOUT))
 		{
 			KalturaLog::debug("Could not acquire lock for {$lockKey}, another system is creating the entry");
-			return array(null, false); // proceedWithoutLock = false
+			return null; // Lock acquisition failed
 		}
 
 		// Create a simple lock wrapper for the store
-		$lock = new kZoomSimpleLock($store, $lockKey);
-		return array($lock, false); // proceedWithoutLock = false
-	}
-}
-
-class kZoomSimpleLock
-{
-	private $store;
-	private $key;
-
-	public function __construct($store, $key)
-	{
-		$this->store = $store;
-		$this->key = $key;
+		return (object)['store' => $store, 'key' => $lockKey];   // Lock acquired
 	}
 
-	public function unlock()
+	public static function unlock($lock): bool
 	{
-		return $this->store->delete($this->key);
+		return $lock->store->delete($lock->key);
 	}
 }

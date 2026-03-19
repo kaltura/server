@@ -236,7 +236,7 @@ class DropFolderFileService extends KalturaBaseService
 						break;
 					case DropFolderFileStatus::DETECTED:
 					case DropFolderFileStatus::PROCESSING:
-						KalturaLog::info('Exisiting file status is '.$existingDropFolderFile->getStatus().'], updating status to ['.$fileStatus.']');
+						KalturaLog::info('Existing file status is '.$existingDropFolderFile->getStatus().'], updating status to ['.$fileStatus.']');
 						$existingDropFolderFile = $dropFolderFile->toUpdatableObject($existingDropFolderFile);
 						if($existingDropFolderFile->getStatus() != $fileStatus)
 							$existingDropFolderFile->setStatus($fileStatus);
