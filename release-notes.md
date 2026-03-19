@@ -1,3 +1,12 @@
+# Venus-22.16.0
+## Optimize entry_vendor_task queries ##
+- Issue Type: Task
+- Issue ID: PLAT-25733
+
+### Deployment scripts ###
+Alter batch_job_log table to change abort colmun default value    
+mysql –h{HOSTNAME} –u{USER} –p{PASSWORD} kaltura < /opt/kaltura/app/deployment/updates/sql/2026_03_19_add_entry_vendor_task_index.sql
+
 # Venus-22.14.0
 ## Add models sdk permission
 * Issue Type: Task

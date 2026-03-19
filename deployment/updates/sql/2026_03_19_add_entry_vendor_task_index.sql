@@ -1,0 +1,1 @@
+alter table entry_vendor_task add index reach_profile_finish_time(reach_profile_id, finish_time);
