@@ -326,28 +326,13 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId)
 	{
 		$referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
-		try
-		{
-			$lock = kZoomEntryLock::acquireLock($uuid, $recordingStartTime);
-		} catch (kCoreException $e)
-		{
-			KalturaLog::err("Failed to acquire lock for UUID {$uuid}: " . $e->getMessage());
-			return null; // or handle appropriately
-		}
+		$lock = kZoomEntryLock::acquireLock($uuid, $recordingStartTime);
 		if (!$lock)
 		{
-			// Lock acquisition failed, check if entry was created by another system
-			sleep(1);
-			$existingEntry = $this->getEntryByReferenceId($referenceId);
-			if ($existingEntry) {
-				KalturaLog::debug("Entry {$referenceId} was created by another system");
-				return $existingEntry;
-			}
 			return null;
 		}
-
 		try {
-			// Double-check if entry exists after acquiring lock
+			// Check if entry exists after acquiring lock
 			$existingEntry = $this->getEntryByReferenceId($referenceId);
 			if ($existingEntry)
 			{
@@ -355,14 +340,10 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 				kZoomEntryLock::unlock($lock);
 				return $existingEntry;
 			}
-
-			// Create the entry
-			$newEntry = $this->createEntryImpl($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId, $referenceId);
-			ZoomEntryLock::unlock($lock);
-			return $newEntry;
-		} catch (Exception $e) {
+			// Create the entry if it not exists
+			return $this->createEntryImpl($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId, $referenceId);
+		} finally {
 			kZoomEntryLock::unlock($lock);
-			throw $e;
 		}
 	}
 

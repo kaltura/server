@@ -444,44 +444,25 @@ class kZoomEventHanlder
 	protected static function createEntry($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId)
 	{
 		$referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
-		try
-		{
-			$lock = kZoomEntryLock::acquireLock($uuid, $recordingStartTime);
-		} catch (kCoreException $e)
-		{
-			KalturaLog::err("Failed to acquire lock for UUID {$uuid}: " . $e->getMessage());
-			return null;
-		}
+		$lock = kZoomEntryLock::acquireLock($uuid, $recordingStartTime);
 		if (!$lock)
 		{
-			// Lock acquisition failed, check if entry was created by another system
-			sleep(1);
+			return null;
+		}
+		try
+		{
+			// check if entry exists after acquiring lock
 			$existingEntry = self::getEntryByReferenceId($referenceId, $partnerId);
 			if ($existingEntry)
 			{
-				KalturaLog::debug("Entry {$referenceId} was created by another system");
-				return $existingEntry;
-			}
-			KalturaLog::debug("Entry {$referenceId} still not found after lock timeout");
-			return null;
-		}
-
-		try {
-			// Double-check if entry exists after acquiring lock
-			$existingEntry = self::getEntryByReferenceId($referenceId, $partnerId);
-			if ($existingEntry) {
 				KalturaLog::debug("Entry {$referenceId} already exists");
-				kZoomEntryLock::unlock($lock);
 				return $existingEntry;
 			}
-
-			// Create the entry
-			$newEntry = self::createEntryImpl($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId, $referenceId);
+			// Create the entry if it not exists
+			return self::createEntryImpl($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId, $referenceId);
+		}finally
+		{
 			kZoomEntryLock::unlock($lock);
-			return $newEntry;
-		} catch (Exception $e) {
-			kZoomEntryLock::unlock($lock);
-			throw $e;
 		}
 	}
 

@@ -15,12 +15,8 @@ class kZoomEntryLock
 	 * @param string $recordingStartTime
 	 * @return object|null Lock object with store/key properties or null if lock acquisition failed
 	 */
-	public static function acquireLock($uuid, $recordingStartTime): ?object
+	public static function acquireLock($uuid, string $recordingStartTime): ?object
 	{
-		if (empty($recordingStartTime))
-		{
-			throw new kCoreException("Recording start time is null or empty for UUID: {$uuid}");
-		}
 
 		$lockKey = "zoom_entry_creation_{$uuid}_{$recordingStartTime}";
 
@@ -29,7 +25,7 @@ class kZoomEntryLock
 		if (!$store)
 		{
 			KalturaLog::err("Could not get cache store for locking Zoom entry creation for UUID: {$uuid}");
-			throw new kCoreException("Lock cache unavailable, cannot acquire lock for Zoom entry creation");
+			return null;
 		}
 
 		// Use store directly for locking (similar to kClipManager pattern)
