@@ -335,6 +335,12 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $videoCodecIn;
 
+	/**
+	 * filter by agent id
+	 * @var string
+	 */
+	public $agentIdIn;
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -386,6 +392,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'companyIn' => 'companies',
 		'eventSessionContextIdIn' => 'event_session_context_ids',
 		'videoCodecIn' => 'video_codec',
+		'agentIdIn' => 'agent_ids',
 	);
 
 	protected function getMapBetweenObjects()

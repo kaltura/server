@@ -1569,6 +1569,7 @@ class reportsInputFilter
 	public $companies;
 	public $event_session_context_ids;
 	public $video_codec;
+	public $agent_ids;
 	
 	public function getFilterBy() {
 		return "";

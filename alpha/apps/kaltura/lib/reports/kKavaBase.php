@@ -21,6 +21,7 @@ class kKavaBase extends kDruidBase
 	const DATASOURCE_MEETING_REALTIME = 'meeting-events-realtime';
 	const DATASOURCE_CNC_EVENTS = 'cnc-events';
 	const DATASOURCE_APPLICATION_EVENTS = 'application-events';
+	const DATASOURCE_IMMERSIVE_AGENTS_EVENTS = 'immersive-agents-events';
 
 	// dimensions
 	const DIMENSION_PARTNER_ID = 'partnerId';
@@ -91,6 +92,8 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_COMPANY = 'company';
 	const DIMENSION_FLAVOR_ID = 'flavorId';
 	const DIMENSION_VIDEO_CODEC = 'videoCodec';
+	const DIMENSION_EVENT_MULTI_VAR1 = 'eventMultiVar1';
+	const DIMENSION_AGENT_ID = 'agentId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -196,6 +199,12 @@ class kKavaBase extends kDruidBase
 	const EVENT_TYPE_PAGE_LOAD = 'pageLoad';
 	const EVENT_TYPE_BUTTON_CLICKED = 'buttonClicked';
 	const EVENT_TYPE_QR_CODE_SCANNED = 'qrCodeScanned';
+
+	// event types - immersive agents events
+	const EVENT_TYPE_MESSAGE_RESPONSE = 'messageResponse';
+	const EVENT_TYPE_AVATAR_CALL_STARTED = 'callStarted';
+	const EVENT_TYPE_AVATAR_CALL_ENDED = 'callEnded';
+	const EVENT_TYPE_MESSAGE_FEEDBACK = 'messageFeedbackSent';
 
 	// view events
 	const VIEW_EVENT_INTERVAL = 10;
@@ -343,6 +352,10 @@ class kKavaBase extends kDruidBase
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_OFF = 'TabNotFocusedMicMutedFullScreenOffCameraOnSoundOff';
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_OFF_ON_STAGE = 'TabNotFocusedMicMutedFullScreenOffCameraOnSoundOffOnStage';
 	const USER_TAB_NOT_FOCUSED_MIC_MUTED_FULL_SCREEN_OFF_CAMERA_ON_SOUND_OFF_OFF_STAGE = 'TabNotFocusedMicMutedFullScreenOffCameraOnSoundOffOffStage';
+
+	// immersive agents experience values
+	const CHAT_EXPERIENCE = 'Chat';
+	const CALL_EXPERIENCE = 'Call';
 
 	protected static $realtime_engagement = array(
 		self::USER_SOUND_ON_TAB_FOCUSED,
@@ -605,6 +618,13 @@ class kKavaBase extends kDruidBase
 		self::EVENT_TYPE_VE_ATTENDED,
 		self::EVENT_TYPE_VE_PARTICIPATED,
 		self::EVENT_TYPE_VE_PARTICIPATED_POST_EVENT,
+	);
+
+	protected static $immersive_agents_events_types = array(
+		self::EVENT_TYPE_MESSAGE_RESPONSE,
+		self::EVENT_TYPE_AVATAR_CALL_STARTED,
+		self::EVENT_TYPE_AVATAR_CALL_ENDED,
+		self::EVENT_TYPE_MESSAGE_FEEDBACK
 	);
 
 	//general values
@@ -881,6 +901,18 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_EVENT_VAR4 => 1,
 			self::DIMENSION_VIRTUAL_EVENT_ID => 1,
+		),
+		self::DATASOURCE_IMMERSIVE_AGENTS_EVENTS => array(
+			self::DIMENSION_EVENT_TYPE => 1,
+			self::DIMENSION_PARTNER_ID => 1,
+			self::DIMENSION_PARTNER_PARENT_ID => 1,
+			self::DIMENSION_CONTEXT_ID => 1,
+			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_AGENT_ID => 1,
+			self::DIMENSION_EVENT_VAR1 => 1,
+			self::DIMENSION_EVENT_VAR2 => 1,
+			self::DIMENSION_EVENT_VAR3 => 1,
+			self::DIMENSION_EVENT_MULTI_VAR1 => 1,
 		)
 	);
 
