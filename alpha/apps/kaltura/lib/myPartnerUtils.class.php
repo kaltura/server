@@ -352,7 +352,7 @@ class myPartnerUtils
 	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null, $regionalCdnSupport = false )
 	{
 		$urlResult = '';
-		$protocol = infraRequestUtils::getProtocol();
+		$protocol = $protocol ?: infraRequestUtils::getProtocol();
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
 		if ($partner)
