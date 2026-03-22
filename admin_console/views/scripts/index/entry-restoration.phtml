@@ -1,0 +1,379 @@
+<style>
+#frmEntryRestoration .form-field {
+	margin-bottom: 25px;
+	clear: both;
+}
+#frmEntryRestoration label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: bold;
+	font-size: 14px;
+}
+#frmEntryRestoration input[type="text"],
+#frmEntryRestoration select,
+#frmEntryRestoration textarea {
+	display: block;
+	width: 600px;
+	padding: 10px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+}
+#frmEntryRestoration input[type="text"]:focus,
+#frmEntryRestoration select:focus,
+#frmEntryRestoration textarea:focus {
+	border-color: #4CAF50;
+	outline: none;
+	box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+#frmEntryRestoration textarea {
+	min-height: 200px;
+	resize: vertical;
+	width: 600px !important;
+	min-width: 600px !important;
+	max-width: 600px !important;
+}
+#frmEntryRestoration #inputMode,
+#frmEntryRestoration #entryIds {
+	width: 600px !important;
+	min-width: 600px !important;
+	max-width: 600px !important;
+	box-sizing: border-box !important;
+}
+#frmEntryRestoration fieldset {
+	border: 1px solid #ddd;
+	padding: 20px;
+	border-radius: 4px;
+	background: #f9f9f9;
+}
+</style>
+
+<h2>Bulk Entry Restoration</h2>
+
+<p>This tool allows you to restore multiple deleted entries in bulk. You can provide entry IDs via file upload, comma-separated list, or a single entry ID.</p>
+
+<div style="background: #fffacd; border: 1px solid #e6c200; padding: 15px; margin: 15px 0; border-radius: 4px;">
+	<strong>Important Limitations:</strong>
+	<ul style="margin: 10px 0 0 20px;">
+		<li><strong>Comma-separated or Line-separated List:</strong> Maximum 500 entries per submission</li>
+		<li><strong>File Upload:</strong> Maximum 1000 entries per file</li>
+		<li>If you have more entries than these limits, please process them in batches (e.g., split into multiple files of 1000 entries each)</li>
+	</ul>
+</div>
+
+<?php if (count($this->errors)): ?>
+<div class="error">
+	<ul>
+		<?php foreach($this->errors as $error): ?>
+		<li><?php echo htmlspecialchars($error); ?></li>
+		<?php endforeach; ?>
+	</ul>
+</div>
+<?php endif; ?>
+
+<?php echo $this->entryRestorationForm; ?>
+
+<script type="text/javascript">
+function toggleInputMode() {
+	var mode = document.getElementById('inputMode').value;
+	var entryIdsField = document.getElementById('entryIdsField');
+	var entryFileField = document.getElementById('entryFileField');
+
+	if (mode === 'file') {
+		entryIdsField.style.display = 'none';
+		entryFileField.style.display = 'block';
+		document.getElementById('entryIds').required = false;
+		document.getElementById('entryFile').required = true;
+	} else {
+		entryIdsField.style.display = 'block';
+		entryFileField.style.display = 'none';
+		document.getElementById('entryIds').required = true;
+		document.getElementById('entryFile').required = false;
+
+		if (mode === 'single') {
+			document.getElementById('entryIds').rows = 1;
+			document.getElementById('entryIds').placeholder = 'Enter a single entry ID';
+		} else {
+			document.getElementById('entryIds').rows = 10;
+			document.getElementById('entryIds').placeholder = 'Enter entry IDs separated by commas or newlines';
+		}
+	}
+}
+
+// Initialize on page load
+document.getElementById('inputMode').addEventListener('change', toggleInputMode);
+
+// Ensure the dropdown shows the selected value and sync UI state
+window.addEventListener('DOMContentLoaded', function() {
+	var inputMode = document.getElementById('inputMode');
+	if (inputMode) {
+		// Set default value if not already set
+		if (!inputMode.value) {
+			inputMode.value = 'textarea';
+		}
+		// Sync UI state with the current selected mode
+		toggleInputMode();
+	}
+});
+</script>
+
+<!-- Progress and Results Section (hidden initially) -->
+<div id="progressContainer" style="display:none; margin-top:30px;">
+	<h2>Restoration Progress</h2>
+	<div style="background: #f0f0f0; border: 1px solid #ccc; height: 30px; margin: 10px 0;">
+		<div id="progressBar" style="width:0%; background:#4CAF50; height:100%; transition: width 0.3s;"></div>
+	</div>
+	<p id="progressText">Processing...</p>
+</div>
+
+<div id="resultsContainer" style="display:none; margin-top:30px;">
+	<h2>Restoration Results <span id="resultsStats"></span></h2>
+
+	<p id="summaryStats" style="margin: 10px 0;"></p>
+
+	<table class="clear">
+		<thead>
+			<tr>
+				<th>Entry ID</th>
+				<th>Status</th>
+				<th>Error/Message</th>
+			</tr>
+		</thead>
+		<tbody id="resultsBody">
+		</tbody>
+	</table>
+</div>
+
+<script type="text/javascript">
+// Handle form submission
+document.getElementById('frmEntryRestoration').addEventListener('submit', function(e) {
+	e.preventDefault();
+
+	var inputMode = document.getElementById('inputMode').value;
+	var entryIds = [];
+
+	// Get entry IDs based on input mode
+	if (inputMode === 'file') {
+		var fileInput = document.getElementById('entryFile');
+		if (!fileInput.files || !fileInput.files[0]) {
+			alert('Please select a file');
+			return false;
+		}
+
+		// Validate file type (only .txt and .csv allowed)
+		var file = fileInput.files[0];
+		var fileName = file.name.toLowerCase();
+		var fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+
+		if (fileExtension !== '.txt' && fileExtension !== '.csv') {
+			alert('Invalid file type. Only .txt and .csv files are accepted.\n\nYou uploaded: ' + fileExtension);
+			return false;
+		}
+
+		// Validate file size (5MB max)
+		var maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+		if (file.size > maxFileSize) {
+			alert('File is too large. Maximum file size is 5MB.\n\nYour file size: ' + Math.round(file.size / 1024 / 1024 * 100) / 100 + 'MB');
+			return false;
+		}
+
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var content = e.target.result;
+			entryIds = parseEntryIds(content);
+			if (entryIds.length === 0) {
+				alert('No valid entry IDs found in file');
+				return;
+			}
+
+			// Validate file mode limit: max 1000 entries
+			if (entryIds.length > 1000) {
+				alert('File upload mode has a maximum limit of 1000 entries.\n\n' +
+					  'You have provided ' + entryIds.length + ' entries.\n\n' +
+					  'Please split your entries into batches of 1000 or fewer and process them separately.');
+				return;
+			}
+
+			startRestoration(entryIds);
+		};
+		reader.readAsText(fileInput.files[0]);
+		return false;
+	} else {
+		var entryIdsText = document.getElementById('entryIds').value.trim();
+		if (!entryIdsText) {
+			alert('Please enter at least one Entry ID');
+			return false;
+		}
+		entryIds = parseEntryIds(entryIdsText);
+	}
+
+	if (entryIds.length === 0) {
+		alert('No valid entry IDs found');
+		return false;
+	}
+
+	// Validate textarea/single mode limit: max 500 entries
+	if ((inputMode === 'textarea' || inputMode === 'single') && entryIds.length > 500) {
+		alert('Comma-separated or Line-separated mode has a maximum limit of 500 entries.\n\n' +
+			  'You have provided ' + entryIds.length + ' entries.\n\n' +
+			  'Please either:\n' +
+			  '1. Use File Upload mode (supports up to 1000 entries), or\n' +
+			  '2. Split your entries into batches of 500 or fewer');
+		return false;
+	}
+
+	startRestoration(entryIds);
+	return false;
+});
+
+function parseEntryIds(text) {
+	// Split by newlines, commas, spaces, or semicolons
+	var ids = text.split(/[\r\n,;\s]+/);
+	var validIds = [];
+
+	for (var i = 0; i < ids.length; i++) {
+		var id = ids[i].trim();
+		if (id.length > 0) {
+			validIds.push(id);
+		}
+	}
+
+	return validIds;
+}
+
+function startRestoration(entryIds) {
+	// Show progress and results (keep form visible)
+	document.getElementById('progressContainer').style.display = 'block';
+	document.getElementById('resultsContainer').style.display = 'block';
+	document.getElementById('resultsBody').innerHTML = '';
+
+	var total = entryIds.length;
+	var processed = 0;
+	var successCount = 0;
+	var notRestorableCount = 0;
+	var errorCount = 0;
+
+	// Update stats
+	document.getElementById('resultsStats').textContent = '(' + total + (total === 1 ? ' entry' : ' entries') + ')';
+
+	// Process entries one by one
+	processNextEntry(0);
+
+	function processNextEntry(index) {
+		if (index >= total) {
+			// All done
+			document.getElementById('progressText').innerHTML = '<strong>Completed:</strong> ' + processed + ' of ' + total + ' entries processed';
+			updateSummaryStats();
+			return;
+		}
+
+		var entryId = entryIds[index];
+		processed++;
+
+		// Update progress bar
+		var percent = Math.round((processed / total) * 100);
+		document.getElementById('progressBar').style.width = percent + '%';
+		document.getElementById('progressText').innerHTML = 'Processing entry ' + processed + ' of ' + total + ': <strong>' + escapeHtml(entryId) + '</strong>';
+
+		// Call the restore API for this single entry
+		restoreSingleEntry(entryId, function(result) {
+			if (result.success) {
+				successCount++;
+			} else if (result.type === 'not_restorable') {
+				notRestorableCount++;
+			} else {
+				errorCount++;
+			}
+
+			// Add result row
+			addResultRow(result);
+			updateSummaryStats();
+
+			// Process next entry
+			processNextEntry(index + 1);
+		});
+	}
+
+	function updateSummaryStats() {
+		var statsHtml = '<strong>Successfully Restored:</strong> <span style="color:green;">' + successCount + '</span>';
+		if (notRestorableCount > 0) {
+			statsHtml += ' | <strong>Not Restorable:</strong> <span style="color:orange;">' + notRestorableCount + '</span>';
+		}
+		if (errorCount > 0) {
+			statsHtml += ' | <strong>Failed:</strong> <span style="color:red;">' + errorCount + '</span>';
+		}
+		document.getElementById('summaryStats').innerHTML = statsHtml;
+	}
+}
+
+function restoreSingleEntry(entryId, callback) {
+	jQuery.ajax({
+		url: '<?php echo $this->url(array('controller' => 'index', 'action' => 'restore-entry-ajax'), null, true); ?>',
+		type: 'POST',
+		data: {
+			entryId: entryId
+		},
+		dataType: 'json',
+		success: function(response) {
+			callback({
+				entryId: entryId,
+				status: response.status,
+				message: response.message,
+				success: response.success,
+				type: response.type
+			});
+		},
+		error: function(xhr, status, error) {
+			callback({
+				entryId: entryId,
+				status: 'Failed',
+				message: 'AJAX Error: ' + error + ' (Status: ' + xhr.status + ')',
+				success: false,
+				type: 'error'
+			});
+		}
+	});
+}
+
+function addResultRow(result) {
+	var tbody = document.getElementById('resultsBody');
+	var row = tbody.insertRow();
+
+	// Apply zebra striping based on row index, not result status
+	var rowIndex = tbody.rows.length - 1;
+	row.className = (rowIndex % 2 === 1) ? 'odd' : '';
+
+	// Determine color based on result type
+	var statusColor = 'green';
+	var messageColor = 'green';
+	if (result.type === 'not_restorable') {
+		statusColor = 'orange';
+		messageColor = '#cc6600'; // Darker orange for better readability
+	} else if (result.type === 'error') {
+		statusColor = 'red';
+		messageColor = 'red';
+	}
+
+	// Entry ID
+	var cell1 = row.insertCell(0);
+	cell1.textContent = result.entryId;
+
+	// Status
+	var cell2 = row.insertCell(1);
+	cell2.textContent = result.status;
+	cell2.style.color = statusColor;
+	cell2.style.fontWeight = 'bold';
+
+	// Error/Message
+	var cell3 = row.insertCell(2);
+	cell3.textContent = result.message;
+	cell3.style.color = messageColor;
+}
+
+function escapeHtml(text) {
+	var div = document.createElement('div');
+	div.textContent = text;
+	return div.innerHTML;
+}
+</script>

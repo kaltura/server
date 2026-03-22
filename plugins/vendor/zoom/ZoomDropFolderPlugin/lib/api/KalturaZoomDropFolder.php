@@ -65,13 +65,22 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	 * @var time
 	 */
 	public $lastHandledMeetingTime;
+
+	/**
+	 * The amount of time, in seconds, to wait before processing a drop folder file
+	 * @var int
+	 * @minValue 3600
+	 * @maxValue 21600
+	 */
+	public $fileProcessingGracePeriod;
 	
 	/*
 	 * mapping between the field on this object (on the left) and the setter/getter on the entry object (on the right)
 	 */
 	private static $map_between_objects = array(
 		'zoomVendorIntegrationId',
-		'lastHandledMeetingTime'
+		'lastHandledMeetingTime',
+		'fileProcessingGracePeriod'
 	);
 	
 	public function getMapBetweenObjects()
@@ -85,6 +94,8 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		
 		/* @var ZoomVendorIntegration $vendorIntegration */
 		$vendorIntegration = VendorIntegrationPeer::retrieveByPK($this->zoomVendorIntegrationId);
+		$this->fileProcessingGracePeriod = $sourceObject->getFileProcessingGracePeriod();
+
 		try
 		{
 			if ($vendorIntegration)
@@ -143,9 +154,11 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 		{
 			$dbObject = new ZoomDropFolder();
 		}
-		
+
 		$dbObject->setType(ZoomDropFolderPlugin::getDropFolderTypeCoreValue(ZoomDropFolderType::ZOOM));
-		return parent::toObject($dbObject, $skip);
+		$dbObject = parent::toObject($dbObject, $skip);
+
+		return $dbObject;
 	}
 
 }

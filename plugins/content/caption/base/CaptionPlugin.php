@@ -608,7 +608,7 @@ class CaptionPlugin extends KalturaPlugin implements IKalturaServices, IKalturaP
 							$host = $protocol . '://' . $config->deliveryProfile->getHostName();
 						}
 						else
-							$host = myPartnerUtils::getCdnHost($captionAsset->getPartnerId());
+							$host = myPartnerUtils::getCdnHost($captionAsset->getPartnerId(), null, null, true);
 
 						$versionStr = '';
 						if ($captionAsset->getVersion() > 1)
