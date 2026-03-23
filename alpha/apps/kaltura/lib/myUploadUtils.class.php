@@ -5,7 +5,6 @@ class myUploadUtils
 	const EICAR_MD5 = '44d88612fea8a8f36de82e1278abb02f';
 	const EICAR_MIN_FILE_SIZE = 68;
 	const EICAR_MAX_FILE_SIZE = 128;
-	const FILE_SECURITY_SCAN_BYTES  = 1024;
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
 	const TEXT_TROFF_FILE_TYPE = 'text/troff';
 	const FILE_EXT_WHITELIST = 'file_extensions_whitelist';
@@ -229,15 +228,6 @@ class myUploadUtils
 				{
 					$content = file_get_contents($uploadFilePath);
 					if (md5(trim($content)) === self::EICAR_MD5)
-					{
-						return false;
-					}
-				}
-
-				if ($fileType == self::TEXT_TROFF_FILE_TYPE)
-				{
-					$content = file_get_contents($uploadFilePath, false, null, 0, self::FILE_SECURITY_SCAN_BYTES ); // Read first 10KB
-					if (preg_match('/^\s*\.(sy|pi|pso|so|mso)\s/m', $content))
 					{
 						return false;
 					}
