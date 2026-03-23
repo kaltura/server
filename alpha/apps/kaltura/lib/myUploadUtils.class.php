@@ -6,6 +6,7 @@ class myUploadUtils
 	const EICAR_MIN_FILE_SIZE = 68;
 	const EICAR_MAX_FILE_SIZE = 128;
 	const TEXT_PLAIN_FILE_TYPE = 'text/plain';
+	const TEXT_TROFF_FILE_TYPE = 'text/troff';
 	const FILE_EXT_WHITELIST = 'file_extensions_whitelist';
 	const SECURITY_MAP = 'security';
 
@@ -213,7 +214,7 @@ class myUploadUtils
 
 		KalturaLog::debug("File type: $fileType");
 
-		if ($fileType == self::TEXT_PLAIN_FILE_TYPE)
+		if ($fileType == self::TEXT_PLAIN_FILE_TYPE || $fileType == self::TEXT_TROFF_FILE_TYPE)
 		{
 			$forbidden_extensions_array = kConf::get('file_extensions', self::SECURITY_MAP, array());
 			if (in_array(strtolower(pathinfo($uploadFilePath, PATHINFO_EXTENSION)), $forbidden_extensions_array))
