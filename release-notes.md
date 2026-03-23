@@ -1,11 +1,4 @@
 # Venus-22.16.0
-## Conversion profile for Video Avatar ##
-- Issue Type: Task
-- Issue ID: PLAT-25702
-
-### Deployment Scripts ###
-    php /opt/kaltura/app/deployment/updates/scripts/2026_03_22_deploy_video_avatar_flavor_params.php
-
 ## Add permissions for appToken get and list, session impersonate, partner get, and groupUser list
 * Issue Type: Task
 * Issue ID: PLAT-25755
