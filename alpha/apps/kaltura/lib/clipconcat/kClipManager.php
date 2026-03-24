@@ -687,6 +687,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
+	protected function hasOverlayAttributes($resourceData)
+	{
+		$operationAttributes = $resourceData[self::OPERATION_ATTRIBUTES_ARRAY];
+		if (isset($operationAttributes[0]))
+		{
+			$compositionAttributesArray = $operationAttributes[0]->getMediaCompositionAttributesArray();
+			return isset($compositionAttributesArray[0]) && $compositionAttributesArray[0] instanceof kOverlayAttributes;
+		}
+	}
+
 	/**
 	 * @throws KalturaAPIException
 	 */
@@ -1047,10 +1057,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 
 			$hasReplacement = $this->hasBackgroundReplacementAttributes($resourceData);
-			if ($hasReplacement)
+			$hasOverlay = $this->hasOverlayAttributes($resourceData);
+			$currentConversionParams[self::BACKGROUND_REPLACEMENT] = $hasReplacement;
+
+			if ($hasOverlay || $hasReplacement)
 			{
 				$currentConversionParams[self::TARGET_WIDTH] = $targetWidth;
-				$currentConversionParams[self::BACKGROUND_REPLACEMENT] = true;
 			}
 
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
