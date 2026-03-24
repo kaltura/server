@@ -1757,12 +1757,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$foregroundPosition = $mediaCompositionAttributes->getForegroundPositionPercentage();
 		if($foregroundPosition)
 		{
-			$foregroundPositions = explode(",", $mediaCompositionAttributes->getForegroundPositionPercentage());
-			if(count($foregroundPositions) == 2)
-			{
-				$foregroundPositionW = $foregroundPositions[0];
-				$foregroundPositionH = $foregroundPositions[1];
-			}
+			/* @var $foregroundPosition kPosition **/
+			$foregroundPositionW = $foregroundPosition->getX();
+			$foregroundPositionH = $foregroundPosition->getY();
 		}
 
 		$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
