@@ -2,8 +2,8 @@
 /**
  * Shared Zoom entry locking utility
  */
-require_once(dirname(__FILE__) . '/../../../../../../alpha/apps/kaltura/lib/cache/kCacheManager.php');
-require_once(dirname(__FILE__) . '/../../../../../../alpha/apps/kaltura/lib/logging/KalturaLog.php');
+require_once(dirname(__FILE__) . '/../../../../../alpha/apps/kaltura/lib/cache/kCacheManager.php');
+require_once(dirname(__FILE__) . '/../../../../../infra/log/KalturaLog.php');
 
 class kZoomEntryLock
 {
