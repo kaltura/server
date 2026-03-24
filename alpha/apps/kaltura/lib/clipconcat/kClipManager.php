@@ -23,7 +23,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const SUBTITLES_DATA_ARRAY = 'subtitlesDataArray';
 	const CONVERSION_PARAMS = 'conversionParams';
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
-	const CLIPS_DURATION = 'clipsDuration';
+	const BG_MEDIA_INFO_OBJECT_ARRAY = 'backgroundMediaInfoArray';
 	const AUDIO_DURATION = 'audioDuration';
 	const INVERTED_SOURCE = 'invertedSource';
 	const EXTRA_CONVERSION_PARAMS = 'extraConversionParams';
@@ -682,8 +682,23 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$operationAttributes = $resourceData[self::OPERATION_ATTRIBUTES_ARRAY];
 		if (isset($operationAttributes[0]))
 		{
+			return $this->operationAttributeHasBackgroundReplacement($operationAttributes[0]);
+		}
+	}
+
+	protected function operationAttributeHasBackgroundReplacement($operationAttribute)
+	{
+		$compositionAttributesArray = $operationAttribute->getMediaCompositionAttributesArray();
+		return isset($compositionAttributesArray[0]) && $compositionAttributesArray[0] instanceof kReplaceBackgroundAttributes;
+	}
+
+	protected function hasOverlayAttributes($resourceData)
+	{
+		$operationAttributes = $resourceData[self::OPERATION_ATTRIBUTES_ARRAY];
+		if (isset($operationAttributes[0]))
+		{
 			$compositionAttributesArray = $operationAttributes[0]->getMediaCompositionAttributesArray();
-			return isset($compositionAttributesArray[0]) && $compositionAttributesArray[0] instanceof kReplaceBackgroundAttributes;
+			return isset($compositionAttributesArray[0]) && $compositionAttributesArray[0] instanceof kOverlayAttributes;
 		}
 	}
 
@@ -727,15 +742,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $entryId);
 			}
 
-			$currentWidth = $mediaInfoObj->getVideoWidth();
-			$currentHeight = $mediaInfoObj->getVideoHeight();
-			if($currentWidth * $currentHeight == 0)
-			{
-				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $entryId);
-			}
-
-			$hasReplacement = $this->hasBackgroundReplacementAttributes($resourceData);
-			if($crop && $aspectRatio && !$hasReplacement)
+			[$currentWidth, $currentHeight] = $this->getValidWidthAndHeight($mediaInfoObj, $entryId);
+			if($crop && $aspectRatio)
 			{
 				$resourcesData[$key][self::CROP_DATA_ARRAY] = $this->getCropDataArray($aspectRatio, $currentWidth, $currentHeight, $resourceData[self::OPERATION_ATTRIBUTES_ARRAY]);
 				if(count($resourcesData[$key][self::CROP_DATA_ARRAY]) > 0)
@@ -755,17 +763,30 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				}
 			}
 
-			if(!$aspectRatio)
+			// in case of background replacement, consider background dimensions
+			$backgroundMediaInfoArray = $resourceData[self::BG_MEDIA_INFO_OBJECT_ARRAY];
+			foreach ($resourceData[self::OPERATION_ATTRIBUTES_ARRAY] as $ind => $operationAttribute)
 			{
-				// calculate aspect ratio by frequency
-				$duration = $resourceData[self::CLIPS_DURATION];
-				$this->updateKeyFrequency($aspectRatios, $currentWidth/$currentHeight, $duration);
-			}
+				/* @var $operationAttribute kClipAttributes **/
 
-			if(!$targetResolution)
-			{
-				$targetHeight = $targetHeight == 0 ? $currentHeight : min($currentHeight, $targetHeight);
-				$targetWidth = $targetWidth == 0 ? $currentWidth : min($currentWidth, $targetWidth);
+				$backgroundMediaInfo = $backgroundMediaInfoArray[$ind];
+				if($backgroundMediaInfo)
+				{
+					[$currentWidth, $currentHeight] = $this->getValidWidthAndHeight($backgroundMediaInfo, $entryId);
+				}
+
+				if(!$targetResolution)
+				{
+					$targetHeight = $targetHeight == 0 ? $currentHeight : min($currentHeight, $targetHeight);
+					$targetWidth = $targetWidth == 0 ? $currentWidth : min($currentWidth, $targetWidth);
+				}
+
+				if(!$aspectRatio)
+				{
+					// calculate aspect ratio by frequency
+					$duration = $operationAttribute->getDuration();
+					$this->updateKeyFrequency($aspectRatios, $currentWidth/$currentHeight, $duration);
+				}
 			}
 
 			$subtitlesArray = $this->getSubtitlesDataArray($resourceData[self::OPERATION_ATTRIBUTES_ARRAY]);
@@ -804,6 +825,17 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		);
 
 		$this->setConversionParamsOnResourcesData($resourcesData, $generalConversionParams);
+	}
+
+	protected function getValidWidthAndHeight($mediaInfo, $entryId)
+	{
+		$width = $mediaInfo->getVideoWidth();
+		$height = $mediaInfo->getVideoHeight();
+		if($width * $height == 0)
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $entryId);
+		}
+		return [$width, $height];
 	}
 
 	protected function getResourcesCropMode($dimensionsAttributes)
@@ -890,7 +922,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$cropDataArray = array();
 		foreach ($operationAttributes as $operationAttribute)
 		{
-			$cropDataArray[] = $this->getCropData($targetAspectRatio, $inWidth, $inHeight, $operationAttribute->getCropAlignment());
+			if(!$this->operationAttributeHasBackgroundReplacement($operationAttribute))
+			{
+				$cropDataArray[] = $this->getCropData($targetAspectRatio, $inWidth, $inHeight, $operationAttribute->getCropAlignment());
+			}
 		}
 		return $cropDataArray;
 	}
@@ -1047,10 +1082,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 
 			$hasReplacement = $this->hasBackgroundReplacementAttributes($resourceData);
-			if ($hasReplacement)
+			$hasOverlay = $this->hasOverlayAttributes($resourceData);
+			$currentConversionParams[self::BACKGROUND_REPLACEMENT] = $hasReplacement;
+
+			if ($hasOverlay || $hasReplacement)
 			{
 				$currentConversionParams[self::TARGET_WIDTH] = $targetWidth;
-				$currentConversionParams[self::BACKGROUND_REPLACEMENT] = true;
 			}
 
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
