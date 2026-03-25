@@ -390,6 +390,8 @@ class categoryKuser extends BasecategoryKuser implements IIndexable
 	
 	public static function getPermissionNamesByPermissionLevel($permissionLevel)
 	{
+		$permissionNamesArr = array();
+		
 		switch ($permissionLevel)
 		{
 			case CategoryKuserPermissionLevel::MANAGER:
