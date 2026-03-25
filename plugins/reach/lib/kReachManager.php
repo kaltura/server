@@ -697,6 +697,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 	private function invalidateAccessKey(EntryVendorTask $entryVendorTask)
 	{
 		$ksString = $entryVendorTask->getAccessKey();
+
+		if(!$ksString)
+		{
+			return;
+		}
 		
 		try
 		{
@@ -832,7 +837,9 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$entryVendorTask = new EntryVendorTask();
 
 		//Assign default parameters
-		$entryVendorTask->setEntryId($entryObject->getId());
+		$externalObjectId = ($entryObjectType === EntryObjectType::EXTERNAL_OBJECT) ? $entryObject->getId() : null;
+		$entryId = $externalObjectId ? base64_encode(md5($externalObjectId, true)) : $entryObject->getId();
+		$entryVendorTask->setEntryId($entryId);
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setReachProfileId($reachProfile->getId());
 		$entryVendorTask->setPartnerId($reachProfile->getPartnerId());
@@ -849,7 +856,10 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		$accessKeyExpiry = $vendorCatalogItem->getKsExpiry();
 		$entryVendorTask->setIsOutputModerated($shouldModerateOutput);
 		$entryVendorTask->setAccessKeyExpiry($accessKeyExpiry);
-		$entryVendorTask->setAccessKey($vendorCatalogItem->generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, $entryVendorTask->getEntryObjectType()));
+		if ($entryObjectType !== EntryObjectType::EXTERNAL_OBJECT)
+		{
+			$entryVendorTask->setAccessKey($vendorCatalogItem->generateReachVendorKs($entryVendorTask->getEntryId(), $shouldModerateOutput, $accessKeyExpiry, $entryVendorTask->getEntryObjectType()));
+		}
 		$entryVendorTask->setServiceType($vendorCatalogItem->getServiceType());
 		$entryVendorTask->setServiceFeature($vendorCatalogItem->getServiceFeature());
 		$entryVendorTask->setTurnAroundTime($vendorCatalogItem->getTurnAroundTime());
@@ -858,6 +868,11 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 		{
 			$taskPrice = $vendorCatalogItem->calculateTaskPrice($entryObject, $entryObjectType, null, $unitsUsed);
 			$entryVendorTask->setPrice($taskPrice);
+		}
+
+		if ($externalObjectId)
+		{
+			$entryVendorTask->setExternalObjectId($externalObjectId);
 		}
 
 		if($unitsUsed !== null)

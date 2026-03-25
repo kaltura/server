@@ -8,4 +8,5 @@ interface EntryObjectType extends BaseEnum
 {
 	const ENTRY = 1;
 	const ASSET = 2;
+	const EXTERNAL_OBJECT = 3;
 }

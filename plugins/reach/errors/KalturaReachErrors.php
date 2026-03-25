@@ -104,4 +104,6 @@ class KalturaReachErrors implements kReachErrors
 	/* Credit */
 	
 	const OVERAGE_CREDIT_CANNOT_BE_NEGATIVE = "OVERAGE_CREDIT_CANNOT_BE_NEGATIVE;;Overage credit value cannot be negative";
+
+	const EXTERNAL_OBJECT_REQUIRES_PAY_PER_USE_CATALOG_ITEM = "EXTERNAL_OBJECT_REQUIRES_PAY_PER_USE_CATALOG_ITEM;CATALOG_ITEM_ID;Catalog item [@CATALOG_ITEM_ID@] must be pay-per-use for EXTERNAL_OBJECT tasks";
 }

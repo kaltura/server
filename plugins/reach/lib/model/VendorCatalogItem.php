@@ -291,6 +291,11 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 	public function isDuplicateTask($entryId, $entryObjectType, $partnerId)
 	{
+		if ($entryObjectType === EntryObjectType::EXTERNAL_OBJECT)
+		{
+			return false;
+		}
+
 		$version = $this->getTaskVersion($entryId, $entryObjectType);
 		$catalog_item_ids = [$this->getId()];
 		$catalog_item_ids = array_merge($catalog_item_ids, $this->getLinkedCatalogItems());
