@@ -5,6 +5,23 @@
 
 ### Deployment Scripts ###
 	php deployment/updates/scripts/add_permissions/2026_03_19_app_token_get_permission.php
+
+## Add AvatarVod vendor service
+* Issue Type: Feature
+* Issue ID: REACH2-1415
+
+### Description ###
+Added new vendor service feature: AvatarVod. This service feature does not require job data and supports all media clip entry types.
+
+### Files Modified ###
+- VendorServiceFeature.php - Added AVATAR_VOD enum
+- BulkUploadVendorCatalogItemEngineCsv.php - Added CSV handling for AvatarVod
+
+### Files Created ###
+- VendorAvatarVodCatalogItem.php
+- KalturaVendorAvatarVodCatalogItem.php
+- KalturaVendorAvatarVodCatalogItemFilter.php
+
 ## Add Quota partner
 * Issue Type: Task
 * Issue ID: PLAT-25763
