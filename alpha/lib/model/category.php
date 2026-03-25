@@ -1001,6 +1001,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		/* @var $member categoryKuser */
 		while ($member = array_pop($members))
 		{
+			if($member->getPermissionLevel() && $member->getPermissionLevel() == CategoryKuserPermissionLevel::NONE)
+			{
+				KalturaLog::debug("skipping user " . $member->getKuserId() . " with NONE permission level for category " . $this->getId());
+				continue;
+			}
+			
 			if(isset($membersIdsByPermission[$member->getPermissionLevel()]))
 				$membersIdsByPermission[$member->getPermissionLevel()][] = $member->getKuserId();
 			else
@@ -1858,6 +1864,11 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$values = array();
 		foreach ($members as $member)
 		{
+			if($member->getPermissionLevel() && $member->getPermissionLevel() == CategoryKuserPermissionLevel::NONE)
+			{
+				KalturaLog::debug("skipping user " . $member->getKuserId() . " with NONE permission level for category " . $this->getId());
+				continue;
+			}
 			/**
 			 * @var categoryKuser $member
 			*/
