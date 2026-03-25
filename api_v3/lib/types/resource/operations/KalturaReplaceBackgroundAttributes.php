@@ -86,7 +86,7 @@ class KalturaReplaceBackgroundAttributes extends KalturaMediaCompositionAttribut
 	{
 		$minScalePercentage = 0;
 		$maxScalePercentage = 1;
-		if($this->foregroundScalePercentage && $this->foregroundScalePercentage < $minScalePercentage || $this->foregroundScalePercentage > 1)
+		if($this->foregroundScalePercentage && ($this->foregroundScalePercentage < $minScalePercentage || $this->foregroundScalePercentage > $maxScalePercentage))
 		{
 			throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "foregroundScalePercentage", $minScalePercentage, $maxScalePercentage);
 		}
