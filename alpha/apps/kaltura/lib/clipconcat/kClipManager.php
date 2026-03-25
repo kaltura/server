@@ -13,7 +13,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const ORIGINAL_HEIGHT = 'originalHeight';
 	const ORIGINAL_WIDTH = 'originalWidth';
 	const TARGET_WIDTH = 'targetWidth';
-	CONST BACKGROUND_REPLACEMENT = 'backgroundReplacement';
+	const BACKGROUND_REPLACEMENT = 'backgroundReplacement';
 	const FRAME_RATE = 'frameRate';
 	const AUDIO_CHANNELS = 'audioChannels';
 	const AUDIO_SAMPLE_RATE = 'audioSamplingRate';
@@ -684,6 +684,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		{
 			return $this->operationAttributeHasBackgroundReplacement($operationAttributes[0]);
 		}
+		return false;
 	}
 
 	protected function operationAttributeHasBackgroundReplacement($operationAttribute)
@@ -700,6 +701,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$compositionAttributesArray = $operationAttributes[0]->getMediaCompositionAttributesArray();
 			return isset($compositionAttributesArray[0]) && $compositionAttributesArray[0] instanceof kOverlayAttributes;
 		}
+		return false;
 	}
 
 	/**
@@ -728,7 +730,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		{
 			$targetWidth = $targetResolution[0];
 			$targetHeight = $targetResolution[1];
-			$aspectRatio = $targetWidth/$targetHeight;
+			$aspectRatio = $targetWidth * $targetHeight ? $targetWidth / $targetHeight : $aspectRatio;
 		}
 
 		foreach ($resourcesData as $key => $resourceData)
@@ -1051,7 +1053,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 			$actualWidth = $mediaInfoObj->getVideoWidth();
 			$actualHeight = $mediaInfoObj->getVideoHeight();
-			$currentConversionParams[self::ORIGINAL_HEIGHT] = $actualWidth;
+			$currentConversionParams[self::ORIGINAL_HEIGHT] = $actualHeight;
 			$currentConversionParams[self::ORIGINAL_WIDTH] = $actualWidth;
 			$rotate = $mediaInfoObj->getVideoRotation() ? $mediaInfoObj->getVideoRotation() : 0;
 			if(($rotate/90) % 2 == 1)
