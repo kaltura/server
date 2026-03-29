@@ -1805,7 +1805,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$fileNameIndex++;
 		$newBackgroundFileNameIndex = $fileNameIndex;
 
-		$scaleNewBackground = "[$newBackgroundFileNameIndex:v]scale=$targetWidth:$targetHeight"."[bg]";
+		$scaleNewBackground =
+			"[$newBackgroundFileNameIndex:v]scale='ceil(iw*max($targetWidth/iw\,$targetHeight/ih)/2)*2':'ceil(ih*max($targetWidth/iw\,$targetHeight/ih)/2)*2'".
+			",crop=$targetWidth:$targetHeight"."[bg]";
 		$positionForegroundOnNewBackground = "[bg][fg]overlay=(main_w-overlay_w)*$foregroundPositionW:(main_h-overlay_h)*$foregroundPositionH:format=auto:shortest=1$composedVideoStreamName";
 
 		return "$foregroundFilter;$scaleNewBackground;$positionForegroundOnNewBackground";
