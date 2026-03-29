@@ -27,9 +27,14 @@ class CategoryUserService extends KalturaBaseService
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_MAX_USER_REACHED,$maxUserPerCategory);
 
 		$kuser = kuserPeer::getKuserByPartnerAndUid($this->getPartnerId(), $categoryUser->userId);
-		if ($kuser->getType() == KuserType::APPLICATIVE_GROUP)
+		if ($kuser->getType() == KuserType::APPLICATIVE_GROUP &&
+			(
+				(isset($categoryUser->permissionLevel) && $categoryUser->permissionLevel != KalturaCategoryUserPermissionLevel::NONE) ||
+				(!isset($categoryUser->permissionLevel) && $category->getDefaultPermissionLevel() != KalturaCategoryUserPermissionLevel::NONE)
+			)
+		)
 		{
-			throw new KalturaAPIException(KalturaErrors::CANNOT_ADD_APPLICATIVE_GROUP_TO_CATEGORY);
+			throw new KalturaAPIException(KalturaErrors::APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED);
 		}
 
 		$lockKey = 'categoryUser_add_' . $categoryUser->categoryId . '_' . $categoryUser->userId;
@@ -83,7 +88,7 @@ class CategoryUserService extends KalturaBaseService
 	 */
 	function getAction($categoryId, $userId)
 	{
-		$partnerId = kCurrentContext::$partner_id ? kCurrentContext::$partner_id : kCurrentContext::$ks_partner_id;
+		$partnerId = kCurrentContext::getCurrentPartnerId();
 		$kuser = kuserPeer::getKuserByPartnerAndUid($partnerId, $userId);
 		if (!$kuser)
 			throw new KalturaAPIException(KalturaErrors::INVALID_USER_ID, $userId);

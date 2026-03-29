@@ -1528,4 +1528,8 @@ return array(
 	'Kaltura_Client_Enum_RecycleBinRetentionPeriod::DAYS_5' => '5 Days',
 	'Kaltura_Client_Enum_RecycleBinRetentionPeriod::DAYS_15' => '15 Days',
 	'Kaltura_Client_Enum_RecycleBinRetentionPeriod::DAYS_30' => '30 Days',
+
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AR_LB' => 'Arabic (Lebanon)',
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AR_QA' => 'Arabic (Qatar)',
+	'Kaltura_Client_Reach_Enum_CatalogItemLanguage::AR_SA' => 'Arabic (Saudi Arabia)',
 );

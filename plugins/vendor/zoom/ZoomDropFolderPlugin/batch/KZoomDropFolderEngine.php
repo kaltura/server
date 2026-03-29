@@ -2,6 +2,8 @@
 /**
  * @package plugins.ZoomDropFolder
  */
+require_once(dirname(__FILE__) . '/../../lib/model/kZoomEntryLock.php');
+
 class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 {
 	const DEFAULT_ZOOM_QUERY_TIMERANGE = 259200; // 3 days
@@ -82,7 +84,7 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 		
 		if($fileInStatusProcessingExists)
 		{
-			$fileProcessingGracePeriod = $this->getZoomParam('fileProcessingGracePeriod');
+			$fileProcessingGracePeriod = $this->dropFolder->fileProcessingGracePeriod;
 			if($secondsFromMidnight <= $fileProcessingGracePeriod)
 			{
 				KalturaLog::info("DropFolderId {$this->dropFolder->id}: A new day is here, but found files in status Processing. Waiting for status completed");
@@ -280,6 +282,11 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 								{
 									$parentEntry = $this->createEntry($meetingFile[self::UUID],
 									                                  $this->dropFolder->zoomVendorIntegration->enableZoomTranscription, $recordingFile[self::RECORDING_START], $userId);
+									if (!$parentEntry)
+									{
+										KalturaLog::debug("Failed to create entry, skipping drop folder file creation");
+										continue; // Skip this recording file
+									}
 									$this->addDropFolderFile($meetingFile, $recordingFile, $parentEntry->id, true);
 								}
 							}
@@ -318,10 +325,33 @@ class KZoomDropFolderEngine extends KDropFolderFileTransferEngine
 	
 	protected function createEntry($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId)
 	{
+		$referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
+		$lock = kZoomEntryLock::acquireLock($uuid, $recordingStartTime);
+		if (!$lock)
+		{
+			return null;
+		}
+		try {
+			// Check if entry exists after acquiring lock
+			$existingEntry = $this->getEntryByReferenceId($referenceId);
+			if ($existingEntry)
+			{
+				KalturaLog::debug("Entry {$referenceId} already exists");
+				return $existingEntry;
+			}
+			// Create the entry if it not exists
+			return $this->createEntryImpl($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId, $referenceId);
+		} finally {
+			kZoomEntryLock::unlock($lock);
+		}
+	}
+
+	protected function createEntryImpl($uuid, $enableTranscriptionViaZoom, $recordingStartTime, $userId, $referenceId)
+	{
 		$newEntry = new KalturaMediaEntry();
 		$newEntry->sourceType = KalturaSourceType::URL;
 		$newEntry->mediaType = KalturaMediaType::VIDEO;
-		$newEntry->referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
+		$newEntry->referenceId = $referenceId;
 		$newEntry->blockAutoTranscript = $enableTranscriptionViaZoom;
 		$newEntry->conversionProfileId = $this->dropFolder->conversionProfileId;
 		if ($userId)

@@ -3,6 +3,7 @@
  * @package plugins.vendor
  * @subpackage zoom.model
  */
+require_once(dirname(__FILE__) . '/kZoomEntryLock.php');
 
 class kZoomEventHanlder
 {
@@ -321,6 +322,11 @@ class kZoomEventHanlder
 						{
 							$parentEntry = self::createEntry($recording->uuid, $partnerId, $zoomVendorIntegration->getEnableZoomTranscription(),
 							                                 $recordingFile->recordingStart, $conversionProfileId);
+							if (!$parentEntry)
+							{
+								KalturaLog::debug("Failed to create entry, skipping drop folder file creation");
+								continue; // Skip this recording file
+							}
 							$zoomDropFolderFile->setIsParentEntry(true);
 						}
 					}
@@ -434,8 +440,33 @@ class kZoomEventHanlder
 		}
 		return $entry;
 	}
-	
+
 	protected static function createEntry($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId)
+	{
+		$referenceId = zoomProcessor::ZOOM_PREFIX . $uuid . $recordingStartTime;
+		$lock = kZoomEntryLock::acquireLock($uuid, $recordingStartTime);
+		if (!$lock)
+		{
+			return null;
+		}
+		try
+		{
+			// check if entry exists after acquiring lock
+			$existingEntry = self::getEntryByReferenceId($referenceId, $partnerId);
+			if ($existingEntry)
+			{
+				KalturaLog::debug("Entry {$referenceId} already exists");
+				return $existingEntry;
+			}
+			// Create the entry if it not exists
+			return self::createEntryImpl($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId, $referenceId);
+		}finally
+		{
+			kZoomEntryLock::unlock($lock);
+		}
+	}
+
+	protected static function createEntryImpl($uuid, $partnerId, $enableTranscriptionViaZoom, $recordingStartTime, $conversionProfileId, $referenceId)
 	{
 		$templateEntry = null;
 		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
@@ -454,7 +485,7 @@ class kZoomEventHanlder
 		$newEntry->setType(entryType::MEDIA_CLIP);
 		$newEntry->setSourceType(EntrySourceType::URL);
 		$newEntry->setMediaType(entry::ENTRY_MEDIA_TYPE_VIDEO);
-		$newEntry->setReferenceId(zoomProcessor::ZOOM_PREFIX . $uuid. $recordingStartTime);
+		$newEntry->setReferenceId($referenceId);
 		$newEntry->setStatus(entryStatus::NO_CONTENT);
 		$newEntry->setPartnerId($partnerId);
 		$newEntry->setBlockAutoTranscript($enableTranscriptionViaZoom);

@@ -2018,7 +2018,8 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		//check if entry is in append mode and currently streaming
 		$liveEntry = entryPeer::retrieveByPK($entry->getRootEntryId());
 		if ($liveEntry && $liveEntry instanceof LiveEntry && $liveEntry->getSource() == EntrySourceType::LIVE_STREAM
-			&& $liveEntry->getRecordStatus() == RecordStatus::APPENDED && $liveEntry->getRecordedEntryId() == $entry->getId())
+			&& $liveEntry->getRecordStatus() == RecordStatus::APPENDED && $liveEntry->getRecordedEntryId() == $entry->getId()
+			&& $liveEntry->getRecordingStatus() == RecordingStatus::ACTIVE)
 			return !is_null(EntryServerNodePeer::retrieveByEntryIdAndServerType($liveEntry->getId(), EntryServerNodeType::LIVE_PRIMARY));
 
 		return false;
@@ -2052,11 +2053,7 @@ PuserKuserPeer::getCriteriaFilter()->disable();
 		else
 			$protocol = infraRequestUtils::PROTOCOL_HTTP;
 
-		$cdnApiHost = null;
-		if ($protocol == infraRequestUtils::PROTOCOL_HTTPS && kConf::hasParam('cdn_api_host_https'))
-			$cdnApiHost = "$protocol://" . kConf::get('cdn_api_host_https');
-		else
-			$cdnApiHost =  "$protocol://" . kConf::get('cdn_api_host');
+		$cdnApiHost = myPartnerUtils::getCdnHost($partnerId, $protocol, 'cdnApi', true);
 
 		$flavorIds = array();
 		$fileExtension = null;

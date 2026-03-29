@@ -939,7 +939,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 			$width = self::DEFAULT_IMAGE_WIDTH;
 			$height = self::DEFAULT_IMAGE_HEIGHT;
 
-			$url = myPartnerUtils::getCdnHost($this->getPartnerId());
+			$url = myPartnerUtils::getCdnHost($this->getPartnerId(), null, null, true);
 			$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
 			if (!$version)
 				$version = $current_version;
@@ -1041,7 +1041,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		}
 		
 		// always return the URL for the download - there is enough logic there to fix problems return the correct version/flavor
-		return myPartnerUtils::getCdnHost($this->getPartnerId()). myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/raw/entry_id/" . $this->getId() . "/version/" . $this->getVersion();
+		return myPartnerUtils::getCdnHost($this->getPartnerId(), null, null, true). myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() ) . "/raw/entry_id/" . $this->getId() . "/version/" . $this->getVersion();
 	}
 	
 	
@@ -4109,7 +4109,7 @@ class entry extends Baseentry implements ISyncableFile, IIndexable, IOwnable, IR
 		$entryId = $this->getId();
 		$protocolStr = infraRequestUtils::getProtocol();
 		
-		$url = requestUtils::getApiCdnHost();
+		$url = myPartnerUtils::getCdnHost($this->getPartnerId(), $protocolStr, 'api', true);
 		$url .= myPartnerUtils::getUrlForPartner( $this->getPartnerId() , $this->getSubpId() );
 		$url .= "/playManifest/entryId/$entryId/format/$format/protocol/$protocolStr";
 		

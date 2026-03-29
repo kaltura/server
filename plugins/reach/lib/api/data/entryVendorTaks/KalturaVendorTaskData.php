@@ -88,6 +88,14 @@ abstract class KalturaVendorTaskData extends KalturaObject implements IApiObject
 			case 'kSpeechToVideoVendorTaskData':
 				$taskData = new KalturaSpeechToVideoVendorTaskData();
 				break;
+
+			case 'kImmersiveAgentCallVendorTaskData':
+				$taskData = new KalturaImmersiveAgentCallVendorTaskData();
+				break;
+
+			case 'kImmersiveAgentChatVendorTaskData':
+				$taskData = new KalturaImmersiveAgentsChatVendorTaskData();
+				break;
 		}
 
 		if ($taskData)

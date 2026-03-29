@@ -497,7 +497,17 @@ class kApiCache extends kApiCacheBase
 		$this->_cacheKeyDirty = false;
 
 		ksort($this->_params);
-		$this->_cacheKey = $this->_cacheKeyPrefix . md5( http_build_query($this->_params, '', '&') );		// we have to explicitly set the separator since symfony changes it to '&amp;'
+
+		$regionalSuffix = infraRequestUtils::getRegionalCdnSuffix();
+		if (empty($regionalSuffix))
+		{
+			$this->_cacheKey = $this->_cacheKeyPrefix . md5( http_build_query($this->_params, '', '&'));       // we have to explicitly set the separator since symfony changes it to '&amp;'
+		}
+		else
+		{
+			$this->_cacheKey = $this->_cacheKeyPrefix . md5( http_build_query($this->_params, '', '&') . $regionalSuffix );
+		}
+
 		if (is_null($this->_originalCacheKey))
 			$this->_originalCacheKey = $this->_cacheKey;
 	}
