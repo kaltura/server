@@ -1749,16 +1749,21 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	protected function getFileInputCommandByEntryType($mediaCompositionAttributes, $key)
 	{
+		if ($this->checkResourceEntryType($mediaCompositionAttributes, KalturaMediaType::IMAGE))
+		{
+			return " -loop 1 -i __inFileName".$key."__ ";
+		}
+		return " -i __inFileName".$key."__ ";
+	}
+
+	protected function checkResourceEntryType($mediaCompositionAttributes, $mediaType)
+	{
 		$resourceEntry = $this->getMediaCompositionAttributesResourceEntry($mediaCompositionAttributes);
 		if(!$resourceEntry)
 		{
 			throw new KalturaAPIException(KalturaErrors::MISSING_MANDATORY_PARAMETER, "resource");
 		}
-		if($resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
-		{
-			return " -loop 1 -i __inFileName".$key."__ ";
-		}
-		return " -i __inFileName".$key."__ ";
+		return $resourceEntry->getMediaType() == $mediaType;
 	}
 
 	protected function getBackgroundColor($replacementAttributes)
@@ -1770,7 +1775,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return "0x6FED48";
 	}
 
-	protected function getReplacementAttributesFilterComplex($mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, $conversionParams, $composedVideoStreamName)
+	protected function getReplacementAttributesFilterComplex($mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
 	{
 		$mainFileNameIndex = $fileNameIndex;
 		$BGColor = $this->getBackgroundColor($mediaCompositionAttributes);
@@ -1805,12 +1810,24 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$fileNameIndex++;
 		$newBackgroundFileNameIndex = $fileNameIndex;
 
+		$imageResource = $this->checkResourceEntryType($mediaCompositionAttributes, KalturaMediaType::IMAGE);
+		$shortest = $imageResource ? "1" : "0";
+		$setpts = $imageResource ? "" : "setpts=PTS-STARTPTS,";
 		$scaleNewBackground =
-			"[$newBackgroundFileNameIndex:v]scale='ceil(iw*max($targetWidth/iw\,$targetHeight/ih)/2)*2':'ceil(ih*max($targetWidth/iw\,$targetHeight/ih)/2)*2'".
+			"[$newBackgroundFileNameIndex:v]$setpts" . "scale='ceil(iw*max($targetWidth/iw\,$targetHeight/ih)/2)*2':'ceil(ih*max($targetWidth/iw\,$targetHeight/ih)/2)*2'".
 			",crop=$targetWidth:$targetHeight"."[bg]";
-		$positionForegroundOnNewBackground = "[bg][fg]overlay=(main_w-overlay_w)*$foregroundPositionW:(main_h-overlay_h)*$foregroundPositionH:format=auto:shortest=1$composedVideoStreamName";
+		$positionForegroundOnNewBackground = "[bg][fg]overlay=(main_w-overlay_w)*$foregroundPositionW:(main_h-overlay_h)*$foregroundPositionH:format=auto:shortest=$shortest$composedVideoStreamName";
 
-		return "$foregroundFilter;$scaleNewBackground;$positionForegroundOnNewBackground";
+		$filterComplex = "$foregroundFilter;$scaleNewBackground;$positionForegroundOnNewBackground";
+
+		if(!$imageResource)
+		{
+			$audioMapName = '"[aout]"';
+			$defineAudioVolumesFilter = "[$newBackgroundFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_main]";
+			$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
+			$filterComplex .= ";$defineAudioVolumesFilter;$combineAudioFilter";
+		}
+		return $filterComplex;
 	}
 
 	protected function getOverlayAttributesFilterComplex($mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
@@ -1878,7 +1895,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$mediaCompositionAttributes = $mediaCompositionAttributesArray[0];
 			if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
 			{
-				$filterComplex = $this->getReplacementAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $conversionParams, $composedVideoStreamName);
+				$filterComplex = $this->getReplacementAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $conversionParams, $composedVideoStreamName);
 				// scaling or cropping is already done in $filterComplex
 				unset($sortedFilters["scale"]);
 				unset($sortedFilters["crop"]);
