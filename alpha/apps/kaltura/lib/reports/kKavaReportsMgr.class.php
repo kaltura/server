@@ -156,6 +156,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVATAR_CALL_MESSAGES = 'avatar_call_messages';
 	const METRIC_AVATAR_CALL_DURATION = 'avatar_call_duration';
 	const METRIC_AVATAR_AVG_CALL_DURATION = 'avatar_avg_call_duration';
+	const METRIC_AVATAR_CHAT_MESSAGES = 'avatar_call_messages';
+
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -1553,6 +1555,10 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::$aggregations_def[self::METRIC_AVATAR_CALL_MESSAGES] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE),
+			self::getLongSumAggregator(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_AVATAR_CHAT_MESSAGES] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CHAT_EXPERIENCE),
 			self::getLongSumAggregator(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_AVATAR_CALL_DURATION_SEC] = self::getFilteredAggregator(
