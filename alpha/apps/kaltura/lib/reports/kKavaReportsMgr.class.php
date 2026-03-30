@@ -1552,7 +1552,7 @@ class kKavaReportsMgr extends kKavaBase
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_THREADS, self::METRIC_UNIQUE_THREAD_IDS));
 
 		self::$aggregations_def[self::METRIC_AVATAR_CALL_MESSAGES] = self::getFilteredAggregator(
-			self::getInFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE),
+			self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE),
 			self::getLongSumAggregator(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_COUNT));
 
 		self::$aggregations_def[self::METRIC_AVATAR_CALL_DURATION_SEC] = self::getFilteredAggregator(
