@@ -2084,9 +2084,9 @@ class KalturaEntryService extends KalturaBaseService
 
 	protected function getMediaInfo($resourceObj, $sourceEntry)
 	{
+		$sourceEntryId = $sourceEntry->getId();
 		if($sourceEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$sourceEntryId = $sourceEntry->getId();
 			$syncKey = $sourceEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, 'mediainfo');
