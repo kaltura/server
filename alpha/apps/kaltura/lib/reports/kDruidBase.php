@@ -85,6 +85,7 @@ class kDruidBase
 	const DRUID_TIME_FORMAT = 'timeFormat';
 	const DRUID_UNION = 'union';
 	const DRUID_PATTERN = 'pattern';
+	const DRUID_BY_ROW = 'byRow';
 	
 	// druid response keywords
 	const DRUID_TIMESTAMP = 'timestamp';
