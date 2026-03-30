@@ -26,12 +26,18 @@ class KalturaReplaceBackgroundAttributes extends KalturaMediaCompositionAttribut
 	 */
 	public $foregroundPositionPercentage;
 
+	/**
+	 * @var KalturaAudioAttributes
+	 */
+	public $audioAttributes;
+
 	private static $map_between_objects = array
 	(
 		"resource",
 		"backgroundColorCode",
 		"foregroundScalePercentage",
-		"foregroundPositionPercentage"
+		"foregroundPositionPercentage",
+		"audioAttributes"
 	);
 
 	public function getMapBetweenObjects()
@@ -82,7 +88,7 @@ class KalturaReplaceBackgroundAttributes extends KalturaMediaCompositionAttribut
 		$this->validateForegroundScalePercentage();
 	}
 
-	function validateForegroundScalePercentage()
+	public function validateForegroundScalePercentage()
 	{
 		$minScalePercentage = 0;
 		$maxScalePercentage = 5;
@@ -92,7 +98,7 @@ class KalturaReplaceBackgroundAttributes extends KalturaMediaCompositionAttribut
 		}
 	}
 
-	function validateBackgroundColor()
+	public function validateBackgroundColor()
 	{
 		if($this->backgroundColorCode && preg_match('/^0x[A-Fa-f0-9]{6}$/', $this->backgroundColorCode) !== 1)
 		{
@@ -100,7 +106,7 @@ class KalturaReplaceBackgroundAttributes extends KalturaMediaCompositionAttribut
 		}
 	}
 
-	function validateForegroundPositionPercentage()
+	public function validateForegroundPositionPercentage()
 	{
 		if($this->foregroundPositionPercentage)
 		{

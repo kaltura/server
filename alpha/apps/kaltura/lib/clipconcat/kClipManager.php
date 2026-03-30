@@ -1494,7 +1494,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$deleteEntry = $clipConcatJobData->getTempEntryId();
 			}
-			$this->deleteEntry($deleteEntry);
+//			$this->deleteEntry($deleteEntry);
 		}
 	}
 
@@ -1555,7 +1555,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					// assume concatenated assets have the same actualFlavorParamsId and take the last
 					$lastAssetId = $flavorAssetId ? $flavorAssetId : $lastAssetId;
 				}
-				$this->deleteEntry($jobData->getTempEntryId());
+//				$this->deleteEntry($jobData->getTempEntryId());
 			}
 
 			// use no filter because we delete the entry
@@ -1775,7 +1775,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return "0x6FED48";
 	}
 
-	protected function getReplacementAttributesFilterComplex($mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
+	protected function getReplacementAttributesFilterComplex(kReplaceBackgroundAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
 	{
 		$mainFileNameIndex = $fileNameIndex;
 		$BGColor = $this->getBackgroundColor($mediaCompositionAttributes);
@@ -1823,26 +1823,112 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		if(!$imageResource)
 		{
 			$audioMapName = '"[aout]"';
-			$defineAudioVolumesFilter = "[$newBackgroundFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_main]";
+			$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $newBackgroundFileNameIndex);
 			$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
 			$filterComplex .= ";$defineAudioVolumesFilter;$combineAudioFilter";
 		}
 		return $filterComplex;
 	}
 
-	protected function getOverlayAttributesFilterComplex($mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
+	protected function getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $secondaryFileNameIndex)
+	{
+		$audioAttributes = $mediaCompositionAttributes->getAudioAttributes();
+		$overlayVolume = $audioAttributes ? $audioAttributes->getVolume() : 1;
+		$volume = 1 - $overlayVolume;
+
+		return
+			"[$secondaryFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$overlayVolume" . "[a_secondary];" .
+			"[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$volume" . "[a_main]";
+
+	}
+
+	function buildOverlayPosition(kMediaCompositionAlignment $alignment, $marginsPercentage): string
+	{
+		$margin = "min(main_w\\,main_h)*$marginsPercentage";
+		switch ($alignment)
+		{
+			case kMediaCompositionAlignment::BOTTOM_CENTER:
+				return "x=(main_w-overlay_w)/2:y=main_h-overlay_h-$margin";
+
+			case kMediaCompositionAlignment::BOTTOM_RIGHT:
+				return "x=main_w-overlay_w-$margin:y=main_h-overlay_h-$margin";
+
+			case kMediaCompositionAlignment::TOP_LEFT:
+				return "x=$margin:y=$margin";
+
+			case kMediaCompositionAlignment::TOP_CENTER:
+				return "x=(main_w-overlay_w)/2:y=$margin";
+
+			case kMediaCompositionAlignment::TOP_RIGHT:
+				return "x=main_w-overlay_w-$margin:y=$margin";
+
+			case kMediaCompositionAlignment::CENTER_LEFT:
+				return "x=$margin:y=(main_h-overlay_h)/2";
+
+			case kMediaCompositionAlignment::CENTER_CENTER:
+				return "x=(main_w-overlay_w)/2:y=(main_h-overlay_h)/2";
+
+			case kMediaCompositionAlignment::CENTER_RIGHT:
+				return "x=main_w-overlay_w-$margin:y=(main_h-overlay_h)/2";
+
+			case kMediaCompositionAlignment::BOTTOM_LEFT:
+			default:
+				return "x=$margin:y=main_h-overlay_h-$margin";
+		}
+	}
+
+	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
 	{
 		$mainFileNameIndex = $fileNameIndex;
 		$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
 		$fileNameIndex++;
 		$overlayFileNameIndex = $fileNameIndex;
 
-		$marginsPercentage = 0.074;
-		$overlayScalePercentage = 0.4;
+		$marginsPercentage =  $mediaCompositionAttributes->getMarginsPercentage() ? $mediaCompositionAttributes->getMarginsPercentage() : 0.074;
+		$overlayScalePercentage = $mediaCompositionAttributes->getOverlayScalePercentage() ? $mediaCompositionAttributes->getOverlayScalePercentage() : 0.4;
+		$overlayPlacement = $mediaCompositionAttributes->getOverlayPlacement() ? $mediaCompositionAttributes->getOverlayPlacement() : kMediaCompositionAlignment::BOTTOM_LEFT;
+		$overlayPosition = $this->buildOverlayPosition($overlayPlacement, $marginsPercentage);
 
 		$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
-		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-min(main_w\,main_h)*$marginsPercentage:y=main_h-overlay_h-min(main_w\,main_h)*$marginsPercentage:format=auto$composedVideoStreamName";
-		$defineAudioVolumesFilter = "[$overlayFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
+
+//		$createRectangleShapeFilter =
+//			"[front_rect]geq="
+//			."r='r(X,Y)':"
+//			."g='g(X,Y)':"
+//			."b='b(X,Y)':"
+//			."a='255'"
+//			."[front_rectangle]";
+//
+//		$cornerRadius = 20;
+//
+//		$createRoundedRectangleShapeFilter =
+//			"[front_rect]geq="
+//			."r='r(X,Y)':"
+//			."g='g(X,Y)':"
+//			."b='g(X,Y)':"
+//			."a='if(gte(min(min(X\\,W-X)\\,min(Y\\,H-Y)),$cornerRadius),255,0)'"
+//			."[front_rounded]";
+//
+//		$createCircleShapeFilter =
+//			"[front_rect]geq="
+//			."r='r(X,Y)':"
+//			."g='g(X,Y)':"
+//			."b='b(X,Y)':"
+//			."a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'"
+//			."[front_circle]";
+//
+//
+//		$createEllipseShapeFilter =
+//			"[front_rect]geq="
+//			."r='r(X,Y)':"
+//			."g='g(X,Y)':"
+//			."b='b(X,Y)':"
+//			."a='if(lte(((X-W/2)*(X-W/2))/((W/2)*(W/2)) + ((Y-H/2)*(Y-H/2))/((H/2)*(H/2)),1),255,0)'"
+//			."[front_ellipse]";
+//
+
+		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=$overlayPosition:format=auto$composedVideoStreamName";
+		$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex);
 		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
 		$audioMapName = '"[aout]"';
 

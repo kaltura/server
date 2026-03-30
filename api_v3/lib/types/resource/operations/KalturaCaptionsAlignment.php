@@ -3,7 +3,6 @@
  * @package Core
  * @subpackage model.data
  */
-class KalturaCaptionsAlignment extends KalturaEnum implements kCaptionsAlignment
+class KalturaCaptionsAlignment extends KalturaEnum implements kMediaCompositionAlignment
 {
-
 }

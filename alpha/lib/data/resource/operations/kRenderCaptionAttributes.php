@@ -61,7 +61,7 @@ class kRenderCaptionAttributes extends kCaptionAttributes
 	private $underline;
 
 	/**
-	 * @var kCaptionsAlignment
+	 * @var kMediaCompositionAlignment
 	 */
 	private $alignment;
 
@@ -231,7 +231,7 @@ class kRenderCaptionAttributes extends kCaptionAttributes
 	}
 
 	/**
-	 * @return kCaptionsAlignment
+	 * @return kMediaCompositionAlignment
 	 */
 	public function getAlignment()
 	{
@@ -239,7 +239,7 @@ class kRenderCaptionAttributes extends kCaptionAttributes
 	}
 
 	/**
-	 * @param kCaptionsAlignment $alignment
+	 * @param kMediaCompositionAlignment $alignment
 	 */
 	public function setAlignment($alignment)
 	{
