@@ -2,7 +2,7 @@
 /**
  * @package deployment
  *
- * Deploy video avatar flavor params + conversion profile
+ * Deploy source only flavor params + conversion profile
  *
  */
 require_once (__DIR__ . '/../../bootstrap.php');

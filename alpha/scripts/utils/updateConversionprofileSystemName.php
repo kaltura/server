@@ -3,7 +3,7 @@ require_once('/opt/kaltura/app/alpha/scripts/bootstrap.php');
 
 if ($argc < 5)
 {
-	die('Error executing script, Usage: php updateConversionprofileSystemName.php.php
+	die('Error executing script, Usage: php updateConversionprofileSystemName.php
 	 < conversionProfileId >
 	 < newSystemName >
 	 < partnerId >
