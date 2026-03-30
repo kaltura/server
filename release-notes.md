@@ -5,6 +5,7 @@
 
 ### Deployment Scripts ###
 	php deployment/updates/scripts/add_permissions/2026_03_19_app_token_get_permission.php
+
 ## Add Quota partner
 * Issue Type: Task
 * Issue ID: PLAT-25763
