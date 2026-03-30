@@ -838,7 +838,7 @@ class kReachManager implements kObjectChangedEventConsumer, kObjectCreatedEventC
 
 		//Assign default parameters
 		$externalObjectId = ($entryObjectType === EntryObjectType::EXTERNAL_OBJECT) ? $entryObject->getId() : null;
-		$entryId = $externalObjectId ? base64_encode(md5($externalObjectId, true)) : $entryObject->getId();
+		$entryId = $externalObjectId ? substr($externalObjectId, 0, 31) : $entryObject->getId();
 		$entryVendorTask->setEntryId($entryId);
 		$entryVendorTask->setCatalogItemId($vendorCatalogItem->getId());
 		$entryVendorTask->setReachProfileId($reachProfile->getId());
