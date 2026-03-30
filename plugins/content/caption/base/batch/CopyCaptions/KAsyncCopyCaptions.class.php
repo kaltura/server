@@ -128,7 +128,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 	{
 		$captionAsset = new KalturaCaptionAsset();
 		KalturaLog::info("Start copying properties from caption asset: [{$originalCaptionAsset->id}] to new caption asset on entryId: [$targetEntryId]");
-		$propertiesToCopy = array("tags", "fileExt", "language", "label", "format", "isDefault", "displayOnPlayer", "accuracy");
+		$propertiesToCopy = array("tags", "fileExt", "language", "label", "format", "isDefault", "displayOnPlayer", "accuracy", "usage");
 		foreach ($propertiesToCopy as $property)
 		{
 			$captionAsset->$property = $originalCaptionAsset->$property;
@@ -326,11 +326,12 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 	{
 		$errorMsg = '';
 		$clipDescriptionArray = $data->clipsDescriptionArray;
-		$languageEntryCaptionAsset = $this->buildLanguageEntryCaption($clipDescriptionArray);
-		foreach ($languageEntryCaptionAsset as $language => $entryCaptionAsset)
+		$languageUsageEntryCaptionAsset = $this->buildLanguageUsageEntryCaption($clipDescriptionArray);
+		foreach ($languageUsageEntryCaptionAsset as $languageUsageKey => $entryCaptionAsset)
 		{
-			KalturaLog::debug("Copy captions for language [$language]");
-			$captionAsset = $this->getNewCaptionAsset($entryCaptionAsset, $language);
+			KalturaLog::debug("Copy captions for language/usage key [$languageUsageKey]");
+			list($language, $usage) = explode('_', $languageUsageKey, 2);
+			$captionAsset = $this->getNewCaptionAsset($entryCaptionAsset, $language, $usage);
 			$newCaptionAsset = $this->addCaptionAsset($data->entryId, $captionAsset);
 			$newCaptionAssetResource = new KalturaStringResource();
 			foreach ($clipDescriptionArray as $clipDescription)
@@ -355,7 +356,7 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		}
 	}
 
-	protected function getNewCaptionAsset($entryCaptionAssetArray, $language)
+	protected function getNewCaptionAsset($entryCaptionAssetArray, $language, $usage)
 	{
 		$captionAsset = new KalturaCaptionAsset();
 		foreach ($entryCaptionAssetArray as $entryCaptionAsset)
@@ -368,12 +369,13 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 		}
 		$captionAsset->language = $language;
 		$captionAsset->label = $language;
+		$captionAsset->usage = $usage;
 		return $captionAsset;
 	}
 
-	protected function buildLanguageEntryCaption($clipDescriptionArray)
+	protected function buildLanguageUsageEntryCaption($clipDescriptionArray)
 	{
-		$languageEntryCaptionAsset = array();
+		$languageUsageEntryCaptionAsset = array();
 		$entryCaptionAssets = array();
 		foreach ($clipDescriptionArray as $clipDescription)
 		{
@@ -386,24 +388,27 @@ class KAsyncCopyCaptions extends KJobHandlerWorker
 				foreach ($entryCaptionAssets[$sourceEntryId] as $captionAsset)
 				{
 					$language = $captionAsset->language;
-					if (!isset($languageEntryCaptionAsset[$language]))
+					$usage = $captionAsset->usage ?? CaptionUsage::CAPTION;
+					$languageUsageKey = "{$language}_{$usage}";
+
+					if (!isset($languageUsageEntryCaptionAsset[$languageUsageKey]))
 					{
-						$languageEntryCaptionAsset[$language] = array();
+						$languageUsageEntryCaptionAsset[$languageUsageKey] = array();
 					}
-					if (!isset($languageEntryCaptionAsset[$language][$sourceEntryId]))
+					if (!isset($languageUsageEntryCaptionAsset[$languageUsageKey][$sourceEntryId]))
 					{
-						$languageEntryCaptionAsset[$language][$sourceEntryId] = array();
+						$languageUsageEntryCaptionAsset[$languageUsageKey][$sourceEntryId] = array();
 					}
-					$currentCaptionAsset = $languageEntryCaptionAsset[$language][$sourceEntryId];
+					$currentCaptionAsset = $languageUsageEntryCaptionAsset[$languageUsageKey][$sourceEntryId];
 					if ($currentCaptionAsset && $currentCaptionAsset->updatedAt > $captionAsset->updatedAt)
 					{
 						continue;
 					}
-					$languageEntryCaptionAsset[$language][$sourceEntryId] = $captionAsset;
+					$languageUsageEntryCaptionAsset[$languageUsageKey][$sourceEntryId] = $captionAsset;
 				}
 			}
 		}
-		return $languageEntryCaptionAsset;
+		return $languageUsageEntryCaptionAsset;
 	}
 
 	/**

@@ -3144,7 +3144,7 @@ class kFlowHelper
 		}
 		else {
 			//url is built with DC url in order to be directed to the same DC of the saved file
-			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
+			$url = myPartnerUtils::getCdnHost($partner_id, null, 'reports', true) . "/api_v3/index.php/service/liveReports/action/serveReport/ks/$ksStr/id/$file_name/$downloadName";
 		}
 		return $url;
 	}
@@ -3265,7 +3265,7 @@ class kFlowHelper
 				$privilege .= ',' . $privilegeActionsLimit;
 			}
 			$ksStr = kSessionBase::generateSession($partner->getKSVersion(), $partner->getAdminSecret(), null, ks::TYPE_KS, $partner_id, $expiry, $privilege);
-			$url = kDataCenterMgr::getCurrentDcUrl() . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
+			$url = myPartnerUtils::getCdnHost($partner_id, null, 'reports', true) . "/api_v3/index.php/service/report/action/serve/ks/$ksStr/id/$file_name/name/$file_name.csv";
 		}
 
 		if ($partner->getEnforceHttpsApi())
@@ -3558,7 +3558,7 @@ class kFlowHelper
 			throw new APIException(APIErrors::START_SESSION_ERROR, $partner);
 
 		//url is built with DC url in order to be directed to the same DC of the saved file
-		$url = kDataCenterMgr::getCurrentDcUrl() . self::SERVE_OBJECT_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
+		$url = myPartnerUtils::getCdnHost($partner_id, null, 'reports', true) . self::SERVE_OBJECT_CSV_PARTIAL_URL ."$ksStr/id/$file_name";
 		if ($partner->getEnforceHttpsApi())
 		{
 			$url = str_replace("http:", "https:", $url);

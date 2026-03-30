@@ -58,7 +58,7 @@ class KEmailNotificationCategoryRecipientEngine extends KEmailNotificationRecipi
 					}
 				}
 
-				else if($user->type == KalturaUserType::GROUP)
+				else if($user->type == KalturaUserType::GROUP || $user->type == KalturaUserType::APPLICATIVE_GROUP)
 				{
 					$groupUsers = $this->getUsersOfGroupByGroupId($user->id);
 
