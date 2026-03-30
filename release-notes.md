@@ -1,3 +1,12 @@
+# Venus-22.17.0
+## Add permissions for partner -29 to update entryVendorTasks
+* Issue Type: Task
+* Issue ID: AV-472
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_03_26_entryvendortask_-29_permission.php
+
+
 # Venus-22.16.0
 ## Add permissions for appToken get and list, session impersonate, partner get, and groupUser list
 * Issue Type: Task
