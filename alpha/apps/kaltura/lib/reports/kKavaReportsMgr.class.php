@@ -28,6 +28,8 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_SEGMENT_DOWNLOAD_TIME_SUM = 'segmentDownloadTimeSum';
 	const METRIC_MANIFEST_DOWNLOAD_TIME_SUM = 'manifestDownloadTimeSum';
 	const METRIC_VIEW_TIME_SUM = 'viewTimeSum';
+	const METRIC_UNIQUE_THREAD_IDS = 'uniqueThreadIds';
+	const METRIC_CALL_DURATION_SUM = 'callDurationSum';
 
 	// druid calculated metrics
 	const METRIC_QUARTILE_PLAY_TIME = 'sum_time_viewed';
@@ -149,7 +151,11 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_MEETING_CAMERA_ON_VIEW_TIME = 'meeting_camera_on_view_time';
 	const METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC = 'transcoding_added_entries_duration_sec';
 	const METRIC_TRANSCODING_ADDED_ENTRIES_DURATION = 'transcoding_added_entries_duration';
-
+	const METRIC_UNIQUE_THREADS = 'unique_threads';
+	const METRIC_AVG_MESSAGES = 'avg_messages';
+	const METRIC_AVATAR_CALL_MESSAGES = 'avatar_call_messages';
+	const METRIC_AVATAR_CALL_DURATION = 'avatar_call_duration';
+	const METRIC_AVATAR_AVG_CALL_DURATION = 'avatar_avg_call_duration';
 
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
@@ -170,6 +176,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_MEETING_VIEW_TIME_SEC = 'meeting_view_time_sec';
 	const METRIC_UNION_LIVE_MEETING_VIEW_TIME = 'union_live_meeting_view_time';
 	const METRIC_UNION_LIVE_MEETING_VOD_VIEW_TIME = 'union_live_meeting_vod_view_time';
+	const METRIC_AVATAR_CALL_DURATION_SEC = 'avatar_call_duration_sec';
 
 	// non druid metrics
 	const METRIC_BANDWIDTH_STORAGE_MB = 'combined_bandwidth_storage';
@@ -276,6 +283,7 @@ class kKavaReportsMgr extends kKavaBase
 	const KAVA_VE_REGISTRATION_CLASS = 'kKavaVeRegistrationReports';
 	const KAVA_EP_REPORTS_CLASS = 'kKavaEventPlatformReports';
 	const KAVA_CNC_REPORTS_CLASS = 'kKavaCnCReports';
+	const KAVA_IMMERSIVE_AGENTS_CLASS = 'kKavaImmersiveAgentsReports';
 
 	/// report settings
 	// report settings - common
@@ -496,6 +504,10 @@ class kKavaReportsMgr extends kKavaBase
 		self::EVENT_TYPE_BUTTON_CLICKED,
 		self::EVENT_TYPE_QR_CODE_SCANNED,
 		self::EVENT_TYPE_DOCUMENT_IMPRESSION,
+		self::EVENT_TYPE_MESSAGE_RESPONSE,
+		self::EVENT_TYPE_AVATAR_CALL_STARTED,
+		self::EVENT_TYPE_AVATAR_CALL_ENDED,
+		self::EVENT_TYPE_MESSAGE_FEEDBACK,
 	);
 
 	protected static $media_type_count_aggrs = array(
@@ -619,6 +631,7 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS => 'floor',
 		self::METRIC_UNIQUE_ATTENDEES => 'floor',
 		self::METRIC_VE_ATTENDED_UNIQUE_USERS => 'floor',
+		self::METRIC_UNIQUE_THREADS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -695,11 +708,14 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_PRIVATE_CHAT_PARTICIPATION => true,
 		self::METRIC_UNIQUE_ATTENDEES => true,
 		self::METRIC_VE_ATTENDED_UNIQUE_USERS => true,
+		self::METRIC_UNIQUE_THREADS => true,
+		self::METRIC_AVATAR_AVG_CALL_DURATION => true,
 	);
 
 	protected static $multi_value_dimensions = array(
 		self::DIMENSION_CATEGORIES,
 		self::DIMENSION_POSITION,
+		self::DIMENSION_EVENT_MULTI_VAR1,
 	);
 
 	protected static $dynamic_metrics = array(
@@ -820,6 +836,7 @@ class kKavaReportsMgr extends kKavaBase
 		5 => self::KAVA_VE_REGISTRATION_CLASS,
 		6 => self::KAVA_EP_REPORTS_CLASS,
 		7 => self::KAVA_CNC_REPORTS_CLASS,
+		8 => self::KAVA_IMMERSIVE_AGENTS_CLASS,
 	);
 	
 	protected static $aggregations_def = array();
@@ -1530,10 +1547,17 @@ class kKavaReportsMgr extends kKavaBase
 				self::getNotFilter(self::getInFilter(self::DIMENSION_SOURCE_TYPE, array('Recorded Live Stream'))))),
 			self::getLongSumAggregator(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC, self::METRIC_DURATION_SEC));
 
-		self::$metrics_def[self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION] = array(
-			self::DRUID_AGGR => array(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC),
-			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
-				self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION, self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC, '60'));
+		self::$aggregations_def[self::METRIC_UNIQUE_THREADS] = self::getFilteredAggregator(
+			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$immersive_agents_events_types),
+			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_THREADS, self::METRIC_UNIQUE_THREAD_IDS));
+
+		self::$aggregations_def[self::METRIC_AVATAR_CALL_MESSAGES] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE),
+			self::getLongSumAggregator(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_AVATAR_CALL_DURATION_SEC] = self::getFilteredAggregator(
+			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_AVATAR_CALL_ENDED),
+			self::getLongSumAggregator(self::METRIC_AVATAR_CALL_DURATION_SEC, self::METRIC_CALL_DURATION_SUM));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
@@ -2046,6 +2070,30 @@ class kKavaReportsMgr extends kKavaBase
 				self::METRIC_PRIVATE_CHAT_PARTICIPATION, '/', array(
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS, self::METRIC_UNIQUE_PRIVATE_MESSAGE_SENT_USERS),
 				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_LOGGED_IN_USERS, self::METRIC_UNIQUE_LOGGED_IN_USERS))));
+
+		self::$metrics_def[self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION, self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION_SEC, '60'));
+
+		self::$metrics_def[self::METRIC_AVG_MESSAGES] = array(
+			self::DRUID_AGGR => array(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_UNIQUE_THREADS),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_AVG_MESSAGES, "/", array(
+				self::getFieldAccessPostAggregator(self::EVENT_TYPE_MESSAGE_RESPONSE),
+				self::getHyperUniqueCardinalityPostAggregator(self::METRIC_UNIQUE_THREADS, self::METRIC_UNIQUE_THREADS))));
+
+		self::$metrics_def[self::METRIC_AVATAR_CALL_DURATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_AVATAR_CALL_DURATION_SEC),
+			self::DRUID_POST_AGGR => self::getConstantRatioPostAggr(
+				self::METRIC_AVATAR_CALL_DURATION, self::METRIC_AVATAR_CALL_DURATION_SEC, '60'));
+
+		self::$metrics_def[self::METRIC_AVATAR_AVG_CALL_DURATION] = array(
+			self::DRUID_AGGR => array(self::METRIC_AVATAR_CALL_DURATION_SEC, self::EVENT_TYPE_AVATAR_CALL_ENDED),
+			self::DRUID_POST_AGGR => self::getArithmeticPostAggregator(
+				self::METRIC_AVATAR_AVG_CALL_DURATION, '/', array(
+				self::getConstantRatioPostAggr('subCallDuration', self::METRIC_AVATAR_CALL_DURATION_SEC, '60'),
+				self::getFieldAccessPostAggregator(self::EVENT_TYPE_AVATAR_CALL_ENDED))));
 
 		self::$headers_to_metrics = array_flip(self::$metrics_to_headers);
 
@@ -3006,6 +3054,8 @@ class kKavaReportsMgr extends kKavaBase
 			'companies' => array(self::DRUID_DIMENSION => self::DIMENSION_COMPANY),
 			'event_session_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_SESSION_CONTEXT_ID),
 			'video_codec' => array(self::DRUID_DIMENSION => self::DIMENSION_VIDEO_CODEC),
+			'agent_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_AGENT_ID),
+			'genie_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_GENIE_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
@@ -3453,10 +3503,17 @@ class kKavaReportsMgr extends kKavaBase
 	{
 		$report_def = self::getBaseReportDef($data_source, $partner_id, $intervals, array(), $filter, self::DRUID_GRANULARITY_ALL, $filter_metrics);
 		$report_def[self::DRUID_QUERY_TYPE] = self::DRUID_TIMESERIES;
-		$report_def[self::DRUID_AGGR][] = array(
+		$cardinality_aggr = array(
 			self::DRUID_TYPE => self::DRUID_CARDINALITY,
 			self::DRUID_NAME => self::METRIC_CARDINALITY,
-			self::DRUID_FIELDS => is_array($dimension) ? $dimension : array($dimension));
+			self::DRUID_FIELDS => is_array($dimension) ? $dimension : array($dimension)
+		);
+		if (in_array($dimension, self::$multi_value_dimensions))
+		{
+			$cardinality_aggr[self::DRUID_BY_ROW] = false;
+		}
+		$report_def[self::DRUID_AGGR][] = $cardinality_aggr;
+
 		return $report_def;
 	}
 
