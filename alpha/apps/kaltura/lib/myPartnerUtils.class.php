@@ -430,17 +430,8 @@ class myPartnerUtils
 				break;
 			case 'analyticsHost':
 				$key = 'analytics_host';
-				if ($protocol == "https")
-				{
-					$key .= "_https";
-				}
-
+				$urlResult = self::buildUrl($protocol, $key);
 				$port = (($_SERVER['SERVER_PORT']) != '80' && $_SERVER['SERVER_PORT'] != '443') ? ':' . $_SERVER['SERVER_PORT'] : '';
-				if ($key && kConf::hasParam($key))
-				{
-					$urlResult = $protocol . '://' . kConf::get($key);
-					break;
-				}
 				break;
 			default:
 				if ($partner && $partner->getCdnHost())
@@ -455,26 +446,46 @@ class myPartnerUtils
 
 		if ($regionalCdnSupport && !empty($urlResult))
 		{
-			$urlResult = self::addRegionalCdnSuffix($urlResult, $port);
+			$urlResult = self::addRegionalCdnSuffix($urlResult);
+		}
+
+		if (!empty($port) && !empty($urlResult))
+		{
+			$urlResult .= $port;
 		}
 
 		return $urlResult;
 	}
 
-	public static function addRegionalCdnSuffix($urlResult, $port)
+	public static function addRegionalCdnSuffix($urlResult)
 	{
 		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
 		foreach ($headerMapping as $headerKey => $suffix)
 		{
 			if (!empty($_SERVER[$headerKey]))
 			{
-				$urlResult = $urlResult . "." . $suffix . $port;
+				$urlResult = $urlResult . "." . $suffix;
 				break;
 			}
 		}
 		return $urlResult;
 	}
-	
+
+	public static function buildUrl($protocol, $key)
+	{
+		if ($protocol == "https")
+		{
+			$key .= "_https";
+		}
+
+		if ($key && kConf::hasParam($key))
+		{
+			return $protocol . '://' . kConf::get($key);
+		}
+
+		return '';
+	}
+
 	public static function getPlayServerHost($partner_id, $protocol = null)
 	{
 		if(is_null($protocol))
