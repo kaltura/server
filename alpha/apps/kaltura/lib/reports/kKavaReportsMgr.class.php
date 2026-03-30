@@ -3055,6 +3055,7 @@ class kKavaReportsMgr extends kKavaBase
 			'event_session_context_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_EVENT_SESSION_CONTEXT_ID),
 			'video_codec' => array(self::DRUID_DIMENSION => self::DIMENSION_VIDEO_CODEC),
 			'agent_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_AGENT_ID),
+			'genie_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_GENIE_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)

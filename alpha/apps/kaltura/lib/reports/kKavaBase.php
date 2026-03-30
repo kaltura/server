@@ -94,6 +94,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_VIDEO_CODEC = 'videoCodec';
 	const DIMENSION_EVENT_MULTI_VAR1 = 'eventMultiVar1';
 	const DIMENSION_AGENT_ID = 'agentId';
+	const DIMENSION_GENIE_ID = 'genieId';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -908,6 +909,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_PARTNER_PARENT_ID => 1,
 			self::DIMENSION_CONTEXT_ID => 1,
 			self::DIMENSION_KUSER_ID => 1,
+			self::DIMENSION_GENIE_ID => 1,
 			self::DIMENSION_AGENT_ID => 1,
 			self::DIMENSION_EVENT_VAR1 => 1,
 			self::DIMENSION_EVENT_VAR2 => 1,

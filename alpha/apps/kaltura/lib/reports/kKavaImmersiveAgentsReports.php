@@ -24,16 +24,21 @@ class kKavaImmersiveAgentsReports extends kKavaReportsMgr
 			self::REPORT_DIMENSION_MAP => array(
 				'source' => self::DIMENSION_EVENT_MULTI_VAR1,
 				'source_name' => self::DIMENSION_EVENT_MULTI_VAR1,
+				'source_type' => self::DIMENSION_EVENT_MULTI_VAR1,
 			),
 			self::REPORT_ENRICH_DEF => array(
-				self::REPORT_ENRICH_OUTPUT => 'entry_name',
-				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::getEntriesNames'
+				self::REPORT_ENRICH_OUTPUT => array('source_name','source_type'),
+				self::REPORT_ENRICH_FUNC => 'kKavaReportsMgr::genericQueryEnrich',
+				self::REPORT_ENRICH_CONTEXT => array(
+					'peer' => 'entryPeer',
+					'columns' => array('NAME', 'MEDIA_TYPE'),
+				),
 			),
-			self::REPORT_METRICS => array(self::EVENT_TYPE_MESSAGE_RESPONSE)
+			self::REPORT_METRICS => array(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_UNIQUE_USERS)
 		),
 
 		ReportType::IMMERSIVE_AGENTS_AVATAR_SESSIONS => array(
-			self::REPORT_METRICS => array(self::EVENT_TYPE_AVATAR_CALL_STARTED, self::METRIC_AVATAR_CALL_MESSAGES, self::METRIC_AVATAR_CALL_DURATION, self::METRIC_AVATAR_AVG_CALL_DURATION),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_AVATAR_CALL_STARTED, self::METRIC_AVATAR_CALL_DURATION, self::METRIC_AVATAR_AVG_CALL_DURATION),
 		)
 
 	);
