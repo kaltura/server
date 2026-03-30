@@ -10,7 +10,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const CROP_HEIGHT = 'cropHeight';
 	const CROP_WIDTH = 'cropWidth';
 	const TARGET_HEIGHT = 'targetHeight';
+	const ORIGINAL_HEIGHT = 'originalHeight';
+	const ORIGINAL_WIDTH = 'originalWidth';
 	const TARGET_WIDTH = 'targetWidth';
+	const BACKGROUND_REPLACEMENT = 'backgroundReplacement';
 	const FRAME_RATE = 'frameRate';
 	const AUDIO_CHANNELS = 'audioChannels';
 	const AUDIO_SAMPLE_RATE = 'audioSamplingRate';
@@ -61,6 +64,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 
 		$description = "source entry id: [$sourceEntryId],  template entry id: [$clipEntryId]";
+		$additionalEntryIds = $this->getCompositionAttributesEntryIds($operationAttributes);
+		if(count($additionalEntryIds) > 0)
+		{
+			$description .= ", additional entry ids: [" . implode(",", $additionalEntryIds) . "]" ;
+		}
+
 		$this->addClipTrackEntry($destEntry->getId(), $description);
 
 		$jobData = new kClipConcatJobData($importUrl);
@@ -89,6 +98,34 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$jobData->setOperationAttributes($operationAttributes);
 		$jobData->setConversionParams($conversionParams);
 		kJobsManager::addJob($parentJob, $jobData, BatchJobType::CLIP_CONCAT);
+	}
+
+	protected function getCompositionAttributesEntryIds($operationAttributes)
+	{
+		$additionalEntryIds = array();
+		foreach ($operationAttributes as $operationAttribute)
+		{
+			if($operationAttribute instanceof kClipAttributes)
+			{
+				$compositionAttributes = $operationAttribute->getMediaCompositionAttributesArray();
+				if(!$compositionAttributes)
+				{
+					continue;
+				}
+				foreach ($compositionAttributes as $compositionAttribute)
+				{
+					if($compositionAttribute instanceof kOverlayAttributes || $compositionAttribute instanceof kReplaceBackgroundAttributes)
+					{
+						$compositionResource = $compositionAttribute->getResource();
+						if($compositionResource)
+						{
+							$additionalEntryIds[] = $compositionResource->getOriginEntryId();
+						}
+					}
+				}
+			}
+		}
+		return $additionalEntryIds;
 	}
 
 	/**
@@ -640,6 +677,28 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return true;
 	}
 
+	protected function hasBackgroundReplacementAttributes($resourceData)
+	{
+		$operationAttributes = $resourceData[self::OPERATION_ATTRIBUTES_ARRAY];
+		if (isset($operationAttributes[0]))
+		{
+			$compositionAttributesArray = $operationAttributes[0]->getMediaCompositionAttributesArray();
+			return isset($compositionAttributesArray[0]) && $compositionAttributesArray[0] instanceof kReplaceBackgroundAttributes;
+		}
+		return false;
+	}
+
+	protected function hasOverlayAttributes($resourceData)
+	{
+		$operationAttributes = $resourceData[self::OPERATION_ATTRIBUTES_ARRAY];
+		if (isset($operationAttributes[0]))
+		{
+			$compositionAttributesArray = $operationAttributes[0]->getMediaCompositionAttributesArray();
+			return isset($compositionAttributesArray[0]) && $compositionAttributesArray[0] instanceof kOverlayAttributes;
+		}
+		return false;
+	}
+
 	/**
 	 * @throws KalturaAPIException
 	 */
@@ -661,6 +720,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$dimensionsAttributes = $resources->getDimensionsAttributes();
 		$crop = $this->getResourcesCropMode($dimensionsAttributes);
 		$aspectRatio = $this->getResourcesAspectRatio($dimensionsAttributes);
+		$targetResolution = $this->getResourcesTargetResolution($dimensionsAttributes);
+		if($targetResolution && count($targetResolution) == 2)
+		{
+			$targetWidth = $targetResolution[0];
+			$targetHeight = $targetResolution[1];
+			$aspectRatio = $targetWidth * $targetHeight > 0 ? $targetWidth/$targetHeight : $aspectRatio;
+		}
 
 		foreach ($resourcesData as $key => $resourceData)
 		{
@@ -680,7 +746,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $entryId);
 			}
 
-			if($crop && $aspectRatio)
+			$hasReplacement = $this->hasBackgroundReplacementAttributes($resourceData);
+			if($crop && $aspectRatio && !$hasReplacement)
 			{
 				$resourcesData[$key][self::CROP_DATA_ARRAY] = $this->getCropDataArray($aspectRatio, $currentWidth, $currentHeight, $resourceData[self::OPERATION_ATTRIBUTES_ARRAY]);
 				if(count($resourcesData[$key][self::CROP_DATA_ARRAY]) > 0)
@@ -707,8 +774,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$this->updateKeyFrequency($aspectRatios, $currentWidth/$currentHeight, $duration);
 			}
 
-			$targetWidth = $targetWidth == 0 ? $currentWidth : min($currentWidth, $targetWidth);
-			$targetHeight = $targetHeight == 0 ? $currentHeight : min($currentHeight, $targetHeight);
+			if(!$targetResolution)
+			{
+				$targetHeight = $targetHeight == 0 ? $currentHeight : min($currentHeight, $targetHeight);
+				$targetWidth = $targetWidth == 0 ? $currentWidth : min($currentWidth, $targetWidth);
+			}
 
 			$subtitlesArray = $this->getSubtitlesDataArray($resourceData[self::OPERATION_ATTRIBUTES_ARRAY]);
 			if(count($subtitlesArray) > 0)
@@ -752,7 +822,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	{
 		foreach ($dimensionsAttributes as $dimensionsAttribute)
 		{
-			if($dimensionsAttribute instanceof kAspectRatioCropAttributes)
+			if($dimensionsAttribute instanceof kAspectRatioCropAttributes || $dimensionsAttribute instanceof kResolutionCropAttributes)
 			{
 				return true;
 			}
@@ -767,6 +837,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($dimensionsAttribute instanceof kAspectRatioCropAttributes || $dimensionsAttribute instanceof kAspectRatioScaleAttributes)
 			{
 				return $dimensionsAttribute->getAspectRatio();
+			}
+		}
+		return null;
+	}
+
+	protected function getResourcesTargetResolution($dimensionsAttributes)
+	{
+		foreach ($dimensionsAttributes as $dimensionsAttribute)
+		{
+			if($dimensionsAttribute instanceof kResolutionCropAttributes)
+			{
+				return [$dimensionsAttribute->getTargetWidth(), $dimensionsAttribute->getTargetHeight()];
 			}
 		}
 		return null;
@@ -946,6 +1028,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 			$actualWidth = $mediaInfoObj->getVideoWidth();
 			$actualHeight = $mediaInfoObj->getVideoHeight();
+			$currentConversionParams[self::ORIGINAL_HEIGHT] = $actualHeight;
+			$currentConversionParams[self::ORIGINAL_WIDTH] = $actualWidth;
 			$rotate = $mediaInfoObj->getVideoRotation() ? $mediaInfoObj->getVideoRotation() : 0;
 			if(($rotate/90) % 2 == 1)
 			{
@@ -972,6 +1056,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				{
 					$currentConversionParams[self::TARGET_WIDTH] = $targetWidth; // trigger scale
 				}
+			}
+
+			$hasReplacement = $this->hasBackgroundReplacementAttributes($resourceData);
+			$hasOverlay = $this->hasOverlayAttributes($resourceData);
+			$currentConversionParams[self::BACKGROUND_REPLACEMENT] = $hasReplacement;
+
+			if ($hasOverlay || $hasReplacement)
+			{
+				$currentConversionParams[self::TARGET_WIDTH] = $targetWidth;
 			}
 
 			$resourcesData[$key][self::CONVERSION_PARAMS] = json_encode($currentConversionParams, true);
@@ -1643,6 +1736,99 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return " -i __inFileName".$key."__ ";
 	}
 
+	protected function getBackgroundColor($replacementAttributes)
+	{
+		if($replacementAttributes && $replacementAttributes->getBackgroundColorCode())
+		{
+			return $replacementAttributes->getBackgroundColorCode();
+		}
+		return "0x6FED48";
+	}
+
+	protected function getReplacementAttributesFilterComplex($mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, $conversionParams, $composedVideoStreamName)
+	{
+		$mainFileNameIndex = $fileNameIndex;
+		$BGColor = $this->getBackgroundColor($mediaCompositionAttributes);
+		$foregroundFilter = "[$mainFileNameIndex:v]setpts=PTS-STARTPTS,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
+
+		$targetHeight = $conversionParams[self::TARGET_HEIGHT];
+		$targetWidth = $conversionParams[self::TARGET_WIDTH];
+
+		// remove background and scale foreground
+		$scalePercentage = $mediaCompositionAttributes->getForegroundScalePercentage();
+		if($scalePercentage)
+		{
+			// scale to cover the crop box, keep aspect ratio
+			$foregroundFilterScale =
+				"scale=ceil(iw*min($targetWidth*$scalePercentage/iw\\,$targetHeight*$scalePercentage/ih)/2)*2:" .
+				"ceil(ih*min($targetWidth*$scalePercentage/iw\\,$targetHeight*$scalePercentage/ih)/2)*2";
+			$foregroundFilter = "[$mainFileNameIndex:v]setpts=PTS-STARTPTS,$foregroundFilterScale,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
+		}
+
+		// position foreground - default is middle-bottom
+		$foregroundPositionW = 0.5;
+		$foregroundPositionH = 1;
+		$foregroundPosition = $mediaCompositionAttributes->getForegroundPositionPercentage();
+		if($foregroundPosition)
+		{
+			/* @var $foregroundPosition kPosition **/
+			$foregroundPositionW = $foregroundPosition->getX();
+			$foregroundPositionH = $foregroundPosition->getY();
+		}
+
+		$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
+		$fileNameIndex++;
+		$newBackgroundFileNameIndex = $fileNameIndex;
+
+		$scaleNewBackground = "[$newBackgroundFileNameIndex:v]scale=$targetWidth:$targetHeight"."[bg]";
+		$positionForegroundOnNewBackground = "[bg][fg]overlay=(main_w-overlay_w)*$foregroundPositionW:(main_h-overlay_h)*$foregroundPositionH:format=auto:shortest=1$composedVideoStreamName";
+
+		return "$foregroundFilter;$scaleNewBackground;$positionForegroundOnNewBackground";
+	}
+
+	protected function getOverlayAttributesFilterComplex($mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
+	{
+		$mainFileNameIndex = $fileNameIndex;
+		$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
+		$fileNameIndex++;
+		$overlayFileNameIndex = $fileNameIndex;
+
+		$marginsPercentage = 0.074;
+		$overlayScalePercentage = 0.4;
+
+		$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
+		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-min(main_w\,main_h)*$marginsPercentage:y=main_h-overlay_h-min(main_w\,main_h)*$marginsPercentage:format=auto$composedVideoStreamName";
+		$defineAudioVolumesFilter = "[$overlayFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
+		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
+		$audioMapName = '"[aout]"';
+
+		$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
+
+		if(isset($attributesArray[0]))
+		{
+			$targetHeight = $conversionParams[self::TARGET_HEIGHT];
+			$targetWidth = $conversionParams[self::TARGET_WIDTH];
+			$BGColor = $this->getBackgroundColor($attributesArray[0]);
+			$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=min($targetHeight\,$targetWidth)*$overlayScalePercentage:min($targetHeight\,$targetWidth)*$overlayScalePercentage,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
+
+			$cmdFileNames .= $this->getFileInputCommandByEntryType($attributesArray[0], $fileNameIndex);
+			$fileNameIndex++;
+			$backgroundFileNameIndex = $fileNameIndex;
+
+			$normalizeImage = "[$backgroundFileNameIndex:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src]";
+			$alignSizes = "[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2]";
+			$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
+			$replaceOverlayBackground = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
+
+			return "$replaceOverlayBackground;$createCircleShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter";
+		}
+		else
+		{
+			$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage" . "[front_rect]";
+			return "$scaleOverlayVideo;$createCircleShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter";
+		}
+	}
+
 	protected function getConvertMediaCompositionCommand($jobData, kClipAttributes $operationAttribute, $sortedFilters)
 	{
 		// media composition command is based on inputFiles order in concat jobData
@@ -1653,69 +1839,26 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 
 		$conversionParams = $this->getJobDataConversionParams($jobData);
-
 		$cmdFileNames = " -i __inFileName__ ";
 		$composedVideoStreamName = '[vcomposed]';
 		$audioMapName = "0:a";
-		$mainFileNameIndex = 0;
-		$BGColor = "0x6FED48";
-		$overlayScalePercentage = 0.4;
-
 		$fileNameIndex = 0;
-		foreach ($operationAttribute->getMediaCompositionAttributesArray() as $mediaCompositionAttributes)
-		{
-			$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
-			$fileNameIndex++;
 
+		// handles single mediaCompositionAttribute per clip
+		$mediaCompositionAttributesArray = $operationAttribute->getMediaCompositionAttributesArray();
+		if (isset($mediaCompositionAttributesArray[0]))
+		{
+			$mediaCompositionAttributes = $mediaCompositionAttributesArray[0];
 			if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
 			{
-				$backgroundFileNameIndex = 1;
-				$filterComplex =
-					"[$mainFileNameIndex:v]setpts=PTS-STARTPTS,chromakey=$BGColor:0.14:0.08,format=rgba[fg];
-					[$backgroundFileNameIndex:v][fg]scale2ref=w=iw:h=ih[bgfit][fg2];[bgfit]setsar=1[bg];
-					[bg][fg2]overlay=0:0:format=auto:shortest=1$composedVideoStreamName";
+				$filterComplex = $this->getReplacementAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $conversionParams, $composedVideoStreamName);
+				// scaling or cropping is already done in $filterComplex
+				unset($sortedFilters["scale"]);
+				unset($sortedFilters["crop"]);
 			}
-
 			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
-				$overlayFileNameIndex = 1;
-				$marginsPercentage = 0.074;
-				$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
-				$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=x=main_w-overlay_w-min(main_w\,main_h)*$marginsPercentage:y=main_h-overlay_h-min(main_w\,main_h)*$marginsPercentage:format=auto$composedVideoStreamName";
-				$defineAudioVolumesFilter = "[$overlayFileNameIndex:a]asetpts=PTS-STARTPTS,volume=1[a_secondary];[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=0[a_main]";
-				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
-				$audioMapName = '"[aout]"';
-
-				$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
-
-				if(isset($attributesArray[0]))
-				{
-					$backgroundFileNameIndex = 2;
-					$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=min(ih\,iw)*$overlayScalePercentage:min(ih\,iw)*$overlayScalePercentage,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
-					$normalizeImage = "[$backgroundFileNameIndex:v]format=yuv444p,scale=in_range=pc:out_range=pc,format=rgba[bg_src]";
-					$alignSizes = "[bg_src][fg]scale2ref=w=iw:h=ih[bg][fg2]";
-					$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
-					$replaceOverlayBackground = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
-					$filterComplex =
-						"$replaceOverlayBackground;
-						$createCircleShapeFilter;
-						$overlayCircleOnVideoFilter;
-						$defineAudioVolumesFilter;
-						$combineAudioFilter";
-
-					$cmdFileNames .= $this->getFileInputCommandByEntryType($attributesArray[0], $fileNameIndex);
-					$fileNameIndex++;
-				}
-				else
-				{
-					$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage" . "[front_rect]";
-					$filterComplex =
-						"$scaleOverlayVideo;
-						$createCircleShapeFilter;
-						$overlayCircleOnVideoFilter;
-						$defineAudioVolumesFilter;
-						$combineAudioFilter";
-				}
+				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $conversionParams, $composedVideoStreamName);
 			}
 		}
 
@@ -1954,7 +2097,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		{
 			$flavorParamsObj->setForceFrameToMultiplication16(0);
 			$flavorParamsObj->setIsAvoidVideoShrinkFramesizeToSource(1);
-			$flavorParamsObj->setHeight($conversionParams[self::TARGET_HEIGHT]);
+
+			$height = $conversionParams[self::TARGET_HEIGHT];
+			$allowScaleOrCrop = !$conversionParams[self::BACKGROUND_REPLACEMENT];
+			if(!$allowScaleOrCrop)
+			{
+				$height = $conversionParams[self::ORIGINAL_HEIGHT];
+			}
+			$flavorParamsObj->setHeight($height);
 
 			$invertedResource = isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE];
 
@@ -1965,7 +2115,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$croppingMode = is_array($cropData) && count($cropData) > 0;
 			}
 
-			if($croppingMode)
+			if($croppingMode && $allowScaleOrCrop)
 			{
 				// crop
 				$processingMode = $invertedResource ? 8 : 7;
@@ -1980,13 +2130,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				// _arProcessingMode = 6, inverts back the output flavor
 				$flavorParamsObj->setAspectRatioProcessingMode(6);
 			}
-			else if(isset($conversionParams[self::TARGET_WIDTH]))
+			else if(isset($conversionParams[self::TARGET_WIDTH]) && $allowScaleOrCrop)
 			{
 				// scale
 				$flavorParamsObj->setAspectRatioProcessingMode(2);
 			}
 
-			if(isset($conversionParams[self::TARGET_WIDTH]))
+			if(isset($conversionParams[self::TARGET_WIDTH]) && $allowScaleOrCrop)
 			{
 				$flavorParamsObj->setWidth($conversionParams[self::TARGET_WIDTH]);
 			}

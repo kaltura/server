@@ -220,6 +220,14 @@ class KalturaCategoryUser extends KalturaObject implements IRelatedFilterable
 		$category = categoryPeer::retrieveByPK($sourceObject->getCategoryId());
 		if (!$category)
 			throw new KalturaAPIException(KalturaErrors::CATEGORY_NOT_FOUND, $sourceObject->getCategoryId());
+		
+		$kuser = kuserPeer::getKuserByPartnerAndUid(kCurrentContext::getCurrentPartnerId(), $this->userId);
+		if(isset($this->permissionLevel) && $this->permissionLevel != $sourceObject->getPermissionLevel() &&
+			$sourceObject->getPermissionLevel() == CategoryKuserPermissionLevel::NONE &&
+			$kuser->getType() == KuserType::APPLICATIVE_GROUP)
+		{
+			throw new KalturaAPIException(KalturaErrors::APPLICATIVE_GROUP_ASSOCIATION_TO_CATEGORY_NOT_ALLOWED);
+		}
 			
 		if ($this->permissionNames && $this->permissionNames != $sourceObject->getPermissionNames())
 		{

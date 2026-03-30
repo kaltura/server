@@ -664,4 +664,17 @@ class infraRequestUtils
 
 		return $result;
 	}
+
+	public static function getRegionalCdnSuffix()
+	{
+		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
+		foreach ($headerMapping as $headerKey => $suffix)
+		{
+			if (!empty($_SERVER[$headerKey]))
+			{
+				return "-" . $suffix;
+			}
+		}
+		return '';
+	}
 }

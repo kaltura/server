@@ -1044,9 +1044,13 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 			return array();
 		
 		$membersIds = array();
+		/* @var $member categoryKuser */
 		foreach ($members as $member)
 		{
-			$membersIds[] = $member->getKuserId();
+			if($member->getKuserType() != GroupType::APPLICATIVE_GROUP)
+			{
+				$membersIds[] = $member->getKuserId();
+			}
 		}
 		
 		return $membersIds;
