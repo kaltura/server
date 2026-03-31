@@ -672,10 +672,10 @@ class infraRequestUtils
 		foreach ($headerMapping as $headerKey => $headerValue)
 		{
 			if (!empty($_SERVER[$headerValue])
-				&& isset($suffixMapping[$_SERVER[$headerKey]])
-				&& $suffixMapping[$_SERVER[$headerKey]] !== '')
+				&& isset($suffixMapping[$_SERVER[$headerValue]])
+				&& $suffixMapping[$_SERVER[$headerValue]] !== '')
 			{
-				return "-" . $suffixMapping[$_SERVER[$headerKey]];
+				return "-" . $suffixMapping[$_SERVER[$headerValue]];
 			}
 		}
 		return '';
