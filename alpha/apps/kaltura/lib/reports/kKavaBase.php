@@ -102,6 +102,7 @@ class kKavaBase extends kDruidBase
 	const METRIC_BITRATE_SUM = 'bitrateSum';
 	const METRIC_EVENT_DOUBLE_SUM1 = 'eventDoubleSum1';
 	const METRIC_USER_CPU = 'userCpu';
+	const METRIC_UNIT_USED = 'unitsUsed';
 
 	// playback types
 	const PLAYBACK_TYPE_VOD = 'vod';

@@ -2068,7 +2068,20 @@ class kKavaReports extends kKavaReportsMgr
 				'transcoding_duration' => self::METRIC_TRANSCODING_ADDED_ENTRIES_DURATION,
 				'live_view_time' => self::METRIC_COMBINED_LIVE_VIEW_TIME,
 			),
-		)
+		),
+
+		ReportType::REACH_UNITS_USAGE => array(
+			self::REPORT_DATA_SOURCE => self::DATASOURCE_REACH_USAGE,
+			self::REPORT_DIMENSION_MAP => array(
+				'reachProfileId' => self::DIMENSION_REACH_PROFILE_ID,
+			),
+			self::REPORT_METRICS => array(self::METRIC_REACH_UNIT_USED),
+			self::REPORT_GRAPH_METRICS => array(self::METRIC_REACH_UNIT_USED),
+			self::REPORT_FILTER => array(
+				self::DRUID_DIMENSION => self::DIMENSION_STATUS,
+				self::DRUID_VALUES => array(self::TASK_READY)
+			),
+		),
 	);
 
 	public static function getReportDef($report_type, $input_filter, $response_options = null)
