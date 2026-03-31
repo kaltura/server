@@ -450,7 +450,7 @@ class myPartnerUtils
 	{
 		$cdnHeader = kConf::get('regional_cdn_header', 'local', array());
 		$suffixMapping = kConf::get('regional_cdn_suffix_mapping', 'local', array());
-		foreach ($cdnHeader as $headerKey => $cdnHeaderName)
+		foreach ($cdnHeader as $cdnHeaderKey => $cdnHeaderName)
 		{
 			if (!empty($_SERVER[$cdnHeaderName]) && isset($suffixMapping[$_SERVER[$cdnHeaderName]]) && $suffixMapping[$_SERVER[$cdnHeaderName]] !== '')
 			{
