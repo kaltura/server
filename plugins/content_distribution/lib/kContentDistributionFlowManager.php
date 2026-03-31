@@ -991,10 +991,10 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 	/**
 	 * @param BatchJob $dbBatchJob
-	 * @param kDistributionSubmitJobData $data
+	 * @param kDistributionUpdateJobData $data
 	 * @return BatchJob
 	 */
-	public static function onDistributionUpdateJobAborted(BatchJob $dbBatchJob, kDistributionSubmitJobData $data)
+	public static function onDistributionUpdateJobAborted(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
 	{
 		self::updateDistributionStatus($data, EntryDistributionStatus::ERROR_UPDATING);
 		return $dbBatchJob;
