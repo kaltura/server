@@ -30,7 +30,12 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 	/**
 	 * @var KalturaMediaCompositionAlignment
 	 */
-	private $overlayPlacement;
+	public $overlayPlacement;
+
+	/**
+	 * @var KalturaOverlayShape
+	 */
+	public $overlayShape;
 
 	/**
 	 * @var KalturaAudioAttributes
@@ -44,6 +49,7 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 		"marginsPercentage",
 		"overlayScalePercentage",
 		"overlayPlacement",
+		"overlayShape",
 		"audioAttributes"
 	);
 

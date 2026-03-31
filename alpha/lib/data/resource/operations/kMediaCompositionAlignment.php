@@ -1,6 +1,6 @@
 <?php
 /**
- * @package plugins.caption
+ * @package core
  * @subpackage api.enums
  */
 interface kMediaCompositionAlignment extends BaseEnum

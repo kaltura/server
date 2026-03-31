@@ -1494,7 +1494,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			{
 				$deleteEntry = $clipConcatJobData->getTempEntryId();
 			}
-//			$this->deleteEntry($deleteEntry);
+			$this->deleteEntry($deleteEntry);
 		}
 	}
 
@@ -1555,7 +1555,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 					// assume concatenated assets have the same actualFlavorParamsId and take the last
 					$lastAssetId = $flavorAssetId ? $flavorAssetId : $lastAssetId;
 				}
-//				$this->deleteEntry($jobData->getTempEntryId());
+				$this->deleteEntry($jobData->getTempEntryId());
 			}
 
 			// use no filter because we delete the entry
@@ -1799,9 +1799,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$foregroundPositionW = 0.5;
 		$foregroundPositionH = 1;
 		$foregroundPosition = $mediaCompositionAttributes->getForegroundPositionPercentage();
-		if($foregroundPosition)
+		if($foregroundPosition && $foregroundPosition->getX() && $foregroundPosition->getY())
 		{
-			/* @var $foregroundPosition kPosition **/
 			$foregroundPositionW = $foregroundPosition->getX();
 			$foregroundPositionH = $foregroundPosition->getY();
 		}
@@ -1842,7 +1841,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	}
 
-	function buildOverlayPosition(kMediaCompositionAlignment $alignment, $marginsPercentage): string
+	function buildOverlayPosition($alignment, $marginsPercentage): string
 	{
 		$margin = "min(main_w\\,main_h)*$marginsPercentage";
 		switch ($alignment)
@@ -1877,6 +1876,88 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
+	protected function buildOverlayShape($shape)
+	{
+		$createRectangleShapeFilter =
+			"[front_rect]geq="
+			."r='r(X,Y)':"
+			."g='g(X,Y)':"
+			."b='b(X,Y)':"
+			."a='255'"
+			."[front_shape]";
+
+
+		$R = 20; // corner radius
+		$createRoundedRectangleShapeFilter =
+			"[front_rect]geq="
+			."r='r(X,Y)':"
+			."g='g(X,Y)':"
+			."b='b(X,Y)':"
+			."a='
+				255 *
+				(
+					(
+						gte(X,$R) * lte(X,W-$R)
+					   + gte(Y,$R) * lte(Y,H-$R)
+					)
+					+
+					(
+						lt(X,$R) * lt(Y,$R)
+						* lte( (X-$R)*(X-$R) + (Y-$R)*(Y-$R), $R*$R )
+					)
+					+
+					(
+						gt(X,W-$R) * lt(Y,$R)
+						* lte( (X-(W-$R))*(X-(W-$R)) + (Y-$R)*(Y-$R), $R*$R )
+					)
+					+
+					(
+						lt(X,$R) * gt(Y,H-$R)
+						* lte( (X-$R)*(X-$R) + (Y-(H-$R))*(Y-(H-$R)), $R*$R )
+					)
+					+
+					(
+						gt(X,W-$R) * gt(Y,H-$R)
+						* lte( (X-(W-$R))*(X-(W-$R)) + (Y-(H-$R))*(Y-(H-$R)), $R*$R )
+					)
+				)'"
+			."[front_shape]";
+
+		$createCircleShapeFilter =
+			"[front_rect]geq="
+			."r='r(X,Y)':"
+			."g='g(X,Y)':"
+			."b='b(X,Y)':"
+			."a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'"
+			."[front_shape]";
+
+
+		$createEllipseShapeFilter =
+			"[front_rect]geq="
+			."r='r(X,Y)':"
+			."g='g(X,Y)':"
+			."b='b(X,Y)':"
+			."a='if(lte(((X-W/2)*(X-W/2))/((W/2)*(W/2)) + ((Y-H/2)*(Y-H/2))/((H/2)*(H/2)),1),255,0)'"
+			."[front_shape]";
+
+
+		switch ($shape)
+		{
+			case kOverlayShape::ELLIPSE:
+				return $createEllipseShapeFilter;
+
+			case kOverlayShape::RECTANGLE:
+				return $createRectangleShapeFilter;
+
+			case kOverlayShape::RECTANGLE_ROUNDED_CORNERS:
+				return $createRoundedRectangleShapeFilter;
+
+			case kOverlayShape::CIRCLE:
+			default:
+				return $createCircleShapeFilter;
+		}
+	}
+
 	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
 	{
 		$mainFileNameIndex = $fileNameIndex;
@@ -1887,47 +1968,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$marginsPercentage =  $mediaCompositionAttributes->getMarginsPercentage() ? $mediaCompositionAttributes->getMarginsPercentage() : 0.074;
 		$overlayScalePercentage = $mediaCompositionAttributes->getOverlayScalePercentage() ? $mediaCompositionAttributes->getOverlayScalePercentage() : 0.4;
 		$overlayPlacement = $mediaCompositionAttributes->getOverlayPlacement() ? $mediaCompositionAttributes->getOverlayPlacement() : kMediaCompositionAlignment::BOTTOM_LEFT;
+		$overlayShape = $mediaCompositionAttributes->getOverlayShape() ? $mediaCompositionAttributes->getOverlayShape() : kOverlayShape::CIRCLE;
+
 		$overlayPosition = $this->buildOverlayPosition($overlayPlacement, $marginsPercentage);
-
-		$createCircleShapeFilter = "[front_rect]geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'[front_circle]";
-
-//		$createRectangleShapeFilter =
-//			"[front_rect]geq="
-//			."r='r(X,Y)':"
-//			."g='g(X,Y)':"
-//			."b='b(X,Y)':"
-//			."a='255'"
-//			."[front_rectangle]";
-//
-//		$cornerRadius = 20;
-//
-//		$createRoundedRectangleShapeFilter =
-//			"[front_rect]geq="
-//			."r='r(X,Y)':"
-//			."g='g(X,Y)':"
-//			."b='g(X,Y)':"
-//			."a='if(gte(min(min(X\\,W-X)\\,min(Y\\,H-Y)),$cornerRadius),255,0)'"
-//			."[front_rounded]";
-//
-//		$createCircleShapeFilter =
-//			"[front_rect]geq="
-//			."r='r(X,Y)':"
-//			."g='g(X,Y)':"
-//			."b='b(X,Y)':"
-//			."a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'"
-//			."[front_circle]";
-//
-//
-//		$createEllipseShapeFilter =
-//			"[front_rect]geq="
-//			."r='r(X,Y)':"
-//			."g='g(X,Y)':"
-//			."b='b(X,Y)':"
-//			."a='if(lte(((X-W/2)*(X-W/2))/((W/2)*(W/2)) + ((Y-H/2)*(Y-H/2))/((H/2)*(H/2)),1),255,0)'"
-//			."[front_ellipse]";
-//
-
-		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_circle]overlay=$overlayPosition:format=auto$composedVideoStreamName";
+		$createShapeFilter = $this->buildOverlayShape($overlayShape);
+		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_shape]overlay=$overlayPosition:format=auto$composedVideoStreamName";
 		$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex);
 		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
 		$audioMapName = '"[aout]"';
@@ -1950,12 +1995,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
 			$replaceOverlayBackground = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
 
-			return "$replaceOverlayBackground;$createCircleShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter";
+			return "$replaceOverlayBackground;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter";
 		}
 		else
 		{
 			$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage" . "[front_rect]";
-			return "$scaleOverlayVideo;$createCircleShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter";
+			return "$scaleOverlayVideo;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter";
 		}
 	}
 

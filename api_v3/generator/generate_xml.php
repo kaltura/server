@@ -48,11 +48,10 @@ if(!file_exists($outputPathBase))
 
 $xmlFileName = "$outputPathBase/KalturaClient.xml";
 
-///KalturaLog::info("Using code introspection to generate XML schema");
+KalturaLog::info("Using code introspection to generate XML schema");
 $xmlGenerator = new XmlClientGenerator();
 $xmlGenerator->generate();
 
 $files = $xmlGenerator->getOutputFiles();
-//file_put_contents($xmlFileName, $files["KalturaClient.xml"]);
-echo $files["KalturaClient.xml"];
-//KalturaLog::info("XML generated: $xmlFileName");
+file_put_contents($xmlFileName, $files["KalturaClient.xml"]);
+KalturaLog::info("XML generated: $xmlFileName");
