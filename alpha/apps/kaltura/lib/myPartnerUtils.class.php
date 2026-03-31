@@ -471,7 +471,7 @@ class myPartnerUtils
 		return $urlResult;
 	}
 
-	public static function buildUrl($protocol, $key)
+	protected static function buildUrl($protocol, $key)
 	{
 		if ($protocol == "https")
 		{
