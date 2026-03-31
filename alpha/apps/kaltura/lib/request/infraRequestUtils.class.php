@@ -671,7 +671,7 @@ class infraRequestUtils
 		$suffixMapping = kConf::get('regional_cdn_suffix_mapping', 'local', array());
 		foreach ($headerMapping as $headerKey => $headerValue)
 		{
-			if (!empty($_SERVER[$headerKey])
+			if (!empty($_SERVER[$headerValue])
 				&& isset($suffixMapping[$_SERVER[$headerKey]])
 				&& $suffixMapping[$_SERVER[$headerKey]] !== '')
 			{
