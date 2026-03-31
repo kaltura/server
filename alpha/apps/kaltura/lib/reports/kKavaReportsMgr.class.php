@@ -157,8 +157,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVATAR_CALL_DURATION = 'avatar_call_duration';
 	const METRIC_AVATAR_AVG_CALL_DURATION = 'avatar_avg_call_duration';
 	const METRIC_AVATAR_CHAT_MESSAGES = 'avatar_chat_messages';
-
-
+	
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
 	const METRIC_SIZE_ADDED_BYTES = 'size_added';
