@@ -667,15 +667,13 @@ class infraRequestUtils
 
 	public static function getRegionalCdnSuffix()
 	{
-		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
+		$cdnHeader = kConf::get('regional_cdn_header', 'local', array());
 		$suffixMapping = kConf::get('regional_cdn_suffix_mapping', 'local', array());
-		foreach ($headerMapping as $headerKey => $headerValue)
+		foreach ($cdnHeader as $cdnHeaderKey => $cdnHeaderName)
 		{
-			if (!empty($_SERVER[$headerValue])
-				&& isset($suffixMapping[$_SERVER[$headerValue]])
-				&& $suffixMapping[$_SERVER[$headerValue]] !== '')
+			if (!empty($_SERVER[$cdnHeaderName]) && isset($suffixMapping[$_SERVER[$cdnHeaderName]]) && $suffixMapping[$_SERVER[$cdnHeaderName]] !== '')
 			{
-				return "-" . $suffixMapping[$_SERVER[$headerValue]];
+				return "-" . $suffixMapping[$_SERVER[$cdnHeaderName]];
 			}
 		}
 		return '';
