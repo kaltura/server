@@ -12,6 +12,8 @@ class HandlerFactory {
 				return new AssetHandler();
 			case EntryObjectType::ENTRY:
 				return new EntryHandler();
+			case EntryObjectType::EXTERNAL_OBJECT:
+				return new ExternalObjectHandler();
 			default:
 				throw new KalturaAPIException(KalturaReachErrors::ENTRY_OBJECT_TYPE_NOT_SUPPORTED, $objectType);
 

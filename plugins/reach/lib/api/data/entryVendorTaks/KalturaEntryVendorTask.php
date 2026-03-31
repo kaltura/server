@@ -223,6 +223,13 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	 */
 	public $externalTaskId;
 
+	/**
+	 * The identifier of the external object for EXTERNAL_OBJECT type tasks
+	 * @var string
+	 * @insertonly
+	 */
+	public $externalObjectId;
+
 	private static $map_between_objects = array
 	(
 		'id',
@@ -256,7 +263,8 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		'serviceType',
 		'serviceFeature',
 		'turnAroundTime',
-		'externalTaskId'
+		'externalTaskId',
+		'externalObjectId'
 	);
 	
 	/* (non-PHPdoc)
@@ -327,7 +335,10 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 	public function validateForInsert($propertiesToSkip = array())
 	{
 		$this->validatePropertyNotNull("catalogItemId");
-		$this->validatePropertyNotNull("entryId");
+		if (!$this->entryObjectType || $this->entryObjectType !== KalturaEntryObjectType::EXTERNAL_OBJECT)
+		{
+			$this->validatePropertyNotNull("entryId");
+		}
 
 		$this->validateEntryObjectId();
 
@@ -399,6 +410,10 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 				$this->validateAssetId();
 				return;
 
+			case KalturaEntryObjectType::EXTERNAL_OBJECT:
+				$this->validatePropertyNotNull("externalObjectId");
+				return;
+
 			default:
 				throw new KalturaAPIException(KalturaReachErrors::ENTRY_OBJECT_TYPE_NOT_SUPPORTED, $this->entryObjectType);
 		}
@@ -457,6 +472,11 @@ class KalturaEntryVendorTask extends KalturaObject implements IRelatedFilterable
 		if (!$vendorCatalogItem)
 		{
 			throw new KalturaAPIException(KalturaReachErrors::CATALOG_ITEM_NOT_FOUND, $this->catalogItemId);
+		}
+
+		if ($this->entryObjectType === KalturaEntryObjectType::EXTERNAL_OBJECT && !$vendorCatalogItem->getPayPerUse())
+		{
+			throw new KalturaAPIException(KalturaReachErrors::EXTERNAL_OBJECT_REQUIRES_PAY_PER_USE_CATALOG_ITEM, $this->catalogItemId);
 		}
 
 		$forceDataFeatureType = [];
