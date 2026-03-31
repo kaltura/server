@@ -991,7 +991,7 @@ class kContentDistributionFlowManager extends kContentDistributionManager implem
 
 	/**
 	 * @param BatchJob $dbBatchJob
-	 * @param kDistributionSubmitJobData $data
+	 * @param kDistributionUpdateJobData $data
 	 * @return BatchJob
 	 */
 	public static function onDistributionUpdateJobAborted(BatchJob $dbBatchJob, kDistributionUpdateJobData $data)
