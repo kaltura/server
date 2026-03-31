@@ -156,7 +156,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVATAR_CALL_MESSAGES = 'avatar_call_messages';
 	const METRIC_AVATAR_CALL_DURATION = 'avatar_call_duration';
 	const METRIC_AVATAR_AVG_CALL_DURATION = 'avatar_avg_call_duration';
-	const METRIC_AVATAR_CHAT_MESSAGES = 'avatar_call_messages';
+	const METRIC_AVATAR_CHAT_MESSAGES = 'avatar_chat_messages';
 
 
 	// druid intermediate metrics
@@ -1553,17 +1553,22 @@ class kKavaReportsMgr extends kKavaBase
 			self::getInFilter(self::DIMENSION_EVENT_TYPE, self::$immersive_agents_events_types),
 			self::getHyperUniqueAggregator(self::METRIC_UNIQUE_THREADS, self::METRIC_UNIQUE_THREAD_IDS));
 
-		self::$aggregations_def[self::METRIC_AVATAR_CALL_MESSAGES] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE),
-			self::getLongSumAggregator(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_COUNT));
-
-		self::$aggregations_def[self::METRIC_AVATAR_CHAT_MESSAGES] = self::getFilteredAggregator(
-			self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CHAT_EXPERIENCE),
-			self::getLongSumAggregator(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_COUNT));
-
 		self::$aggregations_def[self::METRIC_AVATAR_CALL_DURATION_SEC] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_AVATAR_CALL_ENDED),
 			self::getLongSumAggregator(self::METRIC_AVATAR_CALL_DURATION_SEC, self::METRIC_CALL_DURATION_SUM));
+
+		self::$aggregations_def[self::METRIC_AVATAR_CHAT_MESSAGES] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_MESSAGE_RESPONSE),
+				self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CHAT_EXPERIENCE))),
+			self::getLongSumAggregator(self::METRIC_AVATAR_CHAT_MESSAGES, self::METRIC_COUNT));
+
+		self::$aggregations_def[self::METRIC_AVATAR_CALL_MESSAGES] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_MESSAGE_RESPONSE),
+				self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE))),
+			self::getLongSumAggregator(self::METRIC_AVATAR_CALL_MESSAGES, self::METRIC_COUNT));
+
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
