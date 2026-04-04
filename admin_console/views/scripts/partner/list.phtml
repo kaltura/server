@@ -104,8 +104,12 @@
                                         <option value="kavaDashboard" ><?php echo $this->translate('Kava Dashboard'); ?></option>
 									<?php endif; ?>
 								<?php endif; ?>
-								
-								
+
+								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
+									<option value="acpEditor" ><?php echo $this->translate('ACP Editor'); ?></option>
+								<?php endif; ?>
+
+
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-users')): ?>
 									<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
 								<?php endif; ?>
@@ -239,6 +243,11 @@ function manageEp(partnerId) {
 
 function kavaDashboard(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kava-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
+	window.open(url);
+}
+
+function acpEditor(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'acp-editor-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
 	window.open(url);
 }
 
