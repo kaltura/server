@@ -248,7 +248,48 @@ function kavaDashboard(partnerId) {
 
 function acpEditor(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'acp-editor-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
-	window.open(url);
+
+	console.log('Fetching ACP Editor HTML for partner:', partnerId);
+
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		timeout: 30000,
+		success: function(result) {
+			if (result.error) {
+				alert('Error: ' + result.error);
+				return;
+			}
+
+			console.log('Received HTML with injected config, length:', result.html.length);
+
+			// Open a new blank window
+			var newWindow = window.open('', '_blank');
+
+			if (!newWindow) {
+				alert('Please allow pop-ups for this site to open the ACP Editor');
+				return;
+			}
+
+			console.log('New window opened, writing HTML with injected configuration');
+
+			// Write the HTML content (which now includes the configuration script)
+			newWindow.document.open();
+			newWindow.document.write(result.html);
+			newWindow.document.close();
+
+			console.log('ACP Editor loaded with configuration:', {
+				partner_id: result.partnerId,
+				config_injected: true
+			});
+		},
+		error: function(xhr, status, error) {
+			console.error('AJAX error:', status, error);
+			console.error('Status code:', xhr.status);
+			console.error('Response:', xhr.responseText);
+			alert('<?php echo $this->translate('an error occured'); ?>: ' + status);
+		}
+	});
 }
 
 function mpLogin(partnerId) {
