@@ -361,11 +361,10 @@ class PartnerController extends Zend_Controller_Action
 
 	public function acpEditorRedirectAction()
 	{
-		$acpEditUrlSource = 'https://admin.kaltura.com/api_v3/?service=attachment_attachmentasset&action=serve&attachmentAssetId=1_3ip7onxd&serveOptions:objectType=KalturaAttachmentServeOptions&serveOptions:download=false';
-		$ks = $this->generateAdminKs();
+		$acpEditUrlSource = 'https://www.kaltura.com/api_v3/?service=attachment_attachmentasset&action=serve&attachmentAssetId=1_3ip7onxd&serveOptions:objectType=KalturaAttachmentServeOptions&serveOptions:download=false';
 		$acpEditorUrl = $acpEditUrlSource .
 									'&serviceUrl='. Infra_ClientHelper::getServiceUrl() . 
-									'&adminKs=' . $ks;
+									'&adminKs=' . $this->generateAdminKs();
 		$this->getResponse()->setRedirect($acpEditorUrl);
 	}
 	
