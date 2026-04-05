@@ -107,12 +107,12 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 		}
 
 		$minPercentage = 0.1;
-		$maxPercentage = 0.1;
+		$maxPercentage = 0.9;
 		if($this->marginsPercentage)
 		{
 			if($this->marginsPercentage < $minPercentage || $this->marginsPercentage > $maxPercentage)
 			{
-				throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "volume", $minPercentage, $maxPercentage);
+				throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "marginsPercentage", $minPercentage, $maxPercentage);
 			}
 		}
 
@@ -120,7 +120,7 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 		{
 			if($this->overlayScalePercentage < $minPercentage || $this->overlayScalePercentage > $maxPercentage)
 			{
-				throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "volume", $minPercentage, $maxPercentage);
+				throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "overlayScalePercentage", $minPercentage, $maxPercentage);
 			}
 		}
 

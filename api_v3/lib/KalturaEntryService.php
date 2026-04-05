@@ -2043,7 +2043,7 @@ class KalturaEntryService extends KalturaBaseService
 				{
 					$backgroundResource = $composition[0]->getResource();
 					$backgroundEntry = $this->getValidatedEntryForResource($backgroundResource);
-					$backgroundMediaInfo = $this->getMediaInfo($backgroundResource, $backgroundEntry);
+					$backgroundMediaInfo = $this->getEntryMediaInfo($backgroundResource, $backgroundEntry);
 				}
 				$backgroundMediaInfoArray[] = $backgroundMediaInfo;
 			}
@@ -2061,7 +2061,7 @@ class KalturaEntryService extends KalturaBaseService
 				kClipManager::OPERATION_ATTRIBUTES_ARRAY => $operationAttributesArray,
 				kClipManager::SOURCE_ENTRY => $sourceEntry,
 				kClipManager::TEMP_ENTRY => $tempEntry,
-				kClipManager::MEDIA_INFO_OBJECT => $this->getMediaInfo($resourceObj, $sourceEntry),
+				kClipManager::MEDIA_INFO_OBJECT => $this->getEntryMediaInfo($resourceObj, $sourceEntry),
 				kClipManager::BG_MEDIA_INFO_OBJECT_ARRAY => $backgroundMediaInfoArray,
 				kClipManager::IMAGE_TO_VIDEO => $sourceEntry->getMediaType() == KalturaMediaType::IMAGE ? 1 : 0
 			);
@@ -2082,11 +2082,11 @@ class KalturaEntryService extends KalturaBaseService
 		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
 	}
 
-	protected function getMediaInfo($resourceObj, $sourceEntry)
+	protected function getEntryMediaInfo($resourceObj, $sourceEntry)
 	{
+		$sourceEntryId = $sourceEntry->getId();
 		if($sourceEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			$sourceEntryId = $sourceEntry->getId();
 			$syncKey = $sourceEntry->getSyncKey(kEntryFileSyncSubType::DATA);
 			$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
 			$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, 'mediainfo');

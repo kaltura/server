@@ -1841,7 +1841,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 	}
 
-	function buildOverlayPosition($alignment, $marginsPercentage): string
+	protected function buildOverlayPosition($alignment, $marginsPercentage): string
 	{
 		$margin = "min(main_w\\,main_h)*$marginsPercentage";
 		switch ($alignment)
@@ -1896,30 +1896,15 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			."a='
 				255 *
 				(
-					(
-						gte(X,$R) * lte(X,W-$R)
-					   + gte(Y,$R) * lte(Y,H-$R)
-					)
+					(gte(X,$R) * lte(X,W-$R) + gte(Y,$R) * lte(Y,H-$R))
 					+
-					(
-						lt(X,$R) * lt(Y,$R)
-						* lte( (X-$R)*(X-$R) + (Y-$R)*(Y-$R), $R*$R )
-					)
+					(lt(X,$R) * lt(Y,$R) * lte( (X-$R)*(X-$R) + (Y-$R)*(Y-$R), $R*$R ))
 					+
-					(
-						gt(X,W-$R) * lt(Y,$R)
-						* lte( (X-(W-$R))*(X-(W-$R)) + (Y-$R)*(Y-$R), $R*$R )
-					)
+					(gt(X,W-$R) * lt(Y,$R) * lte( (X-(W-$R))*(X-(W-$R)) + (Y-$R)*(Y-$R), $R*$R ))
 					+
-					(
-						lt(X,$R) * gt(Y,H-$R)
-						* lte( (X-$R)*(X-$R) + (Y-(H-$R))*(Y-(H-$R)), $R*$R )
-					)
+					(lt(X,$R) * gt(Y,H-$R) * lte( (X-$R)*(X-$R) + (Y-(H-$R))*(Y-(H-$R)), $R*$R ))
 					+
-					(
-						gt(X,W-$R) * gt(Y,H-$R)
-						* lte( (X-(W-$R))*(X-(W-$R)) + (Y-(H-$R))*(Y-(H-$R)), $R*$R )
-					)
+					(gt(X,W-$R) * gt(Y,H-$R) * lte( (X-(W-$R))*(X-(W-$R)) + (Y-(H-$R))*(Y-(H-$R)), $R*$R ))
 				)'"
 			."[front_shape]";
 
