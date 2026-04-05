@@ -150,8 +150,6 @@ class kVendorCredit
 
 	public function syncCredit($reachProfileId, $partnerId)
 	{
-		public function syncCredit($reachProfileId, $partnerId)
-	{
 		$now = time();
 		$syncStartDate = $this->getSyncCreditStartDate();
 
