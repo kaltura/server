@@ -375,12 +375,23 @@ class PartnerController extends Zend_Controller_Action
 
 		$partnerId = $this->_getParam('partner_id');
 		$serviceUrl = Infra_ClientHelper::getServiceUrl();
+
+		// Ensure service URL uses HTTPS if admin console is accessed via HTTPS
+		// This prevents mixed content issues
+		if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+		{
+			$serviceUrl = str_replace('http://', 'https://', $serviceUrl);
+		}
+
+		KalturaLog::debug("ACP Editor: Service URL: $serviceUrl");
+
 		$adminKs = $this->generateAdminKs();
 
 		if (!$adminKs)
 		{
 			return $this->acpEditorRedirectReturn(array('error' => 'Failed to generate admin KS'));
 		}
+		KalturaLog::debug("ACP Editor: Generated admin KS for partner $partnerId");
 
 		$acpEditorBaseUrl = $settings->acpEditorUrl;
 
@@ -412,11 +423,13 @@ class PartnerController extends Zend_Controller_Action
 
 		// Inject a script at the beginning of <head> to set the configuration
 		// This makes the config available to the ACP Editor app
+		// Using json_encode to properly escape all special characters in JavaScript
 		$configScript = '<script type="text/javascript">' . "\n" .
 						'try {' . "\n" .
-						'  sessionStorage.setItem("acp_editor_admin_ks", "' . addslashes($adminKs) . '");' . "\n" .
-						'  sessionStorage.setItem("acp_editor_service_url", "' . addslashes($serviceUrl) . '");' . "\n" .
-						'  sessionStorage.setItem("acp_editor_partner_id", "' . addslashes($partnerId) . '");' . "\n" .
+						'  sessionStorage.setItem("acp_editor_admin_ks", ' . json_encode($adminKs) . ');' . "\n" .
+						'  sessionStorage.setItem("acp_editor_service_url", ' . json_encode($serviceUrl) . ');' . "\n" .
+						'  sessionStorage.setItem("acp_editor_partner_id", ' . json_encode($partnerId) . ');' . "\n" .
+						'  console.log("ACP Editor config injected successfully");' . "\n" .
 						'} catch(e) { console.error("Failed to set sessionStorage:", e); }' . "\n" .
 						'</script>';
 
