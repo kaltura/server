@@ -448,12 +448,13 @@ class myPartnerUtils
 
 	public static function addRegionalCdnSuffix($urlResult)
 	{
-		$headerMapping = kConf::get('regional_cdn_header_mapping', 'local', array());
-		foreach ($headerMapping as $headerKey => $suffix)
+		$cdnHeader = kConf::get('regional_cdn_header', 'local', array());
+		$suffixMapping = kConf::get('regional_cdn_suffix_mapping', 'local', array());
+		foreach ($cdnHeader as $cdnHeaderKey => $cdnHeaderName)
 		{
-			if (!empty($_SERVER[$headerKey]))
+			if (!empty($_SERVER[$cdnHeaderName]) && isset($suffixMapping[$_SERVER[$cdnHeaderName]]) && $suffixMapping[$_SERVER[$cdnHeaderName]] !== '')
 			{
-				$urlResult = $urlResult . "." . $suffix;
+				$urlResult = $urlResult . '.' . $suffixMapping[$_SERVER[$cdnHeaderName]];
 				break;
 			}
 		}
