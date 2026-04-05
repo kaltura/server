@@ -375,8 +375,8 @@ class PartnerController extends Zend_Controller_Action
 		}
 
 		// Build the ACP Editor URL (will redirect to CDN)
-		$acpEditorUrl = 'https://www.kaltura.com/api_v3/?service=attachment_attachmentasset&action=serve&attachmentAssetId=1_ga79kzsc&serveOptions:objectType=KalturaAttachmentServeOptions&serveOptions:download=false&serveOptions:referrer=' . urlencode($serviceUrl);
-
+		$acpEditorUrl = 'https://www.kaltura.com/api_v3/?service=attachment_attachmentasset&action=serve&attachmentAssetId=1_uz4txzx3&serveOptions:objectType=KalturaAttachmentServeOptions&serveOptions:download=false&&serveOptions:referrer=' . urlencode($serviceUrl);
+		
 		KalturaLog::debug("ACP Editor: Fetching HTML from: $acpEditorUrl");
 
 		// Fetch the HTML content from the URL (follows redirects to CDN)
