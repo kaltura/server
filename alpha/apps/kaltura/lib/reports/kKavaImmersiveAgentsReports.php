@@ -39,8 +39,16 @@ class kKavaImmersiveAgentsReports extends kKavaReportsMgr
 
 		ReportType::IMMERSIVE_AGENTS_AVATAR_SESSIONS => array(
 			self::REPORT_METRICS => array(self::EVENT_TYPE_AVATAR_CALL_STARTED, self::METRIC_AVATAR_CALL_DURATION, self::METRIC_AVATAR_AVG_CALL_DURATION),
-		)
+		),
 
+		ReportType::IMMERSIVE_AGENTS_RESPONSE_EXPERIENCE_TYPES => array(
+			self::REPORT_DIMENSION_MAP => array(
+				'experience' => self::DIMENSION_EVENT_VAR2,
+				'response_type' => self::DIMENSION_EVENT_VAR3,
+			),
+			self::REPORT_METRICS => array(self::EVENT_TYPE_MESSAGE_RESPONSE),
+			self::REPORT_TOTAL_METRICS => array(self::EVENT_TYPE_MESSAGE_RESPONSE, self::METRIC_AVATAR_CALL_MESSAGES, self::METRIC_AVATAR_CHAT_MESSAGES)
+		)
 	);
 
 	public static function getReportDef($report_type, $input_filter, $response_options = null)
