@@ -368,7 +368,8 @@ class PartnerController extends Zend_Controller_Action
 		$settings = Zend_Registry::get('config')->settings;
 
 		// Check if ACP Editor is configured
-		if (!isset($settings->acpEditorUrl) || !$settings->acpEditorUrl) {
+		if (!isset($settings->acpEditorUrl) || !$settings->acpEditorUrl) 
+		{
 			$this->getResponse()->setHeader('Content-Type', 'application/json', true);
 			echo json_encode(array('error' => 'ACP Editor is not configured'));
 			return;
@@ -378,7 +379,8 @@ class PartnerController extends Zend_Controller_Action
 		$serviceUrl = Infra_ClientHelper::getServiceUrl();
 		$adminKs = $this->generateAdminKs();
 
-		if (!$adminKs) {
+		if (!$adminKs)
+		{
 			$this->getResponse()->setHeader('Content-Type', 'application/json', true);
 			echo json_encode(array('error' => 'Failed to generate admin KS'));
 			return;
@@ -404,7 +406,8 @@ class PartnerController extends Zend_Controller_Action
 
 		$htmlContent = @file_get_contents($acpEditorUrl, false, $context);
 
-		if ($htmlContent === false) {
+		if ($htmlContent === false)
+		{
 			KalturaLog::err("ACP Editor: Failed to fetch HTML content");
 			$this->getResponse()->setHeader('Content-Type', 'application/json', true);
 			echo json_encode(array('error' => 'Failed to fetch ACP Editor HTML'));
