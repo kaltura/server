@@ -127,6 +127,7 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_TRANSCODING_USER_CPU_SEC = 'transcoding_user_cpu_sec';
 	const METRIC_REACH_DURATION_SEC = 'reach_duration_sec';
 	const METRIC_REACH_DURATION = 'reach_duration';
+	const METRIC_REACH_UNIT_USED = 'reach_unit_used';
 	const METRIC_MEETING_VIEW_TIME = 'meeting_view_time';
 	const METRIC_COMBINED_LIVE_VIEW_PERIOD_COUNT = 'combined_live_view_period_count';
 	const METRIC_COMBINED_LIVE_ENGAGED_USERS_COUNT = 'combined_live_engaged_users_count';
@@ -1443,6 +1444,9 @@ class kKavaReportsMgr extends kKavaBase
 
 		self::$aggregations_def[self::METRIC_REACH_DURATION_SEC] = self::getLongSumAggregator(
 				self::METRIC_REACH_DURATION_SEC, self::METRIC_DURATION_SEC);
+
+		self::$aggregations_def[self::METRIC_REACH_UNIT_USED] = self::getLongSumAggregator(
+			self::METRIC_REACH_UNIT_USED, self::METRIC_UNIT_USED);
 
 		self::$aggregations_def[self::METRIC_MEETING_VIEW_TIME_SEC] = self::getFilteredAggregator(
 			self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_VIEW_PERIOD),
@@ -3056,6 +3060,7 @@ class kKavaReportsMgr extends kKavaBase
 			'video_codec' => array(self::DRUID_DIMENSION => self::DIMENSION_VIDEO_CODEC),
 			'agent_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_AGENT_ID),
 			'genie_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_GENIE_ID),
+			'reach_profile_ids' => array(self::DRUID_DIMENSION => self::DIMENSION_REACH_PROFILE_ID),
 		);
 
 		foreach ($field_dim_map as $field => $field_filter_def)
