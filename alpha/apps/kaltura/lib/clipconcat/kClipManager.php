@@ -2263,9 +2263,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if(!$allowScaleOrCrop)
 			{
 				$height = $conversionParams[self::ORIGINAL_HEIGHT];
+				$flavorParamsObj->setWidth($conversionParams[self::ORIGINAL_WIDTH]);
 			}
 			$flavorParamsObj->setHeight($height);
-			$flavorParamsObj->setWidth($conversionParams[self::ORIGINAL_WIDTH]);
 
 			$invertedResource = isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE];
 
