@@ -106,7 +106,10 @@
 								<?php endif; ?>
 
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
-									<option value="acpEditor" ><?php echo $this->translate('ACP Editor'); ?></option>
+									<?php $settings = Zend_Registry::get('config')->settings; ?>
+									<?php if (isset($settings->acpEditorUrl) && $settings->acpEditorUrl): ?>
+										<option value="acpEditor" ><?php echo $this->translate('ACP Editor'); ?></option>
+									<?php endif; ?>
 								<?php endif; ?>
 
 

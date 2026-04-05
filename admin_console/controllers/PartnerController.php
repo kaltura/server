@@ -364,6 +364,16 @@ class PartnerController extends Zend_Controller_Action
 		$this->_helper->viewRenderer->setNoRender();
 		$this->_helper->layout->disableLayout();
 
+		// Get ACP Editor URL from configuration
+		$settings = Zend_Registry::get('config')->settings;
+
+		// Check if ACP Editor is configured
+		if (!isset($settings->acpEditorUrl) || !$settings->acpEditorUrl) {
+			$this->getResponse()->setHeader('Content-Type', 'application/json', true);
+			echo json_encode(array('error' => 'ACP Editor is not configured'));
+			return;
+		}
+
 		$partnerId = $this->_getParam('partner_id');
 		$serviceUrl = Infra_ClientHelper::getServiceUrl();
 		$adminKs = $this->generateAdminKs();
@@ -374,9 +384,10 @@ class PartnerController extends Zend_Controller_Action
 			return;
 		}
 
-		// Build the ACP Editor URL (will redirect to CDN)
-		 $ACP_EDITOR_URL = 'https://www.kaltura.com/api_v3/?service=attachment_attachmentasset&action=serve&attachmentAssetId=1_uz4txzx3&serveOptions:objectType=KalturaAttachmentServeOptions&serveOptions:download=false&serveOptions:referrer=';
-		$acpEditorUrl = $ACP_EDITOR_URL . urlencode($serviceUrl);
+		$acpEditorBaseUrl = $settings->acpEditorUrl;
+
+		// Build the full ACP Editor URL with referrer
+		$acpEditorUrl = $acpEditorBaseUrl . urlencode($serviceUrl);
 		
 		KalturaLog::debug("ACP Editor: Fetching HTML from: $acpEditorUrl");
 
