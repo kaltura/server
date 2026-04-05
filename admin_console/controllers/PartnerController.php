@@ -357,6 +357,86 @@ class PartnerController extends Zend_Controller_Action
 
 		$this->getResponse()->setRedirect($partnerkavaDashboardUrl);
 	}
+
+
+	public function acpEditorRedirectAction()
+	{
+		$this->_helper->viewRenderer->setNoRender();
+		$this->_helper->layout->disableLayout();
+
+		// Get ACP Editor URL from configuration
+		$settings = Zend_Registry::get('config')->settings;
+
+		// Check if ACP Editor is configured
+		if (!isset($settings->acpEditorUrl) || !$settings->acpEditorUrl) 
+		{
+			return $this->acpEditorRedirectReturn(array('error' => 'ACP Editor is not configured'));
+		}
+
+		$partnerId = $this->_getParam('partner_id');
+		$serviceUrl = Infra_ClientHelper::getServiceUrl();
+		$adminKs = $this->generateAdminKs();
+
+		if (!$adminKs)
+		{
+			return $this->acpEditorRedirectReturn(array('error' => 'Failed to generate admin KS'));
+		}
+
+		$acpEditorBaseUrl = $settings->acpEditorUrl;
+
+		// Build the full ACP Editor URL with referrer
+		$acpEditorUrl = $acpEditorBaseUrl . urlencode($serviceUrl);
+		
+		KalturaLog::debug("ACP Editor: Fetching HTML from: $acpEditorUrl");
+
+		// Fetch the HTML content from the URL (follows redirects to CDN)
+		$context = stream_context_create(array(
+			'http' => array(
+				'method' => 'GET',
+				'follow_location' => true,
+				'max_redirects' => 5,
+				'header' => "Cache-Control: no-cache, must-revalidate\r\n" .
+							"Pragma: no-cache\r\n"
+			)
+		));
+
+		$htmlContent = @file_get_contents($acpEditorUrl, false, $context);
+
+		if ($htmlContent === false)
+		{
+			KalturaLog::err("ACP Editor: Failed to fetch HTML content");
+			return $this->acpEditorRedirectReturn(array('error' => 'Failed to fetch ACP Editor HTML'));
+		}
+
+		KalturaLog::debug("ACP Editor: Fetched HTML content, length: " . strlen($htmlContent));
+
+		// Inject a script at the beginning of <head> to set the configuration
+		// This makes the config available to the ACP Editor app
+		$configScript = '<script type="text/javascript">' . "\n" .
+						'try {' . "\n" .
+						'  sessionStorage.setItem("acp_editor_admin_ks", "' . addslashes($adminKs) . '");' . "\n" .
+						'  sessionStorage.setItem("acp_editor_service_url", "' . addslashes($serviceUrl) . '");' . "\n" .
+						'  sessionStorage.setItem("acp_editor_partner_id", "' . addslashes($partnerId) . '");' . "\n" .
+						'} catch(e) { console.error("Failed to set sessionStorage:", e); }' . "\n" .
+						'</script>';
+
+		// Inject the script right after <head> tag
+		$htmlContent = preg_replace('/(<head[^>]*>)/i', '$1' . "\n" . $configScript, $htmlContent, 1);
+
+		KalturaLog::debug("ACP Editor: Injected configuration script");
+		
+		$this->acpEditorRedirectReturn(array(
+			'html' => $htmlContent,
+			'partnerId' => $partnerId
+		));
+	}
+	
+	protected function acpEditorRedirectReturn(array $data)
+	{
+		// Set proper headers for JSON response
+		$this->getResponse()->setHeader('Content-Type', 'application/json', true);
+		echo json_encode($data);	
+	}
 	
 	public function configureStorageAction()
 	{
