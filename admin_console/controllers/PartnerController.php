@@ -370,9 +370,7 @@ class PartnerController extends Zend_Controller_Action
 		// Check if ACP Editor is configured
 		if (!isset($settings->acpEditorUrl) || !$settings->acpEditorUrl) 
 		{
-			$this->getResponse()->setHeader('Content-Type', 'application/json', true);
-			echo json_encode(array('error' => 'ACP Editor is not configured'));
-			return;
+			return $this->acpEditorRedirectReturn(array('error' => 'ACP Editor is not configured'));
 		}
 
 		$partnerId = $this->_getParam('partner_id');
@@ -381,9 +379,7 @@ class PartnerController extends Zend_Controller_Action
 
 		if (!$adminKs)
 		{
-			$this->getResponse()->setHeader('Content-Type', 'application/json', true);
-			echo json_encode(array('error' => 'Failed to generate admin KS'));
-			return;
+			return $this->acpEditorRedirectReturn(array('error' => 'Failed to generate admin KS'));
 		}
 
 		$acpEditorBaseUrl = $settings->acpEditorUrl;
@@ -409,9 +405,7 @@ class PartnerController extends Zend_Controller_Action
 		if ($htmlContent === false)
 		{
 			KalturaLog::err("ACP Editor: Failed to fetch HTML content");
-			$this->getResponse()->setHeader('Content-Type', 'application/json', true);
-			echo json_encode(array('error' => 'Failed to fetch ACP Editor HTML'));
-			return;
+			return $this->acpEditorRedirectReturn(array('error' => 'Failed to fetch ACP Editor HTML'));
 		}
 
 		KalturaLog::debug("ACP Editor: Fetched HTML content, length: " . strlen($htmlContent));
@@ -430,15 +424,18 @@ class PartnerController extends Zend_Controller_Action
 		$htmlContent = preg_replace('/(<head[^>]*>)/i', '$1' . "\n" . $configScript, $htmlContent, 1);
 
 		KalturaLog::debug("ACP Editor: Injected configuration script");
-
-		// Set proper headers for JSON response
-		$this->getResponse()->setHeader('Content-Type', 'application/json', true);
-
-		// Return the modified HTML
-		echo json_encode(array(
+		
+		$this->acpEditorRedirectReturn(array(
 			'html' => $htmlContent,
 			'partnerId' => $partnerId
 		));
+	}
+	
+	protected function acpEditorRedirectReturn(array $data)
+	{
+		// Set proper headers for JSON response
+		$this->getResponse()->setHeader('Content-Type', 'application/json', true);
+		echo json_encode($data);	
 	}
 	
 	public function configureStorageAction()
