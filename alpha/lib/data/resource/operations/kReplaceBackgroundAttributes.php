@@ -26,6 +26,11 @@ class kReplaceBackgroundAttributes extends kMediaCompositionAttributes
 	private $foregroundPositionPercentage;
 
 	/**
+	 * @var kAudioAttributes
+	 */
+	private $audioAttributes;
+
+	/**
 	 * @return kContentResource $resource
 	 */
 	public function getResource()
@@ -89,13 +94,30 @@ class kReplaceBackgroundAttributes extends kMediaCompositionAttributes
 		$this->foregroundPositionPercentage = $foregroundPositionPercentage;
 	}
 
+	/**
+	 * @return kAudioAttributes
+	 */
+	public function getAudioAttributes()
+	{
+		return $this->audioAttributes;
+	}
+
+	/**
+	 * @param kAudioAttributes $audioAttributes
+	 */
+	public function setAudioAttributes($audioAttributes)
+	{
+		$this->audioAttributes = $audioAttributes;
+	}
+
 	public function toArray()
 	{
 		return array(
 			'resource' => $this->resource,
 			'backgroundColorCode' => $this->backgroundColorCode,
 			'foregroundScalePercentage' => $this->foregroundScalePercentage,
-			'foregroundPositionPercentage' => $this->foregroundPositionPercentage
+			'foregroundPositionPercentage' => $this->foregroundPositionPercentage,
+			'audioAttributes' => $this->audioAttributes
 		);
 	}
 

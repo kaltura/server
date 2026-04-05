@@ -1,9 +1,9 @@
 <?php
 /**
- * @package plugins.caption
+ * @package core
  * @subpackage api.enums
  */
-interface kCaptionsAlignment extends BaseEnum
+interface kMediaCompositionAlignment extends BaseEnum
 {
 	const BOTTOM_LEFT = 1;
 	const BOTTOM_CENTER = 2;

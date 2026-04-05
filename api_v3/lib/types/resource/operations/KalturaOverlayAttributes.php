@@ -17,10 +17,40 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 	 */
 	public $resourceMediaCompositionAttributesArray;
 
+	/**
+	 * @var float
+	 */
+	public $marginsPercentage;
+
+	/**
+	 * @var float
+	 */
+	public $overlayScalePercentage;
+
+	/**
+	 * @var KalturaMediaCompositionAlignment
+	 */
+	public $overlayPlacement;
+
+	/**
+	 * @var KalturaOverlayShape
+	 */
+	public $overlayShape;
+
+	/**
+	 * @var KalturaAudioAttributes
+	 */
+	public $audioAttributes;
+
 	private static $map_between_objects = array
 	(
 		"resource",
-		"resourceMediaCompositionAttributesArray"
+		"resourceMediaCompositionAttributesArray",
+		"marginsPercentage",
+		"overlayScalePercentage",
+		"overlayPlacement",
+		"overlayShape",
+		"audioAttributes"
 	);
 
 	public function getMapBetweenObjects()
@@ -75,6 +105,35 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 			$mediaAttributes->validateForUsage($sourceObject, $propertiesToSkip);
 
 		}
+
+		$minPercentage = 0.1;
+		$maxPercentage = 0.9;
+		if($this->marginsPercentage)
+		{
+			if($this->marginsPercentage < $minPercentage || $this->marginsPercentage > $maxPercentage)
+			{
+				throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "marginsPercentage", $minPercentage, $maxPercentage);
+			}
+		}
+
+		if($this->overlayScalePercentage)
+		{
+			if($this->overlayScalePercentage < $minPercentage || $this->overlayScalePercentage > $maxPercentage)
+			{
+				throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "overlayScalePercentage", $minPercentage, $maxPercentage);
+			}
+		}
+
+		if($this->overlayScalePercentage && $this->marginsPercentage)
+		{
+			$minPercentage = 0;
+			$maxPercentage = 1;
+			if($this->overlayScalePercentage + $this->marginsPercentage > 1)
+			{
+				throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "overlayScalePercentage + marginsPercentage", $minPercentage, $maxPercentage);
+			}
+		}
+
 	}
 
 	public function doFromObject($source_object, KalturaDetachedResponseProfile $responseProfile = null)
