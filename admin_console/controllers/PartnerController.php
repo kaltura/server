@@ -375,7 +375,8 @@ class PartnerController extends Zend_Controller_Action
 		}
 
 		// Build the ACP Editor URL (will redirect to CDN)
-		$acpEditorUrl = 'https://www.kaltura.com/api_v3/?service=attachment_attachmentasset&action=serve&attachmentAssetId=1_uz4txzx3&serveOptions:objectType=KalturaAttachmentServeOptions&serveOptions:download=false&&serveOptions:referrer=' . urlencode($serviceUrl);
+		 $ACP_EDITOR_URL = 'https://www.kaltura.com/api_v3/?service=attachment_attachmentasset&action=serve&attachmentAssetId=1_uz4txzx3&serveOptions:objectType=KalturaAttachmentServeOptions&serveOptions:download=false&serveOptions:referrer=';
+		$acpEditorUrl = $ACP_EDITOR_URL . urlencode($serviceUrl);
 		
 		KalturaLog::debug("ACP Editor: Fetching HTML from: $acpEditorUrl");
 
@@ -404,13 +405,6 @@ class PartnerController extends Zend_Controller_Action
 		// Inject a script at the beginning of <head> to set the configuration
 		// This makes the config available to the ACP Editor app
 		$configScript = '<script type="text/javascript">' . "\n" .
-						'// ACP Editor Configuration - injected by admin console' . "\n" .
-						'window.ACP_EDITOR_CONFIG = {' . "\n" .
-						'  admin_ks: "' . addslashes($adminKs) . '",' . "\n" .
-						'  service_url: "' . addslashes($serviceUrl) . '",' . "\n" .
-						'  partner_id: "' . addslashes($partnerId) . '"' . "\n" .
-						'};' . "\n" .
-						'// Also set in sessionStorage for convenience' . "\n" .
 						'try {' . "\n" .
 						'  sessionStorage.setItem("acp_editor_admin_ks", "' . addslashes($adminKs) . '");' . "\n" .
 						'  sessionStorage.setItem("acp_editor_service_url", "' . addslashes($serviceUrl) . '");' . "\n" .
