@@ -352,6 +352,7 @@ class myPartnerUtils
 	public static function getCdnHost ( $partner_id, $protocol = null, $hostType = null, $regionalCdnSupport = false )
 	{
 		$urlResult = '';
+		$port = '';
 		$protocol = $protocol ?: infraRequestUtils::getProtocol();
 
 		$partner = PartnerPeer::retrieveByPK( $partner_id );
@@ -427,6 +428,11 @@ class myPartnerUtils
 			case 'baseHost':
 				$urlResult = requestUtils::getRequestHost();
 				break;
+			case 'analyticsHost':
+				$key = 'analytics_host';
+				$urlResult = self::buildUrl($protocol, $key);
+				$port = (($_SERVER['SERVER_PORT']) != '80' && $_SERVER['SERVER_PORT'] != '443') ? ':' . $_SERVER['SERVER_PORT'] : '';
+				break;
 			default:
 				if ($partner && $partner->getCdnHost())
 				{
@@ -438,9 +444,14 @@ class myPartnerUtils
 				}
 		}
 
-		if ($regionalCdnSupport)
+		if ($regionalCdnSupport && !empty($urlResult))
 		{
 			$urlResult = self::addRegionalCdnSuffix($urlResult);
+		}
+
+		if (!empty($port) && !empty($urlResult))
+		{
+			$urlResult .= $port;
 		}
 
 		return $urlResult;
@@ -460,7 +471,22 @@ class myPartnerUtils
 		}
 		return $urlResult;
 	}
-	
+
+	protected static function buildUrl($protocol, $key)
+	{
+		if ($protocol == "https")
+		{
+			$key .= "_https";
+		}
+
+		if ($key && kConf::hasParam($key))
+		{
+			return $protocol . '://' . kConf::get($key);
+		}
+
+		return '';
+	}
+
 	public static function getPlayServerHost($partner_id, $protocol = null)
 	{
 		if(is_null($protocol))
