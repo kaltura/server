@@ -257,6 +257,9 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 
 		$recipientsBccHandledCounter = 0;
 		$recipientsBccBulk = 500;
+		$recipientsTo = $data->to ? $this->getRecipientArray($data->to, $contentParameters) : null;
+		$recipientsCc = $data->cc ? $this->getRecipientArray($data->cc, $contentParameters) : null;
+
 		do
 		{
 		    if($recipientsBcc)
@@ -277,7 +280,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		    try 
 		    {
 				KalturaLog::info('Sending Bulk');
-				$this->logTotalRecipientsSent($data, $recipients, $recipientsBcc, $contentParameters);
+				$this->logTotalRecipientsSent($recipients, $recipientsBcc, $recipientsTo, $recipientsCc);
 
 				$success = $this::$mailer->Send();
 				if (!$success)
@@ -297,11 +300,8 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		return true;
 	}
 
-	protected function logTotalRecipientsSent($data, $recipients, $recipientsBcc, $contentParameters)
+	protected function logTotalRecipientsSent($recipients, $recipientsBcc, $recipientsTo, $recipientsCc)
 	{
-		$recipientsTo = $data->to ? $this->getRecipientArray($data->to, $contentParameters) : null;
-		$recipientsCc = $data->cc ? $this->getRecipientArray($data->cc, $contentParameters) : null;
-
 		if($recipientsTo)
 		{
 			KalturaLog::info("About to send email with total to: " . count($recipientsTo));
