@@ -1849,9 +1849,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			case kMediaCompositionAlignment::BOTTOM_CENTER:
 				return "x=(main_w-overlay_w)/2:y=main_h-overlay_h-$margin";
 
-			case kMediaCompositionAlignment::BOTTOM_RIGHT:
-				return "x=main_w-overlay_w-$margin:y=main_h-overlay_h-$margin";
-
 			case kMediaCompositionAlignment::TOP_LEFT:
 				return "x=$margin:y=$margin";
 
@@ -1871,8 +1868,11 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				return "x=main_w-overlay_w-$margin:y=(main_h-overlay_h)/2";
 
 			case kMediaCompositionAlignment::BOTTOM_LEFT:
-			default:
 				return "x=$margin:y=main_h-overlay_h-$margin";
+
+			case kMediaCompositionAlignment::BOTTOM_RIGHT:
+			default:
+				return "x=main_w-overlay_w-$margin:y=main_h-overlay_h-$margin";
 		}
 	}
 
