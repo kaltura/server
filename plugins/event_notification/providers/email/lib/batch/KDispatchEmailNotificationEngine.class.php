@@ -261,7 +261,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		{
 		    if($recipientsBcc)
 		    {
-		    		$recipients =  array_slice($recipientsBcc, $recipientsBccHandledCounter, $recipientsBccBulk);
+				$recipients =  array_slice($recipientsBcc, $recipientsBccHandledCounter, $recipientsBccBulk);
 
 				foreach ($recipients as $email=>$name)
 				{
@@ -277,6 +277,8 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		    try 
 		    {
 				KalturaLog::info('Sending Bulk');
+				$this->logTotalRecipientsSent($data, $recipients, $recipientsBcc, $contentParameters);
+
 				$success = $this::$mailer->Send();
 				if (!$success)
 				{
@@ -293,6 +295,31 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		while($recipientsBccHandledCounter < count($recipientsBcc));
 		
 		return true;
+	}
+
+	protected function logTotalRecipientsSent($data, $recipients, $recipientsBcc, $contentParameters)
+	{
+		$recipientsTo = $data->to ? $this->getRecipientArray($data->to, $contentParameters) : null;
+		$recipientsCc = $data->cc ? $this->getRecipientArray($data->cc, $contentParameters) : null;
+
+		if($recipientsTo)
+		{
+			KalturaLog::info("About to send email with total to: " . count($recipientsTo));
+		}
+
+		if($recipients)
+		{
+			KalturaLog::info("About to send email with bcc in bulk: " . count($recipients));
+			if ($recipientsBcc && count($recipients) < count($recipientsBcc))
+			{
+				KalturaLog::info("Total bcc amount: " . count($recipientsBcc));
+			}
+		}
+
+		if($recipientsCc)
+		{
+			KalturaLog::info("About to send email with total cc: " . count($recipientsCc));
+		}
 	}
 
 	protected function getSubjectAndBody($emailNotificationTemplate, $contentParameters)
