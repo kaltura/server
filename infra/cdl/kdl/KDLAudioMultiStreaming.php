@@ -594,14 +594,11 @@ class KDLStreamDescriptor {
 	 */
 	private function selectStreamByDisposition(array $streams)
 	{
-		// Single stream — no disambiguation needed
-		if(count($streams) == 1){
-			return $streams[0];
-		}
-
 		if(isset($this->disposition)){
-			// Audio-description (or other disposition-specific) flavor:
-			// find the first stream that carries at least one of the requested flags.
+			// Disposition-specific flavor (e.g. audio description):
+			// always check every stream for a matching disposition flag, even if there
+			// is only one candidate.  This prevents a non-AD track from being silently
+			// used when no matching source track exists.
 			foreach($streams as $stream){
 				if(isset($stream->audioDisposition)
 				&& count(array_intersect($this->disposition, $stream->audioDisposition)) > 0){
@@ -612,6 +609,10 @@ class KDLStreamDescriptor {
 			return null;
 		}
 		else {
+			// Single stream with no disposition requirement — no disambiguation needed
+			if(count($streams) == 1){
+				return $streams[0];
+			}
 			// Standard audio flavor: prefer streams that are NOT audio description tracks
 			foreach($streams as $stream){
 				if(!isset($stream->audioDisposition)
