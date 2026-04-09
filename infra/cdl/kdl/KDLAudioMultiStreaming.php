@@ -9,6 +9,17 @@ class KDLStreamDescriptor {
 	public	$lang = null;
 	public	$label = null;
 	public $channels = null;
+	/**
+	 * Array of FFprobe disposition flags that this descriptor requires on the source stream
+	 * (e.g. ['visual_impaired'] for audio description flavors).
+	 * When null, the descriptor will prefer streams that are NOT audio description tracks.
+	 * @var array|null
+	 */
+	public $disposition = null;
+
+	// Dispositions that identify an audio description / visually-impaired track
+	const AUDIO_DESCRIPTION_DISPOSITIONS = array('visual_impaired', 'visual_impaired_audio');
+
 	public function __construct($mapping=null, $olayout=null, $lang=null, $label=null){
 		$this->setMapping($mapping);
 		$this->olayout = $olayout;
@@ -20,6 +31,7 @@ class KDLStreamDescriptor {
 		if(isset($obj->olayout))	{ $this->olayout = $obj->olayout; }
 		if(isset($obj->lang))		{ $this->lang = $obj->lang; }
 		if(isset($obj->label))		{ $this->label = $obj->label; }
+		if(isset($obj->disposition)){ $this->disposition = (array)$obj->disposition; }
 	}
 
 	/**
@@ -534,26 +546,82 @@ class KDLStreamDescriptor {
 		if(!isset($this->lang)){
 			return null;
 		}
-		
+
 		if(!isset($sourceAnalize->languages) || !key_exists($this->lang, $sourceAnalize->languages)){
 			return null;
 		}
 
 		$streams = $sourceAnalize->languages[$this->lang];
 		/*
-		 * Currently handle just the first language entity
+		 * When multiple streams share the same language (e.g. a standard 'eng' track and an
+		 * audio-description 'eng' track), use the descriptor's requested disposition to pick
+		 * the right one.  Falls back to first-stream behaviour for single-stream languages.
 		 */
-		if(isset($streams[0]->audioChannels)){
-			$olayout = (isset($this->olayout) && $this->olayout>0)? $this->olayout: $streams[0]->audioChannels;
-			$target = new KDLStreamDescriptor(array($streams[0]->id),$olayout,$this->lang);
+		$stream = $this->selectStreamByDisposition($streams);
+		if(!isset($stream)){
+			return null;
+		}
+
+		if(isset($stream->audioChannels)){
+			$olayout = (isset($this->olayout) && $this->olayout>0)? $this->olayout: $stream->audioChannels;
+			$target = new KDLStreamDescriptor(array($stream->id),$olayout,$this->lang);
 		}
 		else {
-			$target =  new KDLStreamDescriptor(array($streams[0]->id),0,$this->lang);
+			$target = new KDLStreamDescriptor(array($stream->id),0,$this->lang);
 		}
-		if(isset($streams[0]->audioLabel)) {
-			$target->label = $streams[0]->audioLabel;
+		if(isset($stream->audioLabel)) {
+			$target->label = $stream->audioLabel;
 		}
 		return $target;
+	}
+
+	/**
+	 * Selects the appropriate stream from a set of same-language streams based on the
+	 * descriptor's requested disposition.
+	 *
+	 * - When $this->disposition IS set (e.g. ['visual_impaired'] for an audio-description
+	 *   flavor), find the first source stream whose audioDisposition intersects the
+	 *   requested dispositions.  Returns null if no matching stream exists, so the flavor
+	 *   is skipped rather than silently using the wrong track.
+	 *
+	 * - When $this->disposition is NOT set (standard audio flavor), prefer source streams
+	 *   that are NOT audio description tracks (i.e. skip streams whose audioDisposition
+	 *   contains any AUDIO_DESCRIPTION_DISPOSITIONS flag).  Falls back to the first stream
+	 *   only if every stream is flagged as audio description.
+	 *
+	 * @param array $streams  KalturaMediaInfo objects for a single language group
+	 * @return KalturaMediaInfo|null
+	 */
+	private function selectStreamByDisposition(array $streams)
+	{
+		// Single stream — no disambiguation needed
+		if(count($streams) == 1){
+			return $streams[0];
+		}
+
+		if(isset($this->disposition)){
+			// Audio-description (or other disposition-specific) flavor:
+			// find the first stream that carries at least one of the requested flags.
+			foreach($streams as $stream){
+				if(isset($stream->audioDisposition)
+				&& count(array_intersect($this->disposition, $stream->audioDisposition)) > 0){
+					return $stream;
+				}
+			}
+			// No source stream matched the requested disposition — do not generate this flavor
+			return null;
+		}
+		else {
+			// Standard audio flavor: prefer streams that are NOT audio description tracks
+			foreach($streams as $stream){
+				if(!isset($stream->audioDisposition)
+				|| count(array_intersect(self::AUDIO_DESCRIPTION_DISPOSITIONS, $stream->audioDisposition)) == 0){
+					return $stream;
+				}
+			}
+			// All streams are audio description — fall back to first stream
+			return $streams[0];
+		}
 	}
 }
 
@@ -743,18 +811,36 @@ class KDLAudioMultiStreamingHelper extends KDLAudioMultiStreaming {
 	 *   that makes it considered as 'multi stream/audio'. Default:2
 	 * @return Ambigous <-, NULL, KDLAudioMultiStreaming>|Ambigous <NULL, KDLAudioMultiStreaming>|NULL|KDLAudioMultiStreamingHelper
 	 */
-	public function GetSettings($sourceStreams, $overrideStreams=null, $minAudioStreams=2)
+	public function GetSettings($sourceStreams, $overrideStreams=null, $minAudioStreams=2, $flavorTags=null)
 	{
 		$sourceAudioStreams = isset($sourceStreams->audio)? $sourceStreams->audio: null;
 		$overrideStreams = isset($overrideStreams->audio)? $overrideStreams->audio: null;
-		
+
 		$overrideAudio = self::prepareSourceOverride($overrideStreams, $sourceAudioStreams);
 		if(isset($overrideAudio)){
 			self::applyOverrideToSource($overrideAudio->perTrack, $sourceAudioStreams);
 		}
 		$sourceAnalize = self::analizeSourceContentStreams($sourceStreams,$minAudioStreams);
 		$sourceAnalize->override = $overrideAudio;
-		
+
+		/*
+		 * Determine whether the flavor is an audio-description flavor by checking for the
+		 * 'audio_description' tag in the (comma-separated) flavor tags string.
+		 * When true, inject AUDIO_DESCRIPTION_DISPOSITIONS as the required disposition on
+		 * every language-based stream descriptor so that generateTargetLingualNotated()
+		 * selects the visually-impaired source track instead of the default one.
+		 */
+		$isAudioDescription = isset($flavorTags)
+			&& strpos(strtolower($flavorTags), 'audio_description') !== false;
+
+		if($isAudioDescription && isset($this->streams)){
+			foreach($this->streams as $stream){
+				if(!isset($stream->disposition)){
+					$stream->disposition = KDLStreamDescriptor::AUDIO_DESCRIPTION_DISPOSITIONS;
+				}
+			}
+		}
+
 		/*
 		 * The 'default' flow (multiStream object is not provided) -
 		 * Check analyze results for

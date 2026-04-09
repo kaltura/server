@@ -457,6 +457,17 @@ class KFFMpegMediaParser extends KBaseMediaParser
 		if(isset($stream->tags) && isset($stream->tags->language)){
 			$mediaInfo->audioLanguage = trim($stream->tags->language);
 		}
+		if(isset($stream->disposition)){
+			$activeDispositions = array();
+			foreach($stream->disposition as $flag => $value){
+				if($value == 1){
+					$activeDispositions[] = $flag;
+				}
+			}
+			if(!empty($activeDispositions)){
+				$mediaInfo->audioDisposition = $activeDispositions;
+			}
+		}
 		$mediaInfo->containerProfile = isset($stream->profile)? trim($stream->profile): null;
 		$mediaInfo->extradata = isset($stream->extradata) ? trim($stream->extradata): null;
 		return $mediaInfo;
