@@ -196,6 +196,10 @@ class kVendorCredit
 		{
 			$totalUsedCredit += $totalPrice;
 		}
+
+		$this->setSyncedCredit($totalUsedCredit);
+		$this->setLastSyncTime($now);
+
 		return $totalUsedCredit;
 	}
 
