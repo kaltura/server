@@ -335,18 +335,40 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 		}
 		return false;
 	}
+
+	private static function uniqueLoginEmail(string $partnerId, string $adminSecret, string $email): string {  
+		$token = $partnerId . $adminSecret . $email;  
+    	$constanthash = sha1($token);  
+    	$domain = strstr($email, '@');  
+    	return $constanthash . $domain; 
+	}
 	
 	/**
 	 * @param string $email
+	 * @param int $partnerId Optional partner ID for shared user lookup
 	 * @return UserLoginData
 	 */
-	public static function getByEmail($email)
+	public static function getByEmail($email, $partnerId = null)
 	{
 		$c = new Criteria();
-		$c->add ( UserLoginDataPeer::LOGIN_EMAIL , $email );
-		$data = UserLoginDataPeer::doSelectOne( $c );
+		$c->add(UserLoginDataPeer::LOGIN_EMAIL, $email);
+		$data = UserLoginDataPeer::doSelectOne($c);
+
+		// If not found, try hashed email for shared users
+		if (!$data && $partnerId) {
+			$partner = PartnerPeer::retrieveByPK($partnerId);
+			if ($partner) {
+				$hashedEmail = self::uniqueLoginEmail(
+					$partnerId,
+					$partner->getAdminSecret(),
+					$email
+				);
+				$c = new Criteria();
+				$c->add(UserLoginDataPeer::LOGIN_EMAIL, $hashedEmail);
+				$data = UserLoginDataPeer::doSelectOne($c);
+			}
+		}
 		return $data;
-		
 	}
 	
 	public static function isPasswordStructureValid($pass, $partnerId = null)
@@ -556,7 +578,7 @@ class UserLoginDataPeer extends BaseUserLoginDataPeer implements IRelatedObjectP
 	// user login by login_email
 	public static function userLoginByEmail($email, $password, $partnerId = null, $otp = null)
 	{
-		$loginData = self::getByEmail($email);
+		$loginData = self::getByEmail($email, $partnerId);
 		if (!$loginData) {
 			throw new kUserException('', kUserException::LOGIN_DATA_NOT_FOUND);
 		}
