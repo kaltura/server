@@ -43,6 +43,9 @@ class registerpartnerAction extends defPartnerservices2Action
 	
 	public function executeImpl ( $partner_id , $subp_id , $puser_id , $partner_prefix , $puser_kuser )
 	{
+		// This API is not supported anymore
+		throw new KalturaAPIException(KalturaErrors::SERVICE_FORBIDDEN, "partnerservices2", "registerpartner - This API is deprecated and no longer supported");
+
 		defPartnerservices2baseAction::disableCache();
 		
 		$partner = new Partner();
