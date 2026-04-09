@@ -1817,14 +1817,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			",crop=$targetWidth:$targetHeight"."[bg]";
 		$positionForegroundOnNewBackground = "[bg][fg]overlay=(main_w-overlay_w)*$foregroundPositionW:(main_h-overlay_h)*$foregroundPositionH:format=auto:shortest=$shortest$composedVideoStreamName";
 
-		$filterComplex = "$foregroundFilter;$scaleNewBackground;$positionForegroundOnNewBackground";
+		$filterComplex = "$foregroundFilter;$scaleNewBackground;$positionForegroundOnNewBackground;";
 
 		if(!$imageResource)
 		{
 			$audioMapName = '"[aout]"';
 			$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $newBackgroundFileNameIndex);
 			$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
-			$filterComplex .= ";$defineAudioVolumesFilter;$combineAudioFilter";
+			$filterComplex .= "$defineAudioVolumesFilter;$combineAudioFilter;";
 		}
 		return $filterComplex;
 	}
@@ -1980,12 +1980,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
 			$replaceOverlayBackground = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
 
-			return "$replaceOverlayBackground;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter";
+			return "$replaceOverlayBackground;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter;";
 		}
 		else
 		{
 			$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage" . "[front_rect]";
-			return "$scaleOverlayVideo;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter";
+			return "$scaleOverlayVideo;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter;";
 		}
 	}
 
