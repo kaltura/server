@@ -1957,9 +1957,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$overlayPosition = $this->buildOverlayPosition($overlayPlacement, $marginsPercentage);
 		$createShapeFilter = $this->buildOverlayShape($overlayShape);
-		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_shape]overlay=$overlayPosition:format=auto$composedVideoStreamName";
+		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v]setpts=N/(FRAME_RATE*TB)[bg_r];[bg_r][front_shape]overlay=$overlayPosition:format=auto:shortest=1$composedVideoStreamName";
 		$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex);
-		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
+		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:normalize=0:dropout_transition=0[aout]";
 		$audioMapName = '"[aout]"';
 
 		$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
@@ -2018,6 +2018,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
+				$cmdFileNames = " -stream_loop -1 -i __inFileName__ ";
 				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $conversionParams, $composedVideoStreamName);
 			}
 		}
