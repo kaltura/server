@@ -1,3 +1,11 @@
+# Venus-22.18.0
+## Add reachProfile update permission for self serve partner ##
+* Issue Type: Task
+* Issue ID: AV-488
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_04_12_self_serve_add_permission_reach_reachprofile_update.php
+
 # Venus-22.17.0
 ## Optimize entry_vendor_task queries ##
 - Issue Type: Task
