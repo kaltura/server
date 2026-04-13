@@ -636,8 +636,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_ATTENDEES => 'floor',
 		self::METRIC_VE_ATTENDED_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_THREADS => 'floor',
-		self::METRIC_CALL_UNIQUE_USERS => 'floor',
 		self::METRIC_CALL_UNIQUE_THREADS => 'floor',
+		self::METRIC_CALL_UNIQUE_USERS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
