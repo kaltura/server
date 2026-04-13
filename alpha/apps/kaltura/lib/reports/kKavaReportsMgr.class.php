@@ -158,7 +158,9 @@ class kKavaReportsMgr extends kKavaBase
 	const METRIC_AVATAR_CALL_DURATION = 'avatar_call_duration';
 	const METRIC_AVATAR_AVG_CALL_DURATION = 'avatar_avg_call_duration';
 	const METRIC_AVATAR_CHAT_MESSAGES = 'avatar_chat_messages';
-	
+	const METRIC_CALL_UNIQUE_THREADS = 'unique_threads_call';
+	const METRIC_CALL_UNIQUE_USERS = 'unique_users_call';
+
 	// druid intermediate metrics
 	const METRIC_PLAYTHROUGH = 'play_through';
 	const METRIC_SIZE_ADDED_BYTES = 'size_added';
@@ -634,6 +636,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_UNIQUE_ATTENDEES => 'floor',
 		self::METRIC_VE_ATTENDED_UNIQUE_USERS => 'floor',
 		self::METRIC_UNIQUE_THREADS => 'floor',
+		self::METRIC_CALL_UNIQUE_USERS => 'floor',
+		self::METRIC_CALL_UNIQUE_THREADS => 'floor',
 	);
 
 	protected static $transform_time_dimensions = null;
@@ -712,6 +716,8 @@ class kKavaReportsMgr extends kKavaBase
 		self::METRIC_VE_ATTENDED_UNIQUE_USERS => true,
 		self::METRIC_UNIQUE_THREADS => true,
 		self::METRIC_AVATAR_AVG_CALL_DURATION => true,
+		self::METRIC_CALL_UNIQUE_THREADS => true,
+		self::METRIC_CALL_UNIQUE_USERS => true,
 	);
 
 	protected static $multi_value_dimensions = array(
@@ -1572,6 +1578,17 @@ class kKavaReportsMgr extends kKavaBase
 				self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE))),
 			self::getLongSumAggregator(self::METRIC_AVATAR_CALL_MESSAGES, self::METRIC_COUNT));
 
+		self::$aggregations_def[self::METRIC_CALL_UNIQUE_THREADS] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_MESSAGE_RESPONSE),
+				self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE))),
+			self::getHyperUniqueAggregator(self::METRIC_CALL_UNIQUE_THREADS, self::METRIC_UNIQUE_THREAD_IDS));
+
+		self::$aggregations_def[self::METRIC_CALL_UNIQUE_USERS] = self::getFilteredAggregator(
+			self::getAndFilter(array(
+				self::getSelectorFilter(self::DIMENSION_EVENT_TYPE, self::EVENT_TYPE_MESSAGE_RESPONSE),
+				self::getSelectorFilter(self::DIMENSION_EVENT_VAR2, self::CALL_EXPERIENCE))),
+			self::getHyperUniqueAggregator(self::METRIC_CALL_UNIQUE_USERS, self::METRIC_UNIQUE_USER_IDS));
 
 		// Note: metrics that have post aggregations are defined below, any metric that
 		//		is not explicitly set on $metrics_def is assumed to be a simple aggregation
