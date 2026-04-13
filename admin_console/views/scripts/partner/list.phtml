@@ -104,8 +104,15 @@
                                         <option value="kavaDashboard" ><?php echo $this->translate('Kava Dashboard'); ?></option>
 									<?php endif; ?>
 								<?php endif; ?>
-								
-								
+
+								<?php if (Infra_AclHelper::isAllowed('partner','kmc-redirect')): ?>
+									<?php $settings = Zend_Registry::get('config')->settings; ?>
+									<?php if (isset($settings->acpEditorUrl) && $settings->acpEditorUrl): ?>
+										<option value="acpEditor" ><?php echo $this->translate('ACP Editor'); ?></option>
+									<?php endif; ?>
+								<?php endif; ?>
+
+
 								<?php if (Infra_AclHelper::isAllowed('partner','kmc-users')): ?>
 									<option value="kmcUsers" ><?php echo $this->translate('KMC Users'); ?></option>
 								<?php endif; ?>
@@ -240,6 +247,52 @@ function manageEp(partnerId) {
 function kavaDashboard(partnerId) {
 	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'kava-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
 	window.open(url);
+}
+
+function acpEditor(partnerId) {
+	var url = '<?php echo $this->url(array('controller' => 'partner', 'action' => 'acp-editor-redirect', 'partner_id' => ''), null, true); ?>' + partnerId;
+
+	console.log('Fetching ACP Editor HTML for partner:', partnerId);
+
+	jQuery.ajax({
+		url: url,
+		dataType: 'json',
+		timeout: 30000,
+		success: function(result) {
+			if (result.error) {
+				alert('Error: ' + result.error);
+				return;
+			}
+
+			console.log('Received HTML with injected config, length:', result.html.length);
+
+			// Open a new blank window
+			var newWindow = window.open('', '_blank');
+
+			if (!newWindow) {
+				alert('Please allow pop-ups for this site to open the ACP Editor');
+				return;
+			}
+
+			console.log('New window opened, writing HTML with injected configuration');
+
+			// Write the HTML content (which now includes the configuration script)
+			newWindow.document.open();
+			newWindow.document.write(result.html);
+			newWindow.document.close();
+
+			console.log('ACP Editor loaded with configuration:', {
+				partner_id: result.partnerId,
+				config_injected: true
+			});
+		},
+		error: function(xhr, status, error) {
+			console.error('AJAX error:', status, error);
+			console.error('Status code:', xhr.status);
+			console.error('Response:', xhr.responseText);
+			alert('<?php echo $this->translate('an error occured'); ?>: ' + status);
+		}
+	});
 }
 
 function mpLogin(partnerId) {

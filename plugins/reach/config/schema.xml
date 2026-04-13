@@ -98,6 +98,10 @@
 			<index-column name="reach_profile_id" />
 			<index-column name="queue_time" />
 		</index>
+		<index name="reach_profile_finish_time">
+			<index-column name="reach_profile_id" />
+			<index-column name="finish_time" />
+		</index>
 	</table>
 	
 </database>

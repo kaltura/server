@@ -1001,6 +1001,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		/* @var $member categoryKuser */
 		while ($member = array_pop($members))
 		{
+			if($member && $this->shouldSkipMemberIndex($member))
+			{
+				KalturaLog::debug("skipping user " . $member->getKuserId() . " with NONE permission level for category " . $this->getId());
+				continue;
+			}
+			
 			if(isset($membersIdsByPermission[$member->getPermissionLevel()]))
 				$membersIdsByPermission[$member->getPermissionLevel()][] = $member->getKuserId();
 			else
@@ -1858,6 +1864,11 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 		$values = array();
 		foreach ($members as $member)
 		{
+			if($member && $this->shouldSkipMemberIndex($member))
+			{
+				KalturaLog::debug("skipping user " . $member->getKuserId() . " with NONE permission level for category " . $this->getId());
+				continue;
+			}
 			/**
 			 * @var categoryKuser $member
 			*/
@@ -2114,5 +2125,12 @@ class category extends Basecategory implements IIndexable, IRelatedObject, IElas
 	{
 		$result = parent::getPrivacyContexts();
 		return is_null($result) ? '' : $result;
+	}
+	
+	private function shouldSkipMemberIndex(categoryKuser $member)
+	{
+		return $member->getPermissionLevel() && $member->getPermissionLevel() == CategoryKuserPermissionLevel::NONE &&
+			$this->getPrivacy() == PrivacyType::MEMBERS_ONLY &&
+			$this->getDisplayInSearch() == DisplayInSearchType::CATEGORY_MEMBERS_ONLY;
 	}
 }

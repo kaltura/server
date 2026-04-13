@@ -944,7 +944,7 @@ CREATE TABLE IF NOT EXISTS `entry_server_node` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='Relationship between entry and server node';
 
 CREATE TABLE IF NOT EXISTS `entry_vendor_task` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `queue_time` datetime DEFAULT NULL,
@@ -962,10 +962,11 @@ CREATE TABLE IF NOT EXISTS `entry_vendor_task` (
   `custom_data` text,
   PRIMARY KEY (`id`),
   KEY `partner_id_status_index` (`partner_id`,`status`),
-	KEY `vendor_partner_id_status_index` (`vendor_partner_id`,`status`),
-	KEY `updated_at` (`updated_at`),
-	KEY `entry_id` (`entry_id`),
-	KEY `reach_profile_queue_time` (`reach_profile_id`,`queue_time`)
+  KEY `vendor_partner_id_status_index` (`vendor_partner_id`,`status`),
+  KEY `updated_at` (`updated_at`),
+  KEY `entry_id` (`entry_id`),
+  KEY `reach_profile_queue_time` (`reach_profile_id`,`queue_time`)
+  KEY `reach_profile_finish_time` (`reach_profile_id`,`finish_time`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `event_notification_template` (

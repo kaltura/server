@@ -2030,14 +2030,22 @@ class KalturaEntryService extends KalturaBaseService
 			$tempEntry = $clipManager->createTempEntryForClip($this->getPartnerId(), "TEMP_$sourceEntryId" . "_");
 			$tempEntryIds[] = $tempEntry->getId();
 
-			$duration = 0;
 			$operationAttributesArray = array();
+			$backgroundMediaInfoArray = array();
 			foreach ($resource->getOperationAttributes() as $operationAttribute)
 			{
 				/* @var $operationAttribute kClipAttributes **/
-				$duration += $operationAttribute->getDuration();
 				$this->setCaptionAssetsUrls($operationAttribute);
 				$operationAttributesArray[] = $operationAttribute;
+				$composition = $operationAttribute->getMediaCompositionAttributesArray();
+				$backgroundMediaInfo = null;
+				if(isset($composition[0]) && $composition[0] instanceof kReplaceBackgroundAttributes)
+				{
+					$backgroundResource = $composition[0]->getResource();
+					$backgroundEntry = $this->getValidatedEntryForResource($backgroundResource);
+					$backgroundMediaInfo = $this->getEntryMediaInfo($backgroundResource, $backgroundEntry);
+				}
+				$backgroundMediaInfoArray[] = $backgroundMediaInfo;
 			}
 
 			if($sourceEntry->getMediaType() == KalturaMediaType::IMAGE)
@@ -2047,36 +2055,15 @@ class KalturaEntryService extends KalturaBaseService
 					/* @var $operationAttribute kClipAttributes **/
 					$operationAttribute->setOffset(0);
 				}
-				$syncKey = $sourceEntry->getSyncKey(kEntryFileSyncSubType::DATA);
-				$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
-				$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, 'mediainfo');
-				$mediaInfo = $mediaInfoParser->getMediaInfo();
-				if(!$mediaInfo)
-				{
-					throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $sourceEntryId);
-				}
-				$mediaInfoObj = $mediaInfo->toInsertableObject();
-				$imageToVideo = 1;
-			}
-			else
-			{
-				$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($resourceObj->getObjectId());
-				$imageToVideo = 0;
-			}
-			if(!$mediaInfoObj)
-			{
-				$objectId = $resourceObj->getObjectId();
-				KalturaLog::err("Could not retrieve media info object for object Id [$objectId] for source entry Id [$sourceEntryId]");
-				throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
 			}
 
 			$entryResourcesData[] = array(
 				kClipManager::OPERATION_ATTRIBUTES_ARRAY => $operationAttributesArray,
 				kClipManager::SOURCE_ENTRY => $sourceEntry,
 				kClipManager::TEMP_ENTRY => $tempEntry,
-				kClipManager::MEDIA_INFO_OBJECT => $mediaInfoObj,
-				kClipManager::CLIPS_DURATION => $duration,
-				kClipManager::IMAGE_TO_VIDEO => $imageToVideo
+				kClipManager::MEDIA_INFO_OBJECT => $this->getEntryMediaInfo($resourceObj, $sourceEntry),
+				kClipManager::BG_MEDIA_INFO_OBJECT_ARRAY => $backgroundMediaInfoArray,
+				kClipManager::IMAGE_TO_VIDEO => $sourceEntry->getMediaType() == KalturaMediaType::IMAGE ? 1 : 0
 			);
 		}
 
@@ -2093,6 +2080,34 @@ class KalturaEntryService extends KalturaBaseService
 		$destEntry->setStatus(entryStatus::PENDING);
 		$destEntry->save();
 		kJobsManager::updateBatchJob($rootJob, BatchJob::BATCHJOB_STATUS_ALMOST_DONE);
+	}
+
+	protected function getEntryMediaInfo($resourceObj, $sourceEntry)
+	{
+		$sourceEntryId = $sourceEntry->getId();
+		if($sourceEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
+			$syncKey = $sourceEntry->getSyncKey(kEntryFileSyncSubType::DATA);
+			$sourceFilePath = kFileSyncUtils::getLocalFilePathForKey($syncKey);
+			$mediaInfoParser = new KMediaInfoMediaParser($sourceFilePath, 'mediainfo');
+			$mediaInfo = $mediaInfoParser->getMediaInfo();
+			if(!$mediaInfo)
+			{
+				throw new KalturaAPIException(KalturaErrors::INVALID_MEDIA_INFO, $sourceEntryId);
+			}
+			$mediaInfoObj = $mediaInfo->toInsertableObject();
+		}
+		else
+		{
+			$mediaInfoObj = mediaInfoPeer::retrieveByFlavorAssetId($resourceObj->getObjectId());
+		}
+		if(!$mediaInfoObj)
+		{
+			$objectId = $resourceObj->getObjectId();
+			KalturaLog::err("Could not retrieve media info object for object Id [$objectId] for source entry Id [$sourceEntryId]");
+			throw new APIException(KalturaErrors::MEDIA_INFO_NOT_FOUND, $objectId);
+		}
+		return $mediaInfoObj;
 	}
 
 	protected function setCaptionAssetsUrls(&$operationAttribute)

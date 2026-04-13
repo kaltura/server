@@ -279,18 +279,23 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 
 	public function getLinkedCatalogItems(): array
 	{
+		$vendor_data = json_decode($this->getVendorData(), true) ?? [];
 		$notes  = json_decode($this->getNotes(), true) ?? [];
-		$linked_catalog_items = $notes['linked_catalog_items'] ?? '';
-		if (!$linked_catalog_items)
-		{
-			return [];
-		}
-		return array_map('trim', explode(',', $linked_catalog_items));
+		$raw = implode(',', array_filter([
+			$notes['linked_catalog_items'] ?? '',
+			$vendor_data['linked_catalog_items'] ?? '',
+		]));
+		return $raw ? array_map('trim', explode(',', $raw)) : [];
 	}
 
 
 	public function isDuplicateTask($entryId, $entryObjectType, $partnerId)
 	{
+		if ($entryObjectType === EntryObjectType::EXTERNAL_OBJECT)
+		{
+			return false;
+		}
+
 		$version = $this->getTaskVersion($entryId, $entryObjectType);
 		$catalog_item_ids = [$this->getId()];
 		$catalog_item_ids = array_merge($catalog_item_ids, $this->getLinkedCatalogItems());

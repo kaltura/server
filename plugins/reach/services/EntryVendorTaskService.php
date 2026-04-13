@@ -67,7 +67,8 @@ class EntryVendorTaskService extends KalturaBaseService
 	{
 		$entryVendorTask->validateForInsert();
 		$vendorTaskObjectHandler = HandlerFactory::getHandler($entryVendorTask->entryObjectType);
-		$entryId = $entryVendorTask->entryId;
+		$isExternalObject = ($entryVendorTask->entryObjectType == KalturaEntryObjectType::EXTERNAL_OBJECT);
+		$entryId = $isExternalObject ? $entryVendorTask->externalObjectId : $entryVendorTask->entryId;
 		$entryObject = $vendorTaskObjectHandler->getTaskObjectById($entryId);
 		if (!$entryObject)
 		{
@@ -138,6 +139,11 @@ class EntryVendorTaskService extends KalturaBaseService
 
 	protected function handlingExistingTasks($entryVendorTask, $dbVendorCatalogItem, $taskVersion)
 	{
+		if ($entryVendorTask->entryObjectType === EntryObjectType::EXTERNAL_OBJECT)
+		{
+			return;
+		}
+
 		$existingTask = EntryVendorTaskPeer::retrieveOneActiveOrCompleteTask($entryVendorTask->entryId, $entryVendorTask->catalogItemId, kCurrentContext::getCurrentPartnerId(), $taskVersion);
 		if ($existingTask)
 		{
