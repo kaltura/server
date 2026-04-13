@@ -2276,18 +2276,19 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			$flavorParamsObj->setHeight($height);
 
+			$croppingMode = false;
+			if(isset($conversionParams[self::CROP_DATA_ARRAY]) && isset($conversionParams[self::CROP_DATA_ARRAY][$index]))
+			{
+				$cropData = $conversionParams[self::CROP_DATA_ARRAY][$index];
+				$croppingMode = is_array($cropData) && count($cropData) > 0;
+			}
+
 			$invertedResource = isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE];
 			if($invertedResource)
 			{
 				// for inverted source calculation, the output flavor is inverted
 				// _arProcessingMode = 6, inverts back the output flavor
 				$flavorParamsObj->setAspectRatioProcessingMode(6);
-			}
-			$croppingMode = false;
-			if(isset($conversionParams[self::CROP_DATA_ARRAY]) && isset($conversionParams[self::CROP_DATA_ARRAY][$index]))
-			{
-				$cropData = $conversionParams[self::CROP_DATA_ARRAY][$index];
-				$croppingMode = is_array($cropData) && count($cropData) > 0;
 			}
 
 			if($allowScaleOrCrop)
@@ -2304,7 +2305,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				else if(isset($conversionParams[self::TARGET_WIDTH]))
 				{
 					// scale
-					$flavorParamsObj->setAspectRatioProcessingMode(2);
+					$processingMode = $invertedResource ? 6 : 2;
+					$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
 					$flavorParamsObj->setWidth($conversionParams[self::TARGET_WIDTH]);
 				}
 			}
