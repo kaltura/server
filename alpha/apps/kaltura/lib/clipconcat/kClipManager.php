@@ -2025,7 +2025,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
 				$cmdFileNames = " -stream_loop -1 -i __inFileName__ ";
-				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $conversionParams, $composedVideoStreamName);
+				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $sortedFilters, $conversionParams, $composedVideoStreamName);
 			}
 			// scaling or cropping is already done in $filterComplex
 			unset($sortedFilters["scale"]);
