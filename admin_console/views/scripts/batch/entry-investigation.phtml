@@ -1128,13 +1128,13 @@
 						{
 							$filter = array(
 								'type' => 'apiLogFilter',
-								'fromTime' => strval($track->createdAt - 300),
-								'toTime' => strval($track->createdAt + 300),
+								'fromTime' => date('Y-m-d H:i:s', $track->createdAt - 300),
+								'toTime' => date('Y-m-d H:i:s', $track->createdAt + 300),
 								'server' => $track->hostName,
 								'session' => $track->sessionId,
 							);
 							$hash = base64_encode(gzcompress(json_encode($filter)));
-							$url = $this->serverUrl()."/admin_console/index.php/index/kelloggs#$hash\n";
+							$url = $this->serverUrl()."/admin_console/index.php/index/kelloggs#$hash";
 							$track->kelloggsUrl = $url;
 							
 							?><td><a href="<?php echo $track->kelloggsUrl; ?>" target="_blank"><?php echo $track->sessionId; ?></a></td><?php
