@@ -1943,7 +1943,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
-	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
+	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, &$sortedFilters, $conversionParams, $composedVideoStreamName)
 	{
 		$mainFileNameIndex = $fileNameIndex;
 		$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
@@ -1957,20 +1957,29 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$overlayPosition = $this->buildOverlayPosition($overlayPlacement, $marginsPercentage);
 		$createShapeFilter = $this->buildOverlayShape($overlayShape);
+
 		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_shape]overlay=$overlayPosition:format=auto$composedVideoStreamName";
+		if(isset($sortedFilters["scale"]))
+		{
+			$mainStreamName = "[main_scaled]";
+			$mainScaleFilter = $sortedFilters["scale"] . $mainStreamName;
+			$overlayCircleOnVideoFilter = "$mainScaleFilter;$mainStreamName" . "[front_shape]overlay=$overlayPosition:format=auto$composedVideoStreamName";
+		}
+
 		$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex);
 		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
 		$audioMapName = '"[aout]"';
 
 		$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
 
+		$targetHeight = $conversionParams[self::TARGET_HEIGHT];
+		$targetWidth = $conversionParams[self::TARGET_WIDTH];
+		$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=min($targetHeight\,$targetWidth)*$overlayScalePercentage:min($targetHeight\,$targetWidth)*$overlayScalePercentage";
+
 		if(isset($attributesArray[0]))
 		{
-			$targetHeight = $conversionParams[self::TARGET_HEIGHT];
-			$targetWidth = $conversionParams[self::TARGET_WIDTH];
 			$BGColor = $this->getBackgroundColor($attributesArray[0]);
-			$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=min($targetHeight\,$targetWidth)*$overlayScalePercentage:min($targetHeight\,$targetWidth)*$overlayScalePercentage,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
-
+			$scaleAndRemoveBGColor = "$scaleOverlayVideo,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
 			$cmdFileNames .= $this->getFileInputCommandByEntryType($attributesArray[0], $fileNameIndex);
 			$fileNameIndex++;
 			$backgroundFileNameIndex = $fileNameIndex;
@@ -1984,7 +1993,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		else
 		{
-			$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage" . "[front_rect]";
+			$scaleOverlayVideo .= "[front_rect]";
 			return "$scaleOverlayVideo;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter;";
 		}
 	}
@@ -2012,14 +2021,14 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
 			{
 				$filterComplex = $this->getReplacementAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $conversionParams, $composedVideoStreamName);
-				// scaling or cropping is already done in $filterComplex
-				unset($sortedFilters["scale"]);
-				unset($sortedFilters["crop"]);
 			}
 			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
-				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $conversionParams, $composedVideoStreamName);
+				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $sortedFilters, $conversionParams, $composedVideoStreamName);
 			}
+			// scaling or cropping is already done in $filterComplex
+			unset($sortedFilters["scale"]);
+			unset($sortedFilters["crop"]);
 		}
 
 		if(!$filterComplex)
@@ -2267,8 +2276,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			$flavorParamsObj->setHeight($height);
 
-			$invertedResource = isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE];
-
 			$croppingMode = false;
 			if(isset($conversionParams[self::CROP_DATA_ARRAY]) && isset($conversionParams[self::CROP_DATA_ARRAY][$index]))
 			{
@@ -2276,30 +2283,32 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$croppingMode = is_array($cropData) && count($cropData) > 0;
 			}
 
-			if($croppingMode && $allowScaleOrCrop)
-			{
-				// crop
-				$processingMode = $invertedResource ? 8 : 7;
-				$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
-				$flavorParamsObj->setCropData(json_encode($cropData));
-				$flavorParamsObj->setHeight($conversionParams[self::CROP_HEIGHT]);
-				$flavorParamsObj->setWidth($conversionParams[self::CROP_WIDTH]);
-			}
-			else if($invertedResource)
+			$invertedResource = isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE];
+			if($invertedResource)
 			{
 				// for inverted source calculation, the output flavor is inverted
 				// _arProcessingMode = 6, inverts back the output flavor
 				$flavorParamsObj->setAspectRatioProcessingMode(6);
 			}
-			else if(isset($conversionParams[self::TARGET_WIDTH]) && $allowScaleOrCrop)
-			{
-				// scale
-				$flavorParamsObj->setAspectRatioProcessingMode(2);
-			}
 
-			if(isset($conversionParams[self::TARGET_WIDTH]) && $allowScaleOrCrop)
+			if($allowScaleOrCrop)
 			{
-				$flavorParamsObj->setWidth($conversionParams[self::TARGET_WIDTH]);
+				if($croppingMode)
+				{
+					// crop
+					$processingMode = $invertedResource ? 8 : 7;
+					$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
+					$flavorParamsObj->setCropData(json_encode($cropData));
+					$flavorParamsObj->setHeight($conversionParams[self::CROP_HEIGHT]);
+					$flavorParamsObj->setWidth($conversionParams[self::CROP_WIDTH]);
+				}
+				else if(isset($conversionParams[self::TARGET_WIDTH]))
+				{
+					// scale
+					$processingMode = $invertedResource ? 6 : 2;
+					$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
+					$flavorParamsObj->setWidth($conversionParams[self::TARGET_WIDTH]);
+				}
 			}
 
 			if(isset($conversionParams[self::FRAME_RATE]))
