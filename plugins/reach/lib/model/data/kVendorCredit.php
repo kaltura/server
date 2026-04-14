@@ -152,8 +152,8 @@ class kVendorCredit
 	{
 		$c = new Criteria();
 		$c->add(EntryVendorTaskPeer::REACH_PROFILE_ID, $reachProfileId , Criteria::EQUAL);
-		$c->add(EntryVendorTaskPeer::STATUS, array(EntryVendorTaskStatus::PENDING, EntryVendorTaskStatus::PROCESSING, EntryVendorTaskStatus::READY), Criteria::IN);
-		$c->add(EntryVendorTaskPeer::QUEUE_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
+		$c->add(EntryVendorTaskPeer::STATUS, EntryVendorTaskStatus::READY, Criteria::EQUAL);
+		$c->add(EntryVendorTaskPeer::FINISH_TIME, $this->getSyncCreditStartDate(), Criteria::GREATER_EQUAL);
 		$c->add(EntryVendorTaskPeer::PRICE, 0, Criteria::NOT_EQUAL);
 		$c->add(EntryVendorTaskPeer::PARTNER_ID, $partnerId);
 		$c->addSelectColumn('SUM('. EntryVendorTaskPeer::PRICE .')');
