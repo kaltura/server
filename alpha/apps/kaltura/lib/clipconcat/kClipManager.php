@@ -2311,11 +2311,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				}
 			}
 
-			if(isset($conversionParams[self::TARGET_WIDTH]) && $allowScaleOrCrop)
-			{
-				$flavorParamsObj->setWidth($conversionParams[self::TARGET_WIDTH]);
-			}
-
 			if(isset($conversionParams[self::FRAME_RATE]))
 			{
 				$flavorParamsObj->setFrameRate($conversionParams[self::FRAME_RATE]);
