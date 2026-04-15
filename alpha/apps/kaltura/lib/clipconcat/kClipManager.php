@@ -1943,7 +1943,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
-	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, &$sortedFilters, $conversionParams, $composedVideoStreamName)
+	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, &$sortedFilters, $conversionParams, $composedVideoStreamName, $mainDurationMs = 0, $overlayDurationMs = 0)
 	{
 		$mainFileNameIndex = $fileNameIndex;
 		$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
@@ -1965,12 +1965,22 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$mainScaleFilter = $sortedFilters["scale"] . $mainStreamName;
 			$overlayCircleOnVideoFilterStream = "$mainScaleFilter;$mainStreamName";
 		}
-		// shortest to end the stream_loop
-		$overlayCircleOnVideoFilter = $overlayCircleOnVideoFilterStream . "setpts=N/(FRAME_RATE*TB)[bg_r];[bg_r][front_shape]overlay=$overlayPosition:format=auto:shortest=1$composedVideoStreamName";
+		$mainOutlastsOverlay = ($mainDurationMs > 0 && $overlayDurationMs > 0 && $mainDurationMs > $overlayDurationMs);
+		if ($mainOutlastsOverlay)
+		{
+			// Main is longer: apply overlay only while the overlay stream plays, then pass main through
+			$overlayDurationSec = $overlayDurationMs / 1000;
+			$overlayCircleOnVideoFilter = $overlayCircleOnVideoFilterStream . "setpts=N/(FRAME_RATE*TB)[bg_r];[bg_r][front_shape]overlay=$overlayPosition:format=auto:enable='lte(t,$overlayDurationSec)'$composedVideoStreamName";
+		}
+		else
+		{
+			// Overlay outlasts main (main is looping): stop output when the overlay stream ends
+			$overlayCircleOnVideoFilter = $overlayCircleOnVideoFilterStream . "setpts=N/(FRAME_RATE*TB)[bg_r];[bg_r][front_shape]overlay=$overlayPosition:format=auto:shortest=1$composedVideoStreamName";
+		}
 
 		$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex);
-		// shortest to end the stream_loop
-		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:normalize=0:dropout_transition=0[aout]";
+		$audioDuration = $mainOutlastsOverlay ? 'longest' : 'shortest';
+		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=$audioDuration:normalize=0:dropout_transition=0[aout]";
 		$audioMapName = '"[aout]"';
 
 		$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
@@ -2027,9 +2037,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
-				// MUST END the stream_loop, for instance: 1. specify duration 2. pair with a finite stream
-				$cmdFileNames = " -stream_loop -1 -i __inFileName__ ";
-				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $sortedFilters, $conversionParams, $composedVideoStreamName);
+				$overlayEntry = $this->getMediaCompositionAttributesResourceEntry($mediaCompositionAttributes);
+				$overlayDurationMs = $overlayEntry ? $overlayEntry->getDuration() : 0;
+				$mainDurationMs = $operationAttribute->getDuration();
+				if ($overlayDurationMs > $mainDurationMs)
+				{
+					// Overlay outlasts main: loop the main video until the overlay ends
+					// MUST END the stream_loop, for instance: 1. specify duration 2. pair with a finite stream
+					$cmdFileNames = " -stream_loop -1 -i __inFileName__ ";
+				}
+				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $sortedFilters, $conversionParams, $composedVideoStreamName, $mainDurationMs, $overlayDurationMs);
 			}
 			// scaling or cropping is already done in $filterComplex
 			unset($sortedFilters["scale"]);
