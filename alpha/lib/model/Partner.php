@@ -131,6 +131,8 @@ class Partner extends BasePartner
 
 	const ENABLE_INTERACTIONS = 'enableInteractions';
 
+	const EXTERNAL_IDENTIFIER = 'externalIdentifier';
+
 	public function save(PropelPDO $con = null)
 	{
 		PartnerPeer::removePartnerFromCache( $this->getId() );
@@ -2469,5 +2471,15 @@ class Partner extends BasePartner
 	public function setEnableInteractions($v)
 	{
 		return $this->putInCustomData(self::ENABLE_INTERACTIONS, $v);
+	}
+
+	public function getExternalIdentifier()
+	{
+		return $this->getFromCustomData(self::EXTERNAL_IDENTIFIER);
+	}
+
+	public function setExternalIdentifier($v)
+	{
+		return $this->putInCustomData(self::EXTERNAL_IDENTIFIER, $v);
 	}
 }
