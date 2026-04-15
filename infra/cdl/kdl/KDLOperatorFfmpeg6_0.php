@@ -41,6 +41,10 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 			if(isset($target->_forGenericSource) && $target->_forGenericSource==true) {
 				$target->multyAudioMapping = null;
 				$generalAudMapping = 'a';
+			// APAC aud streams should not be copied
+				if(isset($target->_apacStreamId))
+					$generalAudMapping.= " -map -0:$target->_apacStreamId";
+
 			}
 			else $generalAudMapping = 'a:0';
 		}
@@ -101,12 +105,17 @@ class KDLOperatorFfmpeg6_0 extends KDLOperatorFfmpeg4_4 {
 		else if(isset($target->multyAudioMapping)) {
 			$mappingStr = implode(' ', $target->multyAudioMapping);
 		}
-			// generation of Generic source flv, requires mapping of ALL source streams
+			// generation of Generic source flv, requires mapping of ALL source streams,
+			// with exception - APAC aud should be removed
 		else if(isset($target->_forGenericSource) && $target->_forGenericSource==true) {
 			if(isset($target->_video))
 				$mappingStr = '-map v:0 ';
-			if(isset($target->_audio))
+			if(isset($target->_audio)) {
 				$mappingStr.= '-map a';
+				// Removing APAC aud
+				if(isset($target->_apacStreamId))
+					$mappingStr.= " -map -0:$target->_apacStreamId";
+			}
 		}
 		$cmdStr = str_replace(" -y", " $mappingStr -y", $cmdStr);
 			// switch the vsync mode to textual name
