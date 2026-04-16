@@ -1877,6 +1877,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		{
 			$silentFilter .= ",atrim=duration=$audioDuration";
 		}
+		else
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, "duration");
+		}
 		return "$silentFilter,asetpts=PTS-STARTPTS$outStreamName";
 	}
 
@@ -1917,14 +1921,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		else
 		{
-			// Explicitly trim silence to $clipDuration so amix:duration=shortest always has a
-			// finite input — critical when the main video is stream-looped (its audio is infinite).
-			$silentSrc = "anullsrc=r=$sampleRate:cl=$channelLayout";
-			if($clipDuration > 0)
-			{
-				$silentSrc .= ",atrim=duration=$clipDuration";
-			}
-			$secondaryFilter = "$silentSrc,asetpts=PTS-STARTPTS[a_secondary]";
+			$secondaryFilter = $this->getSilentAudioFilter($clipDuration, $sampleRate, $channelLayout, "[a_secondary]");
 		}
 
 		if($mainHasAudio)
@@ -1933,12 +1930,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		else
 		{
-			$silentSrc = "anullsrc=r=$sampleRate:cl=$channelLayout";
-			if($clipDuration > 0)
-			{
-				$silentSrc .= ",atrim=duration=$clipDuration";
-			}
-			$mainFilter = "$silentSrc,asetpts=PTS-STARTPTS[a_main]";
+			$mainFilter =  $this->getSilentAudioFilter($clipDuration, $sampleRate, $channelLayout, "[a_main]");
 		}
 
 		return "$secondaryFilter;$mainFilter";
