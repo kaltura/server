@@ -1866,12 +1866,13 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return $filterComplex;
 	}
 
-	protected function getSilentAudioFilter($audioDuration, $sampleRate, $channelLayout, $outStreamName = "[aout]")
+	protected function getSilentAudioFilter($audioDurationSeconds, $sampleRate, $channelLayout, $outStreamName = "[aout]")
 	{
 		$silentFilter = "anullsrc=r=$sampleRate:cl=$channelLayout";
-		if($audioDuration > 0)
+		$maxDurationSeconds = kConf::get("maxMultiClipsDurationSeconds", kConfMapNames::RUNTIME_CONFIG, 5 * 60 * 60);
+		if($audioDurationSeconds > 0 && $audioDurationSeconds < $maxDurationSeconds)
 		{
-			$silentFilter .= ",atrim=duration=$audioDuration";
+			$silentFilter .= ",atrim=duration=$audioDurationSeconds";
 		}
 		else
 		{
