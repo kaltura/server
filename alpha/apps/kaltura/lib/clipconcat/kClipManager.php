@@ -1860,10 +1860,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			else
 			{
-				// At least one input has audio; any missing stream is replaced by a trimmed silence so
-				// amix:duration=shortest always encounters a finite input.
+				// At least one input has audio; any missing stream is replaced by a trimmed silence
 				$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $newBackgroundFileNameIndex, $mainHasAudio, $secondaryHasAudio, $sampleRate, $channelLayout, $audioDuration);
-				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:normalize=0:dropout_transition=0[aout]";
+				// longest stream since audio stream is finite if exists
+				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
 				$filterComplex .= "$defineAudioVolumesFilter;$combineAudioFilter;";
 			}
 		}
