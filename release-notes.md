@@ -1,4 +1,11 @@
 # Venus-22.18.0
+## Add reachProfile update permission on credit property for self serve partner ##
+* Issue Type: Task
+* Issue ID: AV-488
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_04_14_reach_profile_update_credit.php
+
 ## Add reachProfile update permission for self serve partner ##
 * Issue Type: Task
 * Issue ID: AV-488
