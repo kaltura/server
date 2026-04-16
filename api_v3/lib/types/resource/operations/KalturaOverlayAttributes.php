@@ -42,6 +42,11 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 	 */
 	public $audioAttributes;
 
+	/**
+	 * @var KalturaOverlayBorderAttributes
+	 */
+	public $borderAttributes;
+
 	private static $map_between_objects = array
 	(
 		"resource",
@@ -50,7 +55,8 @@ class KalturaOverlayAttributes extends KalturaMediaCompositionAttributes
 		"overlayScalePercentage",
 		"overlayPlacement",
 		"overlayShape",
-		"audioAttributes"
+		"audioAttributes",
+		"borderAttributes",
 	);
 
 	public function getMapBetweenObjects()

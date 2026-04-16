@@ -41,6 +41,11 @@ class kOverlayAttributes extends kMediaCompositionAttributes
 	private $audioAttributes;
 
 	/**
+	 * @var kOverlayBorderAttributes
+	 */
+	private $borderAttributes;
+
+	/**
 	 * @return kContentResource
 	 */
 	public function getResource()
@@ -152,6 +157,22 @@ class kOverlayAttributes extends kMediaCompositionAttributes
 		$this->overlayShape = $overlayShape;
 	}
 
+	/**
+	 * @return kOverlayBorderAttributes
+	 */
+	public function getBorderAttributes()
+	{
+		return $this->borderAttributes;
+	}
+
+	/**
+	 * @param kOverlayBorderAttributes $borderAttributes
+	 */
+	public function setBorderAttributes($borderAttributes)
+	{
+		$this->borderAttributes = $borderAttributes;
+	}
+
 	public function toArray()
 	{
 		return array(
@@ -161,7 +182,8 @@ class kOverlayAttributes extends kMediaCompositionAttributes
 			'overlayScalePercentage' => $this->overlayScalePercentage,
 			'overlayPlacement' => $this->overlayPlacement,
 			'overlayShape' => $this->overlayShape,
-			'audioAttributes' => $this->audioAttributes
+			'audioAttributes' => $this->audioAttributes,
+			'borderAttributes' => $this->borderAttributes,
 		);
 	}
 
