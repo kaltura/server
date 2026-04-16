@@ -1,5 +1,5 @@
 # Venus-22.18.0
-## Add reachProfile update permission on credir property for self serve partner ##
+## Add reachProfile update permission on credit property for self serve partner ##
 * Issue Type: Task
 * Issue ID: AV-488
 
