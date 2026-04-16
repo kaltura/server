@@ -71,6 +71,5 @@ class KalturaOverlayBorderAttributes extends KalturaObject
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, "color");
 		}
-
 	}
 }

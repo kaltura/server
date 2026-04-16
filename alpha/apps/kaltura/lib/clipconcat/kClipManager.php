@@ -2070,9 +2070,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			return $this->buildOverlayShapeNoBorder($shape);
 		}
 
-		$BW = $borderAttributes->getWidth();
-		$opacityPct = $borderAttributes->getOpacity() !== null ? $borderAttributes->getOpacity() : 100;
-		$BA = round(255 * $opacityPct / 100);
+		$BW = (int)$borderAttributes->getWidth();
+		$opacityPct = $borderAttributes->getOpacity() !== null ? (int)$borderAttributes->getOpacity() : 100;
+		$BA = (int)round(255 * $opacityPct / 100);
 		$bc = $this->parseHexColor($borderAttributes->getColor());
 		$BR = $bc['r'];
 		$BG = $bc['g'];
