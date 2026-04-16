@@ -1988,41 +1988,23 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		);
 	}
 
-	/**
-	 * Build an FFmpeg geq filter string that cuts [front_rect] into [front_shape]
-	 * for the requested overlay shape.  When $borderAttributes is supplied the
-	 * shape gains an outline (color / width / opacity) and optional drop shadow.
-	 *
-	 * Backward-compatible: if $borderAttributes is null the original expressions
-	 * are returned unchanged.
-	 *
-	 * @param  int                        $shape
-	 * @param  kOverlayBorderAttributes|null $borderAttributes
-	 * @return string  filter_complex fragment  "[front_rect]geq=...:[front_shape]"
-	 */
-	protected function buildOverlayShape($shape, $borderAttributes = null)
+	protected function buildOverlayShapeNoBorder($shape)
 	{
-		$hasBorder = $borderAttributes && $borderAttributes->hasBorder();
-		$hasShadow = $borderAttributes && $borderAttributes->hasShadow();
+		$createRectangleShapeFilter =
+			"[front_rect]geq="
+			."r='r(X,Y)':"
+			."g='g(X,Y)':"
+			."b='b(X,Y)':"
+			."a='255'"
+			."[front_shape]";
 
-		// ── No border / shadow: original expressions, completely unchanged ────
-		if(!$hasBorder && !$hasShadow)
-		{
-			$createRectangleShapeFilter =
-				"[front_rect]geq="
-				."r='r(X,Y)':"
-				."g='g(X,Y)':"
-				."b='b(X,Y)':"
-				."a='255'"
-				."[front_shape]";
-
-			$R = 20; // corner radius
-			$createRoundedRectangleShapeFilter =
-				"[front_rect]geq="
-				."r='r(X,Y)':"
-				."g='g(X,Y)':"
-				."b='b(X,Y)':"
-				."a='
+		$R = 20; // corner radius
+		$createRoundedRectangleShapeFilter =
+			"[front_rect]geq="
+			."r='r(X,Y)':"
+			."g='g(X,Y)':"
+			."b='b(X,Y)':"
+			."a='
 					255 *
 					(
 						(gte(X,$R) * lte(X,W-$R) + gte(Y,$R) * lte(Y,H-$R))
@@ -2035,233 +2017,136 @@ class kClipManager implements kBatchJobStatusEventConsumer
 						+
 						(gt(X,W-$R) * gt(Y,H-$R) * lte( (X-(W-$R))*(X-(W-$R)) + (Y-(H-$R))*(Y-(H-$R)), $R*$R ))
 					)'"
-				."[front_shape]";
+			."[front_shape]";
 
-			$createCircleShapeFilter =
-				"[front_rect]geq="
-				."r='r(X,Y)':"
-				."g='g(X,Y)':"
-				."b='b(X,Y)':"
-				."a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'"
-				."[front_shape]";
+		$createCircleShapeFilter =
+			"[front_rect]geq="
+			."r='r(X,Y)':"
+			."g='g(X,Y)':"
+			."b='b(X,Y)':"
+			."a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'"
+			."[front_shape]";
 
-			$createEllipseShapeFilter =
-				"[front_rect]geq="
-				."r='r(X,Y)':"
-				."g='g(X,Y)':"
-				."b='b(X,Y)':"
-				."a='if(lte(((X-W/2)*(X-W/2))/((W/2)*(W/2)) + ((Y-H/2)*(Y-H/2))/((H/2)*(H/2)),1),255,0)'"
-				."[front_shape]";
+		$createEllipseShapeFilter =
+			"[front_rect]geq="
+			."r='r(X,Y)':"
+			."g='g(X,Y)':"
+			."b='b(X,Y)':"
+			."a='if(lte(((X-W/2)*(X-W/2))/((W/2)*(W/2)) + ((Y-H/2)*(Y-H/2))/((H/2)*(H/2)),1),255,0)'"
+			."[front_shape]";
 
-			switch($shape)
-			{
-				case kOverlayShape::ELLIPSE:
-					return $createEllipseShapeFilter;
-
-				case kOverlayShape::RECTANGLE:
-					return $createRectangleShapeFilter;
-
-				case kOverlayShape::RECTANGLE_ROUNDED_CORNERS:
-					return $createRoundedRectangleShapeFilter;
-
-				case kOverlayShape::CIRCLE:
-				default:
-					return $createCircleShapeFilter;
-			}
-		}
-
-		// ── Border parameters ─────────────────────────────────────────────────
-		$BW = $hasBorder ? (int)$borderAttributes->getWidth() : 0;
-		$opacityPct = $hasBorder
-			? (int)($borderAttributes->getOpacity() !== null ? $borderAttributes->getOpacity() : 100)
-			: 0;
-		$BA = (int)round(255 * $opacityPct / 100);
-		$BR = $BG = $BB = 0;
-		if($hasBorder)
-		{
-			$bc  = $this->parseHexColor($borderAttributes->getColor());
-			$BR = $bc['r'];
-			$BG = $bc['g'];
-			$BB = $bc['b'];
-		}
-
-		// ── Shadow parameters ─────────────────────────────────────────────────
-		$SA = $SX = $SY = $SR = $SG = $SB = 0;
-		if($hasShadow)
-		{
-			$SA = round(255 * $borderAttributes->getShadowOpacity() / 100);
-			$SX = $borderAttributes->getShadowOffsetX();
-			$SY = $borderAttributes->getShadowOffsetY();
-			$sc  = $this->parseHexColor($borderAttributes->getShadowColor());
-			$SR = $sc['r'];
-			$SG = $sc['g'];
-			$SB = $sc['b'];
-		}
-
-		// ── Per-shape geq construction ────────────────────────────────────────
 		switch($shape)
 		{
-			// ── Rectangle ─────────────────────────────────────────────────────
-			// Shadow is not visible on a fully opaque rectangle (the shape covers
-			// the whole canvas), so only the border is applied.
-			case kOverlayShape::RECTANGLE:
-				if($hasBorder)
-				{
-					// Pixels within BW of any edge become the border color.
-					$edgeDist = 'min(X,min(W-1-X,min(Y,H-1-Y)))';
-					$r = "if(lt($edgeDist,$BW),$BR,r(X,Y))";
-					$g = "if(lt($edgeDist,$BW),$BG,g(X,Y))";
-					$b = "if(lt($edgeDist,$BW),$BB,b(X,Y))";
-					$a = "if(lt($edgeDist,$BW),$BA,255)";
-				}
-				else
-				{
-					$r = 'r(X,Y)'; $g = 'g(X,Y)'; $b = 'b(X,Y)'; $a = '255';
-				}
-				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
-
-			// ── Rounded Rectangle ──────────────────────────────────────────────
-			// Shadow is not applied (opaque shape; see rectangle note above).
-			case kOverlayShape::RECTANGLE_ROUNDED_CORNERS:
-				$Rc = 20; // corner radius (unchanged)
-				if($hasBorder)
-				{
-					// Outer boundary: the full rounded rectangle.
-					$outer =
-						'(gte(X,'.$Rc.')*lte(X,W-'.$Rc.')+gte(Y,'.$Rc.')*lte(Y,H-'.$Rc.'))'
-						.'+(lt(X,'.$Rc.')*lt(Y,'.$Rc.')*lte((X-'.$Rc.')*(X-'.$Rc.')+(Y-'.$Rc.')*(Y-'.$Rc.'),'.$Rc.'*'.$Rc.'))'
-						.'+(gt(X,W-'.$Rc.')*lt(Y,'.$Rc.')*lte((X-(W-'.$Rc.'))*(X-(W-'.$Rc.'))+(Y-'.$Rc.')*(Y-'.$Rc.'),'.$Rc.'*'.$Rc.'))'
-						.'+(lt(X,'.$Rc.')*gt(Y,H-'.$Rc.')*lte((X-'.$Rc.')*(X-'.$Rc.')+(Y-(H-'.$Rc.'))*(Y-(H-'.$Rc.')),'.$Rc.'*'.$Rc.'))'
-						.'+(gt(X,W-'.$Rc.')*gt(Y,H-'.$Rc.')*lte((X-(W-'.$Rc.'))*(X-(W-'.$Rc.'))+(Y-(H-'.$Rc.'))*(Y-(H-'.$Rc.')),'.$Rc.'*'.$Rc.'))';
-
-					// Inner boundary: same shape inset by BW.  Corner centres shift
-					// inward by BW; the corner radius itself stays at $Rc.
-					$iR  = $Rc + $BW; // corner-centre offset from the frame edge
-					$inner =
-						'(gte(X,'.$iR.')*lte(X,W-'.$iR.')+gte(Y,'.$iR.')*lte(Y,H-'.$iR.'))'
-						.'+(lt(X,'.$iR.')*lt(Y,'.$iR.')*lte((X-'.$iR.')*(X-'.$iR.')+(Y-'.$iR.')*(Y-'.$iR.'),'.$Rc.'*'.$Rc.'))'
-						.'+(gt(X,W-'.$iR.')*lt(Y,'.$iR.')*lte((X-(W-'.$iR.'))*(X-(W-'.$iR.'))+(Y-'.$iR.')*(Y-'.$iR.'),'.$Rc.'*'.$Rc.'))'
-						.'+(lt(X,'.$iR.')*gt(Y,H-'.$iR.')*lte((X-'.$iR.')*(X-'.$iR.')+(Y-(H-'.$iR.'))*(Y-(H-'.$iR.')),'.$Rc.'*'.$Rc.'))'
-						.'+(gt(X,W-'.$iR.')*gt(Y,H-'.$iR.')*lte((X-(W-'.$iR.'))*(X-(W-'.$iR.'))+(Y-(H-'.$iR.'))*(Y-(H-'.$iR.')),'.$Rc.'*'.$Rc.'))';
-
-					// in_outer && in_inner  → content (255)
-					// in_outer && !in_inner → border  (BA)
-					// !in_outer             → transparent (0)
-					$r = "if(gt($outer,0),if(gt($inner,0),r(X,Y),$BR),r(X,Y))";
-					$g = "if(gt($outer,0),if(gt($inner,0),g(X,Y),$BG),g(X,Y))";
-					$b = "if(gt($outer,0),if(gt($inner,0),b(X,Y),$BB),b(X,Y))";
-					$a = "if(gt($outer,0),if(gt($inner,0),255,$BA),0)";
-				}
-				else
-				{
-					// Shadow-only on rounded rect: fall back to plain shape — shadow
-					// behind an opaque rounded rect is not visible.
-					$a =
-						'255*('
-						.'(gte(X,'.$Rc.')*lte(X,W-'.$Rc.')+gte(Y,'.$Rc.')*lte(Y,H-'.$Rc.'))'
-						.'+(lt(X,'.$Rc.')*lt(Y,'.$Rc.')*lte((X-'.$Rc.')*(X-'.$Rc.')+(Y-'.$Rc.')*(Y-'.$Rc.'),'.$Rc.'*'.$Rc.'))'
-						.'+(gt(X,W-'.$Rc.')*lt(Y,'.$Rc.')*lte((X-(W-'.$Rc.'))*(X-(W-'.$Rc.'))+(Y-'.$Rc.')*(Y-'.$Rc.'),'.$Rc.'*'.$Rc.'))'
-						.'+(lt(X,'.$Rc.')*gt(Y,H-'.$Rc.')*lte((X-'.$Rc.')*(X-'.$Rc.')+(Y-(H-'.$Rc.'))*(Y-(H-'.$Rc.')),'.$Rc.'*'.$Rc.'))'
-						.'+(gt(X,W-'.$Rc.')*gt(Y,H-'.$Rc.')*lte((X-(W-'.$Rc.'))*(X-(W-'.$Rc.'))+(Y-(H-'.$Rc.'))*(Y-(H-'.$Rc.')),'.$Rc.'*'.$Rc.'))'
-						.')';
-					$r = 'r(X,Y)'; $g = 'g(X,Y)'; $b = 'b(X,Y)';
-				}
-				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
-
-			// ── Ellipse ────────────────────────────────────────────────────────
 			case kOverlayShape::ELLIPSE:
-				// Outer ellipse: normalised distance <= 1
-				$outerE = '(((X-W/2)*(X-W/2))/((W/2)*(W/2))+((Y-H/2)*(Y-H/2))/((H/2)*(H/2)))';
+				return $createEllipseShapeFilter;
 
-				// Sub-expressions for each zone (content, border, shadow/transparent)
-				if($hasBorder)
-				{
-					// Inner ellipse inset by BW pixels on each semi-axis.
-					// Clamp to 1 to avoid division by zero when BW >= half-dimension.
-					$innerE =
-						'(((X-W/2)*(X-W/2))/(max(W/2-'.$BW.',1)*max(W/2-'.$BW.',1))'
-						.'+((Y-H/2)*(Y-H/2))/(max(H/2-'.$BW.',1)*max(H/2-'.$BW.',1)))';
+			case kOverlayShape::RECTANGLE:
+				return $createRectangleShapeFilter;
 
-					$aInOuter = "if(lte($innerE,1),255,$BA)";
-					$rInOuter = "if(lte($innerE,1),r(X,Y),$BR)";
-					$gInOuter = "if(lte($innerE,1),g(X,Y),$BG)";
-					$bInOuter = "if(lte($innerE,1),b(X,Y),$BB)";
-				}
-				else
-				{
-					$aInOuter = '255';
-					$rInOuter = 'r(X,Y)'; $gInOuter = 'g(X,Y)'; $bInOuter = 'b(X,Y)';
-				}
+			case kOverlayShape::RECTANGLE_ROUNDED_CORNERS:
+				return $createRoundedRectangleShapeFilter;
 
-				if($hasShadow)
-				{
-					// Shadow ellipse: same size, shifted by (SX, SY).
-					$shadowE =
-						'(((X-(W/2+'.$SX.'))*(X-(W/2+'.$SX.')))/((W/2)*(W/2))'
-						.'+(((Y-(H/2+'.$SY.'))*(Y-(H/2+'.$SY.')))/((H/2)*(H/2))))';
-
-					$aOutOuter = "if(lte($shadowE,1),$SA,0)";
-					$rOutOuter = "if(lte($shadowE,1),$SR,r(X,Y))";
-					$gOutOuter = "if(lte($shadowE,1),$SG,g(X,Y))";
-					$bOutOuter = "if(lte($shadowE,1),$SB,b(X,Y))";
-				}
-				else
-				{
-					$aOutOuter = '0';
-					$rOutOuter = 'r(X,Y)'; $gOutOuter = 'g(X,Y)'; $bOutOuter = 'b(X,Y)';
-				}
-
-				$r = "if(lte($outerE,1),$rInOuter,$rOutOuter)";
-				$g = "if(lte($outerE,1),$gInOuter,$gOutOuter)";
-				$b = "if(lte($outerE,1),$bInOuter,$bOutOuter)";
-				$a = "if(lte($outerE,1),$aInOuter,$aOutOuter)";
-				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
-
-			// ── Circle ─────────────────────────────────────────────────────────
 			case kOverlayShape::CIRCLE:
 			default:
-				$D2   = '((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2))';
+				return $createCircleShapeFilter;
+		}
+	}
+
+	/**
+	 * Build an FFmpeg geq filter string that cuts [front_rect] into [front_shape]
+	 * for the requested overlay shape.  When $borderAttributes is supplied the
+	 * shape gains an outline (color / width / opacity).
+	 *
+	 * @param  int                           $shape
+	 * @param  kOverlayBorderAttributes|null $borderAttributes
+	 * @return string  filter_complex fragment  "[front_rect]geq=...:[front_shape]"
+	 */
+	protected function buildOverlayShape($shape, $borderAttributes = null)
+	{
+		$hasBorder = $borderAttributes && $borderAttributes->hasBorder();
+
+		if(!$hasBorder)
+		{
+			return $this->buildOverlayShapeNoBorder($shape);
+		}
+
+		$BW = $borderAttributes->getWidth();
+		$opacityPct = $borderAttributes->getOpacity() !== null ? $borderAttributes->getOpacity() : 100;
+		$BA = round(255 * $opacityPct / 100);
+		$bc = $this->parseHexColor($borderAttributes->getColor());
+		$BR = $bc['r'];
+		$BG = $bc['g'];
+		$BB = $bc['b'];
+
+		switch($shape)
+		{
+			case kOverlayShape::RECTANGLE:
+				// Pixels within BW of any edge become the border color.
+				$edgeDist = 'min(X,min(W-1-X,min(Y,H-1-Y)))';
+				$r = "if(lt($edgeDist,$BW),$BR,r(X,Y))";
+				$g = "if(lt($edgeDist,$BW),$BG,g(X,Y))";
+				$b = "if(lt($edgeDist,$BW),$BB,b(X,Y))";
+				$a = "if(lt($edgeDist,$BW),$BA,255)";
+				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
+
+			case kOverlayShape::RECTANGLE_ROUNDED_CORNERS:
+				$Rc = 20; // corner radius (unchanged)
+
+				// Outer boundary: the full rounded rectangle.
+				$outer =
+					'(gte(X,'.$Rc.')*lte(X,W-'.$Rc.')+gte(Y,'.$Rc.')*lte(Y,H-'.$Rc.'))'
+					.'+(lt(X,'.$Rc.')*lt(Y,'.$Rc.')*lte((X-'.$Rc.')*(X-'.$Rc.')+(Y-'.$Rc.')*(Y-'.$Rc.'),'.$Rc.'*'.$Rc.'))'
+					.'+(gt(X,W-'.$Rc.')*lt(Y,'.$Rc.')*lte((X-(W-'.$Rc.'))*(X-(W-'.$Rc.'))+(Y-'.$Rc.')*(Y-'.$Rc.'),'.$Rc.'*'.$Rc.'))'
+					.'+(lt(X,'.$Rc.')*gt(Y,H-'.$Rc.')*lte((X-'.$Rc.')*(X-'.$Rc.')+(Y-(H-'.$Rc.'))*(Y-(H-'.$Rc.')),'.$Rc.'*'.$Rc.'))'
+					.'+(gt(X,W-'.$Rc.')*gt(Y,H-'.$Rc.')*lte((X-(W-'.$Rc.'))*(X-(W-'.$Rc.'))+(Y-(H-'.$Rc.'))*(Y-(H-'.$Rc.')),'.$Rc.'*'.$Rc.'))';
+
+				// Inner boundary: same shape inset by BW.  Corner centres shift
+				// inward by BW; the corner radius itself stays at $Rc.
+				$iR = $Rc + $BW; // corner-centre offset from the frame edge
+				$inner =
+					'(gte(X,'.$iR.')*lte(X,W-'.$iR.')+gte(Y,'.$iR.')*lte(Y,H-'.$iR.'))'
+					.'+(lt(X,'.$iR.')*lt(Y,'.$iR.')*lte((X-'.$iR.')*(X-'.$iR.')+(Y-'.$iR.')*(Y-'.$iR.'),'.$Rc.'*'.$Rc.'))'
+					.'+(gt(X,W-'.$iR.')*lt(Y,'.$iR.')*lte((X-(W-'.$iR.'))*(X-(W-'.$iR.'))+(Y-'.$iR.')*(Y-'.$iR.'),'.$Rc.'*'.$Rc.'))'
+					.'+(lt(X,'.$iR.')*gt(Y,H-'.$iR.')*lte((X-'.$iR.')*(X-'.$iR.')+(Y-(H-'.$iR.'))*(Y-(H-'.$iR.')),'.$Rc.'*'.$Rc.'))'
+					.'+(gt(X,W-'.$iR.')*gt(Y,H-'.$iR.')*lte((X-(W-'.$iR.'))*(X-(W-'.$iR.'))+(Y-(H-'.$iR.'))*(Y-(H-'.$iR.')),'.$Rc.'*'.$Rc.'))';
+
+				// in_outer && in_inner  → content (255)
+				// in_outer && !in_inner → border  (BA)
+				// !in_outer             → transparent (0)
+				$r = "if(gt($outer,0),if(gt($inner,0),r(X,Y),$BR),r(X,Y))";
+				$g = "if(gt($outer,0),if(gt($inner,0),g(X,Y),$BG),g(X,Y))";
+				$b = "if(gt($outer,0),if(gt($inner,0),b(X,Y),$BB),b(X,Y))";
+				$a = "if(gt($outer,0),if(gt($inner,0),255,$BA),0)";
+				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
+
+			case kOverlayShape::ELLIPSE:
+				// Outer ellipse: normalised distance <= 1.
+				$outerE = '(((X-W/2)*(X-W/2))/((W/2)*(W/2))+((Y-H/2)*(Y-H/2))/((H/2)*(H/2)))';
+
+				// Inner ellipse inset by BW pixels on each semi-axis.
+				// Clamp denominator to 1 to avoid division by zero when BW >= half-dimension.
+				$innerE =
+					'(((X-W/2)*(X-W/2))/(max(W/2-'.$BW.',1)*max(W/2-'.$BW.',1))'
+					.'+((Y-H/2)*(Y-H/2))/(max(H/2-'.$BW.',1)*max(H/2-'.$BW.',1)))';
+
+				$r = "if(lte($outerE,1),if(lte($innerE,1),r(X,Y),$BR),r(X,Y))";
+				$g = "if(lte($outerE,1),if(lte($innerE,1),g(X,Y),$BG),g(X,Y))";
+				$b = "if(lte($outerE,1),if(lte($innerE,1),b(X,Y),$BB),b(X,Y))";
+				$a = "if(lte($outerE,1),if(lte($innerE,1),255,$BA),0)";
+				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
+
+			case kOverlayShape::CIRCLE:
+			default:
+				$D2      = '((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2))';
 				$outerR2 = '((min(W,H)/2)*(min(W,H)/2))';
 
-				// Sub-expressions for each zone (content, border, shadow/transparent)
-				if($hasBorder)
-				{
-					// Inner radius clamped to ≥ 0 to handle extreme BW values safely.
-					$innerR2 =
-						'(max(min(W,H)/2-'.$BW.',0)*max(min(W,H)/2-'.$BW.',0))';
+				// Inner radius clamped to >= 0 to handle extreme BW values safely.
+				$innerR2 = '(max(min(W,H)/2-'.$BW.',0)*max(min(W,H)/2-'.$BW.',0))';
 
-					$aInOuter = "if(lte($D2,$innerR2),255,$BA)";
-					$rInOuter = "if(lte($D2,$innerR2),r(X,Y),$BR)";
-					$gInOuter = "if(lte($D2,$innerR2),g(X,Y),$BG)";
-					$bInOuter = "if(lte($D2,$innerR2),b(X,Y),$BB)";
-				}
-				else
-				{
-					$aInOuter = '255';
-					$rInOuter = 'r(X,Y)'; $gInOuter = 'g(X,Y)'; $bInOuter = 'b(X,Y)';
-				}
-
-				if($hasShadow)
-				{
-					// Shadow circle: same radius, shifted by (SX, SY).
-					$SD2 =
-						'((X-(W/2+'.$SX.'))*(X-(W/2+'.$SX.'))+(Y-(H/2+'.$SY.'))*(Y-(H/2+'.$SY.')))';
-
-					$aOutOuter = "if(lte($SD2,$outerR2),$SA,0)";
-					$rOutOuter = "if(lte($SD2,$outerR2),$SR,r(X,Y))";
-					$gOutOuter = "if(lte($SD2,$outerR2),$SG,g(X,Y))";
-					$bOutOuter = "if(lte($SD2,$outerR2),$SB,b(X,Y))";
-				}
-				else
-				{
-					$aOutOuter = '0';
-					$rOutOuter = 'r(X,Y)'; $gOutOuter = 'g(X,Y)'; $bOutOuter = 'b(X,Y)';
-				}
-
-				$r = "if(lte($D2,$outerR2),$rInOuter,$rOutOuter)";
-				$g = "if(lte($D2,$outerR2),$gInOuter,$gOutOuter)";
-				$b = "if(lte($D2,$outerR2),$bInOuter,$bOutOuter)";
-				$a = "if(lte($D2,$outerR2),$aInOuter,$aOutOuter)";
+				$r = "if(lte($D2,$outerR2),if(lte($D2,$innerR2),r(X,Y),$BR),r(X,Y))";
+				$g = "if(lte($D2,$outerR2),if(lte($D2,$innerR2),g(X,Y),$BG),g(X,Y))";
+				$b = "if(lte($D2,$outerR2),if(lte($D2,$innerR2),b(X,Y),$BB),b(X,Y))";
+				$a = "if(lte($D2,$outerR2),if(lte($D2,$innerR2),255,$BA),0)";
 				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
 		}
 	}

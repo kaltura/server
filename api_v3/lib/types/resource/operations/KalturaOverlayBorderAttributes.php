@@ -23,38 +23,10 @@ class KalturaOverlayBorderAttributes extends KalturaObject
 	 */
 	public $opacity;
 
-	/**
-	 * Drop-shadow color as a hex code. Optional.
-	 * @var string
-	 */
-	public $shadowColor;
-
-	/**
-	 * Drop-shadow opacity as a percentage (0–100). Optional; omit or set to 0 for no shadow.
-	 * @var int
-	 */
-	public $shadowOpacity;
-
-	/**
-	 * Horizontal shadow offset in pixels (positive = right).
-	 * @var int
-	 */
-	public $shadowOffsetX;
-
-	/**
-	 * Vertical shadow offset in pixels (positive = down).
-	 * @var int
-	 */
-	public $shadowOffsetY;
-
 	private static $map_between_objects = array(
 		"color",
 		"width",
 		"opacity",
-		"shadowColor",
-		"shadowOpacity",
-		"shadowOffsetX",
-		"shadowOffsetY",
 	);
 
 	public function getMapBetweenObjects()
@@ -95,27 +67,10 @@ class KalturaOverlayBorderAttributes extends KalturaObject
 			throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "opacity", $minOpacity, $maxOpacity);
 		}
 
-		if(isset($this->shadowOpacity))
-		{
-			if($this->shadowOpacity < $minOpacity || $this->shadowOpacity > $maxOpacity)
-			{
-				throw new KalturaAPIException(KalturaErrors::PARAMETER_VALUE_OUT_OF_RANGE, "shadowOpacity", $minOpacity, $maxOpacity);
-			}
-
-			if($this->shadowOpacity > 0)
-			{
-				$this->validatePropertyNotNull('shadowColor');
-			}
-		}
-
 		if(!preg_match('/^(#|0x|0X)?[0-9A-Fa-f]{6}$/', $this->color))
 		{
 			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, "color");
 		}
 
-		if(isset($this->shadowColor) && !preg_match('/^(#|0x|0X)?[0-9A-Fa-f]{6}$/', $this->shadowColor))
-		{
-			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, "shadowColor");
-		}
 	}
 }
