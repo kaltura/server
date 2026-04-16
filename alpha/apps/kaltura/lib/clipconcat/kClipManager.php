@@ -1770,13 +1770,9 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	protected function getResourceEntryMediaInfo($mediaCompositionAttributes)
 	{
 		$resourceEntry = $this->getMediaCompositionAttributesResourceEntry($mediaCompositionAttributes);
-		if(!$resourceEntry)
+		if(!$resourceEntry || $resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
 		{
-			return false;
-		}
-		if($resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
-		{
-			return false;
+			return null;
 		}
 		$assets = assetPeer::retrieveByEntryId($resourceEntry->getId(), array(assetType::FLAVOR));
 		foreach($assets as $asset)
@@ -1787,7 +1783,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				return $mediaInfo;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	protected function getBackgroundColor($replacementAttributes)
@@ -1846,7 +1842,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		if(!$imageResource)
 		{
 			$audioMapName = '"[aout]"';
-			$mainHasAudio = !empty($conversionParams[self::AUDIO_DURATION]);
+			$mainHasAudio = isset($conversionParams[self::AUDIO_DURATION]) && $conversionParams[self::AUDIO_DURATION] > 0;
 			$secondaryMediaInfo = $this->getResourceEntryMediaInfo($mediaCompositionAttributes);
 			$secondaryHasAudio = $secondaryMediaInfo && $secondaryMediaInfo->getAudioChannels();
 			$audioDuration = $this->getComposedAudioDurationSeconds($conversionParams, $secondaryMediaInfo);
@@ -2063,7 +2059,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		// shortest to end the stream_loop
 		$overlayCircleOnVideoFilter = $overlayCircleOnVideoFilterStream . "setpts=N/(FRAME_RATE*TB)[bg_r];[bg_r][front_shape]overlay=$overlayPosition:format=auto:shortest=1$composedVideoStreamName";
 
-		$mainHasAudio = !empty($conversionParams[self::AUDIO_DURATION]);
+		$mainHasAudio = isset($conversionParams[self::AUDIO_DURATION]) && $conversionParams[self::AUDIO_DURATION] > 0;
 		$secondaryMediaInfo = $this->getResourceEntryMediaInfo($mediaCompositionAttributes);
 		$secondaryHasAudio = $secondaryMediaInfo && $secondaryMediaInfo->getAudioChannels();
 		$audioDuration = $this->getComposedAudioDurationSeconds($conversionParams, $secondaryMediaInfo);
