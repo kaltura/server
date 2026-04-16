@@ -25,6 +25,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
 	const BG_MEDIA_INFO_OBJECT_ARRAY = 'backgroundMediaInfoArray';
 	const AUDIO_DURATION = 'audioDuration';
+	const CLIP_DURATION = 'clipDuration';
 	const INVERTED_SOURCE = 'invertedSource';
 	const EXTRA_CONVERSION_PARAMS = 'extraConversionParams';
 	const TEMP_ENTRY = 'tempEntry';
@@ -1766,6 +1767,29 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return $resourceEntry->getMediaType() == $mediaType;
 	}
 
+	protected function getResourceEntryMediaInfo($mediaCompositionAttributes)
+	{
+		$resourceEntry = $this->getMediaCompositionAttributesResourceEntry($mediaCompositionAttributes);
+		if(!$resourceEntry)
+		{
+			return false;
+		}
+		if($resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
+			return false;
+		}
+		$assets = assetPeer::retrieveByEntryId($resourceEntry->getId(), array(assetType::FLAVOR));
+		foreach($assets as $asset)
+		{
+			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
+			if($mediaInfo)
+			{
+				return $mediaInfo;
+			}
+		}
+		return false;
+	}
+
 	protected function getBackgroundColor($replacementAttributes)
 	{
 		if($replacementAttributes && $replacementAttributes->getBackgroundColorCode())
@@ -1822,23 +1846,98 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		if(!$imageResource)
 		{
 			$audioMapName = '"[aout]"';
-			$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $newBackgroundFileNameIndex);
-			$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
-			$filterComplex .= "$defineAudioVolumesFilter;$combineAudioFilter;";
+			$mainHasAudio = !empty($conversionParams[self::AUDIO_DURATION]);
+			$secondaryMediaInfo = $this->getResourceEntryMediaInfo($mediaCompositionAttributes);
+			$secondaryHasAudio = $secondaryMediaInfo && $secondaryMediaInfo->getAudioChannels();
+			$audioDuration = $this->getComposedAudioDuration($conversionParams, $secondaryMediaInfo);
+			$sampleRate = isset($conversionParams[self::AUDIO_SAMPLE_RATE]) ? $conversionParams[self::AUDIO_SAMPLE_RATE] : self::DEFAULT_SAMPLE_RATE;
+
+			if(!$mainHasAudio && !$secondaryHasAudio)
+			{
+				// Both inputs have no audio: generate a single silent stream trimmed to the clip duration
+				$filterComplex .= $this->getSilentAudioFilter($audioDuration, $sampleRate);
+			}
+			else
+			{
+				// At least one input has audio; any missing stream is replaced by a trimmed silence so
+				// amix:duration=shortest always encounters a finite input.
+				$channelLayout = $this->getComposedChannelLayout($conversionParams, $secondaryMediaInfo);
+				$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $newBackgroundFileNameIndex, $mainHasAudio, $secondaryHasAudio, $sampleRate, $channelLayout, $audioDuration);
+				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:normalize=0:dropout_transition=0[aout]";
+				$filterComplex .= "$defineAudioVolumesFilter;$combineAudioFilter;";
+			}
 		}
 		return $filterComplex;
 	}
 
-	protected function getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $secondaryFileNameIndex)
+	protected function getSilentAudioFilter($audioDuration, $sampleRate, $channelLayout = 'mono')
+	{
+		$silentFilter = "anullsrc=r=$sampleRate:cl=$channelLayout";
+		if($audioDuration > 0)
+		{
+			$silentFilter .= ",atrim=duration=$audioDuration";
+		}
+		return "$silentFilter,asetpts=PTS-STARTPTS[aout]";
+	}
+
+	protected function getComposedAudioDuration($conversionParams, $secondaryMediaInfo)
+	{
+		$secondaryDuration = $secondaryMediaInfo && $secondaryMediaInfo->getVideoDuration() ? $secondaryMediaInfo->getVideoDuration() : 0;
+		$clipDuration = isset($conversionParams[self::CLIP_DURATION]) ? $conversionParams[self::CLIP_DURATION] : 0;
+		if($secondaryDuration > 0)
+		{
+			$clipDuration = $secondaryDuration / 1000;
+		}
+		return $clipDuration;
+	}
+
+	protected function getComposedChannelLayout($conversionParams, $secondaryMediaInfo)
+	{
+		$audioChannels = isset($conversionParams[self::AUDIO_CHANNELS]) ? $conversionParams[self::AUDIO_CHANNELS] : self::DEFAULT_AUDIO_CHANNELS;
+		return $audioChannels >= 2 ? 'stereo' : 'mono';
+	}
+
+	protected function getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $secondaryFileNameIndex, $mainHasAudio, $secondaryHasAudio, $sampleRate, $channelLayout, $clipDuration = 0, $loopMainAudio = false)
 	{
 		$audioAttributes = $mediaCompositionAttributes->getAudioAttributes();
 		$overlayVolume = $audioAttributes ? $audioAttributes->getVolume() : 1;
 		$volume = 1 - $overlayVolume;
 
-		return
-			"[$secondaryFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$overlayVolume" . "[a_secondary];" .
-			"[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$volume" . "[a_main]";
+		if($secondaryHasAudio)
+		{
+			$secondaryFilter = "[$secondaryFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$overlayVolume"."[a_secondary]";
+		}
+		else
+		{
+			// Explicitly trim silence to $clipDuration so amix:duration=shortest always has a
+			// finite input — critical when the main video is stream-looped (its audio is infinite).
+			$silentSrc = "anullsrc=r=$sampleRate:cl=$channelLayout";
+			if($clipDuration > 0)
+			{
+				$silentSrc .= ",atrim=duration=$clipDuration";
+			}
+			$secondaryFilter = "$silentSrc,asetpts=PTS-STARTPTS[a_secondary]";
+		}
 
+		if($mainHasAudio)
+		{
+			$mainFilter = "[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$volume"."[a_main]";
+		}
+		else if($loopMainAudio)
+		{
+			$mainFilter = "anullsrc=r=$sampleRate:cl=$channelLayout"."[a_main]";
+		}
+		else
+		{
+			$silentSrc = "anullsrc=r=$sampleRate:cl=$channelLayout";
+			if($clipDuration > 0)
+			{
+				$silentSrc .= ",atrim=duration=$clipDuration";
+			}
+			$mainFilter = "$silentSrc,asetpts=PTS-STARTPTS[a_main]";
+		}
+
+		return "$secondaryFilter;$mainFilter";
 	}
 
 	protected function buildOverlayPosition($alignment, $marginsPercentage): string
@@ -1968,10 +2067,28 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		// shortest to end the stream_loop
 		$overlayCircleOnVideoFilter = $overlayCircleOnVideoFilterStream . "setpts=N/(FRAME_RATE*TB)[bg_r];[bg_r][front_shape]overlay=$overlayPosition:format=auto:shortest=1$composedVideoStreamName";
 
-		$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex);
-		// shortest to end the stream_loop
-		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:normalize=0:dropout_transition=0[aout]";
+		$mainHasAudio = !empty($conversionParams[self::AUDIO_DURATION]);
+		$secondaryMediaInfo = $this->getResourceEntryMediaInfo($mediaCompositionAttributes);
+		$secondaryHasAudio = $secondaryMediaInfo && $secondaryMediaInfo->getAudioChannels();
+		$audioDuration = $this->getComposedAudioDuration($conversionParams, $secondaryMediaInfo);
+		$sampleRate = isset($conversionParams[self::AUDIO_SAMPLE_RATE]) ? $conversionParams[self::AUDIO_SAMPLE_RATE] : self::DEFAULT_SAMPLE_RATE;
+
+		if(!$mainHasAudio && !$secondaryHasAudio)
+		{
+			// Both inputs have no audio: generate a single silent stream trimmed to the clip duration
+			$defineAudioVolumesFilter = $this->getSilentAudioFilter($audioDuration, $sampleRate);
+			$combineAudioFilter = "";
+		}
+		else
+		{
+			// At least one input has audio; any missing stream is replaced by a trimmed silence so
+			// amix:duration=shortest always encounters a finite input even when the main is stream-looped.
+			$channelLayout = $this->getComposedChannelLayout($conversionParams, $secondaryMediaInfo);
+			$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex, $mainHasAudio, $secondaryHasAudio, $sampleRate, $channelLayout, $audioDuration, true);
+			$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:normalize=0:dropout_transition=0[aout]";
+		}
 		$audioMapName = '"[aout]"';
+		$audioSection = $combineAudioFilter === '' ? $defineAudioVolumesFilter : "$defineAudioVolumesFilter;$combineAudioFilter";
 
 		$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
 
@@ -1992,12 +2109,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
 			$replaceOverlayBackground = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
 
-			return "$replaceOverlayBackground;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter;";
+			return "$replaceOverlayBackground;$createShapeFilter;$overlayCircleOnVideoFilter;$audioSection;";
 		}
 		else
 		{
 			$scaleOverlayVideo .= "[front_rect]";
-			return "$scaleOverlayVideo;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter;";
+			return "$scaleOverlayVideo;$createShapeFilter;$overlayCircleOnVideoFilter;$audioSection;";
 		}
 	}
 
@@ -2011,6 +2128,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 
 		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$conversionParams[self::CLIP_DURATION] = $operationAttribute->getDuration() / 1000;
 		$cmdFileNames = " -i __inFileName__ ";
 		$composedVideoStreamName = '[vcomposed]';
 		$audioMapName = "0:a";
