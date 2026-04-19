@@ -77,6 +77,28 @@ class BasePeer
 	 */
 	const TYPE_NUM = 'num';
 
+	/**
+	 * Ensures write operations do not execute on a read/slave connection.
+	 *
+	 * @param PropelPDO $con
+	 * @param string $dbName
+	 * @return PropelPDO
+	 */
+	protected static function ensureMasterConnectionForWrite(PropelPDO $con, $dbName)
+	{
+		$masterCon = Propel::getConnection($dbName, Propel::CONNECTION_WRITE);
+		if ($con === $masterCon) {
+			return $con;
+		}
+
+		$slaveCon = Propel::getConnection($dbName, Propel::CONNECTION_READ);
+		if ($con === $slaveCon && $masterCon !== $slaveCon) {
+			return $masterCon;
+		}
+
+		return $con;
+	}
+
 	static public function getFieldnames ($classname, $type = self::TYPE_PHPNAME) {
 
 		// TODO we should take care of including the peer class here
@@ -114,6 +136,8 @@ class BasePeer
 	 */
 	public static function doDelete(Criteria $criteria, PropelPDO $con)
 	{
+		$con = self::ensureMasterConnectionForWrite($con, $criteria->getDbName());
+
 		$db = Propel::getDB($criteria->getDbName());
 		$dbMap = Propel::getDatabaseMap($criteria->getDbName());
 
@@ -226,6 +250,7 @@ class BasePeer
 	 * @throws     PropelException
 	 */
 	public static function doInsert(Criteria $criteria, PropelPDO $con) {
+		$con = self::ensureMasterConnectionForWrite($con, $criteria->getDbName());
 
 		// the primary key
 		$id = null;
@@ -333,6 +358,7 @@ class BasePeer
 	 * @throws     PropelException
 	 */
 	public static function doUpdate(Criteria $selectCriteria, Criteria $updateValues, PropelPDO $con) {
+		$con = self::ensureMasterConnectionForWrite($con, $selectCriteria->getDbName());
 
 		$db = Propel::getDB($selectCriteria->getDbName());
 		$dbMap = Propel::getDatabaseMap($selectCriteria->getDbName());
