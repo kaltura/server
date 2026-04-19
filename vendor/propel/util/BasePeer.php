@@ -83,6 +83,7 @@ class BasePeer
 	 * @param PropelPDO $con
 	 * @param string $dbName
 	 * @return PropelPDO
+	 * @throws PropelException
 	 */
 	protected static function ensureMasterConnectionForWrite(PropelPDO $con, $dbName)
 	{
@@ -92,7 +93,7 @@ class BasePeer
 		}
 
 		$masterCon = Propel::getConnection($dbName, Propel::CONNECTION_WRITE);
-		if ($con === $slaveCon && $masterCon !== $slaveCon) {
+		if ($masterCon !== $slaveCon) {
 			return $masterCon;
 		}
 
