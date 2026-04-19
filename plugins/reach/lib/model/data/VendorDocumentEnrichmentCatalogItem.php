@@ -26,8 +26,9 @@ class VendorDocumentEnrichmentCatalogItem extends VendorCatalogItem
 
 	public function isEntryTypeSupported($type, $mediaType = null): bool
 	{
-		$supportedMediaTypes = [entry::ENTRY_MEDIA_TYPE_DOCUMENT, entry::ENTRY_MEDIA_TYPE_PDF];
-		return $type === entryType::DOCUMENT && in_array($mediaType, $supportedMediaTypes);
+		$supportedDocumentMediaTypes = [entry::ENTRY_MEDIA_TYPE_DOCUMENT, entry::ENTRY_MEDIA_TYPE_PDF];
+		return ($type === entryType::DOCUMENT && in_array($mediaType, $supportedDocumentMediaTypes)) ||
+			   ($type === entryType::MEDIA_CLIP && $mediaType === entry::ENTRY_MEDIA_TYPE_IMAGE);
 	}
 
 	public function isAssetSupported($asset): bool
