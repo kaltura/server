@@ -27,7 +27,13 @@
  * @subpackage scripts
  */
 
-ini_set('memory_limit', '1024M');
+// Constants for batch processing and display
+const DATE_FORMAT = 'Y-m-d H:i:s';
+const CATEGORY_BATCH_SIZE = 50;
+const RELATION_BATCH_SIZE = 100;
+const DISPLAY_LIMIT = 50;
+
+ini_set('memory_limit', '2048M');
 set_time_limit(0);
 
 if ($argc < 2)
@@ -95,7 +101,7 @@ if (!$deletedAt)
 	die("Error: Category with ID $categoryId has no deletion timestamp" . PHP_EOL);
 }
 
-$deletedAtFormatted = date('Y-m-d H:i:s', $deletedAt);
+$deletedAtFormatted = date(DATE_FORMAT, $deletedAt);
 KalturaLog::info("Category '$categoryId' was deleted at: $deletedAtFormatted");
 KalturaLog::info("Category name: " . $category->getName());
 KalturaLog::info("Category full name: " . $category->getFullName());
@@ -105,17 +111,20 @@ KalturaLog::info("Inheritance Type: " . ($category->getInheritanceType() === Inh
 // Calculate time range for finding related deleted records
 $deletionTimeStart = $deletedAt - $timeDeltaSeconds;
 $deletionTimeEnd = $deletedAt + $timeDeltaSeconds;
-$deletionTimeStartFormatted = date('Y-m-d H:i:s', $deletionTimeStart);
-$deletionTimeEndFormatted = date('Y-m-d H:i:s', $deletionTimeEnd);
+$deletionTimeStartFormatted = date(DATE_FORMAT, $deletionTimeStart);
+$deletionTimeEndFormatted = date(DATE_FORMAT, $deletionTimeEnd);
 KalturaLog::info("Looking for related records deleted between $deletionTimeStartFormatted and $deletionTimeEndFormatted");
 
 // Step 2: Find all deleted child categories (using fullIds prefix match)
 KalturaLog::info("Step 2: Looking for deleted child categories");
 $fullIds = $category->getFullIds();
+// Escape special SQL LIKE characters to prevent unintended matches
+// Full IDs are numeric category IDs separated by '>' so shouldn't contain these, but escape for safety
+$escapedFullIds = str_replace(array('%', '_'), array('\\%', '\\_'), $fullIds);
 categoryPeer::setUseCriteriaFilter(false);
 
 $childCategoriesCriteria = new Criteria();
-$childCategoriesCriteria->add(categoryPeer::FULL_IDS, $fullIds . categoryPeer::CATEGORY_SEPARATOR . '%', Criteria::LIKE);
+$childCategoriesCriteria->add(categoryPeer::FULL_IDS, $escapedFullIds . categoryPeer::CATEGORY_SEPARATOR . '%', Criteria::LIKE);
 $childCategoriesCriteria->add(categoryPeer::STATUS, CategoryStatus::DELETED);
 $childCategoriesCriteria->add(categoryPeer::DELETED_AT, $deletionTimeStart, Criteria::GREATER_EQUAL);
 $childCategoriesCriteria->add(categoryPeer::DELETED_AT, $deletionTimeEnd, Criteria::LESS_EQUAL);
@@ -205,7 +214,7 @@ if ($dryRun)
 		KalturaLog::info("Child categories that would be restored:");
 		foreach ($deletedChildCategories as $childCategory)
 		{
-			$deletedAtFormatted = $childCategory->getDeletedAt('Y-m-d H:i:s');
+			$deletedAtFormatted = $childCategory->getDeletedAt(DATE_FORMAT);
 			$inheritanceType = $childCategory->getInheritanceType() === InheritanceType::MANUAL ? 'MANUAL' : 'INHERIT';
 			KalturaLog::info("  - Category ID: " . $childCategory->getId() . 
 				", Name: " . $childCategory->getName() .
@@ -219,16 +228,15 @@ if ($dryRun)
 	if ($categoryEntriesCount > 0)
 	{
 		KalturaLog::info("CategoryEntry records that would be restored:");
-		$displayLimit = min($categoryEntriesCount, 50);
 		$displayCount = 0;
 		foreach ($deletedCategoryEntries as $categoryEntry)
 		{
-			if ($displayCount >= $displayLimit)
+			if ($displayCount >= DISPLAY_LIMIT)
 			{
-				KalturaLog::info("  ... and " . ($categoryEntriesCount - $displayLimit) . " more");
+				KalturaLog::info("  ... and " . ($categoryEntriesCount - DISPLAY_LIMIT) . " more");
 				break;
 			}
-			$updatedAtFormatted = $categoryEntry->getUpdatedAt('Y-m-d H:i:s');
+			$updatedAtFormatted = $categoryEntry->getUpdatedAt(DATE_FORMAT);
 			KalturaLog::info("  - CategoryEntry ID: " . $categoryEntry->getId() . 
 				", Category ID: " . $categoryEntry->getCategoryId() .
 				", Entry ID: " . $categoryEntry->getEntryId() . 
@@ -241,16 +249,15 @@ if ($dryRun)
 	if ($categoryKusersCount > 0)
 	{
 		KalturaLog::info("CategoryKuser records that would be restored:");
-		$displayLimit = min($categoryKusersCount, 50);
 		$displayCount = 0;
 		foreach ($deletedCategoryKusers as $categoryKuser)
 		{
-			if ($displayCount >= $displayLimit)
+			if ($displayCount >= DISPLAY_LIMIT)
 			{
-				KalturaLog::info("  ... and " . ($categoryKusersCount - $displayLimit) . " more");
+				KalturaLog::info("  ... and " . ($categoryKusersCount - DISPLAY_LIMIT) . " more");
 				break;
 			}
-			$updatedAtFormatted = $categoryKuser->getUpdatedAt('Y-m-d H:i:s');
+			$updatedAtFormatted = $categoryKuser->getUpdatedAt(DATE_FORMAT);
 			KalturaLog::info("  - CategoryKuser ID: " . $categoryKuser->getId() . 
 				", Category ID: " . $categoryKuser->getCategoryId() .
 				", Kuser ID: " . $categoryKuser->getKuserId() . 
@@ -283,7 +290,7 @@ else
 		$childCategory->save();
 		$restoredChildCategories++;
 		
-		if ($restoredChildCategories % 50 === 0)
+		if ($restoredChildCategories % CATEGORY_BATCH_SIZE === 0)
 		{
 			categoryPeer::clearInstancePool();
 			KalturaLog::info("Restored $restoredChildCategories child categories so far...");
@@ -300,7 +307,7 @@ else
 		$categoryEntry->save();
 		$restoredCategoryEntries++;
 		
-		if ($restoredCategoryEntries % 100 === 0)
+		if ($restoredCategoryEntries % RELATION_BATCH_SIZE === 0)
 		{
 			categoryEntryPeer::clearInstancePool();
 			KalturaLog::info("Restored $restoredCategoryEntries categoryEntry records so far...");
@@ -318,7 +325,7 @@ else
 		$categoryKuser->save();
 		$restoredCategoryKusers++;
 		
-		if ($restoredCategoryKusers % 100 === 0)
+		if ($restoredCategoryKusers % RELATION_BATCH_SIZE === 0)
 		{
 			categoryKuserPeer::clearInstancePool();
 			KalturaLog::info("Restored $restoredCategoryKusers categoryKuser records so far...");
@@ -330,25 +337,17 @@ else
 	// Step 9: Rebuild hierarchy and recalculate counts for all restored categories
 	KalturaLog::info("Step 9: Rebuilding hierarchy fields and recalculating counts");
 	
-	// Re-fetch the main category to get fresh data
+	// Re-fetch all categories to process in a single batch query
 	categoryPeer::clearInstancePool();
-	categoryPeer::setUseCriteriaFilter(false);
-	$category = categoryPeer::retrieveByPK($categoryId);
-	categoryPeer::setUseCriteriaFilter(true);
-	
-	// Collect all categories to process (main + children), ordered by depth
-	$allCategoriesToProcess = array($category);
+	$allCategoryIdsToProcess = array($categoryId);
 	foreach ($deletedChildCategories as $childCategory)
 	{
-		// Re-fetch to get fresh data
-		categoryPeer::setUseCriteriaFilter(false);
-		$freshChild = categoryPeer::retrieveByPK($childCategory->getId());
-		categoryPeer::setUseCriteriaFilter(true);
-		if ($freshChild)
-		{
-			$allCategoriesToProcess[] = $freshChild;
-		}
+		$allCategoryIdsToProcess[] = $childCategory->getId();
 	}
+	
+	categoryPeer::setUseCriteriaFilter(false);
+	$allCategoriesToProcess = categoryPeer::retrieveByPKs($allCategoryIdsToProcess);
+	categoryPeer::setUseCriteriaFilter(true);
 	
 	// Sort by depth to ensure parents are processed before children
 	usort($allCategoriesToProcess, function($a, $b) {
@@ -381,7 +380,7 @@ else
 		$categoryToProcess->save();
 		$processedCategories++;
 		
-		if ($processedCategories % 50 === 0)
+		if ($processedCategories % CATEGORY_BATCH_SIZE === 0)
 		{
 			categoryPeer::clearInstancePool();
 			KalturaLog::info("Processed $processedCategories categories so far...");
@@ -391,6 +390,11 @@ else
 	
 	// Step 10: Update parent category's direct sub-categories count
 	KalturaLog::info("Step 10: Updating parent category's sub-categories count");
+	// Re-fetch main category after processing
+	categoryPeer::setUseCriteriaFilter(false);
+	$category = categoryPeer::retrieveByPK($categoryId);
+	categoryPeer::setUseCriteriaFilter(true);
+	
 	$parentId = $category->getParentId();
 	if ($parentId)
 	{
