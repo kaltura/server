@@ -292,7 +292,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 
 				if($recipientsBcc)
 				{
-					$batchNum = max(1, ceil($recipientsBccHandledCounter / $recipientsBccBulk));
+					$batchNum = ceil($recipientsBccHandledCounter / $recipientsBccBulk);
 					KalturaLog::info("Sending Batch #$batchNum with " . count($recipients) . " BCC recipients");
 				}
 				$success = $this::$mailer->Send();
