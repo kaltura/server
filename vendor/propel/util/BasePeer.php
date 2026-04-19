@@ -86,12 +86,7 @@ class BasePeer
 	 */
 	protected static function ensureMasterConnectionForWrite(PropelPDO $con, $dbName)
 	{
-		$masterCon = Propel::getConnection($dbName, Propel::CONNECTION_WRITE);
-		if ($con === $masterCon) {
-			return $con;
-		}
-
-		return $masterCon;
+		return Propel::getConnection($dbName, Propel::CONNECTION_WRITE);
 	}
 
 	static public function getFieldnames ($classname, $type = self::TYPE_PHPNAME) {
