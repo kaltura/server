@@ -83,7 +83,8 @@ if ($category->getStatus() != CategoryStatus::DELETED)
 	die("Error: Category with ID $categoryId is not deleted (status: " . $category->getStatus() . ")" . PHP_EOL);
 }
 
-$deletedAt = $category->getDeletedAt(null); // Get as timestamp
+// getDeletedAt(null) returns UNIX timestamp when format is null, otherwise formatted string
+$deletedAt = $category->getDeletedAt(null);
 if (!$deletedAt)
 {
 	KalturaLog::err("Category with ID $categoryId has no deletion timestamp");
@@ -151,9 +152,10 @@ if ($dryRun)
 		KalturaLog::info("CategoryEntry records that would be restored:");
 		foreach ($deletedCategoryEntries as $categoryEntry)
 		{
+			$updatedAtFormatted = $categoryEntry->getUpdatedAt('Y-m-d H:i:s');
 			KalturaLog::info("  - CategoryEntry ID: " . $categoryEntry->getId() . 
 				", Entry ID: " . $categoryEntry->getEntryId() . 
-				", Updated at: " . $categoryEntry->getUpdatedAt());
+				", Updated at: " . $updatedAtFormatted);
 		}
 	}
 	
@@ -163,10 +165,11 @@ if ($dryRun)
 		KalturaLog::info("CategoryKuser records that would be restored:");
 		foreach ($deletedCategoryKusers as $categoryKuser)
 		{
+			$updatedAtFormatted = $categoryKuser->getUpdatedAt('Y-m-d H:i:s');
 			KalturaLog::info("  - CategoryKuser ID: " . $categoryKuser->getId() . 
 				", Kuser ID: " . $categoryKuser->getKuserId() . 
 				", Puser ID: " . $categoryKuser->getPuserId() .
-				", Updated at: " . $categoryKuser->getUpdatedAt());
+				", Updated at: " . $updatedAtFormatted);
 		}
 	}
 }
