@@ -159,7 +159,8 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 			$this::$mailer->MessageID = $data->messageID;
 
 		$contentParameters = $this->getContentParameters($data);
-			
+		$validToCount = 0;
+		$validCcCount = 0;
 		if($data->to)
 		{
 			$recipients = $this->getRecipientArray($data->to, $contentParameters);
@@ -170,6 +171,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 					continue;
 				}
 				KalturaLog::info("Adding recipient to TO recipients $name<$email>");
+				$validToCount++;
 				self::$mailer->AddAddress($email, $name);
 			}
 		}
@@ -184,6 +186,7 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 					continue;
 				}
 				KalturaLog::info("Adding recipient to CC recipients $name<$email>");
+				$validCcCount++;
 				self::$mailer->AddCC($email, $name);
 			}
 		}
@@ -250,30 +253,22 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		
 		$recipientsBcc = array();
 
+		$validBccCount = 0;
 		if($data->bcc)
 		{
 		    $recipientsBcc = $this->getRecipientArray($data->bcc, $contentParameters);
+			foreach ($recipientsBcc as $email => $name)
+			{
+				if (filter_var($email, FILTER_VALIDATE_EMAIL))
+				{
+					$validBccCount++;
+				}
+			}
 		}
 
 		$recipientsBccHandledCounter = 0;
 		$recipientsBccBulk = 500;
-		$recipientsTo = $data->to ? $this->getRecipientArray($data->to, $contentParameters) : null;
-		$recipientsCc = $data->cc ? $this->getRecipientArray($data->cc, $contentParameters) : null;
-
-		if($recipientsTo)
-		{
-			KalturaLog::info("About to send email with total to: " . count($recipientsTo));
-		}
-
-		if($recipientsCc)
-		{
-			KalturaLog::info("About to send email with total cc: " . count($recipientsCc));
-		}
-
-		if ($recipientsBcc)
-		{
-			KalturaLog::info("Total bcc amount: " . count($recipientsBcc));
-		}
+		KalturaLog::info("About to send email with total to: [" . $validToCount . "], total cc: [" . $validCcCount . "], total bcc: [" . $validBccCount ."]");
 		do
 		{
 		    if($recipientsBcc)
@@ -294,9 +289,12 @@ class KDispatchEmailNotificationEngine extends KDispatchEventNotificationEngine
 		    try 
 		    {
 				KalturaLog::info('Sending Bulk');
-				$batchNum = ceil($recipientsBccHandledCounter / $recipientsBccBulk);
-				KalturaLog::info("Sending Batch #$batchNum with " . count($recipients) . " BCC recipients");
 
+				if($recipientsBcc)
+				{
+					$batchNum = max(1, ceil($recipientsBccHandledCounter / $recipientsBccBulk));
+					KalturaLog::info("Sending Batch #$batchNum with " . count($recipients) . " BCC recipients");
+				}
 				$success = $this::$mailer->Send();
 				if (!$success)
 				{
