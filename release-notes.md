@@ -1,4 +1,11 @@
 # Venus-22.18.0
+## Allow video avatar partner to be a reach vendor ##
+* Issue Type: Task
+* Issue ID: PLAT-25787
+
+### Deployment Scripts ###
+    php deployment/updates/scripts/add_permissions/2026_04_19_video_avatar_add_reach_vendor_permission.php
+
 ## Add reachProfile update permission on credit property for self serve partner ##
 * Issue Type: Task
 * Issue ID: AV-488
