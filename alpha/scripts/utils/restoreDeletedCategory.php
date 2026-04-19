@@ -77,7 +77,7 @@ if (!$category)
 	die("Error: Category with ID $categoryId not found" . PHP_EOL);
 }
 
-if ($category->getStatus() != CategoryStatus::DELETED)
+if ($category->getStatus() !== CategoryStatus::DELETED)
 {
 	KalturaLog::warning("Category with ID $categoryId is not in DELETED status (current status: " . $category->getStatus() . ")");
 	die("Error: Category with ID $categoryId is not deleted (status: " . $category->getStatus() . ")" . PHP_EOL);
@@ -197,7 +197,7 @@ else
 		$restoredCategoryEntries++;
 		
 		// Clear instance pool periodically to manage memory
-		if ($restoredCategoryEntries % 100 == 0)
+		if ($restoredCategoryEntries % 100 === 0)
 		{
 			categoryEntryPeer::clearInstancePool();
 			KalturaLog::info("Restored $restoredCategoryEntries categoryEntry records so far...");
@@ -218,7 +218,7 @@ else
 		$restoredCategoryKusers++;
 		
 		// Clear instance pool periodically to manage memory
-		if ($restoredCategoryKusers % 100 == 0)
+		if ($restoredCategoryKusers % 100 === 0)
 		{
 			categoryKuserPeer::clearInstancePool();
 			KalturaLog::info("Restored $restoredCategoryKusers categoryKuser records so far...");
