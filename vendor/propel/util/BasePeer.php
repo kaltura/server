@@ -91,11 +91,6 @@ class BasePeer
 			return $con;
 		}
 
-		$slaveCon = Propel::getConnection($dbName, Propel::CONNECTION_READ);
-		if ($con === $slaveCon && $masterCon !== $slaveCon) {
-			return $masterCon;
-		}
-
 		return $masterCon;
 	}
 
