@@ -12,13 +12,15 @@
 
 ### Deployment Scripts ###
     php deployment/updates/scripts/add_permissions/2026_04_14_reach_profile_update_credit.php
+    php deployment/updates/scripts/add_permissions/2026_04_12_self_serve_add_permission_reach_reachprofile_update.php
 
-## Add reachProfile update permission for self serve partner ##
+## Add session get permission for self serve partner ##
 * Issue Type: Task
-* Issue ID: AV-488
+* Issue ID: AV-599
 
 ### Deployment Scripts ###
-    php deployment/updates/scripts/add_permissions/2026_04_12_self_serve_add_permission_reach_reachprofile_update.php
+    php deployment/updates/scripts/add_permissions/2026_04_20_session_get_permission.php
+
 
 # Venus-22.17.0
 ## Optimize entry_vendor_task queries ##
