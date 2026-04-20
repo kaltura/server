@@ -70,7 +70,7 @@ class KalturaZoomDropFolder extends KalturaDropFolder
 	 * The amount of time, in seconds, to wait before processing a drop folder file
 	 * @var int
 	 * @minValue 3600
-	 * @maxValue 21600
+	 * @maxValue 54000
 	 */
 	public $fileProcessingGracePeriod;
 	
