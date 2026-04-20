@@ -1572,6 +1572,7 @@ class reportsInputFilter
 	public $agent_ids;
 	public $genie_ids;
 	public $reach_profile_ids;
+	public $is_preview;
 
 	public function getFilterBy() {
 		return "";

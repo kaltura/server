@@ -3115,6 +3115,15 @@ class kKavaReportsMgr extends kKavaBase
 			$druid_filter[] = $filter;
 		}
 
+		if (isset($input_filter->is_preview))
+		{
+			$isPreviewValue = $input_filter->is_preview ? 'true' : 'false';
+			$druid_filter[] = array(
+				self::DRUID_DIMENSION => self::DIMENSION_PREVIEW,
+				self::DRUID_VALUES => array($isPreviewValue)
+			);
+		}
+
 		if (isset($input_filter->gte_entry_created_at) || isset($input_filter->lte_entry_created_at))
 		{
 			$druid_filter[] = self::getBoundFilter(self::DIMENSION_ENTRY_CREATED_AT, $input_filter->gte_entry_created_at, $input_filter->lte_entry_created_at, self::DRUID_ORDER_NUMERIC);
