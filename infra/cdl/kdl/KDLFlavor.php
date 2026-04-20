@@ -550,7 +550,7 @@ $plannedDur = 0;
 			/*
 			 * For surround - make sure all streams have the same sampleRate
 			 */
-			$target->_multiStream = self::evaluateTargetAudioMultiStream($source, $target);
+			$target->_multiStream = self::evaluateTargetAudioMultiStream($source, $target, $this->_tags);
 	
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);
@@ -1855,7 +1855,7 @@ WM HGT related
 	 * @param unknown_type $target
 	 * @return NULL|stdClass
 	 */
-	private static function evaluateTargetAudioMultiStream($source, $target) 
+	private static function evaluateTargetAudioMultiStream($source, $target, $flavorTags=null)
 	{
 		/*
 		 * Analyse the source to determine whether it contains multi-stream audio.
@@ -1950,12 +1950,12 @@ WM HGT related
 			 * - otherwise remove the 'multiStream' object'
 			 */
 		$multiStreamHelper = new KDLAudioMultiStreamingHelper($setupMultiStream);
-		if((isset($setupMultiStream->streams[0]) && isset($setupMultiStream->streams[0]->onSingleStream) 
+		if((isset($setupMultiStream->streams[0]) && isset($setupMultiStream->streams[0]->onSingleStream)
 			&& $setupMultiStream->streams[0]->onSingleStream==1)
 		|| (isset($setupMultiStream->onSingleStream) && $setupMultiStream->onSingleStream==1))
-			$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams, $overrideStreams,1);
+			$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams, $overrideStreams, 1, $flavorTags);
 		else
-			$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams, $overrideStreams,2);
+			$audioStreams = $multiStreamHelper->GetSettings($source->_contentStreams, $overrideStreams, 2, $flavorTags);
 		if(isset($audioStreams)){
 			$targetMultiStream = new stdClass();
 			$targetMultiStream->audio = $audioStreams;
