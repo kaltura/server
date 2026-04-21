@@ -262,7 +262,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	
 	protected function isConcatOfAllChildrenDone(BatchJob $batchJob)
 	{
-		$childJobs = $batchJob->getChildJobsByTypes(array(BatchJobType::CONVERT, BatchJobType::CONCAT, BatchJobType::POSTCONVERT));
+		$concatFlowJobTypes = array(BatchJobType::CONVERT, BatchJobType::CONCAT, BatchJobType::POSTCONVERT);
+		$childJobs = $batchJob->getChildJobsByTypes($concatFlowJobTypes);
 		foreach ($childJobs as $job)
 		{
 			/** @var BatchJob $job */
@@ -272,7 +273,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			KalturaLog::info("Child job id [$jobId] status [$jobStatus] type [$jobType]");
 			if($jobStatus != BatchJob::BATCHJOB_STATUS_FINISHED)
 			{
-				if (!$this->hasGrandChildFinished($job))
+				// if one job is not finished, check the children of same type (alternative job)
+				if (!$this->hasSameTypeChildFinished($job, $concatFlowJobTypes))
 				{
 					return false;
 				}
@@ -292,10 +294,10 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 		return true;
 	}
-	
-	protected function hasGrandChildFinished(BatchJob $job)
+
+	protected function hasSameTypeChildFinished(BatchJob $job, $jobTypes)
 	{
-		$children = $job->getChildJobs();
+		$children = $job->getChildJobsByTypes($jobTypes);
 		if(is_array($children) && count($children) > 0)
 		{
 			/** @var BatchJob $jobChild */
