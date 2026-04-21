@@ -36,6 +36,7 @@ class embedPlaykitJsAction extends sfAction
 	const RAPT = "rapt";
 	const DEFAULT_MAX_OBJECT_CACHE_SIZE = 4 * 1024 * 1024; // 4MB
 	const FAILED_TO_SAVE_BUNDLE_IN_CACHE = "FAILED_TO_SAVE_BUNDLE_IN_CACHE";
+	const DEFAULT_DYNAMIC_VERSIONS_CACHE_EXPIRY = 1814400; // 21 days in seconds
 
 	private $bundleCache = null;
 	private $sourceMapsCache = null;
@@ -59,6 +60,8 @@ class embedPlaykitJsAction extends sfAction
 	private $includeSourceMap = 'false';
 	private $uiConfTags = array(self::PLAYER_V3_VERSIONS_TAG);
 	private $maxObjectCacheSize;
+	private $hasDynamicVersion = false;
+	private $dynamicVersionCacheExpiry;
 
 	public function execute()
 	{
@@ -137,18 +140,21 @@ class embedPlaykitJsAction extends sfAction
             }
         }
 
+		// Use configurable cache expiry for dynamic versions (latest, beta, canary), otherwise cache forever (0)
+		$cacheExpiry = $context->hasDynamicVersion ? $context->dynamicVersionCacheExpiry : 0;
+
 		$bundleContent = time() . "," . base64_decode($content['bundle']);
-		$bundleSaved = self::setCacheData($context, 'bundleCache', $context->bundle_name, $bundleContent);
+		$bundleSaved = self::setCacheData($context, 'bundleCache', $context->bundle_name, $bundleContent, true, $cacheExpiry);
 
 		$sourceMapContent = base64_decode($content['sourceMap']);
-		self::setCacheData($context, 'sourceMapsCache', $context->bundle_name, $sourceMapContent, false);
+		self::setCacheData($context, 'sourceMapsCache', $context->bundle_name, $sourceMapContent, false, $cacheExpiry);
 
 		$i18nContent = isset($content['i18n']) ? base64_decode($content['i18n']) : "";
-		self::setCacheData($context, 'bundleCache', $context->bundle_i18n_name, $i18nContent);
+		self::setCacheData($context, 'bundleCache', $context->bundle_i18n_name, $i18nContent, true, $cacheExpiry);
 
 		$extraModules = isset($content['extraModules']) ? $content['extraModules'] : array();
 		$extraModulesNames = self::getExtraModuleNames($extraModules);;
-		self::setCacheData($context, 'bundleCache', $context->bundle_extra_modules_names, serialize($extraModulesNames));
+		self::setCacheData($context, 'bundleCache', $context->bundle_extra_modules_names, serialize($extraModulesNames), true, $cacheExpiry);
 		if(!$bundleSaved)
 		{
 			KalturaLog::log("Error - failed to save bundle content in cache for config [".$config."]");
@@ -157,7 +163,7 @@ class embedPlaykitJsAction extends sfAction
 		return array($bundleContent, $i18nContent, $extraModulesNames);
 	}
 
-	protected static function setCacheData($context, $cacheType, $key, $data, $shouldCompress = true)
+	protected static function setCacheData($context, $cacheType, $key, $data, $shouldCompress = true, $expiry = 0)
 	{
 		//If length of data is over 4MB compress it before caching
 		if($shouldCompress && strlen($data) > $context->maxObjectCacheSize)
@@ -167,11 +173,11 @@ class embedPlaykitJsAction extends sfAction
 			{
 				KalturaMonitorClient::sendErrorEvent(self::FAILED_TO_SAVE_BUNDLE_IN_CACHE);
 			}
-			return $context->$cacheType->set($key, $data);
+			return $context->$cacheType->set($key, $data, $expiry);
 		}
 		else
 		{
-			return $context->$cacheType->set($key, $data);
+			return $context->$cacheType->set($key, $data, $expiry);
 		}
 	}
 
@@ -784,10 +790,13 @@ class embedPlaykitJsAction extends sfAction
 		$isBetaVersionRequired = array_search(self::BETA, $this->bundleConfig) !== false;
 		$isCanaryVersionRequired = array_search(self::CANARY, $this->bundleConfig) !== false;
 
+		// Track if any dynamic version is used for cache expiry purposes
+		$this->hasDynamicVersion = $isLatestVersionRequired || $isBetaVersionRequired || $isCanaryVersionRequired;
+
 		$isAllPackagesSameVersion = true;
 		$packageVersion = null;
 
-		if ($isLatestVersionRequired || $isBetaVersionRequired || $isCanaryVersionRequired) {
+		if ($this->hasDynamicVersion) {
 
 			list($latestVersionMap, $latestProductVersion, $corePackages) = $this->getConfigByVersion("latest");
 			list($betaVersionMap, $betaProductVersion) = $this->getConfigByVersion("beta");
@@ -915,6 +924,7 @@ class embedPlaykitJsAction extends sfAction
 
 			$this->maxObjectCacheSize = $playkitConfig['max_object_cache_size'] ?? self::DEFAULT_MAX_OBJECT_CACHE_SIZE;
 
+			$this->dynamicVersionCacheExpiry = $playkitConfig['dynamic_version_cache_expiry'] ?? self::DEFAULT_DYNAMIC_VERSIONS_CACHE_EXPIRY;
 
 		}
 		catch (Exception $ex)
