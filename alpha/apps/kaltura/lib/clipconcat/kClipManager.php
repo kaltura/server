@@ -1968,7 +1968,27 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
-	protected function buildOverlayShape($shape)
+	/**
+	 * Parse a CSS/hex color string (#RRGGBB, RRGGBB, 0xRRGGBB) into r/g/b components.
+	 *
+	 * @param  string $hexColor
+	 * @return array{r:int,g:int,b:int}
+	 */
+	protected function parseHexColor($hexColor)
+	{
+		$hex = ltrim($hexColor, '#');
+		if(strtolower(substr($hex, 0, 2)) === '0x')
+		{
+			$hex = substr($hex, 2);
+		}
+		return array(
+			'r' => hexdec(substr($hex, 0, 2)),
+			'g' => hexdec(substr($hex, 2, 2)),
+			'b' => hexdec(substr($hex, 4, 2)),
+		);
+	}
+
+	protected function buildOverlayShapeNoBorder($shape)
 	{
 		$createRectangleShapeFilter =
 			"[front_rect]geq="
@@ -1978,7 +1998,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			."a='255'"
 			."[front_shape]";
 
-
 		$R = 20; // corner radius
 		$createRoundedRectangleShapeFilter =
 			"[front_rect]geq="
@@ -1986,18 +2005,18 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			."g='g(X,Y)':"
 			."b='b(X,Y)':"
 			."a='
-				255 *
-				(
-					(gte(X,$R) * lte(X,W-$R) + gte(Y,$R) * lte(Y,H-$R))
-					+
-					(lt(X,$R) * lt(Y,$R) * lte( (X-$R)*(X-$R) + (Y-$R)*(Y-$R), $R*$R ))
-					+
-					(gt(X,W-$R) * lt(Y,$R) * lte( (X-(W-$R))*(X-(W-$R)) + (Y-$R)*(Y-$R), $R*$R ))
-					+
-					(lt(X,$R) * gt(Y,H-$R) * lte( (X-$R)*(X-$R) + (Y-(H-$R))*(Y-(H-$R)), $R*$R ))
-					+
-					(gt(X,W-$R) * gt(Y,H-$R) * lte( (X-(W-$R))*(X-(W-$R)) + (Y-(H-$R))*(Y-(H-$R)), $R*$R ))
-				)'"
+					255 *
+					(
+						(gte(X,$R) * lte(X,W-$R) + gte(Y,$R) * lte(Y,H-$R))
+						+
+						(lt(X,$R) * lt(Y,$R) * lte( (X-$R)*(X-$R) + (Y-$R)*(Y-$R), $R*$R ))
+						+
+						(gt(X,W-$R) * lt(Y,$R) * lte( (X-(W-$R))*(X-(W-$R)) + (Y-$R)*(Y-$R), $R*$R ))
+						+
+						(lt(X,$R) * gt(Y,H-$R) * lte( (X-$R)*(X-$R) + (Y-(H-$R))*(Y-(H-$R)), $R*$R ))
+						+
+						(gt(X,W-$R) * gt(Y,H-$R) * lte( (X-(W-$R))*(X-(W-$R)) + (Y-(H-$R))*(Y-(H-$R)), $R*$R ))
+					)'"
 			."[front_shape]";
 
 		$createCircleShapeFilter =
@@ -2008,7 +2027,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			."a='if(lte((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2),(min(W,H)/2)*(min(W,H)/2)),255,0)'"
 			."[front_shape]";
 
-
 		$createEllipseShapeFilter =
 			"[front_rect]geq="
 			."r='r(X,Y)':"
@@ -2017,8 +2035,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			."a='if(lte(((X-W/2)*(X-W/2))/((W/2)*(W/2)) + ((Y-H/2)*(Y-H/2))/((H/2)*(H/2)),1),255,0)'"
 			."[front_shape]";
 
-
-		switch ($shape)
+		switch($shape)
 		{
 			case kOverlayShape::ELLIPSE:
 				return $createEllipseShapeFilter;
@@ -2035,6 +2052,105 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
+	/**
+	 * Build an FFmpeg geq filter string that cuts [front_rect] into [front_shape]
+	 * for the requested overlay shape.  When $borderAttributes is supplied the
+	 * shape gains an outline (color / width / opacity).
+	 *
+	 * @param  int                           $shape
+	 * @param  kOverlayBorderAttributes|null $borderAttributes
+	 * @return string  filter_complex fragment  "[front_rect]geq=...:[front_shape]"
+	 */
+	protected function buildOverlayShape($shape, $borderAttributes = null)
+	{
+		$hasBorder = $borderAttributes && $borderAttributes->hasBorder();
+
+		if(!$hasBorder)
+		{
+			return $this->buildOverlayShapeNoBorder($shape);
+		}
+
+		$BW = (int)$borderAttributes->getWidth();
+		$opacityPct = $borderAttributes->getOpacity() !== null ? (int)$borderAttributes->getOpacity() : 100;
+		$BA = (int)round(255 * $opacityPct / 100);
+		$bc = $this->parseHexColor($borderAttributes->getColor());
+		$BR = $bc['r'];
+		$BG = $bc['g'];
+		$BB = $bc['b'];
+
+		switch($shape)
+		{
+			case kOverlayShape::RECTANGLE:
+				// Pixels within BW of any edge become the border color.
+				$edgeDist = 'min(X,min(W-1-X,min(Y,H-1-Y)))';
+				$r = "if(lt($edgeDist,$BW),$BR,r(X,Y))";
+				$g = "if(lt($edgeDist,$BW),$BG,g(X,Y))";
+				$b = "if(lt($edgeDist,$BW),$BB,b(X,Y))";
+				$a = "if(lt($edgeDist,$BW),$BA,255)";
+				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
+
+			case kOverlayShape::RECTANGLE_ROUNDED_CORNERS:
+				$Rc = 20; // corner radius (unchanged)
+
+				// Outer boundary: the full rounded rectangle.
+				$outer =
+					'(gte(X,'.$Rc.')*lte(X,W-'.$Rc.')+gte(Y,'.$Rc.')*lte(Y,H-'.$Rc.'))'
+					.'+(lt(X,'.$Rc.')*lt(Y,'.$Rc.')*lte((X-'.$Rc.')*(X-'.$Rc.')+(Y-'.$Rc.')*(Y-'.$Rc.'),'.$Rc.'*'.$Rc.'))'
+					.'+(gt(X,W-'.$Rc.')*lt(Y,'.$Rc.')*lte((X-(W-'.$Rc.'))*(X-(W-'.$Rc.'))+(Y-'.$Rc.')*(Y-'.$Rc.'),'.$Rc.'*'.$Rc.'))'
+					.'+(lt(X,'.$Rc.')*gt(Y,H-'.$Rc.')*lte((X-'.$Rc.')*(X-'.$Rc.')+(Y-(H-'.$Rc.'))*(Y-(H-'.$Rc.')),'.$Rc.'*'.$Rc.'))'
+					.'+(gt(X,W-'.$Rc.')*gt(Y,H-'.$Rc.')*lte((X-(W-'.$Rc.'))*(X-(W-'.$Rc.'))+(Y-(H-'.$Rc.'))*(Y-(H-'.$Rc.')),'.$Rc.'*'.$Rc.'))';
+
+				// Inner boundary: same shape inset by BW.  Corner centres shift
+				// inward by BW; the corner radius itself stays at $Rc.
+				$iR = $Rc + $BW; // corner-centre offset from the frame edge
+				$inner =
+					'(gte(X,'.$iR.')*lte(X,W-'.$iR.')+gte(Y,'.$iR.')*lte(Y,H-'.$iR.'))'
+					.'+(lt(X,'.$iR.')*lt(Y,'.$iR.')*lte((X-'.$iR.')*(X-'.$iR.')+(Y-'.$iR.')*(Y-'.$iR.'),'.$Rc.'*'.$Rc.'))'
+					.'+(gt(X,W-'.$iR.')*lt(Y,'.$iR.')*lte((X-(W-'.$iR.'))*(X-(W-'.$iR.'))+(Y-'.$iR.')*(Y-'.$iR.'),'.$Rc.'*'.$Rc.'))'
+					.'+(lt(X,'.$iR.')*gt(Y,H-'.$iR.')*lte((X-'.$iR.')*(X-'.$iR.')+(Y-(H-'.$iR.'))*(Y-(H-'.$iR.')),'.$Rc.'*'.$Rc.'))'
+					.'+(gt(X,W-'.$iR.')*gt(Y,H-'.$iR.')*lte((X-(W-'.$iR.'))*(X-(W-'.$iR.'))+(Y-(H-'.$iR.'))*(Y-(H-'.$iR.')),'.$Rc.'*'.$Rc.'))';
+
+				// in_outer && in_inner  → content (255)
+				// in_outer && !in_inner → border  (BA)
+				// !in_outer             → transparent (0)
+				$r = "if(gt($outer,0),if(gt($inner,0),r(X,Y),$BR),r(X,Y))";
+				$g = "if(gt($outer,0),if(gt($inner,0),g(X,Y),$BG),g(X,Y))";
+				$b = "if(gt($outer,0),if(gt($inner,0),b(X,Y),$BB),b(X,Y))";
+				$a = "if(gt($outer,0),if(gt($inner,0),255,$BA),0)";
+				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
+
+			case kOverlayShape::ELLIPSE:
+				// Outer ellipse: normalised distance <= 1.
+				$outerE = '(((X-W/2)*(X-W/2))/((W/2)*(W/2))+((Y-H/2)*(Y-H/2))/((H/2)*(H/2)))';
+
+				// Inner ellipse inset by BW pixels on each semi-axis.
+				// Clamp denominator to 1 to avoid division by zero when BW >= half-dimension.
+				$innerE =
+					'(((X-W/2)*(X-W/2))/(max(W/2-'.$BW.',1)*max(W/2-'.$BW.',1))'
+					.'+((Y-H/2)*(Y-H/2))/(max(H/2-'.$BW.',1)*max(H/2-'.$BW.',1)))';
+
+				$r = "if(lte($outerE,1),if(lte($innerE,1),r(X,Y),$BR),r(X,Y))";
+				$g = "if(lte($outerE,1),if(lte($innerE,1),g(X,Y),$BG),g(X,Y))";
+				$b = "if(lte($outerE,1),if(lte($innerE,1),b(X,Y),$BB),b(X,Y))";
+				$a = "if(lte($outerE,1),if(lte($innerE,1),255,$BA),0)";
+				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
+
+			case kOverlayShape::CIRCLE:
+			default:
+				$D2      = '((X-W/2)*(X-W/2)+(Y-H/2)*(Y-H/2))';
+				$outerR2 = '((min(W,H)/2)*(min(W,H)/2))';
+
+				// Inner radius clamped to >= 0 to handle extreme BW values safely.
+				$innerR2 = '(max(min(W,H)/2-'.$BW.',0)*max(min(W,H)/2-'.$BW.',0))';
+
+				$r = "if(lte($D2,$outerR2),if(lte($D2,$innerR2),r(X,Y),$BR),r(X,Y))";
+				$g = "if(lte($D2,$outerR2),if(lte($D2,$innerR2),g(X,Y),$BG),g(X,Y))";
+				$b = "if(lte($D2,$outerR2),if(lte($D2,$innerR2),b(X,Y),$BB),b(X,Y))";
+				$a = "if(lte($D2,$outerR2),if(lte($D2,$innerR2),255,$BA),0)";
+				return "[front_rect]geq=r='$r':g='$g':b='$b':a='$a'[front_shape]";
+		}
+	}
+
 	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, &$sortedFilters, $conversionParams, $composedVideoStreamName)
 	{
 		$mainFileNameIndex = $fileNameIndex;
@@ -2048,7 +2164,8 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		$overlayShape = $mediaCompositionAttributes->getOverlayShape() ? $mediaCompositionAttributes->getOverlayShape() : kOverlayShape::CIRCLE;
 
 		$overlayPosition = $this->buildOverlayPosition($overlayPlacement, $marginsPercentage);
-		$createShapeFilter = $this->buildOverlayShape($overlayShape);
+		$borderAttributes = $mediaCompositionAttributes->getBorderAttributes();
+		$createShapeFilter = $this->buildOverlayShape($overlayShape, $borderAttributes);
 
 		$overlayCircleOnVideoFilterStream = "[$mainFileNameIndex:v]";
 		if(isset($sortedFilters["scale"]))
