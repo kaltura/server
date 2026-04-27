@@ -280,11 +280,7 @@ class VendorCatalogItem extends BaseVendorCatalogItem implements IRelatedObject
 	public function getLinkedCatalogItems(): array
 	{
 		$vendor_data = json_decode($this->getVendorData(), true) ?? [];
-		$notes  = json_decode($this->getNotes(), true) ?? [];
-		$raw = implode(',', array_filter([
-			$notes['linked_catalog_items'] ?? '',
-			$vendor_data['linked_catalog_items'] ?? '',
-		]));
+		$raw = $vendor_data['linked_catalog_items'] ?? '';
 		return $raw ? array_map('trim', explode(',', $raw)) : [];
 	}
 

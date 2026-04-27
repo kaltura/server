@@ -551,6 +551,22 @@ $plannedDur = 0;
 			 * For surround - make sure all streams have the same sampleRate
 			 */
 			$target->_multiStream = self::evaluateTargetAudioMultiStream($source, $target);
+
+			/*
+			 * APAC audio - new Apple proprietary aud codec (Mar 2026). 
+			 * currently w/out ffmpeg/opensource decoding support.
+			 * _apacStreamId is set, to enable its removal 
+			 * for Generic Source flv(-1/-2)/Clip/Trim/Edit flows.
+			 */
+		if(isset($source->_contentStreams->audio) && is_array($source->_contentStreams->audio)) {
+			$apacStreams = array_filter($source->_contentStreams->audio, 
+				fn($obj) => $obj->audioCodecId == "apac");
+			if(isset($apacStreams) && count($apacStreams)>0) {
+				$target->_apacStreamId = reset($apacStreams)->id;
+				KalturaLog::log("APAC audio detected, stream:$target->_apacStreamId");
+			}
+			else unset($target->_apacStreamId);
+		}
 	
 		if($target->_container->_id==KDLContainerTarget::COPY){
 			$target->_container->_id=self::EvaluateCopyContainer($source->_container);

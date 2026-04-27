@@ -25,6 +25,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 	const MEDIA_INFO_OBJECT = 'mediaInfoObject';
 	const BG_MEDIA_INFO_OBJECT_ARRAY = 'backgroundMediaInfoArray';
 	const AUDIO_DURATION = 'audioDuration';
+	const CLIP_DURATION = 'clipDuration';
 	const INVERTED_SOURCE = 'invertedSource';
 	const EXTRA_CONVERSION_PARAMS = 'extraConversionParams';
 	const TEMP_ENTRY = 'tempEntry';
@@ -1766,6 +1767,25 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		return $resourceEntry->getMediaType() == $mediaType;
 	}
 
+	protected function getResourceEntryMediaInfo($mediaCompositionAttributes)
+	{
+		$resourceEntry = $this->getMediaCompositionAttributesResourceEntry($mediaCompositionAttributes);
+		if(!$resourceEntry || $resourceEntry->getMediaType() == KalturaMediaType::IMAGE)
+		{
+			return null;
+		}
+		$assets = assetPeer::retrieveByEntryId($resourceEntry->getId(), array(assetType::FLAVOR));
+		foreach($assets as $asset)
+		{
+			$mediaInfo = mediaInfoPeer::retrieveByFlavorAssetId($asset->getId());
+			if($mediaInfo)
+			{
+				return $mediaInfo;
+			}
+		}
+		return null;
+	}
+
 	protected function getBackgroundColor($replacementAttributes)
 	{
 		if($replacementAttributes && $replacementAttributes->getBackgroundColorCode())
@@ -1822,23 +1842,95 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		if(!$imageResource)
 		{
 			$audioMapName = '"[aout]"';
-			$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $newBackgroundFileNameIndex);
-			$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
-			$filterComplex .= "$defineAudioVolumesFilter;$combineAudioFilter;";
+			$mainHasAudio = isset($conversionParams[self::AUDIO_DURATION]) && $conversionParams[self::AUDIO_DURATION] > 0;
+			$secondaryMediaInfo = $this->getResourceEntryMediaInfo($mediaCompositionAttributes);
+			$secondaryHasAudio = $secondaryMediaInfo && $secondaryMediaInfo->getAudioChannels();
+			$audioDuration = $this->getComposedAudioDurationSeconds($conversionParams, $secondaryMediaInfo);
+			$sampleRate = isset($conversionParams[self::AUDIO_SAMPLE_RATE]) ? $conversionParams[self::AUDIO_SAMPLE_RATE] : self::DEFAULT_SAMPLE_RATE;
+			$channelLayout = $this->getComposedChannelLayout($conversionParams);
+
+			if(!$mainHasAudio && !$secondaryHasAudio)
+			{
+				// Both inputs have no audio: generate a single silent stream trimmed to the clip duration
+				$filterComplex .= $this->getSilentAudioFilter($audioDuration, $sampleRate, $channelLayout);
+			}
+			else
+			{
+				// At least one input has audio; any missing stream is replaced by a trimmed silence
+				$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $newBackgroundFileNameIndex, $mainHasAudio, $secondaryHasAudio, $sampleRate, $channelLayout, $audioDuration);
+				// longest stream since audio stream is finite if exists
+				$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
+				$filterComplex .= "$defineAudioVolumesFilter;$combineAudioFilter;";
+			}
 		}
 		return $filterComplex;
 	}
 
-	protected function getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $secondaryFileNameIndex)
+	protected function getSilentAudioFilter($audioDurationSeconds, $sampleRate, $channelLayout, $outStreamName = "[aout]")
+	{
+		$silentFilter = "anullsrc=r=$sampleRate:cl=$channelLayout";
+		$maxDurationSeconds = kConf::get("maxMultiClipsDurationSeconds", kConfMapNames::RUNTIME_CONFIG, 5 * 60 * 60);
+		if($audioDurationSeconds > 0 && $audioDurationSeconds < $maxDurationSeconds)
+		{
+			$silentFilter .= ",atrim=duration=$audioDurationSeconds";
+		}
+		else
+		{
+			throw new KalturaAPIException(KalturaErrors::INVALID_FIELD_VALUE, "duration");
+		}
+		return "$silentFilter,asetpts=PTS-STARTPTS$outStreamName";
+	}
+
+	protected function getComposedAudioDurationSeconds($conversionParams, $secondaryMediaInfo)
+	{
+		// We use the secondary's VIDEO duration (not audio duration) because the overlay
+		// filter's shortest=1 terminates the composed video when the secondary video stream
+		// ends — so the audio trim must match that same boundary.
+		// Trade-off: if the secondary's audio track is shorter than its video track,
+		// amix:duration=shortest will terminate the audio mix early (at audio end), leaving
+		// the tail of the video with no audio in the output. This is accepted as an edge case;
+		// well-formed media files have aligned A/V durations.
+		$secondaryDuration = $secondaryMediaInfo && $secondaryMediaInfo->getVideoDuration() ? $secondaryMediaInfo->getVideoDuration() : 0;
+		$clipDuration = isset($conversionParams[self::CLIP_DURATION]) ? $conversionParams[self::CLIP_DURATION] : 0;
+		if($secondaryDuration > 0)
+		{
+			// getVideoDuration() returns milliseconds; convert to seconds for atrim.
+			$clipDuration = $secondaryDuration / 1000;
+		}
+		return $clipDuration;
+	}
+
+	protected function getComposedChannelLayout($conversionParams)
+	{
+		$audioChannels = isset($conversionParams[self::AUDIO_CHANNELS]) ? $conversionParams[self::AUDIO_CHANNELS] : self::DEFAULT_AUDIO_CHANNELS;
+		return $audioChannels >= 2 ? 'stereo' : 'mono';
+	}
+
+	protected function getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $secondaryFileNameIndex, $mainHasAudio, $secondaryHasAudio, $sampleRate, $channelLayout, $clipDuration = 0)
 	{
 		$audioAttributes = $mediaCompositionAttributes->getAudioAttributes();
 		$overlayVolume = $audioAttributes ? $audioAttributes->getVolume() : 1;
 		$volume = 1 - $overlayVolume;
 
-		return
-			"[$secondaryFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$overlayVolume" . "[a_secondary];" .
-			"[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$volume" . "[a_main]";
+		if($secondaryHasAudio)
+		{
+			$secondaryFilter = "[$secondaryFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$overlayVolume"."[a_secondary]";
+		}
+		else
+		{
+			$secondaryFilter = $this->getSilentAudioFilter($clipDuration, $sampleRate, $channelLayout, "[a_secondary]");
+		}
 
+		if($mainHasAudio)
+		{
+			$mainFilter = "[$mainFileNameIndex:a]asetpts=PTS-STARTPTS,volume=$volume"."[a_main]";
+		}
+		else
+		{
+			$mainFilter =  $this->getSilentAudioFilter($clipDuration, $sampleRate, $channelLayout, "[a_main]");
+		}
+
+		return "$secondaryFilter;$mainFilter";
 	}
 
 	protected function buildOverlayPosition($alignment, $marginsPercentage): string
@@ -1943,7 +2035,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 	}
 
-	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, $conversionParams, $composedVideoStreamName)
+	protected function getOverlayAttributesFilterComplex(kOverlayAttributes $mediaCompositionAttributes, &$cmdFileNames, &$fileNameIndex, &$audioMapName, &$sortedFilters, $conversionParams, $composedVideoStreamName)
 	{
 		$mainFileNameIndex = $fileNameIndex;
 		$cmdFileNames .= $this->getFileInputCommandByEntryType($mediaCompositionAttributes, $fileNameIndex);
@@ -1957,20 +2049,50 @@ class kClipManager implements kBatchJobStatusEventConsumer
 
 		$overlayPosition = $this->buildOverlayPosition($overlayPlacement, $marginsPercentage);
 		$createShapeFilter = $this->buildOverlayShape($overlayShape);
-		$overlayCircleOnVideoFilter = "[$mainFileNameIndex:v][front_shape]overlay=$overlayPosition:format=auto$composedVideoStreamName";
-		$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex);
-		$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:normalize=0:dropout_transition=0[aout]";
+
+		$overlayCircleOnVideoFilterStream = "[$mainFileNameIndex:v]";
+		if(isset($sortedFilters["scale"]))
+		{
+			$mainStreamName = "[main_scaled]";
+			$mainScaleFilter = $sortedFilters["scale"] . $mainStreamName;
+			$overlayCircleOnVideoFilterStream = "$mainScaleFilter;$mainStreamName";
+		}
+		// shortest to end the stream_loop
+		$overlayCircleOnVideoFilter = $overlayCircleOnVideoFilterStream . "setpts=N/(FRAME_RATE*TB)[bg_r];[bg_r][front_shape]overlay=$overlayPosition:format=auto:shortest=1$composedVideoStreamName";
+
+		$mainHasAudio = isset($conversionParams[self::AUDIO_DURATION]) && $conversionParams[self::AUDIO_DURATION] > 0;
+		$secondaryMediaInfo = $this->getResourceEntryMediaInfo($mediaCompositionAttributes);
+		$secondaryHasAudio = $secondaryMediaInfo && $secondaryMediaInfo->getAudioChannels();
+		$audioDuration = $this->getComposedAudioDurationSeconds($conversionParams, $secondaryMediaInfo);
+		$sampleRate = isset($conversionParams[self::AUDIO_SAMPLE_RATE]) ? $conversionParams[self::AUDIO_SAMPLE_RATE] : self::DEFAULT_SAMPLE_RATE;
+		$channelLayout = $this->getComposedChannelLayout($conversionParams);
+
+		if(!$mainHasAudio && !$secondaryHasAudio)
+		{
+			// Both inputs have no audio: generate a single silent stream trimmed to the clip duration
+			$defineAudioVolumesFilter = $this->getSilentAudioFilter($audioDuration, $sampleRate, $channelLayout);
+			$combineAudioFilter = "";
+		}
+		else
+		{
+			// At least one input has audio; any missing stream is replaced by a trimmed silence so
+			// amix:duration=shortest always encounters a finite input even when the main is stream-looped.
+			$defineAudioVolumesFilter = $this->getAudioVolumesFilter($mediaCompositionAttributes, $mainFileNameIndex, $overlayFileNameIndex, $mainHasAudio, $secondaryHasAudio, $sampleRate, $channelLayout, $audioDuration);
+			$combineAudioFilter = "[a_secondary][a_main]amix=inputs=2:duration=shortest:normalize=0:dropout_transition=0[aout]";
+		}
 		$audioMapName = '"[aout]"';
+		$audioSection = $combineAudioFilter === '' ? $defineAudioVolumesFilter : "$defineAudioVolumesFilter;$combineAudioFilter";
 
 		$attributesArray = $mediaCompositionAttributes->getResourceMediaCompositionAttributesArray();
 
+		$targetHeight = $conversionParams[self::TARGET_HEIGHT];
+		$targetWidth = $conversionParams[self::TARGET_WIDTH];
+		$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=min($targetHeight\,$targetWidth)*$overlayScalePercentage:min($targetHeight\,$targetWidth)*$overlayScalePercentage";
+
 		if(isset($attributesArray[0]))
 		{
-			$targetHeight = $conversionParams[self::TARGET_HEIGHT];
-			$targetWidth = $conversionParams[self::TARGET_WIDTH];
 			$BGColor = $this->getBackgroundColor($attributesArray[0]);
-			$scaleAndRemoveBGColor = "[$overlayFileNameIndex:v]scale=min($targetHeight\,$targetWidth)*$overlayScalePercentage:min($targetHeight\,$targetWidth)*$overlayScalePercentage,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
-
+			$scaleAndRemoveBGColor = "$scaleOverlayVideo,chromakey=$BGColor:0.14:0.08,format=rgba[fg]";
 			$cmdFileNames .= $this->getFileInputCommandByEntryType($attributesArray[0], $fileNameIndex);
 			$fileNameIndex++;
 			$backgroundFileNameIndex = $fileNameIndex;
@@ -1980,12 +2102,12 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			$overlay = "[bg][fg2]overlay=0:0:format=auto:shortest=1[front_rect]";
 			$replaceOverlayBackground = "$scaleAndRemoveBGColor;$normalizeImage;$alignSizes;$overlay";
 
-			return "$replaceOverlayBackground;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter;";
+			return "$replaceOverlayBackground;$createShapeFilter;$overlayCircleOnVideoFilter;$audioSection;";
 		}
 		else
 		{
-			$scaleOverlayVideo = "[$overlayFileNameIndex:v]scale=iw*$overlayScalePercentage:ih*$overlayScalePercentage" . "[front_rect]";
-			return "$scaleOverlayVideo;$createShapeFilter;$overlayCircleOnVideoFilter;$defineAudioVolumesFilter;$combineAudioFilter;";
+			$scaleOverlayVideo .= "[front_rect]";
+			return "$scaleOverlayVideo;$createShapeFilter;$overlayCircleOnVideoFilter;$audioSection;";
 		}
 	}
 
@@ -1999,6 +2121,7 @@ class kClipManager implements kBatchJobStatusEventConsumer
 		}
 
 		$conversionParams = $this->getJobDataConversionParams($jobData);
+		$conversionParams[self::CLIP_DURATION] = $operationAttribute->getDuration() / 1000.0;
 		$cmdFileNames = " -i __inFileName__ ";
 		$composedVideoStreamName = '[vcomposed]';
 		$audioMapName = "0:a";
@@ -2012,14 +2135,16 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			if($mediaCompositionAttributes instanceof kReplaceBackgroundAttributes)
 			{
 				$filterComplex = $this->getReplacementAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $conversionParams, $composedVideoStreamName);
-				// scaling or cropping is already done in $filterComplex
-				unset($sortedFilters["scale"]);
-				unset($sortedFilters["crop"]);
 			}
 			else if($mediaCompositionAttributes instanceof kOverlayAttributes)
 			{
-				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $conversionParams, $composedVideoStreamName);
+				// MUST END the stream_loop, for instance: 1. specify duration 2. pair with a finite stream
+				$cmdFileNames = " -stream_loop -1 -i __inFileName__ ";
+				$filterComplex = $this->getOverlayAttributesFilterComplex($mediaCompositionAttributes, $cmdFileNames, $fileNameIndex, $audioMapName, $sortedFilters, $conversionParams, $composedVideoStreamName);
 			}
+			// scaling or cropping is already done in $filterComplex
+			unset($sortedFilters["scale"]);
+			unset($sortedFilters["crop"]);
 		}
 
 		if(!$filterComplex)
@@ -2267,8 +2392,6 @@ class kClipManager implements kBatchJobStatusEventConsumer
 			}
 			$flavorParamsObj->setHeight($height);
 
-			$invertedResource = isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE];
-
 			$croppingMode = false;
 			if(isset($conversionParams[self::CROP_DATA_ARRAY]) && isset($conversionParams[self::CROP_DATA_ARRAY][$index]))
 			{
@@ -2276,30 +2399,32 @@ class kClipManager implements kBatchJobStatusEventConsumer
 				$croppingMode = is_array($cropData) && count($cropData) > 0;
 			}
 
-			if($croppingMode && $allowScaleOrCrop)
-			{
-				// crop
-				$processingMode = $invertedResource ? 8 : 7;
-				$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
-				$flavorParamsObj->setCropData(json_encode($cropData));
-				$flavorParamsObj->setHeight($conversionParams[self::CROP_HEIGHT]);
-				$flavorParamsObj->setWidth($conversionParams[self::CROP_WIDTH]);
-			}
-			else if($invertedResource)
+			$invertedResource = isset($conversionParams[self::INVERTED_SOURCE]) && $conversionParams[self::INVERTED_SOURCE];
+			if($invertedResource)
 			{
 				// for inverted source calculation, the output flavor is inverted
 				// _arProcessingMode = 6, inverts back the output flavor
 				$flavorParamsObj->setAspectRatioProcessingMode(6);
 			}
-			else if(isset($conversionParams[self::TARGET_WIDTH]) && $allowScaleOrCrop)
-			{
-				// scale
-				$flavorParamsObj->setAspectRatioProcessingMode(2);
-			}
 
-			if(isset($conversionParams[self::TARGET_WIDTH]) && $allowScaleOrCrop)
+			if($allowScaleOrCrop)
 			{
-				$flavorParamsObj->setWidth($conversionParams[self::TARGET_WIDTH]);
+				if($croppingMode)
+				{
+					// crop
+					$processingMode = $invertedResource ? 8 : 7;
+					$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
+					$flavorParamsObj->setCropData(json_encode($cropData));
+					$flavorParamsObj->setHeight($conversionParams[self::CROP_HEIGHT]);
+					$flavorParamsObj->setWidth($conversionParams[self::CROP_WIDTH]);
+				}
+				else if(isset($conversionParams[self::TARGET_WIDTH]))
+				{
+					// scale
+					$processingMode = $invertedResource ? 6 : 2;
+					$flavorParamsObj->setAspectRatioProcessingMode($processingMode);
+					$flavorParamsObj->setWidth($conversionParams[self::TARGET_WIDTH]);
+				}
 			}
 
 			if(isset($conversionParams[self::FRAME_RATE]))

@@ -95,6 +95,7 @@ class kKavaBase extends kDruidBase
 	const DIMENSION_EVENT_MULTI_VAR1 = 'eventMultiVar1';
 	const DIMENSION_AGENT_ID = 'agentId';
 	const DIMENSION_GENIE_ID = 'genieId';
+	const DIMENSION_PREVIEW = 'preview';
 
 	// metrics
 	const METRIC_COUNT = 'count';
@@ -916,6 +917,7 @@ class kKavaBase extends kDruidBase
 			self::DIMENSION_EVENT_VAR2 => 1,
 			self::DIMENSION_EVENT_VAR3 => 1,
 			self::DIMENSION_EVENT_MULTI_VAR1 => 1,
+			self::DIMENSION_PREVIEW => 1,
 		)
 	);
 

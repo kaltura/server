@@ -353,6 +353,14 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 	 */
 	public $reachProfileIdIn;
 
+	/**
+	 * filter by preview mode
+	 *
+	 * @var bool
+	 */
+	public $isPreview;
+
+
 	private static $map_between_objects = array
 	(
 		'keywords',
@@ -407,6 +415,7 @@ class KalturaReportInputFilter extends KalturaReportInputBaseFilter
 		'agentIdIn' => 'agent_ids',
 		'genieIdIn' => 'genie_ids',
 		'reachProfileIdIn' => 'reach_profile_ids',
+		'isPreview' => 'is_preview',
 	);
 
 	protected function getMapBetweenObjects()

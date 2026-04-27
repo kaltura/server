@@ -133,8 +133,8 @@ class KalturaReachProfile extends KalturaObject implements IRelatedFilterable
 
 	/**
 	 * @var float
-	 * @readonly
-	 */
+	 * @requiresPermission update
+ 	*/
 	public $usedCredit;
 
 	/**
