@@ -130,11 +130,43 @@ class MediaService extends KalturaEntryService
 	    return $this->getEntry($entryId);
     }
 
-    /**
-     * @param KalturaResource $resource
-     * @param entry $dbEntry
-     * @param int $conversionProfileId
-     */
+	/**
+	 * Ensures the conversion profile is a VOD profile, not a LIVE profile.
+	 * If a LIVE profile is provided, it's replaced with the default VOD conversion profile.
+	 *
+	 * @param int $conversionProfileId The conversion profile ID to validate
+	 * @return int The validated/corrected conversion profile ID
+	 * @throws Exception
+	 */
+	protected function ensureVodConversionProfile($conversionProfileId)
+	{
+		if ( !$conversionProfileId )
+		{
+			return null;
+		}
+
+		$conversionProfile = conversionProfile2Peer::retrieveByPK($conversionProfileId);
+
+		// Check if profile exists and is NOT a MEDIA (VOD) type
+		if ( !is_null($conversionProfile) && $conversionProfile->getType() != ConversionProfileType::MEDIA )
+		{
+			KalturaLog::warning("Conversion profile ID [$conversionProfileId] is a LIVE profile. Replacing with default VOD profile.");
+			$defaultConversionProfile = myPartnerUtils::getConversionProfile2ForPartner( $this->getPartnerId() );
+			if ( !is_null($defaultConversionProfile) )
+			{
+				return $defaultConversionProfile->getId();
+			}
+			KalturaLog::warning("No default VOD conversion profile found for partner [" . $this->getPartnerId() . "]. Using original profile.");
+		}
+		return $conversionProfileId;
+	}
+
+
+	/**
+	 * @param KalturaResource $resource
+	 * @param entry $dbEntry
+	 * @param int $conversionProfileId
+	 */
     protected function replaceResource(KalturaResource $resource, entry $dbEntry, $conversionProfileId = null, $advancedOptions = null)
     {
 	    if($advancedOptions)
@@ -164,19 +196,14 @@ class MediaService extends KalturaEntryService
 			$tempMediaEntry->sourceType = $dbEntry->getSourceType();
 			$tempMediaEntry->streams = $dbEntry->getStreams();
 
-			if ( !$conversionProfileId ) {
-				$originalConversionProfileId = $dbEntry->getConversionQuality();
-				$conversionProfile = conversionProfile2Peer::retrieveByPK($originalConversionProfileId);
-				if ( is_null($conversionProfile) || $conversionProfile->getType() != ConversionProfileType::MEDIA )
-				{
-					$defaultConversionProfile = myPartnerUtils::getConversionProfile2ForPartner( $this->getPartnerId() );
-					if ( !is_null($defaultConversionProfile) ) {
-						$conversionProfileId = $defaultConversionProfile->getId();
-					}
-				} else {
-					$conversionProfileId = $originalConversionProfileId;
-				}
-			}
+        if ( !$conversionProfileId )
+        {
+            $conversionProfileId = $dbEntry->getConversionQuality();
+        }
+
+        // Validate and sanitize conversion profile (replace LIVE with default VOD if needed)
+        $conversionProfileId = $this->ensureVodConversionProfile($conversionProfileId);
+
 			if($conversionProfileId)
 				$tempMediaEntry->conversionProfileId = $conversionProfileId;
 			
